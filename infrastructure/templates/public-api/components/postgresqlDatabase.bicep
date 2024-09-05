@@ -1,11 +1,8 @@
-@description('Specifies the Resource Prefix')
-param resourcePrefix string
-
 @description('Specifies the location for all resources.')
 param location string
 
 @description('Server Name for Azure Database for PostgreSQL')
-param serverName string = ''
+param databaseServerName string = ''
 
 @description('Database administrator login name')
 @minLength(0)
@@ -76,10 +73,6 @@ param createMode string = 'Default'
 
 @description('The id of the subnet which will be used to install the private endpoint for allowing secure connection to the database server over the VNet')
 param subnetId string
-
-var databaseServerName = empty(serverName)
-  ? '${resourcePrefix}-psql-flexibleserver'
-  : '${resourcePrefix}-psql-flexibleserver-${serverName}'
 
 resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
   name: databaseServerName

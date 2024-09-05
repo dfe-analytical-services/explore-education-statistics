@@ -85,28 +85,57 @@ param dataProcessorAppRegistrationClientId string = ''
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the API Container App.')
 param apiAppRegistrationClientId string = ''
 
-var resourcePrefix = '${subscription}-ees-papi'
-var apiContainerAppName = 'api'
-var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
-var adminAppServiceFullName = '${subscription}-as-ees-admin'
-var publisherFunctionAppFullName = '${subscription}-fa-ees-publisher'
-var dataProcessorFunctionAppName = 'processor'
-var dataProcessorFunctionAppManagedIdentityName = '${resourcePrefix}-id-fa-${dataProcessorFunctionAppName}'
-var psqlServerName = 'psql-flexibleserver'
-var psqlServerFullName = '${subscription}-ees-${psqlServerName}'
-var coreStorageAccountName = '${subscription}saeescore'
-var keyVaultName = '${subscription}-kv-ees-01'
-var acrName = 'eesacr'
-var vNetName = '${subscription}-vnet-ees'
-var containerAppEnvironmentNameSuffix = '01'
-var dataFilesFileShareMountName = 'public-api-fileshare-mount'
-var dataFilesFileShareMountPath = '/data/public-api-data'
-var publicApiStorageAccountName = '${subscription}eespapisa'
-
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
   DateProvisioned: dateProvisioned
 })
+
+//
+// Define our resource prefix.
+//
+
+// The resource prefix for anything specific to the Public API. 
+var publicApiResourcePrefix = '${subscription}-ees-papi'
+
+// The resource prefix for anything not specific solely to the Public API but set up within Bicep. 
+var commonResourcePrefix = '${subscription}-ees'
+
+// The resource prefix for resources created in the ARM template.
+var legacyResourcePrefix = subscription
+
+
+//
+// Define the full names of all resources.
+//
+
+// Define full names for the pre-existing resources managed by the ARM template.
+var adminAppName = '${legacyResourcePrefix}-as-ees-admin'
+var publisherAppFullName = '${legacyResourcePrefix}-fa-ees-publisher'
+var coreStorageAccountName = '${legacyResourcePrefix}saeescore'
+var keyVaultName = '${legacyResourcePrefix}-kv-ees-01'
+var vNetName = '${legacyResourcePrefix}-vnet-ees'
+var alertsGroupFullName = '${legacyResourcePrefix}-ag-ees-alertedusers'
+var acrName = 'eesacr'
+
+// Define full names for new resources managed by the Bicep deployment.
+var dataProcessorAppName = '${publicApiResourcePrefix}-fa-processor'
+var dataProcessorAppServicePlanName = '${publicApiResourcePrefix}-asp-processor'
+var dataProcessorStorageAccountsPrefix = '${subscription}eessaprocessor'
+var psqlServerName = '${subscription}-ees-psql-flexibleserver'
+var containerAppEnvironmentName = '${commonResourcePrefix}-cae-01'
+var apiAppName = '${publicApiResourcePrefix}-ca-api'
+var appGatewayName = '${commonResourcePrefix}-agw-01'
+var fileShareName = '${publicApiResourcePrefix}-fs-data'
+var appInsightsName = '${publicApiResourcePrefix}-ai'
+var logAnalyticsWorkspaceName = '${commonResourcePrefix}-log'
+var publicApiStorageAccountName = '${subscription}eespapisa'
+var dataFilesFileShareMountName = 'public-api-fileshare-mount'
+var dataFilesFileShareMountPath = '/data/public-api-data'
+
+// Define full names for managed identities used by Bicep-managed resources.
+var apiAppIdentityName = '${publicApiResourcePrefix}-id-ca-api'
+var dataProcessorIdentityName = '${publicApiResourcePrefix}-id-fa-processor'
+var appGatewayIdentityName = '${commonResourcePrefix}-id-agw-01'
 
 // Reference the existing Azure Container Registry resource as currently managed by the EES ARM template.
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
@@ -127,10 +156,15 @@ module vNetModule 'application/virtualNetwork.bicep' = {
   name: 'networkDeploy'
   params: {
     vNetName: vNetName
-    resourcePrefix: resourcePrefix
-    subscription: subscription
-    dataProcessorFunctionAppNameSuffix: dataProcessorFunctionAppName
-    containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
+    publicApiResourcePrefix: publicApiResourcePrefix
+    commonResourcePrefix: commonResourcePrefix
+    legacyResourcePrefix: legacyResourcePrefix
+    containerAppEnvironmentName: containerAppEnvironmentName
+    dataProcessorName: dataProcessorAppName
+    adminAppServiceName: adminAppName
+    psqlFlexibleServerName: psqlServerName
+    publisherFunctionAppName: publisherAppFullName
+    appGatewayName: appGatewayName
   }
 }
 
@@ -176,8 +210,7 @@ var publicApiStorageAccountAccessKey = publicApiStorageAccount.listKeys().keys[0
 module dataFilesFileShareModule 'components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
-    resourcePrefix: resourcePrefix
-    fileShareName: 'data'
+    fileShareName: fileShareName
     fileShareQuota: fileShareQuota
     storageAccountName: publicApiStorageAccountName
     fileShareAccessTier: 'TransactionOptimized'
@@ -191,9 +224,8 @@ module dataFilesFileShareModule 'components/fileShare.bicep' = {
 module applicationInsightsModule 'components/appInsights.bicep' = {
   name: 'appInsightsDeploy'
   params: {
-    resourcePrefix: resourcePrefix
     location: location
-    appInsightsName: ''
+    appInsightsName: appInsightsName
   }
 }
 
@@ -201,7 +233,7 @@ module applicationInsightsModule 'components/appInsights.bicep' = {
 module logAnalyticsWorkspaceModule 'components/logAnalyticsWorkspace.bicep' = {
   name: 'logAnalyticsWorkspaceDeploy'
   params: {
-    subscription: subscription
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     location: location
     tagValues: tagValues
   }
@@ -216,7 +248,7 @@ var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
 module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (updatePsqlFlexibleServer) {
   name: 'postgreSQLDatabaseDeploy'
   params: {
-    resourcePrefix: '${subscription}-ees'
+    databaseServerName: psqlServerName
     location: location
     createMode: 'Default'
     adminName: postgreSqlAdminName
@@ -235,15 +267,15 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
   ]
 }
 
-var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name]'
+var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name]'
 
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: apiContainerAppManagedIdentityName
+  name: apiAppIdentityName
   location: location
 }
 
 module apiContainerAppAcrPullRoleAssignmentModule 'components/containerRegistryRoleAssignment.bicep' = {
-  name: '${apiContainerAppManagedIdentityName}AcrPullRoleAssignmentDeploy'
+  name: '${apiAppIdentityName}AcrPullRoleAssignmentDeploy'
   params: {
     role: 'AcrPull'
     containerRegistryName: acrName
@@ -255,9 +287,8 @@ module apiContainerAppAcrPullRoleAssignmentModule 'components/containerRegistryR
 module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' = {
   name: 'containerAppEnvironmentDeploy'
   params: {
-    subscription: subscription
     location: location
-    containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
+    containerAppEnvironmentName: containerAppEnvironmentName
     subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
@@ -278,9 +309,8 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
 module apiContainerAppModule 'components/containerApp.bicep' = if (deployContainerApp) {
   name: 'apiContainerAppDeploy'
   params: {
-    resourcePrefix: resourcePrefix
     location: location
-    containerAppName: apiContainerAppName
+    containerAppName: apiAppName
     acrLoginServer: containerRegistry.properties.loginServer
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
     userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
@@ -309,7 +339,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
       // TODO EES-5128 - replace this with a Key Vault reference string.
       {
         name: 'ConnectionStrings__PublicDataDb'
-        value: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiContainerAppManagedIdentityName)
+        value: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiAppIdentityName)
       }
       {
         // This settings allows the Container App to identify which user-assigned identity it should use in order to
@@ -360,7 +390,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
 }
 
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
-  name: adminAppServiceFullName
+  name: adminAppName
 }
 
 resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-31' existing = {
@@ -372,7 +402,7 @@ var adminAppClientId = adminAppServiceIdentity.properties.clientId
 var adminAppPrincipalId = adminAppService.identity.principalId
 
 resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: dataProcessorFunctionAppManagedIdentityName
+  name: dataProcessorIdentityName
   location: location
 }
 
@@ -380,9 +410,10 @@ resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/user
 module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
-    subscription: subscription
-    resourcePrefix: resourcePrefix
-    functionAppName: dataProcessorFunctionAppName
+    functionAppName: dataProcessorAppName
+    appServicePlanName: dataProcessorAppServicePlanName
+    storageAccountsNamePrefix: dataProcessorStorageAccountsPrefix
+    alertsGroupName: alertsGroupFullName
     location: location
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
@@ -439,8 +470,8 @@ module appGatewayModule 'components/appGateway.bicep' = {
   name: 'appGatewayDeploy'
   params: {
     location: location
-    resourcePrefix: subscription
-    instanceName: '01'
+    appGatewayName: appGatewayName
+    managedIdentityName: appGatewayIdentityName
     keyVaultName: keyVaultName
     subnetId: vNetModule.outputs.appGatewaySubnetRef
     sites: [
@@ -477,7 +508,7 @@ module storePublisherPsqlConnectionString 'components/keyVaultSecret.bicep' = {
     keyVaultName: keyVaultName
     isEnabled: true
     secretName: publisherPsqlConnectionStringSecretKey
-    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', publisherFunctionAppFullName)
+    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', publisherAppFullName)
     contentType: 'text/plain'
   }
 }
@@ -490,7 +521,7 @@ module storeAdminPsqlConnectionString 'components/keyVaultSecret.bicep' = {
     keyVaultName: keyVaultName
     isEnabled: true
     secretName: adminPsqlConnectionStringSecretKey
-    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', adminAppServiceFullName)
+    secretValue: replace(replace(psqlManagedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', adminAppName)
     contentType: 'text/plain'
   }
 }

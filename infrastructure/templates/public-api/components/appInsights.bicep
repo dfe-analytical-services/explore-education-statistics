@@ -1,6 +1,3 @@
-@description('Specifies the Resource Prefix')
-param resourcePrefix string
-
 @description('Specifies the location for all resources.')
 param location string
 
@@ -8,12 +5,9 @@ param location string
 param appInsightsName string
 
 var kind = 'web'
-var insightsName = empty(appInsightsName)
-  ? '${resourcePrefix}-ai'
-  : '${resourcePrefix}-ai-${appInsightsName}'
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: insightsName
+  name: appInsightsName
   location: location
   kind: kind
   properties: {

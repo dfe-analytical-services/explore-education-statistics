@@ -1,6 +1,3 @@
-@description('Specifies the Resource Prefix')
-param resourcePrefix string
-
 @description('Specifies the location for all resources.')
 param location string
 
@@ -100,10 +97,9 @@ param entraIdAuthentication {
 }?
 
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
-var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 
 resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
-  name: containerApplicationName
+  name: containerAppName
   location: location
   identity: {
     type: 'UserAssigned'
@@ -173,7 +169,7 @@ module azureAuthentication 'containerAppAzureAuthentication.bicep' = if (entraId
   name: '${containerAppName}AzureAuthentication'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
-    containerAppName: containerApplicationName
+    containerAppName: containerAppName
     allowedClientIds: entraIdAuthentication!.allowedClientIds
     allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
   }
