@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -64,6 +65,7 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
         {
             var entities = await dataTableStorageService.QueryEntities<TableEntity>(
                 tableName: table.Name,
+                filter: (Expression<Func<TableEntity, bool>>) null, // @MarkFix not ideal way to tell compiler which overload to call
                 select: new List<string>() { nameof(TableEntity.PartitionKey), nameof(TableEntity.RowKey) });
 
             await entities.AsPages().ForEachAwaitAsync(async page => {

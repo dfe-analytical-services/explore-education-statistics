@@ -43,26 +43,26 @@ public class ReleaseNotifierTests
         // generate Azure Storage Table and return results
         var cloudTable = MockCloudTable();
 
-        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
+        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntityOld>
         {
             new(Guid.NewGuid().ToString(), "test@test.com", "Publication 1", "publication-1", null)
         });
         cloudTable.Setup(mock =>
                 mock.ExecuteQuerySegmentedAsync(
-                    It.Is<TableQuery<SubscriptionEntity>>(
+                    It.Is<TableQuery<SubscriptionEntityOld>>(
                         tq =>
                             tq.FilterString == $"PartitionKey eq '{publication1Id}'"),
                     It.IsAny<TableContinuationToken>()))
             .ReturnsAsync(tableQuerySegmentPubSubs);
 
         var supersededPubId = Guid.NewGuid();
-        var tableQuerySegmentSupersededPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
+        var tableQuerySegmentSupersededPubSubs = CreateTableQuerySegment(new List<SubscriptionEntityOld>
         {
             new(supersededPubId.ToString(), "superseded@test.com", "Superseded publication",
                 "superseded-publication", null)
         });
         cloudTable.Setup(mock =>
-            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntity>>(tq =>
+            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntityOld>>(tq =>
                     tq.FilterString == $"PartitionKey eq '{supersededPubId}'"),
                 It.IsAny<TableContinuationToken>()))
             .ReturnsAsync(tableQuerySegmentSupersededPubSubs);
@@ -143,7 +143,7 @@ public class ReleaseNotifierTests
         // generate Azure Storage Table and return results
         var cloudTable = MockCloudTable();
 
-        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
+        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntityOld>
         {
             new(Guid.NewGuid().ToString(), "test1@test.com", "Publication 1", "publication-1", null),
             new(Guid.NewGuid().ToString(), "test2@test.com", "Publication 1", "publication-1", null),
@@ -151,7 +151,7 @@ public class ReleaseNotifierTests
         });
         cloudTable.Setup(mock =>
                 mock.ExecuteQuerySegmentedAsync(
-                    It.Is<TableQuery<SubscriptionEntity>>(
+                    It.Is<TableQuery<SubscriptionEntityOld>>(
                         tq =>
                             tq.FilterString == $"PartitionKey eq '{publication1Id}'"),
                     It.IsAny<TableContinuationToken>()))
@@ -237,17 +237,17 @@ public class ReleaseNotifierTests
         // generate Azure Storage Table and return results
         var cloudTable = MockCloudTable();
 
-        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>());
+        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntityOld>());
         cloudTable.Setup(mock =>
                 mock.ExecuteQuerySegmentedAsync(
-                    It.Is<TableQuery<SubscriptionEntity>>(
+                    It.Is<TableQuery<SubscriptionEntityOld>>(
                         tq =>
                             tq.FilterString == $"PartitionKey eq '{publication1Id}'"),
                     It.IsAny<TableContinuationToken>()))
             .ReturnsAsync(tableQuerySegmentPubSubs);
 
         var supersededPubId = Guid.NewGuid();
-        var tableQuerySegmentSupersededPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
+        var tableQuerySegmentSupersededPubSubs = CreateTableQuerySegment(new List<SubscriptionEntityOld>
         {
             new(supersededPubId.ToString(), "superseded1@test.com", "Superseded publication",
                 "superseded-publication", null),
@@ -257,7 +257,7 @@ public class ReleaseNotifierTests
                 "superseded-publication", null),
         });
         cloudTable.Setup(mock =>
-            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntity>>(tq =>
+            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntityOld>>(tq =>
                     tq.FilterString == $"PartitionKey eq '{supersededPubId}'"),
                 It.IsAny<TableContinuationToken>()))
             .ReturnsAsync(tableQuerySegmentSupersededPubSubs);
@@ -352,35 +352,35 @@ public class ReleaseNotifierTests
         // generate Azure Storage Table and return results
         var cloudTable = MockCloudTable();
 
-        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>());
+        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntityOld>());
         cloudTable.Setup(mock =>
                 mock.ExecuteQuerySegmentedAsync(
-                    It.Is<TableQuery<SubscriptionEntity>>(
+                    It.Is<TableQuery<SubscriptionEntityOld>>(
                         tq =>
                             tq.FilterString == $"PartitionKey eq '{publication1Id}'"),
                     It.IsAny<TableContinuationToken>()))
             .ReturnsAsync(tableQuerySegmentPubSubs);
 
         var supersededPub1Id = Guid.NewGuid();
-        var tableQuerySegmentSupersededPub1Subs = CreateTableQuerySegment(new List<SubscriptionEntity>
+        var tableQuerySegmentSupersededPub1Subs = CreateTableQuerySegment(new List<SubscriptionEntityOld>
         {
             new(supersededPub1Id.ToString(), "superseded1@test.com", "Superseded 1 publication",
                 "superseded-1-publication", null),
         });
         cloudTable.Setup(mock =>
-            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntity>>(tq =>
+            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntityOld>>(tq =>
                     tq.FilterString == $"PartitionKey eq '{supersededPub1Id}'"),
                 It.IsAny<TableContinuationToken>()))
             .ReturnsAsync(tableQuerySegmentSupersededPub1Subs);
 
         var supersededPub2Id = Guid.NewGuid();
-        var tableQuerySegmentSupersededPub2Subs = CreateTableQuerySegment(new List<SubscriptionEntity>
+        var tableQuerySegmentSupersededPub2Subs = CreateTableQuerySegment(new List<SubscriptionEntityOld>
         {
             new(supersededPub1Id.ToString(), "superseded2@test.com", "Superseded21 publication",
                 "superseded-2-publication", null),
         });
         cloudTable.Setup(mock =>
-            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntity>>(tq =>
+            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntityOld>>(tq =>
                     tq.FilterString == $"PartitionKey eq '{supersededPub2Id}'"),
                 It.IsAny<TableContinuationToken>()))
             .ReturnsAsync(tableQuerySegmentSupersededPub2Subs);
@@ -466,26 +466,26 @@ public class ReleaseNotifierTests
         // generate Azure Storage Table and return results
         var cloudTable = MockCloudTable();
 
-        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
+        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntityOld>
         {
             new(Guid.NewGuid().ToString(), "test@test.com", "Publication 1", "publication-1", null)
         });
         cloudTable.Setup(mock =>
                 mock.ExecuteQuerySegmentedAsync(
-                    It.Is<TableQuery<SubscriptionEntity>>(
+                    It.Is<TableQuery<SubscriptionEntityOld>>(
                         tq =>
                             tq.FilterString == $"PartitionKey eq '{publication1Id}'"),
                     It.IsAny<TableContinuationToken>()))
             .ReturnsAsync(tableQuerySegmentPubSubs);
 
         var supersededPubId = Guid.NewGuid();
-        var tableQuerySegmentSupersededPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
+        var tableQuerySegmentSupersededPubSubs = CreateTableQuerySegment(new List<SubscriptionEntityOld>
         {
             new(supersededPubId.ToString(), "superseded@test.com", "Superseded publication",
                 "superseded-publication", null)
         });
         cloudTable.Setup(mock =>
-            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntity>>(tq =>
+            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntityOld>>(tq =>
                     tq.FilterString == $"PartitionKey eq '{supersededPubId}'"),
                 It.IsAny<TableContinuationToken>()))
             .ReturnsAsync(tableQuerySegmentSupersededPubSubs);

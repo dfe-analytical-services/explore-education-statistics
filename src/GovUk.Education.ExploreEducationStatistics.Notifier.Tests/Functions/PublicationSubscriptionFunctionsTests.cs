@@ -95,7 +95,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     {
         // Arrange (data)
         await AddTestSubscription(NotifierTableStorage.PublicationPendingSubscriptionsTable,
-            new SubscriptionEntity("test-id-2",
+            new SubscriptionEntityOld("test-id-2",
                 "test2@test.com",
                 "Test Publication Title 2",
                 "test-publication-slug-2",
@@ -161,7 +161,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     {
         // Arrange (data)
         await AddTestSubscription(NotifierTableStorage.PublicationSubscriptionsTable,
-            new SubscriptionEntity("test-id-3",
+            new SubscriptionEntityOld("test-id-3",
                 "test3@test.com",
                 "Test Publication Title 3",
                 "test-publication-slug-3",
@@ -408,7 +408,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     {
         // Arrange (data)
         await AddTestSubscription(NotifierTableStorage.PublicationPendingSubscriptionsTable,
-            new SubscriptionEntity("test-id-4",
+            new SubscriptionEntityOld("test-id-4",
                 "test4@test.com",
                 "Test Publication Title 4",
                 "test-publication-slug-4",
@@ -469,7 +469,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     {
         // Arrange (data)
         await AddTestSubscription(NotifierTableStorage.PublicationSubscriptionsTable,
-            new SubscriptionEntity("test-id-5",
+            new SubscriptionEntityOld("test-id-5",
                 "test5@test.com",
                 "Test Publication Title 5",
                 "test-publication-slug-5",
@@ -531,7 +531,8 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     private PublicationSubscriptionFunctions BuildFunction(
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
-        IPublicationSubscriptionRepository? publicationSubscriptionRepository = null) =>
+        IPublicationSubscriptionRepository? publicationSubscriptionRepository = null,
+        IApiSubscriptionTableStorageService? apiSubscriptionTableStorageService = null) =>
         new(
             Mock.Of<ILogger<PublicationSubscriptionFunctions>>(),
             Options.Create(new AppSettingsOptions { PublicAppUrl = "https://localhost:3000" }),
@@ -543,5 +544,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             publicationSubscriptionRepository ?? Mock.Of<IPublicationSubscriptionRepository>(MockBehavior.Strict),
-            new PendingPublicationSubscriptionCreateRequest.Validator());
+            new PendingPublicationSubscriptionCreateRequest.Validator(),
+            apiSubscriptionTableStorageService: apiSubscriptionTableStorageService
+                                                ?? Mock.Of<IApiSubscriptionTableStorageService>(MockBehavior.Strict));
 }
