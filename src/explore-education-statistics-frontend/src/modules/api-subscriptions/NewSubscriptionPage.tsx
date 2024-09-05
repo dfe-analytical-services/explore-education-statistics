@@ -39,7 +39,8 @@ interface Props {
 }
 
 const NewSubscriptionPage: NextPage<Props> = ({ dataSetFile }) => {
-  const { id: dataSetId, title } = dataSetFile;
+  const { id: dataSetFileId, title } = dataSetFile;
+  const dataSetId = dataSetFile.api!.id;
 
   const handleFormSubmit = async ({ email }: FormValues) => {
     await apiNotificationService.requestPendingSubscription({
@@ -51,14 +52,14 @@ const NewSubscriptionPage: NextPage<Props> = ({ dataSetFile }) => {
 
   return (
     <Page
-      title={dataSetFile.title}
+      title={title}
       caption="Notify me"
       breadcrumbLabel="Notify me"
       breadcrumbs={[
         { name: 'Data catalogue', link: '/data-catalogue' },
         {
           name: title,
-          link: `/data-catalogue/data-set/${dataSetId}`,
+          link: `/data-catalogue/data-set/${dataSetFileId}`,
         },
       ]}
     >
@@ -70,7 +71,7 @@ const NewSubscriptionPage: NextPage<Props> = ({ dataSetFile }) => {
         enableReinitialize
         errorMappings={errorMappings}
         initialValues={{
-          dataSetId: dataSetFile.id,
+          dataSetId,
           email: '',
         }}
         validationSchema={Yup.object({
@@ -120,12 +121,12 @@ const NewSubscriptionPage: NextPage<Props> = ({ dataSetFile }) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async ({ query }) => {
-    const { dataSetId } = query as Dictionary<string>;
+    const { dataSetFileId } = query as Dictionary<string>;
 
     const queryClient = new QueryClient();
 
     const dataSetFile = await queryClient.fetchQuery(
-      dataSetFileQueries.get(dataSetId),
+      dataSetFileQueries.get(dataSetFileId),
     );
 
     return {

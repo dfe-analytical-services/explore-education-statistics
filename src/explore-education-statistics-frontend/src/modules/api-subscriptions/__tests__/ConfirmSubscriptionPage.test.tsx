@@ -1,14 +1,14 @@
 import render from '@common-test/render';
 import createAxiosErrorMock from '@common-test/createAxiosErrorMock';
-import _dataSetFileService from '@frontend/services/dataSetFileService';
+import _apiDataSetService from '@frontend/services/apiDataSetService';
 import _apiNotificationService from '@frontend/services/apiNotificationService';
-import { testDataSetWithApi } from '@frontend/modules/data-catalogue/__data__/testDataSets';
+import { testApiDataSet } from '@frontend/modules/data-catalogue/__data__/testDataSets';
 import ConfirmSubscriptionPage from '@frontend/modules/api-subscriptions/ConfirmSubscriptionPage';
 import { screen, waitFor } from '@testing-library/react';
 
-jest.mock('@frontend/services/dataSetFileService');
-const dataSetFileService = _dataSetFileService as jest.Mocked<
-  typeof _dataSetFileService
+jest.mock('@frontend/services/apiDataSetService');
+const apiDataSetService = _apiDataSetService as jest.Mocked<
+  typeof _apiDataSetService
 >;
 
 jest.mock('@frontend/services/apiNotificationService');
@@ -18,19 +18,16 @@ const apiNotificationService = _apiNotificationService as jest.Mocked<
 
 describe('ConfirmSubscriptionPage', () => {
   beforeEach(() => {
-    dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
+    apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
   });
 
   test('renders correctly', () => {
     render(
-      <ConfirmSubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmSubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     expect(
-      screen.getByRole('heading', { name: 'Data set 1' }),
+      screen.getByRole('heading', { name: 'Test title' }),
     ).toBeInTheDocument();
 
     expect(
@@ -43,10 +40,7 @@ describe('ConfirmSubscriptionPage', () => {
 
   test('successful confirmation', async () => {
     const { user } = render(
-      <ConfirmSubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmSubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
@@ -54,7 +48,7 @@ describe('ConfirmSubscriptionPage', () => {
     await waitFor(() => {
       expect(
         apiNotificationService.confirmPendingSubscription,
-      ).toHaveBeenCalledWith('data-set-file-id', 'test-token');
+      ).toHaveBeenCalledWith('api-data-set-id', 'test-token');
     });
 
     expect(
@@ -73,10 +67,7 @@ describe('ConfirmSubscriptionPage', () => {
     });
     apiNotificationService.confirmPendingSubscription.mockRejectedValue(error);
     const { user } = render(
-      <ConfirmSubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmSubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
@@ -84,7 +75,7 @@ describe('ConfirmSubscriptionPage', () => {
     await waitFor(() => {
       expect(
         apiNotificationService.confirmPendingSubscription,
-      ).toHaveBeenCalledWith('data-set-file-id', 'test-token');
+      ).toHaveBeenCalledWith('api-data-set-id', 'test-token');
     });
 
     expect(
@@ -112,10 +103,7 @@ describe('ConfirmSubscriptionPage', () => {
     });
     apiNotificationService.confirmPendingSubscription.mockRejectedValue(error);
     const { user } = render(
-      <ConfirmSubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmSubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
@@ -123,7 +111,7 @@ describe('ConfirmSubscriptionPage', () => {
     await waitFor(() => {
       expect(
         apiNotificationService.confirmPendingSubscription,
-      ).toHaveBeenCalledWith('data-set-file-id', 'test-token');
+      ).toHaveBeenCalledWith('api-data-set-id', 'test-token');
     });
 
     expect(
@@ -151,10 +139,7 @@ describe('ConfirmSubscriptionPage', () => {
     });
     apiNotificationService.confirmPendingSubscription.mockRejectedValue(error);
     const { user } = render(
-      <ConfirmSubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmSubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
@@ -162,7 +147,7 @@ describe('ConfirmSubscriptionPage', () => {
     await waitFor(() => {
       expect(
         apiNotificationService.confirmPendingSubscription,
-      ).toHaveBeenCalledWith('data-set-file-id', 'test-token');
+      ).toHaveBeenCalledWith('api-data-set-id', 'test-token');
     });
 
     expect(
@@ -189,10 +174,7 @@ describe('ConfirmSubscriptionPage', () => {
     });
     apiNotificationService.confirmPendingSubscription.mockRejectedValue(error);
     const { user } = render(
-      <ConfirmSubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmSubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
@@ -200,7 +182,7 @@ describe('ConfirmSubscriptionPage', () => {
     await waitFor(() => {
       expect(
         apiNotificationService.confirmPendingSubscription,
-      ).toHaveBeenCalledWith('data-set-file-id', 'test-token');
+      ).toHaveBeenCalledWith('api-data-set-id', 'test-token');
     });
 
     expect(
@@ -226,10 +208,7 @@ describe('ConfirmSubscriptionPage', () => {
     });
     apiNotificationService.confirmPendingSubscription.mockRejectedValue(error);
     const { user } = render(
-      <ConfirmSubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmSubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
@@ -237,7 +216,7 @@ describe('ConfirmSubscriptionPage', () => {
     await waitFor(() => {
       expect(
         apiNotificationService.confirmPendingSubscription,
-      ).toHaveBeenCalledWith('data-set-file-id', 'test-token');
+      ).toHaveBeenCalledWith('api-data-set-id', 'test-token');
     });
 
     expect(

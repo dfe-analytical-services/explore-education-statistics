@@ -296,5 +296,8 @@ export const testApiDataSet: ApiDataSet = {
     geographicLevels: [],
     filters: [],
     indicators: [],
+    file: {
+      id: 'data-set-file-id',
+    },
   },
 };

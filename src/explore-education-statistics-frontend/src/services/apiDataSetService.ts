@@ -21,6 +21,9 @@ export interface ApiDataSet {
     geographicLevels: string[];
     filters: string[];
     indicators: string[];
+    file: {
+      id: string;
+    };
   };
 }
 

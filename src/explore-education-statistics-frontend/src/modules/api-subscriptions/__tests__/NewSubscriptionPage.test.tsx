@@ -73,7 +73,7 @@ describe('NewSubscriptionPage', () => {
       apiNotificationService.requestPendingSubscription,
     ).toHaveBeenLastCalledWith({
       email: 'user@test.com',
-      dataSetId: 'data-set-file-id',
+      dataSetId: 'api-data-set-id',
       dataSetTitle: 'Data set 1',
     });
 

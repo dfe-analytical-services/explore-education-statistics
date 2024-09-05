@@ -61,6 +61,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                 content.LatestVersion.Published
             );
             Assert.Equal(dataSetVersion.TotalResults, content.LatestVersion.TotalResults);
+            Assert.Equal(dataSetVersion.Release.DataSetFileId, content.LatestVersion.File.Id);
             Assert.Equal(
                 TimePeriodFormatter.FormatLabel(
                     dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,

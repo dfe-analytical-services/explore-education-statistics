@@ -115,6 +115,11 @@ public record DataSetLatestVersionViewModel
     public required long TotalResults { get; init; }
 
     /// <summary>
+    /// The file that this data set version is based on.
+    /// </summary>
+    public required DataSetVersionFileViewModel File { get; init; }
+
+    /// <summary>
     /// The time period range covered by the data set.
     /// </summary>
     public required TimePeriodRangeViewModel TimePeriods { get; init; }

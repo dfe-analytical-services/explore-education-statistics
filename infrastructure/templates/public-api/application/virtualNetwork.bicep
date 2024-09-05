@@ -32,6 +32,11 @@ resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-
   parent: vNet
 }
 
+resource dataProcessorPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppNameSuffix}-pep'
+  parent: vNet
+}
+
 resource containerAppEnvironmentSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
   name: '${subscription}-ees-snet-cae-${containerAppEnvironmentNameSuffix}'
   parent: vNet
@@ -42,8 +47,13 @@ resource psqlFlexibleServerSubnet 'Microsoft.Network/virtualNetworks/subnets@202
   parent: vNet
 }
 
+resource appGatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: '${subscription}-ees-snet-agw-01'
+  parent: vNet
+}
+
 @description('The fully qualified Azure resource ID of the Network.')
-output vNetRef string = resourceId('Microsoft.Network/VirtualNetworks', vNetName)
+output vnetId string = resourceId('Microsoft.Network/VirtualNetworks', vNetName)
 
 @description('The fully qualified Azure resource ID of the Data Processor Function App Subnet.')
 output dataProcessorSubnetRef string = dataProcessorSubnet.id
@@ -53,6 +63,15 @@ output dataProcessorSubnetStartIpAddress string = parseCidr(dataProcessorSubnet.
 
 @description('The last usable IP address for the Data Processor Function App Subnet.')
 output dataProcessorSubnetEndIpAddress string = parseCidr(dataProcessorSubnet.properties.addressPrefix).lastUsable
+
+@description('The fully qualified Azure resource ID of the Data Processor Function App Private Endpoint Subnet.')
+output dataProcessorPrivateEndpointSubnetRef string = dataProcessorPrivateEndpointSubnet.id
+
+@description('The first usable IP address for the Data Processor Function App Private Endpoint Subnet.')
+output dataProcessorPrivateEndpointSubnetStartIpAddress string = parseCidr(dataProcessorPrivateEndpointSubnet.properties.addressPrefix).firstUsable
+
+@description('The last usable IP address for the Data Processor Function App Private Endpoint Subnet.')
+output dataProcessorPrivateEndpointSubnetEndIpAddress string = parseCidr(dataProcessorPrivateEndpointSubnet.properties.addressPrefix).lastUsable
 
 @description('The fully qualified Azure resource ID of the API Container App Subnet.')
 output containerAppEnvironmentSubnetRef string = containerAppEnvironmentSubnet.id
@@ -83,3 +102,6 @@ output psqlFlexibleServerSubnetStartIpAddress string = parseCidr(psqlFlexibleSer
 
 @description('The last usable IP address for the PSQL Flexible Server Subnet.')
 output psqlFlexibleServerSubnetEndIpAddress string = parseCidr(psqlFlexibleServerSubnet.properties.addressPrefix).lastUsable
+
+@description('The fully qualified Azure resource ID of the App Gateway Subnet.')
+output appGatewaySubnetRef string = appGatewaySubnet.id

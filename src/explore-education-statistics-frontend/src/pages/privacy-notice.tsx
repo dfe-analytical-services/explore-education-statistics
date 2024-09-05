@@ -189,7 +189,7 @@ function PrivacyNoticePage() {
             <p>
               We may need to update this privacy notice periodically so we
               recommend you revisit from time to time. This version was last
-              updated on DD/MM/YY.
+              updated on 14/04/2020.
             </p>
           </section>
           <section className="govuk-section-break--xl">
