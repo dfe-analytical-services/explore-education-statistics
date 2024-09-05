@@ -109,21 +109,11 @@ var legacyResourcePrefix = subscription
 //
 var adminAppName = '${legacyResourcePrefix}-as-ees-admin'
 var publisherAppFullName = '${legacyResourcePrefix}-fa-ees-publisher'
-var coreStorageAccountName = '${legacyResourcePrefix}saeescore'
 var keyVaultName = '${legacyResourcePrefix}-kv-ees-01'
 var vNetName = '${legacyResourcePrefix}-vnet-ees'
 var alertsGroupName = '${legacyResourcePrefix}-ag-ees-alertedusers'
 var acrName = 'eesacr'
 
-resource coreStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: coreStorageAccountName
-  scope: resourceGroup(resourceGroup().name)
-}
-var coreStorageAccountKey = coreStorageAccount.listKeys().keys[0].value
-var endpointSuffix = environment().suffixes.storage
-var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${coreStorageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${coreStorageAccountKey}'
-
-// Reference the existing VNet as currently managed by the EES ARM template, and register new subnets for Bicep-controlled resources.
 module vNetModule 'application/shared/virtualNetwork.bicep' = {
   name: 'networkDeploy'
   params: {
@@ -131,6 +121,14 @@ module vNetModule 'application/shared/virtualNetwork.bicep' = {
     publicApiResourcePrefix: publicApiResourcePrefix
     commonResourcePrefix: commonResourcePrefix
     legacyResourcePrefix: legacyResourcePrefix
+  }
+}
+
+module coreStorage 'application/shared/coreStorage.bicep' = {
+  name: 'coreStorageModuleDeploy'
+  params: {
+    legacyResourcePrefix: legacyResourcePrefix
+    keyVaultName: keyVaultName
   }
 }
 
@@ -312,24 +310,11 @@ module storeAdminPsqlConnectionString 'components/keyVaultSecret.bicep' = {
   }
 }
 
-var coreStorageConnectionStringSecretKey = 'ees-core-storage-connectionstring'
-
-module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
-  name: 'storeCoreStorageConnectionString'
-  params: {
-    keyVaultName: keyVaultName
-    isEnabled: true
-    secretName: coreStorageConnectionStringSecretKey
-    secretValue: coreStorageConnectionString
-    contentType: 'text/plain'
-  }
-}
-
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
 output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorModule.outputs.managedIdentityClientId
 
-output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
+output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
 
 output dataProcessorPublicApiDataFileShareMountPath string = dataProcessorModule.outputs.publicApiDataFileShareMountPath

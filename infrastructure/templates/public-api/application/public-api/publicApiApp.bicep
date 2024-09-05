@@ -22,7 +22,7 @@ param dockerImagesTag string
 @description('The URL of the Public API.')
 param publicApiUrl string
 
-@description('The URL of the Cotnent API.')
+@description('The URL of the Content API.')
 param contentApiUrl string
 
 @description('Specifies the Application (Client) Id of the App Registration used to represent the API Container App.')
@@ -36,7 +36,6 @@ param tagValues object
 
 var apiAppName = '${publicApiResourcePrefix}-ca-api'
 var apiAppIdentityName = '${publicApiResourcePrefix}-id-ca-api'
-
 var dataFilesFileShareMountPath = '/data/public-api-data'
 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
