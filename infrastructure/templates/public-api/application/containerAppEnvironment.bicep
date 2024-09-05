@@ -13,9 +13,6 @@ param logAnalyticsWorkspaceName string
 @description('Specifies the Application Insights key that is associated with this resource.')
 param applicationInsightsKey string
 
-@description('Specifies a set of tags with which to tag the resource in Azure.')
-param tagValues object
-
 @description('Specifies the name of the Public API storage account.')
 param publicApiStorageAccountName string
 
@@ -24,6 +21,9 @@ param publicApiStorageAccountAccessKey string
 
 @description('Specifies the fileshare name of the Public API data.')
 param publicApiFileShareName string
+
+@description('Specifies a set of tags with which to tag the resource in Azure.')
+param tagValues object
 
 module containerAppEnvironmentModule '../components/containerAppEnvironment.bicep' = {
   name: 'containerAppEnvironmentDeploy'
