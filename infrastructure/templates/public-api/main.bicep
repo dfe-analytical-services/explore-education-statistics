@@ -283,8 +283,7 @@ module apiContainerAppAcrPullRoleAssignmentModule 'components/containerRegistryR
   }
 }
 
-// Create a generic Container App Environment for any Container Apps to use.
-module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' = {
+module containerAppEnvironmentModule 'application/containerAppEnvironment.bicep' = {
   name: 'containerAppEnvironmentDeploy'
   params: {
     location: location
@@ -292,16 +291,10 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
     subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
+    publicApiStorageAccountName: publicApiStorageAccountName
+    publicApiFileShareName: dataFilesFileShareModule.outputs.fileShareName
+    publicApiStorageAccountAccessKey: publicApiStorageAccountAccessKey
     tagValues: tagValues
-    azureFileStorages: [
-      {
-        storageName: dataFilesFileShareModule.outputs.fileShareName
-        storageAccountName: publicApiStorageAccountName
-        storageAccountKey: publicApiStorageAccountAccessKey
-        fileShareName: dataFilesFileShareModule.outputs.fileShareName
-        accessMode: 'ReadWrite'
-      }
-    ]
   }
 }
 
