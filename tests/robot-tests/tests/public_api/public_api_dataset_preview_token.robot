@@ -256,3 +256,17 @@ Search with 1st API dataset
     user clicks radio    Newest
     user checks page contains link    ${SUBJECT_NAME_1}
     user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_1}
+
+User clicks on API dataset link
+    user clicks link by index    ${SUBJECT_NAME_1}
+    user waits until page finishes loading
+    
+    user waits until h1 is visible    ${SUBJECT_NAME_1}
+
+User checks relevant headings exist on API dataset details page
+    user waits until h2 is visible    Data set details
+    user waits until h2 is visible    Data set preview
+    user waits until h2 is visible    Variables in this data set
+    user waits until h2 is visible    Using this data
+    user waits until h2 is visible    API data set quick start
+    user waits until h2 is visible    API data set version history
