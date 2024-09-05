@@ -1,4 +1,4 @@
-time_identifier,time_period,geographic_level,country_code,country_name,number,percent,pound,pp,million_pound,code
+time_identifier,time_period,geographic_level,country_code,country_name,number,percent,pound,pp,million_pound,numberstring
 Academic year,201819,national,E92000001,England,201819,1819,2018,1000,500,123123123
 Academic year,201718,national,E92000001,England,201718,17.18,2017.18,10.1,134.13,123.123123
 Academic year,201617,national,E92000001,England,-201617,16,2016,-100,-1000,ABCD
