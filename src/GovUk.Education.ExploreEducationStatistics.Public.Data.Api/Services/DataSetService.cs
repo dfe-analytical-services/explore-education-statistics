@@ -160,6 +160,7 @@ internal class DataSetService(
             Version = latestVersion.PublicVersion,
             Published = latestVersion.Published!.Value,
             TotalResults = latestVersion.TotalResults,
+            File = MapFile(latestVersion),
             TimePeriods = MapTimePeriods(latestVersion.MetaSummary!.TimePeriodRange),
             GeographicLevels = latestVersion.MetaSummary.GeographicLevels,
             Filters = latestVersion.MetaSummary.Filters,
