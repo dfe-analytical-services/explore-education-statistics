@@ -121,7 +121,7 @@ var acrName = 'eesacr'
 var dataProcessorAppName = '${publicApiResourcePrefix}-fa-processor'
 var dataProcessorAppServicePlanName = '${publicApiResourcePrefix}-asp-processor'
 var dataProcessorStorageAccountsPrefix = '${subscription}eessaprocessor'
-var psqlServerName = '${subscription}-ees-psql-flexibleserver'
+var postgreSqlServerName = '${subscription}-ees-psql-flexibleserver'
 var containerAppEnvironmentName = '${commonResourcePrefix}-cae-01'
 var apiAppName = '${publicApiResourcePrefix}-ca-api'
 var appGatewayName = '${commonResourcePrefix}-agw-01'
@@ -156,7 +156,7 @@ module vNetModule 'application/virtualNetwork.bicep' = {
     containerAppEnvironmentName: containerAppEnvironmentName
     dataProcessorName: dataProcessorAppName
     adminAppServiceName: adminAppName
-    psqlFlexibleServerName: psqlServerName
+    psqlFlexibleServerName: postgreSqlServerName
     publisherFunctionAppName: publisherAppFullName
     appGatewayName: appGatewayName
   }
@@ -184,7 +184,6 @@ module publicApiStorageModule 'application/publicApiStorage.bicep' = {
   }
 }
 
-
 // Deploy a single shared Application Insights for all relevant Public API resources to use.
 module applicationInsightsModule 'components/appInsights.bicep' = {
   name: 'appInsightsDeploy'
@@ -204,28 +203,19 @@ module logAnalyticsWorkspaceModule 'components/logAnalyticsWorkspace.bicep' = {
   }
 }
 
-var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
-  name: replace(rule.name, ' ', '_')
-  cidr: rule.cidr
-})
-
-// Deploy PostgreSQL Database.
-module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (updatePsqlFlexibleServer) {
-  name: 'postgreSQLDatabaseDeploy'
+module postgreSqlServerModule 'application/postgreSqlFlexibleServer.bicep' = if (updatePsqlFlexibleServer) {
+  name: 'postgreSqlFlexibleServerDeploy'
   params: {
-    databaseServerName: psqlServerName
     location: location
-    createMode: 'Default'
-    adminName: postgreSqlAdminName
-    adminPassword: postgreSqlAdminPassword!
-    dbSkuName: postgreSqlSkuName
-    dbStorageSizeGB: postgreSqlStorageSizeGB
-    dbAutoGrowStatus: postgreSqlAutoGrowStatus
-    postgreSqlVersion: '16'
+    postgreSqlServerName: postgreSqlServerName
+    postgreSqlAdminName: postgreSqlAdminName
+    postgreSqlAdminPassword: postgreSqlAdminPassword
+    privateEndpointSubnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
+    postgreSqlAutoGrowStatus: postgreSqlAutoGrowStatus
+    postgreSqlFirewallRules: postgreSqlFirewallRules
+    postgreSqlSkuName: postgreSqlSkuName
+    postgreSqlStorageSizeGB: postgreSqlStorageSizeGB
     tagValues: tagValues
-    firewallRules: formattedPostgreSqlFirewallRules
-    databaseNames: ['public_data']
-    subnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
   }
   dependsOn: [
     privateDnsZonesModule
