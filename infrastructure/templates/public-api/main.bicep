@@ -114,7 +114,7 @@ var publisherAppFullName = '${legacyResourcePrefix}-fa-ees-publisher'
 var coreStorageAccountName = '${legacyResourcePrefix}saeescore'
 var keyVaultName = '${legacyResourcePrefix}-kv-ees-01'
 var vNetName = '${legacyResourcePrefix}-vnet-ees'
-var alertsGroupFullName = '${legacyResourcePrefix}-ag-ees-alertedusers'
+var alertsGroupName = '${legacyResourcePrefix}-ag-ees-alertedusers'
 var acrName = 'eesacr'
 
 // Define full names for new resources managed by the Bicep deployment.
@@ -125,7 +125,7 @@ var psqlServerName = '${subscription}-ees-psql-flexibleserver'
 var containerAppEnvironmentName = '${commonResourcePrefix}-cae-01'
 var apiAppName = '${publicApiResourcePrefix}-ca-api'
 var appGatewayName = '${commonResourcePrefix}-agw-01'
-var fileShareName = '${publicApiResourcePrefix}-fs-data'
+var publicApiDataFileShareName = '${publicApiResourcePrefix}-fs-data'
 var appInsightsName = '${publicApiResourcePrefix}-ai'
 var logAnalyticsWorkspaceName = '${commonResourcePrefix}-log'
 var publicApiStorageAccountName = '${subscription}eespapisa'
@@ -204,7 +204,7 @@ var publicApiStorageAccountAccessKey = publicApiStorageAccount.listKeys().keys[0
 module dataFilesFileShareModule 'components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
-    fileShareName: fileShareName
+    fileShareName: publicApiDataFileShareName
     fileShareQuota: fileShareQuota
     storageAccountName: publicApiStorageAccountName
     fileShareAccessTier: 'TransactionOptimized'
@@ -291,7 +291,7 @@ module apiAppModule 'application/apiApp.bicep' = if (deployContainerApp) {
     publicApiUrl: publicUrls.publicApi
     dockerImagesTag: dockerImagesTag
     publicApiDbConnectionStringTemplate: postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
-    publicApiDataFileShareName: fileShareName
+    publicApiDataFileShareName: publicApiDataFileShareName
     tagValues: tagValues
   }
   dependsOn: [
@@ -299,75 +299,27 @@ module apiAppModule 'application/apiApp.bicep' = if (deployContainerApp) {
   ]
 }
 
-resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
-  name: adminAppName
-}
-
-resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-31' existing = {
-  scope: adminAppService
-  name: 'default'
-}
-
-var adminAppClientId = adminAppServiceIdentity.properties.clientId
-var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
-
-resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: dataProcessorIdentityName
-  location: location
-}
-
-// Deploy Data Processor Function.
-module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
-  name: 'dataProcessorFunctionAppDeploy'
+module dataProcessorModule 'application/dataProcessor.bicep' = {
+  name: 'dataProcessorDeploy'
   params: {
-    functionAppName: dataProcessorAppName
-    appServicePlanName: dataProcessorAppServicePlanName
-    storageAccountsNamePrefix: dataProcessorStorageAccountsPrefix
-    alertsGroupName: alertsGroupFullName
     location: location
+    dataProcessorAppName: dataProcessorAppName
+    appServicePlanName: dataProcessorAppServicePlanName
+    dataProcessorIdentityName: dataProcessorIdentityName
+    adminAppName: adminAppName
+    keyVaultName: keyVaultName
+    metricsNamePrefix: '${subscription}PublicDataProcessor'
+    alertsGroupName: alertsGroupName
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
     privateEndpointSubnetId: vNetModule.outputs.dataProcessorPrivateEndpointSubnetRef
-    publicNetworkAccessEnabled: false
-    entraIdAuthentication: {
-      appRegistrationClientId: dataProcessorAppRegistrationClientId
-      allowedClientIds: [
-        adminAppClientId
-      ]
-      allowedPrincipalIds: [
-        adminAppPrincipalId
-      ]
-      requireAuthentication: true
-    }
-    userAssignedManagedIdentityParams: {
-      id: dataProcessorFunctionAppManagedIdentity.id
-      name: dataProcessorFunctionAppManagedIdentity.name
-      principalId: dataProcessorFunctionAppManagedIdentity.properties.principalId
-    }
-    functionAppExists: dataProcessorFunctionAppExists
-    keyVaultName: keyVaultName
-    functionAppRuntime: 'dotnet-isolated'
-    sku: {
-      name: 'EP1'
-      tier: 'ElasticPremium'
-      family: 'EP'
-    }
-    preWarmedInstanceCount: 1
-    healthCheck: {
-      path: '/api/HealthCheck'
-      unhealthyMetricName: '${subscription}PublicDataProcessorUnhealthy'
-    }
-    appSettings: {
-      AppSettings__MetaInsertBatchSize: 1000
-    }
-    azureFileShares: [{
-      storageName: dataFilesFileShareModule.outputs.fileShareName
-      storageAccountKey: publicApiStorageAccountAccessKey
-      storageAccountName: publicApiStorageAccountName
-      fileShareName: dataFilesFileShareModule.outputs.fileShareName
-      mountPath: dataFilesFileShareMountPath
-    }]
+    dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
+    dataProcessorStorageAccountsPrefix: dataProcessorStorageAccountsPrefix
+    publicApiDataFileShareName: publicApiDataFileShareName
+    publicApiStorageAccountAccessKey: publicApiStorageAccountAccessKey
+    publicApiStorageAccountName: publicApiStorageAccountName
     storageFirewallRules: storageFirewallRules
+    dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
     tagValues: tagValues
   }
   dependsOn: [
@@ -405,7 +357,7 @@ module storeDataProcessorPsqlConnectionString 'components/keyVaultSecret.bicep' 
     keyVaultName: keyVaultName
     isEnabled: true
     secretName: dataProcessorPsqlConnectionStringSecretKey
-    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppManagedIdentity.name)
+    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorIdentityName)
     contentType: 'text/plain'
   }
 }
@@ -451,7 +403,7 @@ module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
 
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
-output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorFunctionAppManagedIdentity.properties.clientId
+output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorModule.outputs.managedIdentityClientId
 
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
 output keyVaultName string = keyVaultName
