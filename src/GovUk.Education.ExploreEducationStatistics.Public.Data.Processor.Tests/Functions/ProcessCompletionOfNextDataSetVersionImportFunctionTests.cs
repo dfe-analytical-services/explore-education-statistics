@@ -1171,6 +1171,120 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
+    public class CreateChangesTestsGeographicLevelTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
+        : CreateChangesTests(fixture)
+    {
+        [Fact]
+        public async Task GeographicLevelsAddedAndDeleted_ChangeExists()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels([GeographicLevel.LocalAuthority, GeographicLevel.LocalAuthorityDistrict, GeographicLevel.School]));
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            var actualChange = await GetDbContext<PublicDataDbContext>()
+                .GeographicLevelMetaChanges
+                .AsNoTracking()
+                .SingleOrDefaultAsync(c => c.DataSetVersionId == newVersion.Id);
+
+            Assert.NotNull(actualChange);
+            Assert.Equal(newVersion.Id, actualChange.DataSetVersionId);
+            Assert.Equal(originalVersion.GeographicLevelMeta!.Id, actualChange.PreviousStateId);
+            Assert.Equal(newVersion.GeographicLevelMeta!.Id, actualChange.CurrentStateId);
+        }
+
+        [Fact]
+        public async Task GeographicLevelsUnchanged_ChangeIsNull()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]));
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            var actualChange = await GetDbContext<PublicDataDbContext>()
+                .GeographicLevelMetaChanges
+                .AsNoTracking()
+                .SingleOrDefaultAsync(c => c.DataSetVersionId == newVersion.Id);
+
+            Assert.Null(actualChange);
+        }
+
+        [Fact]
+        public async Task GeographicLevelsAdded_ChangeExists()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels([GeographicLevel.Country]),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]));
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            var actualChange = await GetDbContext<PublicDataDbContext>()
+                .GeographicLevelMetaChanges
+                .AsNoTracking()
+                .SingleOrDefaultAsync(c => c.DataSetVersionId == newVersion.Id);
+
+            Assert.NotNull(actualChange);
+            Assert.Equal(newVersion.Id, actualChange.DataSetVersionId);
+            Assert.Equal(originalVersion.GeographicLevelMeta!.Id, actualChange.PreviousStateId);
+            Assert.Equal(newVersion.GeographicLevelMeta!.Id, actualChange.CurrentStateId);
+        }
+
+        [Fact]
+        public async Task GeographicLevelsDeleted_ChangesExists()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels([GeographicLevel.Country]));
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            var actualChange = await GetDbContext<PublicDataDbContext>()
+                .GeographicLevelMetaChanges
+                .AsNoTracking()
+                .SingleOrDefaultAsync(c => c.DataSetVersionId == newVersion.Id);
+
+            Assert.NotNull(actualChange);
+            Assert.Equal(newVersion.Id, actualChange.DataSetVersionId);
+            Assert.Equal(originalVersion.GeographicLevelMeta!.Id, actualChange.PreviousStateId);
+            Assert.Equal(newVersion.GeographicLevelMeta!.Id, actualChange.CurrentStateId);
+        }
+    }
+
     public class CreateChangesTestsTimePeriodTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateChangesTests(fixture)

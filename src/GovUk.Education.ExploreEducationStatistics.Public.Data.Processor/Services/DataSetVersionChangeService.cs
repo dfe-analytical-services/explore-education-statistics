@@ -39,7 +39,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             mappings: mappings,
             cancellationToken: cancellationToken);
 
-        nextVersion.GeographicLevelMetaChange = await CreateGeographicLevelChanges(
+        nextVersion.GeographicLevelMetaChange = await CreateGeographicLevelChange(
             previousVersionId: previousVersionId,
             nextVersionId: nextVersion.Id,
             cancellationToken: cancellationToken);
@@ -263,7 +263,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         );
     }
 
-    private async Task<GeographicLevelMetaChange?> CreateGeographicLevelChanges(
+    private async Task<GeographicLevelMetaChange?> CreateGeographicLevelChange(
         Guid previousVersionId,
         Guid nextVersionId,
         CancellationToken cancellationToken)
