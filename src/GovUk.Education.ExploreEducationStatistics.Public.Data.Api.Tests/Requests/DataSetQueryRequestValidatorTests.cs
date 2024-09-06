@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
-[Collection("Set FluentValidation property name camel case configuration")]
 public class DataSetQueryRequestValidatorTests
 {
     private readonly DataSetQueryRequest.Validator _validator = new();
@@ -45,7 +44,7 @@ public class DataSetQueryRequestValidatorTests
             };
 
             _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor("criteria.filters.eq")
+                .ShouldHaveValidationErrorFor("Criteria.Filters.Eq")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
         }
@@ -96,7 +95,7 @@ public class DataSetQueryRequestValidatorTests
             };
 
             _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor("criteria.and[0].filters.eq")
+                .ShouldHaveValidationErrorFor("Criteria.And[0].Filters.Eq")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
         }
@@ -147,7 +146,7 @@ public class DataSetQueryRequestValidatorTests
             };
 
             _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor("criteria.or[0].filters.eq")
+                .ShouldHaveValidationErrorFor("Criteria.Or[0].Filters.Eq")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
         }
@@ -192,7 +191,7 @@ public class DataSetQueryRequestValidatorTests
             };
 
             _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor("criteria.not.filters.eq")
+                .ShouldHaveValidationErrorFor("Criteria.Not.Filters.Eq")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
         }
@@ -239,16 +238,16 @@ public class DataSetQueryRequestValidatorTests
 
             Assert.Equal(query.Indicators.Count, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor("indicators[0]")
+            result.ShouldHaveValidationErrorFor("Indicators[0]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
-            result.ShouldHaveValidationErrorFor("indicators[1]")
+            result.ShouldHaveValidationErrorFor("Indicators[1]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
-            result.ShouldHaveValidationErrorFor("indicators[2]")
+            result.ShouldHaveValidationErrorFor("Indicators[2]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
-            result.ShouldHaveValidationErrorFor("indicators[3]")
+            result.ShouldHaveValidationErrorFor("Indicators[3]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
@@ -264,10 +263,10 @@ public class DataSetQueryRequestValidatorTests
 
             Assert.Equal(query.Indicators.Count, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor("indicators[0]")
+            result.ShouldHaveValidationErrorFor("Indicators[0]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
 
-            result.ShouldHaveValidationErrorFor("indicators[1]")
+            result.ShouldHaveValidationErrorFor("Indicators[1]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
         }
 
@@ -284,11 +283,11 @@ public class DataSetQueryRequestValidatorTests
             Assert.Equal(query.Indicators.Count, result.Errors.Count);
 
             result
-                .ShouldHaveValidationErrorFor("indicators[0]")
+                .ShouldHaveValidationErrorFor("Indicators[0]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
 
             result
-                .ShouldHaveValidationErrorFor("indicators[1]")
+                .ShouldHaveValidationErrorFor("Indicators[1]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }
@@ -346,19 +345,19 @@ public class DataSetQueryRequestValidatorTests
 
             Assert.Equal(query.Sorts.Count, result.Errors.Count);
 
-            result.ShouldHaveValidationErrorFor("sorts[0]")
+            result.ShouldHaveValidationErrorFor("Sorts[0]")
                 .WithErrorCode(FluentValidationKeys.NotNullValidator);
 
-            result.ShouldHaveValidationErrorFor("sorts[1].field")
+            result.ShouldHaveValidationErrorFor("Sorts[1].Field")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
-            result.ShouldHaveValidationErrorFor("sorts[2].direction")
+            result.ShouldHaveValidationErrorFor("Sorts[2].Direction")
                 .WithErrorCode(ValidationMessages.AllowedValue.Code);
 
-            result.ShouldHaveValidationErrorFor("sorts[3].direction")
+            result.ShouldHaveValidationErrorFor("Sorts[3].Direction")
                 .WithErrorCode(ValidationMessages.AllowedValue.Code);
 
-            result.ShouldHaveValidationErrorFor("sorts[4].field")
+            result.ShouldHaveValidationErrorFor("Sorts[4].Field")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
         }
     }
