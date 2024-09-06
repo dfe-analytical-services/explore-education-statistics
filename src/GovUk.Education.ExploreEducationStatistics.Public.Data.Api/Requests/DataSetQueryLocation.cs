@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -5,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests.Converters;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
@@ -26,7 +28,7 @@ public abstract record DataSetQueryLocation
     ///
     /// This should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.
     /// </summary>
-    public virtual string Level { get; init; } = string.Empty;
+    public virtual string Level { get; protected init; } = string.Empty;
 
     public GeographicLevel ParsedLevel() => EnumUtil.GetFromEnumValue<GeographicLevel>(Level);
 
@@ -133,7 +135,11 @@ public record DataSetQueryLocationId : DataSetQueryLocation
     /// </summary>
     public required string Id { get; init; }
 
-    public override required string Level { get; init; }
+    public new required string Level
+    {
+        get => base.Level;
+        init => base.Level = value;
+    }
 
     public override string KeyProperty => nameof(Id);
 
@@ -163,7 +169,11 @@ public record DataSetQueryLocationCode : DataSetQueryLocation
     /// </summary>
     public required string Code { get; init; }
 
-    public override required string Level { get; init; }
+    public new required string Level
+    {
+        get => base.Level;
+        init => base.Level = value;
+    }
 
     public override string KeyProperty => nameof(Code);
 
@@ -191,7 +201,9 @@ public record DataSetQueryLocationLocalAuthorityCode : DataSetQueryLocation
     /// </summary>
     public required string Code { get; init; }
 
-    public override string Level => GeographicLevel.LocalAuthority.GetEnumValue();
+    [Required]
+    [SwaggerSchema(ReadOnly = false)]
+    public override string Level { get; protected init; } = GeographicLevel.LocalAuthority.GetEnumValue();
 
     public override string KeyProperty => nameof(Code);
 
@@ -219,7 +231,9 @@ public record DataSetQueryLocationLocalAuthorityOldCode : DataSetQueryLocation
     /// </summary>
     public required string OldCode { get; init; }
 
-    public override string Level => GeographicLevel.LocalAuthority.GetEnumValue();
+    [Required]
+    [SwaggerSchema(ReadOnly = false)]
+    public override string Level { get; protected init; } = GeographicLevel.LocalAuthority.GetEnumValue();
 
     public override string KeyProperty => nameof(OldCode);
 
@@ -246,7 +260,9 @@ public record DataSetQueryLocationProviderUkprn : DataSetQueryLocation
     /// </summary>
     public required string Ukprn { get; init; }
 
-    public override string Level => GeographicLevel.Provider.GetEnumValue();
+    [Required]
+    [SwaggerSchema(ReadOnly = false)]
+    public override string Level { get; protected init; } = GeographicLevel.Provider.GetEnumValue();
 
     public override string KeyProperty => nameof(Ukprn);
 
@@ -273,7 +289,9 @@ public record DataSetQueryLocationSchoolUrn : DataSetQueryLocation
     /// </summary>
     public required string Urn { get; init; }
 
-    public override string Level => GeographicLevel.School.GetEnumValue();
+    [Required]
+    [SwaggerSchema(ReadOnly = false)]
+    public override string Level { get; protected init; } = GeographicLevel.School.GetEnumValue();
 
     public override string KeyProperty => nameof(Urn);
 
@@ -300,7 +318,9 @@ public record DataSetQueryLocationSchoolLaEstab : DataSetQueryLocation
     /// </summary>
     public required string LaEstab { get; init; }
 
-    public override string Level => GeographicLevel.School.GetEnumValue();
+    [Required]
+    [SwaggerSchema(ReadOnly = false)]
+    public override string Level { get; protected init; } = GeographicLevel.School.GetEnumValue();
 
     public override string KeyProperty => nameof(LaEstab);
 

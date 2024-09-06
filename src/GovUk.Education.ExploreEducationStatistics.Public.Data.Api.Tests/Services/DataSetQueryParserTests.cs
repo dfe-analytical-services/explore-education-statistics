@@ -2465,16 +2465,16 @@ public abstract class DataSetQueryParserTests
             GeographicLevel.LocalAuthority => option switch
             {
                 { Code: not null } =>
-                    new DataSetQueryLocationLocalAuthorityCode { Level = option.Level, Code = option.Code },
+                    new DataSetQueryLocationLocalAuthorityCode { Code = option.Code },
                 { OldCode: not null } =>
-                    new DataSetQueryLocationLocalAuthorityOldCode { Level = option.Level, OldCode = option.OldCode },
+                    new DataSetQueryLocationLocalAuthorityOldCode { OldCode = option.OldCode },
                 _ => throw new NullReferenceException(
                     $"{nameof(option.Code)} and {nameof(option.OldCode)} cannot both be null")
             },
             GeographicLevel.Provider => option switch
             {
                 { Ukprn: not null } =>
-                    new DataSetQueryLocationProviderUkprn { Level = option.Level, Ukprn = option.Ukprn! },
+                    new DataSetQueryLocationProviderUkprn { Ukprn = option.Ukprn! },
                 _ => throw new NullReferenceException($"{nameof(option.Ukprn)} cannot both be null")
             },
             GeographicLevel.RscRegion => new DataSetQueryLocationId
@@ -2484,9 +2484,9 @@ public abstract class DataSetQueryParserTests
             GeographicLevel.School => option switch
             {
                 { Urn: not null } =>
-                    new DataSetQueryLocationSchoolUrn { Level = option.Level, Urn = option.Urn },
+                    new DataSetQueryLocationSchoolUrn { Urn = option.Urn },
                 { LaEstab: not null } =>
-                    new DataSetQueryLocationSchoolLaEstab { Level = option.Level, LaEstab = option.LaEstab },
+                    new DataSetQueryLocationSchoolLaEstab { LaEstab = option.LaEstab },
                 _ => throw new NullReferenceException(
                     $"{nameof(option.Urn)} and {nameof(option.LaEstab)} cannot both be null")
             },
