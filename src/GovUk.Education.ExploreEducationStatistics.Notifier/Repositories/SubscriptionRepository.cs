@@ -5,26 +5,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 
-internal class SubscriptionRepository(
+public class SubscriptionRepository(
     INotifierTableStorageService notifierTableStorage) : ISubscriptionRepository
 {
-    public async Task RemoveSubscription(Guid publicationId, string email)
-    {
-        await notifierTableStorage
-            .DeleteEntity(
-                tableName: NotifierTableStorage.PublicationSubscriptionsTable,
-                partitionKey: publicationId.ToString(),
-                rowKey: email);
-    }
-
-    public async Task RemovePendingSubscription(Guid publicationId, string email)
-    {
-
-    }
-
     public async Task<List<string>> GetSubscriberEmails(Guid publicationId)
     {
         var results = await notifierTableStorage
@@ -37,5 +24,36 @@ internal class SubscriptionRepository(
         return await results
             .Select(subscriber => subscriber.RowKey)
             .ToListAsync();
+    }
+
+    public async Task<Subscription> GetSubscriptionAndStatus(string publicationId, string email)
+    {
+        var pendingSub = await notifierTableStorage.GetEntityIfExists<SubscriptionEntity>(
+            tableName: NotifierTableStorage.PublicationPendingSubscriptionsTable,
+            partitionKey: publicationId,
+            rowKey: email);
+        if (pendingSub is not null)
+        {
+            return new Subscription
+            {
+                Entity = pendingSub,
+                Status = SubscriptionStatus.SubscriptionPending,
+            };
+        }
+        
+        var activeSub = await notifierTableStorage.GetEntityIfExists<SubscriptionEntity>(
+            tableName: NotifierTableStorage.PublicationSubscriptionsTable,
+            partitionKey: publicationId,
+            rowKey: email);
+        if (activeSub is not null)
+        {
+            return new Subscription
+            {
+                Entity = activeSub,
+                Status = SubscriptionStatus.Subscribed,
+            };
+        }
+
+        return new Subscription { Status = SubscriptionStatus.NotSubscribed };
     }
 }

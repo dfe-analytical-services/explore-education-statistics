@@ -14,5 +14,5 @@ public interface IPublicationSubscriptionRepository
 
     Task<CloudTable> GetTable(string storageTableName);
 
-    Task<Subscription> GetSubscription(string id, string email);
+    Task<SubscriptionOld> GetSubscription(string id, string email);
 }
