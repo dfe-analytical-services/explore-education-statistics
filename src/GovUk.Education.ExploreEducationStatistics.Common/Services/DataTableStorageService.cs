@@ -116,7 +116,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
 
     public async Task<AsyncPageable<TEntity>> QueryEntities<TEntity>(
         string tableName,
-        string filter = "",
+        string filterStr = "",
         int? maxPerPage = 1000,
         IEnumerable<string>? select = null,
         CancellationToken cancellationToken = default)
@@ -125,7 +125,7 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
         var tableClient = await GetTableClient(tableName, cancellationToken);
 
         return tableClient.QueryAsync<TEntity>(
-            filter: filter,
+            filter: filterStr,
             maxPerPage: maxPerPage,
             select: select,
             cancellationToken: cancellationToken);
