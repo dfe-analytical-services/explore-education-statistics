@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -30,6 +25,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -111,8 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(releaseVersion => _mapper
                     .Map<ReleaseViewModel>(releaseVersion) with
-                    {
-                        PreReleaseUsersOrInvitesAdded = _context
+                {
+                    PreReleaseUsersOrInvitesAdded = _context
                             .UserReleaseRoles
                             .Any(role => role.ReleaseVersionId == releaseVersionId
                                          && role.Role == ReleaseRole.PrereleaseViewer) ||
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .UserReleaseInvites
                             .Any(role => role.ReleaseVersionId == releaseVersionId
                                          && role.Role == ReleaseRole.PrereleaseViewer)
-                    });
+                });
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
@@ -207,61 +207,125 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, Unit>> DeleteReleaseVersion(Guid releaseVersionId)
+        public Task<Either<ActionResult, Unit>> DeleteReleaseVersion(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken = default)
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanDeleteReleaseVersion) // only allows unapproved amendments to be removed
+                .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
                 .OnSuccessDo(async () => await _processorClient.BulkDeleteDataSetVersions(releaseVersionId))
-                .OnSuccessDo(async release => await _cacheService.DeleteCacheFolderAsync(
-                    new PrivateReleaseContentFolderCacheKey(release.Id)))
+                .OnSuccessDo(async release => await _cacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(release.Id)))
                 .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseVersionId))
                 .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseVersionId))
                 .OnSuccessVoid(async releaseVersion =>
                 {
-                    // NOTE: As only removing unapproved amendments, releaseVersion.Release will not be orphaned
-                    // and associated item in releaseVersion.Publication.ReleaseSeries will also not be orphaned
-                    // so no need to remove them.
-
-                    releaseVersion.SoftDeleted = true;
-                    _context.ReleaseVersions.Update(releaseVersion);
-
-                    var roles = await _context
-                        .UserReleaseRoles
-                        .AsQueryable()
-                        .Where(r => r.ReleaseVersionId == releaseVersionId)
-                        .ToListAsync();
-                    roles.ForEach(r => r.SoftDeleted = true);
-                    _context.UpdateRange(roles);
-
-                    var invites = await _context
-                        .UserReleaseInvites
-                        .AsQueryable()
-                        .Where(r => r.ReleaseVersionId == releaseVersionId)
-                        .ToListAsync();
-                    invites.ForEach(r => r.SoftDeleted = true);
-                    _context.UpdateRange(invites);
-
-                    var methodologiesScheduledWithRelease =
-                        GetMethodologiesScheduledWithRelease(releaseVersionId);
-
-                    // TODO EES-2747 - this should be looked at to see how best to reuse similar "set to draft" logic
-                    // in MethodologyApprovalService.
-                    methodologiesScheduledWithRelease.ForEach(m =>
+                    if (!releaseVersion.Amendment && releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Draft)
                     {
-                        m.PublishingStrategy = Immediately;
-                        m.Status = Draft;
-                        m.ScheduledWithReleaseVersion = null;
-                        m.ScheduledWithReleaseVersionId = null;
-                        m.Updated = DateTime.UtcNow;
-                    });
+                        await HardDeleteForDraft(releaseVersion, cancellationToken);
+                    }
+                    else
+                    {
+                        await SoftDeleteForAmendment(releaseVersion, cancellationToken);
+                    }
 
-                    _context.UpdateRange(methodologiesScheduledWithRelease);
+                    UpdateMethodologies(releaseVersionId);
 
                     await _context.SaveChangesAsync();
 
                     await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseVersionId: releaseVersionId);
                 });
+        }
+
+        private async Task HardDeleteForDraft(
+            ReleaseVersion releaseVersion,
+            CancellationToken cancellationToken)
+        {
+            var publication = await _context.Publications.FindAsync(releaseVersion.PublicationId, cancellationToken);
+            var releaseSeriesItem = publication!.ReleaseSeries.Find(rs => rs.ReleaseId == releaseVersion.ReleaseId);
+
+            publication.ReleaseSeries.Remove(releaseSeriesItem!);
+            _context.Publications.Update(publication);
+
+            var release = await _context.Releases.FindAsync(releaseVersion.ReleaseId, cancellationToken);
+            _context.Releases.Remove(release!);
+
+            await DeleteRoles(releaseVersion.Id, hardDelete: true, cancellationToken);
+            await DeleteInvites(releaseVersion.Id, hardDelete: true, cancellationToken);
+
+            _context.ReleaseVersions.Remove(releaseVersion);
+        }
+
+        private async Task SoftDeleteForAmendment(
+            ReleaseVersion releaseVersion,
+            CancellationToken cancellationToken)
+        {
+            releaseVersion.SoftDeleted = true;
+            _context.ReleaseVersions.Update(releaseVersion);
+
+            await DeleteRoles(releaseVersion.Id, hardDelete: false, cancellationToken);
+            await DeleteInvites(releaseVersion.Id, hardDelete: false, cancellationToken);
+        }
+
+        private async Task DeleteRoles(
+            Guid releaseVersionId,
+            bool hardDelete,
+            CancellationToken cancellationToken)
+        {
+            var roles = await _context
+                .UserReleaseRoles
+                .AsQueryable()
+                .Where(r => r.ReleaseVersionId == releaseVersionId)
+                .ToListAsync(cancellationToken);
+
+            if (hardDelete)
+            {
+                _context.UserReleaseRoles.RemoveRange(roles);
+            }
+            else
+            {
+                roles.ForEach(r => r.SoftDeleted = true);
+                _context.UpdateRange(roles);
+            }
+        }
+
+        private async Task DeleteInvites(
+            Guid releaseVersionId,
+            bool hardDelete,
+            CancellationToken cancellationToken)
+        {
+            var invites = await _context
+                .UserReleaseInvites
+                .AsQueryable()
+                .Where(r => r.ReleaseVersionId == releaseVersionId)
+                .ToListAsync(cancellationToken);
+
+            if (hardDelete)
+            {
+                _context.UserReleaseInvites.RemoveRange(invites);
+            }
+            else
+            {
+                invites.ForEach(r => r.SoftDeleted = true);
+                _context.UpdateRange(invites);
+            }
+        }
+
+        private void UpdateMethodologies(Guid releaseVersionId)
+        {
+            var methodologiesScheduledWithRelease = GetMethodologiesScheduledWithRelease(releaseVersionId);
+
+            // TODO EES-2747 - this should be looked at to see how best to reuse similar "set to draft" logic in MethodologyApprovalService.
+            methodologiesScheduledWithRelease.ForEach(m =>
+            {
+                m.PublishingStrategy = Immediately;
+                m.Status = Draft;
+                m.ScheduledWithReleaseVersion = null;
+                m.ScheduledWithReleaseVersionId = null;
+                m.Updated = DateTime.UtcNow;
+            });
+
+            _context.UpdateRange(methodologiesScheduledWithRelease);
         }
 
         public Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(

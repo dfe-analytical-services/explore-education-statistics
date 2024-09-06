@@ -1,8 +1,9 @@
 #nullable enable
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
@@ -29,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             DeleteSpecificReleaseRequirement requirement,
             ReleaseVersion releaseVersion)
         {
-            if (!releaseVersion.Amendment || releaseVersion.ApprovalStatus == Approved)
+            if ((!context.User.IsInRole(RoleNames.BauUser) && !releaseVersion.Amendment) || releaseVersion.ApprovalStatus == Approved)
             {
                 return;
             }
