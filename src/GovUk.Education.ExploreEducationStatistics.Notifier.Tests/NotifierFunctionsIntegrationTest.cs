@@ -55,16 +55,6 @@ public abstract class NotifierFunctionsIntegrationTest
         return GetRequiredService<IOptions<GovUkNotifyOptions>>().Value;
     }
 
-    protected async Task AddTestSubscription(string tableName, SubscriptionEntityOld subscription) // @MarkFix remove
-    {
-        var storageAccount = CloudStorageAccount.Parse(StorageConnectionString());
-        var tableClient = storageAccount.CreateCloudTableClient();
-        var table = tableClient.GetTableReference(tableName);
-        await table.CreateIfNotExistsAsync();
-
-        await table.ExecuteAsync(TableOperation.InsertOrReplace(subscription));
-    }
-
     protected async Task CreateApiSubscriptions(params ApiSubscription[] subscriptions)
     {
         var dataTableStorageService = new DataTableStorageService(StorageConnectionString());

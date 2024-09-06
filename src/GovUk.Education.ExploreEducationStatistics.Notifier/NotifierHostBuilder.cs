@@ -52,7 +52,6 @@ public static class NotifierHostBuilder
                     })
                     .AddTransient<INotifierTableStorageService, NotifierTableStorageService>()
                     .AddTransient<IEmailService, EmailService>()
-                    .AddTransient<IPublicationSubscriptionRepository, PublicationSubscriptionRepository>()
                     .AddTransient<IApiSubscriptionRepository, ApiSubscriptionRepository>()
                     .AddTransient<ISubscriptionRepository, SubscriptionRepository>()
                     .AddTransient<IApiSubscriptionService, ApiSubscriptionService>()
