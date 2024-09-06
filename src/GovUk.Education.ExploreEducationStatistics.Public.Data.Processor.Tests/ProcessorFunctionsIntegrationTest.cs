@@ -218,6 +218,22 @@ public abstract class ProcessorFunctionsIntegrationTest(
         return (dataSetVersion, dataSetVersionImport.InstanceId);
     }
 
+    protected async Task<DataSetVersionMapping> CreateDefaultCompleteMappings(
+        Guid sourceDataSetVersionId,
+        Guid targetDataSetVersionId)
+    {
+        var dataSetVersionMapping = DataFixture.DefaultDataSetVersionMapping()
+            .WithSourceDataSetVersionId(sourceDataSetVersionId)
+            .WithTargetDataSetVersionId(targetDataSetVersionId)
+            .WithLocationMappingsComplete(true)
+            .WithFilterMappingsComplete(true);
+
+        await AddTestData<PublicDataDbContext>(context =>
+            context.DataSetVersionMappings.Add(dataSetVersionMapping));
+
+        return dataSetVersionMapping;
+    }
+
     protected DuckDbConnection GetDuckDbConnection(DataSetVersion dataSetVersion)
     {
         var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();

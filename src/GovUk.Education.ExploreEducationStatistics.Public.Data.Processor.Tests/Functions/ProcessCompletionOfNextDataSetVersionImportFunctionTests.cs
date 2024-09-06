@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -1167,6 +1168,206 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .Include(dsv => dsv.OptionLinks)
                 .Where(lm => lm.DataSetVersionId == version.Id)
                 .ToListAsync();
+        }
+    }
+
+    public class CreateChangesTestsTimePeriodTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
+        : CreateChangesTests(fixture)
+    {
+        [Fact]
+        public async Task TimePeriodsAddedAndDeleted_ChangesContainAdditionsAndDeletions()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                initialVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
+                    .WithCode(TimeIdentifier.AcademicYear)
+                    .ForIndex(0, s => s.SetPeriod("2020"))
+                    .ForIndex(1, s => s.SetPeriod("2021"))
+                    .ForIndex(2, s => s.SetPeriod("2022"))
+                    .Generate(3),
+                nextVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
+                    .WithCode(TimeIdentifier.AcademicYear)
+                    .ForIndex(0, s => s.SetPeriod("2022"))
+                    .ForIndex(1, s => s.SetPeriod("2023"))
+                    .ForIndex(2, s => s.SetPeriod("2024"))
+                    .Generate(3));
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            var actualChanges = await GetDbContext<PublicDataDbContext>()
+                .TimePeriodMetaChanges
+                .AsNoTracking()
+                .Where(c => c.DataSetVersionId == newVersion.Id)
+                .ToListAsync();
+
+            Assert.Equal(4, actualChanges.Count);
+            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var originalTimePeriodMetas = originalVersion.TimePeriodMetas
+                .ToDictionary(m => (m.Code, m.Period));
+
+            Assert.Equal(originalTimePeriodMetas[(TimeIdentifier.AcademicYear, "2020")].Id,
+                actualChanges[0].PreviousStateId);
+            Assert.Null(actualChanges[0].CurrentStateId);
+
+            Assert.Equal(originalTimePeriodMetas[(TimeIdentifier.AcademicYear, "2021")].Id,
+                actualChanges[1].PreviousStateId);
+            Assert.Null(actualChanges[1].CurrentStateId);
+
+            var newTimePeriodMetas = newVersion.TimePeriodMetas
+                .ToDictionary(m => (m.Code, m.Period));
+
+            Assert.Null(actualChanges[2].PreviousStateId);
+            Assert.Equal(newTimePeriodMetas[(TimeIdentifier.AcademicYear, "2023")].Id, actualChanges[2].CurrentStateId);
+
+            Assert.Null(actualChanges[3].PreviousStateId);
+            Assert.Equal(newTimePeriodMetas[(TimeIdentifier.AcademicYear, "2024")].Id, actualChanges[3].CurrentStateId);
+        }
+
+        [Fact]
+        public async Task TimePeriodsUnchanged_ChangesAreEmpty()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                initialVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
+                    .WithCode(TimeIdentifier.AcademicYear)
+                    .ForIndex(0, s => s.SetPeriod("2019").SetCode(TimeIdentifier.AcademicYear))
+                    .ForIndex(1, s => s.SetPeriod("2020").SetCode(TimeIdentifier.CalendarYear))
+                    .ForIndex(2, s => s.SetPeriod("2021").SetCode(TimeIdentifier.January))
+                    .Generate(3),
+                nextVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
+                    .ForIndex(0, s => s.SetPeriod("2019").SetCode(TimeIdentifier.AcademicYear))
+                    .ForIndex(1, s => s.SetPeriod("2020").SetCode(TimeIdentifier.CalendarYear))
+                    .ForIndex(2, s => s.SetPeriod("2021").SetCode(TimeIdentifier.January))
+                    .Generate(3));
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            var actualChanges = await GetDbContext<PublicDataDbContext>()
+                .TimePeriodMetaChanges
+                .AsNoTracking()
+                .Where(c => c.DataSetVersionId == newVersion.Id)
+                .ToListAsync();
+
+            Assert.Empty(actualChanges);
+        }
+
+        [Fact]
+        public async Task TimePeriodsAdded_ChangesContainOnlyAdditions()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                initialVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
+                    .WithCode(TimeIdentifier.CalendarYear)
+                    .WithPeriod("2020")
+                    .Generate(1),
+                nextVersionTimePeriodMetas:
+                [
+                    ..DataFixture.DefaultTimePeriodMeta()
+                        .WithCode(TimeIdentifier.CalendarYear)
+                        .WithPeriod("2020")
+                        .Generate(1),
+                    ..DataFixture.DefaultTimePeriodMeta()
+                        .WithCode(TimeIdentifier.AcademicYear)
+                        .ForIndex(0, s => s.SetPeriod("2019"))
+                        .ForIndex(1, s => s.SetPeriod("2020"))
+                        .ForIndex(2, s => s.SetPeriod("2021"))
+                        .Generate(3)
+                ]);
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            var actualChanges = await GetDbContext<PublicDataDbContext>()
+                .TimePeriodMetaChanges
+                .AsNoTracking()
+                .Where(c => c.DataSetVersionId == newVersion.Id)
+                .ToListAsync();
+
+            Assert.Equal(3, actualChanges.Count);
+            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.All(actualChanges, c => Assert.Null(c.PreviousStateId));
+
+            var newTimePeriodMetas = newVersion.TimePeriodMetas
+                .ToDictionary(m => (m.Code, m.Period));
+
+            Assert.Equal(newTimePeriodMetas[(TimeIdentifier.AcademicYear, "2019")].Id, actualChanges[0].CurrentStateId);
+            Assert.Equal(newTimePeriodMetas[(TimeIdentifier.AcademicYear, "2020")].Id, actualChanges[1].CurrentStateId);
+            Assert.Equal(newTimePeriodMetas[(TimeIdentifier.AcademicYear, "2021")].Id, actualChanges[2].CurrentStateId);
+        }
+
+        [Fact]
+        public async Task TimePeriodsDeleted_ChangesContainOnlyDeletions()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                initialVersionTimePeriodMetas:
+                [
+                    ..DataFixture.DefaultTimePeriodMeta()
+                        .WithCode(TimeIdentifier.CalendarYear)
+                        .WithPeriod("2020")
+                        .Generate(1),
+                    ..DataFixture.DefaultTimePeriodMeta()
+                        .WithCode(TimeIdentifier.AcademicYear)
+                        .ForIndex(0, s => s.SetPeriod("2019"))
+                        .ForIndex(1, s => s.SetPeriod("2020"))
+                        .ForIndex(2, s => s.SetPeriod("2021"))
+                        .Generate(3)
+                ],
+                nextVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
+                    .WithCode(TimeIdentifier.CalendarYear)
+                    .WithPeriod("2020")
+                    .Generate(1));
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            var actualChanges = await GetDbContext<PublicDataDbContext>()
+                .TimePeriodMetaChanges
+                .AsNoTracking()
+                .Where(c => c.DataSetVersionId == newVersion.Id)
+                .ToListAsync();
+
+            Assert.Equal(3, actualChanges.Count);
+            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.All(actualChanges, c => Assert.Null(c.CurrentStateId));
+
+            var oldTimePeriodMetas = originalVersion.TimePeriodMetas
+                .ToDictionary(m => (m.Code, m.Period));
+
+            Assert.Equal(oldTimePeriodMetas[(TimeIdentifier.AcademicYear, "2019")].Id,
+                actualChanges[0].PreviousStateId);
+            Assert.Equal(oldTimePeriodMetas[(TimeIdentifier.AcademicYear, "2020")].Id,
+                actualChanges[1].PreviousStateId);
+            Assert.Equal(oldTimePeriodMetas[(TimeIdentifier.AcademicYear, "2021")].Id,
+                actualChanges[2].PreviousStateId);
         }
     }
 

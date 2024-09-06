@@ -334,6 +334,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 PreviousStateId = oldTimePeriodMetaIdsByCodeAndPeriod[codeAndPeriod].Id,
                 CurrentStateId = null
             })
+            .OrderBy(c => c.PreviousStateId)
             .ToList();
 
         var timePeriodMetaAdditions = newTimePeriodMetaIdsByCodeAndPeriod
@@ -345,6 +346,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 PreviousStateId = null,
                 CurrentStateId = newTimePeriodMetaIdsByCodeAndPeriod[codeAndPeriod].Id
             })
+            .OrderBy(c => c.CurrentStateId)
             .ToList();
 
         return [.. timePeriodMetaDeletions, .. timePeriodMetaAdditions];

@@ -35,10 +35,20 @@ public static class DataSetVersionMappingGeneratorExtensions
         LocationMappingPlan locationMappingPlan)
         => generator.ForInstance(s => s.SetLocationMappingPlan(locationMappingPlan));
 
+    public static Generator<DataSetVersionMapping> WithLocationMappingsComplete(
+        this Generator<DataSetVersionMapping> generator,
+        bool locationMappingsComplete)
+        => generator.ForInstance(s => s.SetLocationMappingsComplete(locationMappingsComplete));
+
     public static Generator<DataSetVersionMapping> WithFilterMappingPlan(
         this Generator<DataSetVersionMapping> generator,
         FilterMappingPlan filterMappingPlan)
         => generator.ForInstance(s => s.SetFilterMappingPlan(filterMappingPlan));
+
+    public static Generator<DataSetVersionMapping> WithFilterMappingsComplete(
+        this Generator<DataSetVersionMapping> generator,
+        bool filterMappingsComplete)
+        => generator.ForInstance(s => s.SetFilterMappingsComplete(filterMappingsComplete));
 
     public static InstanceSetters<DataSetVersionMapping> SetDefaults(
         this InstanceSetters<DataSetVersionMapping> setters)
@@ -79,9 +89,19 @@ public static class DataSetVersionMappingGeneratorExtensions
         => instanceSetter
             .Set(mapping => mapping.LocationMappingPlan, locationMappingPlan);
 
+    public static InstanceSetters<DataSetVersionMapping> SetLocationMappingsComplete(
+        this InstanceSetters<DataSetVersionMapping> instanceSetter,
+        bool locationMappingsComplete)
+        => instanceSetter.Set(mapping => mapping.LocationMappingsComplete, locationMappingsComplete);
+
     public static InstanceSetters<DataSetVersionMapping> SetFilterMappingPlan(
         this InstanceSetters<DataSetVersionMapping> instanceSetter,
         FilterMappingPlan filterMappingPlan)
         => instanceSetter
             .Set(mapping => mapping.FilterMappingPlan, filterMappingPlan);
+
+    public static InstanceSetters<DataSetVersionMapping> SetFilterMappingsComplete(
+        this InstanceSetters<DataSetVersionMapping> instanceSetter,
+        bool filterMappingsComplete)
+        => instanceSetter.Set(mapping => mapping.FilterMappingsComplete, filterMappingsComplete);
 }
