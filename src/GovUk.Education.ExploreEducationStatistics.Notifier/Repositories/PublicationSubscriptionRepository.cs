@@ -20,7 +20,7 @@ public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appS
 
     public async Task RemoveSubscriber(CloudTable table, SubscriptionEntityOld subscription)
     {
-        subscription.ETag = "*";
+        subscription.ETag = "*"; // @MarkFix Do I need to do this? Looks like it
         await table.ExecuteAsync(TableOperation.Delete(subscription));
     }
 
@@ -47,14 +47,14 @@ public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appS
         return table;
     }
 
-    public async Task<Subscription> GetSubscription(string id, string email)
+    public async Task<SubscriptionOld> GetSubscription(string id, string email) // @MarkFix remove
     {
         var pendingSub =
             await RetrieveSubscriber(await GetTable(NotifierTableStorage.PublicationPendingSubscriptionsTable),
                 new SubscriptionEntityOld(id, email));
         if (pendingSub is not null)
         {
-            return new Subscription
+            return new SubscriptionOld
             {
                 Subscriber = pendingSub,
                 Status = SubscriptionStatus.SubscriptionPending
@@ -65,13 +65,13 @@ public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appS
             new SubscriptionEntityOld(id, email));
         if (activeSubscriber is not null)
         {
-            return new Subscription
+            return new SubscriptionOld
             {
                 Subscriber = activeSubscriber,
                 Status = SubscriptionStatus.Subscribed
             };
         }
 
-        return new Subscription { Status = SubscriptionStatus.NotSubscribed };
+        return new SubscriptionOld { Status = SubscriptionStatus.NotSubscribed };
     }
 }
