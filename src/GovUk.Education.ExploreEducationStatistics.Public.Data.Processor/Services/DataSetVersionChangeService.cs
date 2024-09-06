@@ -301,6 +301,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 PreviousStateId = oldIndicatorMetaIdsByPublicId[publicId].Id,
                 CurrentStateId = null
             })
+            .OrderBy(c => c.PreviousStateId)
             .ToList();
 
         var indicatorMetaAdditions = newIndicatorMetaIdsByPublicId
@@ -312,6 +313,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 PreviousStateId = null,
                 CurrentStateId = newIndicatorMetaIdsByPublicId[publicId].Id
             })
+            .OrderBy(c => c.CurrentStateId)
             .ToList();
 
         return [.. indicatorMetaDeletions, .. indicatorMetaAdditions];

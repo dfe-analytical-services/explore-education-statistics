@@ -1285,6 +1285,177 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
+    public class CreateChangesTestsIndicatorTests(
+        ProcessorFunctionsIntegrationTestFixture fixture)
+        : CreateChangesTests(fixture)
+    {
+        [Fact]
+        public async Task IndicatorsAddedAndDeleted_ChangesContainAdditionsAndDeletions()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                initialVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
+                    .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                    .ForIndex(1, s => s.SetPublicId("O7CLF"))
+                    .ForIndex(2, s => s.SetPublicId("7zXob"))
+                    .Generate(3),
+                nextVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
+                    .ForIndex(0, s => s.SetPublicId("7zXob"))
+                    .ForIndex(1, s => s.SetPublicId("pTSoj"))
+                    .ForIndex(2, s => s.SetPublicId("IzBzg"))
+                    .Generate(3));
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            var actualChanges = await GetDbContext<PublicDataDbContext>()
+                .IndicatorMetaChanges
+                .AsNoTracking()
+                .Where(c => c.DataSetVersionId == newVersion.Id)
+                .OrderBy(c => c.Id)
+                .ToListAsync();
+
+            Assert.Equal(4, actualChanges.Count);
+            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldIndicatorMetas = originalVersion.IndicatorMetas
+                .ToDictionary(m => m.PublicId);
+
+            Assert.Equal(oldIndicatorMetas["dP0Zw"].Id, actualChanges[0].PreviousStateId);
+            Assert.Null(actualChanges[0].CurrentStateId);
+
+            Assert.Equal(oldIndicatorMetas["O7CLF"].Id, actualChanges[1].PreviousStateId);
+            Assert.Null(actualChanges[1].CurrentStateId);
+
+            var newIndicatorMetas = newVersion.IndicatorMetas
+                .ToDictionary(m => m.PublicId);
+
+            Assert.Null(actualChanges[2].PreviousStateId);
+            Assert.Equal(newIndicatorMetas["pTSoj"].Id, actualChanges[2].CurrentStateId);
+
+            Assert.Null(actualChanges[3].PreviousStateId);
+            Assert.Equal(newIndicatorMetas["IzBzg"].Id, actualChanges[3].CurrentStateId);
+        }
+
+        [Fact]
+        public async Task IndicatorsUnchanged_ChangesAreEmpty()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                initialVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
+                    .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                    .ForIndex(1, s => s.SetPublicId("O7CLF"))
+                    .ForIndex(2, s => s.SetPublicId("7zXob"))
+                    .Generate(3),
+                nextVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
+                    .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                    .ForIndex(1, s => s.SetPublicId("O7CLF"))
+                    .ForIndex(2, s => s.SetPublicId("7zXob"))
+                    .Generate(3));
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            Assert.False(await GetDbContext<PublicDataDbContext>()
+                .IndicatorMetaChanges
+                .AnyAsync(c => c.DataSetVersionId == newVersion.Id));
+        }
+
+        [Fact]
+        public async Task IndicatorsAdded_ChangesContainOnlyAdditions()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                initialVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
+                    .WithPublicId("dP0Zw")
+                    .Generate(1),
+                nextVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
+                    .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                    .ForIndex(1, s => s.SetPublicId("O7CLF"))
+                    .ForIndex(2, s => s.SetPublicId("7zXob"))
+                    .Generate(3));
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            var actualChanges = await GetDbContext<PublicDataDbContext>()
+                .IndicatorMetaChanges
+                .AsNoTracking()
+                .Where(c => c.DataSetVersionId == newVersion.Id)
+                .OrderBy(c => c.Id)
+                .ToListAsync();
+
+            Assert.Equal(2, actualChanges.Count);
+            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.All(actualChanges, c => Assert.Null(c.PreviousStateId));
+
+            var newIndicatorMetas = newVersion.IndicatorMetas
+                .ToDictionary(m => m.PublicId);
+
+            Assert.Equal(newIndicatorMetas["O7CLF"].Id, actualChanges[0].CurrentStateId);
+            Assert.Equal(newIndicatorMetas["7zXob"].Id, actualChanges[1].CurrentStateId);
+        }
+
+        [Fact]
+        public async Task IndicatorsDeleted_ChangesContainOnlyDeletions()
+        {
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage(),
+                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
+                initialVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
+                        .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                        .ForIndex(1, s => s.SetPublicId("O7CLF"))
+                        .ForIndex(2, s => s.SetPublicId("7zXob"))
+                        .Generate(3),
+                nextVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
+                    .WithPublicId("dP0Zw")
+                    .Generate(1));
+
+            await CreateDefaultCompleteMappings(
+                sourceDataSetVersionId: originalVersion.Id,
+                targetDataSetVersionId: newVersion.Id);
+
+            await CreateChanges(instanceId);
+
+            var actualChanges = await GetDbContext<PublicDataDbContext>()
+                .IndicatorMetaChanges
+                .AsNoTracking()
+                .Where(c => c.DataSetVersionId == newVersion.Id)
+                .OrderBy(c => c.Id)
+                .ToListAsync();
+
+            Assert.Equal(2, actualChanges.Count);
+            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.All(actualChanges, c => Assert.Null(c.CurrentStateId));
+
+            var oldIndicatorMetas = originalVersion.IndicatorMetas
+                .ToDictionary(m => m.PublicId);
+
+            Assert.Equal(oldIndicatorMetas["O7CLF"].Id, actualChanges[0].PreviousStateId);
+            Assert.Equal(oldIndicatorMetas["7zXob"].Id, actualChanges[1].PreviousStateId);
+        }
+    }
+
     public class CreateChangesTestsTimePeriodTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateChangesTests(fixture)
@@ -1320,6 +1491,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .TimePeriodMetaChanges
                 .AsNoTracking()
                 .Where(c => c.DataSetVersionId == newVersion.Id)
+                .OrderBy(c => c.Id)
                 .ToListAsync();
 
             Assert.Equal(4, actualChanges.Count);
@@ -1372,13 +1544,9 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualChanges = await GetDbContext<PublicDataDbContext>()
+            Assert.False(await GetDbContext<PublicDataDbContext>()
                 .TimePeriodMetaChanges
-                .AsNoTracking()
-                .Where(c => c.DataSetVersionId == newVersion.Id)
-                .ToListAsync();
-
-            Assert.Empty(actualChanges);
+                .AnyAsync(c => c.DataSetVersionId == newVersion.Id));
         }
 
         [Fact]
@@ -1417,6 +1585,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .TimePeriodMetaChanges
                 .AsNoTracking()
                 .Where(c => c.DataSetVersionId == newVersion.Id)
+                .OrderBy(c => c.Id)
                 .ToListAsync();
 
             Assert.Equal(3, actualChanges.Count);
@@ -1467,6 +1636,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .TimePeriodMetaChanges
                 .AsNoTracking()
                 .Where(c => c.DataSetVersionId == newVersion.Id)
+                .OrderBy(c => c.Id)
                 .ToListAsync();
 
             Assert.Equal(3, actualChanges.Count);
