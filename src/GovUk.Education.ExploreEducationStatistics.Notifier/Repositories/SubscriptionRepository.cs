@@ -11,17 +11,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 internal class SubscriptionRepository(
     INotifierTableStorageService notifierTableStorage) : ISubscriptionRepository
 {
+    public async Task RemoveSubscription(Guid publicationId, string email)
+    {
+        await notifierTableStorage
+            .DeleteEntity(
+                tableName: NotifierTableStorage.PublicationSubscriptionsTable,
+                partitionKey: publicationId.ToString(),
+                rowKey: email);
+    }
+
+    public async Task RemovePendingSubscription(Guid publicationId, string email)
+    {
+
+    }
+
     public async Task<List<string>> GetSubscriberEmails(Guid publicationId)
     {
-            var results = await notifierTableStorage
-                .QueryEntities<SubscriptionEntity>(
-                    tableName: NotifierTableStorage.PublicationSubscriptionsTable,
-                    filter: sub => sub.PartitionKey == publicationId.ToString(),
-                    select: [nameof(SubscriptionEntity.RowKey)]); // email address
+        var results = await notifierTableStorage
+            .QueryEntities<SubscriptionEntity>(
+                tableName: NotifierTableStorage.PublicationSubscriptionsTable,
+                filter: sub => sub.PartitionKey == publicationId.ToString(),
+                select: [nameof(SubscriptionEntity.RowKey)]); // email address
 
-            // @MarkFix especially check this - we used to fetch in segments (I think)
-            return await results
-                .Select(subscriber => subscriber.RowKey)
-                .ToListAsync();
+        // @MarkFix especially check this - we used to fetch in segments (I think)
+        return await results
+            .Select(subscriber => subscriber.RowKey)
+            .ToListAsync();
     }
 }

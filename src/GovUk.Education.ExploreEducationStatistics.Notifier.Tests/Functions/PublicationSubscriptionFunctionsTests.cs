@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interface
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
@@ -467,21 +468,25 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task Unsubscribes()
     {
-        // Arrange (data)
-        await AddTestSubscription(NotifierTableStorage.PublicationSubscriptionsTable,
-            new SubscriptionEntityOld("test-id-5",
-                "test5@test.com",
-                "Test Publication Title 5",
-                "test-publication-slug-5",
-                DateTime.UtcNow.AddDays(-4)));
-
-
-        // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
         {
-            NotifierStorageConnectionString = StorageConnectionString()
+           NotifierStorageConnectionString = StorageConnectionString(),
         }));
 
+        // Arrange (data)
+        var publicationId = Guid.NewGuid();
+        await notifierTableStorageService.CreateEntity(
+            NotifierTableStorage.PublicationSubscriptionsTable,
+            new SubscriptionEntity
+            {
+                PartitionKey = publicationId.ToString(),
+                RowKey = "test5@test.com",
+                Slug = "test-publication-slug-5",
+                Title = "Test Publication Title 5",
+                DateTimeCreated = DateTime.UtcNow.AddDays(-4)
+            });
+
+        // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GetEmailFromToken("unsubscription-code-5"))
@@ -490,14 +495,14 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
 
         var notifierFunction = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository,
+            notifierTableStorageService: notifierTableStorageService,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
         // Act
         var result =
             await notifierFunction.Unsubscribe(new TestFunctionContext(),
-                "test-id-5",
+                publicationId,
                 "unsubscription-code-5");
 
         var okResult = Assert.IsAssignableFrom<OkObjectResult>(result);

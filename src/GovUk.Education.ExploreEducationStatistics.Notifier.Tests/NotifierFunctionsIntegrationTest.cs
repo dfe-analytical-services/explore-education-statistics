@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -54,7 +55,7 @@ public abstract class NotifierFunctionsIntegrationTest
         return GetRequiredService<IOptions<GovUkNotifyOptions>>().Value;
     }
 
-    protected async Task AddTestSubscription(string tableName, SubscriptionEntityOld subscription)
+    protected async Task AddTestSubscription(string tableName, SubscriptionEntityOld subscription) // @MarkFix remove
     {
         var storageAccount = CloudStorageAccount.Parse(StorageConnectionString());
         var tableClient = storageAccount.CreateCloudTableClient();

@@ -5,6 +5,6 @@ using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 
-internal class NotifierTableStorageService(IOptions<AppSettingsOptions> appSettingsOptions)
+public class NotifierTableStorageService(IOptions<AppSettingsOptions> appSettingsOptions)
     : DataTableStorageService(appSettingsOptions.Value.NotifierStorageConnectionString),
         INotifierTableStorageService;

@@ -151,9 +151,9 @@ public class PublicationSubscriptionFunctions(
 
     [Function(FunctionNames.Unsubscribe)]
     public async Task<IActionResult> Unsubscribe(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe/{token}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId:guid}/unsubscribe/{token:string}")]
         FunctionContext context,
-        string id,
+        Guid publicationId,
         string token)
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
@@ -164,18 +164,26 @@ public class PublicationSubscriptionFunctions(
             return new BadRequestObjectResult("Unable to unsubscribe. A valid email address could not be parsed from the given token.");
         }
 
-        var table = await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationSubscriptionsTable);
-        var sub = await publicationSubscriptionRepository.RetrieveSubscriber(table, new SubscriptionEntityOld(id, email));
-        if (sub is null)
+        var subscription = await notifierTableStorageService.GetEntityIfExists<SubscriptionEntity>(
+            tableName: NotifierTableStorage.PublicationSubscriptionsTable,
+            partitionKey: publicationId.ToString(),
+            rowKey: email);
+
+        if (subscription is null)
         {
             return new UnprocessableEntityObjectResult("Unable to unsubscribe. Given email is not currently subscribed.");
         }
 
-        await publicationSubscriptionRepository.RemoveSubscriber(table, sub);
+        await notifierTableStorageService
+            .DeleteEntity(
+                tableName: NotifierTableStorage.PublicationSubscriptionsTable,
+                partitionKey: publicationId.ToString(),
+                rowKey: email);
+
         return new OkObjectResult(new SubscriptionStateDto
         {
-            Slug = sub.Slug,
-            Title = sub.Title,
+            Slug = subscription.Slug,
+            Title = subscription.Title,
             Status = SubscriptionStatus.NotSubscribed
         });
     }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
@@ -88,11 +89,22 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
     {
         var tableClient = await GetTableClient(tableName, cancellationToken);
 
-        await tableClient.DeleteEntityAsync(
+        var response = await tableClient.DeleteEntityAsync(
             partitionKey: partitionKey,
             rowKey: rowKey,
             ifMatch: ETag.All,
             cancellationToken: cancellationToken);
+
+        if (response.Status != (int)HttpStatusCode.OK &&  // @MarkFix not sure what it actually returns
+            response.Status != (int)HttpStatusCode.NoContent)
+        {
+            throw new Exception($"""
+                                 Entity not deleted.
+                                 TableName: {tableName}
+                                 PartitionKey: {partitionKey}
+                                 RowKey: {rowKey}
+                                 """);
+        }
     }
 
     public async Task<AsyncPageable<TEntity>> QueryEntities<TEntity>(
