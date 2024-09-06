@@ -1,3 +1,4 @@
+import render from '@common-test/render';
 import {
   testChartConfiguration,
   testChartTableData,
@@ -6,17 +7,16 @@ import {
   testMapConfiguration,
   testMapTableData,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { Chart, DataBlock } from '@common/services/types/blocks';
 import { screen, waitFor } from '@testing-library/dom';
-import { render } from '@testing-library/react';
 import { AxiosError } from 'axios';
 import React from 'react';
 import { forceVisible } from 'react-lazyload';
-import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 
 jest.mock('@common/services/tableBuilderService');
 

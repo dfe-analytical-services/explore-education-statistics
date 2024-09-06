@@ -49,7 +49,7 @@ const DataBlockTabs = ({
     tableBuilderQueries.getDataBlockTable(
       releaseId,
       dataBlock.dataBlockParentId,
-      dataBlock.charts[0].type === 'map'
+      dataBlock.charts[0]?.type === 'map'
         ? dataBlock.charts[0].boundaryLevel
         : undefined,
     ),

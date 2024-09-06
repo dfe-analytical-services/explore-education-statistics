@@ -1,12 +1,12 @@
 import EditableKeyStatDataBlock from '@admin/pages/release/content/components/EditableKeyStatDataBlock';
+import render from '@common-test/render';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import _tableBuilderService, {
   TableDataResponse,
 } from '@common/services/tableBuilderService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
 
 jest.mock('@admin/services/keyStatisticService');
 jest.mock('@common/services/tableBuilderService');
