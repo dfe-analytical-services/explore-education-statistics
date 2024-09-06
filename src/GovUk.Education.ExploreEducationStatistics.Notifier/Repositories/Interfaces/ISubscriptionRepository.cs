@@ -6,5 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Inter
 
 public interface ISubscriptionRepository
 {
+    public Task RemoveSubscription(Guid publicationId, string email);
+
+    public Task RemovePendingSubscription(Guid publicationId, string email);
+
     public Task<List<string>> GetSubscriberEmails(Guid publicationId);
 }
