@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
-[Collection("Set FluentValidation property name camel case configuration")]
 public abstract class DataSetGetQueryLocationsValidatorTests
 {
     private readonly DataSetGetQueryLocations.Validator _validator = new();
@@ -139,7 +138,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
             Assert.Equal(locations.Length, result.Errors.Count);
 
-            locations.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"in[{index}]"));
+            locations.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"In[{index}]"));
         }
 
         [Theory]
@@ -155,7 +154,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
             Assert.Equal(locations.Length, result.Errors.Count);
 
-            locations.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"in[{index}]"));
+            locations.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"In[{index}]"));
         }
     }
 
@@ -194,7 +193,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
             Assert.Equal(locations.Length, result.Errors.Count);
 
-            locations.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"notIn[{index}]"));
+            locations.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"NotIn[{index}]"));
         }
 
         [Theory]
@@ -210,7 +209,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
             Assert.Equal(locations.Length, result.Errors.Count);
 
-            locations.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"notIn[{index}]"));
+            locations.ForEach((_, index) => result.ShouldHaveValidationErrorFor($"NotIn[{index}]"));
         }
     }
 

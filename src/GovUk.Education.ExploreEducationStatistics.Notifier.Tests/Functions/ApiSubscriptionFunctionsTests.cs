@@ -625,7 +625,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                     dataSetFileId: _dataSetFileId,
                     version: Version));
 
-            Assert.Equal("Validation failed:  -- dataSetId: Must not be empty. Severity: Error",
+            Assert.Equal("Validation failed:  -- DataSetId: Must not be empty. Severity: Error",
                 exception.Message.StripLines());
         }
 
@@ -638,7 +638,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                     dataSetFileId: Guid.Empty,
                     version: Version));
 
-            Assert.Equal("Validation failed:  -- dataSetFileId: Must not be empty. Severity: Error",
+            Assert.Equal("Validation failed:  -- DataSetFileId: Must not be empty. Severity: Error",
                 exception.Message.StripLines());
         }
 
@@ -653,7 +653,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                     dataSetFileId: _dataSetFileId,
                     version: version!));
 
-            Assert.Equal("Validation failed:  -- version: Must not be empty. Severity: Error",
+            Assert.Equal("Validation failed:  -- Version: Must not be empty. Severity: Error",
                 exception.Message.StripLines());
         }
 
