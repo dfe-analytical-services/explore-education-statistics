@@ -407,21 +407,25 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task SendsSubscriptionConfirmationEmail()
     {
-        // Arrange (data)
-        await AddTestSubscription(NotifierTableStorage.PublicationPendingSubscriptionsTable,
-            new SubscriptionEntityOld("test-id-4",
-                "test4@test.com",
-                "Test Publication Title 4",
-                "test-publication-slug-4",
-                DateTime.UtcNow.AddDays(-4)));
-
-
-        // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
         {
-            NotifierStorageConnectionString = StorageConnectionString()
+           NotifierStorageConnectionString = StorageConnectionString(),
         }));
 
+        // Arrange (data)
+        var publicationId = Guid.NewGuid();
+        await notifierTableStorageService.CreateEntity(
+            NotifierTableStorage.PublicationPendingSubscriptionsTable,
+            new SubscriptionEntity
+            {
+                PartitionKey = publicationId.ToString(),
+                RowKey = "test4@test.com",
+                Slug = "test-publication-slug-4",
+                Title = "Test Publication Title 4",
+                DateTimeCreated = DateTime.UtcNow.AddDays(-4)
+            });
+
+        // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GetEmailFromToken("verification-code-4"))
@@ -439,14 +443,14 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
 
         var notifierFunction = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository,
+            notifierTableStorageService: notifierTableStorageService,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
         // Act
         var result =
             await notifierFunction.VerifySubscription(new TestFunctionContext(),
-                "test-id-4",
+                publicationId,
                 "verification-code-4");
 
         // Assert
