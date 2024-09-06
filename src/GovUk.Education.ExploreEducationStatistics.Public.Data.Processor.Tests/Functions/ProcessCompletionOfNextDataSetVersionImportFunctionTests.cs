@@ -152,15 +152,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             // filter CHANGED, options UNCHANGED. ===> Should just have 1 change for the CHANGED filter.
             // filter CHANGED + SOME options CHANGED. ===> Should have 1 change for the CHANGED filter, and 1 change for EACH of the CHANGED options.
 
-            var (instanceId, originalVersion, newVersion) = await CreateNextDataSetVersionWithMeta(
-                importStage: Stage.PreviousStage());
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage());
 
             // Here we define what changes have occurred between the original and new data set versions.
             // The metadata and mappings are then automatically calculated and stored from this, which can then be used
             // to create the changes.
             List<FilterChange> allChanges =
             [
-                new FilterChange
+                new()
                 {
                     ParentIdentifier = "filter 1",
                     ChangeType = ChangeType.Deleted,
@@ -179,7 +180,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         }
                     ]
                 },
-                new FilterChange
+                new()
                 {
                     ParentIdentifier = "filter 2",
                     ChangeType = ChangeType.Added,
@@ -198,7 +199,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         }
                     ]
                 },
-                new FilterChange
+                new()
                 {
                     ParentIdentifier = "filter 3",
                     ChangeType = ChangeType.Unchanged,
@@ -217,7 +218,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         }
                     ]
                 },
-                new FilterChange
+                new()
                 {
                     ParentIdentifier = "filter 4",
                     ChangeType = ChangeType.Unchanged,
@@ -241,7 +242,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         }
                     ]
                 },
-                new FilterChange
+                new()
                 {
                     ParentIdentifier = "filter 5",
                     ChangeType = ChangeType.Unchanged,
@@ -265,7 +266,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         }
                     ]
                 },
-                new FilterChange
+                new()
                 {
                     ParentIdentifier = "filter 6",
                     ChangeType = ChangeType.Changed,
@@ -284,7 +285,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         }
                     ]
                 },
-                new FilterChange
+                new()
                 {
                     ParentIdentifier = "filter 7",
                     ChangeType = ChangeType.Changed,
@@ -346,9 +347,9 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             // All changes should be for the new data set version
             Assert.All(newVersionWithChanges.FilterMetaChanges,
-                lmc => Assert.Equal(newVersionWithChanges.Id, lmc.DataSetVersionId));
+                c => Assert.Equal(newVersionWithChanges.Id, c.DataSetVersionId));
             Assert.All(newVersionWithChanges.FilterOptionMetaChanges,
-                lomc => Assert.Equal(newVersionWithChanges.Id, lomc.DataSetVersionId));
+                c => Assert.Equal(newVersionWithChanges.Id, c.DataSetVersionId));
 
             foreach (var parentChange in allChanges)
             {
@@ -430,6 +431,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 DataSetVersion originalVersion,
                 DataSetVersion newVersion)
         {
+            var oldGeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                .WithDataSetVersionId(originalVersion.Id);
+            await CreateMeta(geographicLevelMeta: oldGeographicLevelMeta);
+
             var oldFilterMetasByPublicId = allChanges
                 .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Changed or ChangeType.Deleted)
                 .Select(pc => CreateAddedFilter(
@@ -440,6 +445,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             var oldFilterMetas = oldFilterMetasByPublicId.Values.ToList();
 
             await CreateMeta(filterMetas: oldFilterMetas);
+
+            var newGeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                .WithDataSetVersionId(newVersion.Id);
+            await CreateMeta(geographicLevelMeta: newGeographicLevelMeta);
 
             var newFilterMetasByPublicId = allChanges
                 .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Changed or ChangeType.Added)
@@ -469,7 +478,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateMeta(filterMetas: newFilterMetasByPublicId.Values);
 
-            // The above is SLIGHTLY different than that for locations
+            // The above is SLIGHTLY different from that for locations
 
             var oldFilterOptionMetaLinks = new List<FilterOptionMetaLink>();
 
@@ -689,15 +698,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             // location UNCHANGED, with some DELETED options and some ADDED options. ===> Should have 1 change for EACH of the DELETED options and EACH of the ADDED options.
             // location UNCHANGED, SOME options CHANGED. ===> Should have 1 change for EACH of the CHANGED options.
 
-            var (instanceId, originalVersion, newVersion) = await CreateNextDataSetVersionWithMeta(
-                importStage: Stage.PreviousStage());
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage.PreviousStage());
 
             // Here we define what changes have occurred between the original and new data set versions.
             // The metadata and mappings are then automatically calculated and stored from this, which can then be used
             // to create the changes.
             List<LocationChange> allChanges =
             [
-                new LocationChange
+                new()
                 {
                     ParentIdentifier = GeographicLevel.LocalAuthority,
                     ChangeType = ChangeType.Deleted,
@@ -715,7 +725,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         }
                     ]
                 },
-                new LocationChange
+                new()
                 {
                     ParentIdentifier = GeographicLevel.School,
                     ChangeType = ChangeType.Added,
@@ -733,7 +743,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         }
                     ]
                 },
-                new LocationChange
+                new()
                 {
                     ParentIdentifier = GeographicLevel.Country,
                     ChangeType = ChangeType.Unchanged,
@@ -751,7 +761,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         }
                     ]
                 },
-                new LocationChange
+                new()
                 {
                     ParentIdentifier = GeographicLevel.RscRegion,
                     ChangeType = ChangeType.Unchanged,
@@ -774,7 +784,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         }
                     ]
                 },
-                new LocationChange
+                new()
                 {
                     ParentIdentifier = GeographicLevel.Provider,
                     ChangeType = ChangeType.Unchanged,
@@ -914,6 +924,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 DataSetVersion originalVersion,
                 DataSetVersion newVersion)
         {
+            var oldGeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                .WithDataSetVersionId(originalVersion.Id);
+            await CreateMeta(geographicLevelMeta: oldGeographicLevelMeta);
+
             var oldLocationMetasByLevel = allChanges
                 .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Deleted)
                 .Select(pc => DataFixture
@@ -924,6 +938,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .ToDictionary(lm => lm.Level);
 
             await CreateMeta(locationMetas: oldLocationMetasByLevel.Values);
+
+            var newGeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                .WithDataSetVersionId(newVersion.Id);
+            await CreateMeta(geographicLevelMeta: newGeographicLevelMeta);
 
             var newLocationMetasByLevel = allChanges
                 .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Added)
@@ -1161,17 +1179,9 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task Success_PathUpdated()
         {
-            var (initialDataSetVersion, _) = await CreateDataSet(
-                importStage: DataSetVersionImportStage.Completing,
-                status: DataSetVersionStatus.Published);
-
-            var defaultNextVersion = initialDataSetVersion.DefaultNextVersion();
-
-            var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
-                dataSetId: initialDataSetVersion.DataSetId,
-                importStage: Stage,
-                versionMajor: defaultNextVersion.Major,
-                versionMinor: defaultNextVersion.Minor);
+            var (_, nextDataSetVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage);
 
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             var originalStoragePath = dataSetVersionPathResolver.DirectoryPath(nextDataSetVersion);
@@ -1181,7 +1191,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             nextDataSetVersion.VersionMajor++;
 
-            publicDataDbContext.DataSetVersions.Attach(nextDataSetVersion);
             publicDataDbContext.DataSetVersions.Update(nextDataSetVersion);
             await publicDataDbContext.SaveChangesAsync();
 
@@ -1196,17 +1205,9 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task Success_PathNotUpdated()
         {
-            var (initialDataSetVersion, _) = await CreateDataSet(
-                importStage: DataSetVersionImportStage.Completing,
-                status: DataSetVersionStatus.Published);
-
-            var defaultNextVersion = initialDataSetVersion.DefaultNextVersion();
-
-            var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
-                dataSetId: initialDataSetVersion.DataSetId,
-                importStage: Stage,
-                versionMajor: defaultNextVersion.Major,
-                versionMinor: defaultNextVersion.Minor);
+            var (_, nextDataSetVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+                nextVersionStatus: DataSetVersionStatus.Mapping,
+                nextVersionImportStage: Stage);
 
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             var originalStoragePath = dataSetVersionPathResolver.DirectoryPath(nextDataSetVersion);
@@ -1233,7 +1234,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task Success()
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             Directory.CreateDirectory(dataSetVersionPathResolver.DirectoryPath(dataSetVersion));
@@ -1255,7 +1256,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task DuckDbFileIsDeleted()
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             // Create empty data set version files for all file paths
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
@@ -1280,43 +1281,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunction>();
             await function.CompleteNextDataSetVersionImportProcessing(instanceId, CancellationToken.None);
         }
-    }
-
-    private async Task<(Guid instanceId, DataSetVersion initialVersion, DataSetVersion nextVersion)>
-        CreateNextDataSetVersionWithMeta(
-            DataSetVersionImportStage importStage,
-            IEnumerable<FilterMeta>? oldFilterMetas = null,
-            IEnumerable<LocationMeta>? oldLocationMetas = null,
-            GeographicLevelMeta? oldGeographicLevelMeta = null,
-            IEnumerable<IndicatorMeta>? oldIndicatorMetas = null,
-            IEnumerable<TimePeriodMeta>? oldTimePeriodMetas = null,
-            IEnumerable<FilterMeta>? newFilterMetas = null,
-            IEnumerable<LocationMeta>? newLocationMetas = null,
-            GeographicLevelMeta? newGeographicLevelMeta = null,
-            IEnumerable<IndicatorMeta>? newIndicatorMetas = null,
-            IEnumerable<TimePeriodMeta>? newTimePeriodMetas = null)
-    {
-        var (initialDataSetVersion, _) = await CreateDataSet(
-            importStage: DataSetVersionImportStage.Completing,
-            status: DataSetVersionStatus.Published,
-            filterMetas: oldFilterMetas,
-            locationMetas: oldLocationMetas,
-            geographicLevelMeta: oldGeographicLevelMeta ?? DataFixture.DefaultGeographicLevelMeta(),
-            indicatorMetas: oldIndicatorMetas,
-            timePeriodMetas: oldTimePeriodMetas);
-
-        var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
-            dataSetId: initialDataSetVersion.DataSetId,
-            importStage: importStage,
-            versionMajor: 1,
-            versionMinor: 1,
-            filterMetas: newFilterMetas,
-            locationMetas: newLocationMetas,
-            geographicLevelMeta: newGeographicLevelMeta ?? DataFixture.DefaultGeographicLevelMeta(),
-            indicatorMetas: newIndicatorMetas,
-            timePeriodMetas: newTimePeriodMetas);
-
-        return (instanceId, initialDataSetVersion, nextDataSetVersion);
     }
 
     private async Task CreateMeta(
@@ -1352,7 +1316,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             if (geographicLevelMeta is not null)
             {
-                context.GeographicLevelMetas.AddRange(geographicLevelMeta);
+                context.GeographicLevelMetas.Add(geographicLevelMeta);
             }
 
             if (indicatorMetas is not null)
@@ -1371,6 +1335,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
     {
         return await GetDbContext<PublicDataDbContext>()
             .DataSetVersions
+            .AsNoTracking()
             .Include(dsv => dsv.FilterMetaChanges)
             .Include(dsv => dsv.FilterOptionMetaChanges)
             .Include(dsv => dsv.LocationMetaChanges)
@@ -1382,37 +1347,35 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
     }
 
     // These classes are to make setting up the tests easier and safer to change.
-    // We define what changes we want the hypothetical new data set version to have, relative to it's original version, and
+    // We define what changes we want the hypothetical new data set version to have, relative to its original version, and
     // the metadata and mappings are then worked out for us.
     private abstract record ParentChange<TParentIdentifier>
     {
-        public TParentIdentifier ParentIdentifier { get; init; }
-        public ChangeType ChangeType { get; init; }
-        public IReadOnlyList<OptionChange> OptionChanges { get; init; } = [];
+        public required TParentIdentifier ParentIdentifier { get; init; }
+        public required ChangeType ChangeType { get; init; }
+        public required IReadOnlyList<OptionChange> OptionChanges { get; init; }
     }
 
     private record OptionChange
     {
-        public ChangeType ChangeType { get; init; }
+        public required ChangeType ChangeType { get; init; }
 
         // This is the index of the corresponding option for the original data set version, or for the new data set version
-        public int OptionIndex { get; init; }
+        public required int OptionIndex { get; init; }
     }
 
-    private record LocationChange : ParentChange<GeographicLevel>
-    {
-    }
+    private record LocationChange : ParentChange<GeographicLevel>;
 
     private record FilterChange : ParentChange<string>
     {
         // This is the index of the corresponding filter for the original data set version, or for the new data set version
-        public int FilterIndex { get; init; }
+        public required int FilterIndex { get; init; }
     }
 
     private enum ChangeType
     {
         Unchanged, // This is essentially an option that has been auto-mapped
-        Changed, // This is an option that has had it's label changed, and has been manually mapped to the new option
+        Changed, // This is an option that has had its label changed, and has been manually mapped to the new option
         Deleted, // This is an option that had been deleted
         Added // This is an option that has been added
     }

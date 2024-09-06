@@ -46,7 +46,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task Success(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
@@ -99,7 +99,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task DataSetVersionMeta_CorrectGeographicLevels(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
@@ -119,7 +119,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFilesWithMetaInsertBatchSize))]
         public async Task DataSetVersionMeta_CorrectLocationOptions(ProcessorTestData testData, int metaInsertBatchSize)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             await ImportMetadata(testData, dataSetVersion, instanceId, metaInsertBatchSize);
 
@@ -176,12 +176,10 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             ProcessorTestData testData,
             int metaInsertBatchSize)
         {
-            var (sourceDataSetVersion, _) = await CreateDataSet(Stage.PreviousStage());
-
-            var (targetDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
-                dataSetId: sourceDataSetVersion.DataSet.Id,
-                importStage: DataSetVersionImportStage.ManualMapping,
-                versionMinor: 1);
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CreateDataSetInitialVersionAndNextVersion(
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping);
 
             // In this test, we will create mappings for all the original location options.
             // 2 of these mappings will have candidates, and the rest will have no candidates
@@ -294,7 +292,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task DataSetVersionMeta_CorrectTimePeriods(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
@@ -323,7 +321,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFilesWithMetaInsertBatchSize))]
         public async Task DataSetVersionMeta_CorrectFilters(ProcessorTestData testData, int metaInsertBatchSize)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             await ImportMetadata(testData, dataSetVersion, instanceId, metaInsertBatchSize);
 
@@ -377,12 +375,10 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         public async Task DataSetVersionMeta_CorrectFilters_WithMappings(ProcessorTestData testData,
             int metaInsertBatchSize)
         {
-            var (sourceDataSetVersion, _) = await CreateDataSet(Stage.PreviousStage());
-
-            var (targetDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
-                dataSetId: sourceDataSetVersion.DataSet.Id,
-                importStage: DataSetVersionImportStage.ManualMapping,
-                versionMinor: 1);
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CreateDataSetInitialVersionAndNextVersion(
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping);
 
             // In this test, we will create mappings for all the original filter options.
             // 2 of these mappings will have candidates, and the rest will have no candidates
@@ -526,7 +522,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task DataSetVersionMeta_CorrectIndicators(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
@@ -554,7 +550,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task DuckDbMeta_CorrectLocationOptions(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
@@ -589,7 +585,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task DuckDbMeta_CorrectTimePeriods(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
@@ -618,7 +614,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task DuckDbMeta_CorrectFilterOptions(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
@@ -663,7 +659,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task DuckDbMeta_CorrectIndicators(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 

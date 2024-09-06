@@ -268,19 +268,19 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         Guid nextVersionId,
         CancellationToken cancellationToken)
     {
-        var oldGeographicLevelMetas = await GetGeographicLevelMeta(previousVersionId, cancellationToken);
-        var newGeographicLevelMetas = await GetGeographicLevelMeta(nextVersionId, cancellationToken);
+        var oldGeographicLevelMeta = await GetGeographicLevelMeta(previousVersionId, cancellationToken);
+        var newGeographicLevelMeta = await GetGeographicLevelMeta(nextVersionId, cancellationToken);
 
         var levelsAreEqual =
-            newGeographicLevelMetas.Levels.Order().SequenceEqual(oldGeographicLevelMetas.Levels.Order());
+            newGeographicLevelMeta.Levels.Order().SequenceEqual(oldGeographicLevelMeta.Levels.Order());
 
         return levelsAreEqual
             ? null
             : new GeographicLevelMetaChange
             {
                 DataSetVersionId = nextVersionId,
-                PreviousStateId = oldGeographicLevelMetas.Id,
-                CurrentStateId = newGeographicLevelMetas.Id
+                PreviousStateId = oldGeographicLevelMeta.Id,
+                CurrentStateId = newGeographicLevelMeta.Id
             };
     }
 
