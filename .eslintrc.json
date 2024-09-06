@@ -30,7 +30,12 @@
     "@typescript-eslint/ban-ts-ignore": "off",
     "@typescript-eslint/default-param-last": "error",
     "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-empty-function": [
+      "error",
+      {
+        "allow": ["arrowFunctions", "functions", "methods"]
+      }
+    ],
     "@typescript-eslint/no-shadow": "error",
     "@typescript-eslint/no-unused-vars": [
       "warn",
@@ -45,9 +50,13 @@
     "import/no-cycle": "off",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "import/no-unresolved": "off",
-    "lines-between-class-members": ["error", "always", {
-      "exceptAfterSingleLine": true
-    }],
+    "lines-between-class-members": [
+      "error",
+      "always",
+      {
+        "exceptAfterSingleLine": true
+      }
+    ],
     "react/forbid-prop-types": "off",
     "react/function-component-definition": "off",
     "react/no-unstable-nested-components": [
@@ -78,7 +87,7 @@
       }
     ],
     "react/jsx-curly-newline": "off",
-    "react/jsx-no-useless-fragment": ["error", { "allowExpressions":  true}],
+    "react/jsx-no-useless-fragment": ["error", { "allowExpressions": true }],
     "react/jsx-one-expression-per-line": "off",
     "react/jsx-props-no-spreading": [
       "error",
@@ -100,6 +109,7 @@
         "assert": "htmlFor"
       }
     ],
+    "no-empty-function": "off",
     "no-console": "warn",
     "no-param-reassign": [
       "error",
@@ -161,7 +171,10 @@
       "extends": ["plugin:@next/next/recommended"],
       "rules": {
         "@next/next/no-img-element": "off",
-        "@next/next/no-html-link-for-pages": ["error", ["src/pages", "src/explore-education-statistics-frontend/src/pages"]]
+        "@next/next/no-html-link-for-pages": [
+          "error",
+          ["src/pages", "src/explore-education-statistics-frontend/src/pages"]
+        ]
       }
     }
   ]
