@@ -9,11 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 
 internal class SubscriptionRepository(
-    IApiSubscriptionTableStorageService apiSubscriptionTableStorage) : ISubscriptionRepository
+    INotifierTableStorageService notifierTableStorage) : ISubscriptionRepository
 {
     public async Task<List<string>> GetSubscriberEmails(Guid publicationId)
     {
-            var results = await apiSubscriptionTableStorage
+            var results = await notifierTableStorage
                 .QueryEntities<SubscriptionEntity>(
                     tableName: NotifierTableStorage.PublicationSubscriptionsTable,
                     filter: sub => sub.PartitionKey == publicationId.ToString(),

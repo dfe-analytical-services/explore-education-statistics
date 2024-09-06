@@ -50,7 +50,7 @@ public static class NotifierHostBuilder
 
                         return new NotificationClient(govUkNotifyOptions.Value.ApiKey);
                     })
-                    .AddTransient<IApiSubscriptionTableStorageService, ApiSubscriptionTableStorageService>()
+                    .AddTransient<INotifierTableStorageService, NotifierTableStorageService>()
                     .AddTransient<IEmailService, EmailService>()
                     .AddTransient<IPublicationSubscriptionRepository, PublicationSubscriptionRepository>()
                     .AddTransient<IApiSubscriptionRepository, ApiSubscriptionRepository>()

@@ -532,7 +532,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
         IPublicationSubscriptionRepository? publicationSubscriptionRepository = null,
-        IApiSubscriptionTableStorageService? apiSubscriptionTableStorageService = null) =>
+        INotifierTableStorageService? notifierTableStorageService = null) =>
         new(
             Mock.Of<ILogger<PublicationSubscriptionFunctions>>(),
             Options.Create(new AppSettingsOptions { PublicAppUrl = "https://localhost:3000" }),
@@ -545,6 +545,6 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             publicationSubscriptionRepository ?? Mock.Of<IPublicationSubscriptionRepository>(MockBehavior.Strict),
             new PendingPublicationSubscriptionCreateRequest.Validator(),
-            apiSubscriptionTableStorageService: apiSubscriptionTableStorageService
-                                                ?? Mock.Of<IApiSubscriptionTableStorageService>(MockBehavior.Strict));
+            notifierTableStorageService: notifierTableStorageService
+                                                ?? Mock.Of<INotifierTableStorageService>(MockBehavior.Strict));
 }
