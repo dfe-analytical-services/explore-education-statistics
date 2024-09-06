@@ -234,6 +234,7 @@ public class DataSetsController(
     /// and consequently can express more complex queries.
     /// </remarks>
     [HttpPost("{dataSetId:guid}/query")]
+    [Consumes("application/json")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of query results", type: typeof(DataSetQueryPaginatedResultsViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
