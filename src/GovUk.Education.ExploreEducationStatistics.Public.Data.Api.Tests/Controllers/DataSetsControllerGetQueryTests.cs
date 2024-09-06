@@ -675,9 +675,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                                 "NAT|id| ",
                                 "LA|code| ",
                                 $"NAT|id|{new string('a', 11)}",
-                                $"LA|code|{new string('a', 26)}",
-                                $"SCH|urn|{new string('a', 7)}",
-                                $"PROV|ukprn|{new string('a', 9)}",
+                                $"LA|code|{new string('a', 31)}",
+                                $"LA|oldCode|{new string('a', 21)}",
+                                $"SCH|urn|{new string('a', 21)}",
+                                $"PROV|ukprn|{new string('a', 21)}",
                                 $"RSC|id|{new string('a', 11)}",
                             ]
                         )
@@ -687,7 +688,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             var validationProblem = response.AssertValidationProblem();
 
-            Assert.Equal(17, validationProblem.Errors.Count);
+            Assert.Equal(18, validationProblem.Errors.Count);
 
             validationProblem.AssertHasNotEmptyError(expectedPath: $"{path}[0]");
             validationProblem.AssertHasLocationFormatError(expectedPath: $"{path}[1]", value: "invalid");
@@ -732,20 +733,25 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             validationProblem.AssertHasLocationValueMaxLengthError(
                 expectedPath: $"{path}[13]",
                 property: "code",
-                maxLength: 25
+                maxLength: 30
             );
             validationProblem.AssertHasLocationValueMaxLengthError(
                 expectedPath: $"{path}[14]",
-                property: "urn",
-                maxLength: 6
+                property: "oldCode",
+                maxLength: 20
             );
             validationProblem.AssertHasLocationValueMaxLengthError(
                 expectedPath: $"{path}[15]",
-                property: "ukprn",
-                maxLength: 8
+                property: "urn",
+                maxLength: 20
             );
             validationProblem.AssertHasLocationValueMaxLengthError(
                 expectedPath: $"{path}[16]",
+                property: "ukprn",
+                maxLength: 20
+            );
+            validationProblem.AssertHasLocationValueMaxLengthError(
+                expectedPath: $"{path}[17]",
                 property: "id",
                 maxLength: 10
             );
