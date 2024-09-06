@@ -327,7 +327,12 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var newVersionWithChanges = await GetVersionWithChanges(newVersion);
+            var newVersionWithChanges = await GetDbContext<PublicDataDbContext>()
+                .DataSetVersions
+                .AsNoTracking()
+                .Include(dsv => dsv.FilterMetaChanges)
+                .Include(dsv => dsv.FilterOptionMetaChanges)
+                .SingleAsync(dsv => dsv.Id == newVersion.Id);
 
             // Should have 2 FilterMetaChanges:
             // 1 for the DELETED 'filter 1'
@@ -825,7 +830,12 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var newVersionWithChanges = await GetVersionWithChanges(newVersion);
+            var newVersionWithChanges = await GetDbContext<PublicDataDbContext>()
+                .DataSetVersions
+                .AsNoTracking()
+                .Include(dsv => dsv.LocationMetaChanges)
+                .Include(dsv => dsv.LocationOptionMetaChanges)
+                .SingleAsync(dsv => dsv.Id == newVersion.Id);
 
             // Should only have 2 LocationMetaChanges:
             // 1 for the DELETED 'LocalAuthority' level
@@ -1814,21 +1824,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 context.TimePeriodMetas.AddRange(timePeriodMetas);
             }
         });
-    }
-
-    private async Task<DataSetVersion> GetVersionWithChanges(DataSetVersion version)
-    {
-        return await GetDbContext<PublicDataDbContext>()
-            .DataSetVersions
-            .AsNoTracking()
-            .Include(dsv => dsv.FilterMetaChanges)
-            .Include(dsv => dsv.FilterOptionMetaChanges)
-            .Include(dsv => dsv.LocationMetaChanges)
-            .Include(dsv => dsv.LocationOptionMetaChanges)
-            .Include(dsv => dsv.GeographicLevelMetaChange)
-            .Include(dsv => dsv.IndicatorMetaChanges)
-            .Include(dsv => dsv.TimePeriodMetaChanges)
-            .SingleAsync(dsv => dsv.Id == version.Id);
     }
 
     // These classes are to make setting up the tests easier and safer to change.
