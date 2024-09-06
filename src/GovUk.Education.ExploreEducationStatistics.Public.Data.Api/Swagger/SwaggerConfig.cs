@@ -25,9 +25,8 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
             .GetFiles(AppContext.BaseDirectory,"*.xml", SearchOption.TopDirectoryOnly)
             .ForEach(xmlFile => options.IncludeXmlComments(xmlFile));
 
+        options.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true);
         options.DescribeAllParametersInCamelCase();
-        options.UseOneOfForPolymorphism();
-        options.UseAllOfForInheritance();
         options.UseAllOfToExtendReferenceSchemas();
         options.SupportNonNullableReferenceTypes();
         options.CustomOperationIds(apiDesc =>

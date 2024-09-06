@@ -1,10 +1,15 @@
 using System.Text.Json.Serialization;
 using FluentValidation.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests.Converters;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 [JsonConverter(typeof(DataSetQueryCriteriaJsonConverter))]
+[SwaggerSubType(typeof(DataSetQueryCriteriaAnd))]
+[SwaggerSubType(typeof(DataSetQueryCriteriaOr))]
+[SwaggerSubType(typeof(DataSetQueryCriteriaNot))]
+[SwaggerSubType(typeof(DataSetQueryCriteriaFacets))]
 public abstract record DataSetQueryCriteria
 {
     protected static void InheritanceValidator<TCriteria>(

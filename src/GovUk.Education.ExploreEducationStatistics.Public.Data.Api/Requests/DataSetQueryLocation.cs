@@ -21,6 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 /// to use IDs where possible to ensure only a single location is matched.
 /// </summary>
 [JsonConverter(typeof(DataSetQueryLocationJsonConverter))]
+[SwaggerSubType(typeof(DataSetQueryLocationId))]
+[SwaggerSubType(typeof(DataSetQueryLocationCode))]
+[SwaggerSubType(typeof(DataSetQueryLocationLocalAuthorityCode))]
+[SwaggerSubType(typeof(DataSetQueryLocationLocalAuthorityOldCode))]
+[SwaggerSubType(typeof(DataSetQueryLocationProviderUkprn))]
+[SwaggerSubType(typeof(DataSetQueryLocationSchoolLaEstab))]
+[SwaggerSubType(typeof(DataSetQueryLocationSchoolUrn))]
 public abstract record DataSetQueryLocation
 {
     /// <summary>
@@ -124,14 +131,17 @@ public abstract record DataSetQueryLocation
     }
 }
 
+/// <summary>
+/// A location (identified by an ID) to filter results by.
+///
+/// Note that location IDs are guaranteed to be unique to a single location
+/// unlike location codes (which may correspond to multiple locations).
+/// </summary>
 public record DataSetQueryLocationId : DataSetQueryLocation
 {
     /// <summary>
     /// The ID of the location. If specified, this will be used
     /// instead of any codes or other types of identifier.
-    ///
-    /// Every ID is unique to a single location, unlike codes
-    /// which may correspond to multiple locations.
     /// </summary>
     public required string Id { get; init; }
 
@@ -158,14 +168,16 @@ public record DataSetQueryLocationId : DataSetQueryLocation
     }
 }
 
+/// <summary>
+/// A location (identified by a code) to filter results by.
+///
+/// Note that location codes may correspond to multiple locations in the same geographic level.
+/// </summary>
 public record DataSetQueryLocationCode : DataSetQueryLocation
 {
     /// <summary>
     /// The code of the location. This may be an ONS code, or some
     /// other code that identifies the location.
-    ///
-    /// Note that codes are not necessarily unique to a single location.
-    /// Specify the location ID to ensure only a single location is matched.
     /// </summary>
     public required string Code { get; init; }
 
@@ -192,6 +204,9 @@ public record DataSetQueryLocationCode : DataSetQueryLocation
     }
 }
 
+/// <summary>
+/// A local authority (identified by its ONS code) to filter results by.
+/// </summary>
 public record DataSetQueryLocationLocalAuthorityCode : DataSetQueryLocation
 {
     /// <summary>
@@ -201,6 +216,9 @@ public record DataSetQueryLocationLocalAuthorityCode : DataSetQueryLocation
     /// </summary>
     public required string Code { get; init; }
 
+    /// <summary>
+    /// The geographic level of the local authority. Must be set to `LA`.
+    /// </summary>
     [Required]
     [SwaggerSchema(ReadOnly = false)]
     public override string Level { get; protected init; } = GeographicLevel.LocalAuthority.GetEnumValue();
@@ -222,6 +240,9 @@ public record DataSetQueryLocationLocalAuthorityCode : DataSetQueryLocation
     }
 }
 
+/// <summary>
+/// A local authority (identified by its old code) to filter results by.
+/// </summary>
 public record DataSetQueryLocationLocalAuthorityOldCode : DataSetQueryLocation
 {
     /// <summary>
@@ -231,6 +252,9 @@ public record DataSetQueryLocationLocalAuthorityOldCode : DataSetQueryLocation
     /// </summary>
     public required string OldCode { get; init; }
 
+    /// <summary>
+    /// The geographic level of the local authority. Must be set to `LA`.
+    /// </summary>
     [Required]
     [SwaggerSchema(ReadOnly = false)]
     public override string Level { get; protected init; } = GeographicLevel.LocalAuthority.GetEnumValue();
@@ -252,6 +276,9 @@ public record DataSetQueryLocationLocalAuthorityOldCode : DataSetQueryLocation
     }
 }
 
+/// <summary>
+/// A provider (identified by its UKPRN) to filter results by.
+/// </summary>
 public record DataSetQueryLocationProviderUkprn : DataSetQueryLocation
 {
     /// <summary>
@@ -260,6 +287,9 @@ public record DataSetQueryLocationProviderUkprn : DataSetQueryLocation
     /// </summary>
     public required string Ukprn { get; init; }
 
+    /// <summary>
+    /// The geographic level of the provider. Must be set to `PROV`.
+    /// </summary>
     [Required]
     [SwaggerSchema(ReadOnly = false)]
     public override string Level { get; protected init; } = GeographicLevel.Provider.GetEnumValue();
@@ -281,6 +311,9 @@ public record DataSetQueryLocationProviderUkprn : DataSetQueryLocation
     }
 }
 
+/// <summary>
+/// A school (identified by its URN) to filter results by.
+/// </summary>
 public record DataSetQueryLocationSchoolUrn : DataSetQueryLocation
 {
     /// <summary>
@@ -289,6 +322,9 @@ public record DataSetQueryLocationSchoolUrn : DataSetQueryLocation
     /// </summary>
     public required string Urn { get; init; }
 
+    /// <summary>
+    /// The geographic level of the school. Must be set to `SCH`.
+    /// </summary>
     [Required]
     [SwaggerSchema(ReadOnly = false)]
     public override string Level { get; protected init; } = GeographicLevel.School.GetEnumValue();
@@ -310,6 +346,9 @@ public record DataSetQueryLocationSchoolUrn : DataSetQueryLocation
     }
 }
 
+/// <summary>
+/// A school (identified by its LAESTAB) to filter results by.
+/// </summary>
 public record DataSetQueryLocationSchoolLaEstab : DataSetQueryLocation
 {
     /// <summary>
@@ -318,6 +357,9 @@ public record DataSetQueryLocationSchoolLaEstab : DataSetQueryLocation
     /// </summary>
     public required string LaEstab { get; init; }
 
+    /// <summary>
+    /// The geographic level of the location. Must be set to `SCH`.
+    /// </summary>
     [Required]
     [SwaggerSchema(ReadOnly = false)]
     public override string Level { get; protected init; } = GeographicLevel.School.GetEnumValue();

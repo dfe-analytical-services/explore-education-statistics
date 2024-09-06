@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.Converters;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
@@ -8,6 +9,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 /// A location option that can be used to filter a data set.
 /// </summary>
 [JsonConverter(typeof(LocationOptionViewModelJsonConverter))]
+[SwaggerSubType(typeof(LocationCodedOptionViewModel))]
+[SwaggerSubType(typeof(LocationLocalAuthorityOptionViewModel))]
+[SwaggerSubType(typeof(LocationProviderOptionViewModel))]
+[SwaggerSubType(typeof(LocationRscRegionOptionViewModel))]
+[SwaggerSubType(typeof(LocationSchoolOptionViewModel))]
 public abstract record LocationOptionViewModel
 {
     /// <summary>
