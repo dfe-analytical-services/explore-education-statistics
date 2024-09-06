@@ -65,7 +65,7 @@ public abstract class FunctionsIntegrationTest<TFunctionsIntegrationTestFixture>
         {
             var entities = await dataTableStorageService.QueryEntities<TableEntity>(
                 tableName: table.Name,
-                filter: (Expression<Func<TableEntity, bool>>) null, // @MarkFix not ideal way to tell compiler which overload to call
+                filter: null, // overload disambiguation
                 select: new List<string>() { nameof(TableEntity.PartitionKey), nameof(TableEntity.RowKey) });
 
             await entities.AsPages().ForEachAwaitAsync(async page => {

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Azure;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -36,42 +36,15 @@ public class ReleaseNotifierTests
     [Fact]
     public async Task NotifySubscribers()
     {
-        var apiSubscriptionTableStorageService = new Mock<IApiSubscriptionTableStorageService>(MockBehavior.Strict);
+        var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
 
         var publication1Id = Guid.NewGuid();
-        var subResultsPage = Page<SubscriptionEntity>.FromValues(new List<SubscriptionEntity>
-        {
-            new(Guid.NewGuid().ToString(), "test@test.com", "Publication 1", "publication-1", null)
-        }, continuationToken: null, new Mock<Response>().Object);
-        var subscriberResults = AsyncPageable<SubscriptionEntity>.FromPages([subResultsPage]);
-
-        var pub1IdString = publication1Id.ToString(); // Need to do this to get the setup to match the actual call
-        apiSubscriptionTableStorageService.Setup(mock =>
-                mock.QueryEntities<SubscriptionEntity>(
-                    NotifierTableStorage.PublicationSubscriptionsTable,
-                    sub => sub.PartitionKey == pub1IdString,
-                    1000,
-                    new List<string> { nameof(SubscriptionEntity.RowKey) },
-                    default))
-            .ReturnsAsync(subscriberResults);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publication1Id))
+            .ReturnsAsync([ "test@test.com" ]);
 
         var supersededPubId = Guid.NewGuid();
-        var supersededSubResultsPage = Page<SubscriptionEntity>.FromValues(new List<SubscriptionEntity>
-        {
-            new(supersededPubId.ToString(), "superseded@test.com", "Superseded publication",
-                "superseded-publication", null)
-        }, continuationToken: null, new Mock<Response>().Object);
-        var supersededSubscriberResults = AsyncPageable<SubscriptionEntity>.FromPages([supersededSubResultsPage]);
-
-        var supersededPubIdString = supersededPubId.ToString(); // Need to do this to get the setup to match the actual call
-        apiSubscriptionTableStorageService.Setup(mock =>
-                mock.QueryEntities<SubscriptionEntity>(
-                    NotifierTableStorage.PublicationSubscriptionsTable,
-                    sub => sub.PartitionKey == supersededPubIdString,
-                    1000,
-                    new List<string> { nameof(SubscriptionEntity.RowKey) },
-                    default))
-            .ReturnsAsync(supersededSubscriberResults);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
+            .ReturnsAsync([ "superseded@test.com" ]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -90,7 +63,7 @@ public class ReleaseNotifierTests
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            apiSubscriptionTableStorageService: apiSubscriptionTableStorageService.Object,
+            subscriptionRepository: subscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -138,26 +111,11 @@ public class ReleaseNotifierTests
     [Fact]
     public async Task NotifySubscribers_MultipleSubs()
     {
+        var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
+
         var publicationId = Guid.NewGuid();
-
-        var pageResult = Page<SubscriptionEntity>.FromValues(new List<SubscriptionEntity>
-        {
-            new(Guid.NewGuid().ToString(), "test1@test.com", "Publication 1", "publication-1", null),
-            new(Guid.NewGuid().ToString(), "test2@test.com", "Publication 1", "publication-1", null),
-            new(Guid.NewGuid().ToString(), "test3@test.com", "Publication 1", "publication-1", null),
-        }, continuationToken: null, new Mock<Response>().Object);
-        var asyncPageableResult = AsyncPageable<SubscriptionEntity>.FromPages([pageResult]);
-
-        var apiSubscriptionTableStorageService = new Mock<IApiSubscriptionTableStorageService>(MockBehavior.Strict);
-        var pubIdString = publicationId.ToString(); // Need to do this to get the setup to match the actual call
-        apiSubscriptionTableStorageService.Setup(mock =>
-                mock.QueryEntities<SubscriptionEntity>(
-                    NotifierTableStorage.PublicationSubscriptionsTable,
-                    sub => sub.PartitionKey == pubIdString,
-                    1000,
-                    new List<string> { nameof(SubscriptionEntity.RowKey) },
-                    default))
-            .ReturnsAsync(asyncPageableResult);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
+            .ReturnsAsync([ "test1@test.com", "test2@test.com", "test3@test.com" ]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -182,7 +140,7 @@ public class ReleaseNotifierTests
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            apiSubscriptionTableStorageService: apiSubscriptionTableStorageService.Object,
+            subscriptionRepository: subscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -228,51 +186,16 @@ public class ReleaseNotifierTests
     [Fact]
     public async Task NotifySubscribers_MultipleSupersededPublicationSubs()
     {
+        var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
+
         var publicationId = Guid.NewGuid();
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
+            .ReturnsAsync([]);
 
-        var apiSubscriptionTableStorageService = new Mock<IApiSubscriptionTableStorageService>(MockBehavior.Strict);
-
-        // publication mock
-        var pubResultsPage = Page<SubscriptionEntity>.FromValues(
-            new List<SubscriptionEntity>(), // no results
-            continuationToken: null,
-            new Mock<Response>().Object);
-        var pubResults = AsyncPageable<SubscriptionEntity>.FromPages([pubResultsPage]);
-
-        var pubIdString = publicationId.ToString(); // Need to do this to get the setup to match the actual call
-        apiSubscriptionTableStorageService.Setup(mock =>
-                mock.QueryEntities<SubscriptionEntity>(
-                    NotifierTableStorage.PublicationSubscriptionsTable,
-                    sub => sub.PartitionKey == pubIdString,
-                    1000,
-                    new List<string> { nameof(SubscriptionEntity.RowKey) },
-                    default))
-            .ReturnsAsync(pubResults);
-
-        // superseded publication mock
         var supersededPubId = Guid.NewGuid();
-        var supersededSubResultsPage = Page<SubscriptionEntity>.FromValues(new List<SubscriptionEntity>
-        {
-            new(supersededPubId.ToString(), "superseded1@test.com", "Superseded publication",
-                "superseded-publication", null),
-            new(supersededPubId.ToString(), "superseded2@test.com", "Superseded publication",
-                "superseded-publication", null),
-            new(supersededPubId.ToString(), "superseded3@test.com", "Superseded publication",
-                "superseded-publication", null),
-        }, continuationToken: null, new Mock<Response>().Object);
-        var supersededSubscriberResults = AsyncPageable<SubscriptionEntity>.FromPages([supersededSubResultsPage]);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
+            .ReturnsAsync([ "superseded1@test.com", "superseded2@test.com", "superseded3@test.com" ]);
 
-        var supersededPubIdString = supersededPubId.ToString(); // Need to do this to get the setup to match the actual call
-        apiSubscriptionTableStorageService.Setup(mock =>
-                mock.QueryEntities<SubscriptionEntity>(
-                    NotifierTableStorage.PublicationSubscriptionsTable,
-                    sub => sub.PartitionKey == supersededPubIdString,
-                    1000,
-                    new List<string> { nameof(SubscriptionEntity.RowKey) },
-                    default))
-            .ReturnsAsync(supersededSubscriberResults);
-
-        // other mocks
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GenerateToken("superseded1@test.com", It.IsAny<DateTime>()))
@@ -296,7 +219,7 @@ public class ReleaseNotifierTests
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            apiSubscriptionTableStorageService: apiSubscriptionTableStorageService.Object,
+            subscriptionRepository: subscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -352,66 +275,20 @@ public class ReleaseNotifierTests
     [Fact]
     public async Task NotifySubscribers_MultipleSupersededPublications()
     {
+        var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
+
         var publicationId = Guid.NewGuid();
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
+            .ReturnsAsync([]);
 
-        var apiSubscriptionTableStorageService = new Mock<IApiSubscriptionTableStorageService>(MockBehavior.Strict);
-
-        // publication mock
-        var pubResultsPage = Page<SubscriptionEntity>.FromValues(
-            new List<SubscriptionEntity>(), // no results
-            continuationToken: null,
-            new Mock<Response>().Object);
-        var pubResults = AsyncPageable<SubscriptionEntity>.FromPages([pubResultsPage]);
-
-        var pubIdString = publicationId.ToString(); // Need to do this to get the setup to match the actual call
-        apiSubscriptionTableStorageService.Setup(mock =>
-                mock.QueryEntities<SubscriptionEntity>(
-                    NotifierTableStorage.PublicationSubscriptionsTable,
-                    sub => sub.PartitionKey == pubIdString,
-                    1000,
-                    new List<string> { nameof(SubscriptionEntity.RowKey) },
-                    default))
-            .ReturnsAsync(pubResults);
-
-        // first superseded publication mock
         var supersededPub1Id = Guid.NewGuid();
-        var supersededSubResultsPage1 = Page<SubscriptionEntity>.FromValues(new List<SubscriptionEntity>
-        {
-            new(supersededPub1Id.ToString(), "superseded1@test.com", "Superseded 1 publication",
-                "superseded-1-publication", null),
-        }, continuationToken: null, new Mock<Response>().Object);
-        var supersededSubscriberResults1 = AsyncPageable<SubscriptionEntity>.FromPages([supersededSubResultsPage1]);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPub1Id))
+            .ReturnsAsync([ "superseded1@test.com" ]);
 
-        var supersededPub1IdString = supersededPub1Id.ToString(); // Need to do this to get the setup to match the actual call
-        apiSubscriptionTableStorageService.Setup(mock =>
-                mock.QueryEntities<SubscriptionEntity>(
-                    NotifierTableStorage.PublicationSubscriptionsTable,
-                    sub => sub.PartitionKey == supersededPub1IdString,
-                    1000,
-                    new List<string> { nameof(SubscriptionEntity.RowKey) },
-                    default))
-            .ReturnsAsync(supersededSubscriberResults1);
-
-        // second superseded publication mock
         var supersededPub2Id = Guid.NewGuid();
-        var supersededSubResultsPage2 = Page<SubscriptionEntity>.FromValues(new List<SubscriptionEntity>
-        {
-            new(supersededPub1Id.ToString(), "superseded2@test.com", "Superseded21 publication",
-                "superseded-2-publication", null),
-        }, continuationToken: null, new Mock<Response>().Object);
-        var supersededSubscriberResults2 = AsyncPageable<SubscriptionEntity>.FromPages([supersededSubResultsPage2]);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPub2Id))
+            .ReturnsAsync([ "superseded2@test.com" ]);
 
-        var supersededPub2IdString = supersededPub2Id.ToString(); // Need to do this to get the setup to match the actual call
-        apiSubscriptionTableStorageService.Setup(mock =>
-                mock.QueryEntities<SubscriptionEntity>(
-                    NotifierTableStorage.PublicationSubscriptionsTable,
-                    sub => sub.PartitionKey == supersededPub2IdString,
-                    1000,
-                    new List<string> { nameof(SubscriptionEntity.RowKey) },
-                    default))
-            .ReturnsAsync(supersededSubscriberResults2);
-
-        // other mocks
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GenerateToken("superseded1@test.com", It.IsAny<DateTime>()))
@@ -429,7 +306,7 @@ public class ReleaseNotifierTests
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            apiSubscriptionTableStorageService: apiSubscriptionTableStorageService.Object,
+            subscriptionRepository: subscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -482,50 +359,16 @@ public class ReleaseNotifierTests
     [Fact]
     public async Task NotifySubscribers_Amendment() // If an amendment we use a different email template
     {
+        var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
+
         var publicationId = Guid.NewGuid();
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
+            .ReturnsAsync([ "test@test.com" ]);
 
-        var apiSubscriptionTableStorageService = new Mock<IApiSubscriptionTableStorageService>(MockBehavior.Strict);
-
-        // publication mock
-        var pubResultsPage = Page<SubscriptionEntity>.FromValues(
-            new List<SubscriptionEntity>
-            {
-                new(Guid.NewGuid().ToString(), "test@test.com", "Publication 1", "publication-1", null)
-            },
-            continuationToken: null,
-            new Mock<Response>().Object);
-        var pubResults = AsyncPageable<SubscriptionEntity>.FromPages([pubResultsPage]);
-
-        var pubIdString = publicationId.ToString(); // Need to do this to get the setup to match the actual call
-        apiSubscriptionTableStorageService.Setup(mock =>
-                mock.QueryEntities<SubscriptionEntity>(
-                    NotifierTableStorage.PublicationSubscriptionsTable,
-                    sub => sub.PartitionKey == pubIdString,
-                    1000,
-                    new List<string> { nameof(SubscriptionEntity.RowKey) },
-                    default))
-            .ReturnsAsync(pubResults);
-
-        // superseded publication mock
         var supersededPubId = Guid.NewGuid();
-        var supersededSubResultsPage = Page<SubscriptionEntity>.FromValues(new List<SubscriptionEntity>
-        {
-            new(supersededPubId.ToString(), "superseded@test.com", "Superseded publication",
-                "superseded-publication", null)
-        }, continuationToken: null, new Mock<Response>().Object);
-        var supersededSubscriberResults = AsyncPageable<SubscriptionEntity>.FromPages([supersededSubResultsPage]);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
+            .ReturnsAsync([ "superseded@test.com" ]);
 
-        var supersededPubIdString = supersededPubId.ToString(); // Need to do this to get the setup to match the actual call
-        apiSubscriptionTableStorageService.Setup(mock =>
-                mock.QueryEntities<SubscriptionEntity>(
-                    NotifierTableStorage.PublicationSubscriptionsTable,
-                    sub => sub.PartitionKey == supersededPubIdString,
-                    1000,
-                    new List<string> { nameof(SubscriptionEntity.RowKey) },
-                    default))
-            .ReturnsAsync(supersededSubscriberResults);
-
-        // other mocks
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GenerateToken("test@test.com", It.IsAny<DateTime>()))
@@ -544,7 +387,7 @@ public class ReleaseNotifierTests
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var function = BuildFunction(
-            apiSubscriptionTableStorageService: apiSubscriptionTableStorageService.Object,
+            subscriptionRepository: subscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -626,7 +469,7 @@ public class ReleaseNotifierTests
     private static ReleaseNotifier BuildFunction(
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
-        IApiSubscriptionTableStorageService? apiSubscriptionTableStorageService = null)
+        ISubscriptionRepository? subscriptionRepository = null)
     {
         return new ReleaseNotifier(
             Mock.Of<ILogger<ReleaseNotifier>>(),
@@ -638,6 +481,6 @@ public class ReleaseNotifierTests
             }),
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
-            apiSubscriptionTableStorageService ?? Mock.Of<IApiSubscriptionTableStorageService>(MockBehavior.Strict));
+            subscriptionRepository ?? Mock.Of<ISubscriptionRepository>(MockBehavior.Strict));
     }
 }

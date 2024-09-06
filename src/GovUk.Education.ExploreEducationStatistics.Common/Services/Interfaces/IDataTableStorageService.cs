@@ -52,7 +52,7 @@ public interface IDataTableStorageService
 
     Task<AsyncPageable<TEntity>> QueryEntities<TEntity>(
         string tableName,
-        string filter = "",
+        string filterStr = "",
         int? maxPerPage = 1000,
         IEnumerable<string>? select = null,
         CancellationToken cancellationToken = default)

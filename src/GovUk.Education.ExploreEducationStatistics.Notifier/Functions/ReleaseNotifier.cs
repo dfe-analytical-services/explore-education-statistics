@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Functions.Worker;
@@ -18,7 +18,7 @@ public class ReleaseNotifier(
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
     ITokenService tokenService,
     IEmailService emailService,
-    IApiSubscriptionTableStorageService apiSubscriptionTableStorageService)
+    ISubscriptionRepository subscriptionRepository)
 {
     private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
@@ -39,23 +39,11 @@ public class ReleaseNotifier(
         var sentEmails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         // First send emails to publication subscribers
-        // @MarkFix check this
         {
-            // @MarkFix could create a repository to avoid all this...
-            var publicationIdString = msg.PublicationId.ToString(); // To make the unit test mocks work
-            var results = await apiSubscriptionTableStorageService
-                .QueryEntities<SubscriptionEntity>(
-                    tableName: NotifierTableStorage.PublicationSubscriptionsTable,
-                    filter: sub => sub.PartitionKey == publicationIdString,
-                    select: [nameof(SubscriptionEntity.RowKey)]); // email address
+            var subscriberEmails = await subscriptionRepository.GetSubscriberEmails(msg.PublicationId);
 
-            // @MarkFix especially check this - we used to fetch in segments (I think)
-            var releaseSubscribers = await results.ToListAsync();
-
-            foreach (var subscription in releaseSubscribers)
+            foreach (var email in subscriberEmails)
             {
-                var email = subscription.RowKey;
-
                 SendSubscriberEmail(email, msg);
                 sentEmails.Add(email);
             }
@@ -68,18 +56,11 @@ public class ReleaseNotifier(
         var numSupersededSubscriberEmailsSent = 0;
         foreach (var supersededPublication in msg.SupersededPublications)
         {
-            var supersededPublicationIdString = supersededPublication.Id.ToString(); // To make unit test mocks work
-            var results = await apiSubscriptionTableStorageService.QueryEntities<SubscriptionEntity>(
-                tableName: NotifierTableStorage.PublicationSubscriptionsTable,
-                filter: sub => sub.PartitionKey == supersededPublicationIdString,
-                select: [ nameof(SubscriptionEntity.RowKey) ]); // email address
+            var supersededPubSubEmails = await subscriptionRepository.GetSubscriberEmails(
+                supersededPublication.Id);
 
-            var supersededPubSubs = await results.ToListAsync();
-
-            foreach (var subscription in supersededPubSubs)
+            foreach (var email in supersededPubSubEmails)
             {
-                var email = subscription.RowKey;
-
                 if (sentEmails.Contains(email))
                 {
                     continue;
