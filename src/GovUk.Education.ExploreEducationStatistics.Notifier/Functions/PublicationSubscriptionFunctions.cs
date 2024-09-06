@@ -29,7 +29,7 @@ public class PublicationSubscriptionFunctions(
     IEmailService emailService,
     IPublicationSubscriptionRepository publicationSubscriptionRepository,
     IValidator<PendingPublicationSubscriptionCreateRequest> requestValidator,
-    IApiSubscriptionTableStorageService apiSubscriptionTableStorageService)
+    INotifierTableStorageService notifierTableStorageService)
 {
     private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
@@ -248,14 +248,12 @@ public class PublicationSubscriptionFunctions(
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
         // @MarkFix check this
-        // @MarkFix could move this to a repository...
-        // @MarkFix could also rename ApiSubscriptionTableStorageService...
-        var results = await apiSubscriptionTableStorageService.QueryEntities<SubscriptionEntity>(
+        var results = await notifierTableStorageService.QueryEntities<SubscriptionEntity>(
             tableName: NotifierTableStorage.PublicationPendingSubscriptionsTable,
             sub => sub.DateTimeCreated < DateTime.UtcNow.AddHours(1));
         var pendingSubsToRemove = await results.ToListAsync();
 
-        await apiSubscriptionTableStorageService.BatchManipulateEntities(
+        await notifierTableStorageService.BatchManipulateEntities(
             NotifierTableStorage.PublicationPendingSubscriptionsTable,
             pendingSubsToRemove,
             TableTransactionActionType.Delete);
