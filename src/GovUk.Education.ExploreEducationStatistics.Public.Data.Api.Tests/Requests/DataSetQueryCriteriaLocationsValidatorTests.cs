@@ -66,10 +66,11 @@ public class DataSetQueryCriteriaLocationsValidatorTests
         new DataSetQueryLocationId { Level = "NA", Id = "12345" },
         new DataSetQueryLocationId { Level = "la", Id = "12345" },
         new DataSetQueryLocationId { Level = "", Id = "12345" },
-        new DataSetQueryLocationId { Level = "NAT", Id = new string('x', 26) },
-        new DataSetQueryLocationCode { Level = "REG", Code = new string('x', 26) },
-        new DataSetQueryLocationProviderUkprn { Ukprn = new string('x', 9) },
-        new DataSetQueryLocationSchoolUrn { Urn = new string('x', 7) },
+        new DataSetQueryLocationId { Level = "NAT", Id = new string('x', 11) },
+        new DataSetQueryLocationCode { Level = "REG", Code = new string('x', 31) },
+        new DataSetQueryLocationLocalAuthorityOldCode { OldCode = new string('x', 21) },
+        new DataSetQueryLocationProviderUkprn { Ukprn = new string('x', 21) },
+        new DataSetQueryLocationSchoolUrn { Urn = new string('x', 21) },
     };
 
     public static readonly TheoryData<DataSetQueryLocation[]> InvalidLocationsMultiple = new()
@@ -89,10 +90,11 @@ public class DataSetQueryCriteriaLocationsValidatorTests
         },
         new DataSetQueryLocation[]
         {
-            new DataSetQueryLocationId { Level = "NAT", Id = new string('x', 26) },
-            new DataSetQueryLocationCode { Level = "REG", Code = new string('x', 26) },
-            new DataSetQueryLocationProviderUkprn { Ukprn = new string('x', 9) },
-            new DataSetQueryLocationSchoolUrn { Urn = new string('x', 7) },
+            new DataSetQueryLocationId { Level = "NAT", Id = new string('x', 11) },
+            new DataSetQueryLocationCode { Level = "REG", Code = new string('x', 31) },
+            new DataSetQueryLocationLocalAuthorityOldCode { OldCode = new string('x', 21) },
+            new DataSetQueryLocationProviderUkprn { Ukprn = new string('x', 21) },
+            new DataSetQueryLocationSchoolUrn { Urn = new string('x', 21) },
         },
     };
 

@@ -177,7 +177,7 @@ public record DataSetQueryLocationCode : DataSetQueryLocation
         {
             RuleFor(l => l.Code)
                 .NotEmpty()
-                .MaximumLength(25);
+                .MaximumLength(30);
         }
     }
 }
@@ -185,9 +185,8 @@ public record DataSetQueryLocationCode : DataSetQueryLocation
 public record DataSetQueryLocationLocalAuthorityCode : DataSetQueryLocation
 {
     /// <summary>
-    /// The ONS code of the local authority. This should be 9 characters
+    /// The ONS code of the local authority. This is typically 9 characters
     /// in the standard ONS format for local authorities (e.g. `E08000019`).
-    /// It can be a combination of two codes (e.g. `E09000021 / E09000027`).
     /// </summary>
     public required string Code { get; init; }
 
@@ -205,7 +204,7 @@ public record DataSetQueryLocationLocalAuthorityCode : DataSetQueryLocation
         {
             RuleFor(l => l.Code)
                 .NotEmpty()
-                .MaximumLength(25);
+                .MaximumLength(30);
         }
     }
 }
@@ -214,8 +213,7 @@ public record DataSetQueryLocationLocalAuthorityOldCode : DataSetQueryLocation
 {
     /// <summary>
     /// The old code (previously the LEA code) of the local authority.
-    /// This should be a 3 digit number (e.g. `318`) or be
-    /// a combination of two codes (e.g. `314 / 318`).
+    /// This is typically a 3-digit number (e.g. `318`).
     /// </summary>
     public required string OldCode { get; init; }
 
@@ -233,7 +231,7 @@ public record DataSetQueryLocationLocalAuthorityOldCode : DataSetQueryLocation
         {
             RuleFor(l => l.OldCode)
                 .NotEmpty()
-                .MaximumLength(10);
+                .MaximumLength(20);
         }
     }
 }
@@ -242,7 +240,7 @@ public record DataSetQueryLocationProviderUkprn : DataSetQueryLocation
 {
     /// <summary>
     /// The UKPRN (UK provider reference number) of the provider.
-    /// This should be an 8 digit number.
+    /// This is typically an 8-digit number.
     /// </summary>
     public required string Ukprn { get; init; }
 
@@ -260,7 +258,7 @@ public record DataSetQueryLocationProviderUkprn : DataSetQueryLocation
         {
             RuleFor(l => l.Ukprn)
                 .NotEmpty()
-                .MaximumLength(8);
+                .MaximumLength(20);
         }
     }
 }
@@ -269,7 +267,7 @@ public record DataSetQueryLocationSchoolUrn : DataSetQueryLocation
 {
     /// <summary>
     /// The URN (unique reference number) of the school.
-    /// This should be a 6 digit number.
+    /// This is typically a 6-digit number.
     /// </summary>
     public required string Urn { get; init; }
 
@@ -287,7 +285,7 @@ public record DataSetQueryLocationSchoolUrn : DataSetQueryLocation
         {
             RuleFor(l => l.Urn)
                 .NotEmpty()
-                .MaximumLength(6);
+                .MaximumLength(20);
         }
     }
 }
@@ -296,7 +294,7 @@ public record DataSetQueryLocationSchoolLaEstab : DataSetQueryLocation
 {
     /// <summary>
     /// The LAESTAB (local authority establishment number) of the school.
-    /// This should be a 7 digit number.
+    /// This is typically a 7-digit number.
     /// </summary>
     public required string LaEstab { get; init; }
 
@@ -314,7 +312,7 @@ public record DataSetQueryLocationSchoolLaEstab : DataSetQueryLocation
         {
             RuleFor(l => l.LaEstab)
                 .NotEmpty()
-                .MaximumLength(7);
+                .MaximumLength(20);
         }
     }
 }

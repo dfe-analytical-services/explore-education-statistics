@@ -101,16 +101,16 @@ public class DataSetQueryLocationValidatorTests
     public static readonly TheoryData<DataSetQueryLocation> InvalidLocationValueLengths = new()
     {
         new DataSetQueryLocationId { Level = "NAT", Id = new string('X', 11) },
-        new DataSetQueryLocationCode { Level = "NAT", Code = new string('X', 26) },
+        new DataSetQueryLocationCode { Level = "NAT", Code = new string('X', 31) },
         new DataSetQueryLocationId { Level = "LA", Id = new string('X', 11) },
-        new DataSetQueryLocationLocalAuthorityCode { Code = new string('X', 26) },
-        new DataSetQueryLocationLocalAuthorityOldCode { OldCode = new string('X', 11) },
+        new DataSetQueryLocationLocalAuthorityCode { Code = new string('X', 31) },
+        new DataSetQueryLocationLocalAuthorityOldCode { OldCode = new string('X', 21) },
         new DataSetQueryLocationId { Level = "RSC", Id = new string('X', 11) },
         new DataSetQueryLocationId { Level = "SCH", Id = new string('X', 11) },
-        new DataSetQueryLocationSchoolUrn { Urn = new string('X', 7) },
-        new DataSetQueryLocationSchoolLaEstab { LaEstab = new string('X', 8) },
+        new DataSetQueryLocationSchoolUrn { Urn = new string('X', 21) },
+        new DataSetQueryLocationSchoolLaEstab { LaEstab = new string('X', 21) },
         new DataSetQueryLocationId { Level = "PROV", Id = new string('X', 11) },
-        new DataSetQueryLocationProviderUkprn { Ukprn = new string('X', 9) },
+        new DataSetQueryLocationProviderUkprn { Ukprn = new string('X', 21) },
     };
 
     [Theory]

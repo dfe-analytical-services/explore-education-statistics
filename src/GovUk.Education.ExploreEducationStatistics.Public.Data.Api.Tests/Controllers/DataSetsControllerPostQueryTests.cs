@@ -710,11 +710,11 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                             new DataSetQueryLocationCode { Level = "REG", Code = "" },
                             new DataSetQueryLocationLocalAuthorityCode { Code = "" },
                             new DataSetQueryLocationId { Level = "NAT", Id = new string('a', 11) },
-                            new DataSetQueryLocationLocalAuthorityCode { Code = new string('a', 26) },
-                            new DataSetQueryLocationLocalAuthorityOldCode { OldCode = new string('a', 11) },
-                            new DataSetQueryLocationProviderUkprn { Ukprn = new string('a', 9) },
-                            new DataSetQueryLocationSchoolUrn { Urn = new string('a', 7) },
-                            new DataSetQueryLocationSchoolLaEstab { LaEstab = new string('a', 8) }
+                            new DataSetQueryLocationLocalAuthorityCode { Code = new string('a', 31) },
+                            new DataSetQueryLocationLocalAuthorityOldCode { OldCode = new string('a', 21) },
+                            new DataSetQueryLocationProviderUkprn { Ukprn = new string('a', 21) },
+                            new DataSetQueryLocationSchoolUrn { Urn = new string('a', 21) },
+                            new DataSetQueryLocationSchoolLaEstab { LaEstab = new string('a', 21) }
                         ])
                     }
                 }
@@ -741,11 +741,11 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             validationProblem.AssertHasNotEmptyError($"{path}[5].code");
 
             validationProblem.AssertHasMaximumLengthError($"{path}[6].id", maxLength: 10);
-            validationProblem.AssertHasMaximumLengthError($"{path}[7].code", maxLength: 25);
-            validationProblem.AssertHasMaximumLengthError($"{path}[8].oldCode", maxLength: 10);
-            validationProblem.AssertHasMaximumLengthError($"{path}[9].ukprn", maxLength: 8);
-            validationProblem.AssertHasMaximumLengthError($"{path}[10].urn", maxLength: 6);
-            validationProblem.AssertHasMaximumLengthError($"{path}[11].laEstab", maxLength: 7);
+            validationProblem.AssertHasMaximumLengthError($"{path}[7].code", maxLength: 30);
+            validationProblem.AssertHasMaximumLengthError($"{path}[8].oldCode", maxLength: 20);
+            validationProblem.AssertHasMaximumLengthError($"{path}[9].ukprn", maxLength: 20);
+            validationProblem.AssertHasMaximumLengthError($"{path}[10].urn", maxLength: 20);
+            validationProblem.AssertHasMaximumLengthError($"{path}[11].laEstab", maxLength: 20);
         }
 
         [Fact]
