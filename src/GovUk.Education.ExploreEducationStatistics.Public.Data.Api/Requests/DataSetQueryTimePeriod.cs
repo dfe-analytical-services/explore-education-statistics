@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ErrorDetails;
 using ArgumentOutOfRangeException = System.ArgumentOutOfRangeException;
@@ -60,6 +61,7 @@ public record DataSetQueryTimePeriod
     ///
     /// This should be a valid time period code e.g. `AY`, `CY`, `M1`, `W20`.
     /// </summary>
+    [SwaggerEnum(typeof(TimeIdentifier))]
     public required string Code { get; init; }
 
     public string ParsedPeriod() => GetParsedPeriod(Period, ParsedCode());

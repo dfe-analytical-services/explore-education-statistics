@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests.Converters;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
@@ -35,6 +36,7 @@ public abstract record DataSetQueryLocation
     ///
     /// This should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.
     /// </summary>
+    [SwaggerEnum(typeof(GeographicLevel))]
     public virtual string Level { get; protected init; } = string.Empty;
 
     public GeographicLevel ParsedLevel() => EnumUtil.GetFromEnumValue<GeographicLevel>(Level);
@@ -145,6 +147,12 @@ public record DataSetQueryLocationId : DataSetQueryLocation
     /// </summary>
     public required string Id { get; init; }
 
+    /// <summary>
+    /// The geographic level of the location.
+    ///
+    /// This should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.
+    /// </summary>
+    [SwaggerEnum(typeof(GeographicLevel))]
     public new required string Level
     {
         get => base.Level;
@@ -181,6 +189,12 @@ public record DataSetQueryLocationCode : DataSetQueryLocation
     /// </summary>
     public required string Code { get; init; }
 
+    /// <summary>
+    /// The geographic level of the location.
+    ///
+    /// This should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.
+    /// </summary>
+    [SwaggerEnum(typeof(GeographicLevel))]
     public new required string Level
     {
         get => base.Level;
