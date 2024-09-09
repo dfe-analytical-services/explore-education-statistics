@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
-[Collection("Set FluentValidation property name camel case configuration")]
 public class DataSetQueryCriteriaNotValidatorTests
 {
     private readonly DataSetQueryCriteriaNot.Validator _validator = new();
@@ -18,7 +17,7 @@ public class DataSetQueryCriteriaNotValidatorTests
         };
 
         _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("not")
+            .ShouldHaveValidationErrorFor("Not")
             .WithErrorCode(FluentValidationKeys.NotNullValidator)
             .Only();
     }
@@ -55,7 +54,7 @@ public class DataSetQueryCriteriaNotValidatorTests
         };
 
         _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("not.filters.eq")
+            .ShouldHaveValidationErrorFor("Not.Filters.Eq")
             .Only();
     }
 
@@ -71,7 +70,7 @@ public class DataSetQueryCriteriaNotValidatorTests
         };
 
         _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("not.or")
+            .ShouldHaveValidationErrorFor("Not.Or")
             .Only();
     }
 
@@ -119,7 +118,7 @@ public class DataSetQueryCriteriaNotValidatorTests
         };
 
         _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("not.or[0].filters.eq")
+            .ShouldHaveValidationErrorFor("Not.Or[0].Filters.Eq")
             .Only();
     }
 
@@ -184,8 +183,8 @@ public class DataSetQueryCriteriaNotValidatorTests
 
         Assert.Equal(2, result.Errors.Count);
 
-        result.ShouldHaveValidationErrorFor("not.and[0].filters.eq");
-        result.ShouldHaveValidationErrorFor("not.and[1].timePeriods.gte.period");
+        result.ShouldHaveValidationErrorFor("Not.And[0].Filters.Eq");
+        result.ShouldHaveValidationErrorFor("Not.And[1].TimePeriods.Gte.Period");
     }
 
     [Fact]
@@ -227,7 +226,7 @@ public class DataSetQueryCriteriaNotValidatorTests
         };
 
         _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("not.not.filters.eq")
+            .ShouldHaveValidationErrorFor("Not.Not.Filters.Eq")
             .Only();
     }
 
@@ -281,7 +280,7 @@ public class DataSetQueryCriteriaNotValidatorTests
         };
 
         _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("not.and[0].not.filters.eq")
+            .ShouldHaveValidationErrorFor("Not.And[0].Not.Filters.Eq")
             .Only();
     }
 }

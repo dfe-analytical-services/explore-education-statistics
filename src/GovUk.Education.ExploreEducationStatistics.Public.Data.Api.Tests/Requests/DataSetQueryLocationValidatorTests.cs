@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
-[Collection("Set FluentValidation property name camel case configuration")]
 public class DataSetQueryLocationValidatorTests
 {
     public static readonly TheoryData<DataSetQueryLocation> ValidLocations = new()
@@ -57,7 +56,7 @@ public class DataSetQueryLocationValidatorTests
 
         var error = Assert.Single(result.Errors);
 
-        Assert.Equal("level", error.PropertyName);
+        Assert.Equal(nameof(DataSetQueryLocation.Level), error.PropertyName);
         Assert.Equal(ValidationMessages.AllowedValue.Code, error.ErrorCode);
         Assert.Equal(ValidationMessages.AllowedValue.Message, error.ErrorMessage);
 
@@ -95,9 +94,7 @@ public class DataSetQueryLocationValidatorTests
 
         Assert.Equal(FluentValidationKeys.NotEmptyValidator, error.ErrorCode);
 
-        var keyPropertyCamelCase = char.ToLower(location.KeyProperty[0]) + location.KeyProperty[1..];
-        Assert.Equal(keyPropertyCamelCase, error.PropertyName);
-
+        Assert.Equal(location.KeyProperty, error.PropertyName);
         Assert.Equal(location.KeyValue, error.AttemptedValue);
     }
 
@@ -128,8 +125,7 @@ public class DataSetQueryLocationValidatorTests
 
         Assert.Equal(FluentValidationKeys.MaximumLengthValidator, error.ErrorCode);
 
-        var keyPropertyCamelCase = char.ToLower(location.KeyProperty[0]) + location.KeyProperty[1..];
-        Assert.Equal(keyPropertyCamelCase, error.PropertyName);
+        Assert.Equal(location.KeyProperty, error.PropertyName);
 
         Assert.Equal(location.KeyValue, error.AttemptedValue);
         Assert.Equal(location.KeyValue.Length - 1, error.FormattedMessagePlaceholderValues["MaxLength"]);
