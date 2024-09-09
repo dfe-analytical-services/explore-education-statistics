@@ -68,6 +68,10 @@ export interface LocationOption {
   geoJson?: GeoJsonFeature;
 }
 
+export interface LocationGeoJsonOption extends LocationOption {
+  geoJson: GeoJsonFeature;
+}
+
 export interface LocationLeafOption {
   id?: string;
   label: string;
@@ -160,7 +164,7 @@ export interface LocationsOrTimePeriodsQuery {
 export interface TableDataSubjectMeta {
   publicationName: string;
   subjectName: string;
-  locations: Dictionary<LocationOption[]>;
+  locations: Dictionary<LocationOption[] | LocationGeoJsonOption[]>;
   boundaryLevels: BoundaryLevel[];
   timePeriodRange: TimePeriodOption[];
   filters: Dictionary<{
@@ -275,20 +279,25 @@ const tableBuilderService = {
   async getDataBlockTableData(
     releaseId: string,
     dataBlockParentId: string,
-    boundaryLevelId?: number | undefined,
   ): Promise<TableDataResponse> {
-    return boundaryLevelId
-      ? dataApi.get(
-          `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}?boundaryLevelId=${boundaryLevelId}`,
-        )
-      : dataApi.get(
-          `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}`,
-        );
+    return dataApi.get(
+      `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}`,
+    );
   },
   getFastTrackTableAndReleaseMeta(
     dataBlockParentId: string,
   ): Promise<FastTrackTableAndReleaseMeta> {
     return dataApi.get(`/tablebuilder/fast-track/${dataBlockParentId}`);
+  },
+  getLocationGeoJson(
+    releaseId: string,
+    dataBlockParentId: string,
+    boundaryLevelId: number,
+  ): Promise<Dictionary<LocationGeoJsonOption[]>> {
+    return dataApi.get(
+      `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}/geojson`,
+      { params: { boundaryLevelId } },
+    );
   },
 };
 

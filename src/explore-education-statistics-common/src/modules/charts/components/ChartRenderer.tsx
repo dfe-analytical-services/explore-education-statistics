@@ -31,7 +31,7 @@ export type ChartRendererProps = {
   | ({
       type: 'map';
     } & Omit<MapBlockProps, 'id'> & {
-        boundaryLevel?: number;
+        boundaryLevel: number;
       })
   | ({
       type: 'infographic';
