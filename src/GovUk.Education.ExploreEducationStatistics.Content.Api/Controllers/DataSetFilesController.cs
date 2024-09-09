@@ -59,6 +59,14 @@ public class DataSetFilesController : ControllerBase
             .HandleFailuresOrOk();
     }
 
+    [HttpGet("data-set-files/{dataSetFileId:guid}/download")]
+    public async Task<ActionResult> DownloadDataSetFile(
+        Guid dataSetFileId)
+    {
+        return await _dataSetFileService
+            .DownloadDataSetFile(dataSetFileId);
+    }
+
     [HttpGet("data-set-files/sitemap-items")]
     public async Task<ActionResult<List<DataSetSitemapItemViewModel>>> ListSitemapItems(
         CancellationToken cancellationToken = default) =>
