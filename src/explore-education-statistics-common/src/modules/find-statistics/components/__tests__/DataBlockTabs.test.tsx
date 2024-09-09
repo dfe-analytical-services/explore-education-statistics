@@ -370,8 +370,7 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getLocationGeoJson).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        testMapConfiguration.type === 'map' &&
-          testMapConfiguration.boundaryLevel,
+        1,
       );
 
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();

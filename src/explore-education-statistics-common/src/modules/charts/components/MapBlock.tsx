@@ -120,7 +120,7 @@ export default function MapBlock({
   width,
   height,
   axes,
-}: Omit<MapBlockProps, 'releaseId' | 'dataBlockParentId' | 'boundaryLevel'>) {
+}: MapBlockProps) {
   const axisMajor = useMemo<AxisConfiguration>(
     () => ({
       ...axes.major,

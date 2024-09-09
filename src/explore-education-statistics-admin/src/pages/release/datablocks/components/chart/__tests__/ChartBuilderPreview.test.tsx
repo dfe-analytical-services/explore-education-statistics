@@ -4,7 +4,6 @@ import { ChartRendererProps } from '@common/modules/charts/components/ChartRende
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import { Chart } from '@common/services/types/blocks';
 import { render, screen } from '@testing-library/react';
 import { produce } from 'immer';
 
@@ -184,8 +183,7 @@ describe('ChartBuilderPreview', () => {
     render(
       <ChartBuilderPreview
         chart={produce(testMapChartRenderer, draft => {
-          (draft as Chart & { boundaryLevel?: number }).boundaryLevel =
-            undefined;
+          draft.boundaryLevel = 0;
         })}
         loading={false}
       />,
