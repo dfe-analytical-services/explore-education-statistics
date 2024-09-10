@@ -1,14 +1,12 @@
-@description('Specifies the full name of the existing VNet')
-param vNetName string
+import { resourceNamesType } from '../../types.bicep'
 
-@description('Specifies the Public API resource prefix')
-param publicApiResourcePrefix string
+@description('Specifies common resource naming variables.')
+param resourceNames resourceNamesType
 
-@description('Specifies common resource prefix')
-param commonResourcePrefix string
-
-@description('Specifies legacy resource prefix')
-param legacyResourcePrefix string
+var vNetName = resourceNames.existingResources.vNet
+var publicApiResourcePrefix = resourceNames.prefixes.publicApi
+var commonResourcePrefix = resourceNames.prefixes.common
+var legacyResourcePrefix = resourceNames.prefixes.legacy
 
 var adminAppServiceName = '${legacyResourcePrefix}-as-ees-admin'
 var publisherFunctionAppName = '${legacyResourcePrefix}-fa-ees-publisher'

@@ -103,21 +103,33 @@ var commonResourcePrefix = '${subscription}-ees'
 // The resource prefix for resources created in the ARM template.
 var legacyResourcePrefix = subscription
 
-
-//
-// Define full names for the pre-existing resources managed by the ARM template.
-//
-var adminAppName = '${legacyResourcePrefix}-as-ees-admin'
-var publisherAppFullName = '${legacyResourcePrefix}-fa-ees-publisher'
-var keyVaultName = '${legacyResourcePrefix}-kv-ees-01'
-var vNetName = '${legacyResourcePrefix}-vnet-ees'
-var alertsGroupName = '${legacyResourcePrefix}-ag-ees-alertedusers'
-var acrName = 'eesacr'
+var resourceNames = {
+  existingResources: {
+    adminApp: '${legacyResourcePrefix}-as-ees-admin'
+    publisherApp: '${legacyResourcePrefix}-fa-ees-publisher'
+    keyVault: '${legacyResourcePrefix}-kv-ees-01'
+    vNet: '${legacyResourcePrefix}-vnet-ees'
+    alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
+    acr: 'eesacr'
+    coreStorageAccount: '${legacyResourcePrefix}saeescore'
+  }
+  prefixes: {
+    // The resource prefix for anything specific to the Public API. 
+    publicApi: publicApiResourcePrefix
+    // The resource prefix for anything not specific solely to the Public API but set up within Bicep. 
+    common: commonResourcePrefix
+    // The resource prefix for resources created in the ARM template.
+    legacy: legacyResourcePrefix
+  }
+  abbreviations: {
+    
+  }
+}
 
 module vNetModule 'application/shared/virtualNetwork.bicep' = {
   name: 'networkDeploy'
   params: {
-    vNetName: vNetName
+    vNetName: commonVariables.existingResourceNames.vNet
     publicApiResourcePrefix: publicApiResourcePrefix
     commonResourcePrefix: commonResourcePrefix
     legacyResourcePrefix: legacyResourcePrefix

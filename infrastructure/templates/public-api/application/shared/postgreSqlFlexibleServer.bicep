@@ -1,8 +1,10 @@
+import { resourceNamesType } from '../../types.bicep'
+
+@description('Specifies common resource naming variables.')
+param resourceNames resourceNamesType
+
 @description('Specifies the location for all resources.')
 param location string
-
-@description('Specifies common resource prefix')
-param commonResourcePrefix string
 
 @description('Administrator login name.')
 param postgreSqlAdminName string
@@ -32,7 +34,7 @@ param privateEndpointSubnetId string
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var postgreSqlServerName = '${commonResourcePrefix}-psql-flexibleserver'
+var postgreSqlServerName = '${resourceNames.prefixes.common}-${resourceNames.abbreviations.dBforPostgreSQLServers}'
 
 var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
   name: replace(rule.name, ' ', '_')
