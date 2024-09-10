@@ -312,14 +312,19 @@ User verifies the row headings and contents in 'Data set details' section
     user checks contents inside the cell value           2012/13                                                    css:#dataSetDetails [data-testid="Time period-value"]
     user checks contents inside the cell value           Get email updates about this API data set                  css:#dataSetDetails [data-testid="Notifications-value"] > a
 
-Validate API dataset version history column headings
+User verifies the headings and contents in 'API version history' section
     user checks table column heading contains    1    1    Version    css:section[id="apiVersionHistory"]
+
     user checks table column heading contains    1    2    Release    css:section[id="apiVersionHistory"]
     user checks table column heading contains    1    3    Status     css:section[id="apiVersionHistory"]
 
+    user checks table cell contains              1    1    1.0 (current)                xpath://section[@id="apiVersionHistory"]
+    user checks table cell contains              1    2    Academic year Q1 3000/01     xpath://section[@id="apiVersionHistory"]
+    user checks table cell contains              1    3    Published                    xpath://section[@id="apiVersionHistory"]
+
+
 
 *** Keywords ***
-
 User checks contents inside the release type
     [Arguments]      ${expected_text}     ${locator}
      ${full_text}=    get text    ${locator}
