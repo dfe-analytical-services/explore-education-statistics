@@ -1,3 +1,4 @@
+import render from '@common-test/render';
 import {
   testChartConfiguration,
   testChartTableData,
@@ -6,17 +7,16 @@ import {
   testMapConfiguration,
   testMapTableData,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { Chart, DataBlock } from '@common/services/types/blocks';
 import { screen, waitFor } from '@testing-library/dom';
-import { render } from '@testing-library/react';
 import { AxiosError } from 'axios';
 import React from 'react';
 import { forceVisible } from 'react-lazyload';
-import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 
 jest.mock('@common/services/tableBuilderService');
 
@@ -161,7 +161,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(screen.getAllByText('Could not load content')).toHaveLength(2);
@@ -195,7 +194,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(
@@ -227,7 +225,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -263,7 +260,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -298,7 +294,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -339,7 +334,6 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
-        undefined,
       );
 
       expect(screen.getByRole('table')).toBeInTheDocument();
@@ -352,6 +346,9 @@ describe('DataBlockTabs', () => {
   test.skip('renders map', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testMapTableData,
+    );
+    tableBuilderService.getLocationGeoJson.mockResolvedValue(
+      testMapTableData.subjectMeta.locations,
     );
 
     const { container } = render(
@@ -368,10 +365,19 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
         'block-1-parent',
+      );
+
+      expect(tableBuilderService.getLocationGeoJson).toBeCalledWith(
+        'release-1',
+        'block-1-parent',
         1,
       );
 
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(tableBuilderService.getLocationGeoJson).toBeCalled();
+      expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(1);
     });
   });
 

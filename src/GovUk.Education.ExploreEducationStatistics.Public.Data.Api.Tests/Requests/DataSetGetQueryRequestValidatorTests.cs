@@ -6,7 +6,6 @@ using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Dat
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
-[Collection("Set FluentValidation property name camel case configuration")]
 public abstract class DataSetGetQueryRequestValidatorTests
 {
     private readonly DataSetGetQueryRequest.Validator _validator = new();
@@ -41,7 +40,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
             };
 
             _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor("filters.eq")
+                .ShouldHaveValidationErrorFor(q => q.Filters!.Eq)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }
@@ -76,7 +75,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
             };
 
             _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor("geographicLevels.eq")
+                .ShouldHaveValidationErrorFor(q => q.GeographicLevels!.Eq)
                 .WithErrorCode(Common.Validators.ValidationMessages.AllowedValue.Code);
         }
     }
@@ -111,7 +110,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
             };
 
             _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor("locations.eq")
+                .ShouldHaveValidationErrorFor(q => q.Locations!.Eq)
                 .WithErrorCode(ValidationMessages.LocationFormat.Code);
         }
     }
@@ -146,7 +145,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
             };
 
             _validator.TestValidate(query)
-                .ShouldHaveValidationErrorFor("timePeriods.eq")
+                .ShouldHaveValidationErrorFor(q => q.TimePeriods!.Eq)
                 .WithErrorCode(ValidationMessages.TimePeriodFormat.Code);
         }
     }
@@ -196,7 +195,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
 
             foreach (var (_, index) in indicators.WithIndex())
             {
-                result.ShouldHaveValidationErrorFor($"indicators[{index}]")
+                result.ShouldHaveValidationErrorFor($"Indicators[{index}]")
                     .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             }
         }
@@ -212,11 +211,11 @@ public abstract class DataSetGetQueryRequestValidatorTests
             var result = _validator.TestValidate(query);
 
             result
-                .ShouldHaveValidationErrorFor("indicators[0]")
+                .ShouldHaveValidationErrorFor("Indicators[0]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
 
             result
-                .ShouldHaveValidationErrorFor("indicators[1]")
+                .ShouldHaveValidationErrorFor("Indicators[1]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
         }
 
@@ -231,11 +230,11 @@ public abstract class DataSetGetQueryRequestValidatorTests
             var result = _validator.TestValidate(query);
 
             result
-                .ShouldHaveValidationErrorFor("indicators[0]")
+                .ShouldHaveValidationErrorFor("Indicators[0]")
                 .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
 
             result
-                .ShouldHaveValidationErrorFor("indicators[1]")
+                .ShouldHaveValidationErrorFor("Indicators[1]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }
@@ -282,19 +281,19 @@ public abstract class DataSetGetQueryRequestValidatorTests
             result.ShouldHaveValidationErrorFor(q => q.Sorts);
 
             result
-                .ShouldHaveValidationErrorFor("sorts[0]")
+                .ShouldHaveValidationErrorFor("Sorts[0]")
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
             result
-                .ShouldHaveValidationErrorFor("sorts[1]")
+                .ShouldHaveValidationErrorFor("Sorts[1]")
                 .WithErrorCode(ValidationMessages.SortFormat.Code);
 
             result
-                .ShouldHaveValidationErrorFor("sorts[2]")
+                .ShouldHaveValidationErrorFor("Sorts[2]")
                 .WithErrorCode(ValidationMessages.SortDirection.Code);
 
             result
-                .ShouldHaveValidationErrorFor("sorts[3]")
+                .ShouldHaveValidationErrorFor("Sorts[3]")
                 .WithErrorCode(ValidationMessages.SortFieldMaxLength.Code);
         }
     }

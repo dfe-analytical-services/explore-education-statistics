@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -13,7 +15,6 @@ using static
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -41,10 +42,9 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         Status = MethodologyApprovalStatus.Approved,
     };
 
-    private static readonly Publication OwningPublication = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
+
+    private static readonly DataFixture DataFixture = new();
 
     public class ClaimsTests
     {
@@ -64,7 +64,10 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                         mock.IsLatestPublishedVersion(DraftMethodologyVersion))
                     .ReturnsAsync(true);
 
-                var user = CreateClaimsPrincipal(UserId, claim);
+                var user = DataFixture
+                    .AuthenticatedUser(userId: UserId)
+                    .WithClaim(claim.ToString());
+
                 var authContext =
                     CreateAuthorizationHandlerContext
                         <MarkMethodologyAsHigherLevelReviewRequirement, MethodologyVersion>
@@ -113,7 +116,10 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                         .ReturnsAsync(new List<ReleaseRole>());
                 }
 
-                var user = CreateClaimsPrincipal(UserId, claim);
+                var user = DataFixture
+                    .AuthenticatedUser(userId: UserId)
+                    .WithClaim(claim.ToString());
+
                 var authContext =
                     CreateAuthorizationHandlerContext<MarkMethodologyAsHigherLevelReviewRequirement, MethodologyVersion>
                         (user, DraftMethodologyVersion);
@@ -169,7 +175,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                         .ReturnsAsync(new List<ReleaseRole>());
                 }
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext =
                     CreateAuthorizationHandlerContext
@@ -225,7 +231,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                         .ReturnsAsync(new List<ReleaseRole>());
                 }
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext =
                     CreateAuthorizationHandlerContext
@@ -248,7 +254,8 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
     public class ReleaseRoleTests
     {
         [Fact]
-        public async Task ReleaseEditorAndApproverRolesOnAnyOwningPublicationReleaseCanMarkDraftMethodologyHigherReview()
+        public async Task
+            ReleaseEditorAndApproverRolesOnAnyOwningPublicationReleaseCanMarkDraftMethodologyHigherReview()
         {
             await ForEachReleaseRoleAsync(async releaseRole =>
             {
@@ -283,7 +290,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(releaseRole));
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext =
                     CreateAuthorizationHandlerContext<MarkMethodologyAsHigherLevelReviewRequirement,
@@ -340,7 +347,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                         mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(releaseRole));
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext =
                     CreateAuthorizationHandlerContext<MarkMethodologyAsHigherLevelReviewRequirement,
@@ -387,7 +394,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<ReleaseRole>());
 
-            var user = CreateClaimsPrincipal(UserId);
+            var user = DataFixture.AuthenticatedUser(userId: UserId);
 
             var authContext =
                 CreateAuthorizationHandlerContext<MarkMethodologyAsHigherLevelReviewRequirement, MethodologyVersion>

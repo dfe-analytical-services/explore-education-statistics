@@ -12,12 +12,15 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Inte
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Rewrite;
@@ -35,6 +38,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 {
     private readonly IConfiguration _miniProfilerConfig =
         configuration.GetRequiredSection(MiniProfilerOptions.Section);
+    private readonly IConfiguration _openIdConnectConfig =
+        configuration.GetRequiredSection(OpenIdConnectOptions.Section);
     private readonly IConfiguration _requestTimeoutConfig =
         configuration.GetSection(RequestTimeoutOptions.Section);
 
@@ -62,6 +67,24 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                     options.ShouldProfile = request => request.Path.StartsWithSegments("/api");
                 })
                 .AddEntityFramework();
+        }
+
+        // Authentication
+
+        // Look for JWT Bearer tokens, and validate that they are issued from the correct tenant and are
+        // issued for the Public API.  It is only necessary to enable this support in Azure environments
+        // as it is using Azure Authentication to handle the access tokens.
+        if (hostEnvironment.IsProduction())
+        {
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    var tenantId = _openIdConnectConfig.GetValue<Guid>(nameof(OpenIdConnectOptions.TenantId));
+                    var clientId = _openIdConnectConfig.GetValue<Guid>(nameof(OpenIdConnectOptions.ClientId));
+                    options.Authority = $"https://login.microsoftonline.com/{tenantId}";
+                    options.Audience = $"api://{clientId}";
+                });
         }
 
         // MVC
@@ -165,6 +188,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         });
 
         services.AddSecurity();
+        
+        services.AddScoped<IAuthorizationHandlerService, AuthorizationHandlerService>();
 
         services.AddScoped<IPreviewTokenService, PreviewTokenService>();
 
@@ -221,11 +246,20 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         app.UseRouting();
 
+        // Authentication and authorization
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.UseRequestTimeouts();
 
         app.UseEndpoints(builder =>
         {
-            builder.MapControllers();
+            builder
+                .MapControllers()
+                // Enable both anonymous public users and authenticated Admin user to securely access controllers.
+                .RequireAuthorization()
+                .AllowAnonymous();
         });
 
         app.UseHealthChecks("/api/health");

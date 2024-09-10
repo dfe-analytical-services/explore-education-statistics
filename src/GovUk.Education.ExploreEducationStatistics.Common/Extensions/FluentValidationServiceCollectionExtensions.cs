@@ -1,9 +1,6 @@
 #nullable enable
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Text.Json;
 using FluentValidation;
-using FluentValidation.Internal;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,8 +18,6 @@ public static class FluentValidationServiceCollectionExtensions
     {
         ValidatorOptions.Global.LanguageManager = new FluentValidationLanguageManager();
 
-        ValidatorOptions.Global.UseCamelCasePropertyNames();
-
         services.AddValidatorsFromAssembly(assembly);
 
         services.Configure<MvcOptions>(options =>
@@ -31,31 +26,5 @@ public static class FluentValidationServiceCollectionExtensions
         });
 
         return services;
-    }
-
-    public static void UseCamelCasePropertyNames(this ValidatorConfiguration globalConfig)
-    {
-        globalConfig.PropertyNameResolver = (_, memberInfo, expression) =>
-            JsonNamingPolicy.CamelCase.ConvertName(ResolvePropertyName(memberInfo, expression));
-    }
-
-    private static string ResolvePropertyName(MemberInfo? memberInfo, LambdaExpression? expression)
-    {
-        if (expression is not null)
-        {
-            var chain = PropertyChain.FromExpression(expression);
-
-            if (chain.Count > 0)
-            {
-                return chain.ToString();
-            }
-        }
-
-        if (memberInfo is not null)
-        {
-            return memberInfo.Name;
-        }
-
-        return string.Empty;
     }
 }

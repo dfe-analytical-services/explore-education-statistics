@@ -1,7 +1,9 @@
 import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import {
+  releaseApiDataSetChangelogRoute,
   releaseApiDataSetDetailsRoute,
+  ReleaseDataSetChangelogRouteParams,
   ReleaseDataSetPreviewTokenRouteParams,
   ReleaseDataSetRouteParams,
   ReleaseRouteParams,
@@ -92,8 +94,8 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
                           to={generatePath<ReleaseRouteParams>(
                             releaseSummaryRoute.path,
                             {
-                              releaseId: dataSetVersion.releaseVersion.id,
                               publicationId,
+                              releaseId: dataSetVersion.releaseVersion.id,
                             },
                           )}
                         >
@@ -112,7 +114,17 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
 
                       <td className="govuk-!-text-align-right">
                         {dataSetVersion.version !== '1.0' && (
-                          <Link to="/todo">
+                          <Link
+                            to={generatePath<ReleaseDataSetChangelogRouteParams>(
+                              releaseApiDataSetChangelogRoute.path,
+                              {
+                                publicationId,
+                                releaseId: dataSetVersion.releaseVersion.id,
+                                dataSetId,
+                                dataSetVersionId: dataSetVersion.id,
+                              },
+                            )}
+                          >
                             View changelog
                             <VisuallyHidden>
                               {' '}

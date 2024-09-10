@@ -4,18 +4,22 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    PublicationAuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
+using ReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -23,10 +27,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     {
         private readonly Guid _userId = Guid.NewGuid();
 
-        private readonly Publication _publication = new()
-        {
-            Id = Guid.NewGuid()
-        };
+        private readonly Publication _publication = new() { Id = Guid.NewGuid() };
+
+        private readonly DataFixture _fixture = new();
 
         [Fact]
         public async Task SucceedsWithAccessAllPublicationsClaim()
@@ -117,8 +120,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         Mock.Of<IPreReleaseService>(Strict)));
 
                 var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] {new ViewSpecificPublicationRequirement()},
-                    CreateClaimsPrincipal(_userId), _publication);
+                    new IAuthorizationRequirement[] { new ViewSpecificPublicationRequirement() },
+                    _fixture.AuthenticatedUser(userId: _userId), _publication);
 
                 await handler.HandleAsync(authContext);
 

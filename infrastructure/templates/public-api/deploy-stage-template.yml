@@ -8,6 +8,8 @@ parameters:
     type: string
   - name: serviceConnection
     type: string
+  - name: subscription
+    type: string
   - name: dependsOn
     type: string
     default: ''
@@ -37,8 +39,12 @@ stages:
       runOnce:
         deploy:
           steps:
-          - bash: echo "##vso[task.setvariable variable=dataProcessorFunctionAppName;]$(subscription)-ees-papi-fa-processor"
+          - task: Bash@3
             displayName: 'Set additional pipeline variables'
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "##vso[task.setvariable variable=dataProcessorFunctionAppName;]$(subscription)-ees-papi-fa-processor"
 
           - download: EESBuildPipeline
             displayName: 'Download Data Processor Function App ZIP file'
@@ -76,7 +82,8 @@ stages:
                       deployContainerApp=$(deployContainerApp) \
                       updatePsqlFlexibleServer=$(updatePsqlFlexibleServer) \
                       dataProcessorFunctionAppExists=$dataProcessorExists \
-                      dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)'
+                      dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
+                      apiAppRegistrationClientId='$(apiAppRegistrationClientId)'
 
           - template: pipeline-variables-from-bicep-outputs-template.yml
             parameters:
@@ -199,3 +206,10 @@ stages:
                   --resource-group $(resourceGroupName) \
                   --slot staging \
                   --target-slot production
+
+          # - template: assign-app-role-to-service-principal-template.yml
+          #   parameters:
+          #     serviceConnection: ${{parameters.serviceConnection}}
+          #     appRoleName: Admin.Access
+          #     protectedResourceAppRegName: ${{parameters.subscription}}-ees-papi-ca-api-appreg
+          #     servicePrincipalName: ${{parameters.subscription}}-as-ees-admin

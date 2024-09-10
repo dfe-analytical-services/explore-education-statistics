@@ -61,7 +61,7 @@ param dateProvisioned string = utcNow('u')
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string = ''
 
-@description('Can we deploy the Container App yet?  This is dependent on the user-assigned Managed Identity for the API Container App being created with the AcrPull role, and the database users added to PSQL.')
+@description('Can we deploy the Container App yet? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.')
 param deployContainerApp bool = true
 
 // TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL
@@ -72,7 +72,8 @@ param updatePsqlFlexibleServer bool = false
 @description('Public URLs of other components in the service.')
 param publicUrls {
   contentApi: string
-  publicApp: string
+  publicSite: string
+  publicApi: string
 }
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
@@ -80,6 +81,9 @@ param dataProcessorFunctionAppExists bool = false
 
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string = ''
+
+@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the API Container App.')
+param apiAppRegistrationClientId string = ''
 
 var resourcePrefix = '${subscription}-ees-papi'
 var apiContainerAppName = 'api'
@@ -98,7 +102,6 @@ var containerAppEnvironmentNameSuffix = '01'
 var dataFilesFileShareMountName = 'public-api-fileshare-mount'
 var dataFilesFileShareMountPath = '/data/public-api-data'
 var publicApiStorageAccountName = '${subscription}eespapisa'
-var appGatewayManagedIdentityName = '${subscription}-ees-id-agw-01'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -128,6 +131,13 @@ module vNetModule 'application/virtualNetwork.bicep' = {
     subscription: subscription
     dataProcessorFunctionAppNameSuffix: dataProcessorFunctionAppName
     containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
+  }
+}
+
+module privateDnsZonesModule 'application/privateDnsZones.bicep' = {
+  name: 'privateDnsZonesDeploy'
+  params: {
+    vnetName: vNetName
   }
 }
 
@@ -218,15 +228,27 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = if (update
     tagValues: tagValues
     firewallRules: formattedPostgreSqlFirewallRules
     databaseNames: ['public_data']
-    vnetId: vNetModule.outputs.vNetRef
     subnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
   }
+  dependsOn: [
+    privateDnsZonesModule
+  ]
 }
 
 var psqlManagedIdentityConnectionStringTemplate = 'Server=${psqlServerFullName}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name]'
 
-resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (deployContainerApp) {
+resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: apiContainerAppManagedIdentityName
+  location: location
+}
+
+module apiContainerAppAcrPullRoleAssignmentModule 'components/containerRegistryRoleAssignment.bicep' = {
+  name: '${apiContainerAppManagedIdentityName}AcrPullRoleAssignmentDeploy'
+  params: {
+    role: 'AcrPull'
+    containerRegistryName: acrName
+    principalIds: [apiContainerAppManagedIdentity.properties.principalId]
+  }
 }
 
 // Create a generic Container App Environment for any Container Apps to use.
@@ -265,7 +287,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
     managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     corsPolicy: {
       allowedOrigins: [
-        publicUrls.publicApp
+        publicUrls.publicSite
         'http://localhost:3000'
         'http://127.0.0.1'
       ]
@@ -310,11 +332,30 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (deployContain
         name: 'DataFiles__BasePath'
         value: dataFilesFileShareMountPath
       }
+      {
+        name: 'OpenIdConnect__TenantId'
+        value: tenant().tenantId
+      }
+      {
+        name: 'OpenIdConnect__ClientId'
+        value: apiAppRegistrationClientId
+      }
     ]
+    entraIdAuthentication: {
+      appRegistrationClientId: apiAppRegistrationClientId
+      allowedClientIds: [
+        adminAppClientId
+      ]
+      allowedPrincipalIds: [
+        adminAppPrincipalId
+      ]
+      requireAuthentication: false
+    }
     tagValues: tagValues
   }
   dependsOn: [
     postgreSqlServerModule
+    apiContainerAppAcrPullRoleAssignmentModule
   ]
 }
 
@@ -345,6 +386,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     location: location
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
+    privateEndpointSubnetId: vNetModule.outputs.dataProcessorPrivateEndpointSubnetRef
     publicNetworkAccessEnabled: false
     entraIdAuthentication: {
       appRegistrationClientId: dataProcessorAppRegistrationClientId
@@ -354,6 +396,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       allowedPrincipalIds: [
         adminAppPrincipalId
       ]
+      requireAuthentication: true
     }
     userAssignedManagedIdentityParams: {
       id: dataProcessorFunctionAppManagedIdentity.id
@@ -386,19 +429,30 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     storageFirewallRules: storageFirewallRules
     tagValues: tagValues
   }
+  dependsOn: [
+    privateDnsZonesModule
+  ]
 }
 
-// TODO EES-5407 - incorporate this change with the automating of the app gateway creation.
-resource appGatewayManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
-  name: appGatewayManagedIdentityName
-}
-
-module appGatewayKeyVaultRoleAssignments 'components/keyVaultRoleAssignment.bicep' = {
-  name: 'appGatewayKeyVaultRoleAssignment'
+// Create an Application Gateway to serve public traffic for the Public API Container App.
+module appGatewayModule 'components/appGateway.bicep' = {
+  name: 'appGatewayDeploy'
   params: {
+    location: location
+    resourcePrefix: subscription
+    instanceName: '01'
     keyVaultName: keyVaultName
-    principalIds: [appGatewayManagedIdentity.properties.principalId]
-    role: 'Secrets User'
+    subnetId: vNetModule.outputs.appGatewaySubnetRef
+    sites: [
+      {
+        resourceName: apiContainerAppModule.outputs.containerAppName
+        backendFqdn: apiContainerAppModule.outputs.containerAppFqdn
+        publicFqdn: replace(publicUrls.publicApi, 'https://', '')
+        certificateKeyVaultSecretName: '${apiContainerAppModule.outputs.containerAppName}-certificate'
+        healthProbeRelativeUrl: '/docs'
+      }
+    ]
+    tagValues: tagValues
   }
 }
 

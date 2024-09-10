@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Constants;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -10,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Au
 public class ViewDataSetVersionRequirement : IAuthorizationRequirement;
 
 public class ViewDataSetVersionAuthorizationHandler(
+    IAuthorizationHandlerService authorizationHandlerService,
     IHttpContextAccessor httpContextAccessor,
     IPreviewTokenService previewTokenService)
     : AuthorizationHandler<ViewDataSetVersionRequirement, DataSetVersion>
@@ -19,8 +21,7 @@ public class ViewDataSetVersionAuthorizationHandler(
         ViewDataSetVersionRequirement requirement,
         DataSetVersion dataSetVersion)
     {
-        // TODO: EES-5374 - Temporary workaround until authentication is added for admin API
-        if (httpContextAccessor.HttpContext?.Request.Headers.UserAgent.Contains("EES Admin") == true)
+        if (authorizationHandlerService.CanAccessUnpublishedData())
         {
             context.Succeed(requirement);
             return;

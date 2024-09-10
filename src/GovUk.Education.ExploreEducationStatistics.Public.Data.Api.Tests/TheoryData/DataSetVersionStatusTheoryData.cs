@@ -25,12 +25,16 @@ public static class DataSetVersionStatusQueryTheoryData
 
 public static class DataSetVersionStatusViewTheoryData
 {
+    private static readonly List<DataSetVersionStatus> AllStatusesList = EnumUtil.GetEnums<DataSetVersionStatus>();
+    
     private static readonly List<DataSetVersionStatus> AvailableStatusesList =
     [
         DataSetVersionStatus.Published,
         DataSetVersionStatus.Withdrawn,
         DataSetVersionStatus.Deprecated,
     ];
+
+    public static readonly TheoryData<DataSetVersionStatus> AllStatuses = new(AllStatusesList);
 
     public static readonly TheoryData<DataSetVersionStatus> AvailableStatuses = new(AvailableStatusesList);
 

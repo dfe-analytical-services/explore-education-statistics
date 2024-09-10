@@ -1,14 +1,14 @@
 import render from '@common-test/render';
 import createAxiosErrorMock from '@common-test/createAxiosErrorMock';
-import _dataSetFileService from '@frontend/services/dataSetFileService';
+import _apiDataSetService from '@frontend/services/apiDataSetService';
 import _apiNotificationService from '@frontend/services/apiNotificationService';
-import { testDataSetWithApi } from '@frontend/modules/data-catalogue/__data__/testDataSets';
+import { testApiDataSet } from '@frontend/modules/data-catalogue/__data__/testDataSets';
 import ConfirmUnsubscriptionPage from '@frontend/modules/api-subscriptions/ConfirmUnsubscriptionPage';
 import { screen, waitFor } from '@testing-library/react';
 
-jest.mock('@frontend/services/dataSetFileService');
-const dataSetFileService = _dataSetFileService as jest.Mocked<
-  typeof _dataSetFileService
+jest.mock('@frontend/services/apiDataSetService');
+const apiDataSetService = _apiDataSetService as jest.Mocked<
+  typeof _apiDataSetService
 >;
 
 jest.mock('@frontend/services/apiNotificationService');
@@ -18,19 +18,16 @@ const apiNotificationService = _apiNotificationService as jest.Mocked<
 
 describe('ConfirmUnsubscriptionPage', () => {
   beforeEach(() => {
-    dataSetFileService.getDataSetFile.mockResolvedValue(testDataSetWithApi);
+    apiDataSetService.getDataSet.mockResolvedValue(testApiDataSet);
   });
 
   test('renders correctly', () => {
     render(
-      <ConfirmUnsubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmUnsubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     expect(
-      screen.getByRole('heading', { name: 'Data set 1' }),
+      screen.getByRole('heading', { name: 'Test title' }),
     ).toBeInTheDocument();
 
     expect(
@@ -43,17 +40,14 @@ describe('ConfirmUnsubscriptionPage', () => {
 
   test('successful confirmation', async () => {
     const { user } = render(
-      <ConfirmUnsubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmUnsubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(apiNotificationService.confirmUnsubscription).toHaveBeenCalledWith(
-        'data-set-file-id',
+        'api-data-set-id',
         'test-token',
       );
     });
@@ -74,17 +68,14 @@ describe('ConfirmUnsubscriptionPage', () => {
     });
     apiNotificationService.confirmUnsubscription.mockRejectedValue(error);
     const { user } = render(
-      <ConfirmUnsubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmUnsubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(apiNotificationService.confirmUnsubscription).toHaveBeenCalledWith(
-        'data-set-file-id',
+        'api-data-set-id',
         'test-token',
       );
     });
@@ -114,17 +105,14 @@ describe('ConfirmUnsubscriptionPage', () => {
     });
     apiNotificationService.confirmUnsubscription.mockRejectedValue(error);
     const { user } = render(
-      <ConfirmUnsubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmUnsubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(apiNotificationService.confirmUnsubscription).toHaveBeenCalledWith(
-        'data-set-file-id',
+        'api-data-set-id',
         'test-token',
       );
     });
@@ -150,17 +138,14 @@ describe('ConfirmUnsubscriptionPage', () => {
     const error = createAxiosErrorMock({ data: '', status: 404 });
     apiNotificationService.confirmUnsubscription.mockRejectedValue(error);
     const { user } = render(
-      <ConfirmUnsubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmUnsubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(apiNotificationService.confirmUnsubscription).toHaveBeenCalledWith(
-        'data-set-file-id',
+        'api-data-set-id',
         'test-token',
       );
     });
@@ -186,17 +171,14 @@ describe('ConfirmUnsubscriptionPage', () => {
     const error = createAxiosErrorMock({ data: '', status: 500 });
     apiNotificationService.confirmUnsubscription.mockRejectedValue(error);
     const { user } = render(
-      <ConfirmUnsubscriptionPage
-        dataSetFile={testDataSetWithApi}
-        token="test-token"
-      />,
+      <ConfirmUnsubscriptionPage dataSet={testApiDataSet} token="test-token" />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(apiNotificationService.confirmUnsubscription).toHaveBeenCalledWith(
-        'data-set-file-id',
+        'api-data-set-id',
         'test-token',
       );
     });

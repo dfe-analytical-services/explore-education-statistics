@@ -5,8 +5,8 @@ import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
 import Page from '@frontend/components/Page';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
-import { DataSetFile } from '@frontend/services/dataSetFileService';
-import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
+import { ApiDataSet } from '@frontend/services/apiDataSetService';
+import apiDataSetQueries from '@frontend/queries/apiDataSetQueries';
 import Link from '@frontend/components/Link';
 import apiNotificationService from '@frontend/services/apiNotificationService';
 import { isAxiosError } from 'axios';
@@ -16,15 +16,16 @@ import Head from 'next/head';
 import { QueryClient } from '@tanstack/react-query';
 
 interface Props {
-  dataSetFile: DataSetFile;
+  dataSet: ApiDataSet;
   token: string;
 }
 
-const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
+const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSet, token }) => {
   const [submitted, toggleSubmitted] = useToggle(false);
   const [subscriptionError, setSubscriptionError] = useState<string>();
 
-  const { id: dataSetId, title } = dataSetFile;
+  const { id: dataSetId, title } = dataSet;
+  const dataSetFileId = dataSet.latestVersion.file.id;
 
   const onConfirm = async () => {
     try {
@@ -53,7 +54,7 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
             <p>
               Your subscription verification token has expired. You can try
               again by re-subscribing from the{' '}
-              <Link to={`/data-catalogue/data-set/${dataSetId}`}>
+              <Link to={`/data-catalogue/data-set/${dataSetFileId}`}>
                 data set's main screen.
               </Link>
             </p>
@@ -72,7 +73,7 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
           <>
             <p>You are already subscribed to this data set.</p>
             <p>
-              <Link to={`/data-catalogue/data-set/${dataSetId}`}>
+              <Link to={`/data-catalogue/data-set/${dataSetFileId}`}>
                 View {title}
               </Link>
             </p>
@@ -127,7 +128,7 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
         { name: 'Data catalogue', link: '/data-catalogue' },
         {
           name: title,
-          link: `/data-catalogue/data-set/${dataSetId}`,
+          link: `/data-catalogue/data-set/${dataSetFileId}`,
         },
       ]}
     >
@@ -138,7 +139,7 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({ dataSetFile, token }) => {
         <Panel headingTag="h2" title="Subscribed">
           <p>You have successfully subscribed to these updates.</p>
           <p>
-            <Link to={`/data-catalogue/data-set/${dataSetId}`}>
+            <Link to={`/data-catalogue/data-set/${dataSetFileId}`}>
               View {title}
             </Link>
           </p>
@@ -162,13 +163,13 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
 
     const queryClient = new QueryClient();
 
-    const dataSetFile = await queryClient.fetchQuery(
-      dataSetFileQueries.get(dataSetId),
+    const dataSet = await queryClient.fetchQuery(
+      apiDataSetQueries.getDataSet(dataSetId),
     );
 
     return {
       props: {
-        dataSetFile,
+        dataSet,
         token,
       },
     };

@@ -8,10 +8,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -33,10 +33,10 @@ public class ClaimsPrincipalTransformationServiceTests(TestApplicationFactory te
     [InlineData("http://schemas.microsoft.com/identity/claims/scope", "unknown-scope", false)]
     public async Task ScopeClaims(string scopeClaimName, string scopeClaimValue, bool successExpected)
     {
-        var claimsPrincipal = ClaimsPrincipalUtils.CreateClaimsPrincipal(
-            Guid.NewGuid(),
-            new Claim(ClaimTypes.Email, "user@example.com"),
-            new Claim(scopeClaimName, scopeClaimValue));
+        var claimsPrincipal = DataFixture
+            .DefaultClaimsPrincipal()
+            .WithEmail("user@example.com")
+            .WithClaim(scopeClaimName, scopeClaimValue);
 
         // Set up scenario and test data.
         var client = TestApp
@@ -67,7 +67,10 @@ public class ClaimsPrincipalTransformationServiceTests(TestApplicationFactory te
         var userId = Guid.NewGuid();
         var unrelatedUserId = Guid.NewGuid();
 
-        var claimsPrincipal = ClaimsPrincipalUtils.VerifiedByIdentityProviderUser();
+        var claimsPrincipal = DataFixture
+            .VerifiedByIdentityProviderUser()
+            .Generate();
+
         var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
         claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
 
@@ -112,7 +115,6 @@ public class ClaimsPrincipalTransformationServiceTests(TestApplicationFactory te
                 UserId = userId.ToString(),
                 RoleId = globalRoles[1].Id
             });
-
         });
 
         // Set up scenario and test data.
@@ -223,11 +225,11 @@ public class ClaimsPrincipalTransformationServiceTests(TestApplicationFactory te
         [AllowAnonymous]
         public async Task<ActionResult<List<string>>> RoleClaims()
         {
-            return new OkObjectResult(HttpContext
+            return await Task.FromResult(new OkObjectResult(HttpContext
                 .User
                 .Claims
                 .Select(c => new ClaimViewModel(c.Type, c.Value))
-                .ToList());
+                .ToList()));
         }
     }
 

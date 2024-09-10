@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
-[Collection("Set FluentValidation property name camel case configuration")]
 public class DataSetQueryCriteriaOrValidatorTests
 {
     private readonly DataSetQueryCriteriaOr.Validator _validator = new();
@@ -36,7 +35,7 @@ public class DataSetQueryCriteriaOrValidatorTests
         };
 
         _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("or[0]")
+            .ShouldHaveValidationErrorFor("Or[0]")
             .WithErrorCode(FluentValidationKeys.NotNullValidator)
             .Only();
     }
@@ -79,7 +78,7 @@ public class DataSetQueryCriteriaOrValidatorTests
         };
 
         _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("or[0].filters.eq")
+            .ShouldHaveValidationErrorFor("Or[0].Filters.Eq")
             .Only();
     }
 
@@ -139,8 +138,8 @@ public class DataSetQueryCriteriaOrValidatorTests
 
         Assert.Equal(2, result.Errors.Count);
 
-        result.ShouldHaveValidationErrorFor("or[0].filters.eq");
-        result.ShouldHaveValidationErrorFor("or[1].timePeriods.gte.code");
+        result.ShouldHaveValidationErrorFor("Or[0].Filters.Eq");
+        result.ShouldHaveValidationErrorFor("Or[1].TimePeriods.Gte.Code");
     }
 
     [Fact]
@@ -158,7 +157,7 @@ public class DataSetQueryCriteriaOrValidatorTests
         };
 
         _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("or[0].or")
+            .ShouldHaveValidationErrorFor("Or[0].Or")
             .Only();
     }
 
@@ -212,7 +211,7 @@ public class DataSetQueryCriteriaOrValidatorTests
         };
 
         _validator.TestValidate(query)
-            .ShouldHaveValidationErrorFor("or[0].or[0].filters.eq")
+            .ShouldHaveValidationErrorFor("Or[0].Or[0].Filters.Eq")
             .Only();
     }
 
@@ -315,9 +314,9 @@ public class DataSetQueryCriteriaOrValidatorTests
 
         Assert.Equal(3, result.Errors.Count);
 
-        result.ShouldHaveValidationErrorFor("or[0].and[0].filters.eq");
-        result.ShouldHaveValidationErrorFor("or[1].or[0].timePeriods.gte.period");
-        result.ShouldHaveValidationErrorFor("or[2].not.locations.in[0].level");
+        result.ShouldHaveValidationErrorFor("Or[0].And[0].Filters.Eq");
+        result.ShouldHaveValidationErrorFor("Or[1].Or[0].TimePeriods.Gte.Period");
+        result.ShouldHaveValidationErrorFor("Or[2].Not.Locations.In[0].Level");
     }
 
     [Fact]
@@ -387,7 +386,7 @@ public class DataSetQueryCriteriaOrValidatorTests
 
         Assert.Equal(2, result.Errors.Count);
 
-        result.ShouldHaveValidationErrorFor("or[0].and[0].filters.eq");
-        result.ShouldHaveValidationErrorFor("or[1].timePeriods.gte.period");
+        result.ShouldHaveValidationErrorFor("Or[0].And[0].Filters.Eq");
+        result.ShouldHaveValidationErrorFor("Or[1].TimePeriods.Gte.Period");
     }
 }

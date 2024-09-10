@@ -702,6 +702,12 @@
       "metadata": {
         "description": "The Client ID of a manually-created App Registration that represents the Public API Data Processor Function App in Entra ID"
       }
+    },
+    "apiAppRegistrationClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Client ID of a manually-created App Registration that represents the Public API Container App in Entra ID"
+      }
     }
   },
   "variables": {
@@ -1071,7 +1077,7 @@
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
     "publicApiDataProcessorSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor')]",
     "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
-    "publicApiDataProcessorPlinkSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor-plink')]",
+    "publicApiDataProcessorPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor-pep')]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
     "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
     "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
@@ -1165,7 +1171,16 @@
         }
       ]
     },
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]"
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
+    "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
+    "keyVaultSecretsUserPrincipalRefs": [
+      "[concat('Microsoft.Web/sites/', variables('adminAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('publisherAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('importerAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('contentAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('dataAppName'))]"
+    ]
   },
   "resources": [
     {
@@ -1763,6 +1778,7 @@
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]",
         "PublicDataApi:Url": "[concat('https://', parameters('publicApiUrl'))]",
+        "PublicDataApi:AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
         "PublicDataProcessor:Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
         "PublicDataProcessor:AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]"
       }
@@ -3543,7 +3559,7 @@
             }
           },
           {
-            "name": "[variables('publicApiDataProcessorPlinkSubnetName')]",
+            "name": "[variables('publicApiDataProcessorPrivateEndpointsSubnetName')]",
             "properties": {
               "addressPrefix": "10.0.7.0/24"
             }
@@ -3664,10 +3680,7 @@
             "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
             "permissions": {
               "keys": [],
-              "secrets": [
-                "Get",
-                "List"
-              ],
+              "secrets": ["Get", "List"],
               "certificates": []
             }
           },
@@ -3676,10 +3689,7 @@
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').principalId]",
             "permissions": {
               "keys": [],
-              "secrets": [
-                "Get",
-                "List"
-              ],
+              "secrets": ["Get", "List"],
               "certificates": []
             }
           },
@@ -3688,10 +3698,7 @@
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('publisherAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
               "keys": [],
-              "secrets": [
-                "Get",
-                "List"
-              ],
+              "secrets": ["Get", "List"],
               "certificates": []
             }
           },
@@ -3700,10 +3707,7 @@
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
               "keys": [],
-              "secrets": [
-                "Get",
-                "List"
-              ],
+              "secrets": ["Get", "List"],
               "certificates": []
             }
           },
@@ -3712,10 +3716,7 @@
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('importerAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
               "keys": [],
-              "secrets": [
-                "Get",
-                "List"
-              ],
+              "secrets": ["Get", "List"],
               "certificates": []
             }
           },
@@ -3724,10 +3725,7 @@
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('contentAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
               "keys": [],
-              "secrets": [
-                "Get",
-                "List"
-              ],
+              "secrets": ["Get", "List"],
               "certificates": []
             }
           },
@@ -3736,30 +3734,23 @@
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('dataAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
               "keys": [],
-              "secrets": [
-                "Get",
-                "List"
-              ],
+              "secrets": ["Get", "List"],
               "certificates": []
             }
           },
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "[parameters('devopsSPN')]",
-            // Devops SPN
+            "objectId": "[parameters('devopsSPN')]", // Devops SPN
             "permissions": {
               "keys": [],
-              "secrets": [
-                "Get",
-                "List"
-              ],
+              "secrets": ["Get", "List"],
               "certificates": []
             }
           },
+
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "a2d80c7b-fa56-4145-9a11-8aa3f9a4a8fe",
-            // EES Admin Group ID
+            "objectId": "a2d80c7b-fa56-4145-9a11-8aa3f9a4a8fe", // EES Admin Group ID
             "permissions": {
               "keys": [
                 "Get",
@@ -3802,8 +3793,7 @@
           },
           {
             "tenantId": "[subscription().tenantId]",
-            "objectId": "976855ee-57b9-438c-bace-b4dfe141bb7e",
-            // EDAP Team
+            "objectId": "976855ee-57b9-438c-bace-b4dfe141bb7e", // EDAP Team
             "permissions": {
               "keys": [
                 "Get",
@@ -3851,6 +3841,7 @@
             }
           }
         ]
+        // "enableRbacAuthorization": true
       },
       "resources": [
         {
@@ -3902,6 +3893,43 @@
           }
         }
       ]
+    },
+    {
+      "copy": {
+        "name": "keyVaultSecretUsersCopy",
+        "count": "[length(variables('keyVaultSecretsUserPrincipalRefs'))]"
+      },
+      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()]))]",
+      "properties": {
+        "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
+        "principalId": "[reference(variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "principalType": "ServicePrincipal"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), parameters('devopsSPN')))]",
+      "properties": {
+        "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
+        "principalId": "[parameters('devopsSPN')]",
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "principalType": "ServicePrincipal"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), variables('dataFactoryName')))]",
+      "properties": {
+        "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
+        "principalId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "principalType": "ServicePrincipal"
+      }
     },
     {
       "name": "[concat(variables('dataAppName'), '-autoscale')]",

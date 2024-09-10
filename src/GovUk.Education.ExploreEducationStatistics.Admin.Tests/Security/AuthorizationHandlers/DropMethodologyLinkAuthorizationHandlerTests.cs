@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -38,6 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             MethodologyId = Guid.NewGuid()
         };
 
+        private static readonly DataFixture DataFixture = new();
+
         public class ClaimsTests
         {
             [Fact]
@@ -49,7 +52,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var handler = SetupHandler(userPublicationRoleRepository.Object);
 
-                    var user = CreateClaimsPrincipal(UserId, claim);
+                    var user = DataFixture
+                        .AuthenticatedUser(userId: UserId)
+                        .WithClaim(claim.ToString());
+
                     var authContext =
                         CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
                             user,
@@ -83,7 +89,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(new List<PublicationRole>());
                     }
 
-                    var user = CreateClaimsPrincipal(UserId, claim);
+                    var user = DataFixture
+                        .AuthenticatedUser(userId: UserId)
+                        .WithClaim(claim.ToString());
+
                     var authContext =
                         CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
                             user,
@@ -109,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 // Deliberately set no expectations for checking user has any publication owner roles
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
                 var authContext =
                     CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
                         user,
@@ -139,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
                         .ReturnsAsync(ListOf(publicationRole));
 
-                    var user = CreateClaimsPrincipal(UserId);
+                    var user = DataFixture.AuthenticatedUser(userId: UserId);
                     var authContext =
                         CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
                             user,
@@ -164,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                var user = CreateClaimsPrincipal(UserId);
+                var user = DataFixture.AuthenticatedUser(userId: UserId);
                 var authContext =
                     CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(
                         user,

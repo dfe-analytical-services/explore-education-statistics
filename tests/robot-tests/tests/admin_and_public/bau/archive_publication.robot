@@ -137,7 +137,6 @@ Generate permalink for archive-publication
     Sleep    5
     
     user waits until page finishes loading    
-    
 
     user waits until results table appears    %{WAIT_LONG}
     user waits until page contains button    Generate shareable link

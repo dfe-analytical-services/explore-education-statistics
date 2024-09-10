@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -29,7 +30,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModel
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
@@ -508,7 +508,7 @@ public abstract class DataSetsControllerTests(
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             var client = TestApp
-                .SetUser(AuthenticatedUser())
+                .SetUser(DataFixture.AuthenticatedUser())
                 .CreateClient();
 
             var response = await ListPublicationDataSets(publication.Id, client: client);
@@ -583,8 +583,12 @@ public abstract class DataSetsControllerTests(
             int? pageSize = null,
             HttpClient? client = null)
         {
+            var user = DataFixture
+                .AuthenticatedUser()
+                .WithClaim(SecurityClaimTypes.AccessAllPublications.ToString());
+
             client ??= TestApp
-                .SetUser(AuthenticatedUser(SecurityClaim(SecurityClaimTypes.AccessAllPublications)))
+                .SetUser(user)
                 .CreateClient();
 
             var queryParams = new Dictionary<string, string?>
@@ -992,7 +996,7 @@ public abstract class DataSetsControllerTests(
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
             var client = TestApp
-                .SetUser(AuthenticatedUser())
+                .SetUser(DataFixture.AuthenticatedUser())
                 .CreateClient();
 
             var response = await GetDataSet(dataSetId: dataSet.Id, client: client);
@@ -1065,8 +1069,12 @@ public abstract class DataSetsControllerTests(
 
         private async Task<HttpResponseMessage> GetDataSet(Guid dataSetId, HttpClient? client = null)
         {
+            var user = DataFixture
+                .AuthenticatedUser()
+                .WithClaim(SecurityClaimTypes.AccessAllPublications.ToString());
+
             client ??= TestApp
-                .SetUser(AuthenticatedUser(SecurityClaim(SecurityClaimTypes.AccessAllPublications)))
+                .SetUser(user)
                 .CreateClient();
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}", UriKind.Relative);
@@ -1173,7 +1181,7 @@ public abstract class DataSetsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: AuthenticatedUser()).CreateClient();
+            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await CreateDataSet(Guid.NewGuid(), client);
 
@@ -1223,7 +1231,7 @@ public abstract class DataSetsControllerTests(
             return TestApp.ConfigureServices(
                     services => { services.ReplaceService(processorClient ?? Mock.Of<IProcessorClient>()); }
                 )
-                .SetUser(user ?? BauUser());
+                .SetUser(user ?? DataFixture.BauUser());
         }
 
         private async Task<HttpResponseMessage> CreateDataSet(
