@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
-[Collection("Set FluentValidation property name camel case configuration")]
 public class DataSetQueryCriteriaLocationsValidatorTests
 {
     private readonly DataSetQueryCriteriaLocations.Validator _validator = new();
@@ -119,7 +118,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
             Assert.NotEmpty(result.Errors);
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("eq", error.PropertyName));
+                Assert.StartsWith("Eq", error.PropertyName));
         }
     }
 
@@ -145,7 +144,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
             Assert.NotEmpty(result.Errors);
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("notEq", error.PropertyName));
+                Assert.StartsWith("NotEq", error.PropertyName));
         }
     }
 
@@ -173,7 +172,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
                 "Must have at least as many errors as locations");
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("in", error.PropertyName));
+                Assert.StartsWith("In", error.PropertyName));
         }
 
         [Fact]
@@ -212,7 +211,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
                 "Must have at least as many errors as locations");
 
             Assert.All(result.Errors, error =>
-                Assert.StartsWith("notIn", error.PropertyName));
+                Assert.StartsWith("NotIn", error.PropertyName));
         }
 
         [Fact]

@@ -1,8 +1,9 @@
+import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
 import EditableKeyStat from '@admin/pages/release/content/components/EditableKeyStat';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import _dataBlockService from '@admin/services/dataBlockService';
 import _keyStatisticService from '@admin/services/keyStatisticService';
-import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
+import baseRender from '@common-test/render';
 import {
   KeyStatisticDataBlock,
   KeyStatisticText,
@@ -10,14 +11,9 @@ import {
 import _tableBuilderService, {
   TableDataResponse,
 } from '@common/services/tableBuilderService';
-import {
-  render as baseRender,
-  RenderResult,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { RenderResult, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 jest.mock('@common/services/tableBuilderService');
 const tableBuilderService = _tableBuilderService as jest.Mocked<

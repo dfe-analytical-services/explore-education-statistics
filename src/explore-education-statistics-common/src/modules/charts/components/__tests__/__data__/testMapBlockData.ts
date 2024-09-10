@@ -8,12 +8,15 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import {
   GeoJsonFeature,
+  LocationGeoJsonOption,
   TableDataResponse,
 } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { Dictionary } from '@common/types';
 
 export const testMapConfiguration: Chart = {
+  boundaryLevel: 1,
   axes: {
     major: {
       type: 'major',
@@ -69,7 +72,7 @@ export const testMapConfiguration: Chart = {
       },
     ],
   },
-  boundaryLevel: 1,
+
   type: 'map',
   title: '',
   alt: '',
@@ -77,7 +80,11 @@ export const testMapConfiguration: Chart = {
   map: { dataSetConfigs: [] },
 };
 
-export const testMapTableData: TableDataResponse = {
+export const testMapTableData: TableDataResponse & {
+  subjectMeta: TableDataResponse['subjectMeta'] & {
+    locations: Dictionary<LocationGeoJsonOption[]>;
+  };
+} = {
   subjectMeta: {
     filters: {
       SchoolType: {

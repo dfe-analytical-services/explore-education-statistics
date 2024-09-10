@@ -1,7 +1,8 @@
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
 import React, { ReactNode } from 'react';
 import KeyStat from '@common/modules/find-statistics/components/KeyStat';
+import { useQuery } from '@tanstack/react-query';
+import tableBuilderQueries from '../queries/tableBuilderQueries';
 
 export interface KeyStatDataBlockProps {
   children?: ReactNode;
@@ -23,10 +24,10 @@ export default function KeyStatDataBlock({
   testId = 'keyStat',
 }: KeyStatDataBlockProps) {
   const {
-    value: dataBlock,
+    data: dataBlock,
     isLoading,
     error,
-  } = useKeyStatQuery(releaseId, dataBlockParentId);
+  } = useQuery(tableBuilderQueries.getKeyStat(releaseId, dataBlockParentId));
 
   const title = dataBlock?.title;
   const statistic = dataBlock?.value;

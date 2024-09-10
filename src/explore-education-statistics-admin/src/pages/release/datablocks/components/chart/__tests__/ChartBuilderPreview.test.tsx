@@ -1,12 +1,11 @@
-import { AxisConfiguration } from '@common/modules/charts/types/chart';
-import React from 'react';
-import { render, screen } from '@testing-library/react';
 import ChartBuilderPreview from '@admin/pages/release/datablocks/components/chart/ChartBuilderPreview';
+import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
-import { produce } from 'immer';
+import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
+import { render, screen } from '@testing-library/react';
+import { produce } from 'immer';
 
 describe('ChartBuilderPreview', () => {
   const testDataSets: DataSet[] = [
@@ -184,7 +183,7 @@ describe('ChartBuilderPreview', () => {
     render(
       <ChartBuilderPreview
         chart={produce(testMapChartRenderer, draft => {
-          draft.boundaryLevel = undefined;
+          draft.boundaryLevel = 0;
         })}
         loading={false}
       />,

@@ -7,8 +7,9 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
+import tableBuilderQueries from '@common/modules/find-statistics/queries/tableBuilderQueries';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
+import { useQuery } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
 
 export interface EditableKeyStatDataBlockProps {
@@ -35,10 +36,12 @@ export default function EditableKeyStatDataBlock({
   const [showForm, toggleShowForm] = useToggle(false);
 
   const {
-    value: dataBlockValues,
+    data: dataBlockValues,
     isLoading,
     error,
-  } = useKeyStatQuery(releaseId, keyStat.dataBlockParentId);
+  } = useQuery(
+    tableBuilderQueries.getKeyStat(releaseId, keyStat.dataBlockParentId),
+  );
 
   const handleSubmit = useCallback(
     async (values: KeyStatDataBlockFormValues) => {
