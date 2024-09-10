@@ -21,6 +21,12 @@ user checks release update
 user checks publication is on find statistics page
     [Arguments]    ${publication_name}
     user navigates to public find statistics page
+    user clicks element    id:searchForm-search
+    user presses keys    ${publication_name}
+    user clicks button    Search
+    user waits until page finishes loading
+    user clicks radio    Relevance
+    user waits until page finishes loading
     user waits until page contains link    ${publication_name}
 
 user waits until details dropdown contains publication
