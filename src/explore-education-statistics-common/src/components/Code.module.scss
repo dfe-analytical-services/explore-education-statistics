@@ -1,0 +1,42 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.container {
+  position: relative;
+
+  &:active,
+  &:focus-within,
+  &:hover {
+    & > .copyButton {
+      opacity: 1;
+    }
+  }
+}
+
+.copyButton {
+  max-width: fit-content;
+  position: absolute;
+  right: govuk-spacing(2);
+  top: govuk-spacing(2);
+
+  &:active {
+    top: 12px;
+  }
+}
+
+.pre {
+  border: 1px solid #bfc1c3;
+  background: #f9f9f8;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 46px 15px 15px;
+
+  &:focus {
+    border: $govuk-focus-width solid #000;
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+    padding: 44px 13px 13px; // counter border width to avoid content shift
+  }
+
+  > code {
+    background: none;
+  }
+}
