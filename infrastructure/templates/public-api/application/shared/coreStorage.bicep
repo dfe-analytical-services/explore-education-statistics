@@ -1,13 +1,10 @@
-@description('Specifies the legacy resource prefix')
-param legacyResourcePrefix string
+import { resourceNamesType } from '../../types.bicep'
 
-@description('Specifies the name of the Key Vault.')
-param keyVaultName string
-
-var coreStorageAccountName = '${legacyResourcePrefix}saeescore'
+@description('Specifies common resource naming variables.')
+param resourceNames resourceNamesType
 
 resource coreStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: coreStorageAccountName
+  name: resourceNames.existingResources.coreStorageAccount
   scope: resourceGroup(resourceGroup().name)
 }
 
@@ -20,7 +17,7 @@ var coreStorageConnectionStringSecretKey = 'ees-core-storage-connectionstring'
 module storeCoreStorageConnectionString '../../components/keyVaultSecret.bicep' = {
   name: 'storeCoreStorageConnectionString'
   params: {
-    keyVaultName: keyVaultName
+    keyVaultName: resourceNames.existingResources.keyVault
     isEnabled: true
     secretName: coreStorageConnectionStringSecretKey
     secretValue: coreStorageConnectionString

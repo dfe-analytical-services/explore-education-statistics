@@ -1,0 +1,48 @@
+{
+    "analysisServicesServers": "as",
+    "containerRegistryRegistries": "cr",
+    "insightsActionGroups": "ag-",
+    "logicWorkflows": "logic-",
+    "networkApplicationSecurityGroups": "asg-",
+    "networkVirtualNetworks": "vnet-",
+    "networkVirtualNetworksSubnets": "snet-",
+    "resourcesResourceGroups": "rg-",
+    
+
+    // Non-standard
+    // Should be "st"
+    "storageStorageAccounts": "sa",
+    // Should be "func-"
+    "webSitesFunctions": "fa-",
+    // Should be "app-"
+    "webSitesAppService": "as-",
+    
+
+    "operationalInsightsWorkspaces": "log-",
+    
+    
+    
+    "networkPrivateDnsZones": "pdnsz-",
+    
+
+
+    "appManagedEnvironments": "cae-",
+    "appContainerApps": "ca-",
+    "dBforPostgreSQLServers": "psql-",
+    "keyVaultVaults": "kv-",
+    "managedIdentityUserAssignedIdentities": "id-",
+    "networkApplicationGateways": "agw-",
+    "networkAzureFirewalls": "afw-",
+    "networkFirewallPolicies": "afwp-",
+    "networkFirewallPoliciesWebApplication": "waf",
+    "networkPublicIPAddresses": "pip-",
+    
+    
+    
+    "authorizationPolicyDefinitions": "policy-",
+    
+    
+    "webServerFarms": "plan-",
+    "webSitesAppServiceEnvironment": "ase-",
+    "webStaticSites": "stapp-"
+}

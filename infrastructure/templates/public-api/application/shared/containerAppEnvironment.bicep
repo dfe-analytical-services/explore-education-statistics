@@ -1,8 +1,10 @@
+import { resourceNamesType } from '../../types.bicep'
+
+@description('Specifies common resource naming variables.')
+param resourceNames resourceNamesType
+
 @description('Specifies the location for all resources.')
 param location string
-
-@description('Specifies common resource prefix')
-param commonResourcePrefix string
 
 @description('Specifies the subnet id to connect this resource to the VNet.')
 param subnetId string = ''
@@ -22,7 +24,7 @@ param publicApiFileShareName string
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var containerAppEnvironmentName = '${commonResourcePrefix}-cae-01'
+var containerAppEnvironmentName = '${resourceNames.prefixes.common}-${resourceNames.abbreviations.appManagedEnvironments}-01'
 
 resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: publicApiStorageAccountName
