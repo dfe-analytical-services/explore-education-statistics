@@ -44,7 +44,7 @@ public class TimeIdentifierSchemaFilter : ISchemaFilter
             schema.Example = new OpenApiString("CY");
 
             schema.Enum = TimeIdentifierUtils.DataCodes
-                .Order()
+                .NaturalOrder()
                 .Select(code => new OpenApiString(code))
                 .ToList<IOpenApiAny>();
         }
