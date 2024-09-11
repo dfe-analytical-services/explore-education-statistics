@@ -11,6 +11,7 @@ public record TimePeriodOptionViewModel : TimePeriodViewModel
     /// <summary>
     /// The time period in human-readable format.
     /// </summary>
+    /// <example>2020/21 Q1</example>
     public required string Label { get; init; }
 
     public static TimePeriodOptionViewModel Create(TimePeriodMeta meta)

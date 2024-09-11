@@ -16,6 +16,7 @@ public record DataSetQueryRequest
     /// <summary>
     /// The IDs of indicators in the data set to return values for.
     /// </summary>
+    /// <example>["C2ySJ", "q4X3J"]</example>
     public IReadOnlyList<string> Indicators { get; init; } = [];
 
     /// <summary>

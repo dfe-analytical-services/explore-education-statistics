@@ -10,22 +10,26 @@ public record DataSetGetQueryLocations
     /// <summary>
     /// Filter the results to be in this location.
     /// </summary>
+    /// <example>NAT|id|3dCWP</example>
     public string? Eq { get; init; }
 
     /// <summary>
     /// Filter the results to not be in this location.
     /// </summary>
+    /// <example>REG|code|E12000003</example>
     public string? NotEq { get; init; }
 
     /// <summary>
     /// Filter the results to be in one of these locations.
     /// </summary>
+    /// <example>["LA|code|E08000003", "LA|oldCode|373"]</example>
     [FromQuery, QuerySeparator]
     public IReadOnlyList<string>? In { get; init; }
 
     /// <summary>
     /// Filter the results not to be in one of these locations.
     /// </summary>
+    /// <example>["SCH|urn|123456", "SCH|laEstab|1234567"]</example>
     [FromQuery, QuerySeparator]
     public IReadOnlyList<string>? NotIn { get; init; }
 

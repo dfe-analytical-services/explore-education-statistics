@@ -13,6 +13,20 @@ public record DataSetQueryCriteriaAnd : DataSetQueryCriteria
     /// <summary>
     /// The sub-criteria which all must resolve to true.
     /// </summary>
+    /// <example>
+    /// [
+    ///     {
+    ///         "filters": {
+    ///             "eq": "pVAkV"
+    ///         }
+    ///     },
+    ///     {
+    ///         "locations": {
+    ///             "eq": "LA|code|E08000019"
+    ///         }
+    ///     }
+    /// ]
+    /// </example>
     public required IReadOnlyList<DataSetQueryCriteria> And { get; init; }
 
     public class Validator : AbstractValidator<DataSetQueryCriteriaAnd>

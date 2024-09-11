@@ -10,22 +10,26 @@ public record DataSetGetQueryTimePeriods
     /// <summary>
     /// Filter the results to be in this time period.
     /// </summary>
+    /// <example>2024|CY</example>
     public string? Eq { get; init; }
 
     /// <summary>
     /// Filter the results to not be in this time period.
     /// </summary>
+    /// <example>2024/2025|AY</example>
     public string? NotEq { get; init; }
 
     /// <summary>
     /// Filter the results to be in one of these time periods.
     /// </summary>
+    /// <example>["2022|CY", "2023|CY", "2024|CY"]</example>
     [FromQuery, QuerySeparator]
     public IReadOnlyList<string>? In { get; init; }
 
     /// <summary>
     /// Filter the results to not be in one of these time periods.
     /// </summary>
+    /// <example>["2020|M1", "2020|M2", "2020|M3"]</example>
     [FromQuery, QuerySeparator]
     public IReadOnlyList<string>? NotIn { get; init; }
 
@@ -33,24 +37,28 @@ public record DataSetGetQueryTimePeriods
     /// Filter the results to be in a time period that is
     /// chronologically greater than the one specified.
     /// </summary>
+    /// <example>2017/2018|AY</example>
     public string? Gt { get; init; }
 
     /// <summary>
     /// Filter the results to be in a time period that is
     /// chronologically greater than or equal to the one specified.
     /// </summary>
+    /// <example>2017|CY</example>
     public string? Gte { get; init; }
 
     /// <summary>
     /// Filter the results to be in a time period that is
     /// chronologically less than the one specified.
     /// </summary>
+    /// <example>2023/2024|AY</example>
     public string? Lt { get; init; }
 
     /// <summary>
     /// Filter the results to be in a time period that is
     /// chronologically less than or equal to the one specified.
     /// </summary>
+    /// <example>2023|CY</example>
     public string? Lte { get; init; }
 
     public DataSetQueryCriteriaTimePeriods ToCriteria()

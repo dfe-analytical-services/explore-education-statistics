@@ -19,11 +19,13 @@ public abstract record LocationOptionViewModel
     /// <summary>
     /// The ID of the location.
     /// </summary>
+    /// <example>bOmZ4</example>
     public required string Id { get; init; }
 
     /// <summary>
     /// The human-readable label of the location.
     /// </summary>
+    /// <example>Sheffield</example>
     public required string Label { get; init; }
 
     public static LocationOptionViewModel Create(LocationOptionMetaLink link)
@@ -84,6 +86,7 @@ public record LocationCodedOptionViewModel : LocationOptionViewModel
     /// <summary>
     /// The code of the location.
     /// </summary>
+    /// <example>E12000003</example>
     public required string Code { get; init; }
 
     public override bool HasMajorChange(LocationOptionViewModel otherOption)
@@ -100,11 +103,13 @@ public record LocationLocalAuthorityOptionViewModel : LocationOptionViewModel
     /// <summary>
     /// The ONS code of the local authority.
     /// </summary>
+    /// <example>E08000019</example>
     public required string Code { get; init; }
 
     /// <summary>
     /// The old code (previously the LEA code) of the local authority.
     /// </summary>
+    /// <example>373</example>
     public required string OldCode { get; init; }
 
     public override bool HasMajorChange(LocationOptionViewModel otherOption)
@@ -122,6 +127,7 @@ public record LocationProviderOptionViewModel : LocationOptionViewModel
     /// <summary>
     /// The UKPRN (UK provider reference number) of the provider.
     /// </summary>
+    /// <example>12345678</example>
     public required string Ukprn { get; init; }
 
     public override bool HasMajorChange(LocationOptionViewModel otherOption)
@@ -148,11 +154,13 @@ public record LocationSchoolOptionViewModel : LocationOptionViewModel
     /// <summary>
     /// The URN (unique reference number) of the school.
     /// </summary>
+    /// <example>123456</example>
     public required string Urn { get; init; }
 
     /// <summary>
     /// The LAESTAB (local authority establishment number) of the school.
     /// </summary>
+    /// <example>1234567</example>
     public required string LaEstab { get; init; }
 
     public override bool HasMajorChange(LocationOptionViewModel otherOption)

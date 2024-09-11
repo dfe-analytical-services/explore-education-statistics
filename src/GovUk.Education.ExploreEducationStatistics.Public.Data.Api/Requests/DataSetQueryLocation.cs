@@ -36,6 +36,7 @@ public abstract record DataSetQueryLocation
     ///
     /// This should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.
     /// </summary>
+    /// <example>NAT</example>
     [SwaggerEnum(typeof(GeographicLevel))]
     public virtual string Level { get; protected init; } = string.Empty;
 
@@ -145,6 +146,7 @@ public record DataSetQueryLocationId : DataSetQueryLocation
     /// The ID of the location. If specified, this will be used
     /// instead of any codes or other types of identifier.
     /// </summary>
+    /// <example>2tYX</example>
     public required string Id { get; init; }
 
     /// <summary>
@@ -152,6 +154,7 @@ public record DataSetQueryLocationId : DataSetQueryLocation
     ///
     /// This should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.
     /// </summary>
+    /// <example>NAT</example>
     [SwaggerEnum(typeof(GeographicLevel))]
     public new required string Level
     {
@@ -187,6 +190,7 @@ public record DataSetQueryLocationCode : DataSetQueryLocation
     /// The code of the location. This may be an ONS code, or some
     /// other code that identifies the location.
     /// </summary>
+    /// <example>E12000003</example>
     public required string Code { get; init; }
 
     /// <summary>
@@ -194,6 +198,7 @@ public record DataSetQueryLocationCode : DataSetQueryLocation
     ///
     /// This should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.
     /// </summary>
+    /// <example>NAT</example>
     [SwaggerEnum(typeof(GeographicLevel))]
     public new required string Level
     {
@@ -228,11 +233,13 @@ public record DataSetQueryLocationLocalAuthorityCode : DataSetQueryLocation
     /// in the standard ONS format for local authorities (e.g. `E08000019`).
     /// It can be a combination of two codes (e.g. `E09000021 / E09000027`).
     /// </summary>
+    /// <example>E08000019</example>
     public required string Code { get; init; }
 
     /// <summary>
     /// The geographic level of the local authority. Must be set to `LA`.
     /// </summary>
+    /// <example>LA</example>
     [Required]
     [SwaggerSchema(ReadOnly = false)]
     public override string Level { get; protected init; } = GeographicLevel.LocalAuthority.GetEnumValue();
@@ -264,11 +271,13 @@ public record DataSetQueryLocationLocalAuthorityOldCode : DataSetQueryLocation
     /// This should be a 3 digit number (e.g. `318`) or be
     /// a combination of two codes (e.g. `314 / 318`).
     /// </summary>
+    /// <example>373</example>
     public required string OldCode { get; init; }
 
     /// <summary>
     /// The geographic level of the local authority. Must be set to `LA`.
     /// </summary>
+    /// <example>LA</example>
     [Required]
     [SwaggerSchema(ReadOnly = false)]
     public override string Level { get; protected init; } = GeographicLevel.LocalAuthority.GetEnumValue();
@@ -299,11 +308,13 @@ public record DataSetQueryLocationProviderUkprn : DataSetQueryLocation
     /// The UKPRN (UK provider reference number) of the provider.
     /// This should be an 8 digit number.
     /// </summary>
+    /// <example>123454678</example>
     public required string Ukprn { get; init; }
 
     /// <summary>
     /// The geographic level of the provider. Must be set to `PROV`.
     /// </summary>
+    /// <example>PROV</example>
     [Required]
     [SwaggerSchema(ReadOnly = false)]
     public override string Level { get; protected init; } = GeographicLevel.Provider.GetEnumValue();
@@ -334,11 +345,13 @@ public record DataSetQueryLocationSchoolUrn : DataSetQueryLocation
     /// The URN (unique reference number) of the school.
     /// This should be a 6 digit number.
     /// </summary>
+    /// <example>123456</example>
     public required string Urn { get; init; }
 
     /// <summary>
     /// The geographic level of the school. Must be set to `SCH`.
     /// </summary>
+    /// <example>SCH</example>
     [Required]
     [SwaggerSchema(ReadOnly = false)]
     public override string Level { get; protected init; } = GeographicLevel.School.GetEnumValue();
@@ -369,11 +382,13 @@ public record DataSetQueryLocationSchoolLaEstab : DataSetQueryLocation
     /// The LAESTAB (local authority establishment number) of the school.
     /// This should be a 7 digit number.
     /// </summary>
+    /// <example>1234567</example>
     public required string LaEstab { get; init; }
 
     /// <summary>
     /// The geographic level of the location. Must be set to `SCH`.
     /// </summary>
+    /// <example>SCH</example>
     [Required]
     [SwaggerSchema(ReadOnly = false)]
     public override string Level { get; protected init; } = GeographicLevel.School.GetEnumValue();

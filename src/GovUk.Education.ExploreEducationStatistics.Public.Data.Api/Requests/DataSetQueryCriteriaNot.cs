@@ -13,6 +13,13 @@ public record DataSetQueryCriteriaNot : DataSetQueryCriteria
     /// <summary>
     /// The sub-criteria which must resolve to false.
     /// </summary>
+    /// <example>
+    /// {
+    ///     "filters": {
+    ///         "eq": "pVAkV"
+    ///     }
+    /// }
+    /// </example>
     public required DataSetQueryCriteria Not { get; init; }
 
     public class Validator : AbstractValidator<DataSetQueryCriteriaNot>

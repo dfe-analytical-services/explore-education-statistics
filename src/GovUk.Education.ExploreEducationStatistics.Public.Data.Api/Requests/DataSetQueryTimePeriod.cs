@@ -54,6 +54,7 @@ public record DataSetQueryTimePeriod
     ///
     /// This should be a single year like `2020` or a range like `2020/2021`.
     /// </summary>
+    /// <example>2020/2021</example>
     public required string Period { get; init; }
 
     /// <summary>
@@ -61,6 +62,7 @@ public record DataSetQueryTimePeriod
     ///
     /// This should be a valid time period code e.g. `AY`, `CY`, `M1`, `W20`.
     /// </summary>
+    /// <example>AY</example>
     [SwaggerEnum(typeof(TimeIdentifier))]
     public required string Code { get; init; }
 
