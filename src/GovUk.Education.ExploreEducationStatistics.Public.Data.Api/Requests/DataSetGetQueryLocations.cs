@@ -5,6 +5,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
+/// <summary>
+/// The location option criteria to filter results by in a data set GET query.
+///
+/// The results can be matched by either the location option's ID or a code.
+/// Note the following differences:
+///
+/// - IDs only match a **single location**
+/// - Codes may match **multiple locations**
+///
+/// Whilst codes are generally unique to a single location, they can be
+/// used for multiple locations. This may match more results than you
+/// expect so it's recommended to use IDs where possible.
+/// </summary>
 public record DataSetGetQueryLocations
 {
     /// <summary>

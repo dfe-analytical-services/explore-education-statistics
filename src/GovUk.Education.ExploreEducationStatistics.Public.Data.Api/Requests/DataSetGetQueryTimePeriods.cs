@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
+/// <summary>
+/// The time period criteria to filter results by in a data set GET query.
+/// </summary>
 public record DataSetGetQueryTimePeriods
 {
     /// <summary>
