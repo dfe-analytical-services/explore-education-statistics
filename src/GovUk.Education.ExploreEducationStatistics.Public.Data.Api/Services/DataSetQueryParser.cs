@@ -18,7 +18,7 @@ internal class DataSetQueryParser(
     : IDataSetQueryParser
 {
     public async Task<IInterpolatedSql> ParseCriteria(
-        DataSetQueryCriteria criteria,
+        IDataSetQueryCriteria criteria,
         DataSetVersion dataSetVersion,
         QueryState queryState,
         string basePath = "",
@@ -49,7 +49,7 @@ internal class DataSetQueryParser(
         return ParseCriteriaFragment(criteria, parsers, basePath);
     }
 
-    private static Facets ExtractFacets(DataSetQueryCriteria criteria, Facets? facets = null)
+    private static Facets ExtractFacets(IDataSetQueryCriteria criteria, Facets? facets = null)
     {
         facets ??= new Facets();
 
@@ -78,7 +78,7 @@ internal class DataSetQueryParser(
     }
 
     private static IInterpolatedSql ParseCriteriaFragment(
-        DataSetQueryCriteria criteria,
+        IDataSetQueryCriteria criteria,
         IEnumerable<IFacetsParser> facetParsers,
         string path,
         string facetJoinCondition = "AND")

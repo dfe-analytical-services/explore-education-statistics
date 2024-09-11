@@ -10,11 +10,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 [SwaggerSubType(typeof(DataSetQueryCriteriaOr))]
 [SwaggerSubType(typeof(DataSetQueryCriteriaNot))]
 [SwaggerSubType(typeof(DataSetQueryCriteriaFacets))]
-public abstract record DataSetQueryCriteria
+public interface IDataSetQueryCriteria
 {
     protected static void InheritanceValidator<TCriteria>(
-        PolymorphicValidator<TCriteria, DataSetQueryCriteria> validator)
-        where TCriteria : DataSetQueryCriteria
+        PolymorphicValidator<TCriteria, IDataSetQueryCriteria> validator)
+        where TCriteria : IDataSetQueryCriteria
     {
         validator.Add(_ => new DataSetQueryCriteriaAnd.Validator());
         validator.Add(_ => new DataSetQueryCriteriaOr.Validator());

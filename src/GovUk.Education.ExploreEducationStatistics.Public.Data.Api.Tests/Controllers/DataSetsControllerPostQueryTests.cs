@@ -2209,7 +2209,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             }
         };
 
-        public static readonly TheoryData<DataSetQueryCriteria> EquivalentCriteria = new()
+        public static readonly TheoryData<IDataSetQueryCriteria> EquivalentCriteria = new()
         {
             new DataSetQueryCriteriaAnd
             {
@@ -2368,7 +2368,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
         [Theory]
         [MemberData(nameof(EquivalentCriteria))]
-        public async Task EquivalentCriteria_Returns200(DataSetQueryCriteria criteria)
+        public async Task EquivalentCriteria_Returns200(IDataSetQueryCriteria criteria)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -2460,7 +2460,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             }
         };
 
-        public static readonly TheoryData<DataSetQueryCriteria> EquivalentCriteria = new()
+        public static readonly TheoryData<IDataSetQueryCriteria> EquivalentCriteria = new()
         {
             new DataSetQueryCriteriaOr
             {
@@ -2624,7 +2624,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
         [Theory]
         [MemberData(nameof(EquivalentCriteria))]
-        public async Task EquivalentCriteria_Returns200(DataSetQueryCriteria criteria)
+        public async Task EquivalentCriteria_Returns200(IDataSetQueryCriteria criteria)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -2726,7 +2726,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             }
         };
 
-        public static readonly TheoryData<DataSetQueryCriteria> EquivalentCriteria = new()
+        public static readonly TheoryData<IDataSetQueryCriteria> EquivalentCriteria = new()
         {
             new DataSetQueryCriteriaNot
             {
@@ -2828,7 +2828,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
         [Theory]
         [MemberData(nameof(EquivalentCriteria))]
-        public async Task EquivalentCriteria_Returns200(DataSetQueryCriteria criteria)
+        public async Task EquivalentCriteria_Returns200(IDataSetQueryCriteria criteria)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 

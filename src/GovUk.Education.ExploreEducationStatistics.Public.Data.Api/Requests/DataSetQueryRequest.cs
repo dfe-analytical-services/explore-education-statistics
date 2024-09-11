@@ -11,7 +11,7 @@ public record DataSetQueryRequest
     /// <summary>
     /// The criteria to match.
     /// </summary>
-    public DataSetQueryCriteria? Criteria { get; init; }
+    public IDataSetQueryCriteria? Criteria { get; init; }
 
     /// <summary>
     /// The IDs of indicators in the data set to return values for.

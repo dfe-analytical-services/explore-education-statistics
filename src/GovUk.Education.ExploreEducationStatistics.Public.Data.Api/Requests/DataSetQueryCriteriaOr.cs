@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 ///
 /// This is equivalent to the `OR` operator in SQL.
 /// </summary>
-public record DataSetQueryCriteriaOr : DataSetQueryCriteria
+public record DataSetQueryCriteriaOr : IDataSetQueryCriteria
 {
     /// <summary>
     /// The sub-criteria where one must resolve to true.
@@ -27,7 +27,7 @@ public record DataSetQueryCriteriaOr : DataSetQueryCriteria
     ///     }
     /// ]
     /// </example>
-    public required IReadOnlyList<DataSetQueryCriteria> Or { get; init; }
+    public required IReadOnlyList<IDataSetQueryCriteria> Or { get; init; }
 
     public class Validator : AbstractValidator<DataSetQueryCriteriaOr>
     {
@@ -38,7 +38,7 @@ public record DataSetQueryCriteriaOr : DataSetQueryCriteria
 
             RuleForEach(q => q.Or)
                 .NotNull()
-                .SetInheritanceValidator(InheritanceValidator);
+                .SetInheritanceValidator(IDataSetQueryCriteria.InheritanceValidator);
         }
     }
 }
