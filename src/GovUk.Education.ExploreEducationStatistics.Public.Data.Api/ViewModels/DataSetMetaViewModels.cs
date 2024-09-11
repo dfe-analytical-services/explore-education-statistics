@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
 /// <summary>
@@ -40,6 +42,7 @@ public record FilterOptionsViewModel : FilterViewModel
     /// <summary>
     /// The filter options belonging to this filter.
     /// </summary>
+    [JsonPropertyOrder(1)]
     public required IReadOnlyList<FilterOptionViewModel> Options { get; init; }
 }
 
@@ -51,6 +54,7 @@ public record LocationGroupOptionsViewModel : LocationGroupViewModel
     /// <summary>
     /// The locations belonging to this level.
     /// </summary>
+    [JsonPropertyOrder(1)]
     public required IReadOnlyList<LocationOptionViewModel> Options { get; init; }
 }
 

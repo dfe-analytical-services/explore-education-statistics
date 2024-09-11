@@ -87,6 +87,7 @@ public record LocationCodedOptionViewModel : LocationOptionViewModel
     /// The code of the location.
     /// </summary>
     /// <example>E12000003</example>
+    [JsonPropertyOrder(1)]
     public required string Code { get; init; }
 
     public override bool HasMajorChange(LocationOptionViewModel otherOption)
@@ -104,12 +105,14 @@ public record LocationLocalAuthorityOptionViewModel : LocationOptionViewModel
     /// The ONS code of the local authority.
     /// </summary>
     /// <example>E08000019</example>
+    [JsonPropertyOrder(1)]
     public required string Code { get; init; }
 
     /// <summary>
     /// The old code (previously the LEA code) of the local authority.
     /// </summary>
     /// <example>373</example>
+    [JsonPropertyOrder(1)]
     public required string OldCode { get; init; }
 
     public override bool HasMajorChange(LocationOptionViewModel otherOption)
@@ -128,6 +131,7 @@ public record LocationProviderOptionViewModel : LocationOptionViewModel
     /// The UKPRN (UK provider reference number) of the provider.
     /// </summary>
     /// <example>12345678</example>
+    [JsonPropertyOrder(1)]
     public required string Ukprn { get; init; }
 
     public override bool HasMajorChange(LocationOptionViewModel otherOption)
@@ -155,12 +159,14 @@ public record LocationSchoolOptionViewModel : LocationOptionViewModel
     /// The URN (unique reference number) of the school.
     /// </summary>
     /// <example>123456</example>
+    [JsonPropertyOrder(1)]
     public required string Urn { get; init; }
 
     /// <summary>
     /// The LAESTAB (local authority establishment number) of the school.
     /// </summary>
     /// <example>1234567</example>
+    [JsonPropertyOrder(1)]
     public required string LaEstab { get; init; }
 
     public override bool HasMajorChange(LocationOptionViewModel otherOption)
