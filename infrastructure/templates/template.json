@@ -3912,17 +3912,6 @@
     {
       "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
       "apiVersion": "2022-04-01",
-      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), parameters('devopsSPN')))]",
-      "properties": {
-        "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
-        "principalId": "[parameters('devopsSPN')]",
-        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
-        "principalType": "ServicePrincipal"
-      }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
-      "apiVersion": "2022-04-01",
       "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), variables('dataFactoryName')))]",
       "properties": {
         "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
