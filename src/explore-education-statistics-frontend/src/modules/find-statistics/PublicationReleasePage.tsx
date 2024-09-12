@@ -161,6 +161,14 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 Sign up for email alerts
               </Link>
             }
+            renderProducerLink={
+              <Link
+                unvisited
+                to="https://www.gov.uk/government/organisations/department-for-education"
+              >
+                Department for Education
+              </Link>
+            }
             onShowReleaseTypeModal={() =>
               logEvent({
                 category: `${release.publication.title} release page`,
