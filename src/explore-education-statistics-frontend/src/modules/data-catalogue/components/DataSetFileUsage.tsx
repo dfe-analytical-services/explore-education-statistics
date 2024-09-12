@@ -65,11 +65,12 @@ export default function DataSetFileUsage({
           description="Access this data using common programming languages"
           descriptionAfter={
             <>
-              <div className="govuk-!-margin-top-5 govuk-!-margin-bottom-5">
-                URL:
-                <CopyTextButton inlineButton={false} text={downloadLink} />
-              </div>
-              Example code:
+              <CopyTextButton
+                className="govuk-!-margin-top-5"
+                text={downloadLink}
+                labelHidden={false}
+              />
+              <h4>Example code</h4>
               <Tabs id="dataSetUsage-code">
                 <TabsSection title="Python" headingTag="h4">
                   <CodeBlock

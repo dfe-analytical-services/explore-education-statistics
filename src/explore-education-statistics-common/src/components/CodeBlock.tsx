@@ -1,8 +1,8 @@
 import styles from '@common/components/Code.module.scss';
 import React, { useEffect } from 'react';
-import { Highlight, Prism, PrismTheme, themes } from 'prism-react-renderer';
-import Button from './Button';
+import { Highlight, Prism, PrismTheme } from 'prism-react-renderer';
 import useToggle from '@common/hooks/useToggle';
+import Button from './Button';
 
 (typeof global !== 'undefined' ? global : window).Prism = Prism;
 require('prismjs/components/prism-r');
@@ -116,12 +116,14 @@ export default function CodeBlock({
           >
             {copied ? <span aria-live="polite">Code copied</span> : 'Copy Code'}
           </Button>
+          {/* eslint-disable-next-line */}
           <pre tabIndex={0} className={styles.pre} style={style}>
             <code>
               {tokens.map((line, i) => (
+                /* eslint-disable-next-line */
                 <div key={String(`ln:${i}`)} {...getLineProps({ line })}>
-                  {/* <span>{i + 1}</span> */}
                   {line.map((token, key) => (
+                    /* eslint-disable-next-line */
                     <span key={key} {...getTokenProps({ token })} />
                   ))}
                 </div>

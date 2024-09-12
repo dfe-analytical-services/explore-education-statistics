@@ -3,12 +3,10 @@
 .container {
   position: relative;
 
-  &:active,
-  &:focus-within,
-  &:hover {
-    & > .copyButton {
-      opacity: 1;
-    }
+  &:active.copyButton,
+  &:focus-within.copyButton,
+  &:hover.copyButton {
+    opacity: 1;
   }
 }
 

@@ -11,6 +11,7 @@ export interface CopyTextButtonProps {
   confirmMessage?: string;
   inlineButton?: boolean;
   label?: string;
+  labelHidden?: boolean;
   text: string;
 }
 
@@ -20,6 +21,7 @@ export default function CopyTextButton({
   confirmMessage = 'Text copied to the clipboard.',
   inlineButton = true,
   label,
+  labelHidden = true,
   text,
 }: CopyTextButtonProps) {
   const [copied, toggleCopied] = useToggle(false);
@@ -31,7 +33,14 @@ export default function CopyTextButton({
           'dfe-flex dfe-align-items-start': inlineButton,
         })}
       >
-        <UrlContainer id="copy-link-url" label={label} url={text} />
+        <UrlContainer
+          id="copy-link-url"
+          className={styles.urlContainer}
+          label={label}
+          labelHidden={labelHidden}
+          url={text}
+          widthLimited={false}
+        />
         <div
           className={classNames({
             'dfe-flex dfe-align-items--center govuk-!-margin-top-2':
