@@ -50,10 +50,10 @@ public record DataSetGetQueryLocations
     {
         return new DataSetQueryCriteriaLocations
         {
-            Eq = Eq is not null ? DataSetQueryLocation.Parse(Eq) : null,
-            NotEq = NotEq is not null ? DataSetQueryLocation.Parse(NotEq) : null,
-            In = In?.Select(DataSetQueryLocation.Parse).ToList(),
-            NotIn = NotIn?.Select(DataSetQueryLocation.Parse).ToList()
+            Eq = Eq is not null ? IDataSetQueryLocation.Parse(Eq) : null,
+            NotEq = NotEq is not null ? IDataSetQueryLocation.Parse(NotEq) : null,
+            In = In?.Select(IDataSetQueryLocation.Parse).ToList(),
+            NotIn = NotIn?.Select(IDataSetQueryLocation.Parse).ToList()
         };
     }
 

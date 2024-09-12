@@ -172,7 +172,7 @@ internal class DataSetQueryParser(
     {
         public HashSet<string> Filters { get; init; } = [];
 
-        public HashSet<DataSetQueryLocation> Locations { get; init; } = [];
+        public HashSet<IDataSetQueryLocation> Locations { get; init; } = [];
 
         public HashSet<DataSetQueryTimePeriod> TimePeriods { get; init; } = [];
     }

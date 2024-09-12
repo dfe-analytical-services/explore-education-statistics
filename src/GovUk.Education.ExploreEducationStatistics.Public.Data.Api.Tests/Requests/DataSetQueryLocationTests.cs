@@ -17,7 +17,7 @@ public abstract class DataSetQueryLocationTests
         public void IdProperty_ReturnsLocationId(string level)
         {
             const string id = "12345";
-            var location = DataSetQueryLocation.Parse($"{level}|id|{id}");
+            var location = IDataSetQueryLocation.Parse($"{level}|id|{id}");
 
             var locationId = Assert.IsType<DataSetQueryLocationId>(location);
 
@@ -37,7 +37,7 @@ public abstract class DataSetQueryLocationTests
         {
             const string expectedValue = "12345";
 
-            var location = DataSetQueryLocation.Parse($"{level}|{property}|{expectedValue}");
+            var location = IDataSetQueryLocation.Parse($"{level}|{property}|{expectedValue}");
 
             Assert.IsType(expectedType, location);
 
@@ -59,7 +59,7 @@ public abstract class DataSetQueryLocationTests
         public void InvalidLevel_Throws(string level)
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
-                DataSetQueryLocation.Parse($"{level}|id|12345"));
+                IDataSetQueryLocation.Parse($"{level}|id|12345"));
         }
 
         [Theory]
@@ -84,15 +84,15 @@ public abstract class DataSetQueryLocationTests
         public void InvalidProperty_Throws(string level, string property)
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
-                DataSetQueryLocation.Parse($"{level}|{property}|12345"));
+                IDataSetQueryLocation.Parse($"{level}|{property}|12345"));
         }
 
         public static readonly TheoryData<Type> LocationTypes = new(
             Assembly
-                .GetAssembly(typeof(DataSetQueryLocation))!
+                .GetAssembly(typeof(IDataSetQueryLocation))!
                 .GetTypes()
-                .Where(type => type != typeof(DataSetQueryLocation))
-                .Where(type => typeof(DataSetQueryLocation).IsAssignableFrom(type))
+                .Where(type => type != typeof(IDataSetQueryLocation))
+                .Where(type => typeof(IDataSetQueryLocation).IsAssignableFrom(type))
         );
 
         [Theory]
@@ -111,7 +111,7 @@ public abstract class DataSetQueryLocationTests
             ];
 
             var parsedLocationTypes = locationStrings
-                .Select(DataSetQueryLocation.Parse)
+                .Select(IDataSetQueryLocation.Parse)
                 .Select(l => l.GetType())
                 .ToHashSet();
 
@@ -120,7 +120,7 @@ public abstract class DataSetQueryLocationTests
                 $"""
                   The location type could not be parsed. Ensure that:
                   
-                  - There is a branch for this type in '{nameof(DataSetQueryLocation)}.{nameof(DataSetQueryLocation.Parse)}'
+                  - There is a branch for this type in '{nameof(IDataSetQueryLocation)}.{nameof(IDataSetQueryLocation.Parse)}'
                   - There is a corresponding string for this in the '{nameof(locationStrings)}' variable
                   """
             );

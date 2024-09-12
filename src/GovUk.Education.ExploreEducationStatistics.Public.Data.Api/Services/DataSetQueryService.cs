@@ -459,7 +459,7 @@ internal class DataSetQueryService(
     private static WarningViewModel MapGetQueryWarning(WarningViewModel warning)
     {
         if (warning.Code == ValidationMessages.LocationsNotFound.Code
-            && warning.Detail is NotFoundItemsErrorDetail<DataSetQueryLocation> notFoundLocations)
+            && warning.Detail is NotFoundItemsErrorDetail<IDataSetQueryLocation> notFoundLocations)
         {
             return warning with
             {

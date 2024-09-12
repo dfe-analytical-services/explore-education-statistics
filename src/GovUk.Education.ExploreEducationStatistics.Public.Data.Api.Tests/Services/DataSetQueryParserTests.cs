@@ -35,7 +35,7 @@ public abstract class DataSetQueryParserTests
             _dataSetVersion = DefaultDataSetVersion();
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -351,7 +351,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -588,7 +588,7 @@ public abstract class DataSetQueryParserTests
         public async Task AllComparators_Empty(string comparator)
         {
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             var service = BuildService();
@@ -671,7 +671,7 @@ public abstract class DataSetQueryParserTests
         [InlineData("NotIn", "true")]
         public async Task AllComparators_SingleOptionNotFound(string comparator, string expectedSql)
         {
-            List<DataSetQueryLocation> queryLocation =
+            List<IDataSetQueryLocation> queryLocation =
             [
                 new DataSetQueryLocationId
                 {
@@ -704,7 +704,7 @@ public abstract class DataSetQueryParserTests
             Assert.Equal(ValidationMessages.LocationsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.LocationsNotFound.Code, warning.Code);
 
-            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<DataSetQueryLocation>>(warning.Detail);
+            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<IDataSetQueryLocation>>(warning.Detail);
 
             Assert.Equal(queryLocation, warningDetail.Items);
         }
@@ -867,7 +867,7 @@ public abstract class DataSetQueryParserTests
             Assert.Equal(ValidationMessages.LocationsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.LocationsNotFound.Code, warning.Code);
 
-            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<DataSetQueryLocation>>(warning.Detail);
+            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<IDataSetQueryLocation>>(warning.Detail);
 
             Assert.Equal([queryLocations[0], queryLocations[2], queryLocations[3]], warningDetail.Items);
         }
@@ -913,7 +913,7 @@ public abstract class DataSetQueryParserTests
             Assert.Equal(ValidationMessages.LocationsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.LocationsNotFound.Code, warning.Code);
 
-            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<DataSetQueryLocation>>(warning.Detail);
+            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<IDataSetQueryLocation>>(warning.Detail);
 
             Assert.Equal(queryLocations, warningDetail.Items);
         }
@@ -928,7 +928,7 @@ public abstract class DataSetQueryParserTests
             _dataSetVersion = DefaultDataSetVersion();
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _filterRepository
@@ -1210,7 +1210,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -1239,7 +1239,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -1462,7 +1462,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -1726,7 +1726,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -1990,7 +1990,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -2219,7 +2219,7 @@ public abstract class DataSetQueryParserTests
 
             _locationRepository
                 .Setup(r =>
-                    r.ListOptions(_dataSetVersion, It.IsAny<IEnumerable<DataSetQueryLocation>>(), default))
+                    r.ListOptions(_dataSetVersion, It.IsAny<IEnumerable<IDataSetQueryLocation>>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -2456,7 +2456,7 @@ public abstract class DataSetQueryParserTests
                 .WithGeographicLevels([GeographicLevel.Country, GeographicLevel.Region])
         );
 
-    private static DataSetQueryLocation MapOptionToQueryLocation(ParquetLocationOption option)
+    private static IDataSetQueryLocation MapOptionToQueryLocation(ParquetLocationOption option)
     {
         var level = EnumUtil.GetFromEnumValue<GeographicLevel>(option.Level);
 

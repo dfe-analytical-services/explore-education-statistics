@@ -9,10 +9,10 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 {
     private readonly DataSetGetQueryLocations.Validator _validator = new();
 
-    public static readonly TheoryData<DataSetQueryLocation> ValidLocationQueriesSingle =
+    public static readonly TheoryData<IDataSetQueryLocation> ValidLocationQueriesSingle =
         DataSetQueryCriteriaLocationsValidatorTests.ValidLocationsSingle;
 
-    public static readonly TheoryData<DataSetQueryLocation[]> ValidLocationQueriesMultiple =
+    public static readonly TheoryData<IDataSetQueryLocation[]> ValidLocationQueriesMultiple =
         DataSetQueryCriteriaLocationsValidatorTests.ValidLocationsMultiple;
 
     public static readonly TheoryData<string> InvalidLocationFormatsSingle = new()
@@ -31,17 +31,17 @@ public abstract class DataSetGetQueryLocationsValidatorTests
         new [] { "Invalid", "NAT|", "|", "||" },
     };
 
-    public static readonly TheoryData<DataSetQueryLocation> InvalidLocationQueriesSingle =
+    public static readonly TheoryData<IDataSetQueryLocation> InvalidLocationQueriesSingle =
         DataSetQueryCriteriaLocationsValidatorTests.InvalidLocationsSingle;
 
-    public static readonly TheoryData<DataSetQueryLocation[]> InvalidLocationQueriesMultiple =
+    public static readonly TheoryData<IDataSetQueryLocation[]> InvalidLocationQueriesMultiple =
         DataSetQueryCriteriaLocationsValidatorTests.InvalidLocationsMultiple;
     
     public class EqTests : DataSetGetQueryLocationsValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidLocationQueriesSingle))]
-        public void Success(DataSetQueryLocation location)
+        public void Success(IDataSetQueryLocation location)
         {
             var query = new DataSetGetQueryLocations { Eq = location.ToLocationString() };
 
@@ -61,7 +61,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
         [Theory]
         [MemberData(nameof(InvalidLocationQueriesSingle))]
-        public void Failure_InvalidQuery(DataSetQueryLocation location)
+        public void Failure_InvalidQuery(IDataSetQueryLocation location)
         {
             var query = new DataSetGetQueryLocations { Eq = location.ToLocationString() };
 
@@ -75,7 +75,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidLocationQueriesSingle))]
-        public void Success(DataSetQueryLocation location)
+        public void Success(IDataSetQueryLocation location)
         {
             var query = new DataSetGetQueryLocations { NotEq = location.ToLocationString() };
 
@@ -94,7 +94,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
         [Theory]
         [MemberData(nameof(InvalidLocationQueriesSingle))]
-        public void Failure_InvalidQuery(DataSetQueryLocation location)
+        public void Failure_InvalidQuery(IDataSetQueryLocation location)
         {
             var query = new DataSetGetQueryLocations { NotEq = location.ToLocationString() };
 
@@ -107,7 +107,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidLocationQueriesMultiple))]
-        public void Success(DataSetQueryLocation[] locations)
+        public void Success(IDataSetQueryLocation[] locations)
         {
             var query = new DataSetGetQueryLocations
             {
@@ -143,7 +143,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
         [Theory]
         [MemberData(nameof(InvalidLocationQueriesMultiple))]
-        public void Failure_InvalidQueries(DataSetQueryLocation[] locations)
+        public void Failure_InvalidQueries(IDataSetQueryLocation[] locations)
         {
             var query = new DataSetGetQueryLocations
             {
@@ -162,7 +162,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidLocationQueriesMultiple))]
-        public void Success(DataSetQueryLocation[] locations)
+        public void Success(IDataSetQueryLocation[] locations)
         {
             var query = new DataSetGetQueryLocations
             {
@@ -198,7 +198,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
 
         [Theory]
         [MemberData(nameof(InvalidLocationQueriesMultiple))]
-        public void Failure_InvalidQueries(DataSetQueryLocation[] locations)
+        public void Failure_InvalidQueries(IDataSetQueryLocation[] locations)
         {
             var query = new DataSetGetQueryLocations
             {
