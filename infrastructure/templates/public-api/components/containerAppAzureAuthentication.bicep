@@ -13,7 +13,6 @@ param allowedPrincipalIds string[] = []
 @description('Specifies whether all calls to this resource should be authenticated or not.  Defaults to true')
 param requireAuthentication bool = true
 
-
 resource containerAppConfig 'Microsoft.App/containerApps/authConfigs@2024-03-01' = {
   name: '${containerAppName}/current'  
   properties: {

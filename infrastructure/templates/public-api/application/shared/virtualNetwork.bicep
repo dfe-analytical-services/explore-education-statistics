@@ -3,67 +3,49 @@ import { resourceNamesType } from '../../types.bicep'
 @description('Specifies common resource naming variables.')
 param resourceNames resourceNamesType
 
-var vNetName = resourceNames.existingResources.vNet
-var publicApiResourcePrefix = resourceNames.prefixes.publicApi
-var commonResourcePrefix = resourceNames.prefixes.common
-var legacyResourcePrefix = resourceNames.prefixes.legacy
-
-var adminAppServiceName = '${legacyResourcePrefix}-as-ees-admin'
-var publisherFunctionAppName = '${legacyResourcePrefix}-fa-ees-publisher'
-var dataProcessorName = '${publicApiResourcePrefix}-fa-processor'
-var psqlFlexibleServerName = '${commonResourcePrefix}-psql-flexibleserver'
-var containerAppEnvironmentName = '${commonResourcePrefix}-cae-01'
-var appGatewayName = '${commonResourcePrefix}-agw-01'
-
-var dataProcessorSubnetName = replace(dataProcessorName, publicApiResourcePrefix, '${publicApiResourcePrefix}-snet-')
-var dataProcessorPrivateEndpointsSubnetName = '${dataProcessorSubnetName}-pep'
-var containerAppEnvironmentSubnetName = replace(containerAppEnvironmentName, commonResourcePrefix, '${commonResourcePrefix}-snet-')
-var psqlFlexibleServerSubnetName = replace(psqlFlexibleServerName, commonResourcePrefix, '${commonResourcePrefix}-snet-')
-var appGatewaySubnetName = replace(appGatewayName, commonResourcePrefix, '${commonResourcePrefix}-snet-')
-var adminAppServiceSubnetName = replace(adminAppServiceName, legacyResourcePrefix, '${legacyResourcePrefix}-snet-')
-var publisherFunctionAppSubnetName = replace(publisherFunctionAppName, legacyResourcePrefix, '${legacyResourcePrefix}-snet-')
+var subnets = resourceNames.existingResources.subnets
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
-  name: vNetName
+  name: resourceNames.existingResources.vNet
 }
 
 resource adminSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: adminAppServiceSubnetName
+  name: subnets.adminApp
   parent: vNet
 }
 
 resource publisherSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: publisherFunctionAppSubnetName
+  name: subnets.publisherFunction
   parent: vNet
 }
 
 resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: dataProcessorSubnetName
+  name: subnets.dataProcessor
   parent: vNet
 }
 
 resource dataProcessorPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: dataProcessorPrivateEndpointsSubnetName
+  name: subnets.dataProcessorPrivateEndpoints
   parent: vNet
 }
 
 resource containerAppEnvironmentSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: containerAppEnvironmentSubnetName
+  name: subnets.containerAppEnvironment
   parent: vNet
 }
 
 resource psqlFlexibleServerSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: psqlFlexibleServerSubnetName
+  name: subnets.psqlFlexibleServer
   parent: vNet
 }
 
 resource appGatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: appGatewaySubnetName
+  name: subnets.appGateway
   parent: vNet
 }
 
 @description('The fully qualified Azure resource ID of the Network.')
-output vnetId string = resourceId('Microsoft.Network/VirtualNetworks', vNetName)
+output vnetId string = resourceId('Microsoft.Network/VirtualNetworks', resourceNames.existingResources.vNet)
 
 @description('The fully qualified Azure resource ID of the Data Processor Function App Subnet.')
 output dataProcessorSubnetRef string = dataProcessorSubnet.id

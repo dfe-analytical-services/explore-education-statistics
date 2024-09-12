@@ -1,4 +1,4 @@
-@description('Specifies the name of the Container Registry')
+@description('Specifies the name of the Container Registry (must be globally unique)')
 param containerRegistryName string
 
 @description('Specifies the location for all resources.')

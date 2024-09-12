@@ -9,12 +9,10 @@ param location string
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var logAnalyticsWorkspaceName = '${resourceNames.prefixes.common}-${resourceNames.abbreviations.operationalInsightsWorkspaces}'
-
 module logAnalyticsWorkspaceModule '../../components/logAnalyticsWorkspace.bicep' = {
   name: 'logAnalyticsWorkspaceDeploy'
   params: {
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    logAnalyticsWorkspaceName: resourceNames.sharedResources.logAnalyticsWorkspace
     location: location
     tagValues: tagValues
   }

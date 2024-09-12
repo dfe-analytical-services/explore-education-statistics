@@ -1,35 +1,32 @@
+import { resourceNamesType, firewallRuleType } from '../../types.bicep'
+
+param resourceNames resourceNamesType
+
 @description('Specifies the location for all resources.')
 param location string
-
-@description('Specifies the Public API resource prefix')
-param publicApiResourcePrefix string
-
-@description('Specifies the subscription name.')
-param subscription string
-
-@description('Specifies the subnet id of the Public API Data Processor.')
-param dataProcessorSubnetId string
-
-@description('Specifies the subnet id of the Container App Environment.')
-param containerAppEnvironmentSubnetId string
-
-@description('Specifies the name of the Key Vault.')
-param keyVaultName string
 
 @description('Public API Storage : Size of the file share in GB.')
 param publicApiDataFileShareQuota int = 1
 
 @description('Public API Storage : Firewall rules.')
-param storageFirewallRules {
-  name: string
-  cidr: string
-}[] = []
+param storageFirewallRules firewallRuleType[] = []
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var publicApiDataFileShareName = '${publicApiResourcePrefix}-fs-data'
-var publicApiStorageAccountName = '${subscription}eespapisa'
+resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
+  name: resourceNames.existingResources.vNet
+}
+
+resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: resourceNames.existingResources.subnets.dataProcessor
+  parent: vNet
+}
+
+resource containerAppEnvironmentSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: resourceNames.existingResources.subnets.containerAppEnvironment
+  parent: vNet
+}
 
 // TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
 // Currently supported by subnet whitelisting and Storage service endpoints being enabled on the whitelisted subnets.
@@ -37,14 +34,14 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
   name: 'publicApiStorageAccountDeploy'
   params: {
     location: location
-    storageAccountName: publicApiStorageAccountName
+    storageAccountName: resourceNames.publicApi.publicApiStorageAccount
     allowedSubnetIds: [
-      dataProcessorSubnetId
-      containerAppEnvironmentSubnetId
+      dataProcessorSubnet.id
+      containerAppEnvironmentSubnet.id
     ]
     firewallRules: storageFirewallRules
     skuStorageResource: 'Standard_LRS'
-    keyVaultName: keyVaultName
+    keyVaultName: resourceNames.existingResources.keyVault
     tagValues: tagValues
   }
 }
@@ -52,7 +49,7 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
 module dataFilesFileShareModule '../../components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
-    fileShareName: publicApiDataFileShareName
+    fileShareName: resourceNames.publicApi.publicApiFileshare
     fileShareQuota: publicApiDataFileShareQuota
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: 'TransactionOptimized'
@@ -62,5 +59,5 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
 output storageAccountName string = publicApiStorageAccountModule.outputs.storageAccountName
 output connectionStringSecretName string = publicApiStorageAccountModule.outputs.connectionStringSecretName
 output accessKeySecretName string = publicApiStorageAccountModule.outputs.accessKeySecretName
-output publicApiDataFileShareName string = publicApiDataFileShareName
-output publicApiStorageAccountName string = publicApiStorageAccountName
+output publicApiDataFileShareName string = resourceNames.publicApi.publicApiFileshare
+output publicApiStorageAccountName string = resourceNames.publicApi.publicApiStorageAccount

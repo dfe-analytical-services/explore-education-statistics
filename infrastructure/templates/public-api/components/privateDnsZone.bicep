@@ -1,9 +1,7 @@
+import { privateDnsZoneType } from '../types.bicep'
+
 @description('Specifies the type of zone to create')
-@allowed([
-  'sites'
-  'postgres'
-])
-param zoneType string
+param zoneType privateDnsZoneType
 
 @description('Specifies the name of the VNet that this DNS Zone will be attached to')
 param vnetName string
