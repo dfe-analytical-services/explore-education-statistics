@@ -105,7 +105,6 @@ Verify the contents inside the 'Draft API datasets' table
     
     user checks table cell contains    2    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
     user checks table cell contains    2    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
-    
 
 Click on 'View Details' link
     user clicks link in table cell    1    4    View details    xpath://table[@data-testid='draft-api-data-sets']
@@ -197,6 +196,18 @@ Verify the contents inside the 'Draft API datasets' table
 
     user checks table cell contains    1    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
     user checks table cell contains    1    3    Failed    xpath://table[@data-testid='draft-api-data-sets']
+
+Verify the contents inside the 'Live API datasets' table
+    user checks table column heading contains    1    1    Version          xpath://table[@data-testid='live-api-data-sets']
+    user checks table column heading contains    1    2    Name             xpath://table[@data-testid='live-api-data-sets']
+    user checks table column heading contains    1    3    Actions          xpath://table[@data-testid='live-api-data-sets']
+
+
+    user checks table cell contains    1    1    v1.0                       xpath://table[@data-testid='live-api-data-sets']
+    user checks table cell contains    1    2    ${SUBJECT_NAME_1}          xpath://table[@data-testid='live-api-data-sets']
+    
+    user checks table cell contains    2    1    v1.0                       xpath://table[@data-testid='live-api-data-sets']
+    user checks table cell contains    2    2    ${SUBJECT_NAME_2}          xpath://table[@data-testid='live-api-data-sets']
 
 Add release note for new release amendment
     user clicks link    Content
