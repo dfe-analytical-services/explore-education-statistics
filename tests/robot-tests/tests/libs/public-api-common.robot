@@ -53,7 +53,7 @@ user checks status in Draft version table
     ${status_value}=    get text    xpath:(//div[@data-testid="Status"]//dd[@data-testid="${text}"]//strong)[2]
     should be equal as strings    ${status_value}    ${expected_status}
 
-user checks row headinds within the api dataset section
+user checks row headings within the api dataset section
     [Arguments]    ${text}        ${parent}=#dataSetDetails
     user waits until page contains element    css:${PARENT} [data-testid="${text}"] > dt
 
@@ -62,13 +62,10 @@ user gets accordion header button element
     ${button}=    get child element    ${parent}    css:.[data-testid="Release"] > dt
     [Return]    ${button}
 
-
 user checks contents inside the cell value
     [Arguments]      ${expected_text}     ${locator}
      ${status_value}=    get text    ${locator}
     should be equal as strings    ${status_value}    ${expected_text}
-
-
 
 user checks table headings for Draft version details table
     ${elements}=  create list  Version  Status  Release  Data set file  Geographic levels  Time periods  Indicators  Filters  Actions
