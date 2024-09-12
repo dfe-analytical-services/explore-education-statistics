@@ -302,16 +302,16 @@ User checks relevant headings exist on API dataset details page
     user waits until h2 is visible    API data set version history
 
 User verifies the row headings and contents in 'Data set details' section
-    user checks row headinds within the api dataset section    Theme
-    user checks row headinds within the api dataset section    Publication
-    user checks row headinds within the api dataset section    Release
-    user checks row headinds within the api dataset section    Release type
-    user checks row headinds within the api dataset section    Geographic levels
-    user checks row headinds within the api dataset section    Indicators
-    user checks row headinds within the api dataset section    Filters
-    user checks row headinds within the api dataset section    Time period
+    user checks row headings within the api dataset section    Theme
+    user checks row headings within the api dataset section    Publication
+    user checks row headings within the api dataset section    Release
+    user checks row headings within the api dataset section    Release type
+    user checks row headings within the api dataset section   Geographic levels
+    user checks row headings within the api dataset section   Indicators
+    user checks row headings within the api dataset section    Filters
+    user checks row headings within the api dataset section    Time period
 
-    user checks row headinds within the api dataset section    Notifications
+    user checks row headings within the api dataset section   Notifications
 
     user checks contents inside the cell value          Test theme                                                  css: #dataSetDetails [data-testid="Theme-value"]
     user checks contents inside the cell value          ${PUBLICATION_NAME}                                         css:#dataSetDetails [data-testid="Publication-value"] 
