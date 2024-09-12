@@ -1,0 +1,184 @@
+*** Settings ***
+Library             ../libs/admin_api.py
+Resource            ../libs/admin-common.robot
+Resource            ../libs/admin/manage-content-common.robot
+Resource            ../libs/public-common.robot
+Resource            ../libs/public-api-common.robot
+
+Force Tags          Admin    Local    Dev    AltersData
+
+Suite Setup         user signs in as bau1
+Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
+
+
+
+*** Variables ***
+${PUBLICATION_NAME}=    UI tests - public api resolve mapping statuses %{RUN_IDENTIFIER}
+${RELEASE_NAME}=        Financial year 3000-01
+${SUBJECT_NAME_1}=      UI test subject 1
+${SUBJECT_NAME_2}=      UI test subject 2
+
+
+
+*** Test Cases ***
+Create publication and release
+   ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
+    user creates test release via api    ${PUBLICATION_ID}    FY    3000
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+
+Verify release summary
+    user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
+    user verifies release summary    Financial year    3000-01    Accredited official statistics
+
+Upload datafile
+    user uploads subject    ${SUBJECT_NAME_1}    absence_school.csv    absence_school.meta.csv    ${PUBLIC_API_FILES_DIR}
+
+Add data guidance to subjects
+    user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
+
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
+
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user waits until page contains accordion section    ${SUBJECT_NAME_1}
+
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME_1}
+    ...    ${SUBJECT_NAME_1} Main guidance content
+
+Save data guidance
+    user clicks button    Save guidance
+
+Create 1st API dataset
+    user scrolls to the top of the page
+    user clicks link    API data sets
+    user waits until h2 is visible    API data sets
+
+    user clicks button    Create API data set
+    ${modal}=    user waits until modal is visible    Create a new API data set
+    user chooses select option    id:apiDataSetCreateForm-releaseFileId   ${SUBJECT_NAME_1}
+    user clicks button    Confirm new API data set
+
+    user waits until page finishes loading
+    user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
+
+User waits until the 1st API dataset status changes to 'Ready'
+    user waits until h3 is visible    Draft version details
+    wait until keyword succeeds    10x    5s    Verify status of API Datasets    Ready
+
+Add headline text block to Content page
+    user clicks link    Back to API data sets
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Approve first release
+    user clicks link    Sign off
+    user approves release for immediate publication
+
+Create a second draft release via api
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3010
+
+Upload subject to second release
+   user uploads subject    ${SUBJECT_NAME_2}    absence_school_major_manual.csv    absence_school_major_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
+
+Add data guidance to second release
+    user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
+
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
+
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user waits until page contains accordion section    ${SUBJECT_NAME_2}
+
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME_2}
+    ...    ${SUBJECT_NAME_2} Main guidance content
+
+Save data guidance
+    user clicks button    Save guidance
+
+Create a different version of an API dataset(Major version)
+    user scrolls to the top of the page
+    user clicks link    API data sets
+    user waits until h2 is visible    API data sets
+
+    user waits until h3 is visible    Current live API data sets
+
+    user checks table column heading contains    1    1    Version    xpath://table[@data-testid="live-api-data-sets"]
+    user clicks button in table cell    1    3    Create new version    xpath://table[@data-testid="live-api-data-sets"]
+
+    ${modal}=    user waits until modal is visible    Create a new API data set version
+    user chooses select option    id:apiDataSetCreateForm-releaseFileId   ${SUBJECT_NAME_2}
+    user clicks button    Confirm new data set version
+
+    user waits until page finishes loading
+    user waits until modal is not visible    Create a new API data set version    %{WAIT_LONG}
+
+Validate the summary contents inside the 'draft version details' table
+    user waits until h3 is visible    Draft version details
+    user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(1) > dt + dd     v2.0    %{WAIT_LONG}
+    user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd     Action required    %{WAIT_LONG}
+    ${mapping_status}=    get text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
+    should be equal as strings    ${mapping_status}    Action required
+
+Validate the version task statuses inside the 'Draft version task' section
+    user waits until h3 is visible    Draft version tasks
+    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) a    Map locations    %{WAIT_LONG}
+    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(2) a    Map filters    %{WAIT_LONG}
+
+    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) div[id="map-locations-task-status"]    Incomplete    %{WAIT_LONG}
+    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(2) div[id="map-filters-task-status"]    Incomplete    %{WAIT_LONG}
+
+User clicks on Map locations link
+    user clicks link    Map locations
+    user waits until h3 is visible        Locations not found in new data set
+    user waits until element contains     xpath://table[@data-testid='mappable-table-region']/caption//strong[1]    1 unmapped location     %{WAIT_LONG}
+
+Validate the row headings and its contents in the 'Regions' section
+    user checks table column heading contains    1    1    Current data set
+    user checks table column heading contains    1    2    New data set
+
+    user checks table column heading contains    1    3    Type
+    user checks table column heading contains   1    4    Actions
+    
+    user checks table cell contains    1    1    Yorkshire and The Humber
+    user checks table cell contains    1    2    Unmapped
+    user checks table cell contains    1    3    N/A
+
+User edits location mapping
+    user clicks button in table cell     1    4    Edit
+
+    ${modal}=    user waits until modal is visible    Map existing location
+    user clicks radio        Yorkshire
+    user clicks button    Update location mapping
+    user waits until modal is not visible    Map existing location
+
+Verify mapping changes
+    user waits until element contains    xpath://table[@data-testid='mappable-table-region']/caption//strong[1]    1 mapped location     %{WAIT_LONG}
+
+Validate the row headings and its contents in the 'Regions' section(after mapping)
+
+    user waits until h3 is visible    Locations not found in new data set
+    user checks table column heading contains    1    1    Current data set
+    user checks table column heading contains    1    2    New data set
+
+    user checks table column heading contains    1    3    Type
+    user checks table column heading contains   1    4    Actions
+
+    user checks table cell contains    1    1    Yorkshire and The Humber
+    user checks table cell contains    1    2    Yorkshire
+    user checks table cell contains    1    3    Minor
+
+    user clicks link    Back
+
+Validate the version status of location task
+    user waits until h3 is visible    Draft version tasks
+    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) a    Map locations    %{WAIT_LONG}
+    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(2) a    Map filters    %{WAIT_LONG}
+
+    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) div[id="map-locations-task-status"]    Complete    %{WAIT_LONG}
+
