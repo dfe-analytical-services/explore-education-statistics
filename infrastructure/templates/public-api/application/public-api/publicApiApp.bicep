@@ -1,20 +1,13 @@
+import { resourceNamesType } from '../../types.bicep'
+
+@description('Specifies common resource naming variables.')
+param resourceNames resourceNamesType
+
 @description('Specifies the location for all resources.')
 param location string
 
-@description('Specifies the Public API resource prefix')
-param publicApiResourcePrefix string
-
-@description('Specifies the Admin App Service name.')
-param adminAppName string
-
 @description('Specifies the id of the Container App Environment in which to deploy this Container App.')
 param containerAppEnvironmentId string
-
-@description('Specifies the name of the fileshare used to store Public API Data.')
-param publicApiDataFileShareName string
-
-@description('Specifies the Container Registry name from which to pull Docker images.')
-param acrName string
 
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string
@@ -34,16 +27,14 @@ param publicApiDbConnectionStringTemplate string
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var apiAppName = '${publicApiResourcePrefix}-ca-api'
-var apiAppIdentityName = '${publicApiResourcePrefix}-id-ca-api'
 var dataFilesFileShareMountPath = '/data/public-api-data'
 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: acrName
+  name: resourceNames.existingResources.acr
 }
 
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
-  name: adminAppName
+  name: resourceNames.existingResources.adminApp
 }
 
 resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-31' existing = {
@@ -55,15 +46,15 @@ var adminAppClientId = adminAppServiceIdentity.properties.clientId
 var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
 
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: apiAppIdentityName
+  name: resourceNames.publicApi.apiAppIdentity
   location: location
 }
 
 module apiContainerAppAcrPullRoleAssignmentModule '../../components/containerRegistryRoleAssignment.bicep' = {
-  name: '${apiAppIdentityName}AcrPullRoleAssignmentDeploy'
+  name: '${resourceNames.publicApi.apiAppIdentity}AcrPullRoleAssignmentDeploy'
   params: {
     role: 'AcrPull'
-    containerRegistryName: acrName
+    containerRegistryName: resourceNames.existingResources.acr
     principalIds: [apiContainerAppManagedIdentity.properties.principalId]
   }
 }
@@ -72,7 +63,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
   name: 'apiContainerAppDeploy'
   params: {
     location: location
-    containerAppName: apiAppName
+    containerAppName: resourceNames.publicApi.apiApp
     acrLoginServer: containerRegistry.properties.loginServer
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
     userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
@@ -94,13 +85,13 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       {
         name: 'public-api-fileshare-mount'
         storageType: 'AzureFile'
-        storageName: publicApiDataFileShareName
+        storageName: resourceNames.publicApi.publicApiFileshare
       }
     ]
     appSettings: [
       {
         name: 'ConnectionStrings__PublicDataDb'
-        value: replace(replace(publicApiDbConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiAppIdentityName)
+        value: replace(replace(publicApiDbConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', resourceNames.publicApi.apiAppIdentity)
       }
       {
         // This settings allows the Container App to identify which user-assigned identity it should use in order to

@@ -2,7 +2,7 @@
 type resourceNamesType = {
   existingResources: {
     adminApp: string
-    publisherApp: string
+    publisherFunction: string
     keyVault: string
     vNet: string
     alertsGroup: string
@@ -14,24 +14,67 @@ type resourceNamesType = {
       containerAppEnvironment: string
       psqlFlexibleServer: string
       appGateway: string
-      adminAppService: string
-      publisherFunctionApp: string
+      adminApp: string
+      publisherFunction: string
     }
   }
   sharedResources: {
     appGateway: string
+    appGatewayIdentity: string
     containerAppEnvironment: string
     logAnalyticsWorkspace: string
     postgreSqlFlexibleServer: string
-    privateDnsZones: {
-      sites: string
-      postgres: string
-    }
   }
-  publicAPi: {
+  publicApi: {
     apiApp: string
+    apiAppIdentity: string
     appInsights: string
     dataProcessor: string
-    publicApiStorage: string
+    dataProcessorIdentity: string
+    dataProcessorPlan: string
+    dataProcessorStorageAccountsPrefix: string
+    publicApiStorageAccount: string
+    publicApiFileshare: string
   }
 }
+
+@export()
+type firewallRuleType = {
+  name: string
+  cidr: string
+}
+
+@export()
+type azureFileshareMountType = {
+  storageName: string
+  storageAccountKey: string
+  storageAccountName: string
+  fileShareName: string
+  mountPath: string
+}
+
+@export()
+type entraIdAuthenticationType = {
+  appRegistrationClientId: string
+  allowedClientIds: string[]
+  allowedPrincipalIds: string[]
+  requireAuthentication: bool
+}
+
+@export()
+type appGatewaySiteConfigType = {
+  resourceName: string
+  backendFqdn: string
+  publicFqdn: string
+  certificateName: string
+  healthProbeRelativeUrl: string
+}
+
+@export()
+type privateDnsZoneType = 'sites' | 'postgres'
+
+@export()
+type containerRegistryRoleType = 'AcrPull'
+
+@export()
+type keyVaultRoleType = 'Secrets User' | 'Certificate User'

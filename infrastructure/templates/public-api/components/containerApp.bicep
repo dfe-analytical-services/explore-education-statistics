@@ -1,3 +1,5 @@
+import { entraIdAuthenticationType } from '../types.bicep'
+
 @description('Specifies the location for all resources.')
 param location string
 
@@ -89,12 +91,7 @@ param volumeMounts {
 }[] = []
 
 @description('An existing App Registration registered with Entra ID that will be used to control access to this Container App')
-param entraIdAuthentication {
-  appRegistrationClientId: string
-  allowedClientIds: string[]
-  allowedPrincipalIds: string[]
-  requireAuthentication: bool
-}?
+param entraIdAuthentication entraIdAuthenticationType?
 
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
 

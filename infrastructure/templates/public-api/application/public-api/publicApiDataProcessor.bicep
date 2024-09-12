@@ -1,32 +1,16 @@
+import { resourceNamesType, firewallRuleType } from '../../types.bicep'
+
+@description('Specifies common resource naming variables.')
+param resourceNames resourceNamesType
+
 @description('Specifies the location for all resources.')
 param location string
-
-@description('Specifies the Public API resource prefix')
-param publicApiResourcePrefix string
-
-@description('Specifies the subscription name.')
-param subscription string
-
-@description('Specifies the name of an alerts group for reporting metric alerts')
-param alertsGroupName string
 
 @description('Alert metric name prefix')
 param metricsNamePrefix string
 
-@description('Specifies the Admin App Service name.')
-param adminAppName string
-
-@description('Specifies the name of the Key Vault.')
-param keyVaultName string
-
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
-
-@description('Specifies the subnet id for the function app outbound traffic across the VNet')
-param subnetId string
-
-@description('Specifies the optional subnet id for function app inbound traffic from the VNet')
-param privateEndpointSubnetId string
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
 param dataProcessorFunctionAppExists bool = false
@@ -34,29 +18,16 @@ param dataProcessorFunctionAppExists bool = false
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string
 
-@description('Specifies the name of the fileshare used to store Public API Data.')
-param publicApiDataFileShareName string
-
-@description('Specifies the name of the Public API storage account.')
-param publicApiStorageAccountName string
-
 @description('Public API Storage : Firewall rules.')
-param storageFirewallRules {
-  name: string
-  cidr: string
-}[] = []
+param storageFirewallRules firewallRuleType[] = []
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var appName = '${publicApiResourcePrefix}-fa-processor'
-var appServicePlanName = '${publicApiResourcePrefix}-asp-processor'
-var identityName = '${publicApiResourcePrefix}-id-fa-processor'
-var storageAccountsNamePrefix = '${subscription}eessaprocessor'
 var publicApiDataFileShareMountPath = '/data/public-api-data'
 
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
-  name: adminAppName
+  name: resourceNames.existingResources.adminApp
 }
 
 resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-31' existing = {
@@ -68,26 +39,40 @@ var adminAppClientId = adminAppServiceIdentity.properties.clientId
 var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
 
 resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: publicApiStorageAccountName
+  name: resourceNames.publicApi.publicApiStorageAccount
 }
 
 resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: identityName
+  name: resourceNames.publicApi.dataProcessorIdentity
   location: location
+}
+
+resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
+  name: resourceNames.existingResources.vNet
+}
+
+resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: resourceNames.existingResources.subnets.dataProcessor
+  parent: vNet
+}
+
+resource inboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: resourceNames.existingResources.subnets.dataProcessorPrivateEndpoints
+  parent: vNet
 }
 
 // Deploy Data Processor Function.
 module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
-    functionAppName: appName
-    appServicePlanName: appServicePlanName
-    storageAccountsNamePrefix: storageAccountsNamePrefix
-    alertsGroupName: alertsGroupName
+    functionAppName: resourceNames.publicApi.dataProcessor
+    appServicePlanName: resourceNames.publicApi.dataProcessor
+    storageAccountsNamePrefix: resourceNames.publicApi.dataProcessorStorageAccountsPrefix
+    alertsGroupName: resourceNames.existingResources.alertsGroup
     location: location
     applicationInsightsKey: applicationInsightsKey
-    subnetId: subnetId
-    privateEndpointSubnetId: privateEndpointSubnetId
+    subnetId: outboundVnetSubnet.id
+    privateEndpointSubnetId: inboundVnetSubnet.id
     publicNetworkAccessEnabled: false
     entraIdAuthentication: {
       appRegistrationClientId: dataProcessorAppRegistrationClientId
@@ -105,7 +90,7 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       principalId: dataProcessorFunctionAppManagedIdentity.properties.principalId
     }
     functionAppExists: dataProcessorFunctionAppExists
-    keyVaultName: keyVaultName
+    keyVaultName: resourceNames.existingResources.keyVault
     functionAppRuntime: 'dotnet-isolated'
     sku: {
       name: 'EP1'
@@ -121,10 +106,10 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       AppSettings__MetaInsertBatchSize: 1000
     }
     azureFileShares: [{
-      storageName: publicApiDataFileShareName
+      storageName: resourceNames.publicApi.publicApiFileshare
       storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
-      storageAccountName: publicApiStorageAccountName
-      fileShareName: publicApiDataFileShareName
+      storageAccountName: resourceNames.publicApi.publicApiStorageAccount
+      fileShareName: resourceNames.publicApi.publicApiFileshare
       mountPath: publicApiDataFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules

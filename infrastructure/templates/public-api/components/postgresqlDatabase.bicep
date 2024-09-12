@@ -1,3 +1,5 @@
+import { firewallRuleType } from '../types.bicep'
+
 @description('Specifies the location for all resources.')
 param location string
 
@@ -23,23 +25,10 @@ param dbStorageSizeGB int
 param dbAutoGrowStatus string
 
 @description('Azure Database for PostgreSQL pricing tier')
-@allowed([
-  'Burstable'
-  'GeneralPurpose'
-  'MemoryOptimized'
-])
-param dbSkuTier string = 'Burstable'
+param dbSkuTier 'Burstable' | 'GeneralPurpose' | 'MemoryOptimized' = 'Burstable'
 
 @description('PostgreSQL version')
-@allowed([
-  '11'
-  '12'
-  '13'
-  '14'
-  '15'
-  '16'
-])
-param postgreSqlVersion string = '16'
+param postgreSqlVersion '11' | '12' | '13' | '14' | '15' | '16' = '16'
 
 @description('PostgreSQL Server backup retention days')
 param backupRetentionDays int = 7
@@ -51,10 +40,7 @@ param geoRedundantBackup string = 'Disabled'
 param databaseNames string[]
 
 @description('An array of firewall rules containing IP address ranges')
-param firewallRules {
-  name: string
-  cidr: string
-}[] = []
+param firewallRules firewallRuleType[] = []
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
