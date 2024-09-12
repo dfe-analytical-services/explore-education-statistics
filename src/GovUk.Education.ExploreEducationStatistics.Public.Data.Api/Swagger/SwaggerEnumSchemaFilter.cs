@@ -36,10 +36,12 @@ public class SwaggerEnumSchemaFilter : ISchemaFilter
                 );
             }
 
+            var enumSchemaId = GetEnumSchemaId(context, enumAttribute);
+
             var enumRef = new OpenApiReference
             {
                 Type = ReferenceType.Schema,
-                Id = enumAttribute.Type.Name
+                Id = enumSchemaId
             };
 
             if (schema.Type == "array")
@@ -108,6 +110,18 @@ public class SwaggerEnumSchemaFilter : ISchemaFilter
         }
 
         return context.SchemaRepository.Schemas.TryGetValue(refSchema.Reference.Id, out enumSchema);
+    }
+
+    private static string GetEnumSchemaId(
+        SchemaFilterContext context,
+        SwaggerEnumAttribute enumAttribute)
+    {
+        if (!context.SchemaRepository.TryLookupByType(enumAttribute.Type, out var refSchema))
+        {
+            throw new InvalidOperationException($"Could not find enum schema ID for {enumAttribute.Type.Name}");
+        }
+
+        return refSchema.Reference.Id;
     }
 
     private static IOpenApiPrimitive SerializeEnum(Enum @enum, SwaggerEnumSerializer serializer)
