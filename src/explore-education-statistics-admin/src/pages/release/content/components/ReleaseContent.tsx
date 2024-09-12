@@ -188,6 +188,14 @@ const ReleaseContent = ({
                 Sign up for email alerts
               </a>
             }
+            renderProducerLink={
+              <Link
+                unvisited
+                to="https://www.gov.uk/government/organisations/department-for-education"
+              >
+                Department for Education
+              </Link>
+            }
             trackScroll
           />
 
