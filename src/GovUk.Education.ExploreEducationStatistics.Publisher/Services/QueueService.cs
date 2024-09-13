@@ -24,9 +24,12 @@ public class QueueService(
 
         await releasePublishingKeys
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async key =>
+            .ForEachAwaitAsync(async keyOld =>
+            {
+                var key = new ReleasePublishingKey(keyOld.ReleaseVersionId, keyOld.ReleaseStatusId);
                 await releasePublishingStatusService.UpdateContentStage(key,
-                    ReleasePublishingStatusContentStage.Queued));
+                    ReleasePublishingStatusContentStage.Queued);
+            });
     }
 
     public async Task QueuePublishReleaseContentMessage(ReleasePublishingKeyOld releasePublishingKeyOld)
@@ -34,7 +37,9 @@ public class QueueService(
         logger.LogInformation("Queuing publish content message for release version: {ReleaseVersionId}",
             releasePublishingKeyOld.ReleaseVersionId);
         await publisherClient.PublishReleaseContent(releasePublishingKeyOld);
-        await releasePublishingStatusService.UpdateContentStage(releasePublishingKeyOld,
+        var releasePublishingKey = new ReleasePublishingKey(
+            releasePublishingKeyOld.ReleaseVersionId, releasePublishingKeyOld.ReleaseStatusId);
+        await releasePublishingStatusService.UpdateContentStage(releasePublishingKey,
             ReleasePublishingStatusContentStage.Queued);
     }
 

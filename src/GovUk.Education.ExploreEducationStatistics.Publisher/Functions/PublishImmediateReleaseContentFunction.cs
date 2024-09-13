@@ -60,8 +60,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ReleasePublishingStatusContentStage state,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
+            var releasePublishingKey = new ReleasePublishingKey(
+                releasePublishingKeyOld.ReleaseVersionId, releasePublishingKeyOld.ReleaseStatusId);
             await releasePublishingStatusService.UpdateContentStage(
-                releasePublishingKeyOld,
+                releasePublishingKey,
                 state,
                 logMessage);
         }

@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             ReleasePublishingStatusState state);
 
         Task UpdateContentStage(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null);
 

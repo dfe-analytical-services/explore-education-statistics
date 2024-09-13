@@ -194,11 +194,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task UpdateContentStage(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsyncOld(releasePublishingKeyOld,
+            await UpdateRowAsync(releasePublishingKey,
                 row =>
                 {
                     row.State.Content = stage;
