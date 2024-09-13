@@ -3840,8 +3840,8 @@
               ]
             }
           }
-        ],
-        "enableRbacAuthorization": true
+        ]//,
+        //"enableRbacAuthorization": true
       },
       "resources": [
         {
