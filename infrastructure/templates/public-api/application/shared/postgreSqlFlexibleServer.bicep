@@ -55,5 +55,46 @@ module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
   }
 }
 
-@description('A template connection string to be used with managed identities and access tokens.')
-output managedIdentityConnectionStringTemplate string = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
+var managedIdentityConnectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
+
+var dataProcessorPsqlConnectionStringSecretKey = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
+
+// TODO - these are reliant on PSQL being deployed successfully at least once, so they should be made dependent on PSQL being created or updated.
+module storeDataProcessorPsqlConnectionString '../../components/keyVaultSecret.bicep' = {
+  name: 'storeDataProcessorPsqlConnectionString'
+  params: {
+    keyVaultName: resourceNames.existingResources.keyVault
+    isEnabled: true
+    secretName: dataProcessorPsqlConnectionStringSecretKey
+    secretValue: replace(replace(managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', resourceNames.publicApi.dataProcessorIdentity)
+    contentType: 'text/plain'
+  }
+}
+
+var publisherPsqlConnectionStringSecretKey = 'ees-publisher-connectionstring-publicdatadb'
+
+module storePublisherPsqlConnectionString '../../components/keyVaultSecret.bicep' = {
+  name: 'storePublisherPsqlConnectionString'
+  params: {
+    keyVaultName: resourceNames.existingResources.keyVault
+    isEnabled: true
+    secretName: publisherPsqlConnectionStringSecretKey
+    secretValue: replace(replace(managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', resourceNames.existingResources.publisherFunction)
+    contentType: 'text/plain'
+  }
+}
+
+var adminPsqlConnectionStringSecretKey = 'ees-admin-connectionstring-publicdatadb'
+
+module storeAdminPsqlConnectionString '../../components/keyVaultSecret.bicep' = {
+  name: 'storeAdminPsqlConnectionString'
+  params: {
+    keyVaultName: resourceNames.existingResources.keyVault
+    isEnabled: true
+    secretName: adminPsqlConnectionStringSecretKey
+    secretValue: replace(replace(managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', resourceNames.existingResources.adminApp)
+    contentType: 'text/plain'
+  }
+}
+
+output managedIdentityConnectionStringTemplate string = managedIdentityConnectionStringTemplate
