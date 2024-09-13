@@ -33,11 +33,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 // is set. This also applies to running integration tests which identify as a Production environment
                 // if the enviroment is not set. Integration tests connect as the Postgres superuser without running
                 // the Docker script.
+
+                // A separate grant is needed for the __EFMigrationsHistory table, as it was created prior to this migration.
                 migrationBuilder.Sql(
                     $"""
                      DO $$
                      BEGIN
                          IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '{PublicDataDbContext.PublicDataReadWriteRole}') THEN
+                             GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES ON "__EFMigrationsHistory" TO {PublicDataDbContext.PublicDataReadWriteRole};
                              ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES ON TABLES TO {PublicDataDbContext.PublicDataReadWriteRole};
                              ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, UPDATE ON SEQUENCES TO {PublicDataDbContext.PublicDataReadWriteRole};
                          END IF;
