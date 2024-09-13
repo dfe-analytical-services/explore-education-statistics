@@ -7,8 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IReleasePublishingStatusService
     {
-        Task<ReleasePublishingKeyOld> Create(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+        Task Create(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state,
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null);

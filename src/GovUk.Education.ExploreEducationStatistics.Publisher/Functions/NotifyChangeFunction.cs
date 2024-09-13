@@ -77,11 +77,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ReleasePublishingStatusState state,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
         {
-            return await releasePublishingStatusService.Create(
-                message.ReleasePublishingKeyOld,
+            var key = new ReleasePublishingKey(
+                message.ReleasePublishingKeyOld.ReleaseVersionId,
+                message.ReleasePublishingKeyOld.ReleaseStatusId);
+            await releasePublishingStatusService.Create(
+                key,
                 state,
                 message.Immediate,
                 logMessages);
+
+            return new ReleasePublishingKeyOld(key.ReleaseVersionId, key.ReleaseStatusId);
         }
 
         private async Task MarkScheduledReleaseStatusAsSuperseded(NotifyChangeMessage message)

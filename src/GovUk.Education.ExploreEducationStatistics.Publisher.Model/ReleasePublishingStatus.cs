@@ -32,17 +32,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         }
 
         public ReleasePublishingStatus(
-            string publicationSlug,
-            DateTime? publish,
             Guid releaseVersionId,
             Guid releaseStatusId,
+            string publicationSlug,
+            DateTime? publish,
             string releaseSlug,
             ReleasePublishingStatusState state,
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
         {
-            RowKey = releaseStatusId.ToString();
             PartitionKey = releaseVersionId.ToString();
+            RowKey = releaseStatusId.ToString();
             Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
             Publish = publish;

@@ -35,8 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _publisherTableStorageService = publisherTableStorageService;
         }
 
-        public async Task<ReleasePublishingKeyOld> Create(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+        public async Task Create(
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state,
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
@@ -44,11 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var releaseVersion = await _context.ReleaseVersions
                 .AsNoTracking()
                 .Include(rv => rv.Publication)
-                .FirstAsync(rv => rv.Id == releasePublishingKeyOld.ReleaseVersionId);
+                .FirstAsync(rv => rv.Id == releasePublishingKey.ReleaseVersionId);
 
-            var releaseStatus = new ReleasePublishingStatusOld(
+            var releaseStatus = new ReleasePublishingStatus(
                 releaseVersionId: releaseVersion.Id,
-                releaseStatusId: releasePublishingKeyOld.ReleaseStatusId,
+                releaseStatusId: releasePublishingKey.ReleaseStatusId,
                 publicationSlug: releaseVersion.Publication.Slug,
                 publish: immediate ? null : releaseVersion.PublishScheduled,
                 releaseSlug: releaseVersion.Slug,
@@ -56,8 +56,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 immediate: immediate,
                 logMessages);
 
-            var tableResult = await GetTable().ExecuteAsync(TableOperation.Insert(releaseStatus));
-            return (tableResult.Result as ReleasePublishingStatusOld).AsTableRowKey();
+            await _publisherTableStorageService.CreateEntity(
+                PublisherReleaseStatusTableName,
+                releaseStatus);
         }
 
         public async Task<ReleasePublishingStatus> Get(ReleasePublishingKey releasePublishingKey)
