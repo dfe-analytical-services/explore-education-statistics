@@ -138,6 +138,10 @@ User clicks on Map locations link
     user waits until h3 is visible        Locations not found in new data set
     user waits until element contains     xpath://table[@data-testid='mappable-table-region']/caption//strong[1]    1 unmapped location     %{WAIT_LONG}
 
+Validate the 'unmapped location' notification banner
+    user waits until h2 is visible    Action required
+    user waits until page contains link    There is 1 unmapped region
+
 Validate the row headings and its contents in the 'Regions' section
     user checks table column heading contains    1    1    Current data set
     user checks table column heading contains    1    2    New data set
@@ -177,8 +181,84 @@ Validate the row headings and its contents in the 'Regions' section(after mappin
 
 Validate the version status of location task
     user waits until h3 is visible    Draft version tasks
+
     user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) a    Map locations    %{WAIT_LONG}
     user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(2) a    Map filters    %{WAIT_LONG}
 
     user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) div[id="map-locations-task-status"]    Complete    %{WAIT_LONG}
 
+User clicks on Map filters link
+    user clicks link    Map filters
+    user waits until h3 is visible        Filter options not found in new data set
+    user waits until element contains     xpath://table[@data-testid='mappable-table-school_type']/caption//strong[1]    1 unmapped filter option     %{WAIT_LONG}
+
+Validate the 'unmapped filter option' notification banner
+    user waits until h2 is visible    Action required
+    user waits until page contains link    There is 1 unmapped School type filter option
+
+Validate the row headings and its contents in the 'filter options' section
+    user checks table column heading contains    1    1    Current data set
+    user checks table column heading contains    1    2    New data set
+
+    user checks table column heading contains    1    3    Type
+    user checks table column heading contains   1    4    Actions
+
+    user checks table cell contains    1    1    Total
+    user checks table cell contains    1    2    Unmapped
+    user checks table cell contains    1    3    N/A
+
+User edits filter mapping
+    user clicks button in table cell     1    4    Edit
+
+    ${modal}=    user waits until modal is visible    Map existing filter option
+    user clicks radio        State-funded primary and secondary
+    user clicks button    Update filter option mapping
+    user waits until modal is not visible    Map existing location
+
+Verify mapping changes
+    user waits until element contains    xpath://table[@data-testid='mappable-table-school_type']/caption//strong[1]    1 mapped filter option     %{WAIT_LONG}
+
+Validate the row headings and its contents in the 'filters options' section(after mapping)
+    user waits until h3 is visible    Filter options not found in new data set
+    user checks table column heading contains    1    1    Current data set
+    user checks table column heading contains    1    2    New data set
+
+    user checks table column heading contains    1    3    Type
+    user checks table column heading contains   1    4    Actions
+
+    user checks table cell contains    1    1    Total
+    user checks table cell contains    1    2    State-funded primary and secondary
+    user checks table cell contains    1    3    Minor
+
+    user clicks link    Back
+
+Confirm finalization of this API data set version
+    User Clicks Button    Finalise this data set version
+    User Waits For Caches To Expire
+    User Waits Until H2 Is Visible    Mappings finalised
+    User Waits Until Page Contains    Draft API data set version is ready to be published
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Approve first release
+    user clicks link    Sign off
+    user approves release for immediate publication
+
+Verify newly published release is on Find Statistics page
+    user checks publication is on find statistics page    ${PUBLICATION_NAME}
+
+User navigates to data catalogue page
+    user navigates to data catalogue page on public frontend
+
+Search with 1st API dataset
+    user clicks element    id:searchForm-search
+    user presses keys    ${PUBLICATION_NAME}
+    user clicks radio    API data sets only
+
+    user waits until page finishes loading
+    user clicks radio    Newest
+    user checks page contains link    ${SUBJECT_NAME_2}
+    user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_2}
