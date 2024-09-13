@@ -2,12 +2,6 @@
 
 .container {
   position: relative;
-
-  &:active.copyButton,
-  &:focus-within.copyButton,
-  &:hover.copyButton {
-    opacity: 1;
-  }
 }
 
 .copyButton {
@@ -23,14 +17,5 @@
 
 .pre {
   border: 1px solid #bfc1c3;
-  background: #f9f9f8;
-  max-width: 100%;
-  overflow-x: auto;
   padding: 60px 15px 15px !important;
-
-  &:focus {
-    border: $govuk-focus-width solid #000;
-    outline: $govuk-focus-colour solid $govuk-focus-width;
-    padding: 58px 13px 13px !important; // counter border width to avoid content shift
-  }
 }
