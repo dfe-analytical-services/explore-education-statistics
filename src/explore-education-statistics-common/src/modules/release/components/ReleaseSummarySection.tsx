@@ -37,6 +37,7 @@ interface Props {
   renderReleaseNotes: ReactNode;
   renderStatusTags: ReactNode;
   renderSubscribeLink: ReactNode;
+  renderProducerLink: ReactNode;
   trackScroll?: boolean;
   onShowReleaseTypeModal?: () => void;
 }
@@ -51,6 +52,7 @@ export default function ReleaseSummarySection({
   renderReleaseNotes,
   renderStatusTags,
   renderSubscribeLink,
+  renderProducerLink,
   trackScroll = false,
   onShowReleaseTypeModal,
 }: Props) {
@@ -117,6 +119,10 @@ export default function ReleaseSummarySection({
 
         <SummaryListItem term="Receive updates">
           {renderSubscribeLink}
+        </SummaryListItem>
+
+        <SummaryListItem term="Produced by">
+          {renderProducerLink}
         </SummaryListItem>
       </SummaryList>
     </div>
