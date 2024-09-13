@@ -208,11 +208,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task UpdateFilesStage(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsyncOld(releasePublishingKeyOld,
+            await UpdateRowAsync(releasePublishingKey,
                 row =>
                 {
                     row.State.Files = stage;

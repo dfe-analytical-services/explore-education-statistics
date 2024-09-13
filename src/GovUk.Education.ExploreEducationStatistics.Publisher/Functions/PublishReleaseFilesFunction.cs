@@ -94,7 +94,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             await releasePublishingKeys
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(key => releasePublishingStatusService.UpdateFilesStage(key, stage, logMessage));
+                .ForEachAwaitAsync(keyOld =>
+                {
+                    var key = new ReleasePublishingKey(keyOld.ReleaseVersionId, keyOld.ReleaseStatusId);
+                    return releasePublishingStatusService.UpdateFilesStage(key, stage, logMessage);
+                });
         }
 
         private async Task UpdatePublishingStage(

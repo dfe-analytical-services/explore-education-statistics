@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             ReleasePublishingStatusLogMessage? logMessage = null);
 
         Task UpdateFilesStage(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null);
 
