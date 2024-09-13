@@ -1,3 +1,5 @@
+import { appGatewaySiteConfigType } from '../types.bicep'
+
 @description('Specifies the Key Vault name that this App Gateway will be permitted to get and list certificates from')
 param keyVaultName string
 
@@ -14,21 +16,10 @@ param appGatewayName string = ''
 param managedIdentityName string = ''
 
 @description('Specifies a set of configurations for the App Gateway to use to direct traffic to backend resources')
-param sites {
-  resourceName: string
-  publicFqdn: string
-  backendFqdn: string
-  healthProbeRelativeUrl: string
-  certificateKeyVaultSecretName: string
-}[]
+param sites appGatewaySiteConfigType[]
 
 @description('Specifies a set of Azure availability zones for the region that this resource should be accessible from. Defaults to all zones')
-@allowed([
-  '1'
-  '2'
-  '3'
-])
-param availabilityZones string[] = [
+param availabilityZones ('1' | '2' | '3') [] = [
   '1'
   '2'
   '3'
@@ -130,7 +121,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
     sslCertificates: [for site in sites: {
       name: '${site.resourceName}-cert'
       properties: {
-        keyVaultSecretId: 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/secrets/${site.certificateKeyVaultSecretName}'
+        keyVaultSecretId: 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/secrets/${site.certificateName}'
       }
     }]
     frontendIPConfigurations: [for site in sites: {

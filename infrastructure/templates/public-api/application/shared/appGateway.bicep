@@ -1,44 +1,40 @@
+import { resourceNamesType, appGatewaySiteConfigType } from '../../types.bicep'
+
+@description('Specifies common resource naming variables.')
+param resourceNames resourceNamesType
+
 @description('Specifies the location for all resources.')
 param location string
 
-@description('Specifies common resource prefix.')
-param commonResourcePrefix string
-
-@description('Specifies the name of the Key Vault.')
-param keyVaultName string
-
 @description('Specifies the subnet id for the App Gateway to integrate with the VNet.')
-param subnetId string
-
-@description('Specifies the subnet id for the App Gateway to integrate with the VNet.')
-param publicApiContainerAppSettings {
-  name: string
-  backendFqdn: string
-  publicFqdn: string
-  certificateName: string
-  healthProbeRelativeUrl: string
-}
+param publicApiContainerAppSettings appGatewaySiteConfigType
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var appGatewayName = '${commonResourcePrefix}-agw-01'
-var appGatewayIdentityName = '${commonResourcePrefix}-id-agw-01'
+resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
+  name: resourceNames.existingResources.vNet
+}
+
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: resourceNames.existingResources.subnets.appGateway
+  parent: vNet
+}
 
 module appGatewayModule '../../components/appGateway.bicep' = {
   name: 'appGatewayDeploy'
   params: {
     location: location
-    appGatewayName: appGatewayName
-    managedIdentityName: appGatewayIdentityName
-    keyVaultName: keyVaultName
-    subnetId: subnetId
+    appGatewayName: resourceNames.sharedResources.appGateway
+    managedIdentityName: resourceNames.sharedResources.appGatewayIdentity
+    keyVaultName: resourceNames.existingResources.keyVault
+    subnetId: subnet.id
     sites: [
       {
-        resourceName: publicApiContainerAppSettings.name
+        resourceName: publicApiContainerAppSettings.resourceName
         backendFqdn: publicApiContainerAppSettings.backendFqdn
         publicFqdn: publicApiContainerAppSettings.publicFqdn
-        certificateKeyVaultSecretName: publicApiContainerAppSettings.certificateName
+        certificateName: publicApiContainerAppSettings.certificateName
         healthProbeRelativeUrl: publicApiContainerAppSettings.healthProbeRelativeUrl
       }
     ]

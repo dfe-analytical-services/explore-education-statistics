@@ -17,11 +17,7 @@ param enabledForDiskEncryption bool = false
 param enabledForTemplateDeployment bool = true
 
 @description('Specifies whether the key vault is a standard vault or a premium vault.')
-@allowed([
-  'standard'
-  'premium'
-])
-param skuName string = 'standard'
+param skuName 'standard' | 'premium' = 'standard'
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object

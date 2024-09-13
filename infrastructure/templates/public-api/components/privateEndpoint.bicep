@@ -1,3 +1,5 @@
+import { privateDnsZoneType } from '../types.bicep'
+
 @description('Specifies the name of the service being connected via private endpoint')
 @minLength(0)
 param serviceName string
@@ -14,11 +16,7 @@ param subnetId string
 param location string
 
 @description('Specifies the type of service being attached to the private endpoint')
-@allowed([
-  'sites'
-  'postgres'
-])
-param serviceType string
+param serviceType privateDnsZoneType
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object

@@ -1,30 +1,29 @@
+import { resourceNamesType, firewallRuleType } from '../../types.bicep'
+
+@description('Specifies common resource naming variables.')
+param resourceNames resourceNamesType
+
 @description('Specifies the location for all resources.')
 param location string
 
-@description('Specifies common resource prefix')
-param commonResourcePrefix string
-
 @description('Administrator login name.')
-param postgreSqlAdminName string
+param adminName string
 
 @description('Administrator password.')
 @secure()
-param postgreSqlAdminPassword string
+param adminPassword string
 
 @description('SKU name.')
-param postgreSqlSkuName string = 'Standard_B1ms'
+param sku string = 'Standard_B1ms'
 
 @description('Storage Size in GB.')
-param postgreSqlStorageSizeGB int = 32
+param storageSizeGB int = 32
 
 @description('Autogrow setting.')
-param postgreSqlAutoGrowStatus string = 'Disabled'
+param autoGrowStatus string = 'Disabled'
 
 @description('Firewall rules.')
-param postgreSqlFirewallRules {
-  name: string
-  cidr: string
-}[] = []
+param firewallRules firewallRuleType[] = []
 
 @description('Specifies the subnet id that the PostgreSQL private endpoint will be attached to.')
 param privateEndpointSubnetId string
@@ -32,9 +31,7 @@ param privateEndpointSubnetId string
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var postgreSqlServerName = '${commonResourcePrefix}-psql-flexibleserver'
-
-var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
+var formattedFirewallRules = map(firewallRules, rule => {
   name: replace(rule.name, ' ', '_')
   cidr: rule.cidr
 })
@@ -42,16 +39,16 @@ var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
 module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
   name: 'postgreSQLDatabaseDeploy'
   params: {
-    databaseServerName: postgreSqlServerName
+    databaseServerName: resourceNames.sharedResources.postgreSqlFlexibleServer
     location: location
     createMode: 'Default'
-    adminName: postgreSqlAdminName
-    adminPassword: postgreSqlAdminPassword
-    dbSkuName: postgreSqlSkuName
-    dbStorageSizeGB: postgreSqlStorageSizeGB
-    dbAutoGrowStatus: postgreSqlAutoGrowStatus
+    adminName: adminName
+    adminPassword: adminPassword
+    dbSkuName: sku
+    dbStorageSizeGB: storageSizeGB
+    dbAutoGrowStatus: autoGrowStatus
     postgreSqlVersion: '16'
-    firewallRules: formattedPostgreSqlFirewallRules
+    firewallRules: formattedFirewallRules
     databaseNames: ['public_data']
     privateEndpointSubnetId: privateEndpointSubnetId
     tagValues: tagValues
