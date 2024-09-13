@@ -108,14 +108,15 @@ var resourceNames = {
     vNet: '${legacyResourcePrefix}-vnet-ees'
     alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
     acr: 'eesacr'
-    coreStorageAccount: '${legacyResourcePrefix}saeescore'
+    // The Test Resource Group has broken from the naming convention of other environments for Core Storage
+    coreStorageAccount: subscription == 's101t01' ? '${legacyResourcePrefix}storageeescore' : '${legacyResourcePrefix}saeescore'
     subnets: {
-      adminApp: '${legacyResourcePrefix}-snet-as-ees-admin'
+      adminApp: '${legacyResourcePrefix}-snet-ees-admin'
+      publisherFunction: '${legacyResourcePrefix}-snet-ees-publisher'
       appGateway: '${commonResourcePrefix}-snet-${abbreviations.networkApplicationGateways}-01'
       containerAppEnvironment: '${commonResourcePrefix}-snet-${abbreviations.appManagedEnvironments}-01'
       dataProcessor: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor'
       dataProcessorPrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor-pep'
-      publisherFunction: '${legacyResourcePrefix}-snet-a-ees-publisher'
       psqlFlexibleServer: '${commonResourcePrefix}-snet-${abbreviations.dBforPostgreSQLServers}'
     }
   }
@@ -141,28 +142,28 @@ var resourceNames = {
 }
 
 module vNetModule 'application/shared/virtualNetwork.bicep' = {
-  name: 'networkDeploy'
+  name: 'virtualNetworkApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
   }
 }
 
 module coreStorage 'application/shared/coreStorage.bicep' = {
-  name: 'coreStorageModuleDeploy'
+  name: 'coreStorageApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
   }
 }
 
 module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = {
-  name: 'privateDnsZonesDeploy'
+  name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
   }
 }
 
 module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = {
-  name: 'publicApiStorageAccountDeploy'
+  name: 'publicApiStorageAccountApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
@@ -173,7 +174,7 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
 }
 
 module appInsightsModule 'application/public-api/publicApiAppInsights.bicep' = {
-  name: 'publicApiAppInsightsModuleDeploy'
+  name: 'publicApiAppInsightsApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
@@ -182,7 +183,7 @@ module appInsightsModule 'application/public-api/publicApiAppInsights.bicep' = {
 
 // Create a generic, shared Log Analytics Workspace for any relevant resources to use.
 module logAnalyticsWorkspaceModule 'application/shared/logAnalyticsWorkspace.bicep' = {
-  name: 'logAnalyticsWorkspaceModuleDeploy'
+  name: 'logAnalyticsWorkspaceApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
@@ -191,7 +192,7 @@ module logAnalyticsWorkspaceModule 'application/shared/logAnalyticsWorkspace.bic
 }
 
 module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep' = if (updatePsqlFlexibleServer) {
-  name: 'postgreSqlFlexibleServerModuleDeploy'
+  name: 'postgreSqlFlexibleServerApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
@@ -210,18 +211,21 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
 }
 
 module containerAppEnvironmentModule 'application/shared/containerAppEnvironment.bicep' = {
-  name: 'containerAppEnvironmentModuleDeploy'
+  name: 'containerAppEnvironmentApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
     tagValues: tagValues
   }
+  dependsOn: [
+    publicApiStorageModule
+  ]
 }
 
 // Deploy main Public API Container App.
 module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployContainerApp) {
-  name: 'publicApiAppModuleDeploy'
+  name: 'publicApiAppApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
@@ -238,26 +242,9 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
   ]
 }
 
-module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = {
-  name: 'publicApiDataProcessorModuleDeploy'
-  params: {
-    location: location
-    resourceNames: resourceNames
-    metricsNamePrefix: '${subscription}PublicDataProcessor'
-    applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
-    dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
-    storageFirewallRules: storageFirewallRules
-    dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
-    tagValues: tagValues
-  }
-  dependsOn: [
-    privateDnsZonesModule
-  ]
-}
-
 // Create an Application Gateway to serve public traffic for the Public API Container App.
-module appGatewayModule 'application/shared/appGateway.bicep' = {
-  name: 'appGatewayModuleDeploy'
+module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp) {
+  name: 'appGatewayApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
@@ -272,47 +259,26 @@ module appGatewayModule 'application/shared/appGateway.bicep' = {
   }
 }
 
-var dataProcessorPsqlConnectionStringSecretKey = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
-
-module storeDataProcessorPsqlConnectionString 'components/keyVaultSecret.bicep' = {
-  name: 'storeDataProcessorPsqlConnectionString'
+module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = {
+  name: 'publicApiDataProcessorApplicationModuleDeploy'
   params: {
-    keyVaultName: resourceNames.existingResources.keyVault
-    isEnabled: true
-    secretName: dataProcessorPsqlConnectionStringSecretKey
-    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorModule.outputs.managedIdentityName)
-    contentType: 'text/plain'
+    location: location
+    resourceNames: resourceNames
+    metricsNamePrefix: '${subscription}PublicDataProcessor'
+    applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
+    dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
+    storageFirewallRules: storageFirewallRules
+    dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
+    tagValues: tagValues
   }
-}
-
-var publisherPsqlConnectionStringSecretKey = 'ees-publisher-connectionstring-publicdatadb'
-
-module storePublisherPsqlConnectionString 'components/keyVaultSecret.bicep' = {
-  name: 'storePublisherPsqlConnectionString'
-  params: {
-    keyVaultName: resourceNames.existingResources.keyVault
-    isEnabled: true
-    secretName: publisherPsqlConnectionStringSecretKey
-    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', resourceNames.existingResources.publisherFunction)
-    contentType: 'text/plain'
-  }
-}
-
-var adminPsqlConnectionStringSecretKey = 'ees-admin-connectionstring-publicdatadb'
-
-module storeAdminPsqlConnectionString 'components/keyVaultSecret.bicep' = {
-  name: 'storeAdminPsqlConnectionString'
-  params: {
-    keyVaultName: resourceNames.existingResources.keyVault
-    isEnabled: true
-    secretName: adminPsqlConnectionStringSecretKey
-    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', resourceNames.existingResources.adminApp)
-    contentType: 'text/plain'
-  }
+  dependsOn: [
+    privateDnsZonesModule
+    publicApiStorageModule
+  ]
 }
 
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
-output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
+output dataProcessorPsqlConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
 output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorModule.outputs.managedIdentityClientId
 
 output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreStorageConnectionStringSecretKey
