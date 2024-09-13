@@ -26,15 +26,11 @@
   background: #f9f9f8;
   max-width: 100%;
   overflow-x: auto;
-  padding: 46px 15px 15px;
+  padding: 60px 15px 15px !important;
 
   &:focus {
     border: $govuk-focus-width solid #000;
     outline: $govuk-focus-colour solid $govuk-focus-width;
-    padding: 44px 13px 13px; // counter border width to avoid content shift
-  }
-
-  > code {
-    background: none;
+    padding: 58px 13px 13px !important; // counter border width to avoid content shift
   }
 }
