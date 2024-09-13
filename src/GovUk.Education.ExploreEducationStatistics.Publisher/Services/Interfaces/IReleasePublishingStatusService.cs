@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<ReleasePublishingStatusOld> GetOld(ReleasePublishingKeyOld releasePublishingKeyOld);
 
-        Task<ReleasePublishingStatusOld?> GetLatest(Guid releaseVersionId);
+        Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId);
 
         Task UpdateState(
             ReleasePublishingKeyOld releasePublishingKeyOld,

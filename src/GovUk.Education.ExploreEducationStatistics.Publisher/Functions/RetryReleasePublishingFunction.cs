@@ -52,7 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }
                 else
                 {
-                    await queueService.QueuePublishReleaseContentMessage(releaseStatus.AsTableRowKey());
+                    var releaseStatusOld = new ReleasePublishingStatusOld(releaseStatus);
+                    await queueService.QueuePublishReleaseContentMessage(releaseStatusOld.AsTableRowKey());
                 }
             }
 

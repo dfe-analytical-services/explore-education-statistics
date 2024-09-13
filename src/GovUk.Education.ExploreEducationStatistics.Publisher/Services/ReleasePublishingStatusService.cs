@@ -45,10 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(rv => rv.Publication)
                 .FirstAsync(rv => rv.Id == releasePublishingKeyOld.ReleaseVersionId);
 
-            var releaseStatus = new ReleasePublishingStatusOld(publicationSlug: releaseVersion.Publication.Slug,
-                publish: immediate ? null : releaseVersion.PublishScheduled,
+            var releaseStatus = new ReleasePublishingStatusOld(
                 releaseVersionId: releaseVersion.Id,
                 releaseStatusId: releasePublishingKeyOld.ReleaseStatusId,
+                publicationSlug: releaseVersion.Publication.Slug,
+                publish: immediate ? null : releaseVersion.PublishScheduled,
                 releaseSlug: releaseVersion.Slug,
                 state,
                 immediate: immediate,
@@ -162,15 +163,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await ExecuteQuery(query);
         }
 
-        public async Task<ReleasePublishingStatusOld?> GetLatest(Guid releaseVersionId)
+        public async Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId)
         {
-            var query = new TableQuery<ReleasePublishingStatusOld>()
-                .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatusOld.PartitionKey),
-                    QueryComparisons.Equal,
-                    releaseVersionId.ToString()));
+            var asyncPages = await _publisherTableStorageService
+                .QueryEntities<ReleasePublishingStatus>(
+                    PublisherReleaseStatusTableName,
+                    status => status.PartitionKey == releaseVersionId.ToString());
+            var statusList = await asyncPages.ToListAsync();
 
-            var result = await ExecuteQuery(query);
-            return result.OrderByDescending(status => status.Created).FirstOrDefault();
+            return statusList.OrderByDescending(status => status.Created).FirstOrDefault();
         }
 
         private async Task<IReadOnlyList<ReleasePublishingStatusOld>> ExecuteQuery(

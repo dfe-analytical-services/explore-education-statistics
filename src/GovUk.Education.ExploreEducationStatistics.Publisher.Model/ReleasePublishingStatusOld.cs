@@ -26,17 +26,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         }
 
         public ReleasePublishingStatusOld(
-            string publicationSlug,
-            DateTime? publish,
             Guid releaseVersionId,
             Guid releaseStatusId,
+            string publicationSlug,
+            DateTime? publish,
             string releaseSlug,
             ReleasePublishingStatusState state,
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
         {
-            RowKey = releaseStatusId.ToString();
             PartitionKey = releaseVersionId.ToString();
+            RowKey = releaseStatusId.ToString();
             Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
             Publish = publish;
@@ -44,6 +44,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             Immediate = immediate;
             Messages = logMessages == null ? null : JsonConvert.SerializeObject(logMessages);
             State = state;
+        }
+
+        public ReleasePublishingStatusOld(ReleasePublishingStatus status,
+            IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
+        {
+            PartitionKey = status.PartitionKey;
+            RowKey = status.RowKey;
+            Created = DateTime.UtcNow;
+            PublicationSlug = status.PublicationSlug;
+            Publish = status.Publish;
+            ReleaseSlug = status.ReleaseSlug;
+            Immediate = status.Immediate;
+            Messages = logMessages == null ? null : JsonConvert.SerializeObject(logMessages);
+            State = status.State;
         }
 
         public Guid Id => Guid.Parse(RowKey);
