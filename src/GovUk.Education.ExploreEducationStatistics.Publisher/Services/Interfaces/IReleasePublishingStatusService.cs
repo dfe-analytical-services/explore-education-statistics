@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId);
 
         Task UpdateState(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state);
 
         Task UpdateContentStage(

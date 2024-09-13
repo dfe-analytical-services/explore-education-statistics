@@ -182,10 +182,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task UpdateState(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state)
         {
-            await UpdateRowAsyncOld(releasePublishingKeyOld,
+            await UpdateRowAsync(releasePublishingKey,
                 row =>
                 {
                     row.State = state;
