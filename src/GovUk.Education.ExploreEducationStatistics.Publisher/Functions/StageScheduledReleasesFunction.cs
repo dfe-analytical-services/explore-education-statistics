@@ -92,8 +92,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForToday()
         {
-            return await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
+            var keyList = await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
                 overall: ReleasePublishingStatusOverallStage.Scheduled);
+            return keyList
+                .Select(key => new ReleasePublishingKeyOld(key.ReleaseVersionId, key.ReleaseStatusId))
+                .ToList();
         }
 
         private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForTodayOrFuture(

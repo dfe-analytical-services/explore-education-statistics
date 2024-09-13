@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -91,15 +90,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return result;
         }
 
-        public async Task<IReadOnlyList<ReleasePublishingKeyOld>> GetWherePublishingDueTodayWithStages(
+        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayWithStages(
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null)
         {
-            var query = QueryPublishLessThanEndOfTodayWithStages(content, files, publishing, overall);
-            var tableResult = await ExecuteQuery(query);
-            return tableResult.Select(status => status.AsTableRowKey()).ToList();
+            var filter = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
+                status.Publish < DateTime.Today.AddDays(1));
+
+            filter = UpdateFilterForStages(filter, content, files, publishing, overall);
+
+            var asyncPageable = await _publisherTableStorageService
+                .QueryEntities<ReleasePublishingStatus>(
+                    PublisherReleaseStatusTableName,
+                    filter);
+
+            var tableResults = await asyncPageable.ToListAsync();
+
+            return tableResults
+                .Select(status => status.AsTableRowKey())
+                .ToList();
         }
 
         public async Task<IReadOnlyList<ReleasePublishingKeyOld>> GetWherePublishingDueTodayOrInFutureWithStages(
@@ -219,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 });
         }
 
-        private async Task UpdateRowAsync(
+        private async Task UpdateRowAsync( // @MarkFix rename to update with retries - also move retry logic into DataTableStorageService?
             ReleasePublishingKey releasePublishingKey,
             Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction,
             int numRetries = 5)
@@ -259,11 +270,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     throw;
                 }
             }
-        }
-
-        private CloudTable GetTable()
-        {
-            return _tableStorageServiceOld.GetTable(PublisherReleaseStatusTableName);
         }
     }
 }
