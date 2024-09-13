@@ -28,6 +28,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using RequestTimeoutOptions = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options.RequestTimeoutOptions;
 
@@ -125,6 +126,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             {
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 options.JsonSerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow;
+                options.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
 
                 // This must be false to allow `JsonExceptionResultFilter` to work correctly,
                 // otherwise, JsonExceptions can't be identified. Also, this prevents
