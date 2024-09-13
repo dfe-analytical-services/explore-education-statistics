@@ -10,12 +10,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 /// </summary>
 public record GeographicLevelViewModel
 {
+    /// <summary>
+    /// The code for the geographic level.
+    /// </summary>
+    /// <example>NAT</example>
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<GeographicLevel>))]
     public required GeographicLevel Code { get; init; }
 
     /// <summary>
     /// The human-readable label for the geographic level.
     /// </summary>
+    /// <example>National</example>
     public string Label => Code.GetEnumLabel();
 
     public static GeographicLevelViewModel Create(GeographicLevel level)

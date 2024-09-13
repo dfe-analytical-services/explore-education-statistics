@@ -13,6 +13,7 @@ public class DataSetVersionViewModel
     /// <summary>
     /// The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor).
     /// </summary>
+    /// <example>1.0</example>
     public required string Version { get; init; }
 
     /// <summary>
@@ -26,6 +27,7 @@ public class DataSetVersionViewModel
     ///
     /// Minor versions should not cause issues in the functionality of existing code.
     /// </summary>
+    /// <example>Major</example>
     public required DataSetVersionType Type { get; init; }
 
     /// <summary>
@@ -35,26 +37,31 @@ public class DataSetVersionViewModel
     /// - `Deprecated` - the version is being deprecated and will not be usable in the future
     /// - `Withdrawn` - the version has been withdrawn and can no longer be used
     /// </summary>
+    /// <example>Published</example>
     public required DataSetVersionStatus Status { get; init; }
 
     /// <summary>
     /// When the version was published.
     /// </summary>
+    /// <example>2024-03-01T09:30:00+00:00</example>
     public DateTimeOffset? Published { get; init; }
 
     /// <summary>
     /// When the version was withdrawn.
     /// </summary>
+    /// <example>null</example>
     public DateTimeOffset? Withdrawn { get; init; }
 
     /// <summary>
     /// Any notes about this version and its changes.
     /// </summary>
+    /// <example>Some notes about the version.</example>
     public required string Notes { get; init; }
 
     /// <summary>
     /// The total number of results available to query in the data set.
-    /// </summary>
+    /// </summary>]
+    /// <example>1000000</example>
     public required long TotalResults { get; init; }
 
     /// <summary>
@@ -75,17 +82,20 @@ public class DataSetVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
+    /// <example>["NAT", "REG", "LA"]</example>
     [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
     /// The filters available in the data set.
     /// </summary>
+    /// <example>["Characteristic", "School type"]</example>
     public required IReadOnlyList<string> Filters { get; init; }
 
     /// <summary>
     /// The indicators available in the data set.
     /// </summary>
+    /// <example>["Authorised absence rate" "Overall absence rate"]</example>
     public required IReadOnlyList<string> Indicators { get; init; }
 }
 
@@ -102,16 +112,19 @@ public record DataSetLatestVersionViewModel
     /// <summary>
     /// The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor).
     /// </summary>
+    /// <example>2.0</example>
     public required string Version { get; init; }
 
     /// <summary>
     /// When the version was published.
     /// </summary>
+    /// <example>2024-03-01T09:30:00+00:00</example>
     public required DateTimeOffset Published { get; init; }
 
     /// <summary>
     /// The total number of results available to query in the data set.
     /// </summary>
+    /// <example>1000000</example>
     public required long TotalResults { get; init; }
 
     /// <summary>
@@ -127,17 +140,20 @@ public record DataSetLatestVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
+    /// <example>["NAT", "REG", "LA"]</example>
     [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
     /// The filters available in the data set.
     /// </summary>
+    /// <example>["Characteristic", "School type"]</example>
     public required IReadOnlyList<string> Filters { get; init; }
 
     /// <summary>
     /// The indicators available in the data set.
     /// </summary>
+    /// <example>["Authorised absence rate" "Overall absence rate"]</example>
     public required IReadOnlyList<string> Indicators { get; init; }
 }
 
@@ -149,6 +165,7 @@ public record DataSetVersionFileViewModel
     /// <summary>
     /// The ID of the file.
     /// </summary>
+    /// <example>e0754872-3206-4918-aad4-029eaaae191f</example>
     public required Guid Id { get; init; }
 }
 
@@ -160,10 +177,12 @@ public record DataSetVersionReleaseViewModel
     /// <summary>
     /// The title of the release.
     /// </summary>
+    /// <example>Spring term 2023/24</example>
     public required string Title { get; init; }
 
     /// <summary>
     /// The slug of the release.
     /// </summary>
+    /// <example>2023-24-spring-term</example>
     public required string Slug { get; init; }
 }

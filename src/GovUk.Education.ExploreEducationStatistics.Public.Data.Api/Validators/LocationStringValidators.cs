@@ -58,10 +58,10 @@ public static partial class LocationStringValidators
                 return;
             }
 
-            var queryLocation = DataSetQueryLocation.Parse(value);
+            var queryLocation = IDataSetQueryLocation.Parse(value);
 
             var validator = queryLocation.CreateValidator();
-            var result = validator.Validate(new ValidationContext<DataSetQueryLocation>(queryLocation));
+            var result = validator.Validate(new ValidationContext<IDataSetQueryLocation>(queryLocation));
 
             if (result.IsValid)
             {

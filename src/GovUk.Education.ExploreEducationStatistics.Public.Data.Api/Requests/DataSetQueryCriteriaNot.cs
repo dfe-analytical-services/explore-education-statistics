@@ -8,12 +8,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 ///
 /// This is equivalent to the `NOT` operator in SQL.
 /// </summary>
-public record DataSetQueryCriteriaNot : DataSetQueryCriteria
+public record DataSetQueryCriteriaNot : IDataSetQueryCriteria
 {
     /// <summary>
     /// The sub-criteria which must resolve to false.
     /// </summary>
-    public required DataSetQueryCriteria Not { get; init; }
+    /// <example>
+    /// {
+    ///     "filters": {
+    ///         "eq": "pVAkV"
+    ///     }
+    /// }
+    /// </example>
+    public required IDataSetQueryCriteria Not { get; init; }
 
     public class Validator : AbstractValidator<DataSetQueryCriteriaNot>
     {
@@ -21,7 +28,7 @@ public record DataSetQueryCriteriaNot : DataSetQueryCriteria
         {
             RuleFor(q => q.Not)
                 .NotNull()
-                .SetInheritanceValidator(InheritanceValidator);
+                .SetInheritanceValidator(IDataSetQueryCriteria.InheritanceValidator);
         }
     }
 }

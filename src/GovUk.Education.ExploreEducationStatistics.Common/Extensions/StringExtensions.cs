@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using AngleSharp.Text;
+using NaturalSort.Extension;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
@@ -37,6 +38,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         public static IList<string> ToLinesList(this string value)
         {
             return value.ToLines().ToList();
+        }
+
+        /// <summary>
+        /// Order some strings in natural order for humans to read.
+        /// </summary>
+        public static IOrderedEnumerable<string> NaturalOrder(
+            this IEnumerable<string> source,
+            StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        {
+            return source.Order(comparison.WithNaturalSort());
         }
 
         public static Stream ToStream(this string value)

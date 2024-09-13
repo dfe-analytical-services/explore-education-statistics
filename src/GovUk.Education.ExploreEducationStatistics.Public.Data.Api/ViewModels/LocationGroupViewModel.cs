@@ -10,6 +10,7 @@ public record LocationGroupViewModel
     /// <summary>
     /// The geographic level of the locations in this group.
     /// </summary>
+    /// <example>NAT</example>
     public required GeographicLevelViewModel Level { get; init; }
 
     public static LocationGroupViewModel Create(LocationMeta meta)

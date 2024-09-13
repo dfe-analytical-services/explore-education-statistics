@@ -11,11 +11,12 @@ public record DataSetQueryRequest
     /// <summary>
     /// The criteria to match.
     /// </summary>
-    public DataSetQueryCriteria? Criteria { get; init; }
+    public IDataSetQueryCriteria? Criteria { get; init; }
 
     /// <summary>
     /// The IDs of indicators in the data set to return values for.
     /// </summary>
+    /// <example>["C2ySJ", "q4X3J"]</example>
     public IReadOnlyList<string> Indicators { get; init; } = [];
 
     /// <summary>

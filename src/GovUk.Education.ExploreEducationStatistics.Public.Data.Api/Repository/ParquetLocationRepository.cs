@@ -33,7 +33,7 @@ public class ParquetLocationRepository(
 
     public async Task<IList<ParquetLocationOption>> ListOptions(
         DataSetVersion dataSetVersion,
-        IEnumerable<DataSetQueryLocation> locations,
+        IEnumerable<IDataSetQueryLocation> locations,
         CancellationToken cancellationToken = default)
     {
         var locationsByLevel = locations
@@ -81,7 +81,7 @@ public class ParquetLocationRepository(
         return allOptions;
     }
 
-    private static (string Column, string Value) MapLocationToColumnValue(DataSetQueryLocation location)
+    private static (string Column, string Value) MapLocationToColumnValue(IDataSetQueryLocation location)
     {
         return location switch
         {

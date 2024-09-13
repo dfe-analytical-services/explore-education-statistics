@@ -10,21 +10,25 @@ public record DataSetQueryCriteriaFilters
     /// <summary>
     /// Filter the results to have a filter option matching this ID.
     /// </summary>
+    /// <example>pVAkV</example>
     public string? Eq { get; init; }
 
     /// <summary>
     /// Filter the results to not have a filter option matching this ID.
     /// </summary>
+    /// <example>wUzft</example>
     public string? NotEq { get; init; }
 
     /// <summary>
     /// Filter the results to have a filter option matching at least one of these IDs.
     /// </summary>
+    /// <example>["q1g3J", "ufp2K"]</example>
     public virtual IReadOnlyList<string>? In { get; init; }
 
     /// <summary>
     /// Filter the results to not have a filter option matching any of these IDs.
     /// </summary>
+    /// <example>["ksrK9", "s1J8a"]</example>
     public virtual IReadOnlyList<string>? NotIn { get; init; }
 
     public HashSet<string> GetOptions()

@@ -15,7 +15,7 @@ public interface IParquetLocationRepository
 
     Task<IList<ParquetLocationOption>> ListOptions(
         DataSetVersion dataSetVersion,
-        IEnumerable<DataSetQueryLocation> locations,
+        IEnumerable<IDataSetQueryLocation> locations,
         CancellationToken cancellationToken = default);
 
     Task<IList<IdPublicIdPair>> ListOptionPublicIds(

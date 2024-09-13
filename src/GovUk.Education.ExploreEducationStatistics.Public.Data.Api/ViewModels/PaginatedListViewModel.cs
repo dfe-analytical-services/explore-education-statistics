@@ -20,24 +20,28 @@ public record PagingViewModel
     /// <summary>
     /// The current page number.
     /// </summary>
+    /// <example>1</example>
     [Required]
     public int Page { get; }
 
     /// <summary>
     /// The maximum number of results per page.
     /// </summary>
+    /// <example>20</example>
     [Required]
     public int PageSize { get; }
 
     /// <summary>
     /// The total number of results across all pages.
     /// </summary>
+    /// <example>60</example>
     [Required]
     public int TotalResults { get; }
 
     /// <summary>
     /// The total number of pages.
     /// </summary>
+    /// <example>3</example>
     [Required]
     public int TotalPages => ((TotalResults - 1) / PageSize) + 1;
 

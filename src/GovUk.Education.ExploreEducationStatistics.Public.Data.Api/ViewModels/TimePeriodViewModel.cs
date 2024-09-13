@@ -9,11 +9,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 /// </summary>
 public record TimePeriodViewModel
 {
+    /// <summary>
+    /// The code identifying the time period's type.
+    /// </summary>
+    /// <example>AYQ1</example>>
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
     public required TimeIdentifier Code { get; init; }
 
     /// <summary>
     /// The period covered by the data e.g. '2020' or '2020/2021'.
     /// </summary>
+    /// <example>2020/2021</example>
     public required string Period { get; init; }
 }
