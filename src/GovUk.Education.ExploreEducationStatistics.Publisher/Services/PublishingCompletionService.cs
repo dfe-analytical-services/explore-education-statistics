@@ -29,7 +29,11 @@ public class PublishingCompletionService(
     {
         var releaseStatuses = await releasePublishingKeys
             .ToAsyncEnumerable()
-            .SelectAwait(async key => await releasePublishingStatusService.GetOld(key))
+            .SelectAwait(async keyOld =>
+            {
+                var key = new ReleasePublishingKey(keyOld.ReleaseVersionId, keyOld.ReleaseStatusId);
+                return await releasePublishingStatusService.Get(key);
+            })
             .ToListAsync();
 
         var prePublishingStagesComplete = releaseStatuses
@@ -43,12 +47,8 @@ public class PublishingCompletionService(
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(statusOld =>
-            {
-                var status = new ReleasePublishingStatus(statusOld);
-                return releasePublishingStatusService.UpdatePublishingStage(status.AsTableRowKey(),
-                    ReleasePublishingStatusPublishingStage.Started);
-            });
+            .ForEachAwaitAsync(status => releasePublishingStatusService.UpdatePublishingStage(status.AsTableRowKey(),
+                ReleasePublishingStatusPublishingStage.Started));
 
         var releaseVersionIdsToUpdate = prePublishingStagesComplete
             .Select(status => status.ReleaseVersionId)
@@ -120,12 +120,9 @@ public class PublishingCompletionService(
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async statusOld =>
-            {
-                var status = new ReleasePublishingStatus(statusOld);
+            .ForEachAwaitAsync(async status =>
                 await releasePublishingStatusService
-                    .UpdatePublishingStage(status.AsTableRowKey(), ReleasePublishingStatusPublishingStage.Complete);
-            });
+                    .UpdatePublishingStage(status.AsTableRowKey(), ReleasePublishingStatusPublishingStage.Complete));
     }
 
     private async Task UpdateLatestPublishedRelease(Guid publicationId)

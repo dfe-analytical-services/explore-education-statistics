@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return (tableResult.Result as ReleasePublishingStatusOld).AsTableRowKey();
         }
 
-        public async Task<ReleasePublishingStatus?> Get(ReleasePublishingKey releasePublishingKey)
+        public async Task<ReleasePublishingStatus> Get(ReleasePublishingKey releasePublishingKey)
         {
             var select = new List<string>
             {
@@ -75,33 +75,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 nameof(ReleasePublishingStatus.Immediate),
                 nameof(ReleasePublishingStatus.Messages)
             };
-            return await _publisherTableStorageService.GetEntityIfExists<ReleasePublishingStatus>(
+            var result = await _publisherTableStorageService.GetEntityIfExists<ReleasePublishingStatus>(
                 tableName: PublisherReleaseStatusTableName,
                 partitionKey: releasePublishingKey.ReleaseVersionId.ToString(),
                 rowKey: releasePublishingKey.ReleaseStatusId.ToString(),
                 select: select);
-        }
 
-        public async Task<ReleasePublishingStatusOld> GetOld(ReleasePublishingKeyOld releasePublishingKeyOld) // @MarkFix remove
-        {
-            var tableResult = await GetTable().ExecuteAsync(
-                TableOperation.Retrieve<ReleasePublishingStatusOld>(
-                    partitionKey: releasePublishingKeyOld.ReleaseVersionId.ToString(),
-                    rowkey: releasePublishingKeyOld.ReleaseStatusId.ToString(),
-                    [
-                        nameof(ReleasePublishingStatusOld.Created),
-                        nameof(ReleasePublishingStatusOld.PublicationSlug),
-                        nameof(ReleasePublishingStatusOld.Publish),
-                        nameof(ReleasePublishingStatusOld.ReleaseSlug),
-                        nameof(ReleasePublishingStatusOld.ContentStage),
-                        nameof(ReleasePublishingStatusOld.FilesStage),
-                        nameof(ReleasePublishingStatusOld.PublishingStage),
-                        nameof(ReleasePublishingStatusOld.OverallStage),
-                        nameof(ReleasePublishingStatusOld.Immediate),
-                        nameof(ReleasePublishingStatusOld.Messages)
-                    ]));
+            if (result == null)
+            {
+                throw new Exception("Failed to fetch entity from PublisherReleaseStatusTable"); // @MarkFix
+            }
 
-            return tableResult.Result as ReleasePublishingStatusOld;
+            return result;
         }
 
         public async Task<IReadOnlyList<ReleasePublishingKeyOld>> GetWherePublishingDueTodayWithStages(
@@ -264,41 +249,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         await UpdateRowAsync(releasePublishingKey,
                             updateFunction,
                             numRetries);
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
-        private async Task UpdateRowAsyncOld( // @MarkFix remove
-            ReleasePublishingKeyOld releasePublishingKeyOld,
-            Func<ReleasePublishingStatusOld, ReleasePublishingStatusOld> updateFunction,
-            int retry = 0)
-        {
-            var table = GetTable();
-            var releasePublishingStatus = await GetOld(releasePublishingKeyOld);
-
-            try
-            {
-                await table.ExecuteAsync(TableOperation.Replace(updateFunction.Invoke(releasePublishingStatus)));
-            }
-            catch (StorageException e)
-            {
-                if (e.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
-                {
-                    _logger.LogDebug("Precondition failure as expected. ETag does not match");
-                    if (retry++ < 5)
-                    {
-                        await UpdateRowAsyncOld(releasePublishingKeyOld,
-                            updateFunction,
-                            retry);
                     }
                     else
                     {
