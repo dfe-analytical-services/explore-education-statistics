@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -232,6 +233,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     row.AppendLogMessage(logMessage);
                     return row;
                 });
+        }
+
+        private async Task UpdateRowAsync(
+            ReleasePublishingKey releasePublishingKey,
+            Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction,
+            int numRetries = 5)
+        {
+            var releasePublishingStatus = await Get(releasePublishingKey)
+                                          ?? throw new Exception("Unable to retrieve release publishing status");
+
+            var updatedStatus = updateFunction.Invoke(releasePublishingStatus);
+
+            try
+            {
+                await _publisherTableStorageService.UpdateEntity(
+                    PublisherReleaseStatusTableName,
+                    updatedStatus
+                );
+            }
+            catch (TableTransactionFailedException e) // @MarkFix test retry logic to this if that actually works - I've randomly chosen an exception here
+            {
+                // @MarkFix write a comment explaining why this code is necessary
+                if (e.Status == (int)HttpStatusCode.PreconditionFailed)
+                {
+                    _logger.LogDebug("Precondition failure as expected. ETag does not match");
+                    if (numRetries > 0)
+                    {
+                        numRetries--;
+                        await UpdateRowAsync(releasePublishingKey,
+                            updateFunction,
+                            numRetries);
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         private async Task UpdateRowAsyncOld( // @MarkFix remove
