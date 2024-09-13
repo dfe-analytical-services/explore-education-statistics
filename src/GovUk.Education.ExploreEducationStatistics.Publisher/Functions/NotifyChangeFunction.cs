@@ -99,12 +99,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             await scheduled
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async statusOld =>
-                {
-                    var status = new ReleasePublishingStatus(statusOld);
+                .ForEachAwaitAsync(async status =>
                     await releasePublishingStatusService.UpdateState(status.AsTableRowKey(),
-                        ReleasePublishingStatusStates.SupersededState);
-                });
+                        ReleasePublishingStatusStates.SupersededState));
         }
     }
 }

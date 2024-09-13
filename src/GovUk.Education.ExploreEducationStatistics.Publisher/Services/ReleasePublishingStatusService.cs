@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -116,38 +117,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
 
-        public async Task<IReadOnlyList<ReleasePublishingStatusOld>> GetAllByOverallStage(
+        public async Task<List<ReleasePublishingStatus>> GetAllByOverallStage(
             Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages)
         {
-            var filter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatusOld.PartitionKey),
-                QueryComparisons.Equal,
-                releaseVersionId.ToString());
+            // @Mark test all this
+            var filter = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
+                status.PartitionKey == releaseVersionId.ToString());
 
-            if (overallStages.Any())
+            var stageFilter = "";
+            foreach (var stage in overallStages)
             {
-                var allStageFilters = overallStages.ToList().Aggregate("",
-                    (acc, stage) =>
-                    {
-                        var stageFilter = TableQuery.GenerateFilterCondition(
-                            nameof(ReleasePublishingStatusOld.OverallStage),
-                            QueryComparisons.Equal,
-                            stage.ToString()
-                        );
+                var stageFilterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
+                    status.OverallStage == stage);
 
-                        if (acc == "")
-                        {
-                            return stageFilter;
-                        }
-
-                        return TableQuery.CombineFilters(acc, TableOperators.Or, stageFilter);
-                    });
-
-                filter = TableQuery.CombineFilters(filter, TableOperators.And, allStageFilters);
+                stageFilter = stageFilter == ""
+                    ? stageFilterCondition
+                    : $"({stageFilter}) or ({stageFilterCondition})";
             }
 
-            var query = new TableQuery<ReleasePublishingStatusOld>().Where(filter);
-            return await ExecuteQuery(query);
+            filter = stageFilter == ""
+                ? filter
+                : $"({filter}) and ({stageFilter})";
+
+            var results = await _publisherTableStorageService
+                .QueryEntities<ReleasePublishingStatus>(
+                    PublisherReleaseStatusTableName,
+                    filter);
+
+            return await results.ToListAsync();
         }
 
         public async Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId)

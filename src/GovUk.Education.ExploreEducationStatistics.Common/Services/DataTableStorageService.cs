@@ -64,6 +64,8 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
         await tableClient.AddEntityAsync(
             entity: entity,
             cancellationToken: cancellationToken);
+
+        // @MarkFix validate response here (and same for other methods)?
     }
 
     public async Task UpdateEntity(

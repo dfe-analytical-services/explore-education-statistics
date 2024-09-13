@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null);
 
-        Task<IReadOnlyList<ReleasePublishingStatusOld>> GetAllByOverallStage(
+        Task<List<ReleasePublishingStatus>> GetAllByOverallStage(
             Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages);
 
