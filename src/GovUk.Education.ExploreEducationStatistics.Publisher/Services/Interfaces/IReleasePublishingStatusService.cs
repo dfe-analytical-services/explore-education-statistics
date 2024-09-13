@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             ReleasePublishingStatusLogMessage? logMessage = null);
 
         Task UpdatePublishingStage(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null);
     }

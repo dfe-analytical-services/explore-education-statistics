@@ -52,6 +52,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             State = state;
         }
 
+        public ReleasePublishingStatus(
+            ReleasePublishingStatusOld oldStatus,
+            IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
+        {
+            PartitionKey = oldStatus.PartitionKey; // releaseVersionId
+            RowKey = oldStatus.RowKey; // releaseStatusId
+            Created = DateTime.UtcNow;
+            PublicationSlug = oldStatus.PublicationSlug;
+            Publish = oldStatus.Publish;
+            ReleaseSlug = oldStatus.ReleaseSlug;
+            Immediate = oldStatus.Immediate;
+            Messages = logMessages == null ? null : JsonConvert.SerializeObject(logMessages);
+            State = oldStatus.State;
+        }
+
         public Guid Id => Guid.Parse(RowKey);
         public Guid ReleaseVersionId => Guid.Parse(PartitionKey);
 

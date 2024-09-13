@@ -222,11 +222,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task UpdatePublishingStage(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsyncOld(releasePublishingKeyOld,
+            await UpdateRowAsync(releasePublishingKey,
                 row =>
                 {
                     row.State.Publishing = stage;
