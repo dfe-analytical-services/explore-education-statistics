@@ -1,0 +1,21 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.container {
+  position: relative;
+}
+
+.copyButton {
+  max-width: fit-content;
+  position: absolute;
+  right: govuk-spacing(2);
+  top: govuk-spacing(2);
+
+  &:active {
+    top: 12px;
+  }
+}
+
+.pre {
+  border: 1px solid #bfc1c3;
+  padding: 60px 15px 15px !important;
+}
