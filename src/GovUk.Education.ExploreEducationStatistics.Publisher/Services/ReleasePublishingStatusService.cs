@@ -19,16 +19,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _context;
         private readonly ILogger<ReleasePublishingStatusService> _logger;
-        private readonly IPublisherTableStorageServiceOld _tableStorageServiceOld; // @MarkFix change
+        private readonly IPublisherTableStorageServiceOld _tableStorageServiceOld; // @MarkFix remove
+        private readonly IPublisherTableStorageService _publisherTableStorageService;
 
         public ReleasePublishingStatusService(
             ContentDbContext context,
             ILogger<ReleasePublishingStatusService> logger,
-            IPublisherTableStorageServiceOld tableStorageServiceOld)
+            IPublisherTableStorageServiceOld tableStorageServiceOld,
+            IPublisherTableStorageService publisherTableStorageService)
         {
             _context = context;
             _logger = logger;
             _tableStorageServiceOld = tableStorageServiceOld;
+            _publisherTableStorageService = publisherTableStorageService;
         }
 
         public async Task<ReleasePublishingKeyOld> Create(
@@ -55,7 +58,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return (tableResult.Result as ReleasePublishingStatusOld).AsTableRowKey();
         }
 
-        public async Task<ReleasePublishingStatusOld> Get(ReleasePublishingKeyOld releasePublishingKeyOld)
+        public async Task<ReleasePublishingStatus?> Get(ReleasePublishingKey releasePublishingKey)
+        {
+            var select = new List<string>
+            {
+                nameof(ReleasePublishingStatus.Created),
+                nameof(ReleasePublishingStatus.PublicationSlug),
+                nameof(ReleasePublishingStatus.Publish),
+                nameof(ReleasePublishingStatus.ReleaseSlug),
+                nameof(ReleasePublishingStatus.ContentStage),
+                nameof(ReleasePublishingStatus.FilesStage),
+                nameof(ReleasePublishingStatus.PublishingStage),
+                nameof(ReleasePublishingStatus.OverallStage),
+                nameof(ReleasePublishingStatus.Immediate),
+                nameof(ReleasePublishingStatus.Messages)
+            };
+            return await _publisherTableStorageService.GetEntityIfExists<ReleasePublishingStatus>(
+                tableName: PublisherReleaseStatusTableName,
+                partitionKey: releasePublishingKey.ReleaseVersionId.ToString(),
+                rowKey: releasePublishingKey.ReleaseStatusId.ToString(),
+                select: select);
+        }
+
+        public async Task<ReleasePublishingStatusOld> GetOld(ReleasePublishingKeyOld releasePublishingKeyOld) // @MarkFix remove
         {
             var tableResult = await GetTable().ExecuteAsync(
                 TableOperation.Retrieve<ReleasePublishingStatusOld>(
@@ -158,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingKeyOld releasePublishingKeyOld,
             ReleasePublishingStatusState state)
         {
-            await UpdateRowAsync(releasePublishingKeyOld,
+            await UpdateRowAsyncOld(releasePublishingKeyOld,
                 row =>
                 {
                     row.State = state;
@@ -171,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releasePublishingKeyOld,
+            await UpdateRowAsyncOld(releasePublishingKeyOld,
                 row =>
                 {
                     row.State.Content = stage;
@@ -185,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releasePublishingKeyOld,
+            await UpdateRowAsyncOld(releasePublishingKeyOld,
                 row =>
                 {
                     row.State.Files = stage;
@@ -199,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releasePublishingKeyOld,
+            await UpdateRowAsyncOld(releasePublishingKeyOld,
                 row =>
                 {
                     row.State.Publishing = stage;
@@ -208,13 +233,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 });
         }
 
-        private async Task UpdateRowAsync(
+        private async Task UpdateRowAsyncOld( // @MarkFix remove
             ReleasePublishingKeyOld releasePublishingKeyOld,
             Func<ReleasePublishingStatusOld, ReleasePublishingStatusOld> updateFunction,
             int retry = 0)
         {
             var table = GetTable();
-            var releasePublishingStatus = await Get(releasePublishingKeyOld);
+            var releasePublishingStatus = await GetOld(releasePublishingKeyOld);
 
             try
             {
@@ -227,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     _logger.LogDebug("Precondition failure as expected. ETag does not match");
                     if (retry++ < 5)
                     {
-                        await UpdateRowAsync(releasePublishingKeyOld,
+                        await UpdateRowAsyncOld(releasePublishingKeyOld,
                             updateFunction,
                             retry);
                     }

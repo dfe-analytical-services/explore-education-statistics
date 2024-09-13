@@ -29,7 +29,7 @@ public class PublishingCompletionService(
     {
         var releaseStatuses = await releasePublishingKeys
             .ToAsyncEnumerable()
-            .SelectAwait(async key => await releasePublishingStatusService.Get(key))
+            .SelectAwait(async key => await releasePublishingStatusService.GetOld(key))
             .ToListAsync();
 
         var prePublishingStagesComplete = releaseStatuses

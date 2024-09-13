@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages);
 
-        Task<ReleasePublishingStatusOld> Get(ReleasePublishingKeyOld releasePublishingKeyOld);
+        Task<ReleasePublishingStatusOld> GetOld(ReleasePublishingKeyOld releasePublishingKeyOld);
 
         Task<ReleasePublishingStatusOld?> GetLatest(Guid releaseVersionId);
 
