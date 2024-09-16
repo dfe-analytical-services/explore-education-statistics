@@ -42,6 +42,9 @@ param databaseNames string[]
 @description('An array of firewall rules containing IP address ranges')
 param firewallRules firewallRuleType[] = []
 
+@description('An array of Entra ID admin principal names for this resource')
+param entraIdAdminPrincipalNames string[] = []
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
@@ -98,7 +101,7 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
 }
 
 @batchSize(1)
-resource rules 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-01' = [for rule in firewallRules: {
+resource firewallRuleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-01' = [for rule in firewallRules: {
   name: rule.name
   parent: postgreSQLDatabase
   properties: {
@@ -118,6 +121,20 @@ module privateEndpointModule 'privateEndpoint.bicep' = {
     tagValues: tagValues
   }
 }
+
+@batchSize(1)
+resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/administrators@2022-12-01' = [for adminPrincipalName in entraIdAdminPrincipalNames: {
+  name: guid(postgreSQLDatabase.id, adminPrincipalName)
+  parent: postgreSQLDatabase
+  properties: {
+    tenantId: tenant().tenantId
+    principalName: adminPrincipalName
+    principalType: 'USER'
+  }
+  dependsOn: [
+    firewallRuleAssignments
+  ]
+}]
 
 @description('The fully qualified Azure resource ID of the Database Server.')
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)
