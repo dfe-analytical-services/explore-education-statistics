@@ -30,24 +30,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             DeleteSpecificReleaseRequirement requirement,
             ReleaseVersion releaseVersion)
         {
-            if ((!context.User.IsInRole(RoleNames.BauUser) && !releaseVersion.Amendment) || releaseVersion.ApprovalStatus == Approved)
+            if (releaseVersion.ApprovalStatus != Draft)
             {
                 return;
             }
 
-            if (SecurityUtils.HasClaim(context.User, DeleteAllReleaseAmendments))
+            if (!releaseVersion.Amendment)
             {
-                context.Succeed(requirement);
-                return;
+                if (context.User.IsInRole(RoleNames.BauUser))
+                {
+                    context.Succeed(requirement);
+                }
             }
-
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        userId: context.User.GetUserId(),
-                        publicationId: releaseVersion.PublicationId,
-                        Owner))
+            else
             {
-                context.Succeed(requirement);
+                if (SecurityUtils.HasClaim(context.User, DeleteAllReleaseAmendments))
+                {
+                    context.Succeed(requirement);
+                    return;
+                }
+
+                if (await _authorizationHandlerService
+                        .HasRolesOnPublication(
+                            userId: context.User.GetUserId(),
+                            publicationId: releaseVersion.PublicationId,
+                            Owner))
+                {
+                    context.Succeed(requirement);
+                }
             }
         }
     }

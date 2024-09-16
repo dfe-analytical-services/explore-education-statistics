@@ -214,13 +214,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
+                .OnSuccessDo(releaseVersion =>
+                {
+                    if (releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Draft)
+                    {
+                        throw new Exception("Can only delete draft releases");
+                    }
+                })
                 .OnSuccessDo(async () => await _processorClient.BulkDeleteDataSetVersions(releaseVersionId))
                 .OnSuccessDo(async release => await _cacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(release.Id)))
                 .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseVersionId))
                 .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseVersionId))
                 .OnSuccessVoid(async releaseVersion =>
                 {
-                    if (!releaseVersion.Amendment && releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Draft)
+                    if (!releaseVersion.Amendment)
                     {
                         await HardDeleteForDraft(releaseVersion, cancellationToken);
                     }
@@ -233,6 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
+                    // TODO: This may be redundant (investigate as part of EES-1295)
                     await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseVersionId: releaseVersionId);
                 });
         }
@@ -241,19 +249,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ReleaseVersion releaseVersion,
             CancellationToken cancellationToken)
         {
-            var publication = await _context.Publications.FindAsync(releaseVersion.PublicationId, cancellationToken);
-            var releaseSeriesItem = publication!.ReleaseSeries.Find(rs => rs.ReleaseId == releaseVersion.ReleaseId);
-
-            publication.ReleaseSeries.Remove(releaseSeriesItem!);
-            _context.Publications.Update(publication);
+            await DeleteReleaseSeriesItem(releaseVersion, cancellationToken);
+            DeleteDataBlocks(releaseVersion.Id);
 
             var release = await _context.Releases.FindAsync(releaseVersion.ReleaseId, cancellationToken);
             _context.Releases.Remove(release!);
 
+            // We suspect this is only necessary for the unit tests, as the in-memory database doesn't perform a cascade delete
             await DeleteRoles(releaseVersion.Id, hardDelete: true, cancellationToken);
             await DeleteInvites(releaseVersion.Id, hardDelete: true, cancellationToken);
-
-            _context.ReleaseVersions.Remove(releaseVersion);
         }
 
         private async Task SoftDeleteForAmendment(
@@ -267,6 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await DeleteInvites(releaseVersion.Id, hardDelete: false, cancellationToken);
         }
 
+        // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
         private async Task DeleteRoles(
             Guid releaseVersionId,
             bool hardDelete,
@@ -289,6 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
+        // TODO: UserReleaseInvites deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
         private async Task DeleteInvites(
             Guid releaseVersionId,
             bool hardDelete,
@@ -309,6 +315,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 invites.ForEach(r => r.SoftDeleted = true);
                 _context.UpdateRange(invites);
             }
+        }
+
+        private async Task DeleteReleaseSeriesItem(
+            ReleaseVersion releaseVersion,
+            CancellationToken cancellationToken)
+        {
+            var publication = await _context.Publications.FindAsync(releaseVersion.PublicationId, cancellationToken);
+            var releaseSeriesItem = publication!.ReleaseSeries.Find(rs => rs.ReleaseId == releaseVersion.ReleaseId);
+
+            publication.ReleaseSeries.Remove(releaseSeriesItem!);
+            _context.Publications.Update(publication);
+        }
+
+        private void DeleteDataBlocks(Guid releaseVersionId)
+        {
+            var dataBlocks = _context.DataBlockVersions
+                .Where(dbv => dbv.ReleaseVersionId == releaseVersionId)
+                .Select(dbv => dbv.DataBlockParent);
+
+            _context.DataBlockParents.RemoveRange(dataBlocks);
         }
 
         private void UpdateMethodologies(Guid releaseVersionId)
