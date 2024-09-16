@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -21,11 +22,40 @@ public class SwaggerEnumSchemaFilterTests
     private readonly SchemaRepository _schemaRepository = new("Default");
 
     [Fact]
+    public void SerializeEnumRef()
+    {
+        var schema = GenerateSchema();
+
+        var allOf = Assert.Single(schema.Properties[nameof(TestClass.Ref)].AllOf);
+
+        Assert.Equal(nameof(TestEnum), allOf.Reference.Id);
+    }
+
+    [Fact]
+    public void SerializeEnumRef_IncompatibleTypes_Throws()
+    {
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            var schemaGenerator = BuildSchemaGenerator();
+
+            schemaGenerator.GenerateSchema(typeof(TestClassWithInvalidEnumRef), _schemaRepository);
+        });
+    }
+
+    [Fact]
+    public void SerializeEnumRefForList()
+    {
+        var schema = GenerateSchema();
+
+        Assert.Equal(nameof(TestEnum), schema.Properties[nameof(TestClass.RefList)].Items.Reference.Id);
+    }
+
+    [Fact]
     public void SerializeEnumString()
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties["string"]
+        var enums = schema.Properties[nameof(TestClass.String)]
             .Enum
             .Cast<OpenApiString>()
             .ToList();
@@ -36,11 +66,22 @@ public class SwaggerEnumSchemaFilterTests
     }
 
     [Fact]
+    public void SerializeEnumString_IncompatibleTypes_Throws()
+    {
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            var schemaGenerator = BuildSchemaGenerator();
+
+            schemaGenerator.GenerateSchema(typeof(TestClassWithInvalidEnumString), _schemaRepository);
+        });
+    }
+
+    [Fact]
     public void SerializeEnumStringsForList()
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties["stringList"]
+        var enums = schema.Properties[nameof(TestClass.StringList)]
             .Items
             .Enum
             .Cast<OpenApiString>()
@@ -56,7 +97,7 @@ public class SwaggerEnumSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties["int"]
+        var enums = schema.Properties[nameof(TestClass.Int)]
             .Enum
             .Cast<OpenApiInteger>()
             .ToList();
@@ -71,7 +112,7 @@ public class SwaggerEnumSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties["enumLabel"]
+        var enums = schema.Properties[nameof(TestClass.EnumLabel)]
             .Enum
             .Cast<OpenApiString>()
             .ToList();
@@ -86,7 +127,7 @@ public class SwaggerEnumSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties["enumValue"]
+        var enums = schema.Properties[nameof(TestClass.EnumValue)]
             .Enum
             .Cast<OpenApiString>()
             .ToList();
@@ -97,22 +138,22 @@ public class SwaggerEnumSchemaFilterTests
     }
 
     [Fact]
-    public void SerializeDefault()
+    public void SerializeEnumSchema()
     {
         var schema = GenerateSchema();
 
-        var enums = schema.Properties["default"]
+        var enums = schema.Properties[nameof(TestClass.Schema)]
             .Enum
-            .Cast<OpenApiInteger>()
+            .Cast<OpenApiString>()
             .ToList();
 
         Assert.Equal(2, enums.Count);
-        Assert.Equal((int)TestEnum.Sample1, enums[0].Value);
-        Assert.Equal((int)TestEnum.Sample2, enums[1].Value);
+        Assert.Equal(TestEnum.Sample1.ToString(), enums[0].Value);
+        Assert.Equal(TestEnum.Sample2.ToString(), enums[1].Value);
     }
 
     [Fact]
-    public void SerializeDefault_WithGeographicLevelSchemaFilter()
+    public void SerializeEnumSchema_WithGeographicLevelSchemaFilter()
     {
         _schemaGeneratorOptions.SchemaFilters.Add(new GeographicLevelSchemaFilter());
 
@@ -123,7 +164,7 @@ public class SwaggerEnumSchemaFilterTests
 
         var schema = _schemaRepository.Schemas[nameof(TestClassWithGeographicLevel)];
 
-        var enums = schema.Properties["geographicLevel"]
+        var enums = schema.Properties[nameof(TestClassWithGeographicLevel.GeographicLevel)]
             .Enum
             .Cast<OpenApiString>()
             .Select(e => e.Value)
@@ -164,15 +205,11 @@ public class SwaggerEnumSchemaFilterTests
     {
         return new SchemaGenerator(
             _schemaGeneratorOptions,
-            new JsonSerializerDataContractResolver(
-                new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                }
-            )
+            new JsonSerializerDataContractResolver(new JsonSerializerOptions())
         );
     }
 
+    [JsonConverter(typeof(JsonStringEnumConverter<TestEnum>))]
     private enum TestEnum
     {
         [EnumLabelValue("Sample 1", "sample-1")]
@@ -184,34 +221,52 @@ public class SwaggerEnumSchemaFilterTests
 
     private class TestClass
     {
-        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.String)]
-        public string String { get; set; }
-
-        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.String)]
-        public List<string> StringList { get; set; }
-
-        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.Int)]
-        public int Int { get; set; }
-
-        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.Label)]
-        public string EnumLabel { get; set; }
-
-        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.Value)]
-        public string EnumValue { get; set; }
+        [SwaggerEnum(typeof(TestEnum))]
+        public required string Ref { get; set; }
 
         [SwaggerEnum(typeof(TestEnum))]
-        public string Default { get; set; }
+        public required List<string> RefList { get; set; }
+
+        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.String)]
+        public required string String { get; set; }
+
+        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.String)]
+        public required List<string> StringList { get; set; }
+
+        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.Int)]
+        public required int Int { get; set; }
+
+        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.Label)]
+        public required string EnumLabel { get; set; }
+
+        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.Value)]
+        public required string EnumValue { get; set; }
+
+        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.Schema)]
+        public required string Schema { get; set; }
     }
 
     private class TestClassWithGeographicLevel
     {
-        [SwaggerEnum(typeof(GeographicLevel))]
-        public string GeographicLevel { get; set; }
+        [SwaggerEnum(typeof(GeographicLevel), SwaggerEnumSerializer.Schema)]
+        public required string GeographicLevel { get; set; }
+    }
+
+    private class TestClassWithInvalidEnumRef
+    {
+        [SwaggerEnum(typeof(TestEnum))]
+        public required int Invalid { get; set; }
+    }
+
+    private class TestClassWithInvalidEnumString
+    {
+        [SwaggerEnum(typeof(TestEnum), SwaggerEnumSerializer.String)]
+        public required int Invalid { get; set; }
     }
 
     private class InvalidTestClass
     {
         [SwaggerEnum(typeof(string))]
-        public string Invalid { get; set; }
+        public required string Invalid { get; set; }
     }
 }

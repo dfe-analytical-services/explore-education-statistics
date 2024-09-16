@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -152,11 +153,11 @@ public static class GeographicLevelUtils
 
     public static readonly IReadOnlyList<string> OrderedCodes =
         EnumUtil.GetEnumValues<GeographicLevel>()
-            .Order()
+            .NaturalOrder()
             .ToList();
 
     public static readonly IReadOnlyList<string> OrderedLabels = EnumUtil.GetEnumLabels<GeographicLevel>()
-            .Order()
+            .NaturalOrder()
             .ToList();
 
     public static GeographicCsvColumns CsvColumns(this GeographicLevel level) => GeographicLevelCsvColumns.Value[level];

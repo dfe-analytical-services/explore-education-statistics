@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
@@ -15,11 +14,13 @@ public record DataSetMetaRequest
     /// The types of meta to get for the requested data set version.
     /// 
     /// Can be any combination of the following:
+    /// 
     /// - `Filters` - include all meta relating to *filters*
     /// - `Indicators` - include all meta relating to *indicators*
     /// - `Locations` - include all meta relating to *locations*
     /// - `TimePeriods` - include all meta relating to *time periods*
     /// </summary>
+    /// <example>["Filters", "Locations"]</example>
     [FromQuery]
     [QuerySeparator]
     [SwaggerEnum(type: typeof(DataSetMetaType), serializer: SwaggerEnumSerializer.String)]

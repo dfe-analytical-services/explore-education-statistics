@@ -42,6 +42,8 @@ public class GeographicLevelSchemaFilter : ISchemaFilter
                 - `WARD` - Ward
                 """.TrimIndent();
 
+            schema.Example = new OpenApiString("NAT");
+
             schema.Enum = GeographicLevelUtils.OrderedCodes
                 .Select(code => new OpenApiString(code))
                 .ToList<IOpenApiAny>();

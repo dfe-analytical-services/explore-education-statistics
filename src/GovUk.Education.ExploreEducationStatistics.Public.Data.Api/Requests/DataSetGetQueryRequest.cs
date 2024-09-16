@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
+/// <summary>
+/// A data set GET query request.
+/// </summary>
 public record DataSetGetQueryRequest
 {
     /// <summary>

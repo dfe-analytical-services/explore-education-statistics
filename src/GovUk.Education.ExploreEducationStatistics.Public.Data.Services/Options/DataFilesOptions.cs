@@ -2,7 +2,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Option
 
 public class DataFilesOptions
 {
-    public static readonly string Section = "DataFiles";
+    public const string Section = "DataFiles";
 
     /// <summary>
     /// Base path where data files are stored. This should be an absolute path

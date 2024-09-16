@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.In
 public interface IDataSetQueryParser
 {
     Task<IInterpolatedSql> ParseCriteria(
-        DataSetQueryCriteria criteria,
+        IDataSetQueryCriteria criteria,
         DataSetVersion dataSetVersion,
         QueryState queryState,
         string basePath = "",

@@ -46,6 +46,15 @@ const PageFooter = ({ wide }: Props) => {
               </>
             )}
             <div className="govuk-footer__meta-custom">
+              This service is maintained by the{' '}
+              <Link
+                className="govuk-footer__link"
+                to="https://www.gov.uk/government/organisations/department-for-education"
+              >
+                Department for Education
+              </Link>
+            </div>
+            <div className="govuk-footer__meta-custom">
               Our statistical practice is regulated by the{' '}
               <Link
                 className="govuk-footer__link"

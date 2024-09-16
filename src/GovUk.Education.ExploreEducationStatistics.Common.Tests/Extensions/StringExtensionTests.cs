@@ -517,5 +517,64 @@ Test
                 Assert.Equal("f7d6171b6bcfd8923a50b65721064b27", input.ToMd5Hash(Encoding.ASCII));
             }
         }
+
+        public class NaturalOrderTests
+        {
+            [Fact]
+            public void EmptyList()
+            {
+                string[] strings = [];
+
+                Assert.Equal([], strings);
+            }
+
+            [Fact]
+            public void OrdersSingleCharacters()
+            {
+                string[] strings = ["d", "1", "b", "c", "a"];
+                string[] expected = ["1", "a", "b", "c", "d"];
+
+                Assert.Equal(expected, strings.NaturalOrder());
+            }
+
+            [Fact]
+            public void OrdersMultipleCharacters()
+            {
+                string[] strings =
+                [
+                    "z24",
+                    "z2",
+                    "abcde",
+                    "z15",
+                    "abd",
+                    "z1",
+                    "z3",
+                    "abc",
+                    "z20",
+                    "z5",
+                    "abcd",
+                    "z11",
+                    "z22"
+                ];
+                string[] expected =
+                [
+                    "abc",
+                    "abcd",
+                    "abcde",
+                    "abd",
+                    "z1",
+                    "z2",
+                    "z3",
+                    "z5",
+                    "z11",
+                    "z15",
+                    "z20",
+                    "z22",
+                    "z24",
+                ];
+
+                Assert.Equal(expected, strings.NaturalOrder());
+            }
+        }
     }
 }

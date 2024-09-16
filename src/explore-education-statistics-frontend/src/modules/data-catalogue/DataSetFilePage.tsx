@@ -238,6 +238,7 @@ export default function DataSetFilePage({
               )}
 
               <DataSetFileUsage
+                dataSetFileId={dataSetFile.id}
                 hasApiDataSet={!!apiDataSet}
                 tableToolLink={`/data-tables/${release.publication.slug}/${release.slug}?subjectId=${file.subjectId}`}
                 onDownload={handleDownload}

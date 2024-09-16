@@ -29,7 +29,7 @@ public class TimeIdentifierSchemaFilter : ISchemaFilter
                 - `T3` - academic year's summer term
                 - `T1T2` - academic year's autumn and spring term
                 - `CY` - calendar year
-                - `CYQ1 - CYQ4` - calendar year quart 1 to 4
+                - `CYQ1 - CYQ4` - calendar year quarter 1 to 4
                 - `RY` - reporting year
                 - `P1` - financial year part 1 (April to September)
                 - `P2` - financial year part 2 (October to March)
@@ -41,8 +41,10 @@ public class TimeIdentifierSchemaFilter : ISchemaFilter
                 - `M1 - M12` - month 1 to 12
                 """.TrimIndent();
 
+            schema.Example = new OpenApiString("CY");
+
             schema.Enum = TimeIdentifierUtils.DataCodes
-                .Order()
+                .NaturalOrder()
                 .Select(code => new OpenApiString(code))
                 .ToList<IOpenApiAny>();
         }

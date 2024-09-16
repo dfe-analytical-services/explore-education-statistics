@@ -84,7 +84,7 @@ internal class LocationFacetsParser : IFacetsParser
     }
 
     private IInterpolatedSql EqFragment(
-        DataSetQueryLocation location,
+        IDataSetQueryLocation location,
         string path,
         bool negate = false)
     {
@@ -105,7 +105,7 @@ internal class LocationFacetsParser : IFacetsParser
     }
 
     private IInterpolatedSql InFragment(
-        HashSet<DataSetQueryLocation> locations,
+        HashSet<IDataSetQueryLocation> locations,
         string path,
         bool negate = false)
     {
@@ -113,7 +113,7 @@ internal class LocationFacetsParser : IFacetsParser
 
 
         var options = new List<ParquetLocationOption>();
-        var notFoundLocations = new List<DataSetQueryLocation>();
+        var notFoundLocations = new List<IDataSetQueryLocation>();
 
         foreach (var location in locations)
         {
@@ -163,7 +163,7 @@ internal class LocationFacetsParser : IFacetsParser
     }
 
     private bool TryGetLocationOption(
-        DataSetQueryLocation queryLocation,
+        IDataSetQueryLocation queryLocation,
         [MaybeNullWhen(false)] out ParquetLocationOption locationOption)
     {
         locationOption = null;
@@ -185,7 +185,7 @@ internal class LocationFacetsParser : IFacetsParser
         return true;
     }
 
-    private static bool IsMatchingLocationOption(ParquetLocationOption option, DataSetQueryLocation queryLocation)
+    private static bool IsMatchingLocationOption(ParquetLocationOption option, IDataSetQueryLocation queryLocation)
         => queryLocation switch
         {
             DataSetQueryLocationId locationId => option.PublicId == locationId.Id,
@@ -198,11 +198,11 @@ internal class LocationFacetsParser : IFacetsParser
             _ => false
         };
 
-    private WarningViewModel CreateNotFoundWarning(IEnumerable<DataSetQueryLocation> locations, string path) => new()
+    private WarningViewModel CreateNotFoundWarning(IEnumerable<IDataSetQueryLocation> locations, string path) => new()
     {
         Code = ValidationMessages.LocationsNotFound.Code,
         Message = ValidationMessages.LocationsNotFound.Message,
         Path = path,
-        Detail = new NotFoundItemsErrorDetail<DataSetQueryLocation>(locations)
+        Detail = new NotFoundItemsErrorDetail<IDataSetQueryLocation>(locations)
     };
 }
