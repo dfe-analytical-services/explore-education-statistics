@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null);
 
-        Task<IReadOnlyList<ReleasePublishingKeyOld>> GetWherePublishingDueTodayOrInFutureWithStages(
+        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFutureWithStages(
             IReadOnlyList<Guid> releaseVersionIds,
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,

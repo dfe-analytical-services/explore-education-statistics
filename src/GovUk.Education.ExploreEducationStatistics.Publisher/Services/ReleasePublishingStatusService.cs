@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
@@ -20,18 +19,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _context;
         private readonly ILogger<ReleasePublishingStatusService> _logger;
-        private readonly IPublisherTableStorageServiceOld _tableStorageServiceOld; // @MarkFix remove
         private readonly IPublisherTableStorageService _publisherTableStorageService;
 
         public ReleasePublishingStatusService(
             ContentDbContext context,
             ILogger<ReleasePublishingStatusService> logger,
-            IPublisherTableStorageServiceOld tableStorageServiceOld,
             IPublisherTableStorageService publisherTableStorageService)
         {
             _context = context;
             _logger = logger;
-            _tableStorageServiceOld = tableStorageServiceOld;
             _publisherTableStorageService = publisherTableStorageService;
         }
 
@@ -113,16 +109,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        public async Task<IReadOnlyList<ReleasePublishingKeyOld>> GetWherePublishingDueTodayOrInFutureWithStages(
+        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFutureWithStages(
             IReadOnlyList<Guid> releaseVersionIds,
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null)
         {
-            var query = QueryPublishTodayOrInFutureWithStages(content, files, publishing, overall);
-            var tableResult = await ExecuteQuery(query);
-            return tableResult.Where(status => releaseVersionIds.Contains(status.ReleaseVersionId))
+            var filter = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
+                status.Publish >= DateTime.Today);
+
+            filter = UpdateFilterForStages(filter, content, files, publishing, overall);
+
+            var asyncPageable = await _publisherTableStorageService
+                .QueryEntities<ReleasePublishingStatus>(
+                    PublisherReleaseStatusTableName,
+                    filter);
+
+            var tableResults = await asyncPageable.ToListAsync();
+
+            return tableResults
+                .Where(status => releaseVersionIds.Contains(status.ReleaseVersionId))
                 .Select(status => status.AsTableRowKey())
                 .ToList();
         }
@@ -168,12 +175,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var statusList = await asyncPages.ToListAsync();
 
             return statusList.OrderByDescending(status => status.Created).FirstOrDefault();
-        }
-
-        private async Task<IReadOnlyList<ReleasePublishingStatusOld>> ExecuteQuery(
-            TableQuery<ReleasePublishingStatusOld> query)
-        {
-            return await _tableStorageServiceOld.ExecuteQuery(PublisherReleaseStatusTableName, query);
         }
 
         public async Task UpdateState(

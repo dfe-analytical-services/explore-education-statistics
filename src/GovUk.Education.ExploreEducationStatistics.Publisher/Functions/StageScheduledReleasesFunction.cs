@@ -90,10 +90,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await queueService.QueueStageReleaseContentMessages(scheduled);
         }
 
-        private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForToday()
+        private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForToday() // @MarkFix remove
         {
             var keyList = await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
                 overall: ReleasePublishingStatusOverallStage.Scheduled);
+
             return keyList
                 .Select(key => new ReleasePublishingKeyOld(key.ReleaseVersionId, key.ReleaseStatusId))
                 .ToList();
@@ -102,9 +103,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForTodayOrFuture(
             IReadOnlyList<Guid> releaseVersionIds)
         {
-            return await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
+            var keyList = await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
                 releaseVersionIds,
                 overall: ReleasePublishingStatusOverallStage.Scheduled);
+
+            return keyList
+                .Select(key => new ReleasePublishingKeyOld(key.ReleaseVersionId, key.ReleaseStatusId))
+                .ToList();
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local

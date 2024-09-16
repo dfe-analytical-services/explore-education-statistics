@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(scheduled);
         }
 
-        private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForToday()
+        private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForToday() // @MarkFix remove
         {
             var publishingKeyList = await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
                 content: ReleasePublishingStatusContentStage.Scheduled,
@@ -119,13 +119,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForTodayOrFuture(
             IReadOnlyList<Guid> releaseVersionIds)
         {
-            return await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
+            var keyList = await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
                 releaseVersionIds,
                 content: ReleasePublishingStatusContentStage.Scheduled,
                 files: ReleasePublishingStatusFilesStage.Complete,
                 publishing: ReleasePublishingStatusPublishingStage.Scheduled);
+
+            return keyList
+                .Select(key => new ReleasePublishingKeyOld(key.ReleaseVersionId, key.ReleaseStatusId))
+                .ToList();
         }
 
+        // @MarkFix why private and public declartion here?
         // ReSharper disable once ClassNeverInstantiated.Local
         private record ManualTriggerRequest(Guid[] ReleaseVersionIds);
 
