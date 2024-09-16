@@ -253,7 +253,7 @@ Verify newly published release is on Find Statistics page
 User navigates to data catalogue page
     user navigates to data catalogue page on public frontend
 
-Search with 1st API dataset
+Search with 2nd API dataset
     user clicks element    id:searchForm-search
     user presses keys    ${PUBLICATION_NAME}
     user clicks radio    API data sets only
