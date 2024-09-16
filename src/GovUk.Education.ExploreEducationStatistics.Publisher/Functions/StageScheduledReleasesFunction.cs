@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return new ManualTriggerResponse(stagedReleaseVersionIds);
         }
 
-        private async Task PublishReleaseFilesAndStageContent(IReadOnlyList<ReleasePublishingKeyOld> scheduled)
+        private async Task PublishReleaseFilesAndStageContent(IReadOnlyList<ReleasePublishingKey> scheduled)
         {
             if (!scheduled.Any())
             {
@@ -79,37 +79,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             await scheduled
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async keyOld =>
-                {
-                    var key = new ReleasePublishingKey(keyOld.ReleaseVersionId, keyOld.ReleaseStatusId);
+                .ForEachAwaitAsync(async key =>
                     await releasePublishingStatusService.UpdateState(key,
-                        ReleasePublishingStatusStates.ScheduledReleaseStartedState);
-                });
+                        ReleasePublishingStatusStates.ScheduledReleaseStartedState));
 
             await queueService.QueuePublishReleaseFilesMessages(scheduled);
             await queueService.QueueStageReleaseContentMessages(scheduled);
         }
 
-        private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForToday() // @MarkFix remove
+        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForToday() // @MarkFix remove
         {
-            var keyList = await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
+            return await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
                 overall: ReleasePublishingStatusOverallStage.Scheduled);
-
-            return keyList
-                .Select(key => new ReleasePublishingKeyOld(key.ReleaseVersionId, key.ReleaseStatusId))
-                .ToList();
         }
 
-        private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForTodayOrFuture(
+        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForTodayOrFuture(
             IReadOnlyList<Guid> releaseVersionIds)
         {
-            var keyList = await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
+            return await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
                 releaseVersionIds,
                 overall: ReleasePublishingStatusOverallStage.Scheduled);
-
-            return keyList
-                .Select(key => new ReleasePublishingKeyOld(key.ReleaseVersionId, key.ReleaseStatusId))
-                .ToList();
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local

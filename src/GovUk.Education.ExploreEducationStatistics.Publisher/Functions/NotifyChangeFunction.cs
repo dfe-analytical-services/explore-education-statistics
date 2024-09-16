@@ -72,21 +72,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
         }
 
-        private async Task<ReleasePublishingKeyOld> CreateReleaseStatus(
+        private async Task<ReleasePublishingKey> CreateReleaseStatus(
             NotifyChangeMessage message,
             ReleasePublishingStatusState state,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
         {
             var key = new ReleasePublishingKey(
-                message.ReleasePublishingKeyOld.ReleaseVersionId,
-                message.ReleasePublishingKeyOld.ReleaseStatusId);
+                message.ReleasePublishingKey.ReleaseVersionId,
+                message.ReleasePublishingKey.ReleaseStatusId);
+
             await releasePublishingStatusService.Create(
                 key,
                 state,
                 message.Immediate,
                 logMessages);
 
-            return new ReleasePublishingKeyOld(key.ReleaseVersionId, key.ReleaseStatusId);
+            return key;
         }
 
         private async Task MarkScheduledReleaseStatusAsSuperseded(NotifyChangeMessage message)

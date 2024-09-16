@@ -33,12 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             try
             {
-                await UpdateContentStage(message.ReleasePublishingKeyOld, ReleasePublishingStatusContentStage.Started);
-                await contentService.UpdateContent(message.ReleasePublishingKeyOld.ReleaseVersionId);
-                await UpdateContentStage(message.ReleasePublishingKeyOld, ReleasePublishingStatusContentStage.Complete);
+                await UpdateContentStage(message.ReleasePublishingKey, ReleasePublishingStatusContentStage.Started);
+                await contentService.UpdateContent(message.ReleasePublishingKey.ReleaseVersionId);
+                await UpdateContentStage(message.ReleasePublishingKey, ReleasePublishingStatusContentStage.Complete);
                 await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(new[]
                 {
-                    message.ReleasePublishingKeyOld
+                    message.ReleasePublishingKey
                 });
             }
             catch (Exception e)
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 logger.LogError(e, "Exception occured while executing {FunctionName}", context.FunctionDefinition.Name);
 
                 await UpdateContentStage(
-                    message.ReleasePublishingKeyOld,
+                    message.ReleasePublishingKey,
                     ReleasePublishingStatusContentStage.Failed,
                     new ReleasePublishingStatusLogMessage(
                         $"Exception publishing Release Content immediately: {e.Message}"));
@@ -55,13 +55,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
         }
 
-        private async Task UpdateContentStage(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+        private async Task UpdateContentStage( // @MarkFix remove candidate?
+            ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusContentStage state,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            var releasePublishingKey = new ReleasePublishingKey(
-                releasePublishingKeyOld.ReleaseVersionId, releasePublishingKeyOld.ReleaseStatusId);
             await releasePublishingStatusService.UpdateContentStage(
                 releasePublishingKey,
                 state,

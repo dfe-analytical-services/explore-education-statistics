@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publisherClient = new Mock<IPublisherClient>(MockBehavior.Strict);
 
-            var releasePublishingKey = new ReleasePublishingKeyOld(releaseVersion.Id, releaseStatus.Id);
+            var releasePublishingKey = new ReleasePublishingKey(releaseVersion.Id, releaseStatus.Id);
 
             publisherClient.Setup(s => s.HandleReleaseChanged(releasePublishingKey, true, CancellationToken.None))
                 .Returns(Task.CompletedTask);
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publishingService = BuildPublishingService(contentDbContext: context);
 
             var result =
-                await publishingService.ReleaseChanged(new ReleasePublishingKeyOld(Guid.NewGuid(), Guid.NewGuid()),
+                await publishingService.ReleaseChanged(new ReleasePublishingKey(Guid.NewGuid(), Guid.NewGuid()),
                     immediate: true);
 
             result.AssertNotFound();

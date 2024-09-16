@@ -19,15 +19,15 @@ public class PublisherClient(string connectionString) : IPublisherClient
     }
 
     public async Task PublishReleaseContent(
-        ReleasePublishingKeyOld releasePublishingKeyOld, CancellationToken cancellationToken = default)
+        ReleasePublishingKey releasePublishingKey, CancellationToken cancellationToken = default)
     {
         await _queueServiceClient.SendMessageAsJson(PublisherQueues.PublishReleaseContentQueue,
-            new PublishReleaseContentMessage(releasePublishingKeyOld),
+            new PublishReleaseContentMessage(releasePublishingKey),
             cancellationToken);
     }
 
     public async Task PublishReleaseFiles(
-        IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys, CancellationToken cancellationToken = default)
+        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys, CancellationToken cancellationToken = default)
     {
         await _queueServiceClient.SendMessageAsJson(PublisherQueues.PublishReleaseFilesQueue,
             new PublishReleaseFilesMessage(releasePublishingKeys),
@@ -42,10 +42,10 @@ public class PublisherClient(string connectionString) : IPublisherClient
     }
 
     public async Task HandleReleaseChanged(
-        ReleasePublishingKeyOld releasePublishingKeyOld, bool immediate, CancellationToken cancellationToken = default)
+        ReleasePublishingKey releasePublishingKey, bool immediate, CancellationToken cancellationToken = default)
     {
         await _queueServiceClient.SendMessageAsJson(PublisherQueues.NotifyChangeQueue,
-            new NotifyChangeMessage(immediate, releasePublishingKeyOld),
+            new NotifyChangeMessage(immediate, releasePublishingKey),
             cancellationToken);
     }
 
@@ -57,7 +57,7 @@ public class PublisherClient(string connectionString) : IPublisherClient
     }
 
     public async Task StageReleaseContent(
-        IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys, CancellationToken cancellationToken = default)
+        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys, CancellationToken cancellationToken = default)
     {
         await _queueServiceClient.SendMessageAsJson(PublisherQueues.StageReleaseContentQueue,
             new StageReleaseContentMessage(releasePublishingKeys),

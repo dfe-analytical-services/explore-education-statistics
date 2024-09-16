@@ -14,7 +14,7 @@ public class QueueService(
     ILogger<QueueService> logger)
     : IQueueService
 {
-    public async Task QueueStageReleaseContentMessages(IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys)
+    public async Task QueueStageReleaseContentMessages(IReadOnlyList<ReleasePublishingKey> releasePublishingKeys)
     {
         logger.LogInformation(
             "Queuing generate content message for release versions: [{ReleaseVersionIds}]",
@@ -24,26 +24,21 @@ public class QueueService(
 
         await releasePublishingKeys
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async keyOld =>
-            {
-                var key = new ReleasePublishingKey(keyOld.ReleaseVersionId, keyOld.ReleaseStatusId);
+            .ForEachAwaitAsync(async key =>
                 await releasePublishingStatusService.UpdateContentStage(key,
-                    ReleasePublishingStatusContentStage.Queued);
-            });
+                    ReleasePublishingStatusContentStage.Queued));
     }
 
-    public async Task QueuePublishReleaseContentMessage(ReleasePublishingKeyOld releasePublishingKeyOld)
+    public async Task QueuePublishReleaseContentMessage(ReleasePublishingKey releasePublishingKey)
     {
         logger.LogInformation("Queuing publish content message for release version: {ReleaseVersionId}",
-            releasePublishingKeyOld.ReleaseVersionId);
-        await publisherClient.PublishReleaseContent(releasePublishingKeyOld);
-        var releasePublishingKey = new ReleasePublishingKey(
-            releasePublishingKeyOld.ReleaseVersionId, releasePublishingKeyOld.ReleaseStatusId);
+            releasePublishingKey.ReleaseVersionId);
+        await publisherClient.PublishReleaseContent(releasePublishingKey);
         await releasePublishingStatusService.UpdateContentStage(releasePublishingKey,
             ReleasePublishingStatusContentStage.Queued);
     }
 
-    public async Task QueuePublishReleaseFilesMessages(IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys)
+    public async Task QueuePublishReleaseFilesMessages(IReadOnlyList<ReleasePublishingKey> releasePublishingKeys)
     {
         logger.LogInformation(
             "Queuing files message for release versions: [{ReleaseVersionIds}]",
@@ -53,11 +48,8 @@ public class QueueService(
 
         await releasePublishingKeys
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async keyOld =>
-            {
-                var key = new ReleasePublishingKey(keyOld.ReleaseVersionId, keyOld.ReleaseVersionId);
+            .ForEachAwaitAsync(async key =>
                 await releasePublishingStatusService.UpdateFilesStage(key,
-                    ReleasePublishingStatusFilesStage.Queued);
-            });
+                    ReleasePublishingStatusFilesStage.Queued));
     }
 }

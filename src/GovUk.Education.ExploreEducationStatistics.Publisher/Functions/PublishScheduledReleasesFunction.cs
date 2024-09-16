@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             return new ManualTriggerResponse(publishedReleaseVersionIds);
         }
 
-        private async Task PublishScheduledReleases(IReadOnlyList<ReleasePublishingKeyOld> scheduled)
+        private async Task PublishScheduledReleases(IReadOnlyList<ReleasePublishingKey> scheduled)
         {
             if (!scheduled.Any())
             {
@@ -105,29 +105,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(scheduled);
         }
 
-        private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForToday() // @MarkFix remove
+        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForToday() // @MarkFix remove
         {
-            var publishingKeyList = await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
+            return await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
                 content: ReleasePublishingStatusContentStage.Scheduled,
                 files: ReleasePublishingStatusFilesStage.Complete,
                 publishing: ReleasePublishingStatusPublishingStage.Scheduled);
-
-            return publishingKeyList.Select(key => new ReleasePublishingKeyOld(
-                key.ReleaseVersionId, key.ReleaseStatusId)).ToList();
         }
 
-        private async Task<IReadOnlyList<ReleasePublishingKeyOld>> QueryScheduledReleasesForTodayOrFuture(
+        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForTodayOrFuture( // @MarkFix remove
             IReadOnlyList<Guid> releaseVersionIds)
         {
-            var keyList = await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
+            return await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
                 releaseVersionIds,
                 content: ReleasePublishingStatusContentStage.Scheduled,
                 files: ReleasePublishingStatusFilesStage.Complete,
                 publishing: ReleasePublishingStatusPublishingStage.Scheduled);
-
-            return keyList
-                .Select(key => new ReleasePublishingKeyOld(key.ReleaseVersionId, key.ReleaseStatusId))
-                .ToList();
         }
 
         // @MarkFix why private and public declartion here?

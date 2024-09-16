@@ -70,25 +70,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         /// Since the Data task deletes all existing statistical data before copying there will be downtime if this is called with a release version that is already published.
         /// A future schedule for publishing a release version that's not yet started will be cancelled.
         /// </remarks>
-        /// <param name="releasePublishingKeyOld"></param>
+        /// <param name="releasePublishingKey"></param>
         /// <param name="immediate">If true, runs all of the stages of the publishing workflow except that they are combined to act immediately.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public async Task<Either<ActionResult, Unit>> ReleaseChanged(
-            ReleasePublishingKeyOld releasePublishingKeyOld,
+            ReleasePublishingKey releasePublishingKey,
             bool immediate = false,
             CancellationToken cancellationToken = default)
         {
             return await context.ReleaseVersions
-                .FirstOrNotFoundAsync(rv => rv.Id == releasePublishingKeyOld.ReleaseVersionId, cancellationToken)
+                .FirstOrNotFoundAsync(rv => rv.Id == releasePublishingKey.ReleaseVersionId, cancellationToken)
                 .OnSuccessVoid(async _ =>
                 {
-                    await publisherClient.HandleReleaseChanged(releasePublishingKeyOld, immediate, cancellationToken);
+                    await publisherClient.HandleReleaseChanged(releasePublishingKey, immediate, cancellationToken);
 
                     logger.LogTrace(
                         "Sent message for ReleaseVersion: {ReleaseVersionId}, ReleaseStatusId: {ReleaseStatusId}",
-                        releasePublishingKeyOld.ReleaseVersionId,
-                        releasePublishingKeyOld.ReleaseStatusId);
+                        releasePublishingKey.ReleaseVersionId,
+                        releasePublishingKey.ReleaseStatusId);
                 });
         }
 

@@ -11,18 +11,18 @@ public interface IPublisherClient
     Task PublishMethodologyFiles(Guid methodologyId, CancellationToken cancellationToken = default);
 
     Task PublishReleaseContent(
-        ReleasePublishingKeyOld releasePublishingKeyOld, CancellationToken cancellationToken = default);
+        ReleasePublishingKey releasePublishingKey, CancellationToken cancellationToken = default);
 
     Task PublishReleaseFiles(
-        IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys, CancellationToken cancellationToken = default);
+        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys, CancellationToken cancellationToken = default);
 
     Task PublishTaxonomy(CancellationToken cancellationToken = default);
 
     Task HandleReleaseChanged(
-        ReleasePublishingKeyOld releasePublishingKeyOld, bool immediate, CancellationToken cancellationToken = default);
+        ReleasePublishingKey releasePublishingKey, bool immediate, CancellationToken cancellationToken = default);
 
     Task RetryReleasePublishing(Guid releaseVersionId, CancellationToken cancellationToken = default);
 
     Task StageReleaseContent(
-        IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys, CancellationToken cancellationToken = default);
+        IReadOnlyList<ReleasePublishingKey> releasePublishingKeys, CancellationToken cancellationToken = default);
 }

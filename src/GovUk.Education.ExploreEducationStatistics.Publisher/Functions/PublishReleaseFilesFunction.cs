@@ -88,17 +88,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateFilesStage(
-            IReadOnlyList<ReleasePublishingKeyOld> releasePublishingKeys,
+            IReadOnlyList<ReleasePublishingKey> releasePublishingKeys,
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
             await releasePublishingKeys
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(keyOld =>
-                {
-                    var key = new ReleasePublishingKey(keyOld.ReleaseVersionId, keyOld.ReleaseStatusId);
-                    return releasePublishingStatusService.UpdateFilesStage(key, stage, logMessage);
-                });
+                .ForEachAwaitAsync(key => releasePublishingStatusService.UpdateFilesStage(key, stage, logMessage));
         }
 
         private async Task UpdatePublishingStage(
