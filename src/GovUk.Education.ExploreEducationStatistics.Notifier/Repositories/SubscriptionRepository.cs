@@ -14,15 +14,15 @@ public class SubscriptionRepository(
 {
     public async Task<List<string>> GetSubscriberEmails(Guid publicationId)
     {
-        var results = await notifierTableStorage
+        var asyncPageable = await notifierTableStorage
             .QueryEntities<SubscriptionEntity>(
                 tableName: NotifierTableStorage.PublicationSubscriptionsTable,
                 filter: sub => sub.PartitionKey == publicationId.ToString(),
                 select: [nameof(SubscriptionEntity.RowKey)]); // email address
 
-        // @MarkFix especially check this - we used to fetch in segments (I think)
-        return await results
-            .Select(subscriber => subscriber.RowKey)
+        return await asyncPageable
+            .Select(subscriber => subscriber.RowKey ?? "") // suppress nullability warning
+            .Where(email => email != "")
             .ToListAsync();
     }
 

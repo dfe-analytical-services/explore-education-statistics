@@ -35,14 +35,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-            var scheduled = await QueryScheduledReleasesForToday();
+            var scheduledStagedReleases = await releasePublishingStatusService
+                .GetWherePublishingDueToday(
+                    content: ReleasePublishingStatusContentStage.Scheduled,
+                    files: ReleasePublishingStatusFilesStage.Complete,
+                    publishing: ReleasePublishingStatusPublishingStage.Scheduled);
 
-            await PublishScheduledReleases(scheduled);
+            await PublishScheduledReleases(scheduledStagedReleases);
 
             logger.LogInformation(
                 "{FunctionName} completed. Published release versions [{ReleaseVersionIds}].",
                 context.FunctionDefinition.Name,
-                scheduled.Select(key => key.ReleaseVersionId).JoinToString(','));
+                scheduledStagedReleases.Select(key => key.ReleaseVersionId).JoinToString(','));
         }
 
         /// <summary>
@@ -69,8 +73,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
 
             var scheduled = releaseVersionIds?.Length > 0
-                ? await QueryScheduledReleasesForTodayOrFuture(releaseVersionIds)
-                : await QueryScheduledReleasesForToday();
+                ? await releasePublishingStatusService.GetWherePublishingDueTodayOrInFuture(
+                    releaseVersionIds,
+                    content: ReleasePublishingStatusContentStage.Scheduled,
+                    files: ReleasePublishingStatusFilesStage.Complete,
+                    publishing: ReleasePublishingStatusPublishingStage.Scheduled)
+                : await releasePublishingStatusService.GetWherePublishingDueToday(
+                    content: ReleasePublishingStatusContentStage.Scheduled,
+                    files: ReleasePublishingStatusFilesStage.Complete,
+                    publishing: ReleasePublishingStatusPublishingStage.Scheduled);
 
             await PublishScheduledReleases(scheduled);
 
@@ -105,25 +116,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(scheduled);
         }
 
-        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForToday() // @MarkFix remove
-        {
-            return await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
-                content: ReleasePublishingStatusContentStage.Scheduled,
-                files: ReleasePublishingStatusFilesStage.Complete,
-                publishing: ReleasePublishingStatusPublishingStage.Scheduled);
-        }
-
-        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForTodayOrFuture( // @MarkFix remove
-            IReadOnlyList<Guid> releaseVersionIds)
-        {
-            return await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
-                releaseVersionIds,
-                content: ReleasePublishingStatusContentStage.Scheduled,
-                files: ReleasePublishingStatusFilesStage.Complete,
-                publishing: ReleasePublishingStatusPublishingStage.Scheduled);
-        }
-
-        // @MarkFix why private and public declartion here?
         // ReSharper disable once ClassNeverInstantiated.Local
         private record ManualTriggerRequest(Guid[] ReleaseVersionIds);
 

@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return result;
         }
 
-        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayWithStages(
+        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueToday(
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFutureWithStages(
+        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFuture(
             IReadOnlyList<Guid> releaseVersionIds,
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state)
         {
-            await UpdateRowAsync(releasePublishingKey,
+            await UpdateWithRetries(releasePublishingKey,
                 row =>
                 {
                     row.State = state;
@@ -193,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releasePublishingKey,
+            await UpdateWithRetries(releasePublishingKey,
                 row =>
                 {
                     row.State.Content = stage;
@@ -207,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releasePublishingKey,
+            await UpdateWithRetries(releasePublishingKey,
                 row =>
                 {
                     row.State.Files = stage;
@@ -221,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releasePublishingKey,
+            await UpdateWithRetries(releasePublishingKey,
                 row =>
                 {
                     row.State.Publishing = stage;
@@ -230,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 });
         }
 
-        private async Task UpdateRowAsync( // @MarkFix rename to update with retries - also move retry logic into DataTableStorageService?
+        private async Task UpdateWithRetries(
             ReleasePublishingKey releasePublishingKey,
             Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction,
             int numRetries = 5)
@@ -256,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     if (numRetries > 0)
                     {
                         numRetries--;
-                        await UpdateRowAsync(releasePublishingKey,
+                        await UpdateWithRetries(releasePublishingKey,
                             updateFunction,
                             numRetries);
                     }

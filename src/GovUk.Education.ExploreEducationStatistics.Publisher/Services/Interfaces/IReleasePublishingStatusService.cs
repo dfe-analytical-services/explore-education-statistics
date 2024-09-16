@@ -13,13 +13,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null);
 
-        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayWithStages(
+        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueToday(
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null);
 
-        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFutureWithStages(
+        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFuture(
             IReadOnlyList<Guid> releaseVersionIds,
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,

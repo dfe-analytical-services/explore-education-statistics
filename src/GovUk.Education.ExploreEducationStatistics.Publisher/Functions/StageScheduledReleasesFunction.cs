@@ -31,15 +31,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-            await PublishReleaseFilesAndStageContent(await QueryScheduledReleasesForToday());
+            var releasesToBeStaged = await releasePublishingStatusService
+                .GetWherePublishingDueToday(
+                    overall: ReleasePublishingStatusOverallStage.Scheduled);
+            await PublishReleaseFilesAndStageContent(releasesToBeStaged);
 
             logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
         }
 
         /// <summary>
-        /// Azure function which triggers publishing files and staging content for all release versions that are scheduled to
-        /// be published later during the day. This is triggered manually by an HTTP post request, and is disabled in
-        /// production environments.
+        /// Azure function to manually trigger the publishing/staging of releaseVersion(s) files/content. This can be
+        /// done for either all releaseVersions that are scheduled to be published today, or an array of
+        /// releaseVersions that are due to be published today or in the future. This is triggered manually by an HTTP
+        /// post request, and is disabled in production environments. More info in the Publisher README.md.
         /// </summary>
         /// <param name="request">
         /// An optional JSON request body with a "ReleaseVersionIds" array can be included in the POST request to limit
@@ -56,8 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
 
             var scheduled = releaseVersionIds?.Length > 0
-                ? await QueryScheduledReleasesForTodayOrFuture(releaseVersionIds)
-                : await QueryScheduledReleasesForToday();
+                ? await releasePublishingStatusService.GetWherePublishingDueTodayOrInFuture(
+                    releaseVersionIds,
+                    overall: ReleasePublishingStatusOverallStage.Scheduled)
+                : await releasePublishingStatusService.GetWherePublishingDueToday(
+                    overall: ReleasePublishingStatusOverallStage.Scheduled);
 
             await PublishReleaseFilesAndStageContent(scheduled);
 
@@ -85,20 +92,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             await queueService.QueuePublishReleaseFilesMessages(scheduled);
             await queueService.QueueStageReleaseContentMessages(scheduled);
-        }
-
-        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForToday() // @MarkFix remove
-        {
-            return await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
-                overall: ReleasePublishingStatusOverallStage.Scheduled);
-        }
-
-        private async Task<IReadOnlyList<ReleasePublishingKey>> QueryScheduledReleasesForTodayOrFuture(
-            IReadOnlyList<Guid> releaseVersionIds)
-        {
-            return await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
-                releaseVersionIds,
-                overall: ReleasePublishingStatusOverallStage.Scheduled);
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local

@@ -109,7 +109,7 @@ public class PublicationSubscriptionFunctions(
                             RowKey = req.Email,
                             Slug = req.Slug,
                             Title = req.Title,
-                            DateTimeCreated = expiryDateTime,
+                            DateTimeCreated = expiryDateTime, // Take note! DateTimeCreated name for pending subs is misleading
                         },
                         cancellationToken);
 
@@ -223,7 +223,7 @@ public class PublicationSubscriptionFunctions(
 
         if (pendingSubscription == null)
         {
-            return new NotFoundObjectResult("Subscription for email derived from token not found"); // @MarkFix fix response http code
+            return new NotFoundObjectResult("Subscription for email derived from token not found");
         }
 
         logger.LogDebug("Removing address from pending subscribers");
@@ -280,11 +280,10 @@ public class PublicationSubscriptionFunctions(
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        // @MarkFix check this
-        var results = await notifierTableStorageService.QueryEntities<SubscriptionEntity>(
+        var asyncPageable = await notifierTableStorageService.QueryEntities<SubscriptionEntity>(
             tableName: NotifierTableStorage.PublicationPendingSubscriptionsTable,
-            sub => sub.DateTimeCreated < DateTime.UtcNow.AddHours(1));
-        var pendingSubsToRemove = await results.ToListAsync();
+            sub => sub.DateTimeCreated < DateTime.UtcNow.AddHours(1)); // WARN: DateTimeCreated is actually ExpiryTime!!!
+        var pendingSubsToRemove = await asyncPageable.ToListAsync();
 
         await notifierTableStorageService.BatchManipulateEntities(
             NotifierTableStorage.PublicationPendingSubscriptionsTable,
