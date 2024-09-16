@@ -8,7 +8,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 {
     private readonly DataSetQueryCriteriaLocations.Validator _validator = new();
 
-    public static readonly TheoryData<DataSetQueryLocation> ValidLocationsSingle = new()
+    public static readonly TheoryData<IDataSetQueryLocation> ValidLocationsSingle = new()
     {
         new DataSetQueryLocationId { Level = "NAT", Id = "12345" },
         new DataSetQueryLocationId { Level = "REG", Id = "12345" },
@@ -26,38 +26,38 @@ public class DataSetQueryCriteriaLocationsValidatorTests
         new DataSetQueryLocationProviderUkprn { Ukprn = "10066874" },
     };
 
-    public static readonly TheoryData<DataSetQueryLocation[]> ValidLocationsMultiple = new()
+    public static readonly TheoryData<IDataSetQueryLocation[]> ValidLocationsMultiple = new()
     {
-         new DataSetQueryLocation[]
+         new IDataSetQueryLocation[]
          {
              new DataSetQueryLocationId { Level = "NAT", Id = "12345" },
              new DataSetQueryLocationCode { Level = "NAT", Code = "E92000001" },
          },
-         new DataSetQueryLocation[]
+         new IDataSetQueryLocation[]
          {
              new DataSetQueryLocationId { Level = "REG", Id = "12345" },
              new DataSetQueryLocationCode { Level = "REG", Code = "E12000003" },
          },
-         new DataSetQueryLocation[]
+         new IDataSetQueryLocation[]
          {
              new DataSetQueryLocationId { Level = "LA", Id = "12345" },
              new DataSetQueryLocationLocalAuthorityCode { Code = "E08000019" },
              new DataSetQueryLocationLocalAuthorityOldCode { OldCode = "373" },
          },
-         new DataSetQueryLocation[]
+         new IDataSetQueryLocation[]
          {
              new DataSetQueryLocationId { Level = "SCH", Id = "12345" },
              new DataSetQueryLocationSchoolUrn { Urn = "107029" },
              new DataSetQueryLocationSchoolLaEstab { LaEstab = "3732060" },
          },
-         new DataSetQueryLocation[]
+         new IDataSetQueryLocation[]
          {
              new DataSetQueryLocationId { Level = "PROV", Id = "12345" },
              new DataSetQueryLocationProviderUkprn { Ukprn = "10066874" },
          }
     };
 
-    public static readonly TheoryData<DataSetQueryLocation> InvalidLocationsSingle = new()
+    public static readonly TheoryData<IDataSetQueryLocation> InvalidLocationsSingle = new()
     {
         new DataSetQueryLocationId { Level = "", Id = "" },
         new DataSetQueryLocationId { Level = "NAT", Id = "" },
@@ -72,22 +72,22 @@ public class DataSetQueryCriteriaLocationsValidatorTests
         new DataSetQueryLocationSchoolUrn { Urn = new string('x', 7) },
     };
 
-    public static readonly TheoryData<DataSetQueryLocation[]> InvalidLocationsMultiple = new()
+    public static readonly TheoryData<IDataSetQueryLocation[]> InvalidLocationsMultiple = new()
     {
-        new DataSetQueryLocation[]
+        new IDataSetQueryLocation[]
         {
             new DataSetQueryLocationId { Level = "", Id = "" },
             new DataSetQueryLocationId { Level = "NAT", Id = "" },
             new DataSetQueryLocationCode { Level = "REG", Code = "" },
             new DataSetQueryLocationLocalAuthorityCode { Code = "" },
         },
-        new DataSetQueryLocation[]
+        new IDataSetQueryLocation[]
         {
             new DataSetQueryLocationId { Level = "NA", Id = "12345" },
             new DataSetQueryLocationId { Level = "la", Id = "12345" },
             new DataSetQueryLocationId { Level = "", Id = "12345" },
         },
-        new DataSetQueryLocation[]
+        new IDataSetQueryLocation[]
         {
             new DataSetQueryLocationId { Level = "NAT", Id = new string('x', 26) },
             new DataSetQueryLocationCode { Level = "REG", Code = new string('x', 26) },
@@ -100,7 +100,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidLocationsSingle))]
-        public void Success(DataSetQueryLocation location)
+        public void Success(IDataSetQueryLocation location)
         {
             var query = new DataSetQueryCriteriaLocations { Eq = location };
 
@@ -109,7 +109,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 
         [Theory]
         [MemberData(nameof(InvalidLocationsSingle))]
-        public void Failure(DataSetQueryLocation location)
+        public void Failure(IDataSetQueryLocation location)
         {
             var query = new DataSetQueryCriteriaLocations { Eq = location };
 
@@ -126,7 +126,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidLocationsSingle))]
-        public void Success(DataSetQueryLocation location)
+        public void Success(IDataSetQueryLocation location)
         {
             var query = new DataSetQueryCriteriaLocations { NotEq = location };
 
@@ -135,7 +135,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 
         [Theory]
         [MemberData(nameof(InvalidLocationsSingle))]
-        public void Failure(DataSetQueryLocation location)
+        public void Failure(IDataSetQueryLocation location)
         {
             var query = new DataSetQueryCriteriaLocations { NotEq = location };
 
@@ -152,7 +152,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidLocationsMultiple))]
-        public void Success(params DataSetQueryLocation[] locations)
+        public void Success(params IDataSetQueryLocation[] locations)
         {
             var query = new DataSetQueryCriteriaLocations { In = locations };
 
@@ -161,7 +161,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 
         [Theory]
         [MemberData(nameof(InvalidLocationsMultiple))]
-        public void Failure(DataSetQueryLocation[] locations)
+        public void Failure(IDataSetQueryLocation[] locations)
         {
             var query = new DataSetQueryCriteriaLocations { In = locations };
 
@@ -191,7 +191,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidLocationsMultiple))]
-        public void Success(params DataSetQueryLocation[] locations)
+        public void Success(params IDataSetQueryLocation[] locations)
         {
             var query = new DataSetQueryCriteriaLocations { NotIn = locations };
 
@@ -200,7 +200,7 @@ public class DataSetQueryCriteriaLocationsValidatorTests
 
         [Theory]
         [MemberData(nameof(InvalidLocationsMultiple))]
-        public void Failure(params DataSetQueryLocation[] locations)
+        public void Failure(params IDataSetQueryLocation[] locations)
         {
             var query = new DataSetQueryCriteriaLocations { NotIn = locations };
 

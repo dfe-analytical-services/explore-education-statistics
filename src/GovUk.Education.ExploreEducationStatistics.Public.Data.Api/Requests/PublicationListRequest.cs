@@ -8,6 +8,7 @@ public record PublicationListRequest
     /// <summary>
     /// A search term to find matching publications.
     /// </summary>
+    /// <example>Pupil absence</example>
     public string? Search { get; init; }
 
     /// <summary>

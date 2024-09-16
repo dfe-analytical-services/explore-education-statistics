@@ -1,3 +1,4 @@
+import ContentHtml from '@common/components/ContentHtml';
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
 import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import { DataSetFootnote } from '@frontend/services/dataSetFileService';
@@ -14,7 +15,9 @@ export default function DataSetFileFootnotes({ footnotes }: Props) {
     <DataSetFilePageSection heading={pageSections[sectionId]} id={sectionId}>
       <ol>
         {footnotes.map(footnote => (
-          <li key={footnote.id}>{footnote.label}</li>
+          <li key={footnote.id}>
+            <ContentHtml html={footnote.label} />
+          </li>
         ))}
       </ol>
     </DataSetFilePageSection>

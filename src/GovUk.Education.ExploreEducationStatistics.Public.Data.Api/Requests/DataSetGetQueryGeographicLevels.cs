@@ -5,11 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
+/// <summary>
+/// The geographic levels criteria to filter results by in a data set GET query.
+/// </summary>
 public record DataSetGetQueryGeographicLevels : DataSetQueryCriteriaGeographicLevels
 {
     /// <summary>
     /// Filter the results to be in one of these geographic levels.
     /// </summary>
+    /// <example>["NAT", "LA"]</example>
     [FromQuery]
     [QuerySeparator]
     [SwaggerEnum(typeof(GeographicLevel))]
@@ -18,6 +22,7 @@ public record DataSetGetQueryGeographicLevels : DataSetQueryCriteriaGeographicLe
     /// <summary>
     /// Filter the results to not be in one of these geographic levels.
     /// </summary>
+    /// <example>["REG", "LAD"]</example>
     [FromQuery]
     [QuerySeparator]
     [SwaggerEnum(typeof(GeographicLevel))]

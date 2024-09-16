@@ -8,12 +8,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 ///
 /// This is equivalent to the `AND` operator in SQL.
 /// </summary>
-public record DataSetQueryCriteriaAnd : DataSetQueryCriteria
+public record DataSetQueryCriteriaAnd : IDataSetQueryCriteria
 {
     /// <summary>
     /// The sub-criteria which all must resolve to true.
     /// </summary>
-    public required IReadOnlyList<DataSetQueryCriteria> And { get; init; }
+    /// <example>
+    /// [
+    ///     {
+    ///         "filters": {
+    ///             "eq": "pVAkV"
+    ///         }
+    ///     },
+    ///     {
+    ///         "locations": {
+    ///             "eq": "LA|code|E08000019"
+    ///         }
+    ///     }
+    /// ]
+    /// </example>
+    public required IReadOnlyList<IDataSetQueryCriteria> And { get; init; }
 
     public class Validator : AbstractValidator<DataSetQueryCriteriaAnd>
     {
@@ -24,7 +38,7 @@ public record DataSetQueryCriteriaAnd : DataSetQueryCriteria
 
             RuleForEach(q => q.And)
                 .NotNull()
-                .SetInheritanceValidator(InheritanceValidator);
+                .SetInheritanceValidator(IDataSetQueryCriteria.InheritanceValidator);
         }
     }
 }

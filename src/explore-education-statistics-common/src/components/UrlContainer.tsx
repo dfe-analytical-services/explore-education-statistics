@@ -7,6 +7,7 @@ interface Props {
   id: string;
   label?: string | ReactNode;
   labelHidden?: boolean;
+  widthLimited?: boolean;
   testId?: string;
   url: string;
 }
@@ -15,7 +16,8 @@ export default function UrlContainer({
   className,
   id,
   label = 'URL',
-  labelHidden = true,
+  labelHidden,
+  widthLimited,
   testId = id,
   url,
 }: Props) {
@@ -23,6 +25,7 @@ export default function UrlContainer({
     <div
       className={classNames(className, {
         'dfe-flex dfe-align-items--center': !labelHidden,
+        'dfe-flex-grow--1': !widthLimited,
       })}
     >
       <label

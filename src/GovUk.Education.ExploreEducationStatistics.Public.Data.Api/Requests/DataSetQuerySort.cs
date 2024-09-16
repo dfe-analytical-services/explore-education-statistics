@@ -21,6 +21,7 @@ public record DataSetQuerySort
     /// - A filter ID (e.g. `characteristic`, `school_type`) to sort by the options in that filter
     /// - An indicator ID (e.g. `sess_authorised`, `enrolments`) to sort by the values in that indicator
     /// </summary>
+    /// <example>timePeriod</example>
     public required string Field { get; init; }
 
     /// <summary>
@@ -29,6 +30,7 @@ public record DataSetQuerySort
     /// - `Asc` - sort by ascending order
     /// - `Desc` - sort by descending order
     /// </summary>
+    /// <example>Asc</example>
     public required string Direction { get; init; }
 
     public SortDirection ParsedDirection() => EnumUtil.GetFromEnumValue<SortDirection>(Direction);

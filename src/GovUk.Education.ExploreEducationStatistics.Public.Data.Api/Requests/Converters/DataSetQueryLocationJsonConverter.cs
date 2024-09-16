@@ -6,14 +6,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests.Converters;
 
-public class DataSetQueryLocationJsonConverter : JsonConverter<DataSetQueryLocation>
+public class DataSetQueryLocationJsonConverter : JsonConverter<IDataSetQueryLocation>
 {
     public override bool CanConvert(Type type)
     {
-        return type.IsAssignableFrom(typeof(DataSetQueryLocation));
+        return type.IsAssignableFrom(typeof(IDataSetQueryLocation));
     }
 
-    public override DataSetQueryLocation? Read(
+    public override IDataSetQueryLocation? Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options)
@@ -30,7 +30,7 @@ public class DataSetQueryLocationJsonConverter : JsonConverter<DataSetQueryLocat
             .Select(p => p.Name.ToUpperFirst())
             .ToHashSet();
 
-        if (!doc.RootElement.TryGetProperty(nameof(DataSetQueryLocation.Level).ToLowerFirst(), out var levelProperty))
+        if (!doc.RootElement.TryGetProperty(nameof(IDataSetQueryLocation.Level).ToLowerFirst(), out var levelProperty))
         {
             throw new JsonException();
         }
@@ -81,7 +81,7 @@ public class DataSetQueryLocationJsonConverter : JsonConverter<DataSetQueryLocat
         }
     }
 
-    public override void Write(Utf8JsonWriter writer, DataSetQueryLocation value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, IDataSetQueryLocation value, JsonSerializerOptions options)
     {
         try
         {

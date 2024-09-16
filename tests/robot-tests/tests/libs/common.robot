@@ -506,6 +506,12 @@ user clicks link
     [Arguments]    ${text}    ${parent}=css:body
     user clicks element    link:${text}    ${parent}
 
+user clicks link by index
+    [Arguments]    ${text}    ${index}=1    ${parent}=css:body
+    ${xpath}=    set variable    (//a[text()='${text}'])[${index}]
+    ${button}=    get webelement    ${xpath}
+    user clicks element   ${button}    ${parent}
+
 user clicks link by visible text
     [Arguments]    ${text}    ${parent}=css:body
     user clicks element    xpath:.//a[text()="${text}"]    ${parent}

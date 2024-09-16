@@ -4,14 +4,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests.Converters;
 
-public class DataSetQueryCriteriaJsonConverter : JsonConverter<DataSetQueryCriteria>
+public class DataSetQueryCriteriaJsonConverter : JsonConverter<IDataSetQueryCriteria>
 {
     public override bool CanConvert(Type type)
     {
-        return type.IsAssignableFrom(typeof(DataSetQueryCriteria));
+        return type.IsAssignableFrom(typeof(IDataSetQueryCriteria));
     }
 
-    public override DataSetQueryCriteria? Read(
+    public override IDataSetQueryCriteria? Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options)
@@ -53,7 +53,7 @@ public class DataSetQueryCriteriaJsonConverter : JsonConverter<DataSetQueryCrite
         }
     }
 
-    public override void Write(Utf8JsonWriter writer, DataSetQueryCriteria value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, IDataSetQueryCriteria value, JsonSerializerOptions options)
     {
         try
         {

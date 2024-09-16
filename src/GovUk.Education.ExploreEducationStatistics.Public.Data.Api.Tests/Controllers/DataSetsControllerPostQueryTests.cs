@@ -752,7 +752,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            DataSetQueryLocation[] invalidLocations =
+            IDataSetQueryLocation[] invalidLocations =
             [
                 new DataSetQueryLocationId { Level = "", Id = "" },
                 new DataSetQueryLocationId { Level = "NAT", Id = " " },
@@ -779,7 +779,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
             var validationProblem = response.AssertValidationProblem();
 
-            Assert.Equal(8, validationProblem.Errors.Count);
+            Assert.Equal(7, validationProblem.Errors.Count);
 
             validationProblem.AssertHasAllowedValueError(
                 expectedPath: "criteria.locations.eq.level",
@@ -788,7 +788,11 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             );
             validationProblem.AssertHasNotEmptyError(expectedPath: "criteria.locations.notEq.id");
             validationProblem.AssertHasNotEmptyError(expectedPath: "criteria.locations.in[0].id");
-            validationProblem.AssertHasNotEmptyError(expectedPath: "criteria.locations.in[0].level");
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: "criteria.locations.in[0].level",
+                value: "",
+                allowed: GeographicLevelUtils.OrderedCodes
+            );
             validationProblem.AssertHasNotEmptyError(expectedPath: "criteria.locations.in[1].id");
             validationProblem.AssertHasMaximumLengthError(expectedPath: "criteria.locations.in[2].id", maxLength: 10);
             validationProblem.AssertHasNotEmptyError("criteria.locations.notIn");
@@ -801,7 +805,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            DataSetQueryLocation[] notFoundLocations =
+            IDataSetQueryLocation[] notFoundLocations =
             [
                 new DataSetQueryLocationId { Level = "NAT", Id = "11111111" },
                 new DataSetQueryLocationCode { Level = "NAT", Code = "11111111" },
@@ -1498,7 +1502,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
             // Sheffield and Barnsley
-            DataSetQueryLocation[] locations =
+            IDataSetQueryLocation[] locations =
             [
                 new DataSetQueryLocationLocalAuthorityCode { Code = "E08000019" },
                 new DataSetQueryLocationId { Level = "LA", Id = "O7CLF" }
@@ -1547,7 +1551,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
             // Sheffield and Barnsley
             // THe Kingston Academy and King Athelstan Primary School
-            DataSetQueryLocation[] locations =
+            IDataSetQueryLocation[] locations =
             [
                 new DataSetQueryLocationLocalAuthorityCode { Code = "E08000019" },
                 new DataSetQueryLocationId { Level = "LA", Id = "O7CLF" },
@@ -2209,7 +2213,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             }
         };
 
-        public static readonly TheoryData<DataSetQueryCriteria> EquivalentCriteria = new()
+        public static readonly TheoryData<IDataSetQueryCriteria> EquivalentCriteria = new()
         {
             new DataSetQueryCriteriaAnd
             {
@@ -2368,7 +2372,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
         [Theory]
         [MemberData(nameof(EquivalentCriteria))]
-        public async Task EquivalentCriteria_Returns200(DataSetQueryCriteria criteria)
+        public async Task EquivalentCriteria_Returns200(IDataSetQueryCriteria criteria)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -2460,7 +2464,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             }
         };
 
-        public static readonly TheoryData<DataSetQueryCriteria> EquivalentCriteria = new()
+        public static readonly TheoryData<IDataSetQueryCriteria> EquivalentCriteria = new()
         {
             new DataSetQueryCriteriaOr
             {
@@ -2624,7 +2628,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
         [Theory]
         [MemberData(nameof(EquivalentCriteria))]
-        public async Task EquivalentCriteria_Returns200(DataSetQueryCriteria criteria)
+        public async Task EquivalentCriteria_Returns200(IDataSetQueryCriteria criteria)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -2726,7 +2730,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             }
         };
 
-        public static readonly TheoryData<DataSetQueryCriteria> EquivalentCriteria = new()
+        public static readonly TheoryData<IDataSetQueryCriteria> EquivalentCriteria = new()
         {
             new DataSetQueryCriteriaNot
             {
@@ -2828,7 +2832,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
         [Theory]
         [MemberData(nameof(EquivalentCriteria))]
-        public async Task EquivalentCriteria_Returns200(DataSetQueryCriteria criteria)
+        public async Task EquivalentCriteria_Returns200(IDataSetQueryCriteria criteria)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 

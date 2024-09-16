@@ -1,5 +1,7 @@
 using Asp.Versioning.ApiExplorer;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -25,11 +27,11 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
             .GetFiles(AppContext.BaseDirectory,"*.xml", SearchOption.TopDirectoryOnly)
             .ForEach(xmlFile => options.IncludeXmlComments(xmlFile));
 
+        options.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true);
         options.DescribeAllParametersInCamelCase();
-        options.UseOneOfForPolymorphism();
-        options.UseAllOfForInheritance();
         options.UseAllOfToExtendReferenceSchemas();
         options.SupportNonNullableReferenceTypes();
+
         options.CustomOperationIds(apiDesc =>
             {
                 var actionDescriptor = apiDesc.ActionDescriptor;
@@ -42,6 +44,8 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
                        ?? (apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null);
             }
         );
+
+        options.CustomSchemaIds(SchemaIdSelector);
 
         foreach (var description in provider.ApiVersionDescriptions)
         {
@@ -60,5 +64,20 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
                 }
             );
         }
+    }
+
+    private static string SchemaIdSelector(Type type)
+    {
+        if (type == typeof(TimeIdentifier))
+        {
+            return "TimePeriodCode";
+        }
+
+        if (type == typeof(GeographicLevel))
+        {
+            return "GeographicLevelCode";
+        }
+
+        return type.Name;
     }
 }
