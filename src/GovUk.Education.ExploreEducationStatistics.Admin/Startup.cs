@@ -561,8 +561,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     provider.GetRequiredService<ILogger<IBlobStorageService>>()));
             services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(_ =>
                 new PublisherTableStorageService(publisherStorageConnectionString));
-            services.AddTransient<IPublisherTableStorageServiceOld, PublisherTableStorageServiceOld>(_ =>
-                new PublisherTableStorageServiceOld(publisherStorageConnectionString));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);

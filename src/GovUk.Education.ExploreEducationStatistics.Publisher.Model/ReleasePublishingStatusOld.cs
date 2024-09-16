@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json;
 
@@ -90,26 +89,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             }
         }
 
-        public IEnumerable<ReleasePublishingStatusLogMessage> LogMessages => Messages == null
-            ? new List<ReleasePublishingStatusLogMessage>()
-            : JsonConvert.DeserializeObject<IEnumerable<ReleasePublishingStatusLogMessage>>(Messages);
-
-        public void AppendLogMessage(ReleasePublishingStatusLogMessage logMessage)
-        {
-            if (logMessage != null)
-            {
-                Messages = JsonConvert.SerializeObject(LogMessages.Append(logMessage));
-            }
-        }
-
-        public void AppendLogMessages(IEnumerable<ReleasePublishingStatusLogMessage> logMessages)
-        {
-            if (logMessages != null)
-            {
-                Messages = JsonConvert.SerializeObject(LogMessages.Concat(logMessages));
-            }
-        }
-
         private void StateChangedCallback(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -126,12 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             }
 
             OverallStage = _state.Overall.ToString();
-        }
-
-        public bool AllStagesPriorToPublishingComplete()
-        {
-            return State.Content == ReleasePublishingStatusContentStage.Complete &&
-                   State.Files == ReleasePublishingStatusFilesStage.Complete;
         }
 
         public ReleasePublishingKeyOld AsTableRowKey()

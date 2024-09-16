@@ -134,7 +134,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToList();
         }
 
-
         public async Task<List<ReleasePublishingStatus>> GetAllByOverallStage(
             Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages)
