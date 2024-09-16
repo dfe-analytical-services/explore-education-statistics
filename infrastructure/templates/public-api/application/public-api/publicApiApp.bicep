@@ -31,6 +31,7 @@ var dataFilesFileShareMountPath = '/data/public-api-data'
 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
   name: resourceNames.existingResources.acr
+  scope: resourceGroup(resourceNames.existingResources.acrResourceGroup)
 }
 
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
@@ -45,18 +46,8 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
 var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
 
-resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: resourceNames.publicApi.apiAppIdentity
-  location: location
-}
-
-module apiContainerAppAcrPullRoleAssignmentModule '../../components/containerRegistryRoleAssignment.bicep' = {
-  name: '${resourceNames.publicApi.apiAppIdentity}AcrPullRoleAssignmentDeploy'
-  params: {
-    role: 'AcrPull'
-    containerRegistryName: resourceNames.existingResources.acr
-    principalIds: [apiContainerAppManagedIdentity.properties.principalId]
-  }
 }
 
 module apiContainerAppModule '../../components/containerApp.bicep' = {
@@ -135,9 +126,6 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     }
     tagValues: tagValues
   }
-  dependsOn: [
-    apiContainerAppAcrPullRoleAssignmentModule
-  ]
 }
 
 output containerAppFqdn string = apiContainerAppModule.outputs.containerAppFqdn

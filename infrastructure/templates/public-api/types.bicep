@@ -7,6 +7,7 @@ type resourceNamesType = {
     vNet: string
     alertsGroup: string
     acr: string
+    acrResourceGroup: string
     coreStorageAccount: string
     subnets: {
       dataProcessor: string

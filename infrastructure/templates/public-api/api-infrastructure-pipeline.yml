@@ -4,9 +4,6 @@ parameters:
   - name: deployContainerApp
     displayName: Can we deploy the Container App yet? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.
     default: true
-  - name: updatePsqlFlexibleServer
-    displayName: Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.
-    default: false
 
 resources:
   pipelines:
@@ -46,8 +43,6 @@ variables:
     value: $(resources.pipeline.EESBuildPipeline.runName)
   - name: deployContainerApp
     value: ${{parameters.deployContainerApp}}
-  - name: updatePsqlFlexibleServer
-    value: ${{parameters.updatePsqlFlexibleServer}}
 
 pool:
   vmImage: $(vmImageName)

@@ -28,6 +28,9 @@ param firewallRules firewallRuleType[] = []
 @description('Specifies the subnet id that the PostgreSQL private endpoint will be attached to.')
 param privateEndpointSubnetId string
 
+@description('An array of Entra ID admin principal names for this resource')
+param entraIdAdminPrincipalNames string[] = []
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -44,6 +47,7 @@ module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
     createMode: 'Default'
     adminName: adminName
     adminPassword: adminPassword
+    entraIdAdminPrincipalNames: entraIdAdminPrincipalNames
     dbSkuName: sku
     dbStorageSizeGB: storageSizeGB
     dbAutoGrowStatus: autoGrowStatus
