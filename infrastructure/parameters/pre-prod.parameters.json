@@ -38,12 +38,6 @@
     "autoscalePublicApplication": {
       "value": false
     },
-    "devopsSPN": {
-      "value": "2d5a7bf2-a6b1-4474-b202-ab17dd87c375",
-      "metadata": {
-        "comments": "ObjectId for s101prep-datahub-spn-ees-dfe-gov-uk"
-      }
-    },
     "domain": {
       "value": "pre-production.explore-education-statistics.service.gov.uk"
     },
