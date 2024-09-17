@@ -109,7 +109,7 @@ public class PublicationSubscriptionFunctions(
                             RowKey = req.Email,
                             Slug = req.Slug,
                             Title = req.Title,
-                            DateTimeCreated = expiryDateTime, // Take note! DateTimeCreated name for pending subs is misleading
+                            DateTimeCreated = expiryDateTime, // DateTimeCreated for pending subs is a misleading name!
                         },
                         cancellationToken);
 
@@ -141,7 +141,7 @@ public class PublicationSubscriptionFunctions(
         {
             logger.LogError(e, "Caught exception sending email");
 
-            // If fail to send email, remove from pending subscription table // @MarkFix old comment here said "add it" like we were adding the subscription but we're not?
+            // If we fail to send email, clean up entity in pending subs table that we just created
             if (subscription.Status is not SubscriptionStatus.SubscriptionPending)
             {
                 await notifierTableStorageService.DeleteEntity(

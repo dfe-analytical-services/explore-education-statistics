@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public string PublicationSlug { get; set; }
         public DateTime? Publish { get; set; }
         public string ReleaseSlug { get; set; }
-        public string ContentStage { get; set; } // @MarkFix change type of stages? I think so if it works
+        public string ContentStage { get; set; }
         public string FilesStage { get; set; }
         public string PublishingStage { get; set; }
         public ReleasePublishingStatusOverallStage OverallStage { get; set; }

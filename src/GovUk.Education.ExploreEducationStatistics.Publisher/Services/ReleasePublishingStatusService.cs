@@ -60,28 +60,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task<ReleasePublishingStatus> Get(ReleasePublishingKey releasePublishingKey)
         {
-            var select = new List<string>
-            {
-                nameof(ReleasePublishingStatus.Created),
-                nameof(ReleasePublishingStatus.PublicationSlug),
-                nameof(ReleasePublishingStatus.Publish),
-                nameof(ReleasePublishingStatus.ReleaseSlug),
-                nameof(ReleasePublishingStatus.ContentStage),
-                nameof(ReleasePublishingStatus.FilesStage),
-                nameof(ReleasePublishingStatus.PublishingStage),
-                nameof(ReleasePublishingStatus.OverallStage),
-                nameof(ReleasePublishingStatus.Immediate),
-                nameof(ReleasePublishingStatus.Messages)
-            };
             var result = await _publisherTableStorageService.GetEntityIfExists<ReleasePublishingStatus>(
                 tableName: PublisherReleaseStatusTableName,
                 partitionKey: releasePublishingKey.ReleaseVersionId.ToString(),
-                rowKey: releasePublishingKey.ReleaseStatusId.ToString(),
-                select: select);
+                rowKey: releasePublishingKey.ReleaseStatusId.ToString());
 
             if (result == null)
             {
-                throw new Exception("Failed to fetch entity from PublisherReleaseStatusTable"); // @MarkFix
+                throw new Exception($"""
+                                    Failed to fetch entity from PublisherReleaseStatusTable.
+                                    ReleaseVersionId/PartitionKey: {releasePublishingKey.ReleaseVersionId}
+                                    ReleaseStatusId/RowKey: {releasePublishingKey.ReleaseStatusId}
+                                    """);
             }
 
             return result;
@@ -236,8 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction,
             int numRetries = 5)
         {
-            var releasePublishingStatus = await Get(releasePublishingKey)
-                                          ?? throw new Exception("Unable to retrieve release publishing status");
+            var releasePublishingStatus = await Get(releasePublishingKey);
 
             var updatedStatus = updateFunction.Invoke(releasePublishingStatus);
 
@@ -250,9 +239,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
             catch (TableTransactionFailedException e) // @MarkFix test retry logic to this if that actually works - I've randomly chosen an exception here
             {
-                // @MarkFix write a comment explaining why this code is necessary
                 if (e.Status == (int)HttpStatusCode.PreconditionFailed)
                 {
+                    // If the ETag of the status we fetched doesn't match the one found in the table,
+                    // something else has updated the entity, so we should refetch the entity and try the update again.
                     _logger.LogDebug("Precondition failure as expected. ETag does not match");
                     if (numRetries > 0)
                     {
