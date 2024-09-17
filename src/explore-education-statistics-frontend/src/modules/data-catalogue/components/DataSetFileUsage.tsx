@@ -24,7 +24,7 @@ export default function DataSetFileUsage({
   tableToolLink,
   onDownload,
 }: Props) {
-  const downloadLink = `${process.env.CONTENT_API_BASE_URL}/data-set-files/${dataSetFileId}/download`;
+  const downloadLink = `${process.env.PUBLIC_URL}data-catalogue/data-set/${dataSetFileId}/csv`;
 
   return (
     <DataSetFilePageSection
