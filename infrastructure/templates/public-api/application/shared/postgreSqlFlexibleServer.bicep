@@ -1,4 +1,4 @@
-import { resourceNamesType, firewallRuleType } from '../../types.bicep'
+import { resourceNamesType, firewallRuleType, principalNameAndIdType } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames resourceNamesType
@@ -29,7 +29,7 @@ param firewallRules firewallRuleType[] = []
 param privateEndpointSubnetId string
 
 @description('An array of Entra ID admin principal names for this resource')
-param entraIdAdminPrincipalNames string[] = []
+param entraIdAdminPrincipals principalNameAndIdType[] = []
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -47,7 +47,7 @@ module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
     createMode: 'Default'
     adminName: adminName
     adminPassword: adminPassword
-    entraIdAdminPrincipalNames: entraIdAdminPrincipalNames
+    entraIdAdminPrincipals: entraIdAdminPrincipals
     dbSkuName: sku
     dbStorageSizeGB: storageSizeGB
     dbAutoGrowStatus: autoGrowStatus

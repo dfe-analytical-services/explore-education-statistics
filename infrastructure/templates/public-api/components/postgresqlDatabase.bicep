@@ -1,4 +1,4 @@
-import { firewallRuleType } from '../types.bicep'
+import { firewallRuleType, principalNameAndIdType } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -43,7 +43,7 @@ param databaseNames string[]
 param firewallRules firewallRuleType[] = []
 
 @description('An array of Entra ID admin principal names for this resource')
-param entraIdAdminPrincipalNames string[] = []
+param entraIdAdminPrincipals principalNameAndIdType[] = []
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -123,12 +123,12 @@ module privateEndpointModule 'privateEndpoint.bicep' = {
 }
 
 @batchSize(1)
-resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/administrators@2022-12-01' = [for adminPrincipalName in entraIdAdminPrincipalNames: {
-  name: guid(postgreSQLDatabase.id, adminPrincipalName)
+resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/administrators@2022-12-01' = [for adminPrincipal in entraIdAdminPrincipals: {
+  name: adminPrincipal.objectId
   parent: postgreSQLDatabase
   properties: {
     tenantId: tenant().tenantId
-    principalName: adminPrincipalName
+    principalName: adminPrincipal.principalName
     principalType: 'USER'
   }
   dependsOn: [
