@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -16,6 +12,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
@@ -56,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(
                     async _ =>
                     {
-                        if (_context.Themes.Any(theme => theme.Slug == created.Slug))
+                        if (await _context.Themes.AnyAsync(theme => theme.Slug == created.Slug))
                         {
                             return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
                         }
@@ -80,15 +81,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, ThemeViewModel>> UpdateTheme(
-            Guid themeId,
+            Guid id,
             ThemeSaveViewModel updated)
         {
-            return await _persistenceHelper.CheckEntityExists<Theme>(themeId)
+            return await _persistenceHelper.CheckEntityExists<Theme>(id)
                 .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
                 .OnSuccess(
                     async theme =>
                     {
-                        if (_context.Themes.Any(t => t.Slug == updated.Slug && t.Id != themeId))
+                        if (await _context.Themes.AnyAsync(t => t.Slug == updated.Slug && t.Id != id))
                         {
                             return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
                         }
@@ -157,6 +158,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _publishingService.TaxonomyChanged();
                 });
+        }
+
+        public async Task<Either<ActionResult, Unit>> DeleteUITestThemes(CancellationToken cancellationToken = default)
+        {
+            return !_themeDeletionAllowed
+                ? (Either<ActionResult, Unit>)new ForbidResult()
+                : await _userService.CheckCanManageAllTaxonomy()
+                    .OnSuccess(_ => _context.Themes
+                        .Where(theme => theme.Title.Contains("UI test"))
+                        .Include(theme => theme.Topics))
+                    .OnSuccessVoid(async themes =>
+                    {
+                        foreach (var theme in themes)
+                        {
+                            var topicIds = theme.Topics.Select(topic => topic.Id).ToList();
+                            await topicIds.ToAsyncEnumerable().ForEachAwaitAsync(_topicService.DeleteTopic, cancellationToken);
+
+                            _context.Themes.Remove(theme);
+                        }
+
+                        await _context.SaveChangesAsync(cancellationToken);
+                        await _publishingService.TaxonomyChanged(cancellationToken);
+                    });
         }
 
         private async Task<Either<ActionResult, Unit>> CheckCanDeleteTheme(Theme theme)

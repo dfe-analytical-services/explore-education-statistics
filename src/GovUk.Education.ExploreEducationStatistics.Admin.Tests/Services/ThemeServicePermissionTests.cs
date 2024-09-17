@@ -1,16 +1,17 @@
-using System;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using System;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -19,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ThemeServicePermissionTests
     {
-        private readonly Theme _theme = new Theme
+        private readonly Theme _theme = new()
         {
             Id = Guid.NewGuid()
         };
@@ -224,14 +225,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
-        private static Mock<IConfiguration> DefaultConfigurationMock()
+        [Fact]
+        public async Task DeleteUITestThemes()
         {
-            var mock = new Mock<IConfiguration>(MockBehavior.Strict);
-            mock
-                .Setup(x => x.GetSection(It.IsAny<String>()))
-                .Returns(new Mock<IConfigurationSection>().Object);
-            return mock;
+            await PolicyCheckBuilder()
+                .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        var service = SetupThemeService(userService: userService.Object);
+
+                        return await service.DeleteUITestThemes();
+                    }
+                );
         }
+
+        private static Mock<IConfiguration> DefaultConfigurationMock()
+            => CreateMockConfiguration(CollectionUtils.TupleOf("enableThemeDeletion", "true"));
 
         private ThemeService SetupThemeService(
             ContentDbContext context = null,

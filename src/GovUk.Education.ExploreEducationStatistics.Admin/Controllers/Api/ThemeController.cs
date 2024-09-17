@@ -1,32 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    // TODO rename to Themes once the current Crud theme controller is removed
     [Route("api")]
     [Authorize]
     [ApiController]
-    public class ThemeController : ControllerBase
+    public class ThemeController(IThemeService themeService) : ControllerBase
     {
-        private readonly IThemeService _themeService;
-
-        public ThemeController(IThemeService themeService)
-        {
-            _themeService = themeService;
-        }
-
         [HttpPost("themes")]
         public async Task<ActionResult<ThemeViewModel>> CreateTheme(ThemeSaveViewModel theme)
         {
-            return await _themeService
+            return await themeService
                 .CreateTheme(theme)
                 .HandleFailuresOrOk();
         }
@@ -36,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] Guid themeId,
             ThemeSaveViewModel theme)
         {
-            return await _themeService
+            return await themeService
                 .UpdateTheme(themeId, theme)
                 .HandleFailuresOrOk();
         }
@@ -45,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("themes/{themeId:guid}")]
         public async Task<ActionResult<ThemeViewModel>> GetTheme([Required] Guid themeId)
         {
-            return await _themeService
+            return await themeService
                 .GetTheme(themeId)
                 .HandleFailuresOrOk();
         }
@@ -53,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("themes")]
         public async Task<ActionResult<List<ThemeViewModel>>> GetThemes()
         {
-            return await _themeService
+            return await themeService
                 .GetThemes()
                 .HandleFailuresOrOk();
         }
@@ -61,8 +54,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpDelete("themes/{themeId:guid}")]
         public async Task<ActionResult> DeleteTheme([Required] Guid themeId)
         {
-            return await _themeService
+            return await themeService
                 .DeleteTheme(themeId)
+                .HandleFailuresOrNoContent();
+        }
+
+        [HttpDelete("themes")]
+        public async Task<ActionResult> DeleteUITestThemes(CancellationToken cancellationToken)
+        {
+            return await themeService
+                .DeleteUITestThemes(cancellationToken)
                 .HandleFailuresOrNoContent();
         }
     }

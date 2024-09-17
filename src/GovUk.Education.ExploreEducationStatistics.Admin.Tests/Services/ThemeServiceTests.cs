@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -13,10 +9,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.EntityFrameworkCore;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -180,8 +180,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Test theme",
                 Slug = "test-theme",
                 Summary = "Test summary",
-                Topics = new List<Topic>
-                {
+                Topics =
+                [
                     new()
                     {
                         Title = "Test topic 1",
@@ -192,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Title = "Test topic 2",
                         Slug = "test-topic-2",
                     }
-                }
+                ]
             };
 
             // This topic should not be included with
@@ -223,11 +223,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test theme", viewModel.Title);
                 Assert.Equal("test-theme", viewModel.Slug);
                 Assert.Equal("Test summary", viewModel.Summary);
-                
+
                 Assert.Equal(2, theme.Topics.Count);
                 Assert.Equal("Test topic 1", theme.Topics[0].Title);
                 Assert.Equal("test-topic-1", theme.Topics[0].Slug);
-                
+
                 Assert.Equal("Test topic 2", theme.Topics[1].Title);
                 Assert.Equal("test-topic-2", theme.Topics[1].Slug);
             }
@@ -242,24 +242,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Theme A",
                 Summary = "Test summary",
-                Topics = new List<Topic>
-                {
-                    new Topic
-                    {
+                Topics =
+                [
+                    new() {
                         Slug = "topic-b",
                         Title = "Topic B"
                     },
-                    new Topic
-                    {
+                    new() {
                         Slug = "topic-c",
                         Title = "Topic C"
                     },
-                    new Topic
-                    {
+                    new() {
                         Slug = "topic-a",
                         Title = "Topic A"
                     },
-                }
+                ]
             };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -302,16 +299,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var theme = new Theme
             {
                 Title = "UI test theme",
-                Topics = AsList(new Topic
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "UI test topic 1"
-                },
-                new Topic
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "UI test topic 2"
-                })
+                Topics =
+                [
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "UI test topic 1"
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "UI test topic 2"
+                    }
+                ]
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -321,8 +321,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.Add(theme);
                 await context.SaveChangesAsync();
 
-                Assert.Equal(1, context.Themes.Count());
-                Assert.Equal(2, context.Topics.Count());
+                Assert.Equal(1, await context.Themes.CountAsync());
+                Assert.Equal(2, await context.Topics.CountAsync());
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -342,7 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(topicService);
 
                 result.AssertRight();
-                Assert.Equal(0, context.Themes.Count());
+                Assert.Equal(0, await context.Themes.CountAsync());
             }
         }
 
@@ -352,14 +352,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var theme = new Theme
             {
                 Title = "Non-conforming title",
-                Topics = AsList(new Topic
-                {
-                    Title = "UI test topic 1"
-                },
-                new Topic
-                {
-                    Title = "UI test topic 2"
-                })
+                Topics =
+                [
+                    new() { Title = "UI test topic 1" },
+                    new() { Title = "UI test topic 2" }
+                ]
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -379,7 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(topicService);
                 result.AssertForbidden();
 
-                Assert.Equal(1, context.Themes.Count());
+                Assert.Equal(1, await context.Themes.CountAsync());
             }
         }
 
@@ -389,14 +386,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var theme = new Theme
             {
                 Title = "UI test theme",
-                Topics = AsList(new Topic
-                {
-                    Title = "UI test topic 1"
-                },
-                new Topic
-                {
-                    Title = "UI test topic 2"
-                })
+                Topics =
+                [
+                    new() { Title = "UI test topic 1" },
+                    new() { Title = "UI test topic 2" }
+                ]
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -420,7 +414,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(topicService);
                 result.AssertForbidden();
 
-                Assert.Equal(1, context.Themes.Count());
+                Assert.Equal(1, await context.Themes.CountAsync());
             }
         }
 
@@ -430,31 +424,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var theme = new Theme
             {
                 Title = "UI test theme",
-                Topics = AsList(new Topic
+                Topics =
+                [
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Title = "UI test topic 1"
                     },
-                    new Topic
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Title = "UI test topic 2"
-                    })
+                    }
+                ]
             };
 
             var otherTheme = new Theme
             {
                 Title = "UI test theme",
-                Topics = AsList(new Topic
+                Topics =
+                [
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Title = "UI test topic 1"
                     },
-                    new Topic
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Title = "UI test topic 2"
-                    })
+                    }
+                ]
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -464,8 +464,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.AddRangeAsync(theme, otherTheme);
                 await context.SaveChangesAsync();
 
-                Assert.Equal(2, context.Themes.Count());
-                Assert.Equal(4, context.Topics.Count());
+                Assert.Equal(2, await context.Themes.CountAsync());
+                Assert.Equal(4, await context.Topics.CountAsync());
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -485,7 +485,109 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(topicService);
 
                 result.AssertRight();
-                Assert.Equal(otherTheme.Id, context.Themes.AsQueryable().Select(t => t.Id).Single());
+                Assert.Equal(otherTheme.Id, await context.Themes.AsQueryable().Select(t => t.Id).SingleAsync());
+            }
+        }
+
+        [Fact]
+        public async Task DeleteUITestThemes()
+        {
+            // Arrange
+            var uiTestTheme1Id = Guid.NewGuid();
+            var standardTitleThemeId = Guid.NewGuid();
+
+            var uiTestThemeTopic = new Topic
+            {
+                ThemeId = uiTestTheme1Id,
+                Title = "UI test theme topic",
+            };
+
+            var standardTitleThemeTopic = new Topic
+            {
+                ThemeId = standardTitleThemeId,
+                Title = "Standard title theme topic",
+            };
+
+            var uiTestTheme = new Theme
+            {
+                Id = uiTestTheme1Id,
+                Title = "UI test theme",
+                Topics = [uiTestThemeTopic]
+            };
+
+            var standardTitleTheme = new Theme
+            {
+                Id = standardTitleThemeId,
+                Title = "Standard title",
+                Topics = [standardTitleThemeTopic]
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(uiTestTheme, standardTitleTheme);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var topicService = new Mock<ITopicService>(Strict);
+
+                topicService
+                    .Setup(s => s.DeleteTopic(uiTestTheme.Topics[0].Id))
+                    .ReturnsAsync(Unit.Instance);
+
+                var service = SetupThemeService(context, topicService: topicService.Object);
+
+                // Act
+                await service.DeleteUITestThemes();
+
+                // Assert
+                var themesResult = await context.Themes.ToListAsync();
+                var topicsResult = await context.Topics.ToListAsync();
+
+                Assert.Single(themesResult);
+                Assert.Single(topicsResult);
+                Assert.DoesNotContain(themesResult, theme => theme.Title is "UI test theme");
+            }
+        }
+
+        [Fact]
+        public async Task DeleteUITestThemes_DisallowedByConfiguration()
+        {
+            var theme = new Theme
+            {
+                Title = "UI test theme",
+                Topics =
+                [
+                    new() { Title = "UI test topic 1" },
+                    new() { Title = "UI test topic 2" }
+                ]
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(theme);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var topicService = new Mock<ITopicService>(Strict);
+
+                var service = SetupThemeService(
+                    context,
+                    topicService: topicService.Object,
+                    enableThemeDeletion: false);
+
+                var result = await service.DeleteUITestThemes();
+                VerifyAllMocks(topicService);
+                result.AssertForbidden();
+
+                Assert.Equal(1, await context.Themes.CountAsync());
             }
         }
 
