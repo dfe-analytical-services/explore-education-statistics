@@ -1,4 +1,5 @@
 ﻿using Azure.Data.Tables;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -17,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 var contentFilterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
                     status.ContentStage == content.ToString());
 
-                filter = $"({filter}) and ({contentFilterCondition})"; // @MarkFix put this in a util method
+                filter = DataTableStorageUtils.CombineQueryFiltersAnd(filter, contentFilterCondition);
             }
 
             if (files.HasValue)
@@ -25,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 var filesFilterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
                     status.FilesStage == files.ToString());
 
-                filter = $"({filter}) and ({filesFilterCondition})";
+                filter = DataTableStorageUtils.CombineQueryFiltersAnd(filter, filesFilterCondition);
             }
 
             if (publishing.HasValue)
@@ -33,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 var publishingFilterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
                     status.PublishingStage == publishing.ToString());
 
-                filter = $"({filter}) and ({publishingFilterCondition})";
+                filter = DataTableStorageUtils.CombineQueryFiltersAnd(filter, publishingFilterCondition);
             }
 
             if (overall.HasValue)
@@ -41,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 var overallFilterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
                     status.OverallStage == overall);
 
-                filter = $"({filter}) and ({overallFilterCondition})";
+                filter = DataTableStorageUtils.CombineQueryFiltersAnd(filter, overallFilterCondition);
             }
 
             return filter;

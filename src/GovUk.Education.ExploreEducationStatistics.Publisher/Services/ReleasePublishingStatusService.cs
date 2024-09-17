@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -150,12 +151,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
                 stageFilter = stageFilter == ""
                     ? stageFilterCondition
-                    : $"({stageFilter}) or ({stageFilterCondition})";
+                    : DataTableStorageUtils.CombineQueryFiltersOr(stageFilter, stageFilterCondition);
             }
 
             filter = stageFilter == ""
                 ? filter
-                : $"({filter}) and ({stageFilter})";
+                : DataTableStorageUtils.CombineQueryFiltersAnd(filter, stageFilter);
 
             var results = await _publisherTableStorageService
                 .QueryEntities<ReleasePublishingStatus>(
