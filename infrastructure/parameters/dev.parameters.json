@@ -47,12 +47,6 @@
     "blobDeleteRetentionDays": {
       "value": 3
     },
-    "devopsSPN": {
-      "value": "e541f669-7fac-4d33-b480-29b523b9d968",
-      "metadata": {
-        "comments": "ObjectId for s101d-datahub-spn-ees-dfe-gov-uk"
-      }
-    },
     "domain": {
       "value": "dev.explore-education-statistics.service.gov.uk"
     },
