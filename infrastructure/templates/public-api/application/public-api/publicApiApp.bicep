@@ -21,18 +21,10 @@ param contentApiUrl string
 @description('Specifies the Application (Client) Id of the App Registration used to represent the API Container App.')
 param apiAppRegistrationClientId string
 
-@description('Specifies the connection string template for the Public API PSQL database.')
-param publicApiDbConnectionStringTemplate string
-
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
 var dataFilesFileShareMountPath = '/data/public-api-data'
-
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: resourceNames.existingResources.acr
-  scope: resourceGroup(resourceNames.existingResources.acrResourceGroup)
-}
 
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
   name: resourceNames.existingResources.adminApp
@@ -46,6 +38,10 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
 var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: resourceNames.existingResources.keyVault
+}
+
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: resourceNames.publicApi.apiAppIdentity
 }
@@ -55,9 +51,11 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
   params: {
     location: location
     containerAppName: resourceNames.publicApi.apiApp
-    acrLoginServer: containerRegistry.properties.loginServer
+    acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
     userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
+    dockerPullManagedIdentityClientId: keyVault.getSecret('DOCKER-REGISTRY-SERVER-USERNAME')
+    dockerPullManagedIdentitySecretValue: keyVault.getSecret('DOCKER-REGISTRY-SERVER-PASSWORD')
     managedEnvironmentId: containerAppEnvironmentId
     corsPolicy: {
       allowedOrigins: [
@@ -82,7 +80,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     appSettings: [
       {
         name: 'ConnectionStrings__PublicDataDb'
-        value: replace(replace(publicApiDbConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', resourceNames.publicApi.apiAppIdentity)
+        value: 'Server=${resourceNames.sharedResources.postgreSqlFlexibleServer}.postgres.database.azure.com;Database=public_data;Port=5432;User Id=${resourceNames.publicApi.apiAppIdentity}'
       }
       {
         // This settings allows the Container App to identify which user-assigned identity it should use in order to

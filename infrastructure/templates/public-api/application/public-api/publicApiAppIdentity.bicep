@@ -15,12 +15,13 @@ resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedI
   tags: tagValues
 }
 
-module apiContainerAppAcrPullRoleAssignmentModule '../../components/containerRegistryRoleAssignment.bicep' = {
-  name: '${resourceNames.publicApi.apiAppIdentity}AcrPullRoleAssignmentDeploy'
-  scope: resourceGroup(resourceNames.existingResources.acrResourceGroup)
-  params: {
-    role: 'AcrPull'
-    containerRegistryName: resourceNames.existingResources.acr
-    principalIds: [apiContainerAppManagedIdentity.properties.principalId]
-  }
-}
+// TODO - commenting out for now, as 
+// module apiContainerAppAcrPullRoleAssignmentModule '../../components/containerRegistryRoleAssignment.bicep' = {
+//   name: '${resourceNames.publicApi.apiAppIdentity}AcrPullRoleAssignmentDeploy'
+//   scope: resourceGroup(resourceNames.existingResources.acrResourceGroup)
+//   params: {
+//     role: 'AcrPull'
+//     containerRegistryName: resourceNames.existingResources.acr
+//     principalIds: [apiContainerAppManagedIdentity.properties.principalId]
+//   }
+// }

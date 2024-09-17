@@ -72,6 +72,12 @@ type appGatewaySiteConfigType = {
 }
 
 @export()
+type principalNameAndIdType = {
+  principalName: string
+  objectId: string
+}
+
+@export()
 type privateDnsZoneType = 'sites' | 'postgres'
 
 @export()

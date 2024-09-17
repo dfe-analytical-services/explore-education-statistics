@@ -1,5 +1,5 @@
 import { abbreviations } from 'abbreviations.bicep'
-import { firewallRuleType } from 'types.bicep'
+import { firewallRuleType, principalNameAndIdType } from 'types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -40,7 +40,7 @@ param postgreSqlAutoGrowStatus string = 'Disabled'
 param postgreSqlFirewallRules firewallRuleType[] = []
 
 @description('Database : Entra ID admin  principal names for this resource')
-param postgreSqlEntraIdAdminPrincipalNames string[] = []
+param postgreSqlEntraIdAdminPrincipals principalNameAndIdType[] = []
 
 @description('ACR : Specifies the resource group in which the shared Container Registry lives.')
 param acrResourceGroupName string = ''
@@ -66,6 +66,11 @@ param dockerImagesTag string = ''
 
 @description('Can we deploy the Container App yet? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.')
 param deployContainerApp bool = true
+
+// TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL
+// will redeploy even if no changes exist in this deploy from the previous one.
+@description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
+param updatePsqlFlexibleServer bool = false
 
 @description('Public URLs of other components in the service.')
 param publicUrls {
@@ -130,8 +135,8 @@ var resourceNames = {
     postgreSqlFlexibleServer: '${commonResourcePrefix}-${abbreviations.dBforPostgreSQLServers}'
   }
   publicApi: {
-    apiApp: '${publicApiResourcePrefix}-${abbreviations.appManagedEnvironments}-api'
-    apiAppIdentity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.appManagedEnvironments}-api'
+    apiApp: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
+    apiAppIdentity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.appContainerApps}-api'
     appInsights: '${publicApiResourcePrefix}-${abbreviations.insightsComponents}'
     dataProcessor: '${publicApiResourcePrefix}-${abbreviations.webSitesFunctions}-processor'
     dataProcessorIdentity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.webSitesFunctions}-processor'
@@ -193,14 +198,14 @@ module logAnalyticsWorkspaceModule 'application/shared/logAnalyticsWorkspace.bic
   }
 }
 
-module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep' = {
+module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep' = if (updatePsqlFlexibleServer) {
   name: 'postgreSqlFlexibleServerApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
     adminName: postgreSqlAdminName
     adminPassword: postgreSqlAdminPassword!
-    entraIdAdminPrincipalNames: postgreSqlEntraIdAdminPrincipalNames
+    entraIdAdminPrincipals: postgreSqlEntraIdAdminPrincipals
     privateEndpointSubnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
     autoGrowStatus: postgreSqlAutoGrowStatus
     firewallRules: postgreSqlFirewallRules
@@ -247,7 +252,6 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     contentApiUrl: publicUrls.contentApi
     publicApiUrl: publicUrls.publicApi
     dockerImagesTag: dockerImagesTag
-    publicApiDbConnectionStringTemplate: postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
     tagValues: tagValues
   }
   dependsOn: [
