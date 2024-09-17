@@ -137,7 +137,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
-    public class CreateChangesTestsFilterTests(
+    public class CreateChangesFilterTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateChangesTests(fixture)
     {
@@ -153,7 +153,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             // filter CHANGED, options UNCHANGED. ===> Should just have 1 change for the CHANGED filter.
             // filter CHANGED + SOME options CHANGED. ===> Should have 1 change for the CHANGED filter, and 1 change for EACH of the CHANGED options.
 
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage());
 
@@ -618,7 +618,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .DefaultFilterOptionMetaLink()
                 .WithOption(DataFixture.DefaultFilterOptionMeta())
                 .WithMetaId(metaId)
-                .WithPublicId(originalFilterMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+                .WithPublicId(originalFilterMeta.OptionLinks[optionChange.OptionIndex].PublicId);
         }
 
         private FilterOptionMetaLink CreateUnchangedFilterOptionLink(
@@ -629,8 +629,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             return DataFixture
                 .DefaultFilterOptionMetaLink()
                 .WithMetaId(metaId)
-                .WithOptionId(originalFilterMeta!.OptionLinks[optionChange.OptionIndex].OptionId)
-                .WithPublicId(originalFilterMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+                .WithOptionId(originalFilterMeta.OptionLinks[optionChange.OptionIndex].OptionId)
+                .WithPublicId(originalFilterMeta.OptionLinks[optionChange.OptionIndex].PublicId);
         }
 
         private async Task CreateMappings(
@@ -690,7 +690,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
-    public class CreateChangesTestsLocationTests(
+    public class CreateChangesLocationTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateChangesTests(fixture)
     {
@@ -704,7 +704,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             // location UNCHANGED, with some DELETED options and some ADDED options. ===> Should have 1 change for EACH of the DELETED options and EACH of the ADDED options.
             // location UNCHANGED, SOME options CHANGED. ===> Should have 1 change for EACH of the CHANGED options.
 
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage());
 
@@ -1098,25 +1098,25 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         .DefaultLocationOptionMetaLink()
                         .WithOption(DataFixture.DefaultLocationSchoolOptionMeta())
                         .WithMetaId(metaId)
-                        .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+                        .WithPublicId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].PublicId);
                 case GeographicLevel.RscRegion:
                     return DataFixture
                         .DefaultLocationOptionMetaLink()
                         .WithOption(DataFixture.DefaultLocationRscRegionOptionMeta())
                         .WithMetaId(metaId)
-                        .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+                        .WithPublicId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].PublicId);
                 case GeographicLevel.Provider:
                     return DataFixture
                         .DefaultLocationOptionMetaLink()
                         .WithOption(DataFixture.DefaultLocationProviderOptionMeta())
                         .WithMetaId(metaId)
-                        .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+                        .WithPublicId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].PublicId);
                 default:
                     return DataFixture
                         .DefaultLocationOptionMetaLink()
                         .WithOption(DataFixture.DefaultLocationCodedOptionMeta())
                         .WithMetaId(metaId)
-                        .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+                        .WithPublicId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].PublicId);
             }
         }
 
@@ -1128,8 +1128,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             return DataFixture
                 .DefaultLocationOptionMetaLink()
                 .WithMetaId(metaId)
-                .WithOptionId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].OptionId)
-                .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
+                .WithOptionId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].OptionId)
+                .WithPublicId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].PublicId);
         }
 
         private async Task CreateMappings(
@@ -1181,20 +1181,34 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
-    public class CreateChangesTestsGeographicLevelTests(
+    public class CreateChangesGeographicLevelTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateChangesTests(fixture)
     {
         [Fact]
         public async Task GeographicLevelsAddedAndDeleted_ChangeExists()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
-                    .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
-                    .WithLevels([GeographicLevel.LocalAuthority, GeographicLevel.LocalAuthorityDistrict, GeographicLevel.School]));
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                        .WithLevels([
+                            GeographicLevel.Country,
+                            GeographicLevel.Region,
+                            GeographicLevel.LocalAuthority
+                        ])
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                        .WithLevels([
+                            GeographicLevel.LocalAuthority,
+                            GeographicLevel.LocalAuthorityDistrict,
+                            GeographicLevel.School
+                        ])
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1216,13 +1230,27 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task GeographicLevelsUnchanged_ChangeIsNull()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
-                    .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
-                    .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]));
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                        .WithLevels([
+                            GeographicLevel.Country,
+                            GeographicLevel.Region,
+                            GeographicLevel.LocalAuthority
+                        ])
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                        .WithLevels([
+                            GeographicLevel.Country,
+                            GeographicLevel.Region,
+                            GeographicLevel.LocalAuthority
+                        ])
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1241,13 +1269,25 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task GeographicLevelsAdded_ChangeExists()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
-                    .WithLevels([GeographicLevel.Country]),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
-                    .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]));
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                        .WithLevels([
+                            GeographicLevel.Country
+                        ])
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                        .WithLevels([
+                            GeographicLevel.Country,
+                            GeographicLevel.Region,
+                            GeographicLevel.LocalAuthority
+                        ])
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1267,15 +1307,27 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
 
         [Fact]
-        public async Task GeographicLevelsDeleted_ChangesExists()
+        public async Task GeographicLevelsDeleted_ChangeExists()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
-                    .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta()
-                    .WithLevels([GeographicLevel.Country]));
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                        .WithLevels([
+                            GeographicLevel.Country,
+                            GeographicLevel.Region,
+                            GeographicLevel.LocalAuthority
+                        ])
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                        .WithLevels([
+                            GeographicLevel.Country
+                        ])
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1295,28 +1347,34 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
-    public class CreateChangesTestsIndicatorTests(
+    public class CreateChangesIndicatorTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateChangesTests(fixture)
     {
         [Fact]
         public async Task IndicatorsAddedAndDeleted_ChangesContainAdditionsAndDeletions()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                initialVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
-                    .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                    .ForIndex(1, s => s.SetPublicId("O7CLF"))
-                    .ForIndex(2, s => s.SetPublicId("7zXob"))
-                    .Generate(3),
-                nextVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
-                    .ForIndex(0, s => s.SetPublicId("7zXob"))
-                    .ForIndex(1, s => s.SetPublicId("pTSoj"))
-                    .ForIndex(2, s => s.SetPublicId("IzBzg"))
-                    .Generate(3));
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
+                        .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                        .ForIndex(1, s => s.SetPublicId("O7CLF"))
+                        .ForIndex(2, s => s.SetPublicId("7zXob"))
+                        .Generate(3)
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
+                        .ForIndex(0, s => s.SetPublicId("7zXob"))
+                        .ForIndex(1, s => s.SetPublicId("pTSoj"))
+                        .ForIndex(2, s => s.SetPublicId("IzBzg"))
+                        .Generate(3)
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1356,21 +1414,27 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task IndicatorsUnchanged_ChangesAreEmpty()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                initialVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
-                    .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                    .ForIndex(1, s => s.SetPublicId("O7CLF"))
-                    .ForIndex(2, s => s.SetPublicId("7zXob"))
-                    .Generate(3),
-                nextVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
-                    .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                    .ForIndex(1, s => s.SetPublicId("O7CLF"))
-                    .ForIndex(2, s => s.SetPublicId("7zXob"))
-                    .Generate(3));
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
+                        .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                        .ForIndex(1, s => s.SetPublicId("O7CLF"))
+                        .ForIndex(2, s => s.SetPublicId("7zXob"))
+                        .Generate(3)
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
+                        .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                        .ForIndex(1, s => s.SetPublicId("O7CLF"))
+                        .ForIndex(2, s => s.SetPublicId("7zXob"))
+                        .Generate(3)
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1386,19 +1450,25 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task IndicatorsAdded_ChangesContainOnlyAdditions()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                initialVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
-                    .WithPublicId("dP0Zw")
-                    .Generate(1),
-                nextVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
-                    .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                    .ForIndex(1, s => s.SetPublicId("O7CLF"))
-                    .ForIndex(2, s => s.SetPublicId("7zXob"))
-                    .Generate(3));
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
+                        .WithPublicId("dP0Zw")
+                        .Generate(1)
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
+                        .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                        .ForIndex(1, s => s.SetPublicId("O7CLF"))
+                        .ForIndex(2, s => s.SetPublicId("7zXob"))
+                        .Generate(3)
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1427,19 +1497,25 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task IndicatorsDeleted_ChangesContainOnlyDeletions()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                initialVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
                         .ForIndex(0, s => s.SetPublicId("dP0Zw"))
                         .ForIndex(1, s => s.SetPublicId("O7CLF"))
                         .ForIndex(2, s => s.SetPublicId("7zXob"))
-                        .Generate(3),
-                nextVersionIndicatorMetas: DataFixture.DefaultIndicatorMeta()
-                    .WithPublicId("dP0Zw")
-                    .Generate(1));
+                        .Generate(3)
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
+                        .WithPublicId("dP0Zw")
+                        .Generate(1)
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1466,30 +1542,36 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
     }
 
-    public class CreateChangesTestsTimePeriodTests(
+    public class CreateChangesTimePeriodTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateChangesTests(fixture)
     {
         [Fact]
         public async Task TimePeriodsAddedAndDeleted_ChangesContainAdditionsAndDeletions()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                initialVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
-                    .WithCode(TimeIdentifier.AcademicYear)
-                    .ForIndex(0, s => s.SetPeriod("2020"))
-                    .ForIndex(1, s => s.SetPeriod("2021"))
-                    .ForIndex(2, s => s.SetPeriod("2022"))
-                    .Generate(3),
-                nextVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
-                    .WithCode(TimeIdentifier.AcademicYear)
-                    .ForIndex(0, s => s.SetPeriod("2022"))
-                    .ForIndex(1, s => s.SetPeriod("2023"))
-                    .ForIndex(2, s => s.SetPeriod("2024"))
-                    .Generate(3));
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    TimePeriodMetas = DataFixture.DefaultTimePeriodMeta()
+                        .WithCode(TimeIdentifier.AcademicYear)
+                        .ForIndex(0, s => s.SetPeriod("2020"))
+                        .ForIndex(1, s => s.SetPeriod("2021"))
+                        .ForIndex(2, s => s.SetPeriod("2022"))
+                        .Generate(3)
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    TimePeriodMetas = DataFixture.DefaultTimePeriodMeta()
+                        .WithCode(TimeIdentifier.AcademicYear)
+                        .ForIndex(0, s => s.SetPeriod("2022"))
+                        .ForIndex(1, s => s.SetPeriod("2023"))
+                        .ForIndex(2, s => s.SetPeriod("2024"))
+                        .Generate(3)
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1531,22 +1613,28 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task TimePeriodsUnchanged_ChangesAreEmpty()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                initialVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
-                    .WithCode(TimeIdentifier.AcademicYear)
-                    .ForIndex(0, s => s.SetPeriod("2019").SetCode(TimeIdentifier.AcademicYear))
-                    .ForIndex(1, s => s.SetPeriod("2020").SetCode(TimeIdentifier.CalendarYear))
-                    .ForIndex(2, s => s.SetPeriod("2021").SetCode(TimeIdentifier.January))
-                    .Generate(3),
-                nextVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
-                    .ForIndex(0, s => s.SetPeriod("2019").SetCode(TimeIdentifier.AcademicYear))
-                    .ForIndex(1, s => s.SetPeriod("2020").SetCode(TimeIdentifier.CalendarYear))
-                    .ForIndex(2, s => s.SetPeriod("2021").SetCode(TimeIdentifier.January))
-                    .Generate(3));
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    TimePeriodMetas = DataFixture.DefaultTimePeriodMeta()
+                        .WithCode(TimeIdentifier.AcademicYear)
+                        .ForIndex(0, s => s.SetPeriod("2019").SetCode(TimeIdentifier.AcademicYear))
+                        .ForIndex(1, s => s.SetPeriod("2020").SetCode(TimeIdentifier.CalendarYear))
+                        .ForIndex(2, s => s.SetPeriod("2021").SetCode(TimeIdentifier.January))
+                        .Generate(3)
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    TimePeriodMetas = DataFixture.DefaultTimePeriodMeta()
+                        .ForIndex(0, s => s.SetPeriod("2019").SetCode(TimeIdentifier.AcademicYear))
+                        .ForIndex(1, s => s.SetPeriod("2020").SetCode(TimeIdentifier.CalendarYear))
+                        .ForIndex(2, s => s.SetPeriod("2021").SetCode(TimeIdentifier.January))
+                        .Generate(3)
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1562,28 +1650,34 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task TimePeriodsAdded_ChangesContainOnlyAdditions()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                initialVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
-                    .WithCode(TimeIdentifier.CalendarYear)
-                    .WithPeriod("2020")
-                    .Generate(1),
-                nextVersionTimePeriodMetas:
-                [
-                    ..DataFixture.DefaultTimePeriodMeta()
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    TimePeriodMetas = DataFixture.DefaultTimePeriodMeta()
                         .WithCode(TimeIdentifier.CalendarYear)
                         .WithPeriod("2020")
-                        .Generate(1),
-                    ..DataFixture.DefaultTimePeriodMeta()
-                        .WithCode(TimeIdentifier.AcademicYear)
-                        .ForIndex(0, s => s.SetPeriod("2019"))
-                        .ForIndex(1, s => s.SetPeriod("2020"))
-                        .ForIndex(2, s => s.SetPeriod("2021"))
-                        .Generate(3)
-                ]);
+                        .Generate(1)
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    TimePeriodMetas =
+                    [
+                        ..DataFixture.DefaultTimePeriodMeta()
+                            .WithCode(TimeIdentifier.CalendarYear)
+                            .WithPeriod("2020")
+                            .Generate(1),
+                        ..DataFixture.DefaultTimePeriodMeta()
+                            .WithCode(TimeIdentifier.AcademicYear)
+                            .ForIndex(0, s => s.SetPeriod("2019"))
+                            .ForIndex(1, s => s.SetPeriod("2020"))
+                            .ForIndex(2, s => s.SetPeriod("2021"))
+                            .Generate(3)
+                    ]
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1613,28 +1707,34 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task TimePeriodsDeleted_ChangesContainOnlyDeletions()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                nextVersionGeographicLevelMeta: DataFixture.DefaultGeographicLevelMeta(),
-                initialVersionTimePeriodMetas:
-                [
-                    ..DataFixture.DefaultTimePeriodMeta()
+                initialVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    TimePeriodMetas =
+                    [
+                        .. DataFixture.DefaultTimePeriodMeta()
+                            .WithCode(TimeIdentifier.CalendarYear)
+                            .WithPeriod("2020")
+                            .Generate(1),
+                        ..DataFixture.DefaultTimePeriodMeta()
+                            .WithCode(TimeIdentifier.AcademicYear)
+                            .ForIndex(0, s => s.SetPeriod("2019"))
+                            .ForIndex(1, s => s.SetPeriod("2020"))
+                            .ForIndex(2, s => s.SetPeriod("2021"))
+                            .Generate(3)
+                    ]
+                },
+                nextVersionMeta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    TimePeriodMetas = DataFixture.DefaultTimePeriodMeta()
                         .WithCode(TimeIdentifier.CalendarYear)
                         .WithPeriod("2020")
-                        .Generate(1),
-                    ..DataFixture.DefaultTimePeriodMeta()
-                        .WithCode(TimeIdentifier.AcademicYear)
-                        .ForIndex(0, s => s.SetPeriod("2019"))
-                        .ForIndex(1, s => s.SetPeriod("2020"))
-                        .ForIndex(2, s => s.SetPeriod("2021"))
-                        .Generate(3)
-                ],
-                nextVersionTimePeriodMetas: DataFixture.DefaultTimePeriodMeta()
-                    .WithCode(TimeIdentifier.CalendarYear)
-                    .WithPeriod("2020")
-                    .Generate(1));
+                        .Generate(1)
+                });
 
             await CreateDefaultCompleteMappings(
                 sourceDataSetVersionId: originalVersion.Id,
@@ -1674,7 +1774,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task Success_PathUpdated()
         {
-            var (_, nextDataSetVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (_, nextDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage);
 
@@ -1700,7 +1800,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         [Fact]
         public async Task Success_PathNotUpdated()
         {
-            var (_, nextDataSetVersion, instanceId) = await CreateDataSetInitialVersionAndNextVersion(
+            var (_, nextDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage);
 

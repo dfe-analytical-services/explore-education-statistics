@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -22,53 +22,52 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
 
         var previousVersionId = nextVersion.DataSet.LatestLiveVersionId!.Value;
 
-        var mappings = await publicDataDbContext
-            .DataSetVersionMappings
-            .AsNoTracking()
-            .SingleAsync(dsvm => dsvm.TargetDataSetVersionId == nextDataSetVersionId, cancellationToken);
+        await publicDataDbContext.RequireTransaction(async () =>
+        {
+            await CreateFilterChanges(
+                previousVersionId: previousVersionId,
+                nextVersionId: nextVersion.Id,
+                cancellationToken: cancellationToken);
 
-        (nextVersion.FilterMetaChanges, nextVersion.FilterOptionMetaChanges) = await CreateFilterChanges(
-            previousVersionId: previousVersionId,
-            nextVersionId: nextVersion.Id,
-            mappings: mappings,
-            cancellationToken: cancellationToken);
+            await CreateLocationChanges(
+                previousVersionId: previousVersionId,
+                nextVersionId: nextVersion.Id,
+                cancellationToken: cancellationToken);
 
-        (nextVersion.LocationMetaChanges, nextVersion.LocationOptionMetaChanges) = await CreateLocationChanges(
-            previousVersionId: previousVersionId,
-            nextVersionId: nextVersion.Id,
-            mappings: mappings,
-            cancellationToken: cancellationToken);
+            await CreateGeographicLevelChange(
+                previousVersionId: previousVersionId,
+                nextVersionId: nextVersion.Id,
+                cancellationToken: cancellationToken);
 
-        nextVersion.GeographicLevelMetaChange = await CreateGeographicLevelChange(
-            previousVersionId: previousVersionId,
-            nextVersionId: nextVersion.Id,
-            cancellationToken: cancellationToken);
+            await CreateIndicatorChanges(
+                previousVersionId: previousVersionId,
+                nextVersionId: nextVersion.Id,
+                cancellationToken: cancellationToken);
 
-        nextVersion.IndicatorMetaChanges = await CreateIndicatorChanges(
-            previousVersionId: previousVersionId,
-            nextVersionId: nextVersion.Id,
-            cancellationToken: cancellationToken);
-
-        nextVersion.TimePeriodMetaChanges = await CreateTimePeriodChanges(
-            previousVersionId: previousVersionId,
-            nextVersionId: nextVersion.Id,
-            cancellationToken: cancellationToken);
-
-        await publicDataDbContext.SaveChangesAsync(cancellationToken);
+            await CreateTimePeriodChanges(
+                previousVersionId: previousVersionId,
+                nextVersionId: nextVersion.Id,
+                cancellationToken: cancellationToken);
+        });
     }
 
-    private async Task<(List<FilterMetaChange> filterMetaChanges, List<FilterOptionMetaChange> filterOptionMetaChanges)>
-        CreateFilterChanges(
-            Guid previousVersionId,
-            Guid nextVersionId,
-            DataSetVersionMapping mappings,
-            CancellationToken cancellationToken)
+    private async Task CreateFilterChanges(
+        Guid previousVersionId,
+        Guid nextVersionId,
+        CancellationToken cancellationToken)
     {
         var oldFilterMetas = await GetFilterMetas(previousVersionId, cancellationToken);
         var newFilterMetas = await GetFilterMetas(nextVersionId, cancellationToken);
 
-        var filterMetaDeletionsAndChanges = mappings.FilterMappingPlan.Mappings
-            // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+        var mappingPlan = await publicDataDbContext
+            .DataSetVersionMappings
+            .AsNoTracking()
+            .Where(dsvm => dsvm.TargetDataSetVersionId == nextVersionId)
+            .Select(dsvm => dsvm.FilterMappingPlan)
+            .SingleAsync(cancellationToken);
+
+        var filterMetaDeletionsAndChanges = mappingPlan.Mappings
+            // Do not include changes for keys that have been mapped to the exact same candidate key (no renaming)    
             .Where(kv => kv.Key != kv.Value.CandidateKey)
             .Select(kv =>
             {
@@ -86,9 +85,9 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             })
             .ToList();
 
-        var filterMetaAdditions = mappings.FilterMappingPlan.Candidates
+        var filterMetaAdditions = mappingPlan.Candidates
             .Keys
-            .Except(mappings.FilterMappingPlan.Mappings.Select(m => m.Value.CandidateKey!))
+            .Except(mappingPlan.Mappings.Select(m => m.Value.CandidateKey!))
             .Select(newCandidateKey =>
             {
                 var target = newFilterMetas[newCandidateKey].FilterMeta;
@@ -101,8 +100,8 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             })
             .ToList();
 
-        var filterOptionMetaDeletionsAndChanges = mappings.FilterMappingPlan.Mappings
-            // DON'T CREATE A CHANGE FOR ANY FILTER OPTIONS WHICH HAVE HAD THEIR ENTIRE FILTER DELETED
+        var filterOptionMetaDeletionsAndChanges = mappingPlan.Mappings
+            // Don't create a change for any filter options which have had their entire filter deleted
             .Where(kv => !string.IsNullOrEmpty(kv.Value.CandidateKey))
             .SelectMany(
                 fm => fm.Value.OptionMappings,
@@ -111,7 +110,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     FilterMapping = fm,
                     OptionMapping = fom
                 })
-            // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+            // Do not include changes for keys that have been mapped to the exact same candidate key (no renaming)
             .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey)
             .Select(a =>
             {
@@ -129,7 +128,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             })
             .ToList();
 
-        var filterOptionMetaAdditions = mappings.FilterMappingPlan.Candidates
+        var filterOptionMetaAdditions = mappingPlan.Candidates
             .SelectMany(
                 fc => fc.Value.Options,
                 (fc, foc) => new
@@ -138,7 +137,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     OptionCandidateKey = (string?)foc.Key
                 })
             .Except(
-                mappings.FilterMappingPlan.Mappings
+                mappingPlan.Mappings
                     .SelectMany(
                         fm => fm.Value.OptionMappings,
                         (fm, fom) => new
@@ -158,26 +157,30 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 };
             });
 
-        return (
-            filterMetaChanges: [.. filterMetaDeletionsAndChanges, .. filterMetaAdditions],
-            filterOptionMetaChanges: [.. filterOptionMetaDeletionsAndChanges, .. filterOptionMetaAdditions]
-        );
+        publicDataDbContext.FilterMetaChanges.AddRange([.. filterMetaDeletionsAndChanges, .. filterMetaAdditions]);
+        publicDataDbContext.FilterOptionMetaChanges.AddRange([
+            .. filterOptionMetaDeletionsAndChanges, .. filterOptionMetaAdditions
+        ]);
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async
-        Task<(List<LocationMetaChange> locationMetaChanges, List<LocationOptionMetaChange> locationOptionMetaChanges)>
-        CreateLocationChanges(
-            Guid previousVersionId,
-            Guid nextVersionId,
-            DataSetVersionMapping mappings,
-            CancellationToken cancellationToken)
+    private async Task CreateLocationChanges(
+        Guid previousVersionId,
+        Guid nextVersionId,
+        CancellationToken cancellationToken)
     {
         var oldLocationMetas = await GetLocationMetas(previousVersionId, cancellationToken);
         var newLocationMetas = await GetLocationMetas(nextVersionId, cancellationToken);
 
-        var locationMetaChanges = mappings.LocationMappingPlan
-            .Levels
-            // ONLY INCLUDE ADDS AND DELETES FOR LOCATION LEVELS
+        var mappingPlan = await publicDataDbContext
+            .DataSetVersionMappings
+            .AsNoTracking()
+            .Where(dsvm => dsvm.TargetDataSetVersionId == nextVersionId)
+            .Select(dsvm => dsvm.LocationMappingPlan)
+            .SingleAsync(cancellationToken);
+
+        var locationMetaChanges = mappingPlan.Levels
+            // Only include adds and deletes for location levels
             .Where(locationGroupMappings => locationGroupMappings.Value.Mappings.Count == 0 ||
                                             locationGroupMappings.Value.Candidates.Count == 0)
             .Select(locationGroupMappings =>
@@ -197,9 +200,8 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             })
             .ToList();
 
-        var locationOptionMetaDeletionsAndChanges = mappings.LocationMappingPlan
-            .Levels
-            // DON'T CREATE A CHANGE FOR ANY LOCATION OPTIONS WHICH HAVE HAD THEIR ENTIRE LOCATION GROUP DELETED
+        var locationOptionMetaDeletionsAndChanges = mappingPlan.Levels
+            // Don't create a change for any location options which have had their entire location group deleted
             .Where(locationGroupMappings => locationGroupMappings.Value.Candidates.Count > 0)
             .SelectMany(
                 lm => lm.Value.Mappings,
@@ -208,7 +210,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     LocationGroup = lm.Key,
                     OptionMapping = lom
                 })
-            // DO NOT INCLUDE CHANGES FOR KEYS THAT HAVE BEEN MAPPED TO THE EXACT SAME CANDIDATE KEY (NO RENAMING)
+            // Do not include changes for keys that have been mapped to the exact same candidate key (no renaming)
             .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey)
             .Select(a =>
             {
@@ -226,8 +228,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             })
             .ToList();
 
-        var locationOptionMetaAdditions = mappings.LocationMappingPlan
-            .Levels
+        var locationOptionMetaAdditions = mappingPlan.Levels
             .SelectMany(
                 lm => lm.Value.Candidates,
                 (lm, loc) => new
@@ -236,8 +237,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     OptionCandidateKey = (string?)loc.Key
                 })
             .Except(
-                mappings.LocationMappingPlan
-                    .Levels
+                mappingPlan.Levels
                     .SelectMany(
                         lm => lm.Value.Mappings,
                         (lm, lom) => new
@@ -257,13 +257,14 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 };
             });
 
-        return (
-            locationMetaChanges,
-            locationOptionMetaChanges: [.. locationOptionMetaDeletionsAndChanges, .. locationOptionMetaAdditions]
-        );
+        publicDataDbContext.LocationMetaChanges.AddRange(locationMetaChanges);
+        publicDataDbContext.LocationOptionMetaChanges.AddRange([
+            .. locationOptionMetaDeletionsAndChanges, .. locationOptionMetaAdditions
+        ]);
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<GeographicLevelMetaChange?> CreateGeographicLevelChange(
+    private async Task CreateGeographicLevelChange(
         Guid previousVersionId,
         Guid nextVersionId,
         CancellationToken cancellationToken)
@@ -274,84 +275,86 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         var levelsAreEqual =
             newGeographicLevelMeta.Levels.Order().SequenceEqual(oldGeographicLevelMeta.Levels.Order());
 
-        return levelsAreEqual
-            ? null
-            : new GeographicLevelMetaChange
+        if (!levelsAreEqual)
+        {
+            publicDataDbContext.GeographicLevelMetaChanges.Add(new GeographicLevelMetaChange
             {
                 DataSetVersionId = nextVersionId,
                 PreviousStateId = oldGeographicLevelMeta.Id,
                 CurrentStateId = newGeographicLevelMeta.Id
-            };
+            });
+            await publicDataDbContext.SaveChangesAsync(cancellationToken);
+        }
     }
 
-    private async Task<List<IndicatorMetaChange>> CreateIndicatorChanges(
+    private async Task CreateIndicatorChanges(
         Guid previousVersionId,
         Guid nextVersionId,
         CancellationToken cancellationToken)
     {
-        var oldIndicatorMetaIdsByPublicId = await GetIndicatorMetas(previousVersionId, cancellationToken);
-        var newIndicatorMetaIdsByPublicId = await GetIndicatorMetas(nextVersionId, cancellationToken);
+        var oldIndicatorMetas = await GetIndicatorMetas(previousVersionId, cancellationToken);
+        var newIndicatorMetas = await GetIndicatorMetas(nextVersionId, cancellationToken);
 
-        var indicatorMetaDeletions = oldIndicatorMetaIdsByPublicId
-            .Keys
-            .Except(newIndicatorMetaIdsByPublicId.Keys)
-            .Select(publicId => new IndicatorMetaChange
+        var indicatorMetaDeletions = oldIndicatorMetas
+            .Except(newIndicatorMetas, IndicatorMeta.PublicIdComparer)
+            .OrderBy(indicatorMeta => indicatorMeta.Label)
+            .Select(indicatorMeta => new IndicatorMetaChange
             {
                 DataSetVersionId = nextVersionId,
-                PreviousStateId = oldIndicatorMetaIdsByPublicId[publicId].Id,
+                PreviousStateId = indicatorMeta.Id,
                 CurrentStateId = null
             })
-            .OrderBy(c => c.PreviousStateId)
             .ToList();
 
-        var indicatorMetaAdditions = newIndicatorMetaIdsByPublicId
-            .Keys
-            .Except(oldIndicatorMetaIdsByPublicId.Keys)
-            .Select(publicId => new IndicatorMetaChange
+        var indicatorMetaAdditions = newIndicatorMetas
+            .Except(oldIndicatorMetas, IndicatorMeta.PublicIdComparer)
+            .OrderBy(indicatorMeta => indicatorMeta.Label)
+            .Select(indicatorMeta => new IndicatorMetaChange
             {
                 DataSetVersionId = nextVersionId,
                 PreviousStateId = null,
-                CurrentStateId = newIndicatorMetaIdsByPublicId[publicId].Id
+                CurrentStateId = indicatorMeta.Id
             })
-            .OrderBy(c => c.CurrentStateId)
             .ToList();
 
-        return [.. indicatorMetaDeletions, .. indicatorMetaAdditions];
+        publicDataDbContext.IndicatorMetaChanges.AddRange([.. indicatorMetaDeletions, .. indicatorMetaAdditions]);
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<List<TimePeriodMetaChange>> CreateTimePeriodChanges(
+    private async Task CreateTimePeriodChanges(
         Guid previousVersionId,
         Guid nextVersionId,
         CancellationToken cancellationToken)
     {
-        var oldTimePeriodMetaIdsByCodeAndPeriod = await GetTimePeriodMetas(previousVersionId, cancellationToken);
-        var newTimePeriodMetaIdsByCodeAndPeriod = await GetTimePeriodMetas(nextVersionId, cancellationToken);
+        var oldTimePeriodMetas = await GetTimePeriodMetas(previousVersionId, cancellationToken);
+        var newTimePeriodMetas = await GetTimePeriodMetas(nextVersionId, cancellationToken);
 
-        var timePeriodMetaDeletions = oldTimePeriodMetaIdsByCodeAndPeriod
-            .Keys
-            .Except(newTimePeriodMetaIdsByCodeAndPeriod.Keys)
-            .Select(codeAndPeriod => new TimePeriodMetaChange
+        var timePeriodMetaDeletions = oldTimePeriodMetas
+            .Except(newTimePeriodMetas, TimePeriodMeta.CodePeriodComparer)
+            .OrderBy(timePeriodMeta => timePeriodMeta.Period)
+            .ThenBy(timePeriodMeta => timePeriodMeta.Code)
+            .Select(timePeriodMeta => new TimePeriodMetaChange
             {
                 DataSetVersionId = nextVersionId,
-                PreviousStateId = oldTimePeriodMetaIdsByCodeAndPeriod[codeAndPeriod].Id,
+                PreviousStateId = timePeriodMeta.Id,
                 CurrentStateId = null
             })
-            .OrderBy(c => c.PreviousStateId)
             .ToList();
 
-        var timePeriodMetaAdditions = newTimePeriodMetaIdsByCodeAndPeriod
-            .Keys
-            .Except(oldTimePeriodMetaIdsByCodeAndPeriod.Keys)
-            .Select(codeAndPeriod => new TimePeriodMetaChange
+        var timePeriodMetaAdditions = newTimePeriodMetas
+            .Except(oldTimePeriodMetas, TimePeriodMeta.CodePeriodComparer)
+            .OrderBy(timePeriodMeta => timePeriodMeta.Period)
+            .ThenBy(timePeriodMeta => timePeriodMeta.Code)
+            .Select(timePeriodMeta => new TimePeriodMetaChange
             {
                 DataSetVersionId = nextVersionId,
                 PreviousStateId = null,
-                CurrentStateId = newTimePeriodMetaIdsByCodeAndPeriod[codeAndPeriod].Id
+                CurrentStateId = timePeriodMeta.Id
             })
-            .OrderBy(c => c.CurrentStateId)
             .ToList();
 
-        return [.. timePeriodMetaDeletions, .. timePeriodMetaAdditions];
+        publicDataDbContext.TimePeriodMetaChanges.AddRange([.. timePeriodMetaDeletions, .. timePeriodMetaAdditions]);
+        await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
     private async
@@ -384,14 +387,14 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             .SingleAsync(m => m.DataSetVersionId == dataSetVersionId, cancellationToken);
     }
 
-    private async Task<Dictionary<string, IndicatorMeta>> GetIndicatorMetas(
+    private async Task<IReadOnlyList<IndicatorMeta>> GetIndicatorMetas(
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
     {
         return await publicDataDbContext
             .IndicatorMetas
             .Where(m => m.DataSetVersionId == dataSetVersionId)
-            .ToDictionaryAsync(m => m.PublicId, cancellationToken);
+            .ToListAsync(cancellationToken);
     }
 
     private async Task<Dictionary<GeographicLevel,
@@ -413,13 +416,13 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 cancellationToken);
     }
 
-    private async Task<Dictionary<(TimeIdentifier Code, string Period), TimePeriodMeta>> GetTimePeriodMetas(
+    private async Task<IReadOnlyList<TimePeriodMeta>> GetTimePeriodMetas(
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
     {
         return await publicDataDbContext
             .TimePeriodMetas
             .Where(tpm => tpm.DataSetVersionId == dataSetVersionId)
-            .ToDictionaryAsync(m => (m.Code, m.Period), cancellationToken);
+            .ToListAsync(cancellationToken);
     }
 }

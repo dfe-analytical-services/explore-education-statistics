@@ -177,7 +177,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             int metaInsertBatchSize)
         {
             var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
-                await CreateDataSetInitialVersionAndNextVersion(
+                await CreateDataSetInitialAndNextVersion(
                     nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
                     nextVersionStatus: DataSetVersionStatus.Mapping);
 
@@ -376,7 +376,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             int metaInsertBatchSize)
         {
             var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
-                await CreateDataSetInitialVersionAndNextVersion(
+                await CreateDataSetInitialAndNextVersion(
                     nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
                     nextVersionStatus: DataSetVersionStatus.Mapping);
 

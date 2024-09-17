@@ -1491,7 +1491,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
         CreateNextDataSetVersionAndDataFiles(DataSetVersionImportStage importStage)
     {
         var (initialDataSetVersion, nextDataSetVersion, instanceId) =
-            await CreateDataSetInitialVersionAndNextVersion(
+            await CreateDataSetInitialAndNextVersion(
                 nextVersionImportStage: importStage,
                 nextVersionStatus: DataSetVersionStatus.Processing);
 

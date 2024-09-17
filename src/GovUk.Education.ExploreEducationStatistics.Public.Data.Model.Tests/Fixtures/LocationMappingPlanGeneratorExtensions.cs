@@ -40,8 +40,6 @@ public static class LocationMappingPlanGeneratorExtensions
 
                 var locationOptionMapping = fixture
                     .DefaultLocationOptionMapping()
-                    // This might break other stuff? If not, maybe it should default to null anyway
-                    .WithCandidateKey(null)
                     .WithSource(fixture.DefaultMappableLocationOption()
                         .WithLabel(option.Label)
                         .WithCodes(option.ToRow()));
@@ -247,8 +245,7 @@ public static class LocationMappingPlanGeneratorExtensions
         this InstanceSetters<LocationOptionMapping> setters)
         => setters
             .SetDefault(mapping => mapping.PublicId)
-            .SetDefault(mapping => mapping.Type)
-            .SetDefault(mapping => mapping.CandidateKey);
+            .SetDefault(mapping => mapping.Type);
 
     public static InstanceSetters<LocationOptionMapping> SetSource(
         this InstanceSetters<LocationOptionMapping> setters,

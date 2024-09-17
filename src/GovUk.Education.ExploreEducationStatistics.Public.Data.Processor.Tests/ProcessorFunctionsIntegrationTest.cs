@@ -60,29 +60,17 @@ public abstract class ProcessorFunctionsIntegrationTest(
     }
 
     protected async Task<(DataSetVersion initialVersion, DataSetVersion nextVersion, Guid instanceId)>
-        CreateDataSetInitialVersionAndNextVersion(
+        CreateDataSetInitialAndNextVersion(
             DataSetVersionStatus nextVersionStatus,
             DataSetVersionImportStage nextVersionImportStage,
-            IEnumerable<FilterMeta>? initialVersionFilterMetas = null,
-            IEnumerable<LocationMeta>? initialVersionLocationMetas = null,
-            GeographicLevelMeta? initialVersionGeographicLevelMeta = null,
-            IEnumerable<IndicatorMeta>? initialVersionIndicatorMetas = null,
-            IEnumerable<TimePeriodMeta>? initialVersionTimePeriodMetas = null,
-            IEnumerable<FilterMeta>? nextVersionFilterMetas = null,
-            IEnumerable<LocationMeta>? nextVersionLocationMetas = null,
-            GeographicLevelMeta? nextVersionGeographicLevelMeta = null,
-            IEnumerable<IndicatorMeta>? nextVersionIndicatorMetas = null,
-            IEnumerable<TimePeriodMeta>? nextVersionTimePeriodMetas = null)
+            DataSetVersionMeta? initialVersionMeta = null,
+            DataSetVersionMeta? nextVersionMeta = null)
     {
         var (initialVersion, _) = await CreateDataSetInitialVersion(
             dataSetStatus: DataSetStatus.Published,
             dataSetVersionStatus: DataSetVersionStatus.Published,
             importStage: DataSetVersionImportStage.Completing,
-            filterMetas: initialVersionFilterMetas,
-            locationMetas: initialVersionLocationMetas,
-            geographicLevelMeta: initialVersionGeographicLevelMeta,
-            indicatorMetas: initialVersionIndicatorMetas,
-            timePeriodMetas: initialVersionTimePeriodMetas);
+            meta: initialVersionMeta);
 
         var defaultNextVersion = initialVersion.DefaultNextVersion();
 
@@ -92,11 +80,7 @@ public abstract class ProcessorFunctionsIntegrationTest(
             importStage: nextVersionImportStage,
             versionMajor: defaultNextVersion.Major,
             versionMinor: defaultNextVersion.Minor,
-            filterMetas: nextVersionFilterMetas,
-            locationMetas: nextVersionLocationMetas,
-            geographicLevelMeta: nextVersionGeographicLevelMeta,
-            indicatorMetas: nextVersionIndicatorMetas,
-            timePeriodMetas: nextVersionTimePeriodMetas);
+            meta: nextVersionMeta);
 
         return (initialVersion, nextVersion, instanceId);
     }
@@ -107,11 +91,7 @@ public abstract class ProcessorFunctionsIntegrationTest(
             DataSetStatus dataSetStatus = DataSetStatus.Draft,
             DataSetVersionStatus dataSetVersionStatus = DataSetVersionStatus.Processing,
             Guid? releaseFileId = null,
-            IEnumerable<FilterMeta>? filterMetas = null,
-            IEnumerable<LocationMeta>? locationMetas = null,
-            GeographicLevelMeta? geographicLevelMeta = null,
-            IEnumerable<IndicatorMeta>? indicatorMetas = null,
-            IEnumerable<TimePeriodMeta>? timePeriodMetas = null)
+            DataSetVersionMeta? meta = null)
     {
         DataSet dataSet = DataFixture
             .DefaultDataSet()
@@ -124,11 +104,7 @@ public abstract class ProcessorFunctionsIntegrationTest(
             importStage: importStage,
             status: dataSetVersionStatus,
             releaseFileId: releaseFileId,
-            filterMetas: filterMetas,
-            locationMetas: locationMetas,
-            geographicLevelMeta: geographicLevelMeta,
-            indicatorMetas: indicatorMetas,
-            timePeriodMetas: timePeriodMetas);
+            meta: meta);
     }
 
     private async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersion(
@@ -138,11 +114,7 @@ public abstract class ProcessorFunctionsIntegrationTest(
         Guid? releaseFileId = null,
         int versionMajor = 1,
         int versionMinor = 0,
-        IEnumerable<FilterMeta>? filterMetas = null,
-        IEnumerable<LocationMeta>? locationMetas = null,
-        GeographicLevelMeta? geographicLevelMeta = null,
-        IEnumerable<IndicatorMeta>? indicatorMetas = null,
-        IEnumerable<TimePeriodMeta>? timePeriodMetas = null)
+        DataSetVersionMeta? meta = null)
     {
         await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
@@ -177,34 +149,34 @@ public abstract class ProcessorFunctionsIntegrationTest(
                 }
             });
 
-        if (filterMetas is not null)
+        if (meta?.FilterMetas is not null)
         {
             dataSetVersionGenerator = dataSetVersionGenerator
-                .WithFilterMetas(() => filterMetas);
+                .WithFilterMetas(() => meta.FilterMetas);
         }
 
-        if (locationMetas is not null)
+        if (meta?.LocationMetas is not null)
         {
             dataSetVersionGenerator = dataSetVersionGenerator
-                .WithLocationMetas(() => locationMetas);
+                .WithLocationMetas(() => meta.LocationMetas);
         }
 
-        if (geographicLevelMeta is not null)
+        if (meta?.GeographicLevelMeta is not null)
         {
             dataSetVersionGenerator = dataSetVersionGenerator
-                .WithGeographicLevelMeta(() => geographicLevelMeta);
+                .WithGeographicLevelMeta(() => meta.GeographicLevelMeta);
         }
 
-        if (indicatorMetas is not null)
+        if (meta?.IndicatorMetas is not null)
         {
             dataSetVersionGenerator = dataSetVersionGenerator
-                .WithIndicatorMetas(() => indicatorMetas);
+                .WithIndicatorMetas(() => meta.IndicatorMetas);
         }
 
-        if (timePeriodMetas is not null)
+        if (meta?.TimePeriodMetas is not null)
         {
             dataSetVersionGenerator = dataSetVersionGenerator
-                .WithTimePeriodMetas(() => timePeriodMetas);
+                .WithTimePeriodMetas(() => meta.TimePeriodMetas);
         }
 
         var dataSetVersion = dataSetVersionGenerator.Generate();

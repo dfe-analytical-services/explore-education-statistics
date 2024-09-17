@@ -24,7 +24,6 @@ public static class FilterMappingPlanGeneratorExtensions
         {
             var filterMappingGenerator = fixture
                 .DefaultFilterMapping()
-                .WithCandidateKey(null) // This might break other stuff? If not, maybe it should default to null anyway
                 .WithSource(fixture
                     .DefaultMappableFilter()
                     .WithLabel(sourceFilter.Label))
@@ -43,8 +42,6 @@ public static class FilterMappingPlanGeneratorExtensions
 
                 var filterOptionMapping = fixture
                     .DefaultFilterOptionMapping()
-                    // This might break other stuff? If not, maybe it should default to null anyway
-                    .WithCandidateKey(null)
                     .WithSource(fixture
                         .DefaultMappableFilterOption()
                         .WithLabel(option.Label))
@@ -196,7 +193,7 @@ public static class FilterMappingPlanGeneratorExtensions
 
     public static Generator<FilterMapping> WithCandidateKey(
         this Generator<FilterMapping> generator,
-        string candidateKey)
+        string? candidateKey)
         => generator.ForInstance(s => s.SetCandidateKey(candidateKey));
 
     public static Generator<FilterMapping> AddOptionMapping(
@@ -209,8 +206,7 @@ public static class FilterMappingPlanGeneratorExtensions
         this InstanceSetters<FilterMapping> setters)
         => setters
             .SetDefault(mapping => mapping.PublicId)
-            .SetDefault(mapping => mapping.Type)
-            .SetDefault(mapping => mapping.CandidateKey);
+            .SetDefault(mapping => mapping.Type);
 
     public static InstanceSetters<FilterMapping> SetSource(
         this InstanceSetters<FilterMapping> setters,
@@ -363,8 +359,7 @@ public static class FilterMappingPlanGeneratorExtensions
         this InstanceSetters<FilterOptionMapping> setters)
         => setters
             .SetDefault(mapping => mapping.PublicId)
-            .SetDefault(mapping => mapping.Type)
-            .SetDefault(mapping => mapping.CandidateKey);
+            .SetDefault(mapping => mapping.Type);
 
     public static InstanceSetters<FilterOptionMapping> SetSource(
         this InstanceSetters<FilterOptionMapping> setters,
