@@ -53,23 +53,23 @@ pool:
   vmImage: $(vmImageName)
 
 stages:
-  # - template: validate-stage-template.yml
-  #   parameters:
-  #     stageName: 'Validate_Against_Development'
-  #     condition: eq(variables.isDev, true)
-  #     environment: 'Development'
-  #     serviceConnection: $(serviceConnectionDevelopment)
-  #     parameterFile: $(devParamFile)
+  - template: validate-stage-template.yml
+    parameters:
+      stageName: 'Validate_Against_Development'
+      condition: eq(variables.isDev, true)
+      environment: 'Development'
+      serviceConnection: $(serviceConnectionDevelopment)
+      parameterFile: $(devParamFile)
   
-  # - template: deploy-stage-template.yml
-  #   parameters:
-  #     stageName: 'Deploy_to_Development'
-  #     condition: and(succeeded(), eq(variables.isDev, true))
-  #     dependsOn: 'Validate_Against_Development'
-  #     environment: 'Development'
-  #     serviceConnection: $(serviceConnectionDevelopment)
-  #     subscription: $(subscription)
-  #     parameterFile: $(devParamFile)
+  - template: deploy-stage-template.yml
+    parameters:
+      stageName: 'Deploy_to_Development'
+      condition: and(not(or(failed(), canceled())), eq(variables.isDev, true))
+      dependsOn: 'Validate_Against_Development'
+      environment: 'Development'
+      serviceConnection: $(serviceConnectionDevelopment)
+      subscription: $(subscription)
+      parameterFile: $(devParamFile)
 
   - template: validate-stage-template.yml
     parameters:
@@ -83,7 +83,7 @@ stages:
     parameters:
       stageName: 'Deploy_to_Test'
       dependsOn: 'Validate_Against_Test'
-      condition: and(succeeded(), eq(variables.isTest, true))
+      condition: and(not(or(failed(), canceled())), eq(variables.isTest, true))
       environment: 'Test'
       serviceConnection: $(serviceConnectionTest)
       subscription: $(subscription)
@@ -100,7 +100,7 @@ stages:
 #  - template: deploy-stage-template.yml
 #    parameters:
 #      stageName: 'Deploy_to_PreProduction'
-#      condition: and(succeeded(), eq(variables.isMaster, true))
+#      condition: and(not(or(failed('Validate_Against_PreProduction'), canceled('Validate_Against_PreProduction')), eq(variables.isMaster, true))
 #      dependsOn: 'Validate_Against_PreProduction'
 #      environment: 'Pre-production'
 #      serviceConnection: $(serviceConnectionPreProduction)
@@ -110,7 +110,7 @@ stages:
 #  - template: validate-stage-template.yml
 #    parameters:
 #      stageName: 'Validate_Against_Production'
-#      condition: and(succeeded(), eq(variables.isMaster, true))
+#      condition: and(not(or(failed('Deploy_to_PreProduction'), canceled('Deploy_to_PreProduction')), eq(variables.isMaster, true))
 #      environment: 'Production'
 #      serviceConnection: $(serviceConnectionProduction)
 #      parameterFile: $(prodParamFile)
@@ -118,7 +118,7 @@ stages:
 #  - template: deploy-stage-template.yml
 #    parameters:
 #      stageName: 'Deploy_to_Production'
-#      condition: and(succeeded(), eq(variables.isMaster, true))
+#      condition: and(not(or(failed('Validate_Against_Production'), canceled('Validate_Against_Production')), eq(variables.isMaster, true))
 #      dependsOn: 'Validate_Against_Production'
 #      environment: 'Production'
 #      serviceConnection: $(serviceConnectionProduction)

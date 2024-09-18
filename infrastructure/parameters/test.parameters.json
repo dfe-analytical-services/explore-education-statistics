@@ -99,7 +99,7 @@
       "value": true
     },
     "publicDataDbExists": {
-      "value": false
+      "value": true
     }
   }
 }
