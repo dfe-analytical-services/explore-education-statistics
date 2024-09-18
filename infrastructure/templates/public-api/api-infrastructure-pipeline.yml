@@ -23,7 +23,7 @@ variables:
   - name: isDev
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
   - name: isTest
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-5479-modularise-bicep-to-test-env')]
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName

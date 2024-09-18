@@ -15,7 +15,9 @@ resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedI
   tags: tagValues
 }
 
-// TODO - commenting out for now, as 
+// TODO - commenting out for now, as we can't apply roles to Container Registries in other Resource Groups.
+// When we have a shared Resource Group for our ACR with special privileges, we can start to use the Container App
+// Identity again to pull Docker images, but for now we continue to use our shared SPN.
 // module apiContainerAppAcrPullRoleAssignmentModule '../../components/containerRegistryRoleAssignment.bicep' = {
 //   name: '${resourceNames.publicApi.apiAppIdentity}AcrPullRoleAssignmentDeploy'
 //   scope: resourceGroup(resourceNames.existingResources.acrResourceGroup)
