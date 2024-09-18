@@ -53,9 +53,9 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     containerAppName: resourceNames.publicApi.apiApp
     acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
-    userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
     dockerPullManagedIdentityClientId: keyVault.getSecret('DOCKER-REGISTRY-SERVER-USERNAME')
     dockerPullManagedIdentitySecretValue: keyVault.getSecret('DOCKER-REGISTRY-SERVER-PASSWORD')
+    userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
     managedEnvironmentId: containerAppEnvironmentId
     corsPolicy: {
       allowedOrigins: [

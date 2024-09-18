@@ -76,3 +76,4 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' 
 
 output containerAppEnvironmentName string = containerAppEnvironmentName
 output containerAppEnvironmentId string = containerAppEnvironment.id
+output containerAppEnvironmentIpAddress string = containerAppEnvironment.properties.staticIp

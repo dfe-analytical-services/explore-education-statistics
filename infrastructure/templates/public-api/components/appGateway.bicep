@@ -6,6 +6,9 @@ param keyVaultName string
 @description('Specifies the location for all resources')
 param location string
 
+@description('Specifies the VNet name that this App Gateway will be connected to')
+param vnetName string
+
 @description('Specifies the id of a dedicated subnet to which this App Gateway will be connected')
 param subnetId string
 
@@ -89,6 +92,15 @@ module wafPolicyModule 'wafPolicy.bicep' = {
     tagValues: tagValues
   }
 }
+
+module backendPrivateDnsConfigurationsModule './appGatewayBackendDns.bicep' = [for site in sites: {
+  name: site.backendDomainName
+  params: {
+    site: site
+    vnetName: vnetName
+    tagValues: tagValues
+  }
+}]
 
 // Create the App Gateway.
 resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {

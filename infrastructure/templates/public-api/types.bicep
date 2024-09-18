@@ -66,6 +66,8 @@ type entraIdAuthenticationType = {
 type appGatewaySiteConfigType = {
   resourceName: string
   backendFqdn: string
+  backendDomainName: string
+  backendIpAddress: string
   publicFqdn: string
   certificateName: string
   healthProbeRelativeUrl: string
@@ -78,7 +80,7 @@ type principalNameAndIdType = {
 }
 
 @export()
-type privateDnsZoneType = 'sites' | 'postgres'
+type privateDnsZoneType = 'sites' | 'postgres' | 'custom'
 
 @export()
 type containerRegistryRoleType = 'AcrPull'
