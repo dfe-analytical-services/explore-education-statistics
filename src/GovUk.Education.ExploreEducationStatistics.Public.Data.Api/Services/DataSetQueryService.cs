@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -46,7 +46,9 @@ internal class DataSetQueryService(
         { "geographicLevel", DataTable.Cols.GeographicLevel },
     };
 
-    private static string LocationsSortField(GeographicLevel level) => $"locations|{level.GetEnumValue()}";
+    private const string SortTypeFilter = "filter";
+    private const string SortTypeIndicator = "indicator";
+    private const string SortTypeLocation = "location";
 
     public async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> Query(
         Guid dataSetId,
@@ -172,10 +174,15 @@ internal class DataSetQueryService(
 
         var indicators = GetIndicators(query, indicatorColumnsByIdTask.Result, queryState);
 
+        var columnMappings = GetColumnMappings(
+            columns: columnsTask.Result,
+            filterColumnsById: filterColumnsByIdTask.Result,
+            indicatorColumnsById: indicatorColumnsByIdTask.Result,
+            selectedIndicators: indicators);
+
         var sorts = GetSorts(
             request: query,
-            columns: columnsTask.Result,
-            indicators: indicators,
+            columnMappings: columnMappings,
             queryState: queryState);
 
         if (queryState.Errors.Count != 0)
@@ -184,12 +191,6 @@ internal class DataSetQueryService(
         }
 
         var whereSql = whereBuilder.Build();
-
-        var columnMappings = GetColumnMappings(
-            columns: columnsTask.Result,
-            filterColumnsById: filterColumnsByIdTask.Result,
-            indicatorColumnsById: indicatorColumnsByIdTask.Result,
-            selectedIndicators: indicators);
 
         var countTask = dataRepository.CountRows(
             dataSetVersion: dataSetVersion,
@@ -285,8 +286,7 @@ internal class DataSetQueryService(
 
     private static List<Sort> GetSorts(
         DataSetQueryRequest request,
-        IEnumerable<string> columns,
-        IEnumerable<string> indicators,
+        ColumnMappings columnMappings,
         QueryState queryState)
     {
         if (request.Sorts is null)
@@ -294,40 +294,14 @@ internal class DataSetQueryService(
             return [new Sort(Field: DataTable.Cols.TimePeriodId, Direction: SortDirection.Desc)];
         }
 
-        var locationLevels = GeographicLevelUtils.Levels
-            .Where(level => columns.Contains(DataTable.Cols.LocationId(level)))
-            .ToHashSet();
-
-        var fieldColumnMap = new Dictionary<string, string>(ReservedSorts);
-
-        foreach (var locationLevel in locationLevels)
-        {
-            fieldColumnMap[LocationsSortField(locationLevel)] = DataTable.Cols.LocationId(locationLevel);
-        }
-
-        var otherFields = columns
-            .Except([
-                DataTable.Cols.Id,
-                ..ReservedSorts.Keys,
-                ..locationLevels.Select(DataTable.Cols.LocationId),
-            ])
-            .Concat(indicators)
-            .ToHashSet();
-
         var invalidSorts = new HashSet<DataSetQuerySort>();
         var sorts = new List<Sort>();
 
         foreach (var sort in request.Sorts)
         {
-            if (fieldColumnMap.TryGetValue(sort.Field, out var field))
+            if (TryGetSortColumn(sort, columnMappings, out var column))
             {
-                sorts.Add(new Sort(Field: field, Direction: sort.ParsedDirection()));
-                continue;
-            }
-
-            if (otherFields.Contains(sort.Field))
-            {
-                sorts.Add(new Sort(Field: sort.Field, Direction: sort.ParsedDirection()));
+                sorts.Add(new Sort(Field: column, Direction: sort.ParsedDirection()));
                 continue;
             }
 
@@ -346,6 +320,38 @@ internal class DataSetQueryService(
         }
 
         return sorts;
+    }
+
+    private static bool TryGetSortColumn(
+        DataSetQuerySort sort,
+        ColumnMappings columnMappings,
+        [NotNullWhen(true)]
+        out string? column)
+    {
+        column = null;
+
+        if (ReservedSorts.TryGetValue(sort.Field, out column))
+        {
+            return true;
+        }
+
+        var fieldParts = sort.Field.Split('|', 2);
+
+        if (fieldParts.Length != 2)
+        {
+            return false;
+        }
+
+        var fieldType = fieldParts[0];
+        var fieldId = fieldParts[1];
+
+        return fieldType switch
+        {
+            SortTypeFilter => columnMappings.Filters.TryGetValue(fieldId, out column),
+            SortTypeIndicator => columnMappings.Indicators.TryGetValue(fieldId, out column),
+            SortTypeLocation => columnMappings.LocationLevels.TryGetValue(fieldId, out column),
+            _ => false
+        };
     }
 
     private static ColumnMappings GetColumnMappings(
