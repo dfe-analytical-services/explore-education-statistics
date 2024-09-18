@@ -133,17 +133,14 @@ Select National location
 
 Click next step button
     user clicks element    id:locationFiltersForm-submit
-    Sleep    100
     user waits until table tool wizard step is available    4    Choose time period
 
 Select start date and end date
     user chooses select option    id:timePeriodForm-start    2012/13
     user chooses select option    id:timePeriodForm-end    2012/13
     user clicks element    id:timePeriodForm-submit
-     Sleep    100
     user waits until table tool wizard step is available    5    Choose your filters
     user waits until page contains element    id:filtersForm-indicators
-     Sleep    100
     user checks previous table tool step contains    4    Time period    2012/13
 
 Select Indicators
