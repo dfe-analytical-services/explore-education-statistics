@@ -238,6 +238,61 @@ Confirm finalization of this API data set version
     user waits until h2 is visible    Mappings finalised
     user waits until page contains    Draft API data set version is ready to be published
 
+User navigates to 'changelog and guidance notes' page and update relevant details in it
+    user clicks link by index    View changelog and guidance notes    1
+    user waits until page contains     API data set changelog
+    
+    user enters text into element    css:textarea[id="guidanceNotesForm-notes"]    public guidance notes
+    user clicks button    Save public guidance notes
+
+    user waits until page contains    public guidance notes
+    user clicks link    Back to API data set details
+
+User checks row data contents inside the 'Draft API datasets' summary table
+    user checks contents inside the cell value    v1.0                                       xpath://dl[@data-testid="draft-version-summary"]/div/dd[@data-testid='Version-value']/strong
+    user checks contents inside the cell value    Ready                                      xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
+    user checks contents inside the cell value    Academic year Q1 3000/01                    xpath:(//div[@data-testid="Release"]//dd[@data-testid="Release-value"]//a)[1]
+    user checks contents inside the cell value    ${SUBJECT_NAME_1}                          xpath://div[@data-testid="Data set file"]//dd[@data-testid="Data set file-value"]
+    user checks contents inside the cell value    National                                   xpath://div[@data-testid="Geographic levels"]//dd[@data-testid="Geographic levels-value"]
+    user checks contents inside the cell value    2012/13                                    xpath://div[@data-testid="Time periods"]//dd[@data-testid="Time periods-value"]
+
+
+    user checks contents inside the cell value    Lower quartile annualised earnings         xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[1]
+    user checks contents inside the cell value    Median annualised earnings                 xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[2]
+    user checks contents inside the cell value    Number of learners with earnings           xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[3]
+
+    user clicks button                              Show 1 more indicator                    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]
+
+    user checks contents inside the cell value      Upper quartile annualised earnings       xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[4]
+
+    user checks contents inside the cell value    	Cheese                                   xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[1]
+    user checks contents inside the cell value    	Colour                                   xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[2]
+    user checks contents inside the cell value    	Ethnicity group                          xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[3]
+
+    user clicks button                              Show 4 more filters                      xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]
+
+    user checks contents inside the cell value    	Gender                                    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[4]
+    user checks contents inside the cell value    	Level of learning                         xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[5]
+    user checks contents inside the cell value      Number of years after achievement of learning aim    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[6]
+    user checks contents inside the cell value      Provision                                 xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[7]
+
+
+    user checks contents inside the cell value      View changelog and guidance notes         xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[1]/a
+    user checks contents inside the cell value      Preview API data set                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[2]/a
+    user checks contents inside the cell value      View preview token log                    xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[3]/a
+    user checks contents inside the cell value      Remove draft version                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[4]/button
+
+User clicks on 'View preview token log' link inside the 'Draft version details' section
+    user clicks link by index    View changelog and guidance notes    2
+
+Validate the contents in the 'API dataset changelog' page.
+    user waits until page contains     API data set changelog
+
+    user waits until page contains    public guidance notes
+    user clicks link    Back to API data set details
+
+
+
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
@@ -261,5 +316,8 @@ Search with 2nd API dataset
 
     user waits until page finishes loading
     user clicks radio    Newest
+    Sleep    2
+
+    Sleep    10000
     user checks page contains link    ${SUBJECT_NAME_2}
     user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_2}
