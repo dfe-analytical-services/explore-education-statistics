@@ -1093,6 +1093,12 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             [
                 "invalid1|Asc",
                 "invalid2|Desc",
+                "filter|Asc",
+                "filter|invalid|Asc",
+                "location|Asc",
+                "location|invalid|Asc",
+                "indicator|Asc",
+                "indicator|invalid|Asc",
             ];
 
             var response = await QueryDataSet(
@@ -2242,6 +2248,430 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Equal(2, result.Values.Count);
             Assert.Equal("752009", result.Values[AbsenceSchoolData.IndicatorEnrolments]);
             Assert.Equal("262396", result.Values[AbsenceSchoolData.IndicatorSessAuthorised]);
+        }
+    }
+
+    public class SortsTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    {
+        [Fact]
+        public async Task SingleField_TimePeriodAsc_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                sorts: [$"timePeriod|Asc"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
+                    { "geographicLevels.eq", "NAT" }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(6, viewModel.Results.Count);
+
+            string[] expectedSequence =
+            [
+                "2020/2021",
+                "2021/2022",
+                "2022/2023"
+            ];
+
+            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.TimePeriod.Period)));
+        }
+
+        [Fact]
+        public async Task SingleField_TimePeriodDesc_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                sorts: [$"timePeriod|Desc"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
+                    { "geographicLevels.eq", "NAT" }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(6, viewModel.Results.Count);
+
+            string[] expectedSequence =
+            [
+                "2022/2023",
+                "2021/2022",
+                "2020/2021"
+            ];
+
+            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.TimePeriod.Period)));
+        }
+
+        [Fact]
+        public async Task SingleField_GeographicLevelAsc_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                sorts: ["geographicLevel|Asc"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
+                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" },
+                    { "timePeriods.eq", "2020|AY" }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(18, viewModel.Results.Count);
+
+            GeographicLevel[] expectedSequence =
+            [
+                GeographicLevel.LocalAuthority,
+                GeographicLevel.Country,
+                GeographicLevel.Region,
+                GeographicLevel.School
+            ];
+
+            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.GeographicLevel)));
+        }
+
+        [Fact]
+        public async Task SingleField_GeographicLevelDesc_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                sorts: ["geographicLevel|Desc"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
+                    { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" },
+                    { "timePeriods.eq", "2020|AY" }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(18, viewModel.Results.Count);
+
+            GeographicLevel[] expectedSequence =
+            [
+                GeographicLevel.School,
+                GeographicLevel.Region,
+                GeographicLevel.Country,
+                GeographicLevel.LocalAuthority,
+            ];
+
+            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.GeographicLevel)));
+        }
+
+        [Fact]
+        public async Task SingleField_LocationAsc_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                sorts: ["location|LA|Asc"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
+                    { "geographicLevels.eq", "LA" },
+                    { "timePeriods.eq", "2020|AY" }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(11, viewModel.Results.Count);
+
+            string[] expectedSequence =
+            [
+                AbsenceSchoolData.LocationLaBarnet,
+                AbsenceSchoolData.LocationLaBarnsley,
+                AbsenceSchoolData.LocationLaKingstonUponThames,
+                AbsenceSchoolData.LocationLaSheffield,
+            ];
+
+            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.Locations["LA"])));
+        }
+
+        [Fact]
+        public async Task SingleField_LocationDesc_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                sorts: ["location|LA|Desc"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
+                    { "geographicLevels.eq", "LA" },
+                    { "timePeriods.eq", "2020|AY" }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(11, viewModel.Results.Count);
+
+            string[] expectedSequence =
+            [
+                AbsenceSchoolData.LocationLaSheffield,
+                AbsenceSchoolData.LocationLaKingstonUponThames,
+                AbsenceSchoolData.LocationLaBarnsley,
+                AbsenceSchoolData.LocationLaBarnet,
+            ];
+
+            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.Locations["LA"])));
+        }
+
+        [Fact]
+        public async Task SingleField_FilterAsc_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                sorts: [$"filter|{AbsenceSchoolData.FilterNcYear}|Asc"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "geographicLevels.eq", "NAT" },
+                    { "timePeriods.eq", "2020|AY" }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(8, viewModel.Results.Count);
+
+            string[] expectedSequence =
+            [
+                AbsenceSchoolData.FilterNcYear10,
+                AbsenceSchoolData.FilterNcYear4,
+                AbsenceSchoolData.FilterNcYear6,
+                AbsenceSchoolData.FilterNcYear8,
+            ];
+
+            Assert.Equal(
+                expectedSequence,
+                GetSequence(viewModel.Results.Select(r => r.Filters[AbsenceSchoolData.FilterNcYear]))
+            );
+        }
+
+        [Fact]
+        public async Task SingleField_FilterDesc_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                sorts: [$"filter|{AbsenceSchoolData.FilterNcYear}|Desc"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "geographicLevels.eq", "NAT" },
+                    { "timePeriods.eq", "2020|AY" }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(8, viewModel.Results.Count);
+
+            string[] expectedSequence =
+            [
+                AbsenceSchoolData.FilterNcYear8,
+                AbsenceSchoolData.FilterNcYear6,
+                AbsenceSchoolData.FilterNcYear4,
+                AbsenceSchoolData.FilterNcYear10,
+            ];
+
+            Assert.Equal(
+                expectedSequence,
+                GetSequence(viewModel.Results.Select(r => r.Filters[AbsenceSchoolData.FilterNcYear]))
+            );
+        }
+
+        [Fact]
+        public async Task SingleField_IndicatorAsc_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                sorts: [$"indicator|{AbsenceSchoolData.IndicatorEnrolments}|Asc"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
+                    { "geographicLevels.eq", "REG" },
+                    { "timePeriods.eq", "2020|AY" }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(4, viewModel.Results.Count);
+
+            string[] expectedSequence =
+            [
+                "636969",
+                "748965",
+                "794394",
+                "960185",
+            ];
+
+            Assert.Equal(
+                expectedSequence,
+                GetSequence(viewModel.Results.Select(r => r.Values[AbsenceSchoolData.IndicatorEnrolments]))
+            );
+        }
+
+        [Fact]
+        public async Task SingleField_IndicatorDesc_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                sorts: [$"indicator|{AbsenceSchoolData.IndicatorEnrolments}|Desc"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.eq", AbsenceSchoolData.FilterNcYear4 },
+                    { "geographicLevels.eq", "REG" },
+                    { "timePeriods.eq", "2020|AY" }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(4, viewModel.Results.Count);
+
+            string[] expectedSequence =
+            [
+                "960185",
+                "794394",
+                "748965",
+                "636969",
+            ];
+
+            Assert.Equal(
+                expectedSequence,
+                GetSequence(viewModel.Results.Select(r => r.Values[AbsenceSchoolData.IndicatorEnrolments]))
+            );
+        }
+
+        [Fact]
+        public async Task MultipleFields_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: [AbsenceSchoolData.IndicatorEnrolments],
+                sorts:
+                [
+                    "timePeriod|Asc",
+                    "location|LA|Desc",
+                    $"filter|{AbsenceSchoolData.FilterNcYear}|Asc"
+                ],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "geographicLevels.eq", "LA" },
+                    { "filters.eq", AbsenceSchoolData.FilterSchoolTypeTotal }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            string[] expectedTimePeriodSequence =
+            [
+                "2020/2021",
+                "2021/2022",
+                "2022/2023",
+            ];
+
+            string[] expectedLocationSequence =
+            [
+                AbsenceSchoolData.LocationLaSheffield,
+                AbsenceSchoolData.LocationLaKingstonUponThames,
+                AbsenceSchoolData.LocationLaBarnsley,
+                AbsenceSchoolData.LocationLaBarnet,
+            ];
+
+            string[] expectedFilterSequence =
+            [
+                AbsenceSchoolData.FilterNcYear10,
+                AbsenceSchoolData.FilterNcYear4,
+                AbsenceSchoolData.FilterNcYear6,
+                AbsenceSchoolData.FilterNcYear8,
+            ];
+
+            // Creates a cartesian product of the different combinations we expect
+            var expectedSequence = expectedTimePeriodSequence
+                .SelectMany(
+                    _ => expectedLocationSequence,
+                    (timePeriod, location) => (timePeriod, location)
+                )
+                .SelectMany(
+                    _ => expectedFilterSequence,
+                    (tuple, filter) => new
+                    {
+                        TimePeriod = tuple.timePeriod,
+                        Location = tuple.location,
+                        Filter = filter
+                    }
+                )
+                .ToList();
+
+            var actualSequence = viewModel.Results
+                .Select(result => new
+                {
+                    TimePeriod = result.TimePeriod.Period,
+                    Location = result.Locations["LA"],
+                    Filter = result.Filters[AbsenceSchoolData.FilterNcYear]
+                })
+                .ToList();
+
+            Assert.Equal(48, viewModel.Results.Count);
+            Assert.Equal(actualSequence, expectedSequence);
+        }
+
+        private static List<T> GetSequence<T>(IEnumerable<T> values)
+        {
+            var sequence = new List<T>();
+
+            foreach (var value in values)
+            {
+                var previous = sequence.LastOrDefault();
+
+                if (value!.Equals(previous))
+                {
+                    continue;
+                }
+
+                sequence.Add(value);
+            }
+
+            return sequence;
         }
     }
 

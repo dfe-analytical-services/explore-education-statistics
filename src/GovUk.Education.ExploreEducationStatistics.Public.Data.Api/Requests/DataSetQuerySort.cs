@@ -18,9 +18,9 @@ public record DataSetQuerySort
     ///
     /// - `timePeriod` to sort by time period
     /// - `geographicLevel` to sort by the geographic level of the data
-    /// - `location|{level}` to sort by locations in a geographic level, where `{level}` is the level code (e.g. `REG`, `LA`)
-    /// - A filter ID (e.g. `3RxWP`) to sort by the options in that filter
-    /// - An indicator ID (e.g. `6VfPgZ`) to sort by the values in that indicator
+    /// - `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)
+    /// - `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)
+    /// - `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)
     /// </summary>
     /// <example>timePeriod</example>
     public required string Field { get; init; }
