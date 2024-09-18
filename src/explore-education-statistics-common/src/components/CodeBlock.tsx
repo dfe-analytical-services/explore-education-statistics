@@ -1,7 +1,8 @@
 import styles from '@common/components/Code.module.scss';
 import useToggle from '@common/hooks/useToggle';
 import React, { useEffect } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { a11yLight } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import Button from './Button';
 
 export interface CodeBlockProps {
@@ -36,7 +37,12 @@ export default function CodeBlock({
       >
         {copied ? <span aria-live="polite">Code copied</span> : 'Copy Code'}
       </Button>
-      <SyntaxHighlighter language={language} className={styles.pre}>
+      <SyntaxHighlighter
+        className={styles.pre}
+        language={language}
+        style={a11yLight}
+        codeTagProps={{ tabIndex: 0 }}
+      >
         {code}
       </SyntaxHighlighter>
     </div>
