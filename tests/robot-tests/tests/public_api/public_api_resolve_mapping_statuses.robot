@@ -233,10 +233,11 @@ Validate the row headings and its contents in the 'filters options' section(afte
     user clicks link    Back
 
 Confirm finalization of this API data set version
-    User Clicks Button    Finalise this data set version
-    User Waits For Caches To Expire
-    User Waits Until H2 Is Visible    Mappings finalised
-    User Waits Until Page Contains    Draft API data set version is ready to be published
+    user clicks button    Finalise this data set version
+    user waits for caches to expire
+    user waits until h2 is visible    Mappings finalised
+    user waits until page contains    Draft API data set version is ready to be published
+
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
