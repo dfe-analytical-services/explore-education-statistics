@@ -166,6 +166,7 @@ module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
+    tagValues: tagValues
   }
 }
 
@@ -269,6 +270,8 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
     publicApiContainerAppSettings: {
       resourceName: apiAppModule.outputs.containerAppName
       backendFqdn: apiAppModule.outputs.containerAppFqdn
+      backendDomainName: substring(apiAppModule.outputs.containerAppFqdn, indexOf(apiAppModule.outputs.containerAppFqdn, '.') + 1)
+      backendIpAddress: containerAppEnvironmentModule.outputs.containerAppEnvironmentIpAddress
       publicFqdn: replace(publicUrls.publicApi, 'https://', '')
       certificateName: '${apiAppModule.outputs.containerAppName}-certificate'
       healthProbeRelativeUrl: apiAppModule.outputs.containerAppHealthProbeRelativeUrl

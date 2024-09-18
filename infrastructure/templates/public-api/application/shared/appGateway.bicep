@@ -28,15 +28,10 @@ module appGatewayModule '../../components/appGateway.bicep' = {
     appGatewayName: resourceNames.sharedResources.appGateway
     managedIdentityName: resourceNames.sharedResources.appGatewayIdentity
     keyVaultName: resourceNames.existingResources.keyVault
+    vnetName: resourceNames.existingResources.vNet
     subnetId: subnet.id
     sites: [
-      {
-        resourceName: publicApiContainerAppSettings.resourceName
-        backendFqdn: publicApiContainerAppSettings.backendFqdn
-        publicFqdn: publicApiContainerAppSettings.publicFqdn
-        certificateName: publicApiContainerAppSettings.certificateName
-        healthProbeRelativeUrl: publicApiContainerAppSettings.healthProbeRelativeUrl
-      }
+      publicApiContainerAppSettings
     ]
     tagValues: tagValues
   }

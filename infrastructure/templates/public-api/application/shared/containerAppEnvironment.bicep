@@ -47,3 +47,4 @@ module containerAppEnvironmentModule '../../components/containerAppEnvironment.b
 }
 
 output containerAppEnvironmentId string = containerAppEnvironmentModule.outputs.containerAppEnvironmentId
+output containerAppEnvironmentIpAddress string = containerAppEnvironmentModule.outputs.containerAppEnvironmentIpAddress
