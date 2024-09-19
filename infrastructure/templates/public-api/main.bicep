@@ -140,8 +140,7 @@ var resourceNames = {
     appInsights: '${publicApiResourcePrefix}-${abbreviations.insightsComponents}'
     dataProcessor: '${publicApiResourcePrefix}-${abbreviations.webSitesFunctions}-processor'
     dataProcessorIdentity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.webSitesFunctions}-processor'
-    // TODO - would this better be '${publicApiResourcePrefix}-${abbreviations.webServerFarms}-${abbreviations.webSitesFunctions}-processor' 
-    dataProcessorPlan: '${publicApiResourcePrefix}-${abbreviations.webServerFarms}-processor'
+    dataProcessorPlan: '${publicApiResourcePrefix}-${abbreviations.webServerFarms}-${abbreviations.webSitesFunctions}-processor'
     dataProcessorStorageAccountsPrefix: '${subscription}eessaprocessor'
     publicApiFileshare: '${publicApiResourcePrefix}-fs-data'
     publicApiStorageAccount: '${replace(publicApiResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}'
@@ -253,6 +252,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     contentApiUrl: publicUrls.contentApi
     publicApiUrl: publicUrls.publicApi
     dockerImagesTag: dockerImagesTag
+    appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
     tagValues: tagValues
   }
   dependsOn: [

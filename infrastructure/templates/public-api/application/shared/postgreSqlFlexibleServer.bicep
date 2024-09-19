@@ -59,11 +59,21 @@ module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
   }
 }
 
+resource maxPreparedTransactionsConfig 'Microsoft.DBforPostgreSQL/flexibleServers/configurations@2022-12-01' = {
+  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}/max_prepared_transactions'
+  properties: {
+    value: '100'
+    source: 'user-override'
+  }
+  dependsOn: [
+    postgreSqlServerModule
+  ]
+}
+
 var managedIdentityConnectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
 
 var dataProcessorPsqlConnectionStringSecretKey = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
 
-// TODO - these are reliant on PSQL being deployed successfully at least once, so they should be made dependent on PSQL being created or updated.
 module storeDataProcessorPsqlConnectionString '../../components/keyVaultSecret.bicep' = {
   name: 'storeDataProcessorPsqlConnectionString'
   params: {

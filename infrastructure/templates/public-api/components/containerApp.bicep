@@ -185,6 +185,7 @@ module azureAuthentication 'containerAppAzureAuthentication.bicep' = if (entraId
     containerAppName: containerApp.name
     allowedClientIds: entraIdAuthentication!.allowedClientIds
     allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
+    requireAuthentication: entraIdAuthentication!.requireAuthentication
   }
 }
 

@@ -16,3 +16,4 @@ module applicationInsightsModule '../../components/appInsights.bicep' = {
 
 output appInsightsName string = resourceNames.publicApi.appInsights
 output appInsightsKey string = applicationInsightsModule.outputs.applicationInsightsKey
+output appInsightsConnectionString string = applicationInsightsModule.outputs.applicationInsightsConnectionString

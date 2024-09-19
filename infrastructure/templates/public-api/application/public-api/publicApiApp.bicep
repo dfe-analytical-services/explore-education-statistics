@@ -21,6 +21,9 @@ param contentApiUrl string
 @description('Specifies the Application (Client) Id of the App Registration used to represent the API Container App.')
 param apiAppRegistrationClientId string
 
+@description('Specifies the Application Insights connection string for this Container App to use for its monitoring.')
+param appInsightsConnectionString string
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -110,6 +113,10 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       {
         name: 'OpenIdConnect__ClientId'
         value: apiAppRegistrationClientId
+      }
+      {
+        name: 'ApplicationInsights__ConnectionString'
+        value: appInsightsConnectionString
       }
     ]
     entraIdAuthentication: {

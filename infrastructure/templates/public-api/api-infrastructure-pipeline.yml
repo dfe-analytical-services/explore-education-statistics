@@ -21,7 +21,7 @@ resources:
 variables:
   - group: Public API Infrastructure - common
   - name: isDev
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-5479-modularise-bicep')]
   - name: isTest
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
   - name: isMaster
