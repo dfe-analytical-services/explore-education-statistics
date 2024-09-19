@@ -1,4 +1,6 @@
+using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -10,9 +12,15 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
+using System.Globalization;
+using System.Net;
+using System.Net.Mime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -1107,6 +1115,288 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/meta", query);
 
             return await client.GetAsync(uri);
+        }
+    }
+
+    public class DownloadDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    {
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatuses),
+            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+        public async Task LatestVersionAvailable_Returns200(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var csvData = new List<TestClass>
+            {
+                new() {
+                    FirstColumn = "first-column-value-1",
+                    SecondColumn = "second-column-value-1"
+                },
+                new() {
+                    FirstColumn = "first-column-value-2",
+                    SecondColumn = "second-column-value-2"
+                }
+            };
+
+            await CreateGZippedTestCsv(dataSetVersion, csvData);
+
+            var downloadResponse = await DownloadDataSet(dataSet.Id);
+
+            downloadResponse.AssertOk();
+
+            Assert.Equal(MediaTypeNames.Text.Csv, downloadResponse.Content.Headers.ContentType!.MediaType);
+
+            var contentEncoding = Assert.Single(downloadResponse.Content.Headers.ContentEncoding);
+            Assert.Equal(ContentEncodings.Gzip, contentEncoding);
+
+            var results = await DecompressGZippedCsv(downloadResponse);
+
+            Assert.Equal(csvData.Count, results.Count);
+            Assert.All(results, r => Assert.Single(csvData, data => data.FirstColumn == r.FirstColumn && data.SecondColumn == r.SecondColumn));
+        }
+
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatuses),
+            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+        public async Task RequestedVersionAvailable_Returns200(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion latestDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSet(dataSet);
+
+            DataSetVersion requestedDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatus(dataSetVersionStatus)
+                .WithVersionNumber(major: 1, minor: 1, patch: 0)
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange([latestDataSetVersion, requestedDataSetVersion]);
+                context.DataSets.Update(dataSet);
+            });
+
+            var csvData = new List<TestClass>
+            {
+                new() {
+                    FirstColumn = "first-column-value-1",
+                    SecondColumn = "second-column-value-1"
+                },
+                new() {
+                    FirstColumn = "first-column-value-2",
+                    SecondColumn = "second-column-value-2"
+                }
+            };
+
+            await CreateGZippedTestCsv(requestedDataSetVersion, csvData);
+
+            var downloadResponse = await DownloadDataSet(dataSet.Id, requestedDataSetVersion.PublicVersion);
+
+            downloadResponse.AssertOk();
+
+            Assert.Equal(MediaTypeNames.Text.Csv, downloadResponse.Content.Headers.ContentType!.MediaType);
+
+            var contentEncoding = Assert.Single(downloadResponse.Content.Headers.ContentEncoding);
+            Assert.Equal(ContentEncodings.Gzip, contentEncoding);
+
+            var results = await DecompressGZippedCsv(downloadResponse);
+
+            Assert.Equal(csvData.Count, results.Count);
+            Assert.All(results, r => Assert.Single(csvData, data => data.FirstColumn == r.FirstColumn && data.SecondColumn == r.SecondColumn));
+        }
+
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+        public async Task LatestVersionUnavailable_Returns403(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await DownloadDataSet(dataSet.Id);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [MemberData(nameof(DataSetVersionStatusViewTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusViewTheoryData))]
+        public async Task RequestedVersionUnavailable_Returns403(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion latestDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion requestedDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatus(dataSetVersionStatus)
+                .WithVersionNumber(major: 1, minor: 1, patch: 0)
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange([latestDataSetVersion, requestedDataSetVersion]);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await DownloadDataSet(dataSet.Id, requestedDataSetVersion.PublicVersion);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task DataSetDoesNotExist_Returns404()
+        {
+            var response = await DownloadDataSet(Guid.NewGuid());
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task LatestVersionDoesNotExist_Returns404()
+        {
+            DataSet dataSet = DataFixture
+               .DefaultDataSet()
+               .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var response = await DownloadDataSet(dataSet.Id);
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task RequestedVersionDoesNotExist_Returns404()
+        {
+            DataSet dataSet = DataFixture
+               .DefaultDataSet()
+               .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await DownloadDataSet(dataSet.Id, "2.0");
+
+            response.AssertNotFound();
+        }
+
+        private async Task CreateGZippedTestCsv(DataSetVersion dataSetVersion, IReadOnlyList<TestClass> csvData)
+        {
+            var dataSetVersionPathResolver = TestApp.Services.GetRequiredService<IDataSetVersionPathResolver>();
+
+            using var memStream = new MemoryStream();
+            using var streamWriter = new StreamWriter(memStream);
+            using var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
+
+            csvWriter.WriteRecords(csvData);
+            await csvWriter.FlushAsync();
+            memStream.Position = 0;
+
+            var dataSetVersionDirectoryPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
+            Directory.CreateDirectory(dataSetVersionDirectoryPath);
+
+            var compressedDataSetFilePath = Path.Combine(dataSetVersionDirectoryPath, DataSetFilenames.CsvDataFile);
+
+            using var fileStream = new FileStream(compressedDataSetFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
+
+            await CompressionUtils.CompressToStream(memStream, fileStream, ContentEncodings.Gzip);
+        }
+
+        private static async Task<List<TestClass>> DecompressGZippedCsv(HttpResponseMessage downloadResponse)
+        {
+            using var dowloadedFileEncodedStream = await downloadResponse.Content.ReadAsStreamAsync();
+            using var targetStream = new MemoryStream();
+            using var streamReader = new StreamReader(targetStream);
+            using var csvReader = new CsvReader(streamReader, CultureInfo.InvariantCulture);
+
+            await CompressionUtils.DecompressToStream(dowloadedFileEncodedStream, targetStream, ContentEncodings.Gzip);
+
+            return csvReader.GetRecords<TestClass>().ToList();
+        }
+
+        private async Task<HttpResponseMessage> DownloadDataSet(
+            Guid dataSetId,
+            string? dataSetVersion = null)
+        {
+            var client = BuildApp().CreateClient();
+
+            var query = new Dictionary<string, StringValues>();
+
+            if (dataSetVersion is not null)
+            {
+                query["dataSetVersion"] = dataSetVersion;
+            }
+
+            var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/csv", query);
+
+            return await client.GetAsync(uri);
+        }
+
+        private record TestClass
+        {
+            public string FirstColumn { get; init; } = null!;
+            public string SecondColumn { get; init; } = null!;
         }
     }
 
