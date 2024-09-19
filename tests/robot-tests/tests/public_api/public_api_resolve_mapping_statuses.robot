@@ -249,7 +249,7 @@ User navigates to 'changelog and guidance notes' page and update relevant detail
     user clicks link    Back to API data set details
 
 User checks row data contents inside the 'Draft API datasets' summary table
-    user checks contents inside the cell value    v1.0                                       xpath://dl[@data-testid="draft-version-summary"]/div/dd[@data-testid='Version-value']/strong
+    user checks contents inside the cell value    v1.1                                       xpath://dl[@data-testid="draft-version-summary"]/div/dd[@data-testid='Version-value']/strong
     user checks contents inside the cell value    Ready                                      xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
     user checks contents inside the cell value    Academic year Q1 3000/01                    xpath:(//div[@data-testid="Release"]//dd[@data-testid="Release-value"]//a)[1]
     user checks contents inside the cell value    ${SUBJECT_NAME_1}                          xpath://div[@data-testid="Data set file"]//dd[@data-testid="Data set file-value"]
