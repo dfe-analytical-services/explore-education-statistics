@@ -28,7 +28,8 @@ public class FilterOptionsDuckDbRepository(PublicDataDbContext publicDataDbConte
                  {FilterOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
                  {FilterOptionsTable.Cols.Label:raw} VARCHAR,
                  {FilterOptionsTable.Cols.PublicId:raw} VARCHAR,
-                 {FilterOptionsTable.Cols.FilterId:raw} VARCHAR
+                 {FilterOptionsTable.Cols.FilterId:raw} VARCHAR,
+                 {FilterOptionsTable.Cols.FilterColumn:raw} VARCHAR
              )
              """
         ).ExecuteAsync(cancellationToken: cancellationToken);
@@ -47,6 +48,7 @@ public class FilterOptionsDuckDbRepository(PublicDataDbContext publicDataDbConte
                 insertRow.AppendValue(link.Option.Label);
                 insertRow.AppendValue(link.PublicId);
                 insertRow.AppendValue(filter.PublicId);
+                insertRow.AppendValue(filter.Column);
 
                 insertRow.EndRow();
             }

@@ -158,12 +158,13 @@ public class DataSetVersionChangeService(
                 .ToDictionary(
                     grouping => grouping.Key,
                     grouping => grouping
-                        .GroupBy(t => (t.Meta.PublicId, t.Meta.Label), t => t.Option)
+                        .GroupBy(t => (t.Meta.PublicId, t.Meta.Column, t.Meta.Label), t => t.Option)
                         .Select(metaGroup => new FilterOptionChangesViewModel
                         {
                             Filter = new FilterViewModel
                             {
                                 Id = metaGroup.Key.PublicId,
+                                Column = metaGroup.Key.Column,
                                 Label = metaGroup.Key.Label
                             },
                             Options = metaGroup.ToList()

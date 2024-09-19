@@ -26,6 +26,9 @@ public static class FilterMetaGeneratorExtensions
     public static Generator<FilterMeta> WithPublicId(this Generator<FilterMeta> generator, string identifier)
         => generator.ForInstance(s => s.SetPublicId(identifier));
 
+    public static Generator<FilterMeta> WithColumn(this Generator<FilterMeta> generator, string column)
+        => generator.ForInstance(s => s.SetColumn(column));
+
     public static Generator<FilterMeta> WithLabel(this Generator<FilterMeta> generator, string label)
         => generator.ForInstance(s => s.SetLabel(label));
 
@@ -49,7 +52,8 @@ public static class FilterMetaGeneratorExtensions
 
     public static InstanceSetters<FilterMeta> SetDefaults(this InstanceSetters<FilterMeta> setters)
         => setters
-            .SetDefault(m => m.PublicId)
+            .Set(m => m.PublicId, f => f.Random.AlphaNumeric(10))
+            .SetDefault(m => m.Column)
             .SetDefault(m => m.Label)
             .SetDefault(m => m.Hint);
 
@@ -67,6 +71,9 @@ public static class FilterMetaGeneratorExtensions
 
     public static InstanceSetters<FilterMeta> SetPublicId(this InstanceSetters<FilterMeta> setters, string publicId)
         => setters.Set(m => m.PublicId, publicId);
+
+    public static InstanceSetters<FilterMeta> SetColumn(this InstanceSetters<FilterMeta> setters, string column)
+        => setters.Set(m => m.Column, column);
 
     public static InstanceSetters<FilterMeta> SetLabel(this InstanceSetters<FilterMeta> setters, string label)
         => setters.Set(m => m.Label, label);
@@ -86,17 +93,13 @@ public static class FilterMetaGeneratorExtensions
             .Set((_, m, context) =>
             {
                 m.Options = options().ToList();
-
-                if (context.Fixture is not null)
-                {
-                    m.OptionLinks = m.Options
-                        .Select(o => context.Fixture
-                            .DefaultFilterOptionMetaLink()
-                            .WithOption(o)
-                            .WithMeta(m)
-                            .Generate())
-                        .ToList();
-                }
+                m.OptionLinks = m.Options
+                    .Select(o => context.Fixture
+                        .DefaultFilterOptionMetaLink()
+                        .WithOption(o)
+                        .WithMeta(m)
+                        .Generate())
+                    .ToList();
             });
 
     public static InstanceSetters<FilterMeta> SetOptionLinks(

@@ -88,8 +88,8 @@ public class DataDuckDbRepository(
             ..dataSetVersion.FilterMetas.Select(
                 filter => $"""
                            LEFT JOIN {FilterOptionsTable.TableName} AS {FilterOptionsTable.Alias(filter)}
-                           ON {FilterOptionsTable.Ref(filter).FilterId} = '{filter.PublicId}'
-                           AND {FilterOptionsTable.Ref(filter).Label} = {DataSourceTable.Ref.Col(filter.PublicId)}
+                           ON {FilterOptionsTable.Ref(filter).FilterColumn} = '{filter.Column}'
+                           AND {FilterOptionsTable.Ref(filter).Label} = {DataSourceTable.Ref.Col(filter.Column)}
                            """
             ),
             $"""
