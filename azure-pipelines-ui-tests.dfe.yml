@@ -223,7 +223,7 @@ jobs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-admin-public
 
-- job: 'Public API'
+- job: 'PublicAPI'
   displayName: Public API suite - Robot UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
