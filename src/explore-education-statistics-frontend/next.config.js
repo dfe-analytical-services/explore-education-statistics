@@ -40,7 +40,7 @@ const nextConfig = {
     return [
       {
         source: '/data-catalogue/data-set/:dataSetFileId/csv',
-        destination: `${this.publicRuntimeConfig.CONTENT_API_BASE_URL}/data-set-files/:dataSetFileId/download`,
+        destination: `${process.env.CONTENT_API_BASE_URL}/data-set-files/:dataSetFileId/download`,
       },
     ];
   },
