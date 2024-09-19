@@ -1,5 +1,5 @@
-@description('Specifies the subscription name of the Log Analytics Workspace - used for creating name prefix')
-param subscription string
+@description('Specifies the name of the Log Analytics Workspace')
+param logAnalyticsWorkspaceName string
 
 @description('Specifies the location of the Log Analytics Workspace - defaults to that of the Resource Group')
 param location string
@@ -13,8 +13,6 @@ param sku {
 
 @description('Specifies a set of tags with which to tag the resource in Azure')
 param tagValues object
-
-var logAnalyticsWorkspaceName = '${subscription}-ees-log'
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: logAnalyticsWorkspaceName

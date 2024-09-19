@@ -1,13 +1,8 @@
-@description('Specifies the Resource Prefix')
-param resourcePrefix string
+@description('Specifies the name of the Container Registry (must be globally unique)')
+param containerRegistryName string
 
 @description('Specifies the location for all resources.')
 param location string
-
-@minLength(5)
-@maxLength(50)
-@description('Name of the azure container registry (must be globally unique)')
-param containerRegistryName string
 
 @allowed([
   'Basic'
@@ -23,10 +18,8 @@ param deployRegistry bool
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-var registryName = replace('${resourcePrefix}cr${containerRegistryName}', '-', '')
-
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' = if (deployRegistry) {
-  name: registryName
+  name: containerRegistryName
   location: location
   sku: {
     name: skuName
@@ -44,7 +37,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' =
 }
 
 resource currentContainerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: registryName
+  name: containerRegistryName
 }
 
 output containerRegistryId string = currentContainerRegistry.id

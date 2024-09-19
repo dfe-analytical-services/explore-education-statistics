@@ -1,3 +1,5 @@
+import { firewallRuleType } from '../types.bicep'
+
 @description('Specifies the location for all resources.')
 param location string
 
@@ -8,23 +10,10 @@ param storageAccountName string
 param allowedSubnetIds string[] = []
 
 @description('Storage Account Network Firewall Rules')
-param firewallRules {
-  name: string
-  cidr: string
-}[] = []
+param firewallRules firewallRuleType[] = []
 
 @description('Storage Account SKU')
-@allowed([
-  'Standard_LRS'
-  'Standard_GRS'
-  'Standard_RAGRS'
-  'Standard_ZRS'
-  'Premium_LRS'
-  'Premium_ZRS'
-  'Standard_GZRS'
-  'Standard_RAGZRS'
-])
-param skuStorageResource string = 'Standard_LRS'
+param skuStorageResource 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 'Premium_LRS' | 'Premium_ZRS' | 'Standard_GZRS' | 'Standard_RAGZRS' = 'Standard_LRS'
 
 @description('Storage Account Name')
 param keyVaultName string
