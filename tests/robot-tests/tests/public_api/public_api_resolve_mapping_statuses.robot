@@ -291,9 +291,6 @@ Validate the contents in the 'API dataset changelog' page.
     user waits until page contains    public guidance notes
     user clicks link    Back to API data set details
 
-
-
-
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
@@ -316,8 +313,36 @@ Search with 2nd API dataset
 
     user waits until page finishes loading
     user clicks radio    Newest
-    Sleep    2
 
-    Sleep    10000
+    ${API_DATASET_STATUS_VALUE}=  set variable  li[data-testid="data-set-file-summary-UI test subject 2"]:nth-of-type(1) [data-testid="Status-value"] strong:nth-of-type(1)
+    user checks contents inside the cell value     This is the latest data     css:${API_DATASET_STATUS_VALUE}
     user checks page contains link    ${SUBJECT_NAME_2}
+
     user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_2}
+
+User clicks on API dataset link
+    user clicks link by index    ${SUBJECT_NAME_2}
+    user waits until page finishes loading
+
+    user waits until h1 is visible    ${SUBJECT_NAME_2}
+
+User checks relevant headings exist on API dataset details page
+    user waits until h2 is visible    Data set details
+    user waits until h2 is visible    Data set preview
+    user waits until h2 is visible    Variables in this data set
+    user waits until h2 is visible    Using this data
+    user waits until h2 is visible    API data set quick start
+    user waits until h2 is visible    API data set version history
+
+User verifies the headings and contents in 'API version history' section
+    user checks table column heading contains    1    1    Version    css:section[id="apiVersionHistory"]
+    user checks table column heading contains    1    2    Release    css:section[id="apiVersionHistory"]
+    user checks table column heading contains    1    3    Status     css:section[id="apiVersionHistory"]
+
+    user checks table cell contains              1    1    1.1 (current)                xpath://section[@id="apiVersionHistory"]
+    user checks table cell contains              1    2    Academic year 3010/11        xpath://section[@id="apiVersionHistory"]
+    user checks table cell contains              1    3    Published                    xpath://section[@id="apiVersionHistory"]
+
+    user checks table cell contains              2    1    1.0                          xpath://section[@id="apiVersionHistory"]
+    user checks table cell contains              2    2    Financial year 3000-01       xpath://section[@id="apiVersionHistory"]
+    user checks table cell contains              2    3    Published                    xpath://section[@id="apiVersionHistory"]
