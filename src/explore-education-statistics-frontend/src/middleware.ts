@@ -1,9 +1,8 @@
 import redirectPages from '@frontend/middleware/pages/redirectPages';
-import type { NextRequest } from 'next/server';
+import chain from './middleware/chain';
+import rewriteDataCatalogueDownload from './middleware/pages/rewriteDataCatalogue';
 
-export default async function middleware(request: NextRequest) {
-  return redirectPages(request);
-}
+export default chain([rewriteDataCatalogueDownload, redirectPages]);
 
 // Only run the middleware on the specified paths below.
 // Ideally we'd just exclude build files and run it on all routes,
@@ -16,6 +15,7 @@ export const config = {
     '/find-statistics/:path*/:path*',
     '/data-tables',
     '/data-catalogue',
+    '/data-catalogue/data-set/:dataSetFileId/csv',
     '/methodology/:path*',
     '/subscriptions',
   ],
