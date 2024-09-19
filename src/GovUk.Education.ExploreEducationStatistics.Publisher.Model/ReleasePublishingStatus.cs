@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using Azure;
 using Azure.Data.Tables;
 using Newtonsoft.Json;
@@ -15,7 +16,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public DateTimeOffset? Timestamp { get; set; }
         public ETag ETag { get; set; }
 
+        [IgnoreDataMember]
         public Guid ReleaseVersionId => Guid.Parse(PartitionKey);
+
+        [IgnoreDataMember]
         public Guid Id => Guid.Parse(RowKey);
 
         public DateTime Created { get; set; }
@@ -27,7 +31,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public string PublishingStage { get; set; }
         public ReleasePublishingStatusOverallStage OverallStage { get; set; }
         public bool Immediate { get; set; }
+
+        [IgnoreDataMember]
         public string Messages { get; set; }
+
+        [IgnoreDataMember]
         private ReleasePublishingStatusState _state;
 
         public ReleasePublishingStatus()
@@ -55,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             State = state;
         }
 
+        [IgnoreDataMember]
         public ReleasePublishingStatusState State
         {
             get
@@ -82,6 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             }
         }
 
+        [IgnoreDataMember]
         public IEnumerable<ReleasePublishingStatusLogMessage> LogMessages => Messages == null
             ? new List<ReleasePublishingStatusLogMessage>()
             : JsonConvert.DeserializeObject<IEnumerable<ReleasePublishingStatusLogMessage>>(Messages);
