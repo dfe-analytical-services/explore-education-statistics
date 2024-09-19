@@ -38,18 +38,12 @@ public abstract class DataSetVersionPathResolverTests
 
     public class PathTests : DataSetVersionPathResolverTests
     {
-        public static IEnumerable<object[]> GetEnvironmentNames =>
-        [
-            [
-                Environments.Development
-            ],
-            [
-                HostEnvironmentExtensions.IntegrationTestEnvironment
-            ],
-            [
-                Environments.Production
-            ]
-        ];
+        public static readonly TheoryData<string> GetEnvironmentNames = new()
+        {
+            Environments.Development,
+            HostEnvironmentExtensions.IntegrationTestEnvironment,
+            Environments.Production
+        };
 
         [Fact]
         public void DevelopmentEnv_ValidBasePath()
@@ -116,10 +110,7 @@ public abstract class DataSetVersionPathResolverTests
             });
 
             Assert.Equal(
-                Path.Combine(
-                    "data",
-                    "data-files"
-                ),
+                Path.Combine("data", "data-files"),
                 resolver.BasePath());
         }
 
@@ -140,7 +131,7 @@ public abstract class DataSetVersionPathResolverTests
 
             Assert.Equal(
                 Path.Combine(
-                    resolver.BasePath(),
+                    resolver.DataSetsPath(),
                     version.DataSetId.ToString(),
                     "v1.0.0"
                 ),
@@ -164,7 +155,7 @@ public abstract class DataSetVersionPathResolverTests
 
             Assert.Equal(
                 Path.Combine(
-                    resolver.BasePath(),
+                    resolver.DataSetsPath(),
                     version.DataSetId.ToString(),
                     "v1.2.3"
                 ),

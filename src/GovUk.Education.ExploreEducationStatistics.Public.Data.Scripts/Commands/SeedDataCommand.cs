@@ -871,7 +871,7 @@ public class SeedDataCommand : ICommand
         private async Task OutputParquetFiles()
         {
             var projectRootPath = PathUtils.ProjectRootPath;
-            var dataDir = Path.Combine(projectRootPath, "data", "public-api-data");
+            var dataDir = Path.Combine(projectRootPath, "data", "public-api-data", DataSetFilenames.DataSetsDirectory);
 
             if (!Path.Exists(dataDir))
             {
