@@ -270,6 +270,7 @@ public class SeedDataCommand : ICommand
             await _console.Output.WriteLineAsync("=> Started seeding Parquet data");
 
             await SeedParquetData();
+            await OutputFiles();
 
             stopwatch.Stop();
 
@@ -573,7 +574,7 @@ public class SeedDataCommand : ICommand
             {
                 var nameCol = meta.Level.CsvNameColumn();
                 var codeCols = meta.Level.CsvCodeColumns();
-                string[] cols = [..codeCols, nameCol];
+                string[] cols = [.. codeCols, nameCol];
 
                 var options = (await _duckDbConnection.SqlBuilder(
                             $"""
@@ -864,57 +865,6 @@ public class SeedDataCommand : ICommand
                  {DataSourceTable.Ref.TimePeriod:raw} DESC
                  """
             ).ExecuteAsync(cancellationToken: _cancellationToken);
-
-            await OutputParquetFiles();
-        }
-
-        private async Task OutputParquetFiles()
-        {
-            var projectRootPath = PathUtils.ProjectRootPath;
-            var dataDir = Path.Combine(projectRootPath, "data", "public-api-data", DataSetFilenames.DataSetsDirectory);
-
-            if (!Path.Exists(dataDir))
-            {
-                Directory.CreateDirectory(dataDir);
-            }
-
-            var dataSetDir = Path.Combine(dataDir, _seed.DataSet.Id.ToString());
-
-            if (Path.Exists(dataSetDir))
-            {
-                // Make sure data set directory is empty before exporting
-                Directory.Delete(dataSetDir, recursive: true);
-
-                // Deletion can be asynchronous (at OS level), meaning
-                // we have to do this to make sure the directory has
-                // actually been removed before proceeding...
-                while (Directory.Exists(dataSetDir))
-                {
-                    Thread.Sleep(100);
-                }
-            }
-
-            Directory.CreateDirectory(dataSetDir);
-
-            var versionDir = Path.Combine(dataSetDir, "v1.0.0");
-
-            Directory.CreateDirectory(versionDir);
-
-            await _duckDbConnection.SqlBuilder(
-                    $"EXPORT DATABASE '{versionDir:raw}' (FORMAT PARQUET, CODEC ZSTD)")
-                .ExecuteAsync(cancellationToken: _cancellationToken);
-
-            // Convert absolute paths in load.sql to relative paths otherwise
-            // these refer to the machine that the script was run on.
-
-            var loadSqlFilePath = Path.Combine(versionDir, DataSetFilenames.DuckDbLoadSqlFile);
-
-            var absolutePathToReplace = $"{versionDir.Replace('\\', '/')}/";
-
-            var newLines = (await File.ReadAllLinesAsync(loadSqlFilePath, _cancellationToken))
-                .Select(line => line.Replace(absolutePathToReplace, ""));
-
-            await File.WriteAllLinesAsync(loadSqlFilePath, newLines, _cancellationToken);
         }
 
         private async Task CreateParquetMetaTables(DataSetVersion version)
@@ -1118,6 +1068,79 @@ public class SeedDataCommand : ICommand
                         CsvName: geographicLevel.CsvCodeColumns().First())
                 ],
             };
+        }
+
+        private async Task OutputFiles()
+        {
+            var versionDir = CreateOutputDirectory();
+
+            await OutputParquetFiles(versionDir);
+
+            await OutputCompressedDataFile(versionDir);
+        }
+
+        private string CreateOutputDirectory()
+        {
+            var projectRootPath = PathUtils.ProjectRootPath;
+            var dataDir = Path.Combine(projectRootPath, "data", "public-api-data", DataSetFilenames.DataSetsDirectory);
+
+            if (!Path.Exists(dataDir))
+            {
+                Directory.CreateDirectory(dataDir);
+            }
+
+            var dataSetDir = Path.Combine(dataDir, _seed.DataSet.Id.ToString());
+
+            if (Path.Exists(dataSetDir))
+            {
+                // Make sure data set directory is empty before exporting
+                Directory.Delete(dataSetDir, recursive: true);
+
+                // Deletion can be asynchronous (at OS level), meaning
+                // we have to do this to make sure the directory has
+                // actually been removed before proceeding...
+                while (Directory.Exists(dataSetDir))
+                {
+                    Thread.Sleep(100);
+                }
+            }
+
+            Directory.CreateDirectory(dataSetDir);
+
+            var versionDir = Path.Combine(dataSetDir, "v1.0.0");
+
+            Directory.CreateDirectory(versionDir);
+
+            return versionDir;
+        }
+
+        private async Task OutputParquetFiles(string dataSetVersionDirectory)
+        {
+            await _duckDbConnection.SqlBuilder(
+                    $"EXPORT DATABASE '{dataSetVersionDirectory:raw}' (FORMAT PARQUET, CODEC ZSTD)")
+                .ExecuteAsync(cancellationToken: _cancellationToken);
+
+            // Convert absolute paths in load.sql to relative paths otherwise
+            // these refer to the machine that the script was run on.
+
+            var loadSqlFilePath = Path.Combine(dataSetVersionDirectory, DataSetFilenames.DuckDbLoadSqlFile);
+
+            var absolutePathToReplace = $"{dataSetVersionDirectory.Replace('\\', '/')}/";
+
+            var newLines = (await File.ReadAllLinesAsync(loadSqlFilePath, _cancellationToken))
+                .Select(line => line.Replace(absolutePathToReplace, ""));
+
+            await File.WriteAllLinesAsync(loadSqlFilePath, newLines, _cancellationToken);
+        }
+
+        private async Task OutputCompressedDataFile(string versionDir)
+        {
+            var dataFileSourceStream = new FileStream(_dataFilePath, FileMode.Open, FileAccess.Read, FileShare.None);
+
+            var dataFileDestinationPath = Path.Combine(versionDir, DataSetFilenames.CsvDataFile);
+            var dataFileTargetStream = new FileStream(dataFileDestinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
+
+            await CompressionUtils.CompressToStream(dataFileSourceStream, dataFileTargetStream, ContentEncodings.Gzip);
         }
 
         private record LocationColumn(string Name, string CsvName);
