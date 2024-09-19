@@ -15,6 +15,8 @@ import parseHtmlString, {
   attributesToProps,
 } from 'html-react-parser';
 import React, { ReactElement, useMemo } from 'react';
+import { useRedirectsContext } from '@common/contexts/RedirectsContext';
+import applyRedirectRules from '@common/utils/url/applyRedirectRules';
 
 export interface ContentHtmlProps {
   className?: string;
@@ -38,6 +40,7 @@ export default function ContentHtml({
   transformFeaturedTableLinks,
 }: ContentHtmlProps) {
   const { isMounted } = useMounted();
+  const { redirects } = useRedirectsContext();
 
   const cleanHtml = useMemo(() => {
     const opts: SanitizeHtmlOptions = {
@@ -90,7 +93,7 @@ export default function ContentHtml({
             {text} (opens in a new tab)
           </a>
         ) : (
-          <a href={url}>{text}</a>
+          <a href={applyRedirectRules(url, redirects)}>{text}</a>
         );
       }
 

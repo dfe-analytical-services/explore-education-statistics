@@ -1,20 +1,16 @@
-export interface Redirects {
-  methodologies: Redirect[];
-  publications: Redirect[];
-}
+import createMemoryCache from '@common/utils/cache/createMemoryCache';
+import { Redirects } from '@common/utils/url/applyRedirectRules';
 
-export type RedirectType = keyof Redirects;
-
-interface Redirect {
-  fromSlug: string;
-  toSlug: string;
-}
+const redirects = createMemoryCache<Redirects>({
+  get: async () => (await fetch(`${contentApiUrl}/redirects`)).json(),
+  initial: { publications: [], methodologies: [] },
+});
 
 const contentApiUrl = process.env.CONTENT_API_BASE_URL;
 
 const redirectService = {
   async list(): Promise<Redirects> {
-    return (await fetch(`${contentApiUrl}/redirects`)).json();
+    return redirects.get();
   },
 };
 
