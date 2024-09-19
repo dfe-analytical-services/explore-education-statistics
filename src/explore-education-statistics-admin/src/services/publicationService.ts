@@ -75,6 +75,7 @@ export interface PublicationCreateRequest {
   summary: string;
   contact: ContactSave;
   supersededById?: string;
+  themeId: string;
   topicId: string;
 }
 
@@ -103,9 +104,9 @@ export interface ReleaseSeriesTableEntry extends ReleaseSeriesItem {
 }
 
 const publicationService = {
-  listPublications(topicId?: string): Promise<Publication[]> {
+  listPublications(themeId?: string): Promise<Publication[]> {
     return client.get('/publications', {
-      params: { topicId },
+      params: { themeId },
     });
   },
   getPublicationSummaries(): Promise<PublicationSummary[]> {

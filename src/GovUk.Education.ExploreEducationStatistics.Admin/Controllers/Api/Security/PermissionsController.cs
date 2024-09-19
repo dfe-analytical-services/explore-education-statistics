@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -12,6 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Security
@@ -66,10 +66,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 IsApprover: isApprover);
         }
 
-        [HttpGet("permissions/topic/{topicId:guid}/publication/create")]
-        public Task<ActionResult<bool>> CanCreatePublicationForTopic(Guid topicId)
+        [HttpGet("permissions/theme/{themeId:guid}/publication/create")]
+        public Task<ActionResult<bool>> CanCreatePublicationForTheme(Guid themeId)
         {
-            return CheckPolicyAgainstEntity<Topic>(topicId, _userService.CheckCanCreatePublicationForTopic);
+            return CheckPolicyAgainstEntity<Theme>(themeId, _userService.CheckCanCreatePublicationForTheme);
         }
 
         [HttpGet("permissions/release/{releaseVersionId:guid}/update")]

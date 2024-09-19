@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 
                 options.AddPolicy(SecurityPolicies.CanViewReleaseTeamAccess.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPublicationReleaseTeamAccessRequirement()));
-                
+
                 options.AddPolicy(SecurityPolicies.CanManagePublicationReleaseSeries.ToString(), policy =>
                     policy.Requirements.Add(new ManagePublicationReleaseSeriesRequirement()));
 
@@ -149,6 +149,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                  */
                 options.AddPolicy(SecurityPolicies.CanManageAllTaxonomy.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.ManageAllTaxonomy.ToString()));
+
+                options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTheme.ToString(), policy =>
+                    policy.Requirements.Add(new CreatePublicationForSpecificThemeRequirement()));
 
                 options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTopic.ToString(), policy =>
                     policy.Requirements.Add(new CreatePublicationForSpecificTopicRequirement()));

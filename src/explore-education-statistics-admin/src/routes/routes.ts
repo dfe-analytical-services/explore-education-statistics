@@ -40,6 +40,7 @@ export type ThemeParams = {
 };
 
 export type TopicParams = {
+  themeId: string;
   topicId: string;
 };
 

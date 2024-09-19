@@ -184,7 +184,7 @@ describe('PublicationsTab', () => {
   ];
 
   beforeEach(() => {
-    permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+    permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
   });
 
   describe('BAU user', () => {
@@ -216,7 +216,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic1Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       const history = createMemoryHistory();
 
@@ -243,7 +243,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic1Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter>
@@ -272,7 +272,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic1Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter>
@@ -301,7 +301,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic4Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       const history = createMemoryHistory();
 
@@ -328,7 +328,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic2Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter
@@ -354,7 +354,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic1Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter initialEntries={[{ search: '?themeId=not-a-theme' }]}>
@@ -383,7 +383,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic3Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter initialEntries={[{ search: '?topicId=topic-4' }]}>
@@ -407,7 +407,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic3Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter initialEntries={[{ search: '?themeId=theme-2' }]}>
@@ -431,7 +431,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic3Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter
@@ -462,7 +462,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic4Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter initialEntries={[{ search: '?themeId=theme-2' }]}>
@@ -487,7 +487,7 @@ describe('PublicationsTab', () => {
         testTopic3Publications,
       );
 
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter>
@@ -523,7 +523,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic4Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter>
@@ -569,7 +569,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic4Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       const history = createMemoryHistory();
 
@@ -611,7 +611,7 @@ describe('PublicationsTab', () => {
     test('renders correctly when no themes are available', async () => {
       themeService.getThemes.mockResolvedValue([]);
       publicationService.listPublications.mockResolvedValue([]);
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter>
@@ -639,7 +639,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic1Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter>
@@ -669,7 +669,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic1Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter>
@@ -692,7 +692,7 @@ describe('PublicationsTab', () => {
       publicationService.listPublications.mockResolvedValue(
         testTopic1Publications,
       );
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       const history = createMemoryHistory();
 
@@ -718,7 +718,7 @@ describe('PublicationsTab', () => {
         .mockResolvedValueOnce(testTopic2Publications)
         .mockResolvedValueOnce(testTopic3Publications)
         .mockResolvedValueOnce(testTopic4Publications);
-      permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
+      permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
         <MemoryRouter>

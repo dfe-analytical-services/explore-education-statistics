@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -16,6 +13,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -26,6 +26,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PublicationServicePermissionTests
     {
+        private readonly Theme _theme = new()
+        {
+            Id = Guid.NewGuid(),
+            Title = "Test theme"
+        };
+
         private readonly Topic _topic = new()
         {
             Id = Guid.NewGuid(),
@@ -84,6 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 _topic,
                 userService,
                 publicationService,
+                SecurityPolicies.CanCreatePublicationForSpecificTheme,
                 SecurityPolicies.CanCreatePublicationForSpecificTopic);
         }
 
@@ -138,6 +145,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpdatePublication_CanCreatePublicationForSpecificTheme()
+        {
+            await using var context = InMemoryApplicationDbContext();
+            context.Add(_theme);
+            context.Add(_publication);
+            await context.SaveChangesAsync();
+
+            var userService = AlwaysTrueUserService();
+            var publicationService = BuildPublicationService(
+                userService: userService.Object);
+
+            PermissionTestUtil.AssertSecurityPoliciesChecked(
+                async service =>
+                    await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
+                    {
+                        ThemeId = _theme.Id,
+                        TopicId = _topic.Id,
+                        Title = "Updated publication",
+                    }),
+                _topic,
+                userService,
+                publicationService,
+                SecurityPolicies.CanCreatePublicationForSpecificTopic);
+        }
+
+        [Fact]
         public async Task UpdatePublication_CanCreatePublicationForSpecificTopic()
         {
             await using var context = InMemoryApplicationDbContext();
@@ -159,6 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 _topic,
                 userService,
                 publicationService,
+                SecurityPolicies.CanCreatePublicationForSpecificTheme,
                 SecurityPolicies.CanCreatePublicationForSpecificTopic);
         }
 
@@ -263,6 +297,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdatePublication_NoPermissionToChangeTopic()
         {
+            var newTheme = new Theme
+            {
+                Title = "New theme title"
+            };
             var newTopic = new Topic
             {
                 Title = "New topic title"
@@ -297,6 +335,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         SecurityPolicies.CanCreatePublicationForSpecificTopic))
                 .ReturnsAsync(false);
 
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Theme>(t => t.Id == newTheme.Id),
+                        SecurityPolicies.CanCreatePublicationForSpecificTheme))
+                .ReturnsAsync(false);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var publicationService = BuildPublicationService(context,
@@ -318,6 +363,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdatePublication_NoPermissionToChangeSupersededById()
         {
+            var newTheme = new Theme
+            {
+                Title = "New theme title"
+            };
             var newTopic = new Topic
             {
                 Title = "New topic title"
@@ -355,6 +404,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     s.MatchesPolicy(
                         It.Is<Topic>(t => t.Id == newTopic.Id),
                         SecurityPolicies.CanCreatePublicationForSpecificTopic))
+                .ReturnsAsync(false);
+
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Theme>(t => t.Id == newTheme.Id),
+                        SecurityPolicies.CanCreatePublicationForSpecificTheme))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contextId))

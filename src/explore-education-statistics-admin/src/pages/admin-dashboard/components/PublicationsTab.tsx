@@ -1,6 +1,6 @@
 import FormThemeTopicSelect from '@admin/components/form/FormThemeTopicSelect';
 import useQueryParams from '@admin/hooks/useQueryParams';
-import TopicPublications from '@admin/pages/admin-dashboard/components/TopicPublications';
+import ThemePublications from '@admin/pages/admin-dashboard/components/ThemePublications';
 import { ThemeTopicParams, dashboardRoute } from '@admin/routes/routes';
 import { Theme } from '@admin/services/themeService';
 import { Topic } from '@admin/services/topicService';
@@ -168,19 +168,17 @@ const PublicationsTab = ({ isBauUser }: Props) => {
       ) : (
         <>
           {selectedTheme && selectedTopic ? (
-            <TopicPublications
+            <ThemePublications
               key={selectedTopic.id}
-              themeTitle={selectedTheme.title}
-              topic={selectedTopic}
+              theme={selectedTheme}
             />
           ) : (
             <>
               {themes?.map(theme => {
                 return theme.topics.map(topic => (
-                  <TopicPublications
+                  <ThemePublications
                     key={topic.id}
-                    themeTitle={theme.title}
-                    topic={topic}
+                    theme={theme}
                   />
                 ));
               })}

@@ -1,16 +1,16 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPublicationRepository : Content.Model.Repository.Interfaces.IPublicationRepository
     {
-        IQueryable<Publication> QueryPublicationsForTopic(Guid? topicId = null);
+        IQueryable<Publication> QueryPublicationsForTheme(Guid? themeId = null);
 
-        Task<List<Publication>> ListPublicationsForUser(Guid userId, Guid? topicId = null);
+        Task<List<Publication>> ListPublicationsForUser(Guid userId, Guid? themeId = null);
     }
 }

@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanUpdateContact,
         CanUpdateSpecificPublicationSummary,
         CanUpdateSpecificReleaseRole,
+        CanCreatePublicationForSpecificTheme,
         CanCreatePublicationForSpecificTopic,
         CanViewReleaseTeamAccess,
         CanManagePublicationReleaseSeries,

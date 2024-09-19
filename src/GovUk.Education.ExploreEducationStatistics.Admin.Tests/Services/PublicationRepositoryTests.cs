@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id, topicId: null);
+                var result = await service.ListPublicationsForUser(user.Id, themeId: null);
 
                 // Result should contain all publications except the one associated with the
                 // Release.PrereleaseViewer role
@@ -502,7 +502,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = new PublicationRepository(contentDbContext);
                 var publications = await publicationService
-                    .QueryPublicationsForTopic(topic1.Id)
+                    .QueryPublicationsForTheme(topic1.Id)
                     .ToListAsync();
 
                 Assert.Equal(2, publications.Count);
@@ -548,7 +548,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = new PublicationRepository(contentDbContext);
                 var publications = await publicationService
-                    .QueryPublicationsForTopic()
+                    .QueryPublicationsForTheme()
                     .ToListAsync();
 
                 Assert.Equal(4, publications.Count);

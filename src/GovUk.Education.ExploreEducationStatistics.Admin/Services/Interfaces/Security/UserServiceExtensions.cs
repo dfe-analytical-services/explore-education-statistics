@@ -1,12 +1,12 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 
@@ -166,6 +166,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         }
 
         // Publication
+
+        public static Task<Either<ActionResult, Theme>> CheckCanCreatePublicationForTheme(
+            this IUserService userService,
+            Theme theme)
+        {
+            return userService.CheckPolicy(theme, SecurityPolicies.CanCreatePublicationForSpecificTheme);
+        }
 
         public static Task<Either<ActionResult, Topic>> CheckCanCreatePublicationForTopic(
             this IUserService userService,
