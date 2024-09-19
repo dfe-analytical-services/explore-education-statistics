@@ -43,8 +43,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         configuration.GetRequiredSection(OpenIdConnectOptions.Section);
     private readonly IConfiguration _requestTimeoutConfig =
         configuration.GetSection(RequestTimeoutOptions.Section);
-    private readonly IConfiguration _applicationInsightsConfig =
-        configuration.GetSection(ApplicationInsightsOptions.Section);
+    private readonly IConfiguration _appInsightsConfig =
+        configuration.GetSection(AppInsightsOptions.Section);
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -57,7 +57,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             .AddApplicationInsightsTelemetry(options =>
             {
                 options.ConnectionString =
-                    _applicationInsightsConfig.GetValue<string>(nameof(ApplicationInsightsOptions.ConnectionString));
+                    _appInsightsConfig.GetValue<string>(nameof(AppInsightsOptions.ConnectionString));
             })
             .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
 

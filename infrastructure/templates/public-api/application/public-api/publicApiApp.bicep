@@ -102,6 +102,10 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
         value: publicApiUrl
       }
       {
+        name: 'AppInsights__ConnectionString'
+        value: appInsightsConnectionString
+      }
+      {
         name: 'ContentApi__Url'
         value: contentApiUrl
       }
@@ -120,10 +124,6 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       {
         name: 'OpenIdConnect__ClientId'
         value: apiAppRegistrationClientId
-      }
-      {
-        name: 'ApplicationInsights__ConnectionString'
-        value: appInsightsConnectionString
       }
     ]
     entraIdAuthentication: {
