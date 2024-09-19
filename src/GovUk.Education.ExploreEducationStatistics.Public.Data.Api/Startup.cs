@@ -173,6 +173,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // Options
 
+        services.AddOptions<AppSettingsOptions>()
+            .Bind(configuration.GetRequiredSection(AppSettingsOptions.Section));
         services.AddOptions<ContentApiOptions>()
             .Bind(configuration.GetRequiredSection(ContentApiOptions.Section));
         services.AddOptions<RequestTimeoutOptions>()
