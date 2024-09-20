@@ -159,8 +159,8 @@ Navigate to admin and create an amendment
 Upload third subject(large data file)
     user waits until large data upload is completed
     ...    ${SUBJECT_NAME_3}
-    ...    data-upload-import.csv
-    ...    data-upload-import.meta.csv
+    ...    large-data-set.csv
+    ...    large-data-set.meta.csv
 
 Add data guidance to third subject
     user clicks link    Data guidance
