@@ -48,8 +48,8 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
             StartOrchestrationOptions? startOrchestrationOptions = null;
             durableTaskClientMock.Setup(client =>
                     client.ScheduleNewOrchestrationInstanceAsync(
-                        nameof(ProcessCompletionOfNextDataSetVersionFunction
-                            .ProcessCompletionOfNextDataSetVersion),
+                        nameof(ProcessCompletionOfNextDataSetVersionOrchestration
+                            .ProcessCompletionOfNextDataSetVersionImport),
                         It.IsAny<ProcessDataSetVersionContext>(),
                         It.IsAny<StartOrchestrationOptions>(),
                         It.IsAny<CancellationToken>()))

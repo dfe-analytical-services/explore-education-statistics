@@ -62,7 +62,7 @@ public class CompleteNextDataSetVersionImportFunction(
         CancellationToken cancellationToken)
     {
         const string orchestratorName =
-            nameof(ProcessCompletionOfNextDataSetVersionFunction.ProcessCompletionOfNextDataSetVersion);
+            nameof(ProcessCompletionOfNextDataSetVersionOrchestration.ProcessCompletionOfNextDataSetVersionImport);
 
         var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 
