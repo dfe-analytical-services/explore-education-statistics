@@ -36,14 +36,6 @@ const nextConfig = {
       },
     ];
   },
-  async rewrites() {
-    return [
-      {
-        source: '/data-catalogue/data-set/:dataSetFileId/csv',
-        destination: `${process.env.CONTENT_API_BASE_URL}/data-set-files/:dataSetFileId/download`,
-      },
-    ];
-  },
   webpack(config, options) {
     const { dev, isServer } = options;
 
