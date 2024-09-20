@@ -83,7 +83,7 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             await using var contentDataDbContext = GetDbContext<ContentDbContext>();
 
             // Assert that the base directory containing all parquet data file entries has been emptied
-            var dataSetVersionBaseDirectoryEntries = Directory.GetFileSystemEntries(_dataSetVersionPathResolver.BasePath());
+            var dataSetVersionBaseDirectoryEntries = Directory.GetFileSystemEntries(_dataSetVersionPathResolver.DataSetsPath());
             Assert.Empty(dataSetVersionBaseDirectoryEntries);
 
             // Assert that the Data Set has been deleted

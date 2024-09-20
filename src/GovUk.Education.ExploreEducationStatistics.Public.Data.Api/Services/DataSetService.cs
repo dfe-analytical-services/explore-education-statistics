@@ -329,6 +329,7 @@ internal class DataSetService(
         return new FilterOptionsViewModel
         {
             Id = filterMeta.PublicId,
+            Column = filterMeta.Column,
             Hint = filterMeta.Hint,
             Label = filterMeta.Label,
             Options = options,

@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests;
 
@@ -29,12 +30,6 @@ public record ProcessorTestData
     public string CsvMetadataFilePath => Path.Combine(DirectoryPath, "metadata.csv");
 
     private string DirectoryPath => Path.Combine(DataFilesDirectoryPath, Name);
-
-    private static string DataFilesDirectoryPath => Path.Combine(
-        Assembly.GetExecutingAssembly().GetDirectoryPath(),
-        "Resources",
-        "DataFiles"
-    );
 
     public static ProcessorTestData AbsenceSchool => new()
     {
@@ -72,6 +67,7 @@ public record ProcessorTestData
         [
             new LocationMeta
             {
+                Id = 1,
                 Level = GeographicLevel.LocalAuthority,
                 DataSetVersionId = Guid.Empty,
                 Options =
@@ -79,35 +75,36 @@ public record ProcessorTestData
                     new LocationLocalAuthorityOptionMeta
                     {
                         Id = 1,
-                        OldCode = "302",
-                        Code = "E09000003",
-                        Label = "Barnet",
-                    },
-                    new LocationLocalAuthorityOptionMeta
-                    {
-                        Id = 2,
-                        OldCode = "314",
-                        Code = "E09000021 / E09000027",
-                        Label = "Kingston upon Thames / Richmond upon Thames",
-                    },
-                    new LocationLocalAuthorityOptionMeta
-                    {
-                        Id = 3,
                         OldCode = "370",
                         Code = "E08000016",
                         Label = "Barnsley",
                     },
                     new LocationLocalAuthorityOptionMeta
                     {
-                        Id = 4,
+                        Id = 2,
                         OldCode = "373",
                         Code = "E08000019",
                         Label = "Sheffield",
+                    },
+                    new LocationLocalAuthorityOptionMeta
+                    {
+                        Id = 3,
+                        OldCode = "302",
+                        Code = "E09000003",
+                        Label = "Barnet",
+                    },
+                    new LocationLocalAuthorityOptionMeta
+                    {
+                        Id = 4,
+                        OldCode = "314",
+                        Code = "E09000021 / E09000027",
+                        Label = "Kingston upon Thames / Richmond upon Thames",
                     },
                 ]
             },
             new LocationMeta
             {
+                Id = 2,
                 Level = GeographicLevel.Country,
                 DataSetVersionId = Guid.Empty,
                 Options =
@@ -122,6 +119,7 @@ public record ProcessorTestData
             },
             new LocationMeta
             {
+                Id = 3,
                 Level = GeographicLevel.Region,
                 DataSetVersionId = Guid.Empty,
                 Options =
@@ -142,6 +140,7 @@ public record ProcessorTestData
             },
             new LocationMeta
             {
+                Id = 4,
                 Level = GeographicLevel.School,
                 DataSetVersionId = Guid.Empty,
                 Options =
@@ -209,7 +208,9 @@ public record ProcessorTestData
         [
             new FilterMeta
             {
-                PublicId = "academy_type",
+                Id = 1,
+                PublicId = SqidEncoder.Encode(1),
+                Column = "academy_type",
                 Label = "Academy type",
                 Hint = "Only applicable for academies, otherwise no value",
                 DataSetVersionId = Guid.Empty,
@@ -231,7 +232,9 @@ public record ProcessorTestData
             },
             new FilterMeta
             {
-                PublicId = "ncyear",
+                Id = 2,
+                PublicId = SqidEncoder.Encode(2),
+                Column = "ncyear",
                 Label = "National Curriculum year",
                 Hint = "Ranges from years 1 to 11",
                 DataSetVersionId = Guid.Empty,
@@ -257,7 +260,9 @@ public record ProcessorTestData
             },
             new FilterMeta
             {
-                PublicId = "school_type",
+                Id = 3,
+                PublicId = SqidEncoder.Encode(3),
+                Column = "school_type",
                 Label = "School type",
                 Hint = "",
                 DataSetVersionId = Guid.Empty,
@@ -283,39 +288,55 @@ public record ProcessorTestData
         [
             new IndicatorMeta
             {
-                PublicId = "enrolments",
+                Id = 1,
+                PublicId = SqidEncoder.Encode(1),
+                Column = "enrolments",
                 Label = "Enrolments",
                 DecimalPlaces = 0,
                 DataSetVersionId = Guid.Empty,
             },
             new IndicatorMeta
             {
-                PublicId = "sess_authorised",
+                Id = 2,
+                PublicId = SqidEncoder.Encode(2),
+                Column = "sess_authorised",
                 Label = "Number of authorised sessions",
                 DecimalPlaces = 0,
                 DataSetVersionId = Guid.Empty,
             },
             new IndicatorMeta
             {
-                PublicId = "sess_possible",
+                Id = 3,
+                PublicId = SqidEncoder.Encode(3),
+                Column = "sess_possible",
                 Label = "Number of possible sessions",
                 DecimalPlaces = 0,
                 DataSetVersionId = Guid.Empty,
             },
             new IndicatorMeta
             {
-                PublicId = "sess_unauthorised",
+                Id = 4,
+                PublicId = SqidEncoder.Encode(4),
+                Column = "sess_unauthorised",
                 Label = "Number of unauthorised sessions",
                 DecimalPlaces = 0,
                 DataSetVersionId = Guid.Empty,
             },
             new IndicatorMeta
             {
-                PublicId = "sess_unauthorised_percent",
+                Id = 5,
+                PublicId = SqidEncoder.Encode(5),
+                Column = "sess_unauthorised_percent",
                 Label = "Percentage of unauthorised sessions",
                 DecimalPlaces = 2,
                 DataSetVersionId = Guid.Empty
             },
         ],
     };
+
+    private static string DataFilesDirectoryPath => Path.Combine(
+        Assembly.GetExecutingAssembly().GetDirectoryPath(),
+        "Resources",
+        "DataFiles"
+    );
 }

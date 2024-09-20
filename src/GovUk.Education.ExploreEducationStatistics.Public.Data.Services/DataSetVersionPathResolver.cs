@@ -37,7 +37,7 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
     public string DirectoryPath(DataSetVersion dataSetVersion, SemVersion? versionNumber = null)
     {
         return Path.Combine(
-            _basePath,
+            ((IDataSetVersionPathResolver) this).DataSetsPath(),
             dataSetVersion.DataSetId.ToString(),
             $"v{versionNumber ?? dataSetVersion.SemVersion()}");
     }

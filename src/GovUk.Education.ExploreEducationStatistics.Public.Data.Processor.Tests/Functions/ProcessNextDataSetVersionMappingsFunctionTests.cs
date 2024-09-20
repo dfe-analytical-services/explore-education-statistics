@@ -380,7 +380,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         new FilterMapping
                         {
                             CandidateKey = null,
-                            Type = MappingType.None,
+                            PublicId = filter.PublicId,
                             Source = new MappableFilter { Label = filter.Label },
                             OptionMappings = filter
                                 .OptionLinks
@@ -391,7 +391,6 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                                         {
                                             CandidateKey = null,
                                             PublicId = link.PublicId,
-                                            Type = MappingType.None,
                                             Source = new MappableFilterOption { Label = link.Option.Label }
                                         })
                         });

@@ -19,7 +19,7 @@ public static class LocationCodedOptionMetaGeneratorExtensions
         this InstanceSetters<LocationCodedOptionMeta> setters)
         => setters
             .SetBaseDefaults()
-            .SetDefault(m => m.Code);
+            .SetDefaultCode(m => m.Code);
 
     public static InstanceSetters<LocationCodedOptionMeta> SetCode(
         this InstanceSetters<LocationCodedOptionMeta> setters,

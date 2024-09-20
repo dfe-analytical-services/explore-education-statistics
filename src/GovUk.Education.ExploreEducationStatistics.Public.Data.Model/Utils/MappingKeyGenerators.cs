@@ -12,7 +12,7 @@ public static class MappingKeyGenerators
         link => LocationOptionMeta(link.Option);
 
     public static Func<FilterMeta, string> Filter =>
-        filter => filter.PublicId;
+        filter => filter.Column;
 
     public static Func<FilterOptionMeta, string> FilterOptionMeta =>
         option => option.Label;

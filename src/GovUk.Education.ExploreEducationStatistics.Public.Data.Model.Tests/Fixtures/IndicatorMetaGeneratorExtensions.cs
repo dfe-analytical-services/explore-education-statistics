@@ -20,6 +20,12 @@ public static class IndicatorMetaGeneratorExtensions
         Guid dataSetVersionId)
         => generator.ForInstance(s => s.SetDataSetVersionId(dataSetVersionId));
 
+    public static Generator<IndicatorMeta> WithPublicId(this Generator<IndicatorMeta> generator, string identifier)
+        => generator.ForInstance(s => s.SetPublicId(identifier));
+
+    public static Generator<IndicatorMeta> WithColumn(this Generator<IndicatorMeta> generator, string column)
+        => generator.ForInstance(s => s.SetColumn(column));
+
     public static Generator<IndicatorMeta> WithLabel(this Generator<IndicatorMeta> generator, string label)
         => generator.ForInstance(s => s.SetLabel(label));
 
@@ -31,12 +37,12 @@ public static class IndicatorMetaGeneratorExtensions
         byte? decimalPlaces)
         => generator.ForInstance(s => s.SetDecimalPlaces(decimalPlaces));
 
-
     public static InstanceSetters<IndicatorMeta> SetDefaults(this InstanceSetters<IndicatorMeta> setters)
         => setters
+            .Set(m => m.PublicId, f => f.Random.AlphaNumeric(10))
+            .SetDefault(m => m.Column)
             .SetDefault(m => m.Label)
             .SetDefault(m => m.Unit)
-            .SetDefault(m => m.PublicId)
             .Set(
                 m => m.DecimalPlaces,
                 (f, im) => im switch
@@ -57,6 +63,16 @@ public static class IndicatorMetaGeneratorExtensions
         this InstanceSetters<IndicatorMeta> setters,
         Guid dataSetVersionId)
         => setters.Set(m => m.DataSetVersionId, dataSetVersionId);
+
+    public static InstanceSetters<IndicatorMeta> SetPublicId(
+        this InstanceSetters<IndicatorMeta> setters,
+        string publicId)
+        => setters.Set(m => m.PublicId, publicId);
+
+    public static InstanceSetters<IndicatorMeta> SetColumn(
+        this InstanceSetters<IndicatorMeta> setters,
+        string column)
+        => setters.Set(m => m.Column, column);
 
     public static InstanceSetters<IndicatorMeta> SetLabel(
         this InstanceSetters<IndicatorMeta> setters,

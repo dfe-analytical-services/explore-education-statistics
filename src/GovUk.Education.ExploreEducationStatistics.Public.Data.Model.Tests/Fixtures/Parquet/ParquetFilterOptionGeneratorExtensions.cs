@@ -29,8 +29,13 @@ public static class ParquetFilterOptionGeneratorExtensions
 
     public static Generator<ParquetFilterOption> WithFilterId(
         this Generator<ParquetFilterOption> generator,
-        string columnName)
-        => generator.ForInstance(s => s.SetFilterId(columnName));
+        string filterId)
+        => generator.ForInstance(s => s.SetFilterId(filterId));
+
+    public static Generator<ParquetFilterOption> WithFilterColumn(
+        this Generator<ParquetFilterOption> generator,
+        string filterColumn)
+        => generator.ForInstance(s => s.SetFilterColumn(filterColumn));
 
     public static InstanceSetters<ParquetFilterOption> SetDefaults(
         this InstanceSetters<ParquetFilterOption> setters)
@@ -38,6 +43,7 @@ public static class ParquetFilterOptionGeneratorExtensions
             .SetDefault(o => o.Id)
             .SetDefault(o => o.Label)
             .SetDefault(o => o.FilterId)
+            .SetDefault(o => o.FilterColumn)
             .SetDefault(o => o.PublicId);
 
     public static InstanceSetters<ParquetFilterOption> SetId(
@@ -57,6 +63,11 @@ public static class ParquetFilterOptionGeneratorExtensions
 
     public static InstanceSetters<ParquetFilterOption> SetFilterId(
         this InstanceSetters<ParquetFilterOption> setters,
-        string columnName)
-        => setters.Set(o => o.FilterId, columnName);
+        string filterId)
+        => setters.Set(o => o.FilterId, filterId);
+    
+    public static InstanceSetters<ParquetFilterOption> SetFilterColumn(
+        this InstanceSetters<ParquetFilterOption> setters,
+        string filterColumn)
+        => setters.Set(o => o.FilterColumn, filterColumn);
 }

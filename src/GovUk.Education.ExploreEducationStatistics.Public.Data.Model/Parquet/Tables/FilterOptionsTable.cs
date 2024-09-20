@@ -10,10 +10,11 @@ public static class FilterOptionsTable
         public const string Id = "id";
         public const string PublicId = "public_id";
         public const string Label = "label";
+        public const string FilterColumn = "filter_column";
         public const string FilterId = "filter_id";
     }
 
-    public static string Alias(FilterMeta filter) => $"\"{filter.PublicId}\"";
+    public static string Alias(FilterMeta filter) => $"\"{filter.Column}\"";
 
     private static readonly TableRef DefaultRef = new(TableName);
 
@@ -26,6 +27,7 @@ public static class FilterOptionsTable
         public readonly string PublicId = $"{table}.{Cols.PublicId}";
         public readonly string Label = $"{table}.{Cols.Label}";
         public readonly string FilterId = $"{table}.{Cols.FilterId}";
+        public readonly string FilterColumn = $"{table}.{Cols.FilterColumn}";
 
         public string Col(string column) => $"{table}.\"{column}\"";
     }

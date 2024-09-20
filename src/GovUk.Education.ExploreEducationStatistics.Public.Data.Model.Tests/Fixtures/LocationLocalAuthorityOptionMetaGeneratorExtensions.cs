@@ -26,8 +26,8 @@ public static class LocationLocalAuthorityOptionMetaGeneratorExtensions
         this InstanceSetters<LocationLocalAuthorityOptionMeta> setters)
         => setters
             .SetBaseDefaults()
-            .SetDefault(m => m.Code)
-            .SetDefault(m => m.OldCode);
+            .SetDefaultCode(m => m.Code)
+            .SetDefaultCode(m => m.OldCode);
 
     public static InstanceSetters<LocationLocalAuthorityOptionMeta> SetCode(
         this InstanceSetters<LocationLocalAuthorityOptionMeta> setters,

@@ -17,9 +17,9 @@ public static class DataTable
         public static string LocationId(GeographicLevel geographicLevel)
             => $"locations_{geographicLevel.GetEnumValue().ToLower()}_id";
 
-        public static string Filter(FilterMeta filter) => $"\"{filter.PublicId}\"";
+        public static string Filter(FilterMeta filter) => $"\"{filter.Column}\"";
 
-        public static string Indicator(IndicatorMeta indicator) => $"\"{indicator.PublicId}\"";
+        public static string Indicator(IndicatorMeta indicator) => $"\"{indicator.Column}\"";
     }
 
     private static readonly TableRef DefaultRef = new(TableName);
