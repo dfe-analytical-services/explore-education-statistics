@@ -1,10 +1,10 @@
-@description('Specifies the Resource Prefix')
-param resourcePrefix string
+import { entraIdAuthenticationType } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
 
 @description('Specifies the login server from the registry.')
+@secure()
 param acrLoginServer string
 
 @description('Specifies the container image to deploy from the registry.')
@@ -64,11 +64,16 @@ param appSettings {
   value: string
 }[]
 
-@description('A set of tags with which to tag the resource in Azure')
-param tagValues object
-
 @description('An existing Managed Identity\'s Resource Id with which to associate this Container App')
 param userAssignedManagedIdentityId string
+
+@description('An existing Service Principal\'s Client Id with which this Container App can pull Docker images (using it as the ACR username)')
+@secure()
+param dockerPullManagedIdentityClientId string
+
+@description('An existing Service Principal\'s Secret value with which this Container App can pull Docker images (using it as the ACR password)')
+@secure()
+param dockerPullManagedIdentitySecretValue string
 
 @description('Id of the owning Container App Environment')
 param managedEnvironmentId string
@@ -92,18 +97,15 @@ param volumeMounts {
 }[] = []
 
 @description('An existing App Registration registered with Entra ID that will be used to control access to this Container App')
-param entraIdAuthentication {
-  appRegistrationClientId: string
-  allowedClientIds: string[]
-  allowedPrincipalIds: string[]
-  requireAuthentication: bool
-}?
+param entraIdAuthentication entraIdAuthenticationType?
+
+@description('A set of tags with which to tag the resource in Azure')
+param tagValues object
 
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
-var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 
 resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
-  name: containerApplicationName
+  name: containerAppName
   location: location
   identity: {
     type: 'UserAssigned'
@@ -114,6 +116,12 @@ resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
   properties: {
     managedEnvironmentId: managedEnvironmentId
     configuration: {
+      secrets: [
+        {
+          name: 'container-registry-password'
+          value: dockerPullManagedIdentitySecretValue
+        }
+      ]
       maxInactiveRevisions: 1
       activeRevisionsMode: 'Single'
       ingress: {
@@ -131,7 +139,8 @@ resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
       registries: [
         {
           server: acrLoginServer
-          identity: userAssignedManagedIdentityId
+          username: dockerPullManagedIdentityClientId
+          passwordSecretRef: 'container-registry-password'
         }
       ]
     }
@@ -173,9 +182,10 @@ module azureAuthentication 'containerAppAzureAuthentication.bicep' = if (entraId
   name: '${containerAppName}AzureAuthentication'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
-    containerAppName: containerApplicationName
+    containerAppName: containerApp.name
     allowedClientIds: entraIdAuthentication!.allowedClientIds
     allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
+    requireAuthentication: entraIdAuthentication!.requireAuthentication
   }
 }
 

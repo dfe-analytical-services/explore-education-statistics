@@ -1,11 +1,10 @@
-@description('Specifies the Resource Prefix')
-param resourcePrefix string
+import { firewallRuleType, principalNameAndIdType } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
 
 @description('Server Name for Azure Database for PostgreSQL')
-param serverName string = ''
+param databaseServerName string = ''
 
 @description('Database administrator login name')
 @minLength(0)
@@ -26,23 +25,10 @@ param dbStorageSizeGB int
 param dbAutoGrowStatus string
 
 @description('Azure Database for PostgreSQL pricing tier')
-@allowed([
-  'Burstable'
-  'GeneralPurpose'
-  'MemoryOptimized'
-])
-param dbSkuTier string = 'Burstable'
+param dbSkuTier 'Burstable' | 'GeneralPurpose' | 'MemoryOptimized' = 'Burstable'
 
 @description('PostgreSQL version')
-@allowed([
-  '11'
-  '12'
-  '13'
-  '14'
-  '15'
-  '16'
-])
-param postgreSqlVersion string = '16'
+param postgreSqlVersion '11' | '12' | '13' | '14' | '15' | '16' = '16'
 
 @description('PostgreSQL Server backup retention days')
 param backupRetentionDays int = 7
@@ -54,10 +40,10 @@ param geoRedundantBackup string = 'Disabled'
 param databaseNames string[]
 
 @description('An array of firewall rules containing IP address ranges')
-param firewallRules {
-  name: string
-  cidr: string
-}[] = []
+param firewallRules firewallRuleType[] = []
+
+@description('An array of Entra ID admin principal names for this resource')
+param entraIdAdminPrincipals principalNameAndIdType[] = []
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -75,11 +61,7 @@ param tagValues object
 param createMode string = 'Default'
 
 @description('The id of the subnet which will be used to install the private endpoint for allowing secure connection to the database server over the VNet')
-param subnetId string
-
-var databaseServerName = empty(serverName)
-  ? '${resourcePrefix}-psql-flexibleserver'
-  : '${resourcePrefix}-psql-flexibleserver-${serverName}'
+param privateEndpointSubnetId string
 
 resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
   name: databaseServerName
@@ -119,7 +101,7 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
 }
 
 @batchSize(1)
-resource rules 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-01' = [for rule in firewallRules: {
+resource firewallRuleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-01' = [for rule in firewallRules: {
   name: rule.name
   parent: postgreSQLDatabase
   properties: {
@@ -134,11 +116,28 @@ module privateEndpointModule 'privateEndpoint.bicep' = {
     serviceId: postgreSQLDatabase.id
     serviceName: postgreSQLDatabase.name
     serviceType: 'postgres'
-    subnetId: subnetId
+    subnetId: privateEndpointSubnetId
     location: location
     tagValues: tagValues
   }
 }
 
+@batchSize(1)
+resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/administrators@2022-12-01' = [for adminPrincipal in entraIdAdminPrincipals: {
+  name: adminPrincipal.objectId
+  parent: postgreSQLDatabase
+  properties: {
+    tenantId: tenant().tenantId
+    principalName: adminPrincipal.principalName
+    principalType: 'USER'
+  }
+  dependsOn: [
+    firewallRuleAssignments
+  ]
+}]
+
 @description('The fully qualified Azure resource ID of the Database Server.')
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)
+
+@description('A template connection string to be used with managed identities and access tokens.')
+output managedIdentityConnectionStringTemplate string = 'Server=${postgreSQLDatabase.name}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name]'

@@ -8,6 +8,8 @@ public interface IDataSetVersionPathResolver
 {
     string BasePath();
 
+    string DataSetsPath() => Path.Combine(BasePath(), DataSetFilenames.DataSetsDirectory);
+
     string DirectoryPath(DataSetVersion dataSetVersion, SemVersion? versionNumber = null);
 
     string CsvDataPath(DataSetVersion dataSetVersion)

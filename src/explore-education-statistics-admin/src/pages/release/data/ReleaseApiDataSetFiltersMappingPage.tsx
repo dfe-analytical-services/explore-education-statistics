@@ -338,7 +338,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                 </h3>
 
                 <ApiDataSetMappableFilterColumnsTable
-                  mappableFilterColumns={mappableFilters}
+                  mappableFilters={mappableFilters}
                 />
               </>
             )}
@@ -388,9 +388,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                 >
                   New filter columns <Tag colour="grey">No action required</Tag>
                 </h3>
-                <ApiDataSetNewFilterColumnsTable
-                  newFilterColumns={newFilters}
-                />
+                <ApiDataSetNewFilterColumnsTable newFilters={newFilters} />
               </>
             )}
 

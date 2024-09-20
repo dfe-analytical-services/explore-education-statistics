@@ -125,7 +125,7 @@ public enum MappingType
 /// </summary>
 public abstract record MappableElement
 {
-    public string Label { get; init; }
+    public required string Label { get; init; }
 }
 
 public abstract record MappableElementWithOptions<TMappableOption>
@@ -144,9 +144,9 @@ public abstract record MappableElementWithOptions<TMappableOption>
 public abstract record Mapping<TMappableElement>
     where TMappableElement : MappableElement
 {
-    public TMappableElement Source { get; init; } = null!;
+    public required TMappableElement Source { get; init; }
 
-    public string PublicId { get; init; } = string.Empty;
+    public required string PublicId { get; init; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]

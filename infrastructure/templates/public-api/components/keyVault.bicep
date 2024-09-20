@@ -1,5 +1,5 @@
-@description('Specifies the Resource Prefix')
-param resourcePrefix string
+@description('Specifies the name of the Key Vault')
+param keyVaultName string
 
 @description('Specifies the location for all resources.')
 param location string
@@ -17,20 +17,13 @@ param enabledForDiskEncryption bool = false
 param enabledForTemplateDeployment bool = true
 
 @description('Specifies whether the key vault is a standard vault or a premium vault.')
-@allowed([
-  'standard'
-  'premium'
-])
-param skuName string = 'standard'
+param skuName 'standard' | 'premium' = 'standard'
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-@description('The name of the Key Vault resource')
-param keyVaultName string
-
 resource keyvault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: '${resourcePrefix}-kv-${keyVaultName}'
+  name: keyVaultName
   location: location
   properties: {
     enabledForDeployment: enabledForDeployment

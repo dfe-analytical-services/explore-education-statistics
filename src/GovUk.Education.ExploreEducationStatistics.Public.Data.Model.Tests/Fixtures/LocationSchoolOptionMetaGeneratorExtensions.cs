@@ -25,8 +25,8 @@ public static class LocationSchoolOptionMetaGeneratorExtensions
         this InstanceSetters<LocationSchoolOptionMeta> setters)
         => setters
             .SetBaseDefaults()
-            .SetDefault(m => m.Urn)
-            .SetDefault(m => m.LaEstab);
+            .SetDefaultCode(m => m.Urn)
+            .SetDefaultCode(m => m.LaEstab);
 
     public static InstanceSetters<LocationSchoolOptionMeta> SetUrn(
         this InstanceSetters<LocationSchoolOptionMeta> setters,

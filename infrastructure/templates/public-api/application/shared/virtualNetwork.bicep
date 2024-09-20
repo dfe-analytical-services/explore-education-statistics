@@ -1,59 +1,51 @@
-@description('Specifies the full name of the existing VNet')
-param vNetName string
+import { resourceNamesType } from '../../types.bicep'
 
-@description('Specifies the Subscription name')
-param subscription string
+@description('Specifies common resource naming variables.')
+param resourceNames resourceNamesType
 
-@description('Specifies the Resource Prefix')
-param resourcePrefix string
-
-@description('Specifies the name suffix of the Data Processor Function App')
-param dataProcessorFunctionAppNameSuffix string
-
-@description('Specifies the name suffix of the Container App Environment')
-param containerAppEnvironmentNameSuffix string
+var subnets = resourceNames.existingResources.subnets
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
-  name: vNetName
+  name: resourceNames.existingResources.vNet
 }
 
 resource adminSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${subscription}-snet-ees-admin'
+  name: subnets.adminApp
   parent: vNet
 }
 
 resource publisherSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${subscription}-snet-ees-publisher'
+  name: subnets.publisherFunction
   parent: vNet
 }
 
 resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppNameSuffix}'
+  name: subnets.dataProcessor
   parent: vNet
 }
 
 resource dataProcessorPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppNameSuffix}-pep'
+  name: subnets.dataProcessorPrivateEndpoints
   parent: vNet
 }
 
 resource containerAppEnvironmentSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${subscription}-ees-snet-cae-${containerAppEnvironmentNameSuffix}'
+  name: subnets.containerAppEnvironment
   parent: vNet
 }
 
 resource psqlFlexibleServerSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${subscription}-ees-snet-psql-flexibleserver'
+  name: subnets.psqlFlexibleServer
   parent: vNet
 }
 
 resource appGatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: '${subscription}-ees-snet-agw-01'
+  name: subnets.appGateway
   parent: vNet
 }
 
 @description('The fully qualified Azure resource ID of the Network.')
-output vnetId string = resourceId('Microsoft.Network/VirtualNetworks', vNetName)
+output vnetId string = resourceId('Microsoft.Network/VirtualNetworks', resourceNames.existingResources.vNet)
 
 @description('The fully qualified Azure resource ID of the Data Processor Function App Subnet.')
 output dataProcessorSubnetRef string = dataProcessorSubnet.id

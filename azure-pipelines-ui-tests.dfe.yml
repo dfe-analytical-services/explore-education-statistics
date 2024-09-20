@@ -252,7 +252,7 @@ jobs:
       RunAsPreJob: true
 
   - task: PythonScript@0
-    displayName: Admin public UI tests
+    displayName: Public API UI tests
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
       arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --noinvite-pass '"$(ees-test-NOINVITE-PASSWORD)"' --pendinginvite-pass '"$(ees-test-PENDINGINVITE-PASSWORD)"' --env "dev" --file "tests/public_api" --processes 4 --rerun-attempts 3
