@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.
 
 public interface IParquetIndicatorRepository
 {
-    Task<ISet<string>> ListIds(
+    Task<Dictionary<string, string>> GetColumnsById(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default);
 }

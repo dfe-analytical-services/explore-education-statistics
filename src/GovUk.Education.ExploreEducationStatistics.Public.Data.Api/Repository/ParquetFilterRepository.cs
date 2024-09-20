@@ -60,7 +60,13 @@ public class ParquetFilterRepository(
         return await ListOptionsById<IdPublicIdPair>(
             dataSetVersion: dataSetVersion,
             ids: ids.ToList(),
-            columns: [FilterOptionsTable.Cols.Id, FilterOptionsTable.Cols.PublicId],
+            columns:
+            [
+                FilterOptionsTable.Cols.Id,
+                FilterOptionsTable.Cols.PublicId,
+                FilterOptionsTable.Cols.FilterId,
+                FilterOptionsTable.Cols.FilterColumn
+            ],
             cancellationToken: cancellationToken
         );
     }
@@ -94,19 +100,24 @@ public class ParquetFilterRepository(
         return (await command.QueryAsync<T>(cancellationToken: cancellationToken)).AsList();
     }
 
-    public async Task<ISet<string>> ListFilterIds(
+    public async Task<Dictionary<string, string>> GetFilterColumnsById(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken = default)
     {
         var command = duckDbConnection.SqlBuilder(
             $"""
-             SELECT DISTINCT {FilterOptionsTable.Cols.FilterId:raw}
+             SELECT DISTINCT 
+                {FilterOptionsTable.Cols.FilterId:raw},
+                {FilterOptionsTable.Cols.FilterColumn:raw}
              FROM '{dataSetVersionPathResolver.FiltersPath(dataSetVersion):raw}'
              """);
 
         var cols = await command
-            .QueryAsync<string>(cancellationToken: cancellationToken);
+            .QueryAsync<(string FilterId, string FilterColumn)>(cancellationToken: cancellationToken);
 
-        return cols.ToHashSet();
+        return cols.ToDictionary(
+            tuple => tuple.FilterId,
+            tuple => tuple.FilterColumn
+        );
     }
 }

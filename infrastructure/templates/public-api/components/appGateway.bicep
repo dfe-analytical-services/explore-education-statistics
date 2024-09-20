@@ -1,34 +1,28 @@
+import { appGatewaySiteConfigType } from '../types.bicep'
+
 @description('Specifies the Key Vault name that this App Gateway will be permitted to get and list certificates from')
 param keyVaultName string
-
-@description('Specifies the resource prefix')
-param resourcePrefix string
 
 @description('Specifies the location for all resources')
 param location string
 
+@description('Specifies the VNet name that this App Gateway will be connected to')
+param vnetName string
+
 @description('Specifies the id of a dedicated subnet to which this App Gateway will be connected')
 param subnetId string
 
-@description('Specifies an optional suffix for the App Gateway name')
-param instanceName string = ''
+@description('Specifies the App Gateway name')
+param appGatewayName string = ''
+
+@description('Specifies the App Gateway user-assigned managed identity name')
+param managedIdentityName string = ''
 
 @description('Specifies a set of configurations for the App Gateway to use to direct traffic to backend resources')
-param sites {
-  resourceName: string
-  publicFqdn: string
-  backendFqdn: string
-  healthProbeRelativeUrl: string
-  certificateKeyVaultSecretName: string
-}[]
+param sites appGatewaySiteConfigType[]
 
 @description('Specifies a set of Azure availability zones for the region that this resource should be accessible from. Defaults to all zones')
-@allowed([
-  '1'
-  '2'
-  '3'
-])
-param availabilityZones string[] = [
+param availabilityZones ('1' | '2' | '3') [] = [
   '1'
   '2'
   '3'
@@ -36,14 +30,6 @@ param availabilityZones string[] = [
 
 @description('Specifies a set of tags with which to tag the resource in Azure')
 param tagValues object
-
-var appGatewayFullName = empty(instanceName)
-  ? '${resourcePrefix}-ees-agw'
-  : '${resourcePrefix}-ees-agw-${instanceName}'
-
-var managedIdentityName = empty(instanceName)
-  ? '${resourcePrefix}-ees-id-agw'
-  : '${resourcePrefix}-ees-id-agw-${instanceName}'
 
 // Create a user-assigned managed identity for the App Gateway. App Gateway does not support system-assigned identities.
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -53,7 +39,7 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 
 // Allow the managed identity to access certificates from Key Vault.
 module keyVaultSecretsUserRoleAssignmentModule 'keyVaultRoleAssignment.bicep' = {
-  name: '${appGatewayFullName}KeyVaultSecretsUserRoleAssignment'
+  name: '${appGatewayName}KeyVaultSecretsUserRoleAssignment'
   params: {
     keyVaultName: keyVaultName
     principalIds: [managedIdentity.properties.principalId]
@@ -62,7 +48,7 @@ module keyVaultSecretsUserRoleAssignmentModule 'keyVaultRoleAssignment.bicep' = 
 }
 
 module keyVaultCertificateUserRoleAssignmentModule 'keyVaultRoleAssignment.bicep' = {
-  name: '${appGatewayFullName}KeyVaultCertificateUserRoleAssignment'
+  name: '${appGatewayName}KeyVaultCertificateUserRoleAssignment'
   params: {
     keyVaultName: keyVaultName
     principalIds: [managedIdentity.properties.principalId]
@@ -71,7 +57,7 @@ module keyVaultCertificateUserRoleAssignmentModule 'keyVaultRoleAssignment.bicep
 }
 
 module keyVaultAccessPolicyModule 'keyVaultAccessPolicy.bicep' = {
-  name: '${appGatewayFullName}KeyVaultAccessPolicy'
+  name: '${appGatewayName}KeyVaultAccessPolicy'
   params: {
     keyVaultName: keyVaultName
     principalIds: [managedIdentity.properties.principalId]
@@ -101,15 +87,24 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [f
 module wafPolicyModule 'wafPolicy.bicep' = {
   name: 'wafPolicy'
   params: {
-    name: '${appGatewayFullName}-afwp'
+    name: '${appGatewayName}-afwp'
     location: location
     tagValues: tagValues
   }
 }
 
+module backendPrivateDnsConfigurationsModule './appGatewayBackendDns.bicep' = [for site in sites: {
+  name: site.backendDomainName
+  params: {
+    site: site
+    vnetName: vnetName
+    tagValues: tagValues
+  }
+}]
+
 // Create the App Gateway.
 resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
-  name: appGatewayFullName
+  name: appGatewayName
   location: location
   tags: tagValues
   zones: availabilityZones
@@ -127,7 +122,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
     }
     gatewayIPConfigurations: [
       {
-        name: '${appGatewayFullName}-ip-config'
+        name: '${appGatewayName}-ip-config'
         properties: {
           subnet: {
             id: subnetId
@@ -138,7 +133,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
     sslCertificates: [for site in sites: {
       name: '${site.resourceName}-cert'
       properties: {
-        keyVaultSecretId: 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/secrets/${site.certificateKeyVaultSecretName}'
+        keyVaultSecretId: 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/secrets/${site.certificateName}'
       }
     }]
     frontendIPConfigurations: [for site in sites: {
@@ -177,7 +172,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
         pickHostNameFromBackendAddress: true
         requestTimeout: 20
         probe: {
-          id: resourceId('Microsoft.Network/applicationGateways/probes', appGatewayFullName, '${site.resourceName}-health-probe')
+          id: resourceId('Microsoft.Network/applicationGateways/probes', appGatewayName, '${site.resourceName}-health-probe')
         }
       }
     }]
@@ -185,14 +180,14 @@ resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
       name: '${site.resourceName}-listener'
       properties: {
         frontendIPConfiguration: {
-          id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', appGatewayFullName, '${site.resourceName}-public-frontend-ip-config')
+          id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', appGatewayName, '${site.resourceName}-public-frontend-ip-config')
         }
         frontendPort: {
-          id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', appGatewayFullName, 'port443')
+          id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', appGatewayName, 'port443')
         }
         protocol: 'Https'
         sslCertificate: {
-          id: resourceId('Microsoft.Network/applicationGateways/sslCertificates', appGatewayFullName, '${site.resourceName}-cert')
+          id: resourceId('Microsoft.Network/applicationGateways/sslCertificates', appGatewayName, '${site.resourceName}-cert')
         }
         hostName: site.publicFqdn
         requireServerNameIndication: true
@@ -204,13 +199,13 @@ resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
         ruleType: 'Basic'
         priority: 1
         httpListener: {
-          id: resourceId('Microsoft.Network/applicationGateways/httpListeners', appGatewayFullName, '${site.resourceName}-listener')
+          id: resourceId('Microsoft.Network/applicationGateways/httpListeners', appGatewayName, '${site.resourceName}-listener')
         }
         backendAddressPool: {
-          id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', appGatewayFullName, '${site.resourceName}-backend-pool')
+          id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', appGatewayName, '${site.resourceName}-backend-pool')
         }
         backendHttpSettings: {
-          id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', appGatewayFullName, '${site.resourceName}-backend')
+          id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', appGatewayName, '${site.resourceName}-backend')
         }
       }
     }]

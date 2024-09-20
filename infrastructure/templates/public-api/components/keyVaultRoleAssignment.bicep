@@ -1,3 +1,5 @@
+import { keyVaultRoleType } from '../types.bicep'
+
 @description('Specifies the name of the Key Vault.')
 param keyVaultName string
 
@@ -9,11 +11,7 @@ param principalIds string[]
 // roles to support here, in conjunction with the limited set of roles that the deploying service
 // principal is allowed to assign.
 @description('Specifies the Key Vault role to assign to the service principals')
-@allowed([
-  'Secrets User'
-  'Certificate User'
-])
-param role string
+param role keyVaultRoleType
 
 var rolesToRoleIds = {
   'Secrets User': '4633458b-17de-408a-b874-0445c86b69e6'

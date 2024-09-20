@@ -141,7 +141,6 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     var actualLocation = actualLocations[index];
                     actualLocation.AssertDeepEqualTo(expectedLocation,
                         notEqualProperties: AssertExtensions.Except<LocationMeta>(
-                            l => l.Id,
                             l => l.DataSetVersionId,
                             l => l.Options,
                             l => l.OptionLinks,
@@ -212,14 +211,14 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
             mappings.LocationMappingPlan.Levels[firstLevel.Level].Mappings[mappedOption1Key] = mappedOption1 with
             {
-                PublicId = "option-1-public-id",
+                PublicId = "id-1",
                 Type = MappingType.AutoMapped,
                 CandidateKey = mappedOption1Key
             };
 
             mappings.LocationMappingPlan.Levels[lastLevel.Level].Mappings[mappedOption2Key] = mappedOption2 with
             {
-                PublicId = "option-2-public-id",
+                PublicId = "id-2",
                 Type = MappingType.ManualMapped,
                 CandidateKey = mappedOption2Key
             };
@@ -250,7 +249,6 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     var actualLocation = actualLocations[index];
                     actualLocation.AssertDeepEqualTo(expectedLocation,
                         notEqualProperties: AssertExtensions.Except<LocationMeta>(
-                            l => l.Id,
                             l => l.DataSetVersionId,
                             l => l.Options,
                             l => l.OptionLinks,
@@ -277,10 +275,10 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             // Public Ids should be SQIDs based on the option's id unless otherwise directed by the
             // mappings.
             var actualMappedOption1Link = actualLinks.Single(link => link.Option.Label == mappedOption1.Source.Label);
-            Assert.Equal("option-1-public-id", actualMappedOption1Link.PublicId);
+            Assert.Equal("id-1", actualMappedOption1Link.PublicId);
 
             var actualMappedOption2Link = actualLinks.Single(link => link.Option.Label == mappedOption2.Source.Label);
-            Assert.Equal("option-2-public-id", actualMappedOption2Link.PublicId);
+            Assert.Equal("id-2", actualMappedOption2Link.PublicId);
 
             var otherLinks = actualLocations
                 .SelectMany(level => level.OptionLinks)
@@ -347,7 +345,6 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     var actualFilter = actualFilters[index];
                     actualFilter.AssertDeepEqualTo(expectedFilter,
                         notEqualProperties: AssertExtensions.Except<FilterMeta>(
-                            fm => fm.Id,
                             fm => fm.DataSetVersionId,
                             fm => fm.Created,
                             fm => fm.Options,
@@ -397,19 +394,21 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
             var option1Mapping = new FilterOptionMapping
             {
-                PublicId = "option-1-public-id",
+                PublicId = "id-1",
                 Type = MappingType.AutoMapped,
-                CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption1)
+                CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption1),
+                Source = new MappableFilterOption { Label = "Option 1" }
             };
 
             var option2Mapping = new FilterOptionMapping
             {
-                PublicId = "option-2-public-id",
+                PublicId = "id-2",
                 Type = MappingType.ManualMapped,
-                CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption2)
+                CandidateKey = MappingKeyGenerators.FilterOptionMeta(mappedOption2),
+                Source = new MappableFilterOption { Label = "Option 2" }
             };
 
-            var i = 0;
+            var optionId = 0;
 
             var mappings = new DataSetVersionMapping
             {
@@ -424,19 +423,32 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                             keySelector: MappingKeyGenerators.Filter,
                             elementSelector: filter => new FilterMapping
                             {
+                                Type = MappingType.AutoMapped,
+                                Source = new MappableFilter { Label = filter.Label },
+                                PublicId = filter.PublicId,
                                 OptionMappings = filter
                                     .Options
                                     .ToDictionary(
                                         keySelector: MappingKeyGenerators.FilterOptionMeta,
                                         elementSelector: option =>
-                                            option == mappedOption1 ? option1Mapping
-                                            : option == mappedOption2 ? option2Mapping
-                                            : new FilterOptionMapping
-                                            {
-                                                Type = i++ % 2 == 0
-                                                    ? MappingType.AutoNone
-                                                    : MappingType.ManualNone
-                                            })
+                                        {
+                                            optionId++;
+
+                                            return option == mappedOption1 ? option1Mapping
+                                                : option == mappedOption2 ? option2Mapping
+                                                : new FilterOptionMapping
+                                                {
+                                                    PublicId = optionId.ToString(),
+                                                    Type = optionId % 2 == 0
+                                                        ? MappingType.AutoNone
+                                                        : MappingType.ManualNone,
+                                                    Source = new MappableFilterOption
+                                                    {
+                                                        Label = option.Label
+                                                    },
+                                                };
+                                        }
+                                    )
                             })
                 }
             };
@@ -466,7 +478,6 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     var actualFilter = actualFilters[index];
                     actualFilter.AssertDeepEqualTo(expectedFilter,
                         notEqualProperties: AssertExtensions.Except<FilterMeta>(
-                            fm => fm.Id,
                             fm => fm.DataSetVersionId,
                             fm => fm.Created,
                             fm => fm.Options,
@@ -494,11 +505,11 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                             // with queries that use the source filter option's PublicId.
                             if (actualOptionLink.Option.Label == mappedOption1.Label)
                             {
-                                Assert.Equal("option-1-public-id", actualOptionLink.PublicId);
+                                Assert.Equal("id-1", actualOptionLink.PublicId);
                             }
                             else if (actualOptionLink.Option.Label == mappedOption2.Label)
                             {
-                                Assert.Equal("option-2-public-id", actualOptionLink.PublicId);
+                                Assert.Equal("id-2", actualOptionLink.PublicId);
                             }
                             else
                             {
@@ -533,7 +544,6 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     var actualIndicator = actualIndicators[index];
                     actualIndicator.AssertDeepEqualTo(expectedIndicator,
                         notEqualProperties: AssertExtensions.Except<IndicatorMeta>(
-                            im => im.Id,
                             im => im.DataSetVersionId,
                             im => im.Created
                         ));

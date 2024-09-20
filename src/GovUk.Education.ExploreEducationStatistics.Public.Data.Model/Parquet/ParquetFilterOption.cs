@@ -9,4 +9,6 @@ public record ParquetFilterOption
     public required string PublicId { get; set; }
 
     public required string FilterId { get; set; }
+
+    public required string FilterColumn { get; set; }
 }
