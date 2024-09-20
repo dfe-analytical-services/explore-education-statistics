@@ -4,5 +4,5 @@ public class RequestTimeoutOptions
 {
     public const string Section = "RequestTimeout";
 
-    public int? TimeoutMilliseconds { get; init; }
+    public int TimeoutMilliseconds { get; init; }
 }

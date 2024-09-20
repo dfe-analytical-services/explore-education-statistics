@@ -12,6 +12,9 @@ param containerAppEnvironmentId string
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string
 
+@description('The URL of the Public API.')
+param publicApiUrl string
+
 @description('The URL of the Public site.')
 param publicSiteUrl string
 
@@ -95,6 +98,14 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
         value: apiContainerAppManagedIdentity.properties.clientId
       }
       {
+        name: 'AppSettings__HostUrl'
+        value: publicApiUrl
+      }
+      {
+        name: 'AppInsights__ConnectionString'
+        value: appInsightsConnectionString
+      }
+      {
         name: 'ContentApi__Url'
         value: contentApiUrl
       }
@@ -113,10 +124,6 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       {
         name: 'OpenIdConnect__ClientId'
         value: apiAppRegistrationClientId
-      }
-      {
-        name: 'ApplicationInsights__ConnectionString'
-        value: appInsightsConnectionString
       }
     ]
     entraIdAuthentication: {
