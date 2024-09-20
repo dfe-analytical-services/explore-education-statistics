@@ -1,22 +1,34 @@
 import ButtonText from '@common/components/ButtonText';
-import ChevronGrid from '@common/components/ChevronGrid';
 import ChevronCard from '@common/components/ChevronCard';
+import ChevronGrid from '@common/components/ChevronGrid';
+import CodeBlock from '@common/components/CodeBlock';
+import CopyTextButton from '@common/components/CopyTextButton';
+import Tabs from '@common/components/Tabs';
+import TabsSection from '@common/components/TabsSection';
+import React from 'react';
+import Link from '@frontend/components/Link';
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
 import { pageBaseSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
-import Link from '@frontend/components/Link';
-import React from 'react';
+import { DataSetFile } from '@frontend/services/dataSetFileService';
 
 interface Props {
+  dataSetFileId: DataSetFile['id'];
   hasApiDataSet?: boolean;
   tableToolLink: string;
   onDownload: () => void;
 }
 
 export default function DataSetFileUsage({
+  dataSetFileId,
   hasApiDataSet = false,
   tableToolLink,
   onDownload,
 }: Props) {
+  const downloadLink = new URL(
+    `/data-catalogue/data-set/${dataSetFileId}/csv`,
+    process.env.PUBLIC_URL,
+  ).href;
+
   return (
     <DataSetFilePageSection
       heading={pageBaseSections.dataSetUsage}
@@ -50,6 +62,37 @@ export default function DataSetFileUsage({
             }
           />
         )}
+        <ChevronCard
+          link={<>Download this data using code</>}
+          cardSize="l"
+          description="Access this data using common programming languages"
+          descriptionAfter={
+            <>
+              <CopyTextButton
+                className="govuk-!-margin-top-5"
+                text={downloadLink}
+                labelHidden={false}
+              />
+              <h4>Example code</h4>
+              <Tabs id="dataSetUsage-code">
+                <TabsSection title="Python" headingTag="h4">
+                  <CodeBlock
+                    language="python"
+                    code={`import pandas as pd
+pd.read_csv("${downloadLink}")`}
+                  />
+                </TabsSection>
+                <TabsSection title="R" headingTag="h4">
+                  <CodeBlock
+                    language="r"
+                    code={`read.csv("${downloadLink}")`}
+                  />
+                </TabsSection>
+              </Tabs>
+            </>
+          }
+          noChevron
+        />
       </ChevronGrid>
     </DataSetFilePageSection>
   );

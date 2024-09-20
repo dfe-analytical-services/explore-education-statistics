@@ -15,24 +15,28 @@ public record DataSetQueryCriteriaGeographicLevels
     /// <summary>
     /// Filter the results to be in this geographic level.
     /// </summary>
+    /// <example>NAT</example>
     [SwaggerEnum(typeof(GeographicLevel))]
     public string? Eq { get; init; }
 
     /// <summary>
     /// Filter the results to not be in this geographic level.
     /// </summary>
+    /// <example>PROV</example>
     [SwaggerEnum(typeof(GeographicLevel))]
     public string? NotEq { get; init; }
 
     /// <summary>
     /// Filter the results to be in one of these geographic levels.
     /// </summary>
+    /// <example>["REG", "LA"]</example>
     [SwaggerEnum(typeof(GeographicLevel))]
     public virtual IReadOnlyList<string>? In { get; init; }
 
     /// <summary>
     /// Filter the results to not be in one of these geographic levels.
     /// </summary>
+    /// <example>["LAD", "SCH"]</example>
     [SwaggerEnum(typeof(GeographicLevel))]
     public virtual IReadOnlyList<string>? NotIn { get; init; }
 

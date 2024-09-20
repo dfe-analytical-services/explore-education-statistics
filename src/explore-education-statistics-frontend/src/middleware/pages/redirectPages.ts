@@ -2,7 +2,7 @@ import redirectService, {
   Redirects,
   RedirectType,
 } from '@frontend/services/redirectService';
-import type { NextRequest } from 'next/server';
+import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 interface CachedRedirects {
@@ -19,9 +19,13 @@ const redirectPaths = {
   publications: '/find-statistics',
 };
 
-export default async function redirectPages(request: NextRequest) {
+export default async function redirectPages(
+  request: NextRequest,
+  event: NextFetchEvent,
+  middleware: NextMiddleware,
+) {
   const { nextUrl } = request;
-  const decodedPathname = decodeURIComponent(request.nextUrl.pathname);
+  const decodedPathname = decodeURIComponent(nextUrl.pathname);
 
   // Check for redirects for release and methodology pages
   if (
@@ -78,7 +82,7 @@ export default async function redirectPages(request: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
-  return NextResponse.next();
+  return middleware(request, event);
 }
 
 // Cache the redirect paths for 2 seconds on Local,

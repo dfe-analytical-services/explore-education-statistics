@@ -21,26 +21,26 @@ public record DataSetQueryCriteriaLocations
     /// <summary>
     /// Filter the results to be in this location.
     /// </summary>
-    public DataSetQueryLocation? Eq { get; init; }
+    public IDataSetQueryLocation? Eq { get; init; }
 
     /// <summary>
     /// Filter the results to not be in this location.
     /// </summary>
-    public DataSetQueryLocation? NotEq { get; init; }
+    public IDataSetQueryLocation? NotEq { get; init; }
 
     /// <summary>
     /// Filter the results to be in one of these locations.
     /// </summary>
-    public IReadOnlyList<DataSetQueryLocation>? In { get; init; }
+    public IReadOnlyList<IDataSetQueryLocation>? In { get; init; }
 
     /// <summary>
     /// Filter the results to not be in one of these locations.
     /// </summary>
-    public IReadOnlyList<DataSetQueryLocation>? NotIn { get; init; }
+    public IReadOnlyList<IDataSetQueryLocation>? NotIn { get; init; }
 
-    public HashSet<DataSetQueryLocation> GetOptions()
+    public HashSet<IDataSetQueryLocation> GetOptions()
     {
-        List<DataSetQueryLocation?> locations =
+        List<IDataSetQueryLocation?> locations =
         [
             Eq,
             NotEq,
@@ -49,13 +49,13 @@ public record DataSetQueryCriteriaLocations
         ];
 
         return locations
-            .OfType<DataSetQueryLocation>()
+            .OfType<IDataSetQueryLocation>()
             .ToHashSet();
     }
 
     public static DataSetQueryCriteriaLocations Create(
         string comparator,
-        IList<DataSetQueryLocation> locations)
+        IList<IDataSetQueryLocation> locations)
     {
         return comparator switch
         {
@@ -109,7 +109,7 @@ public record DataSetQueryCriteriaLocations
         }
 
         private static void InheritanceValidator(
-            PolymorphicValidator<DataSetQueryCriteriaLocations, DataSetQueryLocation> validator)
+            PolymorphicValidator<DataSetQueryCriteriaLocations, IDataSetQueryLocation> validator)
         {
             validator.Add(new DataSetQueryLocationId.Validator());
             validator.Add(new DataSetQueryLocationCode.Validator());

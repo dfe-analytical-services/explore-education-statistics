@@ -4,6 +4,7 @@ import 'core-js/features/string/replace-all';
 import '@common-test/setupGlobals';
 import '@common-test/extend-expect';
 import { loadEnvConfig } from '@next/env';
+import 'urlpattern-polyfill';
 
 loadEnvConfig(process.cwd());
 

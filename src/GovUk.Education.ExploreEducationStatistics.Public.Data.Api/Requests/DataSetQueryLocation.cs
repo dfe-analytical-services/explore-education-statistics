@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -5,46 +6,41 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests.Converters;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
-/// <summary>
-/// A location to filter results by.
-///
-/// Locations can be specified by an ID or one of its codes (depending
-/// on the location type). Note that whilst most codes are usually unique
-/// to a single location, they may also be used for multiple locations.
-///
-/// When using codes, you may get more results than expected so it's recommended
-/// to use IDs where possible to ensure only a single location is matched.
-/// </summary>
 [JsonConverter(typeof(DataSetQueryLocationJsonConverter))]
-public abstract record DataSetQueryLocation
+[SwaggerSubType(typeof(DataSetQueryLocationId))]
+[SwaggerSubType(typeof(DataSetQueryLocationCode))]
+[SwaggerSubType(typeof(DataSetQueryLocationLocalAuthorityCode))]
+[SwaggerSubType(typeof(DataSetQueryLocationLocalAuthorityOldCode))]
+[SwaggerSubType(typeof(DataSetQueryLocationProviderUkprn))]
+[SwaggerSubType(typeof(DataSetQueryLocationSchoolLaEstab))]
+[SwaggerSubType(typeof(DataSetQueryLocationSchoolUrn))]
+public interface IDataSetQueryLocation
 {
     /// <summary>
     /// The geographic level of the location.
-    ///
-    /// This should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.
     /// </summary>
-    public virtual string Level { get; init; } = string.Empty;
+    public string Level { get; init; }
 
     public GeographicLevel ParsedLevel() => EnumUtil.GetFromEnumValue<GeographicLevel>(Level);
 
     /// <summary>
     /// The name of the key property for this location.
     /// </summary>
-    [JsonIgnore]
-    public abstract string KeyProperty { get; }
+    public string KeyProperty();
 
     /// <summary>
     /// The value of the key property for this location.
     /// </summary>
-    [JsonIgnore]
-    public abstract string KeyValue { get; }
+    public string KeyValue();
 
-    public string ToLocationString() => $"{Level}|{KeyProperty.ToLowerFirst()}|{KeyValue}";
+    public string ToLocationString() => $"{Level}|{KeyProperty().ToLowerFirst()}|{KeyValue()}";
 
-    public static DataSetQueryLocation Parse(string location)
+    public static IDataSetQueryLocation Parse(string location)
     {
         var parts = location.Split('|');
         var level = parts[0];
@@ -109,42 +105,46 @@ public abstract record DataSetQueryLocation
         };
     }
 
-    public abstract IValidator CreateValidator();
-
-    public class BaseValidator<T> : AbstractValidator<T> where T : DataSetQueryLocation
-    {
-        protected BaseValidator()
-        {
-            RuleFor(l => l.Level)
-                .NotEmpty()
-                .AllowedValue(GeographicLevelUtils.OrderedCodes);
-        }
-    }
+    public IValidator CreateValidator();
 }
 
-public record DataSetQueryLocationId : DataSetQueryLocation
+/// <summary>
+/// A location (identified by an ID) to filter results by.
+///
+/// Note that location IDs are guaranteed to be unique to a single location
+/// unlike location codes (which may correspond to multiple locations).
+/// </summary>
+public record DataSetQueryLocationId : IDataSetQueryLocation
 {
     /// <summary>
     /// The ID of the location. If specified, this will be used
     /// instead of any codes or other types of identifier.
-    ///
-    /// Every ID is unique to a single location, unlike codes
-    /// which may correspond to multiple locations.
     /// </summary>
+    /// <example>2tYX</example>
     public required string Id { get; init; }
 
-    public override required string Level { get; init; }
+    /// <summary>
+    /// The geographic level of the location.
+    ///
+    /// This should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.
+    /// </summary>
+    /// <example>NAT</example>
+    [SwaggerEnum(typeof(GeographicLevel))]
+    public required string Level { get; init; }
 
-    public override string KeyProperty => nameof(Id);
+    public string KeyProperty() => nameof(Id);
 
-    public override string KeyValue => Id;
+    public string KeyValue() => Id;
 
-    public override IValidator CreateValidator() => new Validator();
+    public IValidator CreateValidator() => new Validator();
 
-    public class Validator : BaseValidator<DataSetQueryLocationId>
+    public class Validator : AbstractValidator<DataSetQueryLocationId>
     {
         public Validator()
         {
+            RuleFor(l => l.Level)
+                .AllowedValue(GeographicLevelUtils.OrderedCodes);
+
             RuleFor(l => l.Id)
                 .NotEmpty()
                 .MaximumLength(10);
@@ -152,169 +152,245 @@ public record DataSetQueryLocationId : DataSetQueryLocation
     }
 }
 
-public record DataSetQueryLocationCode : DataSetQueryLocation
+/// <summary>
+/// A location (identified by a code) to filter results by.
+///
+/// Note that location codes may correspond to multiple locations in the same geographic level.
+/// </summary>
+public record DataSetQueryLocationCode : IDataSetQueryLocation
 {
     /// <summary>
     /// The code of the location. This may be an ONS code, or some
     /// other code that identifies the location.
-    ///
-    /// Note that codes are not necessarily unique to a single location.
-    /// Specify the location ID to ensure only a single location is matched.
     /// </summary>
+    /// <example>E12000003</example>
     public required string Code { get; init; }
 
-    public override required string Level { get; init; }
+    /// <summary>
+    /// The geographic level of the location.
+    ///
+    /// This should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.
+    /// </summary>
+    /// <example>NAT</example>
+    [SwaggerEnum(typeof(GeographicLevel))]
+    public required string Level { get; init; }
 
-    public override string KeyProperty => nameof(Code);
+    public string KeyProperty() => nameof(Code);
 
-    public override string KeyValue => Code;
+    public string KeyValue() => Code;
 
-    public override IValidator CreateValidator() => new Validator();
+    public IValidator CreateValidator() => new Validator();
 
-    public class Validator : BaseValidator<DataSetQueryLocationCode>
+    public class Validator : AbstractValidator<DataSetQueryLocationCode>
     {
         public Validator()
         {
+            RuleFor(l => l.Level)
+                .AllowedValue(GeographicLevelUtils.OrderedCodes);
+
             RuleFor(l => l.Code)
                 .NotEmpty()
-                .MaximumLength(25);
+                .MaximumLength(30);
         }
     }
 }
 
-public record DataSetQueryLocationLocalAuthorityCode : DataSetQueryLocation
+/// <summary>
+/// A local authority (identified by its ONS code) to filter results by.
+/// </summary>
+public record DataSetQueryLocationLocalAuthorityCode : IDataSetQueryLocation
 {
     /// <summary>
-    /// The ONS code of the local authority. This should be 9 characters
-    /// in the standard ONS format for local authorities (e.g. `E08000019`).
-    /// It can be a combination of two codes (e.g. `E09000021 / E09000027`).
+    /// The ONS code of the local authority. This is typically 9 characters
+    /// in the standard ONS format for local authorities e.g. `E08000019`,
+    /// but may be a combination of multiple codes e.g. `E08000019 / E08000020`.
     /// </summary>
+    /// <example>E08000019</example>
     public required string Code { get; init; }
 
-    public override string Level => GeographicLevel.LocalAuthority.GetEnumValue();
+    /// <summary>
+    /// The geographic level of the local authority. Must be set to `LA`.
+    /// </summary>
+    /// <example>LA</example>
+    [Required]
+    [SwaggerEnum(typeof(GeographicLevel))]
+    public string Level { get; init; } = GeographicLevel.LocalAuthority.GetEnumValue();
 
-    public override string KeyProperty => nameof(Code);
+    public string KeyProperty() => nameof(Code);
 
-    public override string KeyValue => Code;
+    public string KeyValue() => Code;
 
-    public override IValidator CreateValidator() => new Validator();
+    public IValidator CreateValidator() => new Validator();
 
-    public class Validator : BaseValidator<DataSetQueryLocationLocalAuthorityCode>
+    public class Validator : AbstractValidator<DataSetQueryLocationLocalAuthorityCode>
     {
         public Validator()
         {
+            RuleFor(l => l.Level)
+                .AllowedValue([GeographicLevel.LocalAuthority.GetEnumValue()]);
+
             RuleFor(l => l.Code)
                 .NotEmpty()
-                .MaximumLength(25);
+                .MaximumLength(30);
         }
     }
 }
 
-public record DataSetQueryLocationLocalAuthorityOldCode : DataSetQueryLocation
+/// <summary>
+/// A local authority (identified by its old code) to filter results by.
+/// </summary>
+public record DataSetQueryLocationLocalAuthorityOldCode : IDataSetQueryLocation
 {
     /// <summary>
     /// The old code (previously the LEA code) of the local authority.
-    /// This should be a 3 digit number (e.g. `318`) or be
-    /// a combination of two codes (e.g. `314 / 318`).
+    /// This is typically a 3-digit number e.g. `318`, but may be a
+    /// combination of multiple codes e.g. `318 / 319`.
     /// </summary>
+    /// <example>373</example>
     public required string OldCode { get; init; }
 
-    public override string Level => GeographicLevel.LocalAuthority.GetEnumValue();
+    /// <summary>
+    /// The geographic level of the local authority. Must be set to `LA`.
+    /// </summary>
+    /// <example>LA</example>
+    [SwaggerEnum(typeof(GeographicLevel))]
+    public string Level { get; init; } = GeographicLevel.LocalAuthority.GetEnumValue();
 
-    public override string KeyProperty => nameof(OldCode);
+    public string KeyProperty() => nameof(OldCode);
 
-    public override string KeyValue => OldCode;
+    public string KeyValue() => OldCode;
 
-    public override IValidator CreateValidator() => new Validator();
+    public IValidator CreateValidator() => new Validator();
 
-    public class Validator : BaseValidator<DataSetQueryLocationLocalAuthorityOldCode>
+    public class Validator : AbstractValidator<DataSetQueryLocationLocalAuthorityOldCode>
     {
         public Validator()
         {
+            RuleFor(l => l.Level)
+                .AllowedValue([GeographicLevel.LocalAuthority.GetEnumValue()]);
+
             RuleFor(l => l.OldCode)
                 .NotEmpty()
-                .MaximumLength(10);
+                .MaximumLength(20);
         }
     }
 }
 
-public record DataSetQueryLocationProviderUkprn : DataSetQueryLocation
+/// <summary>
+/// A provider (identified by its UKPRN) to filter results by.
+/// </summary>
+public record DataSetQueryLocationProviderUkprn : IDataSetQueryLocation
 {
     /// <summary>
     /// The UKPRN (UK provider reference number) of the provider.
-    /// This should be an 8 digit number.
+    /// This is typically an 8-digit number.
     /// </summary>
+    /// <example>123454678</example>
     public required string Ukprn { get; init; }
 
-    public override string Level => GeographicLevel.Provider.GetEnumValue();
+    /// <summary>
+    /// The geographic level of the provider. Must be set to `PROV`.
+    /// </summary>
+    /// <example>PROV</example>
+    [Required]
+    [SwaggerEnum(typeof(GeographicLevel))]
+    public string Level { get; init; } = GeographicLevel.Provider.GetEnumValue();
 
-    public override string KeyProperty => nameof(Ukprn);
+    public string KeyProperty() => nameof(Ukprn);
 
-    public override string KeyValue => Ukprn;
+    public string KeyValue() => Ukprn;
 
-    public override IValidator CreateValidator() => new Validator();
+    public IValidator CreateValidator() => new Validator();
 
-    public class Validator : BaseValidator<DataSetQueryLocationProviderUkprn>
+    public class Validator : AbstractValidator<DataSetQueryLocationProviderUkprn>
     {
         public Validator()
         {
+            RuleFor(l => l.Level)
+                .AllowedValue([GeographicLevel.Provider.GetEnumValue()]);
+
             RuleFor(l => l.Ukprn)
                 .NotEmpty()
-                .MaximumLength(8);
+                .MaximumLength(20);
         }
     }
 }
 
-public record DataSetQueryLocationSchoolUrn : DataSetQueryLocation
+/// <summary>
+/// A school (identified by its URN) to filter results by.
+/// </summary>
+public record DataSetQueryLocationSchoolUrn : IDataSetQueryLocation
 {
     /// <summary>
     /// The URN (unique reference number) of the school.
-    /// This should be a 6 digit number.
+    /// This is typically a 6-digit number.
     /// </summary>
+    /// <example>123456</example>
     public required string Urn { get; init; }
 
-    public override string Level => GeographicLevel.School.GetEnumValue();
+    /// <summary>
+    /// The geographic level of the school. Must be set to `SCH`.
+    /// </summary>
+    /// <example>SCH</example>
+    [Required]
+    [SwaggerEnum(typeof(GeographicLevel))]
+    public string Level { get; init; } = GeographicLevel.School.GetEnumValue();
 
-    public override string KeyProperty => nameof(Urn);
+    public string KeyProperty() => nameof(Urn);
 
-    public override string KeyValue => Urn;
+    public string KeyValue() => Urn;
 
-    public override IValidator CreateValidator() => new Validator();
+    public IValidator CreateValidator() => new Validator();
 
-    public class Validator : BaseValidator<DataSetQueryLocationSchoolUrn>
+    public class Validator : AbstractValidator<DataSetQueryLocationSchoolUrn>
     {
         public Validator()
         {
+            RuleFor(l => l.Level)
+                .AllowedValue([GeographicLevel.School.GetEnumValue()]);
+
             RuleFor(l => l.Urn)
                 .NotEmpty()
-                .MaximumLength(6);
+                .MaximumLength(20);
         }
     }
 }
 
-public record DataSetQueryLocationSchoolLaEstab : DataSetQueryLocation
+/// <summary>
+/// A school (identified by its LAESTAB) to filter results by.
+/// </summary>
+public record DataSetQueryLocationSchoolLaEstab : IDataSetQueryLocation
 {
     /// <summary>
     /// The LAESTAB (local authority establishment number) of the school.
-    /// This should be a 7 digit number.
+    /// This is typically a 7-digit number.
     /// </summary>
+    /// <example>1234567</example>
     public required string LaEstab { get; init; }
 
-    public override string Level => GeographicLevel.School.GetEnumValue();
+    /// <summary>
+    /// The geographic level of the location. Must be set to `SCH`.
+    /// </summary>
+    /// <example>SCH</example>
+    [Required]
+    public string Level { get; init; } = GeographicLevel.School.GetEnumValue();
 
-    public override string KeyProperty => nameof(LaEstab);
+    public string KeyProperty() => nameof(LaEstab);
 
-    public override string KeyValue => LaEstab;
+    public string KeyValue() => LaEstab;
 
-    public override IValidator CreateValidator() => new Validator();
+    public IValidator CreateValidator() => new Validator();
 
-    public class Validator : BaseValidator<DataSetQueryLocationSchoolLaEstab>
+    public class Validator : AbstractValidator<DataSetQueryLocationSchoolLaEstab>
     {
         public Validator()
         {
+            RuleFor(l => l.Level)
+                .AllowedValue([GeographicLevel.School.GetEnumValue()]);
+
             RuleFor(l => l.LaEstab)
                 .NotEmpty()
-                .MaximumLength(7);
+                .MaximumLength(20);
         }
     }
 }

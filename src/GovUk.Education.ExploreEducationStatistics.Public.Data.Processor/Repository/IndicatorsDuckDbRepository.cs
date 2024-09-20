@@ -24,6 +24,7 @@ public class IndicatorsDuckDbRepository(PublicDataDbContext publicDataDbContext)
             $"""
              CREATE TABLE {IndicatorsTable.TableName:raw}(
                  {IndicatorsTable.Cols.Id:raw} VARCHAR PRIMARY KEY,
+                 {IndicatorsTable.Cols.Column:raw} VARCHAR,
                  {IndicatorsTable.Cols.Label:raw} VARCHAR,
                  {IndicatorsTable.Cols.Unit:raw} VARCHAR,
                  {IndicatorsTable.Cols.DecimalPlaces:raw} TINYINT,
@@ -38,6 +39,7 @@ public class IndicatorsDuckDbRepository(PublicDataDbContext publicDataDbContext)
             var insertRow = appender.CreateRow();
 
             insertRow.AppendValue(meta.PublicId);
+            insertRow.AppendValue(meta.Column);
             insertRow.AppendValue(meta.Label);
             insertRow.AppendValue(meta.Unit?.GetEnumLabel() ?? string.Empty);
             insertRow.AppendValue(meta.DecimalPlaces);

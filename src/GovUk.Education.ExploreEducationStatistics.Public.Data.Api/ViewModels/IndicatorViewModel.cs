@@ -13,22 +13,32 @@ public record IndicatorViewModel
     /// <summary>
     /// The ID of the indicator.
     /// </summary>
+    /// <example>enW68</example>
     public required string Id { get; init; }
+
+    /// <summary>
+    /// The name of the indicator CSV column.
+    /// </summary>
+    /// <example>sess_authorised</example>
+    public required string Column { get; init; }
 
     /// <summary>
     /// The human-readable label of the indicator.
     /// </summary>
+    /// <example>Percentage of authorised sessions</example>
     public required string Label { get; init; }
 
     /// <summary>
     /// A numeric unit for an indicator.
     /// </summary>
+    /// <example>%</example>
     [JsonConverter(typeof(EnumToEnumLabelJsonConverter<IndicatorUnit>))]
     public required IndicatorUnit? Unit { get; init; }
 
     /// <summary>
     /// The optimal number of decimal places that the indicator should use when displayed.
     /// </summary>
+    /// <example>2</example>
     public int? DecimalPlaces { get; init; }
 
     public static IndicatorViewModel Create(IndicatorMeta meta)
@@ -36,6 +46,7 @@ public record IndicatorViewModel
         return new IndicatorViewModel
         {
             Id = meta.PublicId,
+            Column = meta.Column,
             Label = meta.Label,
             Unit = meta.Unit,
             DecimalPlaces = meta.DecimalPlaces

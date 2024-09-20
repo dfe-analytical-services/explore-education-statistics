@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Reque
 
 public class DataSetQueryLocationValidatorTests
 {
-    public static readonly TheoryData<DataSetQueryLocation> ValidLocations = new()
+    public static readonly TheoryData<IDataSetQueryLocation> ValidLocations = new()
     {
         new DataSetQueryLocationId { Level = "NAT", Id = "12345"},
         new DataSetQueryLocationCode { Level = "NAT", Code = "12345"},
@@ -28,16 +28,16 @@ public class DataSetQueryLocationValidatorTests
 
     [Theory]
     [MemberData(nameof(ValidLocations))]
-    public void Success(DataSetQueryLocation location)
+    public void Success(IDataSetQueryLocation location)
     {
         var validator = location.CreateValidator();
 
-        var result = validator.Validate(new ValidationContext<DataSetQueryLocation>(location));
+        var result = validator.Validate(new ValidationContext<IDataSetQueryLocation>(location));
 
         Assert.Empty(result.Errors);
     }
 
-    public static readonly TheoryData<DataSetQueryLocation> InvalidLocationLevels = new()
+    public static readonly TheoryData<IDataSetQueryLocation> InvalidLocationLevels = new()
     {
         new DataSetQueryLocationId { Level = "NA", Id = "12345" },
         new DataSetQueryLocationCode { Level = "NA", Code = "12345" },
@@ -48,15 +48,15 @@ public class DataSetQueryLocationValidatorTests
 
     [Theory]
     [MemberData(nameof(InvalidLocationLevels))]
-    public void Failure_InvalidLevel(DataSetQueryLocation location)
+    public void Failure_InvalidLevel(IDataSetQueryLocation location)
     {
         var validator = location.CreateValidator();
 
-        var result = validator.Validate(new ValidationContext<DataSetQueryLocation>(location));
+        var result = validator.Validate(new ValidationContext<IDataSetQueryLocation>(location));
 
         var error = Assert.Single(result.Errors);
 
-        Assert.Equal(nameof(DataSetQueryLocation.Level), error.PropertyName);
+        Assert.Equal(nameof(IDataSetQueryLocation.Level), error.PropertyName);
         Assert.Equal(ValidationMessages.AllowedValue.Code, error.ErrorCode);
         Assert.Equal(ValidationMessages.AllowedValue.Message, error.ErrorMessage);
 
@@ -66,7 +66,7 @@ public class DataSetQueryLocationValidatorTests
         Assert.Equal(GeographicLevelUtils.OrderedCodes, state.Allowed);
     }
 
-    public static readonly TheoryData<DataSetQueryLocation> EmptyLocationValues = new()
+    public static readonly TheoryData<IDataSetQueryLocation> EmptyLocationValues = new()
     {
         new DataSetQueryLocationId { Level = "NAT", Id = "" },
         new DataSetQueryLocationId { Level = "NAT", Id = "  " },
@@ -84,50 +84,50 @@ public class DataSetQueryLocationValidatorTests
 
     [Theory]
     [MemberData(nameof(EmptyLocationValues))]
-    public void Failure_EmptyValue(DataSetQueryLocation location)
+    public void Failure_EmptyValue(IDataSetQueryLocation location)
     {
         var validator = location.CreateValidator();
 
-        var result = validator.Validate(new ValidationContext<DataSetQueryLocation>(location));
+        var result = validator.Validate(new ValidationContext<IDataSetQueryLocation>(location));
 
         var error = Assert.Single(result.Errors);
 
         Assert.Equal(FluentValidationKeys.NotEmptyValidator, error.ErrorCode);
 
-        Assert.Equal(location.KeyProperty, error.PropertyName);
-        Assert.Equal(location.KeyValue, error.AttemptedValue);
+        Assert.Equal(location.KeyProperty(), error.PropertyName);
+        Assert.Equal(location.KeyValue(), error.AttemptedValue);
     }
 
-    public static readonly TheoryData<DataSetQueryLocation> InvalidLocationValueLengths = new()
+    public static readonly TheoryData<IDataSetQueryLocation> InvalidLocationValueLengths = new()
     {
         new DataSetQueryLocationId { Level = "NAT", Id = new string('X', 11) },
-        new DataSetQueryLocationCode { Level = "NAT", Code = new string('X', 26) },
+        new DataSetQueryLocationCode { Level = "NAT", Code = new string('X', 31) },
         new DataSetQueryLocationId { Level = "LA", Id = new string('X', 11) },
-        new DataSetQueryLocationLocalAuthorityCode { Code = new string('X', 26) },
-        new DataSetQueryLocationLocalAuthorityOldCode { OldCode = new string('X', 11) },
+        new DataSetQueryLocationLocalAuthorityCode { Code = new string('X', 31) },
+        new DataSetQueryLocationLocalAuthorityOldCode { OldCode = new string('X', 21) },
         new DataSetQueryLocationId { Level = "RSC", Id = new string('X', 11) },
         new DataSetQueryLocationId { Level = "SCH", Id = new string('X', 11) },
-        new DataSetQueryLocationSchoolUrn { Urn = new string('X', 7) },
-        new DataSetQueryLocationSchoolLaEstab { LaEstab = new string('X', 8) },
+        new DataSetQueryLocationSchoolUrn { Urn = new string('X', 21) },
+        new DataSetQueryLocationSchoolLaEstab { LaEstab = new string('X', 21) },
         new DataSetQueryLocationId { Level = "PROV", Id = new string('X', 11) },
-        new DataSetQueryLocationProviderUkprn { Ukprn = new string('X', 9) },
+        new DataSetQueryLocationProviderUkprn { Ukprn = new string('X', 21) },
     };
 
     [Theory]
     [MemberData(nameof(InvalidLocationValueLengths))]
-    public void Failure_InvalidValueLength(DataSetQueryLocation location)
+    public void Failure_InvalidValueLength(IDataSetQueryLocation location)
     {
         var validator = location.CreateValidator();
 
-        var result = validator.Validate(new ValidationContext<DataSetQueryLocation>(location));
+        var result = validator.Validate(new ValidationContext<IDataSetQueryLocation>(location));
 
         var error = Assert.Single(result.Errors);
 
         Assert.Equal(FluentValidationKeys.MaximumLengthValidator, error.ErrorCode);
 
-        Assert.Equal(location.KeyProperty, error.PropertyName);
+        Assert.Equal(location.KeyProperty(), error.PropertyName);
 
-        Assert.Equal(location.KeyValue, error.AttemptedValue);
-        Assert.Equal(location.KeyValue.Length - 1, error.FormattedMessagePlaceholderValues["MaxLength"]);
+        Assert.Equal(location.KeyValue(), error.AttemptedValue);
+        Assert.Equal(location.KeyValue().Length - 1, error.FormattedMessagePlaceholderValues["MaxLength"]);
     }
 }

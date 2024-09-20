@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 ///
 /// All parts of the criteria must resolve to true to match a result.
 /// </summary>
-public record DataSetQueryCriteriaFacets : DataSetQueryCriteria
+public record DataSetQueryCriteriaFacets : IDataSetQueryCriteria
 {
     /// <summary>
     /// Query criteria relating to filter options.

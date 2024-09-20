@@ -36,8 +36,8 @@ Verify release summary
     user verifies release summary    Financial year    3000-01    Accredited official statistics
 
 Upload data files
-    user uploads subject    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv
-    user uploads subject    ${SUBJECT_NAME_2}    tiny-two-filters.csv    tiny-two-filters.meta.csv
+    user uploads subject    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject    ${SUBJECT_NAME_2}    tiny-two-filters.csv    tiny-two-filters.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to subjects
     user clicks link    Data and files
@@ -159,8 +159,9 @@ Navigate to admin and create an amendment
 Upload third subject(large data file)
     user waits until large data upload is completed
     ...    ${SUBJECT_NAME_3}
-    ...    data-upload-import.csv
-    ...    data-upload-import.meta.csv
+    ...    large-data-set.csv
+    ...    large-data-set.meta.csv
+    ...    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to third subject
     user clicks link    Data guidance
@@ -235,7 +236,7 @@ Create a second draft release via api
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3010
 
 Upload subject to second release
-    user uploads subject    ${SUBJECT_NAME_4}    seven_filters_minor_update.csv    seven_filters_minor_update.meta.csv
+    user uploads subject    ${SUBJECT_NAME_4}    seven_filters_minor_update.csv    seven_filters_minor_update.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to second release
     user clicks link    Data and files
@@ -294,7 +295,7 @@ Create a third draft release via api
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3020
 
 Upload subject to third release
-    user uploads subject    ${SUBJECT_NAME_5}    institution_and_provider.csv    institution_and_provider.meta.csv
+    user uploads subject    ${SUBJECT_NAME_5}    institution_and_provider.csv    institution_and_provider.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to third release
     user clicks link    Data and files

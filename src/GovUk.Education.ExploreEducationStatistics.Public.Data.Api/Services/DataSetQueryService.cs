@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -46,14 +46,9 @@ internal class DataSetQueryService(
         { "geographicLevel", DataTable.Cols.GeographicLevel },
     };
 
-    private static readonly ImmutableHashSet<string> ReservedColumns =
-    [
-        DataTable.Cols.Id,
-        DataTable.Cols.GeographicLevel,
-        DataTable.Cols.TimePeriodId
-    ];
-
-    private static string LocationsSortField(GeographicLevel level) => $"locations|{level.GetEnumValue()}";
+    private const string SortTypeFilter = "filter";
+    private const string SortTypeIndicator = "indicator";
+    private const string SortTypeLocation = "location";
 
     public async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> Query(
         Guid dataSetId,
@@ -172,16 +167,22 @@ internal class DataSetQueryService(
         }
 
         var columnsTask = dataRepository.ListColumns(dataSetVersion, cancellationToken);
-        var indicatorsTask = indicatorRepository.ListIds(dataSetVersion, cancellationToken);
+        var filterColumnsByIdTask = filterRepository.GetFilterColumnsById(dataSetVersion, cancellationToken);
+        var indicatorColumnsByIdTask = indicatorRepository.GetColumnsById(dataSetVersion, cancellationToken);
 
-        await Task.WhenAll(columnsTask, indicatorsTask);
+        await Task.WhenAll(columnsTask, filterColumnsByIdTask, indicatorColumnsByIdTask);
 
-        var indicators = GetIndicators(query, indicatorsTask.Result, queryState);
+        var indicators = GetIndicators(query, indicatorColumnsByIdTask.Result, queryState);
+
+        var columnMappings = GetColumnMappings(
+            columns: columnsTask.Result,
+            filterColumnsById: filterColumnsByIdTask.Result,
+            indicatorColumnsById: indicatorColumnsByIdTask.Result,
+            selectedIndicators: indicators);
 
         var sorts = GetSorts(
             request: query,
-            columns: columnsTask.Result,
-            indicators: indicators,
+            columnMappings: columnMappings,
             queryState: queryState);
 
         if (queryState.Errors.Count != 0)
@@ -190,11 +191,6 @@ internal class DataSetQueryService(
         }
 
         var whereSql = whereBuilder.Build();
-
-        var columnsByType = GetColumnsByType(
-            columns: columnsTask.Result,
-            allIndicators: indicatorsTask.Result,
-            selectedIndicators: indicators);
 
         var countTask = dataRepository.CountRows(
             dataSetVersion: dataSetVersion,
@@ -206,7 +202,7 @@ internal class DataSetQueryService(
             columns: [
                 DataTable.Cols.TimePeriodId,
                 DataTable.Cols.GeographicLevel,
-                ..columnsByType.All
+                ..columnMappings.Columns
             ],
             where: whereSql,
             sorts: sorts,
@@ -237,7 +233,7 @@ internal class DataSetQueryService(
         var results = await MapQueryResults(
             rows: rowsTask.Result,
             dataSetVersion: dataSetVersion,
-            columnsByType: columnsByType,
+            columnMappings: columnMappings,
             debug: query.Debug,
             cancellationToken: cancellationToken);
 
@@ -256,42 +252,41 @@ internal class DataSetQueryService(
 
     private static HashSet<string> GetIndicators(
         DataSetQueryRequest request,
-        ISet<string> allowedIndicators,
+        Dictionary<string, string> indicatorColumnsById,
         QueryState queryState)
     {
-        var validIndicators = new HashSet<string>();
-        var invalidIndicators = new HashSet<string>();
+        var validIndicatorColumns = new HashSet<string>();
+        var invalidIndicatorIds = new HashSet<string>();
 
-        foreach (var indicator in request.Indicators)
+        foreach (var indicatorId in request.Indicators)
         {
-            if (!allowedIndicators.Contains(indicator))
+            if (indicatorColumnsById.TryGetValue(indicatorId, out var value))
             {
-                invalidIndicators.Add(indicator);
+                validIndicatorColumns.Add(value);
             }
             else
             {
-                validIndicators.Add(indicator);
+                invalidIndicatorIds.Add(indicatorId);
             }
         }
 
-        if (invalidIndicators.Count != 0)
+        if (invalidIndicatorIds.Count != 0)
         {
             queryState.Errors.Add(new ErrorViewModel
             {
                 Code = ValidationMessages.IndicatorsNotFound.Code,
                 Message = ValidationMessages.IndicatorsNotFound.Message,
                 Path = "indicators",
-                Detail = new NotFoundItemsErrorDetail<string>(invalidIndicators)
+                Detail = new NotFoundItemsErrorDetail<string>(invalidIndicatorIds)
             });
         }
 
-        return validIndicators;
+        return validIndicatorColumns;
     }
 
     private static List<Sort> GetSorts(
         DataSetQueryRequest request,
-        IEnumerable<string> columns,
-        IEnumerable<string> indicators,
+        ColumnMappings columnMappings,
         QueryState queryState)
     {
         if (request.Sorts is null)
@@ -299,40 +294,14 @@ internal class DataSetQueryService(
             return [new Sort(Field: DataTable.Cols.TimePeriodId, Direction: SortDirection.Desc)];
         }
 
-        var locationLevels = GeographicLevelUtils.Levels
-            .Where(level => columns.Contains(DataTable.Cols.LocationId(level)))
-            .ToHashSet();
-
-        var fieldColumnMap = new Dictionary<string, string>(ReservedSorts);
-
-        foreach (var locationLevel in locationLevels)
-        {
-            fieldColumnMap[LocationsSortField(locationLevel)] = DataTable.Cols.LocationId(locationLevel);
-        }
-
-        var otherFields = columns
-            .Except([
-                DataTable.Cols.Id,
-                ..ReservedSorts.Keys,
-                ..locationLevels.Select(DataTable.Cols.LocationId),
-            ])
-            .Concat(indicators)
-            .ToHashSet();
-
         var invalidSorts = new HashSet<DataSetQuerySort>();
         var sorts = new List<Sort>();
 
         foreach (var sort in request.Sorts)
         {
-            if (fieldColumnMap.TryGetValue(sort.Field, out var field))
+            if (TryGetSortColumn(sort, columnMappings, out var column))
             {
-                sorts.Add(new Sort(Field: field, Direction: sort.ParsedDirection()));
-                continue;
-            }
-
-            if (otherFields.Contains(sort.Field))
-            {
-                sorts.Add(new Sort(Field: sort.Field, Direction: sort.ParsedDirection()));
+                sorts.Add(new Sort(Field: column, Direction: sort.ParsedDirection()));
                 continue;
             }
 
@@ -353,46 +322,72 @@ internal class DataSetQueryService(
         return sorts;
     }
 
-    private static ColumnsByType GetColumnsByType(
+    private static bool TryGetSortColumn(
+        DataSetQuerySort sort,
+        ColumnMappings columnMappings,
+        [NotNullWhen(true)]
+        out string? column)
+    {
+        column = null;
+
+        if (ReservedSorts.TryGetValue(sort.Field, out column))
+        {
+            return true;
+        }
+
+        var fieldParts = sort.Field.Split('|', 2);
+
+        if (fieldParts.Length != 2)
+        {
+            return false;
+        }
+
+        var fieldType = fieldParts[0];
+        var fieldId = fieldParts[1];
+
+        return fieldType switch
+        {
+            SortTypeFilter => columnMappings.Filters.TryGetValue(fieldId, out column),
+            SortTypeIndicator => columnMappings.Indicators.TryGetValue(fieldId, out column),
+            SortTypeLocation => columnMappings.LocationLevels.TryGetValue(fieldId, out column),
+            _ => false
+        };
+    }
+
+    private static ColumnMappings GetColumnMappings(
         ISet<string> columns,
-        ISet<string> allIndicators,
+        Dictionary<string, string> filterColumnsById,
+        Dictionary<string, string> indicatorColumnsById,
         ISet<string> selectedIndicators)
     {
         var locationLevels = GeographicLevelUtils.Levels
             .Where(level => columns.Contains(DataTable.Cols.LocationId(level)))
-            .ToHashSet();
+            .ToDictionary(
+                level => level.GetEnumValue(),
+                DataTable.Cols.LocationId
+            );
 
-        var filterColumns = columns
-            .Except([
-                ..ReservedColumns,
-                ..locationLevels.Select(DataTable.Cols.LocationId),
-                ..allIndicators
-            ])
-            .ToHashSet();
+        var indicators = indicatorColumnsById
+            .Where(kv => selectedIndicators.Contains(kv.Value))
+            .ToDictionary();
 
-        return new ColumnsByType
+        return new ColumnMappings
         {
-            Filters = filterColumns,
+            Filters = filterColumnsById,
             LocationLevels = locationLevels,
-            Indicators = selectedIndicators
+            Indicators = indicators
         };
     }
 
     private async Task<List<DataSetQueryResultViewModel>> MapQueryResults(
         IList<IDictionary<string, object?>> rows,
         DataSetVersion dataSetVersion,
-        ColumnsByType columnsByType,
+        ColumnMappings columnMappings,
         bool debug,
         CancellationToken cancellationToken)
     {
         using var _ = MiniProfiler.Current.Step(
             $"{nameof(DataSetQueryService)}.{nameof(MapQueryResults)}");
-
-        var locationColumnsByCode = columnsByType.LocationLevels
-            .ToDictionary(
-                level => level.GetEnumValue(),
-                DataTable.Cols.LocationId
-            );
 
         var timePeriodIds = new HashSet<int>();
         var locationOptionIds = new HashSet<int>();
@@ -402,7 +397,7 @@ internal class DataSetQueryService(
         {
             timePeriodIds.Add((int)row[DataTable.Cols.TimePeriodId]!);
 
-            foreach (var (_, locationColumn) in locationColumnsByCode)
+            foreach (var (_, locationColumn) in columnMappings.LocationLevels)
             {
                 if (row[locationColumn] is int locationOptionId)
                 {
@@ -410,7 +405,7 @@ internal class DataSetQueryService(
                 }
             }
 
-            foreach (var filterColumn in columnsByType.Filters)
+            foreach (var filterColumn in columnMappings.Filters.Values)
             {
                 if (row[filterColumn] is int filterOptionId)
                 {
@@ -436,22 +431,23 @@ internal class DataSetQueryService(
         {
             GeographicLevel = EnumUtil.GetFromEnumLabel<GeographicLevel>((string)row[DataTable.Cols.GeographicLevel]!),
             TimePeriod = timePeriodsById.Result[(int)row[DataTable.Cols.TimePeriodId]!],
-            Filters = columnsByType.Filters
-                .Where(filter => row[filter] is int and not 0)
+            Filters = columnMappings.Filters
+                .Where(kv => row[kv.Value] is int and not 0)
                 .ToDictionary(
-                    filter => filter,
-                    filter => filterOptionsById.Result[(int)row[filter]!]
+                    kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
+                    kv => filterOptionsById.Result[(int)row[kv.Value]!]
                 ),
-            Locations = locationColumnsByCode
+            Locations = columnMappings.LocationLevels
                 .Where(kv => row[kv.Value] is int and not 0)
                 .ToDictionary(
                     kv => kv.Key,
                     kv => locationOptionsById.Result[(int)row[kv.Value]!]
                 ),
-            Values = columnsByType.Indicators.ToDictionary(
-                indicator => indicator,
-                indicator => row[indicator] as string ?? string.Empty
-            )
+            Values = columnMappings.Indicators
+                .ToDictionary(
+                    kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
+                    kv => row[kv.Value] as string ?? string.Empty
+                )
         })
         .ToList();
     }
@@ -459,7 +455,7 @@ internal class DataSetQueryService(
     private static WarningViewModel MapGetQueryWarning(WarningViewModel warning)
     {
         if (warning.Code == ValidationMessages.LocationsNotFound.Code
-            && warning.Detail is NotFoundItemsErrorDetail<DataSetQueryLocation> notFoundLocations)
+            && warning.Detail is NotFoundItemsErrorDetail<IDataSetQueryLocation> notFoundLocations)
         {
             return warning with
             {
@@ -586,19 +582,28 @@ internal class DataSetQueryService(
         };
     }
 
-    private class ColumnsByType
+    private class ColumnMappings
     {
-        public required IEnumerable<GeographicLevel> LocationLevels { get; init; } = [];
+        /// <summary>
+        /// Key is level code, value is the column.
+        /// </summary>
+        public required Dictionary<string, string> LocationLevels { get; init; } = [];
 
-        public required IEnumerable<string> Filters { get; init; } = [];
+        /// <summary>
+        /// Key is the filter ID, value is the column.
+        /// </summary>
+        public required Dictionary<string, string> Filters { get; init; } = [];
 
-        public required IEnumerable<string> Indicators { get; init; } = [];
+        /// <summary>
+        /// Key is the indicator ID, value is the column.
+        /// </summary>
+        public required Dictionary<string, string> Indicators { get; init; } = [];
 
-        public IEnumerable<string> All =>
+        public IEnumerable<string> Columns =>
         [
-            ..LocationLevels.Select(DataTable.Cols.LocationId),
-            ..Filters,
-            ..Indicators
+            ..LocationLevels.Values,
+            ..Filters.Values,
+            ..Indicators.Values
         ];
     }
 }

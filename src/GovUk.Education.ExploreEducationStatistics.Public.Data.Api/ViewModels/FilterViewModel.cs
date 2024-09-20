@@ -10,23 +10,33 @@ public record FilterViewModel
     /// <summary>
     /// The ID of the filter.
     /// </summary>
+    /// <example>BRlj4</example>
     public required string Id { get; init; }
 
     /// <summary>
-    /// A hint to assist in describing the filter.
+    /// The name of the filter CSV column.
     /// </summary>
-    public string Hint { get; init; } = string.Empty;
+    /// <example>school_type</example>
+    public required string Column { get; init; }
 
     /// <summary>
     /// The human-readable label describing the filter.
     /// </summary>
+    /// <example>School type</example>
     public required string Label { get; init; }
+
+    /// <summary>
+    /// A hint to assist in describing the filter.
+    /// </summary>
+    /// <example>Additional detail about the filter.</example>
+    public string Hint { get; init; } = string.Empty;
 
     public static FilterViewModel Create(FilterMeta meta)
     {
         return new FilterViewModel
         {
             Id = meta.PublicId,
+            Column = meta.Column,
             Label = meta.Label,
             Hint = meta.Hint
         };

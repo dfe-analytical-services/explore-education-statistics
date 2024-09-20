@@ -62,14 +62,14 @@ public static class DataSetQueryPaginatedResultsViewModelTestExtensions
     public static WarningViewModel AssertHasLocationsNotFoundWarning(
         this DataSetQueryPaginatedResultsViewModel viewModel,
         string expectedPath,
-        IEnumerable<DataSetQueryLocation> notFoundItems)
+        IEnumerable<IDataSetQueryLocation> notFoundItems)
     {
         var warning = viewModel.AssertHasWarning(
             expectedPath: expectedPath,
             expectedCode: ValidationMessages.LocationsNotFound.Code
         );
 
-        var warningDetail = warning.GetDetail<NotFoundItemsErrorDetail<DataSetQueryLocation>>();
+        var warningDetail = warning.GetDetail<NotFoundItemsErrorDetail<IDataSetQueryLocation>>();
 
         Assert.Equal(notFoundItems, warningDetail.Items);
 

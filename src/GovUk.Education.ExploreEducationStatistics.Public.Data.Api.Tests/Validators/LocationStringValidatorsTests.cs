@@ -165,12 +165,12 @@ public class LocationStringValidatorsTests
                 .Only();
         }
 
-        public static readonly TheoryData<DataSetQueryLocation> InvalidLocationValueLengths =
+        public static readonly TheoryData<IDataSetQueryLocation> InvalidLocationValueLengths =
             DataSetQueryLocationValidatorTests.InvalidLocationValueLengths;
 
         [Theory]
         [MemberData(nameof(InvalidLocationValueLengths))]
-        public void Failure_InvalidValueLength(DataSetQueryLocation location)
+        public void Failure_InvalidValueLength(IDataSetQueryLocation location)
         {
             var testObj = new TestClass { Location = location.ToLocationString() };
 
@@ -178,9 +178,9 @@ public class LocationStringValidatorsTests
 
             result.ShouldHaveValidationErrorFor(t => t.Location)
                 .WithErrorCode(ValidationMessages.LocationValueMaxLength.Code)
-                .WithAttemptedValue(location.KeyValue)
-                .WithMessageArgument("Property", location.KeyProperty.ToLowerFirst())
-                .WithMessageArgument("MaxLength", location.KeyValue.Length - 1)
+                .WithAttemptedValue(location.KeyValue())
+                .WithMessageArgument("Property", location.KeyProperty().ToLowerFirst())
+                .WithMessageArgument("MaxLength", location.KeyValue().Length - 1)
                 .Only();
         }
     }

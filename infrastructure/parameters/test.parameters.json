@@ -38,12 +38,6 @@
     "deploySubnets": {
       "value": true
     },
-    "devopsSPN": {
-      "value": "22888fee-3aa4-411d-8016-bb8a8c3b825a",
-      "metadata": {
-        "comments": "ObjectId for s101t-datahub-spn-ees-dfe-gov-uk"
-      }
-    },
     "domain": {
       "value": "test.explore-education-statistics.service.gov.uk"
     },
@@ -99,7 +93,7 @@
       "value": true
     },
     "publicDataDbExists": {
-      "value": false
+      "value": true
     }
   }
 }

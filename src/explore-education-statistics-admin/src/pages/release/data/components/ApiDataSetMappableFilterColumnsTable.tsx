@@ -1,15 +1,16 @@
 import { FilterMapping } from '@admin/services/apiDataSetVersionService';
 import ApiDataSetMappableFilterColumnOptionsModal from '@admin/pages/release/data/components/ApiDataSetMappableFilterColumnOptionsModal';
 import Tag from '@common/components/Tag';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Dictionary } from '@common/types';
 import React from 'react';
 
 interface Props {
-  mappableFilterColumns: Dictionary<FilterMapping>;
+  mappableFilters: Dictionary<FilterMapping>;
 }
 
 export default function ApiDataSetMappableFilterColumnsTable({
-  mappableFilterColumns,
+  mappableFilters,
 }: Props) {
   return (
     <table
@@ -28,23 +29,22 @@ export default function ApiDataSetMappableFilterColumnsTable({
         </tr>
       </thead>
       <tbody>
-        {Object.entries(mappableFilterColumns).map(([key, column]) => {
+        {Object.entries(mappableFilters).map(([key, filter]) => {
           return (
             <tr key={`column-${key}`}>
               <td>
-                {column.source.label}
+                {filter.source.label}
                 <br />
-                <span className="dfe-colour--dark-grey">
-                  ID: <code>{key}</code>
-                </span>
+                <VisuallyHidden>Column: </VisuallyHidden>
+                <code>{key}</code>
                 <br />
                 <ApiDataSetMappableFilterColumnOptionsModal
-                  id={key}
-                  label={column.source.label}
-                  modalLabel="Current data set filter column"
-                  options={Object.values(column.optionMappings).map(
+                  column={key}
+                  label={filter.source.label}
+                  options={Object.values(filter.optionMappings).map(
                     option => option.source.label,
                   )}
+                  publicId={filter.publicId}
                 />
               </td>
               <td>No mapping available</td>

@@ -8,6 +8,7 @@ describe('DataSetFileUsage', () => {
   test('renders correctly without API data set', () => {
     render(
       <DataSetFileUsage
+        dataSetFileId="data-set-file-id"
         hasApiDataSet={false}
         tableToolLink="test-table-tool-link"
         onDownload={noop}
@@ -34,6 +35,7 @@ describe('DataSetFileUsage', () => {
   test('renders correctly with API data set', () => {
     render(
       <DataSetFileUsage
+        dataSetFileId="data-set-file-id"
         hasApiDataSet
         tableToolLink="test-table-tool-link"
         onDownload={noop}
@@ -64,6 +66,7 @@ describe('DataSetFileUsage', () => {
 
     const { user } = render(
       <DataSetFileUsage
+        dataSetFileId="data-set-file-id"
         hasApiDataSet
         tableToolLink="test-table-tool-link"
         onDownload={handleDownload}
@@ -77,5 +80,18 @@ describe('DataSetFileUsage', () => {
     );
 
     expect(handleDownload).toHaveBeenCalledTimes(1);
+  });
+
+  test('renders download with code API link', () => {
+    render(
+      <DataSetFileUsage
+        dataSetFileId="data-set-file-id"
+        hasApiDataSet
+        tableToolLink="test-table-tool-link"
+        onDownload={noop}
+      />,
+    );
+
+    expect(screen.getByTestId('copy-link-url')).toBeInTheDocument();
   });
 });

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -14,21 +15,21 @@ public static class GeographicLevelUtils
             {
                 GeographicLevel.Country,
                 new GeographicCsvColumns(
-                    Codes: new[] { "country_code" },
+                    Codes: ["country_code"],
                     Name: "country_name"
                 )
             },
             {
                 GeographicLevel.EnglishDevolvedArea,
                 new GeographicCsvColumns(
-                    Codes: new[] { "english_devolved_area_code" },
+                    Codes: ["english_devolved_area_code"],
                     Name: "english_devolved_area_name"
                 )
             },
             {
                 GeographicLevel.Institution,
                 new GeographicCsvColumns(
-                    Codes: new[] { "institution_id" },
+                    Codes: ["institution_id"],
                     Name: "institution_name"
                 )
             },
@@ -39,56 +40,56 @@ public static class GeographicLevelUtils
             {
                 GeographicLevel.LocalAuthorityDistrict,
                 new GeographicCsvColumns(
-                    Codes: new[] { "lad_code" },
+                    Codes: ["lad_code"],
                     Name: "lad_name"
                 )
             },
             {
                 GeographicLevel.LocalEnterprisePartnership,
                 new GeographicCsvColumns(
-                    Codes: new[] { "local_enterprise_partnership_code" },
+                    Codes: ["local_enterprise_partnership_code"],
                     Name: "local_enterprise_partnership_name"
                 )
             },
             {
                 GeographicLevel.LocalSkillsImprovementPlanArea,
                 new GeographicCsvColumns(
-                    Codes: new[] { "lsip_code" },
+                    Codes: ["lsip_code"],
                     Name: "lsip_name"
                 )
             },
             {
                 GeographicLevel.MayoralCombinedAuthority,
                 new GeographicCsvColumns(
-                    Codes: new[] { "mayoral_combined_authority_code" },
+                    Codes: ["mayoral_combined_authority_code"],
                     Name: "mayoral_combined_authority_name"
                 )
             },
             {
                 GeographicLevel.MultiAcademyTrust,
                 new GeographicCsvColumns(
-                    Codes: new[] { "trust_id" },
+                    Codes: ["trust_id"],
                     Name: "trust_name"
                 )
             },
             {
                 GeographicLevel.OpportunityArea,
                 new GeographicCsvColumns(
-                    Codes: new[] { "opportunity_area_code" },
+                    Codes: ["opportunity_area_code"],
                     Name: "opportunity_area_name"
                 )
             },
             {
                 GeographicLevel.ParliamentaryConstituency,
                 new GeographicCsvColumns(
-                    Codes: new[] { "pcon_code" },
+                    Codes: ["pcon_code"],
                     Name: "pcon_name"
                 )
             },
             {
                 GeographicLevel.PlanningArea,
                 new GeographicCsvColumns(
-                    Codes: new[] { "planning_area_code" },
+                    Codes: ["planning_area_code"],
                     Name: "planning_area_name"
                 )
             },
@@ -99,14 +100,14 @@ public static class GeographicLevelUtils
             {
                 GeographicLevel.Region,
                 new GeographicCsvColumns(
-                    Codes: new[] { "region_code" },
+                    Codes: ["region_code"],
                     Name: "region_name"
                 )
             },
             {
                 GeographicLevel.RscRegion,
                 new GeographicCsvColumns(
-                    Codes: Array.Empty<string>(),
+                    Codes: [],
                     Name: "rsc_region_lead_name"
                 )
             },
@@ -117,14 +118,14 @@ public static class GeographicLevelUtils
             {
                 GeographicLevel.Sponsor,
                 new GeographicCsvColumns(
-                    Codes: new[] { "sponsor_id" },
+                    Codes: ["sponsor_id"],
                     Name: "sponsor_name"
                 )
             },
             {
                 GeographicLevel.Ward,
                 new GeographicCsvColumns(
-                    Codes: new[] { "ward_code" },
+                    Codes: ["ward_code"],
                     Name: "ward_name"
                 )
             },
@@ -152,11 +153,11 @@ public static class GeographicLevelUtils
 
     public static readonly IReadOnlyList<string> OrderedCodes =
         EnumUtil.GetEnumValues<GeographicLevel>()
-            .Order()
+            .NaturalOrder()
             .ToList();
 
     public static readonly IReadOnlyList<string> OrderedLabels = EnumUtil.GetEnumLabels<GeographicLevel>()
-            .Order()
+            .NaturalOrder()
             .ToList();
 
     public static GeographicCsvColumns CsvColumns(this GeographicLevel level) => GeographicLevelCsvColumns.Value[level];
@@ -170,19 +171,19 @@ public static class GeographicLevelUtils
 
     public record GeographicCsvColumns(string[] Codes, string Name);
 
-    public record SchoolCsvColumns() : GeographicCsvColumns(Codes: new[] { Urn, LaEstab }, Name: "school_name")
+    public record SchoolCsvColumns() : GeographicCsvColumns(Codes: [Urn, LaEstab], Name: "school_name")
     {
         public const string Urn = "school_urn";
 
         public const string LaEstab = "school_laestab";
     }
 
-    public record ProviderCsvColumns() : GeographicCsvColumns(Codes: new[] { Ukprn }, Name: "provider_name")
+    public record ProviderCsvColumns() : GeographicCsvColumns(Codes: [Ukprn], Name: "provider_name")
     {
         public const string Ukprn = "provider_ukprn";
     }
 
-    public record LocalAuthorityCsvColumns() : GeographicCsvColumns(Codes: new[] { OldCode, NewCode }, Name: "la_name")
+    public record LocalAuthorityCsvColumns() : GeographicCsvColumns(Codes: [NewCode, OldCode], Name: "la_name")
     {
         public const string OldCode = "old_la_code";
 

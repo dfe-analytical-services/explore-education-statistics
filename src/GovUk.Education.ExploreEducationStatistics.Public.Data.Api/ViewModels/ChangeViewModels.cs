@@ -1,5 +1,8 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
+/// <summary>
+/// A change to the data set, represented as the state before and after the change.
+/// </summary>
 public abstract record ChangeViewModel<TChange>
 {
     /// <summary>

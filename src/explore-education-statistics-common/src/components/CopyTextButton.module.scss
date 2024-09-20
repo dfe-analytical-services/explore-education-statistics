@@ -8,5 +8,6 @@
 .container {
   @include govuk-media-query($from: tablet) {
     width: 500px;
+    max-width: 100%;
   }
 }

@@ -35,7 +35,7 @@ public abstract class DataSetQueryParserTests
             _dataSetVersion = DefaultDataSetVersion();
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -80,7 +80,7 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(1);
 
             var queryFilterOptionIds = filterOptions
@@ -155,7 +155,7 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(3);
 
             var queryFilterOptionIds = filterOptions
@@ -205,8 +205,8 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForRange(..2, s => s.SetFilterId("field_a"))
-                .ForRange(2..4, s => s.SetFilterId("field_b"))
+                .ForRange(..2, s => s.SetFilterColumn("field_a"))
+                .ForRange(2..4, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -257,8 +257,8 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForRange(..2, s => s.SetFilterId("field_a"))
-                .ForRange(2..4, s => s.SetFilterId("field_b"))
+                .ForRange(..2, s => s.SetFilterColumn("field_a"))
+                .ForRange(2..4, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -351,7 +351,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -588,7 +588,7 @@ public abstract class DataSetQueryParserTests
         public async Task AllComparators_Empty(string comparator)
         {
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             var service = BuildService();
@@ -671,7 +671,7 @@ public abstract class DataSetQueryParserTests
         [InlineData("NotIn", "true")]
         public async Task AllComparators_SingleOptionNotFound(string comparator, string expectedSql)
         {
-            List<DataSetQueryLocation> queryLocation =
+            List<IDataSetQueryLocation> queryLocation =
             [
                 new DataSetQueryLocationId
                 {
@@ -704,7 +704,7 @@ public abstract class DataSetQueryParserTests
             Assert.Equal(ValidationMessages.LocationsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.LocationsNotFound.Code, warning.Code);
 
-            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<DataSetQueryLocation>>(warning.Detail);
+            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<IDataSetQueryLocation>>(warning.Detail);
 
             Assert.Equal(queryLocation, warningDetail.Items);
         }
@@ -867,7 +867,7 @@ public abstract class DataSetQueryParserTests
             Assert.Equal(ValidationMessages.LocationsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.LocationsNotFound.Code, warning.Code);
 
-            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<DataSetQueryLocation>>(warning.Detail);
+            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<IDataSetQueryLocation>>(warning.Detail);
 
             Assert.Equal([queryLocations[0], queryLocations[2], queryLocations[3]], warningDetail.Items);
         }
@@ -913,7 +913,7 @@ public abstract class DataSetQueryParserTests
             Assert.Equal(ValidationMessages.LocationsNotFound.Message, warning.Message);
             Assert.Equal(ValidationMessages.LocationsNotFound.Code, warning.Code);
 
-            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<DataSetQueryLocation>>(warning.Detail);
+            var warningDetail = Assert.IsType<NotFoundItemsErrorDetail<IDataSetQueryLocation>>(warning.Detail);
 
             Assert.Equal(queryLocations, warningDetail.Items);
         }
@@ -928,7 +928,7 @@ public abstract class DataSetQueryParserTests
             _dataSetVersion = DefaultDataSetVersion();
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _filterRepository
@@ -1210,7 +1210,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -1239,7 +1239,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -1273,7 +1273,7 @@ public abstract class DataSetQueryParserTests
 
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(1);
 
             var queryFilterOptionIds = filterOptions
@@ -1358,8 +1358,8 @@ public abstract class DataSetQueryParserTests
 
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -1462,7 +1462,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -1495,7 +1495,7 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(1);
 
             var queryFilterOptionIds = filterOptions
@@ -1540,8 +1540,8 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -1636,9 +1636,9 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForRange(..2, s => s.SetFilterId("field_a"))
-                .ForIndex(2, s => s.SetFilterId("field_b"))
-                .ForRange(3..5, s => s.SetFilterId("field_c"))
+                .ForRange(..2, s => s.SetFilterColumn("field_a"))
+                .ForIndex(2, s => s.SetFilterColumn("field_b"))
+                .ForRange(3..5, s => s.SetFilterColumn("field_c"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -1726,7 +1726,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -1759,7 +1759,7 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(1);
 
             var queryFilterOptionIds = filterOptions
@@ -1804,8 +1804,8 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -1900,9 +1900,9 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
-                .ForRange(2..5, s => s.SetFilterId("field_c"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
+                .ForRange(2..5, s => s.SetFilterColumn("field_c"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -1990,7 +1990,7 @@ public abstract class DataSetQueryParserTests
                 .ReturnsAsync([]);
 
             _locationRepository
-                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<DataSetQueryLocation>(), default))
+                .Setup(r => r.ListOptions(_dataSetVersion, Array.Empty<IDataSetQueryLocation>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -2003,7 +2003,7 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .WithFilterId("field_a")
+                .WithFilterColumn("field_a")
                 .GenerateList(1);
 
             var queryFilterOptionIds = filterOptions
@@ -2045,8 +2045,8 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -2129,10 +2129,10 @@ public abstract class DataSetQueryParserTests
         {
             var filterOptions = _dataFixture
                 .DefaultParquetFilterOption()
-                .ForIndex(0, s => s.SetFilterId("field_a"))
-                .ForIndex(1, s => s.SetFilterId("field_b"))
-                .ForIndex(2, s => s.SetFilterId("field_c"))
-                .ForRange(3..5, s => s.SetFilterId("field_d"))
+                .ForIndex(0, s => s.SetFilterColumn("field_a"))
+                .ForIndex(1, s => s.SetFilterColumn("field_b"))
+                .ForIndex(2, s => s.SetFilterColumn("field_c"))
+                .ForRange(3..5, s => s.SetFilterColumn("field_d"))
                 .GenerateList();
 
             var queryFilterOptionIds = filterOptions
@@ -2219,7 +2219,7 @@ public abstract class DataSetQueryParserTests
 
             _locationRepository
                 .Setup(r =>
-                    r.ListOptions(_dataSetVersion, It.IsAny<IEnumerable<DataSetQueryLocation>>(), default))
+                    r.ListOptions(_dataSetVersion, It.IsAny<IEnumerable<IDataSetQueryLocation>>(), default))
                 .ReturnsAsync([]);
 
             _timePeriodRepository
@@ -2456,7 +2456,7 @@ public abstract class DataSetQueryParserTests
                 .WithGeographicLevels([GeographicLevel.Country, GeographicLevel.Region])
         );
 
-    private static DataSetQueryLocation MapOptionToQueryLocation(ParquetLocationOption option)
+    private static IDataSetQueryLocation MapOptionToQueryLocation(ParquetLocationOption option)
     {
         var level = EnumUtil.GetFromEnumValue<GeographicLevel>(option.Level);
 
@@ -2465,16 +2465,16 @@ public abstract class DataSetQueryParserTests
             GeographicLevel.LocalAuthority => option switch
             {
                 { Code: not null } =>
-                    new DataSetQueryLocationLocalAuthorityCode { Level = option.Level, Code = option.Code },
+                    new DataSetQueryLocationLocalAuthorityCode { Code = option.Code },
                 { OldCode: not null } =>
-                    new DataSetQueryLocationLocalAuthorityOldCode { Level = option.Level, OldCode = option.OldCode },
+                    new DataSetQueryLocationLocalAuthorityOldCode { OldCode = option.OldCode },
                 _ => throw new NullReferenceException(
                     $"{nameof(option.Code)} and {nameof(option.OldCode)} cannot both be null")
             },
             GeographicLevel.Provider => option switch
             {
                 { Ukprn: not null } =>
-                    new DataSetQueryLocationProviderUkprn { Level = option.Level, Ukprn = option.Ukprn! },
+                    new DataSetQueryLocationProviderUkprn { Ukprn = option.Ukprn! },
                 _ => throw new NullReferenceException($"{nameof(option.Ukprn)} cannot both be null")
             },
             GeographicLevel.RscRegion => new DataSetQueryLocationId
@@ -2484,9 +2484,9 @@ public abstract class DataSetQueryParserTests
             GeographicLevel.School => option switch
             {
                 { Urn: not null } =>
-                    new DataSetQueryLocationSchoolUrn { Level = option.Level, Urn = option.Urn },
+                    new DataSetQueryLocationSchoolUrn { Urn = option.Urn },
                 { LaEstab: not null } =>
-                    new DataSetQueryLocationSchoolLaEstab { Level = option.Level, LaEstab = option.LaEstab },
+                    new DataSetQueryLocationSchoolLaEstab { LaEstab = option.LaEstab },
                 _ => throw new NullReferenceException(
                     $"{nameof(option.Urn)} and {nameof(option.LaEstab)} cannot both be null")
             },
