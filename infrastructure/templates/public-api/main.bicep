@@ -97,10 +97,10 @@ var tagValues = union(resourceTags ?? {}, {
 // Define our resource prefix.
 //
 
-// The resource prefix for anything specific to the Public API. 
+// The resource prefix for anything specific to the Public API.
 var publicApiResourcePrefix = '${subscription}-ees-papi'
 
-// The resource prefix for anything not specific solely to the Public API but set up within Bicep. 
+// The resource prefix for anything not specific solely to the Public API but set up within Bicep.
 var commonResourcePrefix = '${subscription}-ees'
 
 // The resource prefix for resources created in the ARM template.
@@ -250,6 +250,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     apiAppRegistrationClientId: apiAppRegistrationClientId
     containerAppEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     contentApiUrl: publicUrls.contentApi
+    publicApiUrl: publicUrls.publicApi
     publicSiteUrl: publicUrls.publicSite
     dockerImagesTag: dockerImagesTag
     appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
