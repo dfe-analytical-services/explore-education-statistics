@@ -1,3 +1,5 @@
+import { azureFileshareMountType } from '../types.bicep'
+
 @description('Specifies the Web / Function App name that these settings belong to')
 param appName string
 
@@ -23,13 +25,7 @@ param existingStagingAppSettings object
 param existingProductionAppSettings object
 
 @description('Specifies additional Azure Storage Accounts to make available to the staging slot')
-param azureFileShares {
-  storageName: string
-  storageAccountKey: string
-  storageAccountName: string
-  fileShareName: string
-  mountPath: string
-}[] = []
+param azureFileShares azureFileshareMountType[] = []
 
 @description('Set specific appsettings to be slot specific values')
 resource functionSlotConfig 'Microsoft.Web/sites/config@2023-12-01' = {

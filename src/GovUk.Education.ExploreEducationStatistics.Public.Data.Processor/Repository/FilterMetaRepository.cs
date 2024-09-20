@@ -94,20 +94,11 @@ public class FilterMetaRepository(
                 .InsertWhenNotMatched()
                 .MergeAsync(cancellationToken);
 
-            var startIndex = await publicDataDbContext.NextSequenceValue(
+            var currentId = await publicDataDbContext.NextSequenceValue(
                 PublicDataDbContext.FilterOptionMetaLinkSequence,
                 cancellationToken);
 
             var current = 0;
-
-            // Keep a count of filter option links that have used the sequence to generate their PublicIds,
-            // as opposed to inheriting their PublicIds from the previous data set version's filter options 
-            // via the mappings.
-            //
-            // This allows us to use the sequence to generate PublicIds for filter options that have no
-            // mapping associated with them, without generating big holes in the sequence where lots of 
-            // filter options have been successfully mapped from the previous data set version.
-            var publicIdsGeneratedFromSequence = 0;
 
             while (current < options.Count)
             {
@@ -136,8 +127,7 @@ public class FilterMetaRepository(
                             publicIdMappings: publicIdMappings,
                             filter: meta,
                             option: option,
-                            defaultPublicIdFn: () =>
-                                SqidEncoder.Encode(startIndex + publicIdsGeneratedFromSequence++)),
+                            defaultPublicIdFn: () => SqidEncoder.Encode(currentId++)),
                         MetaId = meta.Id,
                         OptionId = option.Id
                     })
@@ -156,14 +146,14 @@ public class FilterMetaRepository(
             if (insertedLinks != options.Count)
             {
                 throw new InvalidOperationException(
-                    $"Inserted incorrect number of filter option meta links for {meta.PublicId}. " +
+                    $"Inserted incorrect number of filter option meta links for filter (id = {meta.Id}, column = {meta.Column}). " +
                     $"Inserted: {insertedLinks}, expected: {options.Count}");
             }
 
             // Increase the sequence only by the amount that we used to generate new PublicIds. 
             await publicDataDbContext.SetSequenceValue(
                 PublicDataDbContext.FilterOptionMetaLinkSequence,
-                startIndex + publicIdsGeneratedFromSequence - 1,
+                currentId - 1,
                 cancellationToken);
         }
     }
@@ -174,7 +164,11 @@ public class FilterMetaRepository(
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken)
     {
-        return (await duckDbConnection.SqlBuilder(
+        var currentId = await publicDataDbContext.NextSequenceValue(
+            PublicDataDbContext.FilterMetasIdSequence,
+            cancellationToken);
+
+        var metas = (await duckDbConnection.SqlBuilder(
                     $"""
                      SELECT *
                      FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
@@ -184,16 +178,28 @@ public class FilterMetaRepository(
                 .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken)
             )
             .OrderBy(row => row.Label)
-            .Select(
-                row => new FilterMeta
+            .Select(row =>
+            {
+                var id = currentId++;
+
+                return new FilterMeta
                 {
-                    PublicId = row.ColName,
+                    Id = id,
+                    PublicId = SqidEncoder.Encode(id),
+                    Column = row.ColName,
                     DataSetVersionId = dataSetVersion.Id,
                     Label = row.Label,
                     Hint = row.FilterHint ?? string.Empty
-                }
-            )
+                };
+            })
             .ToList();
+
+        await publicDataDbContext.SetSequenceValue(
+            PublicDataDbContext.FilterMetasIdSequence,
+            currentId - 1,
+            cancellationToken);
+
+        return metas;
     }
 
     private async Task<List<FilterOptionMeta>> GetFilterOptionMeta(
@@ -204,10 +210,10 @@ public class FilterMetaRepository(
     {
         return (await duckDbConnection.SqlBuilder(
                 $"""
-                 SELECT DISTINCT "{meta.PublicId:raw}"
+                 SELECT DISTINCT "{meta.Column:raw}"
                  FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true) AS data
-                 WHERE "{meta.PublicId:raw}" != ''
-                 ORDER BY "{meta.PublicId:raw}"
+                 WHERE "{meta.Column:raw}" != ''
+                 ORDER BY "{meta.Column:raw}"
                  """
             ).QueryAsync<string>(cancellationToken: cancellationToken))
             .Select(

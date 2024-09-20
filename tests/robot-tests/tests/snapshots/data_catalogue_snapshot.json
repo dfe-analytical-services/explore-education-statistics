@@ -1,5 +1,5 @@
 {
-  "num_datasets": "954 data sets",
+  "num_datasets": "958 data sets",
   "themes": [
     {
       "publications": [
@@ -107,6 +107,13 @@
         "Widening participation in higher education"
       ],
       "theme_heading": "Higher education"
+    },
+    {
+      "publications": [
+        "All publications",
+        "Occupations in demand"
+      ],
+      "theme_heading": "Labour market and skills"
     },
     {
       "publications": [

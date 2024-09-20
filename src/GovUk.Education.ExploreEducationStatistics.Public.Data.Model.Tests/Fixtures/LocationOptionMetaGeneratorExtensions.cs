@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+using Bogus;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -28,6 +30,18 @@ public static class LocationOptionMetaGeneratorExtensions
         this InstanceSetters<TOptionMeta> setters) where TOptionMeta : LocationOptionMeta
         => setters
             .SetDefault(m => m.Label);
+
+    public static InstanceSetters<TOptionMeta> SetDefaultCode<TOptionMeta>(
+        this InstanceSetters<TOptionMeta> setters,
+        Expression<Func<TOptionMeta, string?>> property) where TOptionMeta : LocationOptionMeta
+        => setters.Set(
+            property,
+            (faker, _, context) =>
+            {
+                var index = setters.GetDisplayIndex(context, faker);
+                return $"Option {index} {PropertyName.For(property)}";
+            }
+        );
 
     public static InstanceSetters<TOptionMeta> SetId<TOptionMeta>(
         this InstanceSetters<TOptionMeta> setters,
