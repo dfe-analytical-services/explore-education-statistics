@@ -62,7 +62,7 @@ Create 1st API dataset
     user clicks button    Confirm new API data set
 
     user waits until page finishes loading
-    user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
+    user waits until modal is not visible    Create a new API data set
 
 User waits until the 1st API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
@@ -116,7 +116,7 @@ Create a different version of an API dataset(Major version)
     user clicks button    Confirm new data set version
 
     user waits until page finishes loading
-    user waits until modal is not visible    Create a new API data set version    %{WAIT_LONG}
+    user waits until modal is not visible    Create a new API data set version
 
 Validate the summary contents inside the 'draft version details' table
     user waits until h3 is visible    Draft version details
