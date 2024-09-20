@@ -19,68 +19,70 @@ const redirectPaths = {
   publications: '/find-statistics',
 };
 
-export default function redirectPages(middleware: NextMiddleware) {
-  return async (request: NextRequest, event: NextFetchEvent) => {
-    const { nextUrl } = request;
-    const decodedPathname = decodeURIComponent(nextUrl.pathname);
+export default async function redirectPages(
+  request: NextRequest,
+  event: NextFetchEvent,
+  middleware: NextMiddleware,
+) {
+  const { nextUrl } = request;
+  const decodedPathname = decodeURIComponent(nextUrl.pathname);
 
-    // Check for redirects for release and methodology pages
-    if (
-      Object.values(redirectPaths).find(path =>
-        decodedPathname.toLowerCase().startsWith(path),
-      ) &&
-      decodedPathname.split('/').length > 2
-    ) {
-      const shouldRefetch =
-        !cachedRedirects || cachedRedirects.fetchedAt + cacheTime < Date.now();
+  // Check for redirects for release and methodology pages
+  if (
+    Object.values(redirectPaths).find(path =>
+      decodedPathname.toLowerCase().startsWith(path),
+    ) &&
+    decodedPathname.split('/').length > 2
+  ) {
+    const shouldRefetch =
+      !cachedRedirects || cachedRedirects.fetchedAt + cacheTime < Date.now();
 
-      if (shouldRefetch) {
-        cachedRedirects = {
-          redirects: await redirectService.list(),
-          fetchedAt: Date.now(),
-        };
-      }
+    if (shouldRefetch) {
+      cachedRedirects = {
+        redirects: await redirectService.list(),
+        fetchedAt: Date.now(),
+      };
+    }
 
-      const redirectPath = Object.keys(redirectPaths).reduce((acc, key) => {
-        const redirectType = key as RedirectType;
-        if (
-          decodedPathname.toLowerCase().startsWith(redirectPaths[redirectType])
-        ) {
-          const pathSegments = decodedPathname.split('/');
+    const redirectPath = Object.keys(redirectPaths).reduce((acc, key) => {
+      const redirectType = key as RedirectType;
+      if (
+        decodedPathname.toLowerCase().startsWith(redirectPaths[redirectType])
+      ) {
+        const pathSegments = decodedPathname.split('/');
 
-          const rewriteRule = cachedRedirects?.redirects[redirectType]?.find(
-            ({ fromSlug }) => pathSegments[2].toLowerCase() === fromSlug,
-          );
+        const rewriteRule = cachedRedirects?.redirects[redirectType]?.find(
+          ({ fromSlug }) => pathSegments[2].toLowerCase() === fromSlug,
+        );
 
-          if (rewriteRule) {
-            return pathSegments
-              .map(segment =>
-                segment.toLowerCase() === rewriteRule?.fromSlug
-                  ? rewriteRule?.toSlug
-                  : segment.toLowerCase(),
-              )
-              .join('/');
-          }
+        if (rewriteRule) {
+          return pathSegments
+            .map(segment =>
+              segment.toLowerCase() === rewriteRule?.fromSlug
+                ? rewriteRule?.toSlug
+                : segment.toLowerCase(),
+            )
+            .join('/');
         }
-        return acc;
-      }, '');
-
-      if (redirectPath) {
-        const redirectUrl = nextUrl.clone();
-        redirectUrl.pathname = redirectPath;
-        return NextResponse.redirect(redirectUrl, 301);
       }
-    }
+      return acc;
+    }, '');
 
-    // Redirect any URLs with uppercase characters to lowercase.
-    if (decodedPathname !== decodedPathname.toLowerCase()) {
-      const url = nextUrl.clone();
-      url.pathname = decodedPathname.toLowerCase();
-      return NextResponse.redirect(url, 301);
+    if (redirectPath) {
+      const redirectUrl = nextUrl.clone();
+      redirectUrl.pathname = redirectPath;
+      return NextResponse.redirect(redirectUrl, 301);
     }
+  }
 
-    return middleware(request, event);
-  };
+  // Redirect any URLs with uppercase characters to lowercase.
+  if (decodedPathname !== decodedPathname.toLowerCase()) {
+    const url = nextUrl.clone();
+    url.pathname = decodedPathname.toLowerCase();
+    return NextResponse.redirect(url, 301);
+  }
+
+  return middleware(request, event);
 }
 
 // Cache the redirect paths for 2 seconds on Local,

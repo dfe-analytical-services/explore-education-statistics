@@ -3,7 +3,7 @@ import _redirectService, {
   Redirects,
 } from '@frontend/services/redirectService';
 import { NextResponse } from 'next/server';
-import middlewareTestRun from './util/middlewareTetsRun';
+import runMiddleware from './util/runMiddleware';
 
 jest.mock('@frontend/services/redirectService');
 const redirectService = _redirectService as jest.Mocked<
@@ -28,14 +28,14 @@ describe('redirectPages', () => {
   test('does not re-request the list of redirects once it has been fetched', async () => {
     redirectService.list.mockResolvedValue(testRedirects);
 
-    await middlewareTestRun(
+    await runMiddleware(
       redirectPages,
       'https://my-env/methodology/original-slug',
     );
 
     expect(redirectService.list).toHaveBeenCalledTimes(1);
 
-    await middlewareTestRun(
+    await runMiddleware(
       redirectPages,
       'https://my-env/methodology/another-slug',
     );
@@ -44,22 +44,19 @@ describe('redirectPages', () => {
   });
 
   test('does not check for redirects for non release or methodology pages', async () => {
-    await middlewareTestRun(redirectPages, 'https://my-env/find-statistics');
+    await runMiddleware(redirectPages, 'https://my-env/find-statistics');
 
     expect(redirectService.list).not.toHaveBeenCalled();
     expect(redirectSpy).not.toHaveBeenCalled();
     expect(nextSpy).toHaveBeenCalledTimes(1);
 
-    await middlewareTestRun(redirectPages, 'https://my-env/methodology');
+    await runMiddleware(redirectPages, 'https://my-env/methodology');
 
     expect(redirectService.list).not.toHaveBeenCalled();
     expect(redirectSpy).not.toHaveBeenCalled();
     expect(nextSpy).toHaveBeenCalledTimes(2);
 
-    await middlewareTestRun(
-      redirectPages,
-      'https://my-env/data-tables/something',
-    );
+    await runMiddleware(redirectPages, 'https://my-env/data-tables/something');
 
     expect(redirectService.list).not.toHaveBeenCalled();
     expect(redirectSpy).not.toHaveBeenCalled();
@@ -68,7 +65,7 @@ describe('redirectPages', () => {
 
   test('redirects urls with uppercase characters to lowercase', async () => {
     redirectService.list.mockResolvedValue(testRedirects);
-    await middlewareTestRun(redirectPages, 'https://my-env/Find-Statistics');
+    await runMiddleware(redirectPages, 'https://my-env/Find-Statistics');
 
     expect(redirectSpy).toHaveBeenCalledTimes(1);
     expect(redirectSpy).toHaveBeenCalledWith(
@@ -79,7 +76,7 @@ describe('redirectPages', () => {
     );
     expect(nextSpy).not.toHaveBeenCalled();
 
-    await middlewareTestRun(
+    await runMiddleware(
       redirectPages,
       'https://my-env/find-statistics/RELEASE-NAME?testParam=Something',
     );
@@ -98,7 +95,7 @@ describe('redirectPages', () => {
     test('redirects the request when the slug for the requested page has changed', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/methodology/original-slug-1',
       );
@@ -116,7 +113,7 @@ describe('redirectPages', () => {
     test('does not redirect when the slug for the requested page has not changed', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/methodology/my-methodology',
       );
@@ -128,15 +125,12 @@ describe('redirectPages', () => {
     test('does not redirect if the `fromSlug` only partially matches', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
-        redirectPages,
-        'https://my-env/methodology/original',
-      );
+      await runMiddleware(redirectPages, 'https://my-env/methodology/original');
 
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(1);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/methodology/original-slug-and-something',
       );
@@ -148,7 +142,7 @@ describe('redirectPages', () => {
     test('redirects child pages', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/methodology/original-slug-1/child-page',
       );
@@ -166,7 +160,7 @@ describe('redirectPages', () => {
     test('redirects with query params', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/methodology/original-slug-1?search=something',
       );
@@ -184,7 +178,7 @@ describe('redirectPages', () => {
     test('does not redirect when the slug matches a `fromSlug` in a different page type', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/methodology/original-slug-4',
       );
@@ -196,7 +190,7 @@ describe('redirectPages', () => {
     test('redirects with uppercase characters', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/Methodology/original-SLUG-1',
       );
@@ -216,7 +210,7 @@ describe('redirectPages', () => {
     test('redirects the request when the slug for the requested page has changed', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/find-statistics/original-slug-3',
       );
@@ -234,7 +228,7 @@ describe('redirectPages', () => {
     test('does not redirect when the slug for the requested page has not changed', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/find-statistics/my-publication',
       );
@@ -246,7 +240,7 @@ describe('redirectPages', () => {
     test('does not redirect if the `fromSlug` only partially matches', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/find-statistics/original',
       );
@@ -254,7 +248,7 @@ describe('redirectPages', () => {
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(1);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/find-statistics/original-slug-and-something',
       );
@@ -266,7 +260,7 @@ describe('redirectPages', () => {
     test('redirects child pages', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/find-statistics/original-slug-3/child-page',
       );
@@ -284,7 +278,7 @@ describe('redirectPages', () => {
     test('redirects with query params', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/find-statistics/original-slug-3?search=something',
       );
@@ -303,7 +297,7 @@ describe('redirectPages', () => {
     test('does not redirect when the slug matches a `fromSlug` in a different page type', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/find-statistics/original-slug-1',
       );
@@ -315,7 +309,7 @@ describe('redirectPages', () => {
     test('redirects with uppercase characters', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
 
-      await middlewareTestRun(
+      await runMiddleware(
         redirectPages,
         'https://my-env/find-Statistics/original-SLUG-3',
       );

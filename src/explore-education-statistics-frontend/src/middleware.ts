@@ -1,8 +1,8 @@
 import redirectPages from '@frontend/middleware/pages/redirectPages';
-import chain from './middleware/chain';
-import rewriteDataCatalogueDownload from './middleware/pages/rewriteDataCatalogue';
+import chain from './middleware/pages/chain';
+import rewritePaths from './middleware/pages/rewritePaths';
 
-export default chain([rewriteDataCatalogueDownload, redirectPages]);
+export default chain([rewritePaths, redirectPages]);
 
 // Only run the middleware on the specified paths below.
 // Ideally we'd just exclude build files and run it on all routes,
