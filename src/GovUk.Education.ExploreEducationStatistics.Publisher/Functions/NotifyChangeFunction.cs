@@ -98,11 +98,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 message.ReleaseVersionId,
                 ReleasePublishingStatusOverallStage.Scheduled);
 
-            await scheduled
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                    await releasePublishingStatusService.UpdateState(status.AsTableRowKey(),
-                        ReleasePublishingStatusStates.SupersededState));
+            foreach (var status in scheduled)
+            {
+                await releasePublishingStatusService.UpdateState(status.AsTableRowKey(),
+                    ReleasePublishingStatusStates.SupersededState);
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -51,9 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         ent => ent.PartitionKey == releaseVersionId.ToString());
                     var statusList = await asyncPageable.ToListAsync();
                     var latestStatus = statusList.MaxBy(status => status.Created);
-
-                    // NOTE: We don't check whether latestStatus is null, because it might be!
-                    // The frontend can check the status before the PublisherReleaseStatusTable row is created
 
                     return _mapper.Map<ReleasePublishingStatusViewModel>(latestStatus);
                 });

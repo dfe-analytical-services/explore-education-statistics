@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Serialization;
 using Azure;
 using Azure.Data.Tables;
 
@@ -7,6 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model
     public class SubscriptionEntity : ITableEntity
     {
         public string? PartitionKey { get; set; }
+
+        [IgnoreDataMember]
         public string? PublicationId => PartitionKey;
 
         public string? RowKey { get; set; }

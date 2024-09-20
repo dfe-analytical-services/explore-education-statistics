@@ -31,7 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var allStatusesForReleaseVersion = await result.ToListAsync();
 
             var statusesForStages = allStatusesForReleaseVersion
-                .Where(status => overallStages.Contains(status.OverallStage))
+                .Where(status => overallStages.Contains(
+                    Enum.Parse<ReleasePublishingStatusOverallStage>(status.OverallStage)))
                 .ToList();
 
             return statusesForStages;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Azure;
 using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -136,8 +137,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var stageFilter = "";
             foreach (var stage in overallStages)
             {
+                var stageStr = Enum.GetName(stage);
                 var stageFilterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
-                    status.OverallStage == stage);
+                    status.OverallStage == stageStr);
 
                 stageFilter = stageFilter == ""
                     ? stageFilterCondition
@@ -237,28 +239,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     updatedStatus
                 );
             }
-            catch (TableTransactionFailedException e) // @MarkFix test retry logic to this if that actually works - I've randomly chosen an exception here
+            catch (RequestFailedException e)
             {
-                if (e.Status == (int)HttpStatusCode.PreconditionFailed)
+                if (e.Status != (int)HttpStatusCode.PreconditionFailed)
                 {
-                    // If the ETag of the status we fetched doesn't match the one found in the table,
-                    // something else has updated the entity, so we should refetch the entity and try the update again.
-                    _logger.LogDebug("Precondition failure as expected. ETag does not match");
-                    if (numRetries > 0)
-                    {
-                        numRetries--;
-                        await UpdateWithRetries(releasePublishingKey,
-                            updateFunction,
-                            numRetries);
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
+                }
+                
+                // If the ETag of the status fetched doesn't match the one found in the table,
+                // something else has updated the entity, so we should refetch the entity and try the update again.
+                _logger.LogDebug("Precondition failure. ETag does not match");
+                if (numRetries > 0)
+                {
+                    numRetries--;
+                    await UpdateWithRetries(releasePublishingKey,
+                        updateFunction,
+                        numRetries);
                 }
                 else
                 {
-                    throw;
+                    throw new Exception("Did not complete Storage table entity update despite retries");
                 }
             }
         }

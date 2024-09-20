@@ -15,32 +15,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             if (content.HasValue)
             {
+                var contentStr = System.Enum.GetName(content.Value);
                 var contentFilterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
-                    status.ContentStage == content.ToString());
+                    status.ContentStage == contentStr);
 
                 filter = DataTableStorageUtils.CombineQueryFiltersAnd(filter, contentFilterCondition);
             }
 
             if (files.HasValue)
             {
+                var filesStr = System.Enum.GetName(files.Value);
                 var filesFilterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
-                    status.FilesStage == files.ToString());
+                    status.FilesStage == filesStr);
 
                 filter = DataTableStorageUtils.CombineQueryFiltersAnd(filter, filesFilterCondition);
             }
 
             if (publishing.HasValue)
             {
+                var publishingStr = System.Enum.GetName(publishing.Value);
                 var publishingFilterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
-                    status.PublishingStage == publishing.ToString());
+                    status.PublishingStage == publishingStr);
 
                 filter = DataTableStorageUtils.CombineQueryFiltersAnd(filter, publishingFilterCondition);
             }
 
             if (overall.HasValue)
             {
+                var overallStr = System.Enum.GetName(overall.Value);
                 var overallFilterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
-                    status.OverallStage == overall);
+                    status.OverallStage == overallStr);
 
                 filter = DataTableStorageUtils.CombineQueryFiltersAnd(filter, overallFilterCondition);
             }

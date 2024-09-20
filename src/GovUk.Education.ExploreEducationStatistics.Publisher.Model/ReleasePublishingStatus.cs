@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public string ContentStage { get; set; }
         public string FilesStage { get; set; }
         public string PublishingStage { get; set; }
-        public ReleasePublishingStatusOverallStage OverallStage { get; set; }
+        public string OverallStage { get; set; }
         public bool Immediate { get; set; }
 
         [IgnoreDataMember]
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             {
                 if (_state == null)
                 {
-                    _state = new ReleasePublishingStatusState(ContentStage, FilesStage, PublishingStage, OverallStage.ToString());
+                    _state = new ReleasePublishingStatusState(ContentStage, FilesStage, PublishingStage, OverallStage);
                     _state.PropertyChanged += StateChangedCallback;
                 }
 
@@ -81,9 +81,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                 ContentStage = value.Content.ToString();
                 FilesStage = value.Files.ToString();
                 PublishingStage = value.Publishing.ToString();
-                OverallStage = value.Overall;
+                OverallStage = value.Overall.ToString();
 
-                _state = new ReleasePublishingStatusState(value.Content,
+                _state = new ReleasePublishingStatusState(
+                    value.Content,
                     value.Files,
                     value.Publishing,
                     value.Overall);
@@ -119,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                     break;
             }
 
-            OverallStage = _state.Overall;
+            OverallStage = _state.Overall.ToString();
         }
 
         public bool AllStagesPriorToPublishingComplete()

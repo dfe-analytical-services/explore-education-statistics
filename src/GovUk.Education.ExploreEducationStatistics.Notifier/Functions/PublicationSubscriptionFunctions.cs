@@ -109,7 +109,7 @@ public class PublicationSubscriptionFunctions(
                             RowKey = req.Email,
                             Slug = req.Slug,
                             Title = req.Title,
-                            DateTimeCreated = expiryDateTime, // DateTimeCreated for pending subs is a misleading name!
+                            DateTimeCreated = expiryDateTime, // DateTimeCreated is a misleading name!
                         },
                         cancellationToken);
 
