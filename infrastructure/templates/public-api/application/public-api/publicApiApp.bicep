@@ -12,8 +12,8 @@ param containerAppEnvironmentId string
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string
 
-@description('The URL of the Public API.')
-param publicApiUrl string
+@description('The URL of the Public site.')
+param publicSiteUrl string
 
 @description('The URL of the Content API.')
 param contentApiUrl string
@@ -62,7 +62,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     managedEnvironmentId: containerAppEnvironmentId
     corsPolicy: {
       allowedOrigins: [
-        publicApiUrl
+        publicSiteUrl
         'http://localhost:3000'
         'http://127.0.0.1'
       ]
