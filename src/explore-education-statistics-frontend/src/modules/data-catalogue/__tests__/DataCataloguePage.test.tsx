@@ -893,6 +893,37 @@ describe('DataCataloguePage', () => {
         screen.getByRole('button', { name: 'Reset filters' }),
       ).toBeInTheDocument();
     });
+
+    test('Does not show "Download all X data sets (ZIP)" button', async () => {
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
+        paging: testPaging,
+      });
+      dataSetService.listDataSetFiles.mockResolvedValue({
+        results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+
+      const { user } = render(<DataCataloguePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('30 data sets')).toBeInTheDocument();
+      });
+
+      await user.type(screen.getByLabelText('Search data sets'), 'find me');
+      await user.click(screen.getByRole('button', { name: 'Search' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('2 data sets')).toBeInTheDocument();
+      });
+
+      expect(
+        screen.queryByRole('link', {
+          name: 'Download all 2 data sets (ZIP)',
+        }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   describe('filtering by query params on page load', () => {
