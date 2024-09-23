@@ -27,7 +27,7 @@ Verify Release summary
     ...    Accredited official statistics
 
 Upload subject
-    user uploads subject    UI test subject    upload-file-test-with-filter.csv
+    user uploads subject and waits until complete    UI test subject    upload-file-test-with-filter.csv
     ...    upload-file-test-with-filter.meta.csv
 
 Navigate to 'Footnotes' page

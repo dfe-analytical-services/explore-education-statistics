@@ -25,7 +25,7 @@ Upload a subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Academic year 2025/26
 
-    user uploads subject    Dates test subject    dates.csv    dates.meta.csv
+    user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
 
 Create 4 data blocks
     user creates data block for dates csv

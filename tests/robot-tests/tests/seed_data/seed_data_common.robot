@@ -90,7 +90,7 @@ user creates a fully populated draft release
     ...    ${TOPIC_NAME}
 
     # add data files
-    user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
     # add data guidance
     user clicks link    Data guidance
