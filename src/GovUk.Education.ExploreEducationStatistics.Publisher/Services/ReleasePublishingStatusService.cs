@@ -130,7 +130,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages)
         {
-            // @Mark test all this
             var filter = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
                 status.PartitionKey == releaseVersionId.ToString());
 

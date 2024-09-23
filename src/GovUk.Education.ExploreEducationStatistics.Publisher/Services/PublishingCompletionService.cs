@@ -29,9 +29,8 @@ public class PublishingCompletionService(
     {
         var releaseStatuses = await releasePublishingKeys
             .ToAsyncEnumerable()
-            .SelectAwait(async keyOld =>
+            .SelectAwait(async key =>
             {
-                var key = new ReleasePublishingKey(keyOld.ReleaseVersionId, keyOld.ReleaseStatusId);
                 return await releasePublishingStatusService.Get(key);
             })
             .ToListAsync();
