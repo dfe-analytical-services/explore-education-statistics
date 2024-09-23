@@ -52,11 +52,11 @@ internal class DataSetService(
     {
         var csvDataPath = dataSetVersionPathResolver.CsvDataPath(dataSetVersion);
 
-        var fileStream = new FileStream(csvDataPath, FileMode.Open, FileAccess.Read, FileShare.None); 
+        var fileStream = new FileStream(csvDataPath, FileMode.Open, FileAccess.Read, FileShare.Read); 
 
         return new FileStreamResult(fileStream, MediaTypeNames.Text.Csv)
         {
-            FileDownloadName = Path.GetFileName(fileStream.Name)
+            FileDownloadName = $"{dataSetVersion.DataSetId}_v{dataSetVersion.PublicVersion}.csv"
         };
     }
 

@@ -1132,7 +1132,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .DefaultDataSetVersion()
                 .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -1145,11 +1145,13 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             var csvData = new List<TestClass>
             {
-                new() {
+                new()
+                {
                     FirstColumn = "first-column-value-1",
                     SecondColumn = "second-column-value-1"
                 },
-                new() {
+                new()
+                {
                     FirstColumn = "first-column-value-2",
                     SecondColumn = "second-column-value-2"
                 }
@@ -1157,19 +1159,19 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             await CreateGZippedTestCsv(dataSetVersion, csvData);
 
-            var downloadResponse = await DownloadDataSet(dataSet.Id);
+            var response = await DownloadDataSet(dataSet.Id);
 
-            downloadResponse.AssertOk();
+            response.AssertOk();
 
-            Assert.Equal(MediaTypeNames.Text.Csv, downloadResponse.Content.Headers.ContentType!.MediaType);
+            Assert.Equal(MediaTypeNames.Text.Csv, response.Content.Headers.ContentType!.MediaType);
 
-            var contentEncoding = Assert.Single(downloadResponse.Content.Headers.ContentEncoding);
+            var contentEncoding = Assert.Single(response.Content.Headers.ContentEncoding);
             Assert.Equal(ContentEncodings.Gzip, contentEncoding);
 
-            var results = await DecompressGZippedCsv(downloadResponse);
+            var results = await DecompressGZippedCsv(response);
 
             Assert.Equal(csvData.Count, results.Count);
-            Assert.All(results, r => Assert.Single(csvData, data => data.FirstColumn == r.FirstColumn && data.SecondColumn == r.SecondColumn));
+            Assert.Equal(csvData, results);
         }
 
         [Theory]
@@ -1184,12 +1186,12 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
             DataSetVersion latestDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .DefaultDataSetVersion()
                 .WithStatusPublished()
                 .WithDataSet(dataSet);
 
             DataSetVersion requestedDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .DefaultDataSetVersion()
                 .WithStatus(dataSetVersionStatus)
                 .WithVersionNumber(major: 1, minor: 1, patch: 0)
                 .WithDataSet(dataSet)
@@ -1203,11 +1205,13 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             var csvData = new List<TestClass>
             {
-                new() {
+                new()
+                {
                     FirstColumn = "first-column-value-1",
                     SecondColumn = "second-column-value-1"
                 },
-                new() {
+                new()
+                {
                     FirstColumn = "first-column-value-2",
                     SecondColumn = "second-column-value-2"
                 }
@@ -1215,19 +1219,19 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             await CreateGZippedTestCsv(requestedDataSetVersion, csvData);
 
-            var downloadResponse = await DownloadDataSet(dataSet.Id, requestedDataSetVersion.PublicVersion);
+            var response = await DownloadDataSet(dataSet.Id, requestedDataSetVersion.PublicVersion);
 
-            downloadResponse.AssertOk();
+            response.AssertOk();
 
-            Assert.Equal(MediaTypeNames.Text.Csv, downloadResponse.Content.Headers.ContentType!.MediaType);
+            Assert.Equal(MediaTypeNames.Text.Csv, response.Content.Headers.ContentType!.MediaType);
 
-            var contentEncoding = Assert.Single(downloadResponse.Content.Headers.ContentEncoding);
+            var contentEncoding = Assert.Single(response.Content.Headers.ContentEncoding);
             Assert.Equal(ContentEncodings.Gzip, contentEncoding);
 
-            var results = await DecompressGZippedCsv(downloadResponse);
+            var results = await DecompressGZippedCsv(response);
 
             Assert.Equal(csvData.Count, results.Count);
-            Assert.All(results, r => Assert.Single(csvData, data => data.FirstColumn == r.FirstColumn && data.SecondColumn == r.SecondColumn));
+            Assert.Equal(csvData, results);
         }
 
         [Theory]
@@ -1242,7 +1246,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .DefaultDataSetVersion()
                 .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -1270,13 +1274,13 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
             DataSetVersion latestDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .DefaultDataSetVersion()
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
             DataSetVersion requestedDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .DefaultDataSetVersion()
                 .WithStatus(dataSetVersionStatus)
                 .WithVersionNumber(major: 1, minor: 1, patch: 0)
                 .WithDataSet(dataSet)
@@ -1325,7 +1329,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
+                .DefaultDataSetVersion()
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
@@ -1345,32 +1349,31 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
         {
             var dataSetVersionPathResolver = TestApp.Services.GetRequiredService<IDataSetVersionPathResolver>();
 
-            using var memStream = new MemoryStream();
-            using var streamWriter = new StreamWriter(memStream);
-            using var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
+            await using var memStream = new MemoryStream();
+            await using var streamWriter = new StreamWriter(memStream);
+            await using var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
 
-            csvWriter.WriteRecords(csvData);
+            await csvWriter.WriteRecordsAsync(csvData);
             await csvWriter.FlushAsync();
-            memStream.Position = 0;
 
             var dataSetVersionDirectoryPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
             Directory.CreateDirectory(dataSetVersionDirectoryPath);
 
-            var compressedDataSetFilePath = Path.Combine(dataSetVersionDirectoryPath, DataSetFilenames.CsvDataFile);
+            var filePath = Path.Combine(dataSetVersionDirectoryPath, DataSetFilenames.CsvDataFile);
 
-            using var fileStream = new FileStream(compressedDataSetFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
+            await using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
 
             await CompressionUtils.CompressToStream(memStream, fileStream, ContentEncodings.Gzip);
         }
 
         private static async Task<List<TestClass>> DecompressGZippedCsv(HttpResponseMessage downloadResponse)
         {
-            using var dowloadedFileEncodedStream = await downloadResponse.Content.ReadAsStreamAsync();
-            using var targetStream = new MemoryStream();
+            await using var downloadStream = await downloadResponse.Content.ReadAsStreamAsync();
+            await using var targetStream = new MemoryStream();
             using var streamReader = new StreamReader(targetStream);
             using var csvReader = new CsvReader(streamReader, CultureInfo.InvariantCulture);
 
-            await CompressionUtils.DecompressToStream(dowloadedFileEncodedStream, targetStream, ContentEncodings.Gzip);
+            await CompressionUtils.DecompressToStream(downloadStream, targetStream, ContentEncodings.Gzip);
 
             return csvReader.GetRecords<TestClass>().ToList();
         }

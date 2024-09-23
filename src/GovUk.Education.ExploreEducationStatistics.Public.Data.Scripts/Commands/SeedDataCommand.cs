@@ -58,6 +58,7 @@ public class SeedDataCommand : ICommand
             DataSetSeed.SpcEthnicityLanguage,
             DataSetSeed.SpcYearGroupGender,
             DataSetSeed.Nat01,
+            DataSetSeed.Qua01,
         };
 
         var stopwatch = Stopwatch.StartNew();
@@ -1135,12 +1136,16 @@ public class SeedDataCommand : ICommand
 
         private async Task OutputCompressedDataFile(string versionDir)
         {
-            var dataFileSourceStream = new FileStream(_dataFilePath, FileMode.Open, FileAccess.Read, FileShare.None);
+            var sourceStream = new FileStream(_dataFilePath, FileMode.Open);
 
-            var dataFileDestinationPath = Path.Combine(versionDir, DataSetFilenames.CsvDataFile);
-            var dataFileTargetStream = new FileStream(dataFileDestinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
+            var destinationPath = Path.Combine(versionDir, DataSetFilenames.CsvDataFile);
+            var targetStream = new FileStream(destinationPath, FileMode.Create);
 
-            await CompressionUtils.CompressToStream(dataFileSourceStream, dataFileTargetStream, ContentEncodings.Gzip);
+            await CompressionUtils.CompressToStream(
+                sourceStream,
+                targetStream,
+                ContentEncodings.Gzip,
+                _cancellationToken);
         }
 
         private record LocationColumn(string Name, string CsvName);

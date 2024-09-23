@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
 
@@ -255,16 +254,16 @@ public class DataSetsController(
     }
 
     /// <summary>
-    /// Download a full data set, in a compressed (gzip) CSV format
+    /// Download a data set as CSV
     /// </summary>
     /// <remarks>
-    /// The response will be compressed in gzip format. The CSV response is not subject to backward 
-    /// compatibility guarantees. Only the JSON endpoints have backward 
-    /// compatibility guarantees and should be used instead if stability is required.
+    /// The CSV response will render its metadata in a human-readable format (instead of
+    /// machine-readable IDs). The CSV is not subject to the same backward compatibility
+    /// guarantees as the data set's JSON representation in other endpoints.
     /// </remarks>
     [HttpGet("{dataSetId:guid}/csv")]
     [Produces(MediaTypeNames.Text.Csv, MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The GZip compressed requested CSV file")]
+    [SwaggerResponse(200, "The data set CSV file.")]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult> DownloadDataSet(
@@ -280,7 +279,7 @@ public class DataSetsController(
             )
             .OnSuccess(fileStreamResult =>
             {
-                HttpContext.Response.Headers.Append(HeaderNames.ContentEncoding, "gzip");
+                HttpContext.Response.Headers.ContentEncoding = ContentEncodings.Gzip;
 
                 return fileStreamResult;
             })
