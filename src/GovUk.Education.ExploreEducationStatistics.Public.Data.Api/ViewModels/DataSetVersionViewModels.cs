@@ -82,7 +82,7 @@ public class DataSetVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
-    /// <example>["NAT", "REG", "LA"]</example>
+    /// <example>["National", "Regional", "Local authority"]</example>
     [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
