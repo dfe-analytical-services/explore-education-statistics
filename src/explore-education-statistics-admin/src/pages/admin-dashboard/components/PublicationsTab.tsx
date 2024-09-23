@@ -170,7 +170,7 @@ const PublicationsTab = ({ isBauUser }: Props) => {
           {selectedTheme && selectedTopic ? (
             <TopicPublications
               key={selectedTopic.id}
-              themeTitle={selectedTheme.title}
+              theme={selectedTheme}
               topic={selectedTopic}
             />
           ) : (
@@ -179,7 +179,7 @@ const PublicationsTab = ({ isBauUser }: Props) => {
                 return theme.topics.map(topic => (
                   <TopicPublications
                     key={topic.id}
-                    themeTitle={theme.title}
+                    theme={theme}
                     topic={topic}
                   />
                 ));
