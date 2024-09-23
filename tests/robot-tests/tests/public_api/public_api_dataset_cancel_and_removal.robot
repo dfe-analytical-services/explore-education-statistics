@@ -120,6 +120,8 @@ Remove draft API dataset
     
     ${modal}=    user waits until modal is visible     Remove this draft API data set version
     user clicks button     Remove this API data set version
+
+    user waits until modal is not visible     Remove this draft API data set version
     user waits until h2 is visible    API data sets
 
 User creates 1st API dataset again
