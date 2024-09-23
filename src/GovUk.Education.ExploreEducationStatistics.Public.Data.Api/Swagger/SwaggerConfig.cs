@@ -25,6 +25,7 @@ public class SwaggerConfig(
         options.SchemaFilter<DataSetVersionStatusSchemaFilter>();
         options.SchemaFilter<ErrorViewModelSchemaFilter>();
         options.SchemaFilter<GeographicLevelSchemaFilter>();
+        options.SchemaFilter<IndicatorUnitSchemaFilter>();
         options.SchemaFilter<TimeIdentifierSchemaFilter>();
 
         Directory

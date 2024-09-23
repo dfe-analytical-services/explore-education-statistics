@@ -689,7 +689,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     if (expectedIndicator.Unit != null)
                     {
                         Assert.Equal(expectedIndicator.Unit,
-                            EnumUtil.GetFromEnumLabel<IndicatorUnit>(actualIndicator.Unit));
+                            EnumUtil.GetFromEnumValue<IndicatorUnit>(actualIndicator.Unit));
                     }
                     else
                     {
