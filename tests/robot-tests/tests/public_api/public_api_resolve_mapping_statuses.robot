@@ -33,7 +33,7 @@ Verify release summary
     user verifies release summary    Financial year    3000-01    Accredited official statistics
 
 Upload datafile
-    user uploads subject    ${SUBJECT_NAME_1}    absence_school.csv    absence_school.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_1}    absence_school.csv    absence_school.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to subjects
     user clicks link    Data and files
@@ -83,7 +83,7 @@ Create a second draft release via api
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3010
 
 Upload subject to second release
-   user uploads subject    ${SUBJECT_NAME_2}    absence_school_major_manual.csv    absence_school_major_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
+   user uploads subject and waits until complete    ${SUBJECT_NAME_2}    absence_school_major_manual.csv    absence_school_major_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to second release
     user clicks link    Data and files
