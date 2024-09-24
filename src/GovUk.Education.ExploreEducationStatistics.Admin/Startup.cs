@@ -263,8 +263,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             //
             // TODO EES-4869 - review if we want to keep these features of Identity Framework or not.
             services
-                .AddIdentityCore<ApplicationUser>()
-                .AddRoles<IdentityRole>()
+             .AddIdentityCore<ApplicationUser>(options => {
+                 options.Stores.MaxLengthForKeys = 128;
+             })
+             .AddRoles<IdentityRole>()
                 .AddUserManager<UserManager<ApplicationUser>>()
                 .AddRoleManager<RoleManager<IdentityRole>>()
                 .AddUserStore<UserStore<ApplicationUser, IdentityRole, UsersAndRolesDbContext>>()
