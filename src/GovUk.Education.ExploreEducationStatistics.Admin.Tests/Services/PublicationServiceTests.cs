@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -21,6 +17,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -1526,6 +1526,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var updatedPublication = await context.Publications.FirstAsync(p => p.Title == "Test title");
                 Assert.NotNull(updatedPublication);
+            }
+        }
+
+        [Fact]
+        public async Task UpdatePublication_FailsWithNonExistingTheme()
+        {
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Theme = new Theme
+                {
+                    Title = "Test theme"
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                // Service method under test
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new PublicationSaveRequest
+                    {
+                        Title = "Test publication",
+                        ThemeId = Guid.NewGuid(),
+                    }
+                );
+
+                result.AssertBadRequest(ThemeDoesNotExist);
             }
         }
 
