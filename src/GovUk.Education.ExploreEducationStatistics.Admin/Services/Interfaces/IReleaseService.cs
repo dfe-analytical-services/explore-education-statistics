@@ -1,14 +1,14 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -17,10 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
 
         Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
-            Guid releaseVersionId, 
+            Guid releaseVersionId,
             CancellationToken cancellationToken = default);
 
-        Task<Either<ActionResult, Unit>> DeleteReleaseVersion(Guid releaseVersionId);
+        Task<Either<ActionResult, Unit>> DeleteReleaseVersion(Guid releaseVersionId, CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId);
 
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListScheduledReleases();
 
         Task<Either<ActionResult, DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
-            Guid releaseVersionId, 
+            Guid releaseVersionId,
             Guid fileId,
             CancellationToken cancellationToken = default);
 

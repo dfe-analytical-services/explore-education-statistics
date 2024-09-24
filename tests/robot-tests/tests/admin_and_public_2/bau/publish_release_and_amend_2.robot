@@ -29,11 +29,11 @@ Create publication
 Create new release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year Q1    2020
-    user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Upload another subject (for deletion later)
     user waits until page contains element    id:dataFileUploadForm-subjectTitle
-    user uploads subject    ${SECOND_SUBJECT}    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    ${SECOND_SUBJECT}    upload-file-test.csv    upload-file-test.meta.csv
 
 Add data guidance to subject
     user clicks link    Data guidance
@@ -392,7 +392,7 @@ Create amendment to modify release
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Add subject to release
-    user uploads subject    ${THIRD_SUBJECT}    upload-file-test-with-filter.csv
+    user uploads subject and waits until complete    ${THIRD_SUBJECT}    upload-file-test-with-filter.csv
     ...    upload-file-test-with-filter.meta.csv
 
 Add data guidance to third subject

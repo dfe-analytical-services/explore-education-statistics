@@ -1,11 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -38,6 +31,13 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -150,8 +150,8 @@ public abstract class ReleaseServiceTests
                 Id = Guid.NewGuid(),
                 Name = "Data Block 1",
                 Order = 2,
-                Comments = new List<Comment>
-                {
+                Comments =
+                [
                     new()
                     {
                         Id = Guid.NewGuid(),
@@ -162,7 +162,7 @@ public abstract class ReleaseServiceTests
                         Id = Guid.NewGuid(),
                         Content = "Comment 2 Text"
                     }
-                },
+                ],
                 ReleaseVersionId = templateReleaseId
             };
 
@@ -184,15 +184,15 @@ public abstract class ReleaseServiceTests
                     Heading = "Template heading index 0",
                     Type = ContentSectionType.Generic,
                     Order = 1,
-                    Content = new List<ContentBlock>
-                    {
+                    Content =
+                    [
                         new HtmlBlock
                         {
                             Id = Guid.NewGuid(),
                             Body = "<div></div>",
                             Order = 1,
-                            Comments = new List<Comment>
-                            {
+                            Comments =
+                            [
                                 new()
                                 {
                                     Id = Guid.NewGuid(),
@@ -203,10 +203,10 @@ public abstract class ReleaseServiceTests
                                     Id = Guid.NewGuid(),
                                     Content = "Comment 2 Text"
                                 }
-                            }
+                            ]
                         },
                         dataBlock1
-                    }
+                    ]
                 }),
                 Version = 0
             };
@@ -251,11 +251,11 @@ public abstract class ReleaseServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 // Do an in depth check of the saved release version
-                var newReleaseVersion = context
+                var newReleaseVersion = await context
                     .ReleaseVersions
                     .Include(releaseVersion => releaseVersion.Content)
                     .ThenInclude(section => section.Content)
-                    .Single(rv => rv.Id == newReleaseVersionId);
+                    .SingleAsync(rv => rv.Id == newReleaseVersionId);
 
                 var contentSections = newReleaseVersion.GenericContent.ToList();
                 Assert.Single(contentSections);
@@ -506,7 +506,7 @@ public abstract class ReleaseServiceTests
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
 
             footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id))
-                .ReturnsAsync(new List<Footnote>());
+                .ReturnsAsync([]);
 
             releaseDataFileService.Setup(service => service.Delete(releaseVersion.Id, file.Id, false))
                 .ReturnsAsync(Unit.Instance);
@@ -575,18 +575,18 @@ public abstract class ReleaseServiceTests
             dataImportService.Setup(service => service.GetImport(file.Id))
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.STAGE_1 });
 
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var releaseService = BuildReleaseService(context,
-                    dataImportService: dataImportService.Object);
+            await using var context = InMemoryApplicationDbContext(contentDbContextId);
+            var releaseService = BuildReleaseService(
+                context,
+                dataImportService: dataImportService.Object);
 
-                var result = await releaseService.RemoveDataFiles(releaseVersionId: releaseVersion.Id,
-                    fileId: file.Id);
+            var result = await releaseService.RemoveDataFiles(
+                releaseVersionId: releaseVersion.Id,
+                fileId: file.Id);
 
-                VerifyAllMocks(dataImportService);
+            VerifyAllMocks(dataImportService);
 
-                result.AssertBadRequest(CannotRemoveDataFilesUntilImportComplete);
-            }
+            result.AssertBadRequest(CannotRemoveDataFilesUntilImportComplete);
         }
 
         [Fact]
@@ -665,7 +665,7 @@ public abstract class ReleaseServiceTests
 
             footnoteRepository.Setup(service =>
                     service.GetFootnotes(releaseVersion.Id, It.IsIn(subject.Id, replacementSubject.Id)))
-                .ReturnsAsync(new List<Footnote>());
+                .ReturnsAsync([]);
 
             releaseDataFileService
                 .Setup(service => service.Delete(releaseVersion.Id, It.IsIn(file.Id, replacementFile.Id), false))
@@ -775,18 +775,18 @@ public abstract class ReleaseServiceTests
             dataImportService.Setup(service => service.GetImport(replacementFile.Id))
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.STAGE_1 });
 
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var releaseService = BuildReleaseService(context,
-                    dataImportService: dataImportService.Object);
+            await using var context = InMemoryApplicationDbContext(contentDbContextId);
+            var releaseService = BuildReleaseService(
+                context,
+                dataImportService: dataImportService.Object);
 
-                var result = await releaseService.RemoveDataFiles(releaseVersionId: releaseVersion.Id,
-                    fileId: file.Id);
+            var result = await releaseService.RemoveDataFiles(
+                releaseVersionId: releaseVersion.Id,
+                fileId: file.Id);
 
-                VerifyAllMocks(dataImportService);
+            VerifyAllMocks(dataImportService);
 
-                result.AssertBadRequest(CannotRemoveDataFilesUntilImportComplete);
-            }
+            result.AssertBadRequest(CannotRemoveDataFilesUntilImportComplete);
         }
 
         [Fact]
@@ -820,26 +820,26 @@ public abstract class ReleaseServiceTests
             dataImportService.Setup(service => service.GetImport(file.Id))
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
 
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var releaseService = BuildReleaseService(context,
-                    dataImportService: dataImportService.Object);
+            await using var context = InMemoryApplicationDbContext(contentDbContextId);
+            var releaseService = BuildReleaseService(
+                context,
+                dataImportService: dataImportService.Object);
 
-                var result = await releaseService.RemoveDataFiles(releaseVersionId: releaseVersion.Id,
-                    fileId: file.Id);
+            var result = await releaseService.RemoveDataFiles(
+                releaseVersionId: releaseVersion.Id,
+                fileId: file.Id);
 
-                VerifyAllMocks(dataImportService);
+            VerifyAllMocks(dataImportService);
 
-                var validationProblem = result.AssertBadRequestWithValidationProblem();
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-                var errorDetail = validationProblem.AssertHasError(
-                    expectedPath: null,
-                    expectedCode: ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code);
+            var errorDetail = validationProblem.AssertHasError(
+                expectedPath: null,
+                expectedCode: ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code);
 
-                var apiDataSetErrorDetail = Assert.IsType<ApiDataSetErrorDetail>(errorDetail.Detail);
+            var apiDataSetErrorDetail = Assert.IsType<ApiDataSetErrorDetail>(errorDetail.Detail);
 
-                Assert.Equal(releaseFile.PublicApiDataSetId, apiDataSetErrorDetail.DataSetId);
-            }
+            Assert.Equal(releaseFile.PublicApiDataSetId, apiDataSetErrorDetail.DataSetId);
         }
     }
 
@@ -1379,16 +1379,28 @@ public abstract class ReleaseServiceTests
 
     public class DeleteReleaseVersionTests : ReleaseServiceTests
     {
-        [Fact]
-        public async Task Success()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Success(bool isDraft)
         {
-            var publication = new Publication();
+            // Arrange
+            var release = _dataFixture.DefaultRelease().Generate();
+
+            var publication = new Publication
+            {
+                ReleaseSeries =
+                [
+                    new() { Id = Guid.NewGuid(), ReleaseId = release.Id }
+                ]
+            };
 
             var releaseVersion = new ReleaseVersion
             {
-                Id = Guid.NewGuid(),
+                Id = release.Id,
                 Publication = publication,
-                Version = 0,
+                Version = isDraft ? 0 : 1,
+                ReleaseId = release.Id
             };
 
             // This Methodology is scheduled to go out with the Release being deleted.
@@ -1444,6 +1456,7 @@ public abstract class ReleaseServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Publications.Add(publication);
+                context.Releases.Add(release);
                 context.ReleaseVersions.AddRange(releaseVersion, anotherRelease);
                 context.UserReleaseRoles.AddRange(userReleaseRole, anotherUserReleaseRole);
                 context.UserReleaseInvites.AddRange(userReleaseInvite, anotherUserReleaseInvite);
@@ -1486,8 +1499,10 @@ public abstract class ReleaseServiceTests
                     cacheService: cacheService.Object,
                     processorClient: processorClient.Object);
 
+                // Act
                 var result = await releaseService.DeleteReleaseVersion(releaseVersion.Id);
 
+                // Assert
                 releaseDataFilesService.Verify(mock =>
                         mock.DeleteAll(releaseVersion.Id, false),
                     Times.Once);
@@ -1504,88 +1519,130 @@ public abstract class ReleaseServiceTests
 
                 result.AssertRight();
 
-                // assert that soft-deleted entities are no longer discoverable by default
-                var unableToFindDeletedRelease = context
-                    .ReleaseVersions
-                    .FirstOrDefault(rv => rv.Id == releaseVersion.Id);
+                if (isDraft)
+                {
+                    // assert that hard-deleted entities no longer exist
+                    var hardDeletedRelease = await context
+                        .ReleaseVersions
+                        .IgnoreQueryFilters()
+                        .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
-                Assert.Null(unableToFindDeletedRelease);
+                    Assert.Null(hardDeletedRelease);
 
-                var unableToFindDeletedReleaseRole = context
-                    .UserReleaseRoles
-                    .FirstOrDefault(r => r.Id == userReleaseRole.Id);
+                    var hardDeletedReleaseRole = await context
+                        .UserReleaseRoles
+                        .IgnoreQueryFilters()
+                        .FirstOrDefaultAsync(r => r.Id == userReleaseRole.Id);
 
-                Assert.Null(unableToFindDeletedReleaseRole);
+                    Assert.Null(hardDeletedReleaseRole);
 
-                var unableToFindDeletedReleaseInvite = context
-                    .UserReleaseInvites
-                    .FirstOrDefault(r => r.Id == userReleaseInvite.Id);
+                    var hardDeletedReleaseInvite = await context
+                        .UserReleaseInvites
+                        .IgnoreQueryFilters()
+                        .FirstOrDefaultAsync(r => r.Id == userReleaseInvite.Id);
 
-                Assert.Null(unableToFindDeletedReleaseInvite);
+                    Assert.Null(hardDeletedReleaseInvite);
 
-                // assert that soft-deleted entities do not appear via references from other entities by default
-                var publicationWithoutDeletedRelease = context
-                    .Publications
-                    .Include(p => p.ReleaseVersions)
-                    .AsNoTracking()
-                    .First(p => p.Id == publication.Id);
+                    // assert that other entities were not accidentally hard-deleted
+                    var retrievedAnotherReleaseRole = await context
+                        .UserReleaseRoles
+                        .IgnoreQueryFilters()
+                        .FirstAsync(r => r.Id == anotherUserReleaseRole.Id);
 
-                Assert.Single(publicationWithoutDeletedRelease.ReleaseVersions);
-                Assert.Equal(anotherRelease.Id, publicationWithoutDeletedRelease.ReleaseVersions[0].Id);
+                    Assert.False(retrievedAnotherReleaseRole.SoftDeleted);
 
-                // assert that soft-deleted entities have had their soft-deleted flag set to true
-                var updatedRelease = context
-                    .ReleaseVersions
-                    .IgnoreQueryFilters()
-                    .First(rv => rv.Id == releaseVersion.Id);
+                    var retrievedAnotherReleaseInvite = await context
+                        .UserReleaseInvites
+                        .IgnoreQueryFilters()
+                        .FirstAsync(r => r.Id == anotherUserReleaseInvite.Id);
 
-                Assert.True(updatedRelease.SoftDeleted);
+                    Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
+                }
+                else
+                {
+                    // assert that soft-deleted entities are no longer discoverable by default
+                    var softDeletedRelease = await context
+                        .ReleaseVersions
+                        .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
-                var updatedReleaseRole = context
-                    .UserReleaseRoles
-                    .IgnoreQueryFilters()
-                    .First(r => r.Id == userReleaseRole.Id);
+                    Assert.Null(softDeletedRelease);
 
-                Assert.True(updatedReleaseRole.SoftDeleted);
+                    var softDeletedReleaseRole = await context
+                        .UserReleaseRoles
+                        .FirstOrDefaultAsync(r => r.Id == userReleaseRole.Id);
 
-                var updatedReleaseInvite = context
-                    .UserReleaseInvites
-                    .IgnoreQueryFilters()
-                    .First(r => r.Id == userReleaseInvite.Id);
+                    Assert.Null(softDeletedReleaseRole);
 
-                Assert.True(updatedReleaseInvite.SoftDeleted);
+                    var softDeletedReleaseInvite = await context
+                        .UserReleaseInvites
+                        .FirstOrDefaultAsync(r => r.Id == userReleaseInvite.Id);
 
-                // assert that soft-deleted entities appear via references from other entities when explicitly searched for
-                var publicationWithDeletedRelease = context
-                    .Publications
-                    .Include(p => p.ReleaseVersions)
-                    .IgnoreQueryFilters()
-                    .AsNoTracking()
-                    .First(p => p.Id == publication.Id);
+                    Assert.Null(softDeletedReleaseInvite);
 
-                Assert.Equal(2, publicationWithDeletedRelease.ReleaseVersions.Count);
-                Assert.Equal(updatedRelease.Id, publicationWithDeletedRelease.ReleaseVersions[0].Id);
-                Assert.Equal(anotherRelease.Id, publicationWithDeletedRelease.ReleaseVersions[1].Id);
-                Assert.True(publicationWithDeletedRelease.ReleaseVersions[0].SoftDeleted);
-                Assert.False(publicationWithDeletedRelease.ReleaseVersions[1].SoftDeleted);
+                    // assert that soft-deleted entities do not appear via references from other entities by default
+                    var publicationWithoutDeletedRelease = await context
+                        .Publications
+                        .Include(p => p.ReleaseVersions)
+                        .AsNoTracking()
+                        .FirstAsync(p => p.Id == publication.Id);
 
-                // assert that other entities were not accidentally soft-deleted
-                var retrievedAnotherReleaseRole = context
-                    .UserReleaseRoles
-                    .First(r => r.Id == anotherUserReleaseRole.Id);
+                    Assert.Single(publicationWithoutDeletedRelease.ReleaseVersions);
+                    Assert.Equal(anotherRelease.Id, publicationWithoutDeletedRelease.ReleaseVersions[0].Id);
 
-                Assert.False(retrievedAnotherReleaseRole.SoftDeleted);
+                    // assert that soft-deleted entities have had their soft-deleted flag set to true
+                    var updatedRelease = await context
+                        .ReleaseVersions
+                        .IgnoreQueryFilters()
+                        .FirstAsync(rv => rv.Id == releaseVersion.Id);
 
-                var retrievedAnotherReleaseInvite = context
-                    .UserReleaseInvites
-                    .First(r => r.Id == anotherUserReleaseInvite.Id);
+                    Assert.True(updatedRelease.SoftDeleted);
 
-                Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
+                    var updatedReleaseRole = await context
+                        .UserReleaseRoles
+                        .IgnoreQueryFilters()
+                        .FirstAsync(r => r.Id == userReleaseRole.Id);
+
+                    Assert.True(updatedReleaseRole.SoftDeleted);
+
+                    var updatedReleaseInvite = await context
+                        .UserReleaseInvites
+                        .IgnoreQueryFilters()
+                        .FirstAsync(r => r.Id == userReleaseInvite.Id);
+
+                    Assert.True(updatedReleaseInvite.SoftDeleted);
+
+                    // assert that soft-deleted entities appear via references from other entities when explicitly searched for
+                    var publicationWithDeletedRelease = await context
+                        .Publications
+                        .Include(p => p.ReleaseVersions)
+                        .IgnoreQueryFilters()
+                        .AsNoTracking()
+                        .FirstAsync(p => p.Id == publication.Id);
+
+                    Assert.Equal(2, publicationWithDeletedRelease.ReleaseVersions.Count);
+                    Assert.Equal(updatedRelease.Id, publicationWithDeletedRelease.ReleaseVersions[0].Id);
+                    Assert.Equal(anotherRelease.Id, publicationWithDeletedRelease.ReleaseVersions[1].Id);
+                    Assert.True(publicationWithDeletedRelease.ReleaseVersions[0].SoftDeleted);
+                    Assert.False(publicationWithDeletedRelease.ReleaseVersions[1].SoftDeleted);
+
+                    // assert that other entities were not accidentally soft-deleted
+                    var retrievedAnotherReleaseRole = await context
+                        .UserReleaseRoles
+                        .FirstAsync(r => r.Id == anotherUserReleaseRole.Id);
+
+                    Assert.False(retrievedAnotherReleaseRole.SoftDeleted);
+
+                    var retrievedAnotherReleaseInvite = await context
+                        .UserReleaseInvites
+                        .FirstAsync(r => r.Id == anotherUserReleaseInvite.Id);
+
+                    Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
+                }
 
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
                 var retrievedMethodologyVersion =
-                    context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithRelease.Id);
+                    await context.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithRelease.Id);
                 Assert.True(retrievedMethodologyVersion.ScheduledForPublishingImmediately);
                 Assert.Null(retrievedMethodologyVersion.ScheduledWithReleaseVersionId);
                 Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodologyVersion.Status);
@@ -1596,7 +1653,7 @@ public abstract class ReleaseServiceTests
 
                 // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
                 var unrelatedMethodology =
-                    context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithAnotherRelease.Id);
+                    await context.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithAnotherRelease.Id);
                 Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
                 Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
                     unrelatedMethodology.ScheduledWithReleaseVersionId);

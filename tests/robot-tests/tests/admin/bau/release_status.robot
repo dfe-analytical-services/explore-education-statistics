@@ -308,7 +308,7 @@ Create third release
     ...    Financial year 2300-01
 
 Upload data files
-    user uploads subject    Dates test subject    dates.csv    dates.meta.csv
+    user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
     user clicks link    Data and files
     user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
     user waits until page contains accordion section    Dates test subject
@@ -361,7 +361,7 @@ Navigate to data upload and confirm data replacement
     user waits until h2 is visible    Data replacement complete    %{WAIT_MEDIUM}
 
 Upload the larger data file via data upload
-    user waits until data upload displays importing
+    user uploads subject and waits until importing
     ...    ${SUBJECT_NAME}-updated
     ...    large-data-set.csv
     ...    large-data-set.meta.csv

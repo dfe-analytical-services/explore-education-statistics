@@ -16,6 +16,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useState } from 'react';
 import { generatePath } from 'react-router';
+import DeleteDraftModal from '@admin/pages/admin-dashboard/components/DeleteDraftModal';
 
 interface Props {
   publicationId: string;
@@ -68,6 +69,23 @@ const DraftReleaseRow = ({
           {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
+
+        {release.permissions?.canDeleteRelease &&
+          release.approvalStatus === 'Draft' &&
+          !release.amendment && (
+            <DeleteDraftModal
+              triggerButton={
+                <ButtonText variant="warning">
+                  Delete
+                  <VisuallyHidden> {release.title}</VisuallyHidden>
+                </ButtonText>
+              }
+              onConfirm={async () => {
+                await releaseService.deleteRelease(release.id);
+                onAmendmentDelete?.();
+              }}
+            />
+          )}
 
         {release.amendment && release.previousVersionId && (
           <Link
