@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -207,8 +209,8 @@ public class SubjectMetaServicePermissionTests
         );
     }
 
-    private static IOptions<LocationsOptions> DefaultLocationOptions()
+    private static OptionsWrapper<LocationsOptions> DefaultLocationOptions()
     {
-        return Options.Create(new LocationsOptions());
+        return new LocationsOptions().ToOptionsWrapper();
     }
 }

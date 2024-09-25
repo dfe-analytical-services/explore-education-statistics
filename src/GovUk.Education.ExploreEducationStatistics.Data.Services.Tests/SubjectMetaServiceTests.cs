@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -206,20 +207,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     LocalAuthority = _nottingham
                 });
 
-            var options = Options.Create(new LocationsOptions
+            var options = new LocationsOptions
             {
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
                 {
                     {
                         GeographicLevel.LocalAuthority,
-                        new List<string>
-                        {
+                        [
                             "Country",
                             "Region"
-                        }
+                        ]
                     }
                 }
-            });
+            }.ToOptionsWrapper();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2607,9 +2607,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        private static IOptions<LocationsOptions> DefaultLocationOptions()
+        private static OptionsWrapper<LocationsOptions> DefaultLocationOptions()
         {
-            return Options.Create(new LocationsOptions());
+            return new LocationsOptions().ToOptionsWrapper();
         }
 
         private static List<FilterGroup> CreateFilterGroups(Filter filter,

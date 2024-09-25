@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,25 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     }
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class AuthorityMetadataOptions
-    {
-        public string AuthorizationEndpoint { get; set; } = null!;
-        public string TokenEndpoint { get; set; } = null!;
-        public string Issuer { get; set; } = null!;
-        public string UserInfoEndpoint { get; set; } = null!;
-        public string EndSessionEndpoint { get; set; } = null!;
-    }
-
-    public class OpenIdConnectSpaClientOptions
-    {
-        public const string OpenIdConnectSpaClient = "OpenIdConnectSpaClient";
-
-        public string ClientId { get; set; } = null!;
-        public string Authority { get; set; } = null!;
-        public string[] KnownAuthorities { get; set; } = null!;
-        public string AdminApiScope { get; set; } = null!;
-        public AuthorityMetadataOptions? AuthorityMetadata { get; set; }
-    }
 
     public record ConfigurationViewModel(
         string AppInsightsKey,
