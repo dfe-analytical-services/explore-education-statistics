@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using System.Globalization;
-using System.Net;
 using System.Net.Mime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
@@ -1118,7 +1117,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
         }
     }
 
-    public class DownloadDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class DownloadDataSetCsvTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Theory]
         [MemberData(nameof(DataSetVersionStatusViewTheoryData.AvailableStatuses),

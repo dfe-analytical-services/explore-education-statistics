@@ -263,10 +263,10 @@ public class DataSetsController(
     /// </remarks>
     [HttpGet("{dataSetId:guid}/csv")]
     [Produces(MediaTypeNames.Text.Csv, MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The data set CSV file.")]
+    [SwaggerResponse(200, description: "The data set CSV file.", contentTypes: MediaTypeNames.Text.Csv)]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
-    public async Task<ActionResult> DownloadDataSet(
+    public async Task<ActionResult> DownloadDataSetCsv(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
         [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")][FromQuery] string? dataSetVersion,
         CancellationToken cancellationToken)
