@@ -14,28 +14,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var configuration = GetConfiguration();
             var configSection = configuration.GetSection("AppInsights");
+
             Assert.NotNull(configSection);
-            var configValue = configSection.GetValue<string>("InstrumentationKey");
-            Assert.Equal(string.Empty, configValue);
+            Assert.Equal(string.Empty, configSection.GetValue<string>("InstrumentationKey"));
         }
 
         [Fact]
         public void CheckPublicAppUrlConfigurationKeyExists()
         {
             var configuration = GetConfiguration();
-            var configValue = configuration.GetValue<string>("PublicAppUrl");
-            Assert.Equal("http://localhost:3000", configValue);
+            var configSection = configuration.GetSection("PublicApp");
+
+            Assert.NotNull(configSection);
+            Assert.Equal("http://localhost:3000", configSection.GetValue<string>("Url"));
         }
 
         [Fact]
         public void GetConfig()
         {
             var mainConfiguration = GetConfiguration();
-            var openIdConnectSpaClientConfig = new OpenIdConnectSpaClientOptions();
-            mainConfiguration.Bind(OpenIdConnectSpaClientOptions.Section, openIdConnectSpaClientConfig);
-            var openIdConnectSpaClientOptions = openIdConnectSpaClientConfig.ToOptionsWrapper();
+            var openIdConnectSpaClientOptions = new OpenIdConnectSpaClientOptions();
+            mainConfiguration.Bind(OpenIdConnectSpaClientOptions.Section, openIdConnectSpaClientOptions);
 
-            var controller = new ConfigurationController(GetConfiguration(), openIdConnectSpaClientOptions);
+            var publicAppOptions = new PublicAppOptions();
+            mainConfiguration.Bind(PublicAppOptions.Section, publicAppOptions);
+
+            var appInsightsOptions = new AppInsightsOptions();
+            mainConfiguration.Bind(AppInsightsOptions.Section, appInsightsOptions);
+
+            var controller = new ConfigurationController(
+                openIdConnectSpaClientOptions.ToOptionsWrapper(),
+                appInsightsOptions.ToOptionsWrapper(),
+                publicAppOptions.ToOptionsWrapper()
+            );
+
             var result = controller.GetConfig();
             var viewModel = result.AssertOkResult();
 

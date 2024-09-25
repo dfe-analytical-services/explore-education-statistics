@@ -3,15 +3,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -240,8 +241,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
-        private static Mock<IConfiguration> DefaultConfigurationMock()
-            => CreateMockConfiguration(CollectionUtils.TupleOf("enableThemeDeletion", "true"));
+        private static IOptions<AppOptions> DefaultAppOptions()
+        {
+            return new AppOptions { EnableThemeDeletion = true }.ToOptionsWrapper();
+        }
 
         private ThemeService SetupThemeService(
             ContentDbContext context = null,
@@ -252,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPublishingService publishingService = null)
         {
             return new ThemeService(
-                DefaultConfigurationMock().Object,
+                DefaultAppOptions(),
                 context ?? new Mock<ContentDbContext>().Object,
                 mapper ?? AdminMapper(),
                 persistenceHelper ?? MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object,
