@@ -2,7 +2,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,109 +58,111 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         var oldFilterMetas = await GetFilterMetas(previousVersionId, cancellationToken);
         var newFilterMetas = await GetFilterMetas(nextVersionId, cancellationToken);
 
-        var mappingPlan = await publicDataDbContext
-            .DataSetVersionMappings
-            .AsNoTracking()
-            .Where(dsvm => dsvm.TargetDataSetVersionId == nextVersionId)
-            .Select(dsvm => dsvm.FilterMappingPlan)
-            .SingleAsync(cancellationToken);
+        var filterMetaChanges = new List<FilterMetaChange>();
+        var filterOptionMetaChanges = new List<FilterOptionMetaChange>();
 
-        var filterMetaDeletionsAndChanges = mappingPlan.Mappings
-            // Do not include changes for keys that have been mapped to the exact same candidate key (no renaming)    
-            .Where(kv => kv.Key != kv.Value.CandidateKey)
-            .Select(kv =>
+        foreach (var (filterPublicId, oldFilterTuple) in oldFilterMetas)
+        {
+            if (newFilterMetas.TryGetValue(filterPublicId, out var newFilterTuple))
             {
-                var source = oldFilterMetas[kv.Key].FilterMeta;
-                var target = string.IsNullOrEmpty(kv.Value.CandidateKey)
-                    ? null
-                    : newFilterMetas[kv.Value.CandidateKey].FilterMeta;
+                // Filter changed
+                if (!IsFilterEqual(newFilterTuple.FilterMeta, oldFilterTuple.FilterMeta))
+                {
+                    filterMetaChanges.Add(new FilterMetaChange
+                    {
+                        DataSetVersionId = nextVersionId,
+                        PreviousStateId = oldFilterTuple.FilterMeta.Id,
+                        CurrentStateId = newFilterTuple.FilterMeta.Id
+                    });
+                }
 
-                return new FilterMetaChange
+                foreach (var (optionPublicId, oldOptionLink) in oldFilterTuple.OptionLinks)
                 {
-                    DataSetVersionId = nextVersionId,
-                    PreviousStateId = source.Id,
-                    CurrentStateId = target?.Id
-                };
-            })
-            .ToList();
-
-        var filterMetaAdditions = mappingPlan.Candidates
-            .Keys
-            .Except(mappingPlan.Mappings.Select(m => m.Value.CandidateKey!))
-            .Select(newCandidateKey =>
-            {
-                var target = newFilterMetas[newCandidateKey].FilterMeta;
-                return new FilterMetaChange
-                {
-                    DataSetVersionId = nextVersionId,
-                    PreviousStateId = null,
-                    CurrentStateId = target.Id
-                };
-            })
-            .ToList();
-
-        var filterOptionMetaDeletionsAndChanges = mappingPlan.Mappings
-            // Don't create a change for any filter options which have had their entire filter deleted
-            .Where(kv => !string.IsNullOrEmpty(kv.Value.CandidateKey))
-            .SelectMany(
-                fm => fm.Value.OptionMappings,
-                (fm, fom) => new
-                {
-                    FilterMapping = fm,
-                    OptionMapping = fom
-                })
-            // Do not include changes for keys that have been mapped to the exact same candidate key (no renaming)
-            .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey)
-            .Select(a =>
-            {
-                var source = oldFilterMetas[a.FilterMapping.Key].OptionLinks[a.OptionMapping.Key];
-                var target = string.IsNullOrEmpty(a.OptionMapping.Value.CandidateKey)
-                    ? null
-                    : newFilterMetas[a.FilterMapping.Value.CandidateKey!]
-                        .OptionLinks[a.OptionMapping.Value.CandidateKey];
-                return new FilterOptionMetaChange
-                {
-                    DataSetVersionId = nextVersionId,
-                    PreviousState = FilterOptionMetaChange.State.Create(source),
-                    CurrentState = target != null ? FilterOptionMetaChange.State.Create(target) : null
-                };
-            })
-            .ToList();
-
-        var filterOptionMetaAdditions = mappingPlan.Candidates
-            .SelectMany(
-                fc => fc.Value.Options,
-                (fc, foc) => new
-                {
-                    FilterCandidateKey = (string?)fc.Key,
-                    OptionCandidateKey = (string?)foc.Key
-                })
-            .Except(
-                mappingPlan.Mappings
-                    .SelectMany(
-                        fm => fm.Value.OptionMappings,
-                        (fm, fom) => new
+                    if (!newFilterTuple.OptionLinks.TryGetValue(optionPublicId, out var newOptionLink))
+                    {
+                        // Filter option deleted
+                        filterOptionMetaChanges.Add(new FilterOptionMetaChange
                         {
-                            FilterCandidateKey = fm.Value.CandidateKey,
-                            OptionCandidateKey = fom.Value.CandidateKey
-                        }
-                    ))
-            .Select(a =>
+                            DataSetVersionId = nextVersionId,
+                            PreviousState = FilterOptionMetaChange.State.Create(oldOptionLink)
+                        });
+                    }
+                    // Filter option changed
+                    else if (!IsFilterOptionEqual(newOptionLink.Option, oldOptionLink.Option))
+                    {
+                        filterOptionMetaChanges.Add(new FilterOptionMetaChange
+                        {
+                            DataSetVersionId = nextVersionId,
+                            PreviousState = FilterOptionMetaChange.State.Create(oldOptionLink),
+                            CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
+                        });
+                    }
+                }
+            }
+            else
             {
-                var target = newFilterMetas[a.FilterCandidateKey!].OptionLinks[a.OptionCandidateKey!];
-                return new FilterOptionMetaChange
+                // Filter deleted
+                filterMetaChanges.Add(new FilterMetaChange
                 {
                     DataSetVersionId = nextVersionId,
-                    PreviousState = null,
-                    CurrentState = FilterOptionMetaChange.State.Create(target)
-                };
-            });
+                    PreviousStateId = oldFilterTuple.FilterMeta.Id,
+                });
+            }
+        }
 
-        publicDataDbContext.FilterMetaChanges.AddRange([.. filterMetaDeletionsAndChanges, .. filterMetaAdditions]);
-        publicDataDbContext.FilterOptionMetaChanges.AddRange([
-            .. filterOptionMetaDeletionsAndChanges, .. filterOptionMetaAdditions
-        ]);
+        foreach (var (filterPublicId, newFilterTuple) in newFilterMetas)
+        {
+            if (!oldFilterMetas.TryGetValue(filterPublicId, out var oldFilterTuple))
+            {
+                // Filter added
+                filterMetaChanges.Add(new FilterMetaChange
+                {
+                    DataSetVersionId = nextVersionId,
+                    CurrentStateId = newFilterTuple.FilterMeta.Id
+                });
+
+                foreach (var (_, newOptionLink) in newFilterTuple.OptionLinks)
+                {
+                    // Filter option added
+                    filterOptionMetaChanges.Add(new FilterOptionMetaChange
+                    {
+                        DataSetVersionId = nextVersionId,
+                        CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
+                    });
+                }
+            }
+            else
+            {
+                foreach (var (optionPublicId, newOptionLink) in newFilterTuple.OptionLinks)
+                {
+                    if (!oldFilterTuple.OptionLinks.ContainsKey(optionPublicId))
+                    {
+                        // Filter option added
+                        filterOptionMetaChanges.Add(new FilterOptionMetaChange
+                        {
+                            DataSetVersionId = nextVersionId,
+                            CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
+                        });
+                    }
+                }
+            }
+        }
+
+        publicDataDbContext.FilterMetaChanges.AddRange(filterMetaChanges);
+        publicDataDbContext.FilterOptionMetaChanges.AddRange(filterOptionMetaChanges);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private static bool IsFilterEqual(FilterMeta filterMeta1, FilterMeta filterMeta2)
+    {
+        return filterMeta1.Column == filterMeta2.Column
+            && filterMeta1.Label == filterMeta2.Label
+            && filterMeta1.Hint == filterMeta2.Hint;
+    }
+
+    private static bool IsFilterOptionEqual(FilterOptionMeta filterOptionMeta1, FilterOptionMeta filterOptionMeta2)
+    {
+        return filterOptionMeta1.Label == filterOptionMeta2.Label;
     }
 
     private async Task CreateLocationChanges(
@@ -172,96 +173,93 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         var oldLocationMetas = await GetLocationMetas(previousVersionId, cancellationToken);
         var newLocationMetas = await GetLocationMetas(nextVersionId, cancellationToken);
 
-        var mappingPlan = await publicDataDbContext
-            .DataSetVersionMappings
-            .AsNoTracking()
-            .Where(dsvm => dsvm.TargetDataSetVersionId == nextVersionId)
-            .Select(dsvm => dsvm.LocationMappingPlan)
-            .SingleAsync(cancellationToken);
+        var locationMetaChanges = new List<LocationMetaChange>();
+        var locationOptionMetaChanges = new List<LocationOptionMetaChange>();
 
-        var locationMetaChanges = mappingPlan.Levels
-            // Only include adds and deletes for location levels
-            .Where(locationGroupMappings => locationGroupMappings.Value.Mappings.Count == 0 ||
-                                            locationGroupMappings.Value.Candidates.Count == 0)
-            .Select(locationGroupMappings =>
+        foreach (var (locationLevel, oldLocationTuple) in oldLocationMetas)
+        {
+            if (newLocationMetas.TryGetValue(locationLevel, out var newLocationTuple))
             {
-                var source = locationGroupMappings.Value.Mappings.Count == 0
-                    ? null
-                    : oldLocationMetas[locationGroupMappings.Key].LocationMeta;
-                var target = locationGroupMappings.Value.Candidates.Count == 0
-                    ? null
-                    : newLocationMetas[locationGroupMappings.Key].LocationMeta;
-                return new LocationMetaChange
+                foreach (var (optionPublicId, oldOptionLink) in oldLocationTuple.OptionLinks)
                 {
-                    DataSetVersionId = nextVersionId,
-                    PreviousStateId = source?.Id,
-                    CurrentStateId = target?.Id
-                };
-            })
-            .ToList();
-
-        var locationOptionMetaDeletionsAndChanges = mappingPlan.Levels
-            // Don't create a change for any location options which have had their entire location group deleted
-            .Where(locationGroupMappings => locationGroupMappings.Value.Candidates.Count > 0)
-            .SelectMany(
-                lm => lm.Value.Mappings,
-                (lm, lom) => new
-                {
-                    LocationGroup = lm.Key,
-                    OptionMapping = lom
-                })
-            // Do not include changes for keys that have been mapped to the exact same candidate key (no renaming)
-            .Where(a => a.OptionMapping.Key != a.OptionMapping.Value.CandidateKey)
-            .Select(a =>
-            {
-                var level = a.LocationGroup;
-                var source = oldLocationMetas[level].OptionLinks[a.OptionMapping.Key];
-                var target = string.IsNullOrEmpty(a.OptionMapping.Value.CandidateKey)
-                    ? null
-                    : newLocationMetas[level].OptionLinks[a.OptionMapping.Value.CandidateKey];
-                return new LocationOptionMetaChange
-                {
-                    DataSetVersionId = nextVersionId,
-                    PreviousState = LocationOptionMetaChange.State.Create(source),
-                    CurrentState = target != null ? LocationOptionMetaChange.State.Create(target) : null
-                };
-            })
-            .ToList();
-
-        var locationOptionMetaAdditions = mappingPlan.Levels
-            .SelectMany(
-                lm => lm.Value.Candidates,
-                (lm, loc) => new
-                {
-                    LocationGroup = lm.Key,
-                    OptionCandidateKey = (string?)loc.Key
-                })
-            .Except(
-                mappingPlan.Levels
-                    .SelectMany(
-                        lm => lm.Value.Mappings,
-                        (lm, lom) => new
+                    if (!newLocationTuple.OptionLinks.TryGetValue(optionPublicId, out var newOptionLink))
+                    {
+                        // Location option deleted
+                        locationOptionMetaChanges.Add(new LocationOptionMetaChange
                         {
-                            LocationGroup = lm.Key,
-                            OptionCandidateKey = lom.Value.CandidateKey
-                        }
-                    ))
-            .Select(a =>
+                            DataSetVersionId = nextVersionId,
+                            PreviousState = LocationOptionMetaChange.State.Create(oldOptionLink)
+                        });
+                    }
+                    // Location option changed
+                    else if (!IsLocationOptionEqual(newOptionLink.Option, oldOptionLink.Option))
+                    {
+                        locationOptionMetaChanges.Add(new LocationOptionMetaChange
+                        {
+                            DataSetVersionId = nextVersionId,
+                            PreviousState = LocationOptionMetaChange.State.Create(oldOptionLink),
+                            CurrentState = LocationOptionMetaChange.State.Create(newOptionLink)
+                        });
+                    }
+                }
+            }
+            else
             {
-                var target = newLocationMetas[a.LocationGroup].OptionLinks[a.OptionCandidateKey!];
-                return new LocationOptionMetaChange
+                // Location deleted
+                locationMetaChanges.Add(new LocationMetaChange
                 {
                     DataSetVersionId = nextVersionId,
-                    PreviousState = null,
-                    CurrentState = LocationOptionMetaChange.State.Create(target)
-                };
-            });
+                    PreviousStateId = oldLocationTuple.LocationMeta.Id,
+                });
+            }
+        }
+
+        foreach (var (locationLevel, newLocationTuple) in newLocationMetas)
+        {
+            if (!oldLocationMetas.TryGetValue(locationLevel, out var oldLocationTuple))
+            {
+                // Location added
+                locationMetaChanges.Add(new LocationMetaChange
+                {
+                    DataSetVersionId = nextVersionId,
+                    CurrentStateId = newLocationTuple.LocationMeta.Id
+                });
+
+                foreach (var (_, newOptionLink) in newLocationTuple.OptionLinks)
+                {
+                    // Location option added
+                    locationOptionMetaChanges.Add(new LocationOptionMetaChange
+                    {
+                        DataSetVersionId = nextVersionId,
+                        CurrentState = LocationOptionMetaChange.State.Create(newOptionLink)
+                    });
+                }
+            }
+            else
+            {
+                foreach (var (optionPublicId, newOptionLink) in newLocationTuple.OptionLinks)
+                {
+                    if (!oldLocationTuple.OptionLinks.ContainsKey(optionPublicId))
+                    {
+                        // Location option added
+                        locationOptionMetaChanges.Add(new LocationOptionMetaChange
+                        {
+                            DataSetVersionId = nextVersionId,
+                            CurrentState = LocationOptionMetaChange.State.Create(newOptionLink)
+                        });
+                    }
+                }
+            }
+        }
 
         publicDataDbContext.LocationMetaChanges.AddRange(locationMetaChanges);
-        publicDataDbContext.LocationOptionMetaChanges.AddRange([
-            .. locationOptionMetaDeletionsAndChanges, .. locationOptionMetaAdditions
-        ]);
+        publicDataDbContext.LocationOptionMetaChanges.AddRange(locationOptionMetaChanges);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private static bool IsLocationOptionEqual(LocationOptionMeta locationOptionMeta1, LocationOptionMeta locationOptionMeta2)
+    {
+        return locationOptionMeta1.Label == locationOptionMeta2.Label;
     }
 
     private async Task CreateGeographicLevelChange(
@@ -369,10 +367,10 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             .ThenInclude(l => l.Option)
             .Where(m => m.DataSetVersionId == dataSetVersionId)
             .ToDictionaryAsync(
-                MappingKeyGenerators.Filter,
+                m => m.PublicId,
                 m => (
                     FilterMeta: m,
-                    OptionLinks: m.OptionLinks.ToDictionary(l => MappingKeyGenerators.FilterOptionMetaLink(l))
+                    OptionLinks: m.OptionLinks.ToDictionary(l => l.PublicId)
                 ),
                 cancellationToken);
     }
@@ -411,7 +409,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                 lm =>
                 (
                     LocationMeta: lm,
-                    OptionLinks: lm.OptionLinks.ToDictionary(l => MappingKeyGenerators.LocationOptionMetaLink(l))
+                    OptionLinks: lm.OptionLinks.ToDictionary(l => l.PublicId)
                 ),
                 cancellationToken);
     }
