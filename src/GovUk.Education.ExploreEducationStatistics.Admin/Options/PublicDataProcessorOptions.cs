@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Settings;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Options;
 
 internal class PublicDataProcessorOptions
 {
