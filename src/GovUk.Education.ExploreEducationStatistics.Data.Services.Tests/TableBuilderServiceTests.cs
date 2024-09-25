@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -424,19 +425,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         }
                     });
 
-                var options = Options.Create(new TableBuilderOptions
+                var options = new TableBuilderOptions
                 {
                     // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
                     // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
                     // Configure a maximum table size limit lower than 8.
                     MaxTableCellsAllowed = 7
-                });
+                };
 
                 var service = BuildTableBuilderService(
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext,
                     filterItemRepository: filterItemRepository.Object,
-                    tableBuilderOptions: options
+                    tableBuilderOptions: options.ToOptionsWrapper()
                 );
 
                 var result = await service.Query(query);
@@ -788,18 +789,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         }
                     });
 
-                var options = Options.Create(new TableBuilderOptions
+                var options = new TableBuilderOptions
                 {
                     // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
                     // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
                     // Configure a maximum table size limit lower than 8.
                     MaxTableCellsAllowed = 7
-                });
+                };
 
                 var service = BuildTableBuilderService(
                     statisticsDbContext: statisticsDbContext,
                     filterItemRepository: filterItemRepository.Object,
-                    tableBuilderOptions: options
+                    tableBuilderOptions: options.ToOptionsWrapper()
                 );
 
                 var result = await service.Query(releaseSubject.ReleaseVersionId, query, null);
@@ -1155,19 +1156,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         }
                     });
 
-                var options = Options.Create(new TableBuilderOptions
+                var options = new TableBuilderOptions
                 {
                     // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
                     // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
                     // Configure a maximum table size limit lower than 8.
                     MaxTableCellsAllowed = 7
-                });
+                };
 
                 var service = BuildTableBuilderService(
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext,
                     filterItemRepository: filterItemRepository.Object,
-                    tableBuilderOptions: options
+                    tableBuilderOptions: options.ToOptionsWrapper()
                 );
 
                 using var stream = new MemoryStream();
@@ -1657,13 +1658,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         }
                     });
 
-                var options = Options.Create(new TableBuilderOptions
+                var options = new TableBuilderOptions
                 {
                     // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
                     // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
                     // Configure a maximum table size limit lower than 8.
                     MaxTableCellsAllowed = 7
-                });
+                }.ToOptionsWrapper();
 
                 var service = BuildTableBuilderService(
                     statisticsDbContext: statisticsDbContext,
@@ -1683,15 +1684,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private static IOptions<TableBuilderOptions> DefaultTableBuilderOptions()
         {
-            return Options.Create(new TableBuilderOptions
-            {
-                MaxTableCellsAllowed = 25000
-            });
+            return new TableBuilderOptions { MaxTableCellsAllowed = 25000 }.ToOptionsWrapper();
         }
 
         private static IOptions<LocationsOptions> DefaultLocationOptions()
         {
-            return Options.Create(new LocationsOptions
+            return new LocationsOptions
             {
                 Hierarchies = new()
                 {
@@ -1699,7 +1697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     { GeographicLevel.LocalAuthorityDistrict, ["Region"] },
                     { GeographicLevel.School, ["LocalAuthority"] },
                 }
-            });
+            }.ToOptionsWrapper();
         }
 
         private static TableBuilderService BuildTableBuilderService(

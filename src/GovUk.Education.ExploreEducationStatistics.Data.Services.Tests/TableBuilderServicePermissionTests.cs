@@ -13,6 +13,8 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
@@ -133,8 +135,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
                 userService ?? Mock.Of<IUserService>(Strict),
                 releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict),
-                tableBuilderOptions ?? Options.Create(new TableBuilderOptions()),
-                locationsOptions ?? Options.Create(new LocationsOptions())
+                tableBuilderOptions ?? new TableBuilderOptions().ToOptionsWrapper(),
+                locationsOptions ?? new LocationsOptions().ToOptionsWrapper()
             );
         }
 

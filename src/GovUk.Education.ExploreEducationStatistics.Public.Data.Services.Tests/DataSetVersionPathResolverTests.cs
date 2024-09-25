@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -227,7 +228,7 @@ public abstract class DataSetVersionPathResolverTests
         IWebHostEnvironment? webHostEnvironment = null)
     {
         return new DataSetVersionPathResolver(
-            new OptionsWrapper<DataFilesOptions>(options),
+            options.ToOptionsWrapper(),
             webHostEnvironment ?? _webHostEnvironmentMock.Object
         );
     }

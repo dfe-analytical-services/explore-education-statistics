@@ -126,6 +126,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Security;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -360,14 +361,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 configuration.GetRequiredSection(PublicDataProcessorOptions.Section));
             services.Configure<PublicDataApiOptions>(
                 configuration.GetRequiredSection(PublicDataApiOptions.Section));
-            services.Configure<PreReleaseOptions>(configuration);
-            services.Configure<LocationsOptions>(configuration.GetRequiredSection(LocationsOptions.Locations));
+            services.Configure<PreReleaseAccessOptions>(
+                configuration.GetRequiredSection(PreReleaseAccessOptions.Section));
+            services.Configure<LocationsOptions>(
+                configuration.GetRequiredSection(LocationsOptions.Section));
             services.Configure<ReleaseApprovalOptions>(
-                configuration.GetRequiredSection(ReleaseApprovalOptions.ReleaseApproval));
-            services.Configure<TableBuilderOptions>(configuration.GetRequiredSection(TableBuilderOptions.TableBuilder));
+                configuration.GetRequiredSection(ReleaseApprovalOptions.Section));
+            services.Configure<TableBuilderOptions>(
+                configuration.GetRequiredSection(TableBuilderOptions.Section));
+            services.Configure<OpenIdConnectSpaClientOptions>(
+                configuration.GetSection(OpenIdConnectSpaClientOptions.Section));
+
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-            services.Configure<OpenIdConnectSpaClientOptions>(configuration.GetSection(
-                OpenIdConnectSpaClientOptions.OpenIdConnectSpaClient));
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 

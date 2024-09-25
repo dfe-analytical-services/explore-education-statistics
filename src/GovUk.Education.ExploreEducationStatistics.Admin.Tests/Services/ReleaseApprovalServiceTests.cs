@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -385,17 +386,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new DateTimeProvider(DateTime.Parse("2023-01-01T00:00:00Z", styles: DateTimeStyles.RoundtripKind));
 
             // Set up the cron schedules for publishing
-            var options = Options.Create(new ReleaseApprovalOptions
+            var options = new ReleaseApprovalOptions
             {
                 PublishReleasesCronSchedule = "0 0 0 * * *", // Next occurrence 2023-01-01T00:00:00Z
                 PublishReleaseContentCronSchedule = "0 30 9 * * *" // Next occurrence 2023-01-01T09:30:00Z
-            });
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(context,
                     dateTimeProvider: dateTimeProvider,
-                    options: options);
+                    options: options.ToOptionsWrapper());
 
                 // Request a publish day which is earlier than today
                 var result = await releaseService
@@ -450,17 +451,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new DateTimeProvider(DateTime.Parse("2023-06-06T23:00:00Z", styles: DateTimeStyles.RoundtripKind));
 
             // Set up the cron schedules for publishing
-            var options = Options.Create(new ReleaseApprovalOptions
+            var options = new ReleaseApprovalOptions
             {
                 PublishReleasesCronSchedule = "0 0 0 * * *", // Next occurrence 2023-06-06T23:00:00Z
                 PublishReleaseContentCronSchedule = "0 30 9 * * *" // Next occurrence 2023-06-07T08:30:00Z
-            });
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(context,
                     dateTimeProvider: dateTimeProvider,
-                    options: options);
+                    options: options.ToOptionsWrapper());
 
                 // Request a publish day which is the same as the UTC day but earlier than the BST day
                 var result = await releaseService
@@ -512,17 +513,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new DateTimeProvider(DateTime.Parse("2023-01-01T01:00:00Z", styles: DateTimeStyles.RoundtripKind));
 
             // Set up the cron schedules for publishing
-            var options = Options.Create(new ReleaseApprovalOptions
+            var options = new ReleaseApprovalOptions
             {
                 PublishReleasesCronSchedule = "0 0 0 * * *", // Next occurrence 2023-01-02T00:00:00Z
                 PublishReleaseContentCronSchedule = "0 30 9 * * *" // Next occurrence 2023-01-01T09:30:00Z
-            });
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(context,
                     dateTimeProvider: dateTimeProvider,
-                    options: options);
+                    options: options.ToOptionsWrapper());
 
                 // Request a publish day which is today
                 var result = await releaseService
@@ -577,17 +578,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new DateTimeProvider(DateTime.Parse("2023-06-06T23:30:00Z", styles: DateTimeStyles.RoundtripKind));
 
             // Set up the cron schedules for publishing
-            var options = Options.Create(new ReleaseApprovalOptions
+            var options = new ReleaseApprovalOptions
             {
                 PublishReleasesCronSchedule = "0 0 0 * * *", // Next occurrence 2023-06-07T23:00:00Z
                 PublishReleaseContentCronSchedule = "0 30 9 * * *" // Next occurrence 2023-06-07T08:30:00Z
-            });
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(context,
                     dateTimeProvider: dateTimeProvider,
-                    options: options);
+                    options: options.ToOptionsWrapper());
 
                 // Request a publish day which is today
                 var result = await releaseService
@@ -639,17 +640,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new DateTimeProvider(DateTime.Parse("2023-01-01T12:00:00Z", styles: DateTimeStyles.RoundtripKind));
 
             // Set up the cron schedules for publishing
-            var options = Options.Create(new ReleaseApprovalOptions
+            var options = new ReleaseApprovalOptions
             {
                 PublishReleasesCronSchedule = "0 0 0 * * 1-5", // Only occurs on weekdays Monday - Friday
                 PublishReleaseContentCronSchedule = "0 30 9 * * 1-5" // Only occurs on weekdays Monday - Friday
-            });
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(context,
                     dateTimeProvider: dateTimeProvider,
-                    options: options);
+                    options: options.ToOptionsWrapper());
 
                 // Request a publish day in the future which has no scheduled occurrence
                 var result = await releaseService
@@ -703,17 +704,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // Set up cron schedules for publishing hourly on specific minutes in a way that the first function
             // will have an occurrence on the day, but not the second
-            var options = Options.Create(new ReleaseApprovalOptions
+            var options = new ReleaseApprovalOptions
             {
                 PublishReleasesCronSchedule = "0 30 * * * *", // Occurs hourly at minute 30
                 PublishReleaseContentCronSchedule = "0 15 * * * *" // Occurs hourly at minute 15
-            });
+            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(context,
                     dateTimeProvider: dateTimeProvider,
-                    options: options);
+                    options: options.ToOptionsWrapper());
 
                 var result = await releaseService
                     .CreateReleaseStatus(
@@ -2250,11 +2251,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static IOptions<ReleaseApprovalOptions> DefaultReleaseApprovalOptions()
         {
-            return Options.Create(new ReleaseApprovalOptions
+            return new ReleaseApprovalOptions
             {
                 PublishReleasesCronSchedule = "0 0 0 * * *",
                 PublishReleaseContentCronSchedule = "0 30 9 * * *"
-            });
+            }.ToOptionsWrapper();
         }
 
         private ReleaseApprovalService BuildService(

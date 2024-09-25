@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
@@ -32,8 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var mainConfiguration = GetConfiguration();
             var openIdConnectSpaClientConfig = new OpenIdConnectSpaClientOptions();
-            mainConfiguration.Bind("OpenIdConnectSpaClient", openIdConnectSpaClientConfig);
-            var openIdConnectSpaClientOptions = Options.Create(openIdConnectSpaClientConfig);
+            mainConfiguration.Bind(OpenIdConnectSpaClientOptions.Section, openIdConnectSpaClientConfig);
+            var openIdConnectSpaClientOptions = openIdConnectSpaClientConfig.ToOptionsWrapper();
 
             var controller = new ConfigurationController(GetConfiguration(), openIdConnectSpaClientOptions);
             var result = controller.GetConfig();
