@@ -2607,7 +2607,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        private static OptionsWrapper<LocationsOptions> DefaultLocationOptions()
+        private static IOptions<LocationsOptions> DefaultLocationOptions()
         {
             return new LocationsOptions().ToOptionsWrapper();
         }

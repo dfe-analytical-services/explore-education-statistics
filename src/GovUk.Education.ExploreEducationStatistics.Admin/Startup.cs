@@ -1,6 +1,5 @@
 #nullable enable
 using FluentValidation;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
@@ -357,6 +356,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Configuration options
              */
 
+            services.Configure<AppOptions>(
+                configuration.GetRequiredSection(AppOptions.Section));
+            services.Configure<AppInsightsOptions>(
+                configuration.GetSection(AppInsightsOptions.Section));
+            services.Configure<NotifyOptions>(
+                configuration.GetSection(NotifyOptions.Section));
             services.Configure<PublicDataProcessorOptions>(
                 configuration.GetRequiredSection(PublicDataProcessorOptions.Section));
             services.Configure<PublicDataApiOptions>(
@@ -506,14 +511,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddTransient<INotificationClient>(s =>
             {
-                var notifyApiKey = configuration.GetValue<string>("NotifyApiKey");
+                var notifyOptions = s.GetRequiredService<IOptions<NotifyOptions>>();
+
+                var notifyApiKey = notifyOptions.Value.ApiKey;
 
                 if (!hostEnvironment.IsDevelopment() && !hostEnvironment.IsIntegrationTest())
                 {
                     return new NotificationClient(notifyApiKey);
                 }
 
-                if (notifyApiKey != null && notifyApiKey != "change-me")
+                if (!notifyApiKey.IsNullOrEmpty())
                 {
                     return new NotificationClient(notifyApiKey);
                 }
@@ -601,7 +608,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Swagger
              */
 
-            if (configuration.GetValue<bool>("enableSwagger"))
+            if (configuration.GetValue<bool>("App:EnableSwagger"))
                 services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1",
@@ -677,7 +684,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             app.UseResponseCompression();
 
-            if (configuration.GetValue<bool>("enableSwagger"))
+            if (configuration.GetValue<bool>("App:EnableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>

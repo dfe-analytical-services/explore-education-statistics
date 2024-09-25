@@ -3,11 +3,13 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
@@ -15,7 +17,6 @@ using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
@@ -177,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             IUserPublicationInviteRepository? userPublicationInviteRepository = null,
             UserManager<ApplicationUser>? userManager = null,
-            bool? enableDeletion = false)
+            bool enableDeletion = false)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -194,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
                 userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
                 userManager ?? MockUserManager().Object,
-                CreateMockConfiguration(TupleOf("enableThemeDeletion", enableDeletion + "")).Object
+                new AppOptions { EnableThemeDeletion = enableDeletion }.ToOptionsWrapper()
             );
         }
     }

@@ -390,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
-        private static OptionsWrapper<LocationsOptions> DefaultLocationsOptions()
+        private static IOptions<LocationsOptions> DefaultLocationsOptions()
         {
             return new LocationsOptions().ToOptionsWrapper();
         }

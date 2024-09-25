@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -15,10 +16,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -1771,53 +1771,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
-        private static Mock<IConfiguration> DefaultConfigurationMock()
+        private static IOptions<AppOptions> DefaultAppOptions()
         {
-            return CreateMockConfiguration(
-                TupleOf("NotifyPreReleaseTemplateId", PreReleaseTemplateId));
+            return new AppOptions { Url = "http://localhost" }.ToOptionsWrapper();
         }
 
-        private static Mock<IHttpContextAccessor> DefaultHttpContextAccessorMock()
+        private static IOptions<NotifyOptions> DefaultNotifyOptions()
         {
-            var httpContextAccessor = new Mock<IHttpContextAccessor>(MockBehavior.Strict);
-            var context = new DefaultHttpContext();
-            context.Request.Scheme = "http";
-            context.Request.Host = new HostString("localhost");
-
-            httpContextAccessor
-                .SetupGet(m => m.HttpContext)
-                .Returns(context);
-
-            return httpContextAccessor;
+            return new NotifyOptions { PreReleaseTemplateId = PreReleaseTemplateId }.ToOptionsWrapper();
         }
 
         private static PreReleaseUserService SetupPreReleaseUserService(
             ContentDbContext context,
             UsersAndRolesDbContext usersAndRolesDbContext,
-            IConfiguration? configuration = null,
             IEmailService? emailService = null,
+            IOptions<AppOptions>? appOptions = null,
+            IOptions<NotifyOptions>? notifyOptions = null,
             IPreReleaseService? preReleaseService = null,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IUserService? userService = null,
             IUserRepository? userRepository = null,
             IUserInviteRepository? userInviteRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-            IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-            IHttpContextAccessor? httpContextAccessor = null)
+            IUserReleaseInviteRepository? userReleaseInviteRepository = null)
         {
             return new(
                 context,
                 usersAndRolesDbContext,
-                configuration ?? DefaultConfigurationMock().Object,
                 emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
+                appOptions ?? DefaultAppOptions(),
+                notifyOptions ?? DefaultNotifyOptions(),
                 preReleaseService ?? Mock.Of<IPreReleaseService>(MockBehavior.Strict),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object,
                 userRepository ?? new UserRepository(context),
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(context),
-                userReleaseInviteRepository ?? new UserReleaseInviteRepository(context),
-                httpContextAccessor ?? DefaultHttpContextAccessorMock().Object
+                userReleaseInviteRepository ?? new UserReleaseInviteRepository(context)
             );
         }
     }

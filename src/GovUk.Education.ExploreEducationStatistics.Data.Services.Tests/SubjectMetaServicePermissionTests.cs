@@ -209,7 +209,7 @@ public class SubjectMetaServicePermissionTests
         );
     }
 
-    private static OptionsWrapper<LocationsOptions> DefaultLocationOptions()
+    private static IOptions<LocationsOptions> DefaultLocationOptions()
     {
         return new LocationsOptions().ToOptionsWrapper();
     }
