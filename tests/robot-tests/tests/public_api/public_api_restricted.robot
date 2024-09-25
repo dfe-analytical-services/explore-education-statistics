@@ -183,7 +183,7 @@ Create a new API dataset version through the first amendment using the invalid s
 
 User waits until the 2nd invalid API dataset status changes to 'Failed'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    20x    5s    Verify status of API Datasets    Failed
+    wait until keyword succeeds    20x    1s    Verify status of API Datasets    Failed
 
 Verify the contents inside the 'Draft API datasets' table after the invalid import fails
     user clicks link    Back to API data sets

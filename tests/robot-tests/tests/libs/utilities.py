@@ -66,8 +66,6 @@ def enable_basic_auth_headers():
         token = base64.b64encode(f"{public_auth_user}:{public_auth_password}".encode())
 
         try:
-            # Must refetch sl() on rerun or sl().driver is None!
-            # sl() = BuiltIn().get_library_instance("SeleniumLibrary")
             assert sl().driver is not None, "sl().driver is None"
             sl().driver.execute_cdp_cmd("Network.enable", {})
 
@@ -333,7 +331,8 @@ def capture_screenshots_and_html():
 def capture_html():
     html = sl().get_source()
     current_time_millis = round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
-    html_file = open(f"test-results/captured-html-{current_time_millis}.html", "w", encoding="utf-8")
+    output_dir = BuiltIn().get_variable_value('${OUTPUT DIR}')
+    html_file = open(f"{output_dir}{os.sep}captured-html-{current_time_millis}.html", "w", encoding="utf-8")
     html_file.write(html)
     html_file.close()
     logger.warn(f"Captured HTML of {sl().get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
