@@ -10,13 +10,13 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 {
-    public class TokenService(IOptions<AppSettingsOptions> appSettingsOptions) : ITokenService
+    public class TokenService(IOptions<AppOptions> appOptions) : ITokenService
     {
-        private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+        private readonly AppOptions _appOptions = appOptions.Value;
 
         public string GenerateToken(string email, DateTime expiryDateTime)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettingsOptions.TokenSecretKey));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appOptions.TokenSecretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var secToken = new JwtSecurityToken(
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
         public string? GetEmailFromToken(string authToken)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var validationParameters = GetValidationParameters(_appSettingsOptions.TokenSecretKey);
+            var validationParameters = GetValidationParameters(_appOptions.TokenSecretKey);
             string? email = null;
 
             try

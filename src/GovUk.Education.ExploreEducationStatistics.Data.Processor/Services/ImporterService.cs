@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class ImporterService : IImporterService
     {
-        private readonly AppSettingsOptions _appSettingsOptions;
+        private readonly AppOptions _appOptions;
         private readonly IGuidGenerator _guidGenerator;
         private readonly ImporterLocationService _importerLocationService;
         private readonly IImporterMetaService _importerMetaService;
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private const int Stage2RowCheck = 1000;
 
         public ImporterService(
-            IOptions<AppSettingsOptions> appSettingsOptions,
+            IOptions<AppOptions> appOptions,
             IGuidGenerator guidGenerator,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IDatabaseHelper databaseHelper,
             IObservationBatchImporter? observationBatchImporter = null)
         {
-            _appSettingsOptions = appSettingsOptions.Value;
+            _appOptions = appOptions.Value;
             _guidGenerator = guidGenerator;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Subject subject,
             StatisticsDbContext context)
         {
-            var importObservationsBatchSize = _appSettingsOptions.RowsPerBatch;
+            var importObservationsBatchSize = _appOptions.RowsPerBatch;
             var soleGeographicLevel = import.HasSoleGeographicLevel();
             var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
             var totalBatches = Math.Ceiling((decimal)import.TotalRows!.Value / importObservationsBatchSize);

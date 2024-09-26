@@ -43,9 +43,9 @@ public abstract class NotifierFunctionsIntegrationTest
         return fixture.StorageConnectionString();
     }
 
-    protected AppSettingsOptions GetAppSettingsOptions()
+    protected AppOptions GetAppOptions()
     {
-        return GetRequiredService<IOptions<AppSettingsOptions>>().Value;
+        return GetRequiredService<IOptions<AppOptions>>().Value;
     }
 
     protected GovUkNotifyOptions GetGovUkNotifyOptions()
@@ -147,7 +147,7 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
                     .AddInMemoryCollection(new Dictionary<string, string?>
                     {
                         {
-                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.NotifierStorageConnectionString)}",
+                            $"{AppOptions.Section}:{nameof(AppOptions.NotifierStorageConnectionString)}",
                             StorageConnectionString()
                         }
                     });

@@ -1,8 +1,8 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 
-public class AppSettingsOptions
+public class AppOptions
 {
-    public const string Section = "AppSettings";
+    public const string Section = "App";
 
     /// <summary>
     /// The host URL of the public API.

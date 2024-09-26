@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
 public class PublicationSubscriptionFunctions(
     ILogger<PublicationSubscriptionFunctions> logger,
-    IOptions<AppSettingsOptions> appSettingsOptions,
+    IOptions<AppOptions> appOptions,
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
     ITokenService tokenService,
     IEmailService emailService,
@@ -31,7 +31,7 @@ public class PublicationSubscriptionFunctions(
     INotifierTableStorageService notifierTableStorageService,
     ISubscriptionRepository subscriptionRepository)
 {
-    private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+    private readonly AppOptions _appOptions = appOptions.Value;
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
 
     private static class FunctionNames
@@ -83,7 +83,7 @@ public class PublicationSubscriptionFunctions(
                             { "publication_name", subscription.Entity.Title },
                             {
                                 "unsubscribe_link",
-                                $"{_appSettingsOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                                $"{_appOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-unsubscription/{unsubscribeToken}"
                             }
                         };
 
@@ -118,7 +118,7 @@ public class PublicationSubscriptionFunctions(
                         { "publication_name", req.Title },
                         {
                             "verification_link",
-                            $"{_appSettingsOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-subscription/{activationCode}"
+                            $"{_appOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-subscription/{activationCode}"
                         }
                     };
 
@@ -256,7 +256,7 @@ public class PublicationSubscriptionFunctions(
             { "publication_name", newSubscription.Title },
             {
                 "unsubscribe_link",
-                $"{_appSettingsOptions.PublicAppUrl}/subscriptions/{newSubscription.Slug}/confirm-unsubscription/{unsubscribeToken}"
+                $"{_appOptions.PublicAppUrl}/subscriptions/{newSubscription.Slug}/confirm-unsubscription/{unsubscribeToken}"
             }
         };
 

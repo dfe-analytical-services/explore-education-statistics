@@ -38,7 +38,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task SendsSubscriptionVerificationEmail()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -94,7 +94,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task DoesNotSendEmailAgainIfSubIsPending()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -163,7 +163,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task SendsConfirmationEmailIfUserAlreadySubscribed()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -233,7 +233,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Id_Is_Blank()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -278,7 +278,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Title_Is_Blank()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -323,7 +323,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Email_Is_Blank()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -368,7 +368,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Slug_Is_Blank()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -414,7 +414,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task SendsSubscriptionConfirmationEmail()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
         {
            NotifierStorageConnectionString = StorageConnectionString(),
         }));
@@ -479,7 +479,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task Unsubscribes()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
         {
            NotifierStorageConnectionString = StorageConnectionString(),
         }));
@@ -550,7 +550,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         INotifierTableStorageService? notifierTableStorageService = null) =>
         new(
             logger: Mock.Of<ILogger<PublicationSubscriptionFunctions>>(),
-            appSettingsOptions: Options.Create(new AppSettingsOptions { PublicAppUrl = "https://localhost:3000" }),
+            appOptions: Options.Create(new AppOptions { PublicAppUrl = "https://localhost:3000" }),
             govUkNotifyOptions: Options.Create(new GovUkNotifyOptions
             {
                 ApiKey = "",

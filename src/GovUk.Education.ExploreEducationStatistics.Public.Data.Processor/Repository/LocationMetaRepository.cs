@@ -22,10 +22,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public class LocationMetaRepository(
     PublicDataDbContext publicDataDbContext,
-    IOptions<AppSettingsOptions> appSettingsOptions,
+    IOptions<AppOptions> appOptions,
     IDataSetVersionPathResolver dataSetVersionPathResolver) : ILocationMetaRepository
 {
-    private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+    private readonly AppOptions _appOptions = appOptions.Value;
 
     public async Task<IDictionary<LocationMeta, List<LocationOptionMetaRow>>> ReadLocationMetas(
         IDuckDbConnection duckDbConnection,
@@ -78,7 +78,7 @@ public class LocationMetaRepository(
             {
                 var batch = options
                     .Skip(current)
-                    .Take(_appSettingsOptions.MetaInsertBatchSize)
+                    .Take(_appOptions.MetaInsertBatchSize)
                     .ToList();
 
                 // We create a 'row key' for each option that allows us to quickly
@@ -147,7 +147,7 @@ public class LocationMetaRepository(
                 publicDataDbContext.LocationOptionMetaLinks.AddRange(links);
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-                current += _appSettingsOptions.MetaInsertBatchSize;
+                current += _appOptions.MetaInsertBatchSize;
             }
 
             var insertedLinks = await publicDataDbContext.LocationOptionMetaLinks

@@ -114,7 +114,7 @@ public class ProcessorStage1Tests
         var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingsOptions()),
+            Options.Create(new AppOptions()),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,

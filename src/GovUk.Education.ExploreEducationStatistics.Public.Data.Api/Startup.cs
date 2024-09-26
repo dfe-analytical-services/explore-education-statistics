@@ -177,8 +177,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // Options - only need to add ones that will be used in services
 
-        services.AddOptions<AppSettingsOptions>()
-            .Bind(configuration.GetRequiredSection(AppSettingsOptions.Section));
+        services.AddOptions<AppOptions>()
+            .Bind(configuration.GetRequiredSection(AppOptions.Section));
         services.AddOptions<ContentApiOptions>()
             .Bind(configuration.GetRequiredSection(ContentApiOptions.Section));
         services.AddOptions<DataFilesOptions>()
