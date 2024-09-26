@@ -1,5 +1,5 @@
 #nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Configuration;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 
 public class AppOptions
 {

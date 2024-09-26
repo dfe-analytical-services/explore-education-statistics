@@ -4,14 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
@@ -38,10 +37,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task SendsSubscriptionVerificationEmail()
     {
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -102,10 +100,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 DateTime.UtcNow));
 
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -168,10 +165,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 DateTime.UtcNow.AddDays(-4)));
 
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -226,10 +222,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Id_Is_Blank()
     {
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -271,10 +266,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Title_Is_Blank()
     {
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -316,10 +310,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Email_Is_Blank()
     {
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -361,10 +354,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Slug_Is_Blank()
     {
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -416,10 +408,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
 
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -477,10 +468,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
 
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -534,12 +524,12 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         IPublicationSubscriptionRepository? publicationSubscriptionRepository = null) =>
         new(
             Mock.Of<ILogger<PublicationSubscriptionFunctions>>(),
-            Options.Create(new AppOptions { PublicAppUrl = "https://localhost:3000" }),
-            Options.Create(new GovUkNotifyOptions
+            new AppOptions { PublicAppUrl = "https://localhost:3000" }.ToOptionsWrapper(),
+            new GovUkNotifyOptions
             {
                 ApiKey = "",
                 EmailTemplates = EmailTemplateOptions
-            }),
+            }.ToOptionsWrapper(),
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             publicationSubscriptionRepository ?? Mock.Of<IPublicationSubscriptionRepository>(MockBehavior.Strict),

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -404,7 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
         private static IOptions<AppOptions> DefaultAppOptions()
         {
-            return Options.Create(new AppOptions
+            return new AppOptions
             {
                 PrivateStorageConnectionString = string.Empty,
                 PublicStorageConnectionString = PublicStorageConnectionString,
@@ -412,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublisherStorageConnectionString = string.Empty,
                 PublishReleaseContentCronSchedule = string.Empty,
                 PublishReleasesCronSchedule = string.Empty
-            });
+            }.ToOptionsWrapper();
         }
     }
 }
