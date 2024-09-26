@@ -20,7 +20,7 @@ export default function CodeBlock({
     const resetTimeout = setTimeout(toggleCopied.off, 5000);
 
     return () => {
-      if (copied === true) {
+      if (copied) {
         clearTimeout(resetTimeout);
       }
     };
@@ -35,7 +35,7 @@ export default function CodeBlock({
           toggleCopied.on();
         }}
       >
-        {copied ? <span aria-live="polite">Code copied</span> : 'Copy Code'}
+        {copied ? <span aria-live="polite">Code copied</span> : 'Copy code'}
       </Button>
       <SyntaxHighlighter
         className={styles.pre}
