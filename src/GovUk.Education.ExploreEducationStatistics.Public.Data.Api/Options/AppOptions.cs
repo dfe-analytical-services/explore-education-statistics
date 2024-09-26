@@ -7,5 +7,5 @@ public class AppOptions
     /// <summary>
     /// The host URL of the public API.
     /// </summary>
-    public string HostUrl { get; init; } = string.Empty;
+    public string Url { get; init; } = string.Empty;
 }

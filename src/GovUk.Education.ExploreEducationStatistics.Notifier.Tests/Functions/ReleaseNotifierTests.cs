@@ -21,7 +21,7 @@ public class ReleaseNotifierTests
 {
     private static readonly AppOptions AppOptions = new()
     {
-        BaseUrl = "https://notifier.func/api",
+        Url = "https://notifier.func/api",
         PublicAppUrl = "https://public.app"
     };
 
