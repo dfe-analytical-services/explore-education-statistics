@@ -162,7 +162,7 @@ public class PublicationSubscriptionFunctions(
 
     [Function(FunctionNames.Unsubscribe)]
     public async Task<IActionResult> Unsubscribe(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/unsubscribe/{token}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/unsubscribe/{token}")] // @MarkFix I want the supersededPublicationIds here
         FunctionContext context,
         string publicationId,
         string token)
