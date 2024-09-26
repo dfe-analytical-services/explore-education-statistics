@@ -9,9 +9,9 @@ using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 
-public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appSettingsOptions) : IPublicationSubscriptionRepository
+public class PublicationSubscriptionRepository(IOptions<AppOptions> appOptions) : IPublicationSubscriptionRepository
 {
-    private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+    private readonly AppOptions _appOptions = appOptions.Value;
 
     public async Task UpdateSubscriber(CloudTable table, SubscriptionEntity subscription)
     {
@@ -40,7 +40,7 @@ public class PublicationSubscriptionRepository(IOptions<AppSettingsOptions> appS
 
     public async Task<CloudTable> GetTable(string storageTableName)
     {
-        var storageAccount = CloudStorageAccount.Parse(_appSettingsOptions.NotifierStorageConnectionString);
+        var storageAccount = CloudStorageAccount.Parse(_appOptions.NotifierStorageConnectionString);
         var tableClient = storageAccount.CreateCloudTableClient();
         var table = tableClient.GetTableReference(storageTableName);
         await table.CreateIfNotExistsAsync();

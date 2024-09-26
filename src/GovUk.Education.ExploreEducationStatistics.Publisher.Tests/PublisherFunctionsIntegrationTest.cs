@@ -79,19 +79,19 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
                     .AddInMemoryCollection(new Dictionary<string, string?>
                     {
                         {
-                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.PrivateStorageConnectionString)}",
+                            $"{AppOptions.Section}:{nameof(AppOptions.PrivateStorageConnectionString)}",
                             _azuriteContainer.GetConnectionString()
                         },
                         {
-                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.PublicStorageConnectionString)}",
+                            $"{AppOptions.Section}:{nameof(AppOptions.PublicStorageConnectionString)}",
                             _azuriteContainer.GetConnectionString()
                         },
                         {
-                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.NotifierStorageConnectionString)}",
+                            $"{AppOptions.Section}:{nameof(AppOptions.NotifierStorageConnectionString)}",
                             _azuriteContainer.GetConnectionString()
                         },
                         {
-                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.PublisherStorageConnectionString)}",
+                            $"{AppOptions.Section}:{nameof(AppOptions.PublisherStorageConnectionString)}",
                             _azuriteContainer.GetConnectionString()
                         }
                     });

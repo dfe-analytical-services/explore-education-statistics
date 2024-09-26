@@ -389,7 +389,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             IPublicBlobStorageService? publicBlobStorageService = null,
             IMethodologyService? methodologyService = null,
             IReleaseService? releaseService = null,
-            IOptions<AppSettingsOptions>? appSettingsOptions = null,
+            IOptions<AppOptions>? appOptions = null,
             ILogger<PublishingService>? logger = null)
         {
             return new PublishingService(
@@ -397,14 +397,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(MockBehavior.Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(MockBehavior.Strict),
                 releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict),
-                appSettingsOptions ?? DefaultAppSettingsOptions(),
+                appOptions ?? DefaultAppOptions(),
                 logger ?? Mock.Of<ILogger<PublishingService>>()
             );
         }
 
-        private static IOptions<AppSettingsOptions> DefaultAppSettingsOptions()
+        private static IOptions<AppOptions> DefaultAppOptions()
         {
-            return Options.Create(new AppSettingsOptions
+            return Options.Create(new AppOptions
             {
                 PrivateStorageConnectionString = string.Empty,
                 PublicStorageConnectionString = PublicStorageConnectionString,

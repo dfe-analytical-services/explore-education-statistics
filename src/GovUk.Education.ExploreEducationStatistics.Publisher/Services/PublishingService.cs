@@ -20,11 +20,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         IPublicBlobStorageService publicBlobStorageService,
         IMethodologyService methodologyService,
         IReleaseService releaseService,
-        IOptions<AppSettingsOptions> appSettingsOptions,
+        IOptions<AppOptions> appOptions,
         ILogger<PublishingService> logger)
         : IPublishingService
     {
-        private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+        private readonly AppOptions _appOptions = appOptions.Value;
 
         public async Task PublishStagedReleaseContent()
         {
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     destinationDirectoryPath: destinationDirectoryPath,
                     new IBlobStorageService.CopyDirectoryOptions
                     {
-                        DestinationConnectionString = _appSettingsOptions.PublicStorageConnectionString,
+                        DestinationConnectionString = _appOptions.PublicStorageConnectionString,
                         ShouldTransferCallbackAsync = (source, _) =>
                             // Filter by blobs with matching file paths
                             TransferBlobIfFileExistsCallback(
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 destinationDirectoryPath: directoryPath,
                 new IBlobStorageService.CopyDirectoryOptions
                 {
-                    DestinationConnectionString = _appSettingsOptions.PublicStorageConnectionString,
+                    DestinationConnectionString = _appOptions.PublicStorageConnectionString,
                     ShouldTransferCallbackAsync = (source, _) =>
                         // Filter by blobs with matching file paths
                         TransferBlobIfFileExistsCallback(

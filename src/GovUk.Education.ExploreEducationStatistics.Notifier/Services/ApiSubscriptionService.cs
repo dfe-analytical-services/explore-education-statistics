@@ -25,13 +25,13 @@ using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Notifier.V
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 
 internal class ApiSubscriptionService(
-    IOptions<AppSettingsOptions> appSettingsOptions,
+    IOptions<AppOptions> appOptions,
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
     ITokenService tokenService,
     IEmailService emailService,
     IApiSubscriptionRepository apiSubscriptionRepository) : IApiSubscriptionService
 {
-    private readonly string _publicAppUrl = appSettingsOptions.Value.PublicAppUrl;
+    private readonly string _publicAppUrl = appOptions.Value.PublicAppUrl;
 
     public async Task<Either<ActionResult, ApiSubscriptionViewModel>> RequestPendingSubscription(
         Guid dataSetId,

@@ -38,7 +38,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task SendsSubscriptionVerificationEmail()
     {
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -102,7 +102,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 DateTime.UtcNow));
 
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -168,7 +168,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 DateTime.UtcNow.AddDays(-4)));
 
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -226,7 +226,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Id_Is_Blank()
     {
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -271,7 +271,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Title_Is_Blank()
     {
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -316,7 +316,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Email_Is_Blank()
     {
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -361,7 +361,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Slug_Is_Blank()
     {
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -416,7 +416,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
 
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -477,7 +477,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
 
         // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
@@ -534,7 +534,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         IPublicationSubscriptionRepository? publicationSubscriptionRepository = null) =>
         new(
             Mock.Of<ILogger<PublicationSubscriptionFunctions>>(),
-            Options.Create(new AppSettingsOptions { PublicAppUrl = "https://localhost:3000" }),
+            Options.Create(new AppOptions { PublicAppUrl = "https://localhost:3000" }),
             Options.Create(new GovUkNotifyOptions
             {
                 ApiKey = "",

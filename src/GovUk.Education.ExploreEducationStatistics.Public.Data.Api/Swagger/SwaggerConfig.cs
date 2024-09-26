@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 
 public class SwaggerConfig(
     IApiVersionDescriptionProvider provider,
-    IOptions<AppSettingsOptions> appSettingsOptions)
+    IOptions<AppOptions> appOptions)
     : IConfigureOptions<SwaggerGenOptions>
 {
     public void Configure(SwaggerGenOptions options)
@@ -72,7 +72,7 @@ public class SwaggerConfig(
         options.AddServer(new OpenApiServer
         {
             Description = "API server",
-            Url = appSettingsOptions.Value.HostUrl
+            Url = appOptions.Value.HostUrl
         });
     }
 

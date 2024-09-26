@@ -1,8 +1,8 @@
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 
-public class AppSettingsOptions
+public class AppOptions
 {
-    public const string Section = "AppSettings";
+    public const string Section = "App";
 
     public string BaseUrl { get; init; } = null!;
 

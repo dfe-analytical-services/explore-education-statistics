@@ -1,9 +1,9 @@
 #nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Configuration;
 
-public class AppSettingsOptions
+public class AppOptions
 {
-    public const string Section = "AppSettings";
+    public const string Section = "App";
 
     public string PrivateStorageConnectionString { get; init; } = null!;
 
