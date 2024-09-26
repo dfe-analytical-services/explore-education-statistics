@@ -104,10 +104,12 @@ def user_waits_until_parent_contains_element(
     retries: int = 5, delay: float = 1.0
 ):
     try:
+        timeout_per_retry = timeout / retries if timeout is not None else None
+
         child_locator = _normalise_child_locator(child_locator)
 
         def parent_contains_matching_element() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
+            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout_per_retry, error)
             return element_finder().find(child_locator, required=False, parent=parent_el) is not None
 
         if is_noney(count):
@@ -117,14 +119,14 @@ def user_waits_until_parent_contains_element(
                 delay,
                 parent_contains_matching_element,
                 "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
-                timeout,
+                timeout_per_retry,
                 error,
             )
 
         count = int(count)
 
         def parent_contains_matching_elements() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
+            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout_per_retry, error)
             return len(sl().find_elements(child_locator, parent=parent_el)) == count
 
         retry_or_fail_with_delay(
@@ -133,7 +135,7 @@ def user_waits_until_parent_contains_element(
             delay,
             parent_contains_matching_elements,
             "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (parent_locator, count, child_locator),
-            timeout,
+            timeout_per_retry,
             error,
         )
     except Exception as err:
