@@ -23,13 +23,13 @@ from pabot.pabot import main_program as pabot_run_cli
 from robot import run_cli as robot_run_cli
 from scripts.get_webdriver import get_webdriver
 from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
-from tests.libs.fail_fast import failing_suites_filename, get_failing_test_suites, get_failing_test_suites_relative_paths
+from tests.libs.fail_fast import failing_suites_filename, get_failing_test_suites
 from tests.libs.logger import get_logger
 from tests.libs.slack import SlackService
-from tests.libs.reports import merge_robot_reports, log_report_results
+from tests.libs.reports import merge_robot_reports, log_report_results, create_report_from_output_xml
 
 pabot_suite_names_filename = ".pabotsuitenames"
-results_foldername = "test-results"
+main_results_folder = "test-results"
 seed_data_files_filepath = "tests/files/seed-data-files.zip"
 unzipped_seed_data_folderpath = "tests/files/.unzipped-seed-data-files"
 
@@ -61,7 +61,7 @@ def install_chromedriver(chromedriver_version: str):
     get_webdriver(chromedriver_version)
 
 
-def create_robot_arguments(arguments: argparse.Namespace, results_folder, test_suites_to_run: []) -> []:
+def create_robot_arguments(arguments: argparse.Namespace, results_folder, rerun_failed_suites_xml_file: str) -> []:
     robot_args = [
         "--name",
         "UI Tests",
@@ -89,7 +89,9 @@ def create_robot_arguments(arguments: argparse.Namespace, results_folder, test_s
         # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
         robot_args += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
         robot_args += ["--removekeywords", "name:common.user goes to url"]  # To hide basic auth credentials
-    process_includes_and_excludes(robot_args, arguments, test_suites_to_run)
+    
+    process_includes_and_excludes(robot_args, arguments)
+    
     if arguments.visual:
         robot_args += ["-v", "headless:0"]
     else:
@@ -107,18 +109,15 @@ def create_robot_arguments(arguments: argparse.Namespace, results_folder, test_s
     # to change rerunfailedsuites xml file we use
     robot_args += ["--output", "output.xml"]
 
+    if rerun_failed_suites_xml_file is not None:
+        robot_args += ["--rerunfailedsuites", rerun_failed_suites_xml_file]
+
     robot_args += [arguments.tests]
 
-    logger.error(robot_args)
     return robot_args
 
 
-def process_includes_and_excludes(robot_args:[], arguments: argparse.Namespace, test_suites_to_run: []):
-    if len(test_suites_to_run) > 0:
-        for suite in test_suites_to_run:
-            robot_args += ["--include", suite]
-        return;    
-
+def process_includes_and_excludes(robot_args:[], arguments: argparse.Namespace):
     if arguments.reseed:
         robot_args += ["--include", "SeedDataGeneration"]
     else:
@@ -147,8 +146,8 @@ def create_run_identifier():
 def clear_files_before_test_run(rerunning_failures: bool):
     # Remove any existing test results if running from scratch. Leave in place if re-running failures
     # as we'll need the old results to merge in with the rerun results.
-    if not rerunning_failures and Path(results_foldername).exists():
-        shutil.rmtree(results_foldername)
+    if not rerunning_failures and Path(main_results_folder).exists():
+        shutil.rmtree(main_results_folder)
 
     # Remove any prior failing suites so the new test run is not marking any running test suites as
     # failed already.
@@ -161,11 +160,11 @@ def clear_files_before_test_run(rerunning_failures: bool):
         os.remove(pabot_suite_names_filename)
 
 
-def execute_tests(arguments: argparse.Namespace, results_folder, test_suites_to_run: []):
+def execute_tests(arguments: argparse.Namespace, results_folder, rerun_failed_suites_xml_file: str):
     if arguments.interp == "robot":
-        robot_run_cli(create_robot_arguments(arguments, results_folder, test_suites_to_run), exit=False)
+        robot_run_cli(create_robot_arguments(arguments, results_folder, rerun_failed_suites_xml_file), exit=False)
     elif arguments.interp == "pabot":
-        pabot_run_cli(create_robot_arguments(arguments, results_folder, test_suites_to_run))
+        pabot_run_cli(create_robot_arguments(arguments, results_folder, rerun_failed_suites_xml_file))
 
 
 def run():
@@ -190,31 +189,26 @@ def run():
 
     logger.info(f"Running Robot tests with {args.rerun_attempts} rerun attempts for any failing suites")
 
-    failing_suites = []
-
     try:
         # Run tests
         while args.rerun_attempts is None or test_run_index < args.rerun_attempts:
             try:
                 test_run_index += 1
 
-                results_folder = f"{results_foldername}{os.sep}run-{test_run_index + 1}"
+                test_run_results_folder = f"{main_results_folder}{os.sep}run-{test_run_index + 1}"
 
                 # Ensure all SeleniumLibrary elements and keywords are updated to use a brand new
                 # Selenium instance for every test (re)run.
                 if test_run_index > 0:
                     selenium_elements.clear_instances()
 
-                if args.rerun_failed_suites and test_run_index == 0:
-                    failing_suites = get_failing_test_suites_relative_paths(robot_tests_dir)
-
-                rerunning_failed_suites = len(failing_suites) > 0
+                rerunning_failed_suites = args.rerun_failed_suites or test_run_index > 0
                 
                 # Perform any cleanup before the test run.
                 clear_files_before_test_run(rerunning_failed_suites)
 
-                if not Path(f"{results_foldername}/downloads").exists():
-                    os.makedirs(f"{results_foldername}/downloads")
+                if not Path(f"{main_results_folder}/downloads").exists():
+                    os.makedirs(f"{main_results_folder}/downloads")
 
                 # Create a unique run identifier so that this test run's data will be unique.
                 run_identifier = f"{run_identifier_initial_value}-{test_run_index}"
@@ -227,15 +221,19 @@ def run():
                 # Run the tests.
                 logger.info(f"Performing test run {test_run_index + 1} with unique identifier {run_identifier}")
                 
-                if len(failing_suites) > 0:
-                    logger.error(f"Re-running failing suites: {failing_suites}")
+                if rerunning_failed_suites:
+                    if test_run_index == 0:
+                        rerun_failed_suites_xml_file = f"{robot_tests_dir}{os.sep}{main_results_folder}{os.sep}output.xml"
+                    else:
+                        rerun_failed_suites_xml_file = f"{robot_tests_dir}{os.sep}{main_results_folder}{os.sep}run-{test_run_index}{os.sep}output.xml"
+                else:
+                    rerun_failed_suites_xml_file = None
                 
-                test_suites_to_run = failing_suites if len(failing_suites) > 0 else [args.tests]
-
-                execute_tests(args, results_folder, test_suites_to_run)
+                execute_tests(args, test_run_results_folder, rerun_failed_suites_xml_file)
                 
-                failing_suites = get_failing_test_suites_relative_paths(robot_tests_dir)
-
+                if test_run_index > 0:
+                    create_report_from_output_xml(test_run_results_folder)
+                
             finally:
                 # Tear down any data created by this test run unless we've disabled teardown.
                 if args_and_variables.includes_data_changing_tests(args) and not args.disable_teardown:
@@ -246,9 +244,12 @@ def run():
             if not get_failing_test_suites():
                 break
 
+
+        failing_suites = get_failing_test_suites()
+
         number_of_test_runs = test_run_index + 1
         merge_robot_reports(number_of_test_runs)
-        log_report_results(number_of_test_runs, get_failing_test_suites())
+        log_report_results(number_of_test_runs, failing_suites)
 
         if args.enable_slack_notifications:
             slack_service = SlackService()
