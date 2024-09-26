@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 
 public class AppOptions
 {

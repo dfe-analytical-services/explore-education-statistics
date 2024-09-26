@@ -14,8 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
@@ -229,7 +229,7 @@ public class ProcessorStage2Tests
         var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
 
         var importerService = new ImporterService(
-            Options.Create(new AppOptions()),
+            new AppOptions().ToOptionsWrapper(),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,

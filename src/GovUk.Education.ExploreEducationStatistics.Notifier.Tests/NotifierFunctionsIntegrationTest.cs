@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using Microsoft.Extensions.Configuration;

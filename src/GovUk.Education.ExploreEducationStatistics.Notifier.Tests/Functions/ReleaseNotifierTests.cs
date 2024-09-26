@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -473,12 +473,12 @@ public class ReleaseNotifierTests
     {
         return new ReleaseNotifier(
             Mock.Of<ILogger<ReleaseNotifier>>(),
-            Options.Create(AppOptions),
-            Options.Create(new GovUkNotifyOptions
+            AppOptions.ToOptionsWrapper(),
+            new GovUkNotifyOptions
             {
                 ApiKey = "",
                 EmailTemplates = EmailTemplateOptions
-            }),
+            }.ToOptionsWrapper(),
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             subscriptionRepository ?? Mock.Of<ISubscriptionRepository>(MockBehavior.Strict));

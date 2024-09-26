@@ -4,20 +4,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
@@ -38,10 +37,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task SendsSubscriptionVerificationEmail()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var notifierTableStorageService = new NotifierTableStorageService(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -94,10 +92,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task DoesNotSendEmailAgainIfSubIsPending()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var notifierTableStorageService = new NotifierTableStorageService(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         // Arrange (data)
         await notifierTableStorageService.CreateEntity(
@@ -163,10 +160,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task SendsConfirmationEmailIfUserAlreadySubscribed()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var notifierTableStorageService = new NotifierTableStorageService(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         // Arrange (data)
         await notifierTableStorageService.CreateEntity(
@@ -233,10 +229,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Id_Is_Blank()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var notifierTableStorageService = new NotifierTableStorageService(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -278,10 +273,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Title_Is_Blank()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var notifierTableStorageService = new NotifierTableStorageService(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -323,10 +317,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Email_Is_Blank()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var notifierTableStorageService = new NotifierTableStorageService(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -368,10 +361,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Slug_Is_Blank()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
-        {
-            NotifierStorageConnectionString = StorageConnectionString()
-        }));
+        var notifierTableStorageService = new NotifierTableStorageService(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
@@ -414,10 +406,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task SendsSubscriptionConfirmationEmail()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
-        {
-           NotifierStorageConnectionString = StorageConnectionString(),
-        }));
+                var notifierTableStorageService = new NotifierTableStorageService(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         // Arrange (data)
         var publicationId = Guid.NewGuid();
@@ -479,10 +470,9 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task Unsubscribes()
     {
-        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppOptions
-        {
-           NotifierStorageConnectionString = StorageConnectionString(),
-        }));
+        var notifierTableStorageService = new NotifierTableStorageService(
+            new AppOptions { NotifierStorageConnectionString = StorageConnectionString() }.ToOptionsWrapper()
+        );
 
         // Arrange (data)
         var publicationId = Guid.NewGuid();
@@ -550,12 +540,12 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         INotifierTableStorageService? notifierTableStorageService = null) =>
         new(
             logger: Mock.Of<ILogger<PublicationSubscriptionFunctions>>(),
-            appOptions: Options.Create(new AppOptions { PublicAppUrl = "https://localhost:3000" }),
-            govUkNotifyOptions: Options.Create(new GovUkNotifyOptions
+            appOptions: new AppOptions { PublicAppUrl = "https://localhost:3000" }.ToOptionsWrapper(),
+            govUkNotifyOptions: new GovUkNotifyOptions
             {
                 ApiKey = "",
                 EmailTemplates = EmailTemplateOptions
-            }),
+            }.ToOptionsWrapper(),
             tokenService: tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService: emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             requestValidator: new PendingPublicationSubscriptionCreateRequest.Validator(),
