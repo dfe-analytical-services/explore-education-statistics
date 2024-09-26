@@ -12,7 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 public class ConfigController(
     IOptions<OpenIdConnectSpaClientOptions> oidcOptions,
     IOptions<AppInsightsOptions> appInsightsOptions,
-    IOptions<PublicAppOptions> publicAppOptions)
+    IOptions<PublicAppOptions> publicAppOptions,
+    IOptions<PublicDataApiOptions> publicDataApiOptions)
     : ControllerBase
 {
     [AllowAnonymous]
@@ -23,6 +24,8 @@ public class ConfigController(
         {
             AppInsightsKey = appInsightsOptions.Value.InstrumentationKey,
             PublicAppUrl = publicAppOptions.Value.Url,
+            PublicApiUrl = publicDataApiOptions.Value.Url,
+            PublicApiDocsUrl = publicDataApiOptions.Value.DocsUrl,
             PermittedEmbedUrlDomains = EmbedBlockService.PermittedDomains,
             Oidc = oidcOptions.Value
         };
