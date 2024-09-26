@@ -4,7 +4,7 @@ public class AppOptions
 {
     public const string Section = "App";
 
-    public string BaseUrl { get; init; } = null!;
+    public string Url { get; init; } = null!;
 
     public string PublicAppUrl { get; init; } = null!;
 

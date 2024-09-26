@@ -72,7 +72,7 @@ public class SwaggerConfig(
         options.AddServer(new OpenApiServer
         {
             Description = "API server",
-            Url = appOptions.Value.HostUrl
+            Url = appOptions.Value.Url
         });
     }
 
