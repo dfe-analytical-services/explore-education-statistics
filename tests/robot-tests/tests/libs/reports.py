@@ -44,6 +44,19 @@ def log_report_results(number_of_test_runs: int, failing_suites: []):
         logger.info("\nAll tests passed!")
 
 
+def create_report_from_output_xml(test_results_folder: str):
+    create_args = [
+        "--outputdir",
+        f"{test_results_folder}/",
+        "-o",
+        "output.xml",
+        "--xunit",
+        "xunit.xml",
+        f"{test_results_folder}/output.xml"
+    ]
+    robot_rebot_cli(create_args, exit=False)
+
+
 def _merge_test_reports(test_results_folder):
     merge_args = [
         "--outputdir",

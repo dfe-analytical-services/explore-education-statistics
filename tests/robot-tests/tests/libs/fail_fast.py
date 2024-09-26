@@ -8,6 +8,7 @@ should continue to run or if they should fail immediately and therefore fail the
 import os.path
 import os
 import threading
+import traceback
 
 from robot.libraries.BuiltIn import BuiltIn
 from tests.libs.logger import get_logger
@@ -40,6 +41,8 @@ def record_failing_test_suite():
         try:
             with open(failing_suites_filename, "a") as file_write:
                 file_write.write(f"{test_suite}{os.linesep}")
+                logger.error(">>>>>>>>>>>>>...")
+                logger.error(traceback.format_stack())
         except IOError as e:
             logger.error(f"Failed to write failing test suite to file: {e}")
 
@@ -71,10 +74,6 @@ def get_failing_test_suites() -> []:
                 logger.error(f"Failed to read failing test suites from file: {e}")
                 return []
         return []
-
-
-def get_failing_test_suites_relative_paths(parent_path) -> []:
-    return [suite.replace(f"{parent_path}{os.sep}", "") for suite in get_failing_test_suites()]
 
 
 def _raise_assertion_error(err_msg):
