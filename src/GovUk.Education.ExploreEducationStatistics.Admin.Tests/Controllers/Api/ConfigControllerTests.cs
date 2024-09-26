@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
-    public class ConfigurationControllerTests
+    public class ConfigControllerTests
     {
         [Fact]
         public void CheckApplicationInsightsConfigurationKeyExists()
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var appInsightsOptions = new AppInsightsOptions();
             mainConfiguration.Bind(AppInsightsOptions.Section, appInsightsOptions);
 
-            var controller = new ConfigurationController(
+            var controller = new ConfigController(
                 openIdConnectSpaClientOptions.ToOptionsWrapper(),
                 appInsightsOptions.ToOptionsWrapper(),
                 publicAppOptions.ToOptionsWrapper()
