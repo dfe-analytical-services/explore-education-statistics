@@ -9,5 +9,7 @@ public class PublicDataApiOptions
 
     public string Url { get; init; } = string.Empty;
 
+    public string DocsUrl { get; init; } = string.Empty;
+
     public Guid AppRegistrationClientId { get; init; }
 }

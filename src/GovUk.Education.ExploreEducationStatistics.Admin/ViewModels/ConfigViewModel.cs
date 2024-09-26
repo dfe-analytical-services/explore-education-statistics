@@ -9,6 +9,10 @@ public record ConfigViewModel
 
     public required string PublicAppUrl { get; init; }
 
+    public required string PublicApiUrl { get; init; }
+
+    public required string PublicApiDocsUrl { get; init; }
+
     public required string[] PermittedEmbedUrlDomains { get; init; }
 
     public required OpenIdConnectSpaClientOptions Oidc { get; init; }

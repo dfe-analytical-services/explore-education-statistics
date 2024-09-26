@@ -58,7 +58,10 @@ describe('DataSetFileUsage', () => {
       screen.getByRole('link', {
         name: 'API documentation',
       }),
-    ).toHaveAttribute('href', 'TODO-GUIDANCE-URL');
+    ).toHaveAttribute(
+      'href',
+      'https://dfe-analytical-services.github.io/explore-education-statistics-api-docs',
+    );
   });
 
   test('clicking the download button calls the `onDownload` handler', async () => {

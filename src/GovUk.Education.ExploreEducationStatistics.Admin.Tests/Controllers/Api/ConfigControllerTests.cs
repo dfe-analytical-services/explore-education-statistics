@@ -32,20 +32,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public void GetConfig()
         {
-            var mainConfiguration = GetConfiguration();
-            var openIdConnectSpaClientOptions = new OpenIdConnectSpaClientOptions();
-            mainConfiguration.Bind(OpenIdConnectSpaClientOptions.Section, openIdConnectSpaClientOptions);
+            var configuration = GetConfiguration();
 
-            var publicAppOptions = new PublicAppOptions();
-            mainConfiguration.Bind(PublicAppOptions.Section, publicAppOptions);
+            var openIdConnectSpaClientOptions = new OpenIdConnectSpaClientOptions();
+            configuration.Bind(OpenIdConnectSpaClientOptions.Section, openIdConnectSpaClientOptions);
 
             var appInsightsOptions = new AppInsightsOptions();
-            mainConfiguration.Bind(AppInsightsOptions.Section, appInsightsOptions);
+            configuration.Bind(AppInsightsOptions.Section, appInsightsOptions);
+
+            var publicAppOptions = new PublicAppOptions();
+            configuration.Bind(PublicAppOptions.Section, publicAppOptions);
+
+            var publicDataApiOptions = new PublicDataApiOptions();
+            configuration.Bind(PublicDataApiOptions.Section, publicDataApiOptions);
 
             var controller = new ConfigController(
                 openIdConnectSpaClientOptions.ToOptionsWrapper(),
                 appInsightsOptions.ToOptionsWrapper(),
-                publicAppOptions.ToOptionsWrapper()
+                publicAppOptions.ToOptionsWrapper(),
+                publicDataApiOptions.ToOptionsWrapper()
             );
 
             var result = controller.GetConfig();
@@ -53,6 +58,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             Assert.Equal(string.Empty, viewModel.AppInsightsKey);
             Assert.Equal("http://localhost:3000", viewModel.PublicAppUrl);
+            Assert.Equal("http://localhost:5050", viewModel.PublicApiUrl);
+            Assert.Equal(
+                "https://dfe-analytical-services.github.io/explore-education-statistics-api-docs",
+                viewModel.PublicApiDocsUrl
+            );
             Assert.Equal(
                 new []
                 {
