@@ -3,6 +3,7 @@ Resource        ../../libs/public-common.robot
 Library         ../../libs/no_javascript.py
 
 Test Setup      fail test fast if required
+Test Teardown       run keyword if test failed    record test failure
 
 Force Tags      GeneralPublic    Prod
 
