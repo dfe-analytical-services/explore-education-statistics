@@ -50,17 +50,17 @@ def fail_test_fast_if_required():
 
 
 def get_failing_test_suites() -> []:
-    if os.path.isfile(failing_suites_filename):
-        # We wouldn't expect the same test suite to be recorded in this file more than once, as we only trigger the
-        # "record failing test suite" upon the first failing test in an individual suite.
-        #
-        # Strangely though, this does get called multiple times if using Pabot and re-running failed suites. It seems as
-        # though the failure keywords are being merged with the initial run's failure keyword definitions and therefore
-        # causing the failing test suite to be recorded multiple times when its first failing test is hit.
-        #
-        # We therefore explicitly remove any duplicates from the list here.
+    with file_lock:
+        if os.path.isfile(failing_suites_filename):
+            # We wouldn't expect the same test suite to be recorded in this file more than once, as we only trigger the
+            # "record failing test suite" upon the first failing test in an individual suite.
+            #
+            # Strangely though, this does get called multiple times if using Pabot and re-running failed suites. It seems as
+            # though the failure keywords are being merged with the initial run's failure keyword definitions and therefore
+            # causing the failing test suite to be recorded multiple times when its first failing test is hit.
+            #
+            # We therefore explicitly remove any duplicates from the list here.
 
-        with file_lock:
             try:
                 with open(failing_suites_filename, "r") as file:
                     failing_suites = file.readlines()
@@ -70,7 +70,11 @@ def get_failing_test_suites() -> []:
             except IOError as e:
                 logger.error(f"Failed to read failing test suites from file: {e}")
                 return []
-    return []
+        return []
+
+
+def get_failing_test_suites_relative_paths(parent_path) -> []:
+    return [suite.replace(f"{parent_path}{os.sep}", "") for suite in get_failing_test_suites()]
 
 
 def _raise_assertion_error(err_msg):
