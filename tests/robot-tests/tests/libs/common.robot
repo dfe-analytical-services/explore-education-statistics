@@ -1,5 +1,5 @@
 *** Settings ***
-Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=do this on failure
+Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=None
 Library     OperatingSystem
 Library     Collections
 Library     file_operations.py
@@ -25,7 +25,7 @@ ${DATE_FORMAT_MEDIUM}=                  %-d %B %Y
 
 
 *** Keywords ***
-do this on failure
+record test failure
     # See if the currently executing Test Suite is failing fast and if not, take a screenshot and HTML grab of the
     # failing page.
     ${currently_failing_fast}=    current test suite failing fast

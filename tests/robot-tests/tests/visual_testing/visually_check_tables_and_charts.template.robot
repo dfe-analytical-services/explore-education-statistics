@@ -7,6 +7,7 @@ Force Tags          VisualTesting    GeneralPublic    Local    Dev    Test    Pr
 Suite Setup         do suite setup
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
+Test Teardown       run keyword if test failed    record test failure
 
 
 *** Test Cases ***
