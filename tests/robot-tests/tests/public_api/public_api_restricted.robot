@@ -36,8 +36,8 @@ Verify release summary
     user verifies release summary    Financial year    3000-01    Accredited official statistics
 
 Upload data files
-    user uploads subject    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv    ${PUBLIC_API_FILES_DIR}
-    user uploads subject    ${SUBJECT_NAME_2}    tiny-two-filters.csv    tiny-two-filters.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_2}    tiny-two-filters.csv    tiny-two-filters.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to subjects
     user clicks link    Data and files
@@ -156,19 +156,19 @@ Navigate to admin and create an amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-Upload third subject(large data file)
-    user waits until large data upload is completed
+Upload third subject (which is invalid for Public API import) into the first amendment 
+    user uploads subject and waits until complete
     ...    ${SUBJECT_NAME_3}
-    ...    large-data-set.csv
-    ...    large-data-set.meta.csv
+    ...    invalid-data-set.csv
+    ...    invalid-data-set.meta.csv
     ...    ${PUBLIC_API_FILES_DIR}
 
-Add data guidance to third subject
+Add data guidance to third subject for the first amendment
     user clicks link    Data guidance
     user enters text into data guidance data file content editor    ${SUBJECT_NAME_3}    meta content
     user clicks button    Save guidance
 
-Create an API dataset through the amendment
+Create a new API dataset version through the first amendment using the invalid subject
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
@@ -181,11 +181,11 @@ Create an API dataset through the amendment
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
-User waits until the 2nd API dataset status changes to 'Failed'
+User waits until the 2nd invalid API dataset status changes to 'Failed'
     user waits until h3 is visible    Draft version details
     wait until keyword succeeds    20x    5s    Verify status of API Datasets    Failed
 
-Verify the contents inside the 'Draft API datasets' table
+Verify the contents inside the 'Draft API datasets' table after the invalid import fails
     user clicks link    Back to API data sets
     user waits until h3 is visible    Draft API data sets
 
@@ -198,7 +198,7 @@ Verify the contents inside the 'Draft API datasets' table
     user checks table cell contains    1    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
     user checks table cell contains    1    3    Failed    xpath://table[@data-testid='draft-api-data-sets']
 
-Verify the contents inside the 'Live API datasets' table
+Verify the contents inside the 'Live API datasets' table after the invalid import fails
     user checks table column heading contains    1    1    Version          xpath://table[@data-testid='live-api-data-sets']
     user checks table column heading contains    1    2    Name             xpath://table[@data-testid='live-api-data-sets']
     user checks table column heading contains    1    3    Actions          xpath://table[@data-testid='live-api-data-sets']
@@ -210,7 +210,7 @@ Verify the contents inside the 'Live API datasets' table
     user checks table cell contains    2    1    v1.0                       xpath://table[@data-testid='live-api-data-sets']
     user checks table cell contains    2    2    ${SUBJECT_NAME_2}          xpath://table[@data-testid='live-api-data-sets']
 
-Add release note for new release amendment
+Add release note for the first release amendment
     user clicks link    Content
     user adds a release note    Test release note two
 
@@ -236,7 +236,7 @@ Create a second draft release via api
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3010
 
 Upload subject to second release
-    user uploads subject    ${SUBJECT_NAME_4}    seven_filters_minor_update.csv    seven_filters_minor_update.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_4}    seven_filters_minor_update.csv    seven_filters_minor_update.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to second release
     user clicks link    Data and files
@@ -251,10 +251,10 @@ Add data guidance to second release
     user enters text into data guidance data file content editor    ${SUBJECT_NAME_4}
     ...    ${SUBJECT_NAME_4} Main guidance content
 
-Save data guidance
+Save data guidance for the second release
     user clicks button    Save guidance
 
-Create a different version of an API dataset(Minor version)
+Create a different version of an API dataset (minor version)
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
@@ -278,7 +278,7 @@ Validate the summary contents inside the 'draft version details' table
     ${mapping_status}=    get text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
     should be equal as strings    ${mapping_status}    Action required
 
-Add headline text block to Content page
+Add headline text block to Content page for the second release
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
@@ -294,10 +294,10 @@ Create a third draft release via api
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3020
 
-Upload subject to third release
-    user uploads subject    ${SUBJECT_NAME_5}    institution_and_provider.csv    institution_and_provider.meta.csv    ${PUBLIC_API_FILES_DIR}
+Upload subject to the third release
+    user uploads subject and waits until complete    ${SUBJECT_NAME_5}    institution_and_provider.csv    institution_and_provider.meta.csv    ${PUBLIC_API_FILES_DIR}
 
-Add data guidance to third release
+Add data guidance to the third release
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
@@ -310,10 +310,10 @@ Add data guidance to third release
     user enters text into data guidance data file content editor    ${SUBJECT_NAME_5}
     ...    ${SUBJECT_NAME_5} Main guidance content
 
-Save data guidance
+Save data guidance for the third release
     user clicks button    Save guidance
 
-Create a different version of API dataset (major version)
+Create a different version of API dataset (major version) for the third release
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
@@ -332,7 +332,7 @@ Create a different version of API dataset (major version)
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set version    %{WAIT_LONG}
 
-Validate the summary contents inside the 'draft version details' table
+Validate the summary contents inside the 'draft version details' table for the third release
     user waits until h3 is visible    Draft version details
     user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(1) > dt + dd     v2.0    %{WAIT_LONG}
     user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd     Action required    %{WAIT_LONG}
@@ -343,12 +343,12 @@ Validate the summary contents inside the 'draft version details' table
 # Adding this headline text block is optional, but I chose to include it to focus specifically on the errors I'm targeting.
 # Without this, I might be inclined to add a checklist for headline-specific text block errors, which isn't necessary.
 
-Add headline text block to Content page
+Add headline text block to Content page for the third release
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
 
-Validate checklist error for a draft API dataset which shows mapping error
+Validate checklist error for a draft API dataset which shows mapping error for the third release
     user edits release status
     user checks checklist errors contains
     ...    1 issue that must be resolved before this release can be published.

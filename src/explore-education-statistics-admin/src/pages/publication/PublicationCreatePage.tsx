@@ -49,6 +49,7 @@ export default function PublicationCreatePage({
             Cancel
           </Link>
         }
+        themeId={topic.themeId}
         topicId={topic.id}
         onSubmit={() => history.push(dashboardRoute.path)}
       />

@@ -183,6 +183,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             .Bind(configuration.GetRequiredSection(ContentApiOptions.Section));
         services.AddOptions<DataFilesOptions>()
             .Bind(configuration.GetRequiredSection(DataFilesOptions.Section));
+        services.AddOptions<RequestTimeoutOptions>()
+            .Bind(configuration.GetRequiredSection(RequestTimeoutOptions.Section));
 
         // Services
 

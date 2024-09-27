@@ -91,6 +91,7 @@ def user_creates_test_publication_via_api(publication_name: str, topic_id: str =
             "title": publication_name,
             "summary": f"{publication_name} summary",
             "topicId": chosen_topic_id,
+            "themeId": os.getenv("TEST_THEME_ID"),
             "contact": {
                 "contactName": "UI test contact name",
                 "contactTelNo": "0123 4567",

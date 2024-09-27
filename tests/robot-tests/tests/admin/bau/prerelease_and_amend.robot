@@ -30,7 +30,7 @@ Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Calendar year 2000
 
-    user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Add metadata guidance
     user clicks link    Data guidance

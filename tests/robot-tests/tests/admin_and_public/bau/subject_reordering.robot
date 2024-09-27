@@ -27,22 +27,22 @@ Navigate to release
     ...    ${RELEASE_NAME}
 
 Upload subjects to release
-    user uploads subject
+    user uploads subject and waits until complete
     ...    Four
     ...    ordering-test-4.csv
     ...    ordering-test-4.meta.csv
 
-    user uploads subject
+    user uploads subject and waits until complete
     ...    Three
     ...    ordering-test-3.csv
     ...    ordering-test-3.meta.csv
 
-    user uploads subject
+    user uploads subject and waits until complete
     ...    One
     ...    ordering-test-1.csv
     ...    ordering-test-1.meta.csv
 
-    user uploads subject
+    user uploads subject and waits until complete
     ...    Two
     ...    ordering-test-2.csv
     ...    ordering-test-2.meta.csv
