@@ -136,6 +136,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             {
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 options.JsonSerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow;
+                // This allows comments to be left in JSON bodies so users can annotate
+                // their data set queries for debugging - do not remove!
                 options.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
 
                 // This must be false to allow `JsonExceptionResultFilter` to work correctly,
