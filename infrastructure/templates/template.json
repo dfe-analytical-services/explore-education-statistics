@@ -236,13 +236,25 @@
     "sqlImporterUser": {
       "type": "string",
       "metadata": {
-        "description": "The username of the publisher for the private SQL Server"
+        "description": "The username of the importer for the private SQL Server"
       }
     },
     "sqlImporterUserPassword": {
       "type": "securestring",
       "metadata": {
         "description": "The password of the importer user for the private SQL Server"
+      }
+    },
+    "sqlNotifierUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the notifier for the private SQL Server"
+      }
+    },
+    "sqlNotifierUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the notifier user for the private SQL Server"
       }
     },
     "sqlAdminUser": {
@@ -1151,6 +1163,7 @@
     "ees-sql-password-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-data')]",
     "ees-sql-password-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-importer')]",
     "ees-sql-password-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-publisher')]",
+    "ees-sql-password-notifier": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-notifier')]",
     "ees-sql-user-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-admin')]",
     "ees-sql-user-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-data')]",
     "ees-sql-user-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-importer')]",
@@ -2903,7 +2916,14 @@
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]"
             ]
-          }
+          },
+          "connectionStrings": [
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlNotifierUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlNotifierUserPassword'), ';')]"
+            }
+          ]
         }
       }
     },
