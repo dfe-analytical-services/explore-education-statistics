@@ -26,7 +26,7 @@ public class DataSetsController(
     /// Gets a specific data set’s summary details.
     /// </remarks>
     [HttpGet("{dataSetId:guid}")]
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     [SwaggerResponse(200, "The requested data set summary", type: typeof(DataSetViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
@@ -48,7 +48,7 @@ public class DataSetsController(
     /// Get the metadata about a data set. Use this to create data set queries.
     /// </remarks>
     [HttpGet("{dataSetId:guid}/meta")]
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     [SwaggerResponse(200, "The requested data set version metadata", type: typeof(DataSetMetaViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
@@ -206,7 +206,7 @@ public class DataSetsController(
     /// - `location|REG|Asc` sorts by regions in ascending order
     /// </remarks>
     [HttpGet("{dataSetId:guid}/query")]
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     [SwaggerResponse(200, "The paginated list of query results", type: typeof(DataSetQueryPaginatedResultsViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
@@ -236,8 +236,8 @@ public class DataSetsController(
     /// and consequently can express more complex queries.
     /// </remarks>
     [HttpPost("{dataSetId:guid}/query")]
-    [Consumes("application/json")]
-    [Produces("application/json")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces(MediaTypeNames.Application.Json)]
     [SwaggerResponse(200, "The paginated list of query results", type: typeof(DataSetQueryPaginatedResultsViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
