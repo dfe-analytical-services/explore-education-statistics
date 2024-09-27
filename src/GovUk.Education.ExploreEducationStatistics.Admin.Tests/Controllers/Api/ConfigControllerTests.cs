@@ -1,46 +1,68 @@
 ﻿using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
-    public class ConfigurationControllerTests
+    public class ConfigControllerTests
     {
         [Fact]
         public void CheckApplicationInsightsConfigurationKeyExists()
         {
             var configuration = GetConfiguration();
             var configSection = configuration.GetSection("AppInsights");
+
             Assert.NotNull(configSection);
-            var configValue = configSection.GetValue<string>("InstrumentationKey");
-            Assert.Equal(string.Empty, configValue);
+            Assert.Equal(string.Empty, configSection.GetValue<string>("InstrumentationKey"));
         }
 
         [Fact]
         public void CheckPublicAppUrlConfigurationKeyExists()
         {
             var configuration = GetConfiguration();
-            var configValue = configuration.GetValue<string>("PublicAppUrl");
-            Assert.Equal("http://localhost:3000", configValue);
+            var configSection = configuration.GetSection("PublicApp");
+
+            Assert.NotNull(configSection);
+            Assert.Equal("http://localhost:3000", configSection.GetValue<string>("Url"));
         }
 
         [Fact]
         public void GetConfig()
         {
-            var mainConfiguration = GetConfiguration();
-            var openIdConnectSpaClientConfig = new OpenIdConnectSpaClientOptions();
-            mainConfiguration.Bind("OpenIdConnectSpaClient", openIdConnectSpaClientConfig);
-            var openIdConnectSpaClientOptions = Options.Create(openIdConnectSpaClientConfig);
+            var configuration = GetConfiguration();
 
-            var controller = new ConfigurationController(GetConfiguration(), openIdConnectSpaClientOptions);
+            var openIdConnectSpaClientOptions = new OpenIdConnectSpaClientOptions();
+            configuration.Bind(OpenIdConnectSpaClientOptions.Section, openIdConnectSpaClientOptions);
+
+            var appInsightsOptions = new AppInsightsOptions();
+            configuration.Bind(AppInsightsOptions.Section, appInsightsOptions);
+
+            var publicAppOptions = new PublicAppOptions();
+            configuration.Bind(PublicAppOptions.Section, publicAppOptions);
+
+            var publicDataApiOptions = new PublicDataApiOptions();
+            configuration.Bind(PublicDataApiOptions.Section, publicDataApiOptions);
+
+            var controller = new ConfigController(
+                openIdConnectSpaClientOptions.ToOptionsWrapper(),
+                appInsightsOptions.ToOptionsWrapper(),
+                publicAppOptions.ToOptionsWrapper(),
+                publicDataApiOptions.ToOptionsWrapper()
+            );
+
             var result = controller.GetConfig();
             var viewModel = result.AssertOkResult();
 
             Assert.Equal(string.Empty, viewModel.AppInsightsKey);
             Assert.Equal("http://localhost:3000", viewModel.PublicAppUrl);
+            Assert.Equal("http://localhost:5050", viewModel.PublicApiUrl);
+            Assert.Equal(
+                "https://dfe-analytical-services.github.io/explore-education-statistics-api-docs",
+                viewModel.PublicApiDocsUrl
+            );
             Assert.Equal(
                 new []
                 {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -21,7 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -46,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly bool _topicDeletionAllowed;
 
         public TopicService(
-            IConfiguration configuration,
+            IOptions<AppOptions> appOptions,
             ContentDbContext contentContext,
             StatisticsDbContext statisticsContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
@@ -72,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _methodologyService = methodologyService;
             _cacheService = cacheService;
             _releasePublishingStatusRepository = releasePublishingStatusRepository;
-            _topicDeletionAllowed = configuration.GetValue<bool>("enableThemeDeletion");
+            _topicDeletionAllowed = appOptions.Value.EnableThemeDeletion;
         }
 
         public async Task<Either<ActionResult, TopicViewModel>> CreateTopic(TopicSaveViewModel created)

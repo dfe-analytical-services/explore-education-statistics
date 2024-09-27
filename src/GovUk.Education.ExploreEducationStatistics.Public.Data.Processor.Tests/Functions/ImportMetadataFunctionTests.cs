@@ -709,8 +709,8 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             // Override default app settings if provided
             if (metaInsertBatchSize.HasValue)
             {
-                var appSettingsOptions = GetRequiredService<IOptions<AppSettingsOptions>>();
-                appSettingsOptions.Value.MetaInsertBatchSize = metaInsertBatchSize.Value;
+                var appOptions = GetRequiredService<IOptions<AppOptions>>();
+                appOptions.Value.MetaInsertBatchSize = metaInsertBatchSize.Value;
             }
 
             var function = GetRequiredService<ImportMetadataFunction>();

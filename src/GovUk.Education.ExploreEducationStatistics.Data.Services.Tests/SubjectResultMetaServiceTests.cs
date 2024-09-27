@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -262,20 +263,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     }
                 });
 
-            var options = Options.Create(new LocationsOptions
+            var options = new LocationsOptions
             {
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
                 {
                     {
                         GeographicLevel.Region,
-                        new List<string>
-                        {
+                        [
                             "Country",
                             "Region"
-                        }
+                        ]
                     }
                 }
-            });
+            }.ToOptionsWrapper();
 
             var query = new FullTableQuery
             {
@@ -392,7 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private static IOptions<LocationsOptions> DefaultLocationsOptions()
         {
-            return Options.Create(new LocationsOptions());
+            return new LocationsOptions().ToOptionsWrapper();
         }
 
         private static SubjectResultMetaService BuildService(

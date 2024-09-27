@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <param name="context"></param>
         [Function("StageScheduledReleases")]
         public async Task StageScheduledReleases(
-            [TimerTrigger("%AppSettings:PublishReleasesCronSchedule%")] TimerInfo timer,
+            [TimerTrigger("%App:PublishReleasesCronSchedule%")] TimerInfo timer,
             FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);

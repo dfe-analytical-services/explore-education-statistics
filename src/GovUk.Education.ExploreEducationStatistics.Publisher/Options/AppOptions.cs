@@ -1,8 +1,8 @@
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 
-public class AppSettingsOptions
+public class AppOptions
 {
-    public const string Section = "AppSettings";
+    public const string Section = "App";
 
     public required string PrivateStorageConnectionString { get; init; }
 

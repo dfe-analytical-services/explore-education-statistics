@@ -173,7 +173,7 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
                 config.AddInMemoryCollection(new Dictionary<string, string?>
                 {
                     {
-                        $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.PrivateStorageConnectionString)}",
+                        $"{AppOptions.Section}:{nameof(AppOptions.PrivateStorageConnectionString)}",
                         _azuriteContainer.GetConnectionString()
                     }
                 });

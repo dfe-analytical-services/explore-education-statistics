@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using Microsoft.Extensions.Configuration;
@@ -43,9 +43,9 @@ public abstract class NotifierFunctionsIntegrationTest
         return fixture.StorageConnectionString();
     }
 
-    protected AppSettingsOptions GetAppSettingsOptions()
+    protected AppOptions GetAppOptions()
     {
-        return GetRequiredService<IOptions<AppSettingsOptions>>().Value;
+        return GetRequiredService<IOptions<AppOptions>>().Value;
     }
 
     protected GovUkNotifyOptions GetGovUkNotifyOptions()
@@ -147,7 +147,7 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
                     .AddInMemoryCollection(new Dictionary<string, string?>
                     {
                         {
-                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.NotifierStorageConnectionString)}",
+                            $"{AppOptions.Section}:{nameof(AppOptions.NotifierStorageConnectionString)}",
                             StorageConnectionString()
                         }
                     });

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -1047,7 +1048,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
                 userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
                 userManager ?? MockUserManager().Object,
-                configuration ?? CreateMockConfiguration(TupleOf("enableThemeDeletion", "true")).Object
+                new AppOptions { EnableThemeDeletion = true }.ToOptionsWrapper()
             );
         }
     }

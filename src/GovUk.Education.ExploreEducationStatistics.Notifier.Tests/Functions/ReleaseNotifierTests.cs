@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -17,9 +17,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
 public class ReleaseNotifierTests
 {
-    private static readonly AppSettingsOptions AppSettingsOptions = new()
+    private static readonly AppOptions AppOptions = new()
     {
-        BaseUrl = "https://notifier.func/api",
+        Url = "https://notifier.func/api",
         PublicAppUrl = "https://public.app"
     };
 
@@ -441,9 +441,9 @@ public class ReleaseNotifierTests
     {
         Assert.Equal(pubName, values["publication_name"]);
         Assert.Equal(releaseName, values["release_name"]);
-        Assert.Equal($"{AppSettingsOptions.PublicAppUrl}/find-statistics/{pubSlug}/{releaseSlug}",
+        Assert.Equal($"{AppOptions.PublicAppUrl}/find-statistics/{pubSlug}/{releaseSlug}",
             values["release_link"]);
-        Assert.Equal($"{AppSettingsOptions.PublicAppUrl}/subscriptions/{pubSlug}/confirm-unsubscription/{unsubToken}", values["unsubscribe_link"]);
+        Assert.Equal($"{AppOptions.PublicAppUrl}/subscriptions/{pubSlug}/confirm-unsubscription/{unsubToken}", values["unsubscribe_link"]);
 
         if (updateNote != null)
         {
@@ -473,12 +473,12 @@ public class ReleaseNotifierTests
     {
         return new ReleaseNotifier(
             Mock.Of<ILogger<ReleaseNotifier>>(),
-            Options.Create(AppSettingsOptions),
-            Options.Create(new GovUkNotifyOptions
+            AppOptions.ToOptionsWrapper(),
+            new GovUkNotifyOptions
             {
                 ApiKey = "",
                 EmailTemplates = EmailTemplateOptions
-            }),
+            }.ToOptionsWrapper(),
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
             subscriptionRepository ?? Mock.Of<ISubscriptionRepository>(MockBehavior.Strict));
