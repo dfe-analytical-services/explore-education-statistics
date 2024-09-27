@@ -114,6 +114,23 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             cancellationToken: cancellationToken);
     }
 
+    public async Task<AsyncPageable<TEntity>> QueryEntities<TEntity>(
+        string tableName,
+        string filterStr = "",
+        int? maxPerPage = 1000,
+        IEnumerable<string>? select = null,
+        CancellationToken cancellationToken = default)
+        where TEntity : class, ITableEntity
+    {
+        var tableClient = await GetTableClient(tableName, cancellationToken);
+
+        return tableClient.QueryAsync<TEntity>(
+            filter: filterStr,
+            maxPerPage: maxPerPage,
+            select: select,
+            cancellationToken: cancellationToken);
+    }
+
     public async Task BatchManipulateEntities<TEntity>(
         string tableName, 
         IEnumerable<TEntity> entities, 

@@ -105,7 +105,7 @@ public static class PublisherHostBuilderExtensions
                             methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
                             publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()))
                     .AddScoped<IReleaseService, ReleaseService>()
-                    .AddScoped<IPublisherTableStorageService, PublisherTableStorageService>(provider =>
+                    .AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(provider =>
                         new PublisherTableStorageService(
                             provider.GetRequiredService<IOptions<AppSettingsOptions>>().Value.PublisherStorageConnectionString))
                     .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()

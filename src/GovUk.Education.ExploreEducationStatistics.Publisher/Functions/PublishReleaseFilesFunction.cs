@@ -76,7 +76,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     context.FunctionDefinition.Name);
 
                 await UpdatePublishingStage(
-                    successfulReleases,
+                    successfulReleases.Select(release =>
+                        new ReleasePublishingKey(release.ReleaseVersionId, release.ReleaseStatusId)
+                    ).ToList(),
                     ReleasePublishingStatusPublishingStage.Failed,
                     new ReleasePublishingStatusLogMessage(
                         $"Failed during completion of the Publishing process: {e.Message}"));

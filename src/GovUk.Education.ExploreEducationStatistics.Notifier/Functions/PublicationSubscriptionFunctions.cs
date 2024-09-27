@@ -3,15 +3,16 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Notify.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
@@ -26,8 +27,9 @@ public class PublicationSubscriptionFunctions(
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
     ITokenService tokenService,
     IEmailService emailService,
-    IPublicationSubscriptionRepository publicationSubscriptionRepository,
-    IValidator<PendingPublicationSubscriptionCreateRequest> requestValidator)
+    IValidator<PendingPublicationSubscriptionCreateRequest> requestValidator,
+    INotifierTableStorageService notifierTableStorageService,
+    ISubscriptionRepository subscriptionRepository)
 {
     private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
@@ -57,14 +59,11 @@ public class PublicationSubscriptionFunctions(
             return validationResult.Left;
         }
 
-        var subscription = await publicationSubscriptionRepository.GetSubscription(req.Id, req.Email);
-        var pendingSubscriptionTable =
-            await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationPendingSubscriptionsTable);
+        var subscription = await subscriptionRepository.GetSubscriptionAndStatus(req.Id, req.Email);
 
         try
         {
             logger.LogDebug("Pending subscription found?: {Status}", subscription.Status);
-
 
             switch (subscription.Status)
             {
@@ -76,12 +75,12 @@ public class PublicationSubscriptionFunctions(
                 case SubscriptionStatus.Subscribed:
                     {
                         var unsubscribeToken =
-                            tokenService.GenerateToken(subscription.Subscriber.RowKey,
+                            tokenService.GenerateToken(subscription.Entity!.RowKey,
                                 DateTime.UtcNow.AddYears(1));
 
                         var confirmationValues = new Dictionary<string, dynamic>
                         {
-                            { "publication_name", subscription.Subscriber.Title },
+                            { "publication_name", subscription.Entity.Title },
                             {
                                 "unsubscribe_link",
                                 $"{_appSettingsOptions.PublicAppUrl}/subscriptions/{req.Slug}/confirm-unsubscription/{unsubscribeToken}"
@@ -96,12 +95,23 @@ public class PublicationSubscriptionFunctions(
                         return new OkResult();
                     }
 
+                // Adding new pending sub if no pending or active subscription found
                 case SubscriptionStatus.NotSubscribed:
                     // Verification Token expires in 1 hour
                     var expiryDateTime = DateTime.UtcNow.AddHours(1);
                     var activationCode = tokenService.GenerateToken(req.Email, expiryDateTime);
-                    await publicationSubscriptionRepository.UpdateSubscriber(pendingSubscriptionTable,
-                        new SubscriptionEntity(req.Id, req.Email, req.Title, req.Slug, expiryDateTime));
+
+                    await notifierTableStorageService.CreateEntity(
+                        NotifierTableStorage.PublicationPendingSubscriptionsTable,
+                        new SubscriptionEntity
+                        {
+                            PartitionKey = req.Id,
+                            RowKey = req.Email,
+                            Slug = req.Slug,
+                            Title = req.Title,
+                            DateTimeCreated = expiryDateTime, // DateTimeCreated is a misleading name!
+                        },
+                        cancellationToken);
 
                     var values = new Dictionary<string, dynamic>
                     {
@@ -131,11 +141,14 @@ public class PublicationSubscriptionFunctions(
         {
             logger.LogError(e, "Caught exception sending email");
 
-            // Remove the subscriber from storage if we could not successfully send the email & just added it
+            // If we fail to send email, clean up entity in pending subs table that we just created
             if (subscription.Status is not SubscriptionStatus.SubscriptionPending)
             {
-                await publicationSubscriptionRepository.RemoveSubscriber(pendingSubscriptionTable,
-                    new SubscriptionEntity(req.Id, req.Email));
+                await notifierTableStorageService.DeleteEntity(
+                    tableName: NotifierTableStorage.PublicationPendingSubscriptionsTable,
+                    partitionKey: req.Id,
+                    rowKey: req.Email,
+                    cancellationToken: cancellationToken);
             }
 
             return new BadRequestResult();
@@ -149,9 +162,9 @@ public class PublicationSubscriptionFunctions(
 
     [Function(FunctionNames.Unsubscribe)]
     public async Task<IActionResult> Unsubscribe(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/unsubscribe/{token}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/unsubscribe/{token}")]
         FunctionContext context,
-        string id,
+        string publicationId,
         string token)
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
@@ -162,18 +175,26 @@ public class PublicationSubscriptionFunctions(
             return new BadRequestObjectResult("Unable to unsubscribe. A valid email address could not be parsed from the given token.");
         }
 
-        var table = await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationSubscriptionsTable);
-        var sub = await publicationSubscriptionRepository.RetrieveSubscriber(table, new SubscriptionEntity(id, email));
-        if (sub is null)
+        var subscription = await notifierTableStorageService.GetEntityIfExists<SubscriptionEntity>(
+            tableName: NotifierTableStorage.PublicationSubscriptionsTable,
+            partitionKey: publicationId,
+            rowKey: email);
+
+        if (subscription is null)
         {
             return new UnprocessableEntityObjectResult("Unable to unsubscribe. Given email is not currently subscribed.");
         }
 
-        await publicationSubscriptionRepository.RemoveSubscriber(table, sub);
+        await notifierTableStorageService
+            .DeleteEntity(
+                tableName: NotifierTableStorage.PublicationSubscriptionsTable,
+                partitionKey: publicationId,
+                rowKey: email);
+
         return new OkObjectResult(new SubscriptionStateDto
         {
-            Slug = sub.Slug,
-            Title = sub.Title,
+            Slug = subscription.Slug,
+            Title = subscription.Title,
             Status = SubscriptionStatus.NotSubscribed
         });
     }
@@ -181,61 +202,75 @@ public class PublicationSubscriptionFunctions(
 
     [Function(FunctionNames.VerifySubscription)]
     public async Task<IActionResult> VerifySubscription(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{id}/verify-subscription/{token}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "publication/{publicationId}/verify-subscription/{token}")]
         FunctionContext context,
-        string id,
+        Guid publicationId,
         string token)
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
         var email = tokenService.GetEmailFromToken(token);
 
-        if (email != null)
+        if (email == null)
         {
-            var subscriptionsTbl = await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationSubscriptionsTable);
-            var pendingSubscriptionsTbl =
-                await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationPendingSubscriptionsTable);
-
-            var sub = publicationSubscriptionRepository
-                .RetrieveSubscriber(pendingSubscriptionsTbl, new SubscriptionEntity(id, email)).Result;
-
-            if (sub != null)
-            {
-                // Remove the pending subscription from the the file now verified
-                logger.LogDebug("Removing address from pending subscribers");
-                await publicationSubscriptionRepository.RemoveSubscriber(pendingSubscriptionsTbl, sub);
-
-                // Add them to the verified subscribers table
-                logger.LogDebug("Adding address to the verified subscribers");
-                sub.DateTimeCreated = DateTime.UtcNow;
-                await publicationSubscriptionRepository.UpdateSubscriber(subscriptionsTbl, sub);
-                var unsubscribeToken =
-                    tokenService.GenerateToken(sub.RowKey, DateTime.UtcNow.AddYears(1));
-
-                var values = new Dictionary<string, dynamic>
-                {
-                    { "publication_name", sub.Title },
-                    {
-                        "unsubscribe_link",
-                        $"{_appSettingsOptions.PublicAppUrl}/subscriptions/{sub.Slug}/confirm-unsubscription/{unsubscribeToken}"
-                    }
-                };
-
-                emailService.SendEmail(
-                    email: email,
-                    templateId: _emailTemplateOptions.SubscriptionConfirmationId,
-                    values);
-
-                return new OkObjectResult(new SubscriptionStateDto
-                {
-                    Slug = sub.Slug,
-                    Title = sub.Title,
-                    Status = SubscriptionStatus.Subscribed
-                });
-            }
+            return new BadRequestObjectResult("Unable to unsubscribe. A valid email address could not be parsed from the given token.");
         }
 
-        return new BadRequestObjectResult("Verification-Error");
+        var pendingSubscription = await notifierTableStorageService.GetEntityIfExists<SubscriptionEntity>(
+            tableName: NotifierTableStorage.PublicationPendingSubscriptionsTable,
+            partitionKey: publicationId.ToString(),
+            rowKey: email);
+
+        if (pendingSubscription == null)
+        {
+            return new NotFoundObjectResult("Subscription for email derived from token not found");
+        }
+
+        logger.LogDebug("Removing address from pending subscribers");
+
+        await notifierTableStorageService.DeleteEntity(
+            tableName: NotifierTableStorage.PublicationPendingSubscriptionsTable,
+            partitionKey: pendingSubscription.PublicationId,
+            rowKey: pendingSubscription.Email);
+
+        logger.LogDebug("Adding address to the verified subscribers");
+
+        var newSubscription = new SubscriptionEntity
+        {
+            PartitionKey = pendingSubscription.PublicationId,
+            RowKey = pendingSubscription.Email,
+            Slug = pendingSubscription.Slug,
+            Title = pendingSubscription.Title,
+            DateTimeCreated = DateTime.UtcNow,
+        };
+
+        await notifierTableStorageService.CreateEntity(
+            tableName: NotifierTableStorage.PublicationSubscriptionsTable,
+            entity: newSubscription);
+
+        var unsubscribeToken =
+            tokenService.GenerateToken(newSubscription.Email, DateTime.UtcNow.AddYears(1));
+
+        var values = new Dictionary<string, dynamic>
+        {
+            { "publication_name", newSubscription.Title },
+            {
+                "unsubscribe_link",
+                $"{_appSettingsOptions.PublicAppUrl}/subscriptions/{newSubscription.Slug}/confirm-unsubscription/{unsubscribeToken}"
+            }
+        };
+
+        emailService.SendEmail(
+            email: email,
+            templateId: _emailTemplateOptions.SubscriptionConfirmationId,
+            values);
+
+        return new OkObjectResult(new SubscriptionStateDto
+        {
+            Slug = newSubscription.Slug,
+            Title = newSubscription.Title,
+            Status = SubscriptionStatus.Subscribed
+        });
     }
 
     [Function(FunctionNames.RemoveExpiredSubscriptions)]
@@ -245,23 +280,14 @@ public class PublicationSubscriptionFunctions(
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var pendingSubscriptionsTbl = await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationPendingSubscriptionsTable);
+        var asyncPageable = await notifierTableStorageService.QueryEntities<SubscriptionEntity>(
+            tableName: NotifierTableStorage.PublicationPendingSubscriptionsTable,
+            sub => sub.DateTimeCreated < DateTime.UtcNow.AddHours(1)); // WARN: DateTimeCreated is actually ExpiryTime!!!
+        var pendingSubsToRemove = await asyncPageable.ToListAsync();
 
-        // Remove any pending subscriptions where the token has expired i.e. more than 1 hour old
-        var query = new TableQuery<SubscriptionEntity>()
-            .Where(TableQuery.GenerateFilterConditionForDate("DateTimeCreated", QueryComparisons.LessThan,
-                DateTime.UtcNow.AddHours(1)));
-
-        TableContinuationToken? token = null;
-        do
-        {
-            var resultSegment = await pendingSubscriptionsTbl.ExecuteQuerySegmentedAsync(query, token);
-            token = resultSegment.ContinuationToken;
-
-            foreach (var entity in resultSegment.Results)
-            {
-                await publicationSubscriptionRepository.RemoveSubscriber(pendingSubscriptionsTbl, entity);
-            }
-        } while (token != null);
+        await notifierTableStorageService.BatchManipulateEntities(
+            NotifierTableStorage.PublicationPendingSubscriptionsTable,
+            pendingSubsToRemove,
+            TableTransactionActionType.Delete);
     }
 }

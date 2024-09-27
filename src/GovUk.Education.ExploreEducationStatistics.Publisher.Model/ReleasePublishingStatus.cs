@@ -2,13 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Microsoft.Azure.Cosmos.Table;
+using System.Runtime.Serialization;
+using Azure;
+using Azure.Data.Tables;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
-    public class ReleasePublishingStatus : TableEntity
+    public class ReleasePublishingStatus : ITableEntity
     {
+        public string PartitionKey { get; set; }
+        public string RowKey { get; set; }
+        public DateTimeOffset? Timestamp { get; set; }
+        public ETag ETag { get; set; }
+
+        [IgnoreDataMember]
+        public Guid ReleaseVersionId => Guid.Parse(PartitionKey);
+
+        [IgnoreDataMember]
+        public Guid Id => Guid.Parse(RowKey);
+
         public DateTime Created { get; set; }
         public string PublicationSlug { get; set; }
         public DateTime? Publish { get; set; }
@@ -18,7 +31,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public string PublishingStage { get; set; }
         public string OverallStage { get; set; }
         public bool Immediate { get; set; }
+
+        [IgnoreDataMember]
         public string Messages { get; set; }
+
+        [IgnoreDataMember]
         private ReleasePublishingStatusState _state;
 
         public ReleasePublishingStatus()
@@ -26,17 +43,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         }
 
         public ReleasePublishingStatus(
-            string publicationSlug,
-            DateTime? publish,
             Guid releaseVersionId,
             Guid releaseStatusId,
+            string publicationSlug,
+            DateTime? publish,
             string releaseSlug,
             ReleasePublishingStatusState state,
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
         {
-            RowKey = releaseStatusId.ToString();
             PartitionKey = releaseVersionId.ToString();
+            RowKey = releaseStatusId.ToString();
             Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
             Publish = publish;
@@ -46,9 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             State = state;
         }
 
-        public Guid Id => Guid.Parse(RowKey);
-        public Guid ReleaseVersionId => Guid.Parse(PartitionKey);
-
+        [IgnoreDataMember]
         public ReleasePublishingStatusState State
         {
             get
@@ -68,7 +83,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                 PublishingStage = value.Publishing.ToString();
                 OverallStage = value.Overall.ToString();
 
-                _state = new ReleasePublishingStatusState(value.Content,
+                _state = new ReleasePublishingStatusState(
+                    value.Content,
                     value.Files,
                     value.Publishing,
                     value.Overall);
@@ -76,6 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             }
         }
 
+        [IgnoreDataMember]
         public IEnumerable<ReleasePublishingStatusLogMessage> LogMessages => Messages == null
             ? new List<ReleasePublishingStatusLogMessage>()
             : JsonConvert.DeserializeObject<IEnumerable<ReleasePublishingStatusLogMessage>>(Messages);
@@ -85,14 +102,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             if (logMessage != null)
             {
                 Messages = JsonConvert.SerializeObject(LogMessages.Append(logMessage));
-            }
-        }
-
-        public void AppendLogMessages(IEnumerable<ReleasePublishingStatusLogMessage> logMessages)
-        {
-            if (logMessages != null)
-            {
-                Messages = JsonConvert.SerializeObject(LogMessages.Concat(logMessages));
             }
         }
 

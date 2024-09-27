@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Options;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
@@ -20,7 +18,7 @@ public class ReleaseNotifier(
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
     ITokenService tokenService,
     IEmailService emailService,
-    IPublicationSubscriptionRepository publicationSubscriptionRepository)
+    ISubscriptionRepository subscriptionRepository)
 {
     private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
     private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
@@ -38,40 +36,30 @@ public class ReleaseNotifier(
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var subscribersTable = await publicationSubscriptionRepository.GetTable(NotifierTableStorage.PublicationSubscriptionsTable);
-
         var sentEmails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        // Send emails to subscribers of publication
-        var releaseSubscriberQuery = new TableQuery<SubscriptionEntity>()
-            .Where(TableQuery.GenerateFilterCondition("PartitionKey",
-                QueryComparisons.Equal,
-                msg.PublicationId.ToString()));
-        var releaseSubscriberEmails = await GetSubscriberEmails(subscribersTable, releaseSubscriberQuery);
-
-        foreach (var email in releaseSubscriberEmails)
+        // First send emails to publication subscribers
         {
-            SendSubscriberEmail(email, msg);
-            sentEmails.Add(email);
+            var subscriberEmails = await subscriptionRepository.GetSubscriberEmails(msg.PublicationId);
+
+            foreach (var email in subscriberEmails)
+            {
+                SendSubscriberEmail(email, msg);
+                sentEmails.Add(email);
+            }
         }
 
         logger.LogInformation("Emailed {NumReleaseSubscriberEmailsSent} publication subscribers",
             sentEmails.Count);
 
-        // Send emails to subscribers of any associated superseded publication
+        // Then send emails to subscribers of any associated superseded publication
+        var numSupersededSubscriberEmailsSent = 0;
         foreach (var supersededPublication in msg.SupersededPublications)
         {
-            var releaseSupersededPubSubsQuery = new TableQuery<SubscriptionEntity>()
-                .Where(TableQuery.GenerateFilterCondition("PartitionKey",
-                    QueryComparisons.Equal,
-                    supersededPublication.Id.ToString()));
-            var supersededPublicationSubscriberEmails = await GetSubscriberEmails(
-                subscribersTable,
-                releaseSupersededPubSubsQuery);
+            var supersededPubSubEmails = await subscriptionRepository.GetSubscriberEmails(
+                supersededPublication.Id);
 
-            var numSupersededSubscriberEmailsSent = 0;
-
-            foreach (var email in supersededPublicationSubscriberEmails)
+            foreach (var email in supersededPubSubEmails)
             {
                 if (sentEmails.Contains(email))
                 {
@@ -92,28 +80,6 @@ public class ReleaseNotifier(
 
         logger.LogInformation("Sent {TotalNumEmailsSent} emails in total to subscribers",
             sentEmails.Count);
-    }
-
-    private static async Task<List<string>> GetSubscriberEmails(
-        CloudTable table,
-        TableQuery<SubscriptionEntity> query)
-    {
-        var emails = new List<string>();
-
-        TableContinuationToken? token = null;
-        do
-        {
-            var resultSegment =
-                await table.ExecuteQuerySegmentedAsync(query, token);
-            token = resultSegment.ContinuationToken;
-
-            var newEmails = resultSegment.Results
-                .Select(entity => entity.RowKey)
-                .ToList();
-            emails.AddRange(newEmails);
-        } while (token != null);
-
-        return emails;
     }
 
     private void SendSubscriberEmail(

@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -52,16 +51,6 @@ public abstract class NotifierFunctionsIntegrationTest
     protected GovUkNotifyOptions GetGovUkNotifyOptions()
     {
         return GetRequiredService<IOptions<GovUkNotifyOptions>>().Value;
-    }
-
-    protected async Task AddTestSubscription(string tableName, SubscriptionEntity subscription)
-    {
-        var storageAccount = CloudStorageAccount.Parse(StorageConnectionString());
-        var tableClient = storageAccount.CreateCloudTableClient();
-        var table = tableClient.GetTableReference(tableName);
-        await table.CreateIfNotExistsAsync();
-
-        await table.ExecuteAsync(TableOperation.InsertOrReplace(subscription));
     }
 
     protected async Task CreateApiSubscriptions(params ApiSubscription[] subscriptions)

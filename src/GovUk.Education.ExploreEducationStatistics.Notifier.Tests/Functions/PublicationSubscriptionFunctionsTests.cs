@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interface
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
@@ -37,12 +38,12 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task SendsSubscriptionVerificationEmail()
     {
-        // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
 
+        // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GenerateToken("test1@test.com", It.IsAny<DateTime>()))
@@ -56,7 +57,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository,
+            notifierTableStorageService: notifierTableStorageService,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -93,20 +94,23 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task DoesNotSendEmailAgainIfSubIsPending()
     {
-        // Arrange (data)
-        await AddTestSubscription(NotifierTableStorage.PublicationPendingSubscriptionsTable,
-            new SubscriptionEntity("test-id-2",
-                "test2@test.com",
-                "Test Publication Title 2",
-                "test-publication-slug-2",
-                DateTime.UtcNow));
-
-        // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
 
+        // Arrange (data)
+        await notifierTableStorageService.CreateEntity(
+            NotifierTableStorage.PublicationPendingSubscriptionsTable,
+            new SubscriptionEntity
+            {
+                PartitionKey = "test-id-2",
+                RowKey = "test2@test.com",
+                Slug = "test-publication-slug-2",
+                Title = "Test Publication Title 2",
+            });
+
+        // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GenerateToken("test2@test.com", It.IsAny<DateTime>()))
@@ -120,7 +124,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository,
+            notifierTableStorageService: notifierTableStorageService,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -159,20 +163,24 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task SendsConfirmationEmailIfUserAlreadySubscribed()
     {
-        // Arrange (data)
-        await AddTestSubscription(NotifierTableStorage.PublicationSubscriptionsTable,
-            new SubscriptionEntity("test-id-3",
-                "test3@test.com",
-                "Test Publication Title 3",
-                "test-publication-slug-3",
-                DateTime.UtcNow.AddDays(-4)));
-
-        // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
 
+        // Arrange (data)
+        await notifierTableStorageService.CreateEntity(
+            NotifierTableStorage.PublicationSubscriptionsTable,
+            new SubscriptionEntity
+            {
+                PartitionKey = "test-id-3",
+                RowKey = "test3@test.com",
+                Slug = "test-publication-slug-3",
+                Title = "Test Publication Title 3",
+                DateTimeCreated = DateTime.UtcNow.AddDays(-4),
+            });
+
+        // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GenerateToken("test3@test.com", It.IsAny<DateTime>()))
@@ -186,7 +194,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository,
+            notifierTableStorageService: notifierTableStorageService,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -225,12 +233,12 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Id_Is_Blank()
     {
-        // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
 
+        // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GenerateToken("test@test.com", It.IsAny<DateTime>()))
@@ -244,7 +252,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository,
+            notifierTableStorageService: notifierTableStorageService,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -270,12 +278,12 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Title_Is_Blank()
     {
-        // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
 
+        // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GenerateToken("test@test.com", It.IsAny<DateTime>()))
@@ -289,7 +297,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository,
+            notifierTableStorageService: notifierTableStorageService,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -315,12 +323,12 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Email_Is_Blank()
     {
-        // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
 
+        // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GenerateToken("test@test.com", It.IsAny<DateTime>()))
@@ -334,7 +342,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository,
+            notifierTableStorageService: notifierTableStorageService,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -360,12 +368,12 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task RequestPendingSubscription_ReturnsValidationProblem_When_Slug_Is_Blank()
     {
-        // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
         {
             NotifierStorageConnectionString = StorageConnectionString()
         }));
 
+        // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GenerateToken("test@test.com", It.IsAny<DateTime>()))
@@ -379,7 +387,7 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 It.IsAny<Dictionary<string, dynamic>>()));
 
         var notifierFunction = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository,
+            notifierTableStorageService: notifierTableStorageService,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
@@ -406,21 +414,25 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task SendsSubscriptionConfirmationEmail()
     {
-        // Arrange (data)
-        await AddTestSubscription(NotifierTableStorage.PublicationPendingSubscriptionsTable,
-            new SubscriptionEntity("test-id-4",
-                "test4@test.com",
-                "Test Publication Title 4",
-                "test-publication-slug-4",
-                DateTime.UtcNow.AddDays(-4)));
-
-
-        // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
         {
-            NotifierStorageConnectionString = StorageConnectionString()
+           NotifierStorageConnectionString = StorageConnectionString(),
         }));
 
+        // Arrange (data)
+        var publicationId = Guid.NewGuid();
+        await notifierTableStorageService.CreateEntity(
+            NotifierTableStorage.PublicationPendingSubscriptionsTable,
+            new SubscriptionEntity
+            {
+                PartitionKey = publicationId.ToString(),
+                RowKey = "test4@test.com",
+                Slug = "test-publication-slug-4",
+                Title = "Test Publication Title 4",
+                DateTimeCreated = DateTime.UtcNow.AddDays(-4)
+            });
+
+        // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GetEmailFromToken("verification-code-4"))
@@ -438,14 +450,14 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
 
         var notifierFunction = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository,
+            notifierTableStorageService: notifierTableStorageService,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
         // Act
         var result =
             await notifierFunction.VerifySubscription(new TestFunctionContext(),
-                "test-id-4",
+                publicationId,
                 "verification-code-4");
 
         // Assert
@@ -467,21 +479,25 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     [Fact]
     public async Task Unsubscribes()
     {
-        // Arrange (data)
-        await AddTestSubscription(NotifierTableStorage.PublicationSubscriptionsTable,
-            new SubscriptionEntity("test-id-5",
-                "test5@test.com",
-                "Test Publication Title 5",
-                "test-publication-slug-5",
-                DateTime.UtcNow.AddDays(-4)));
-
-
-        // Arrange (mocks)
-        var publicationSubscriptionRepository = new PublicationSubscriptionRepository(Options.Create(new AppSettingsOptions
+        var notifierTableStorageService = new NotifierTableStorageService(Options.Create(new AppSettingsOptions
         {
-            NotifierStorageConnectionString = StorageConnectionString()
+           NotifierStorageConnectionString = StorageConnectionString(),
         }));
 
+        // Arrange (data)
+        var publicationId = Guid.NewGuid();
+        await notifierTableStorageService.CreateEntity(
+            NotifierTableStorage.PublicationSubscriptionsTable,
+            new SubscriptionEntity
+            {
+                PartitionKey = publicationId.ToString(),
+                RowKey = "test5@test.com",
+                Slug = "test-publication-slug-5",
+                Title = "Test Publication Title 5",
+                DateTimeCreated = DateTime.UtcNow.AddDays(-4)
+            });
+
+        // Arrange (mocks)
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GetEmailFromToken("unsubscription-code-5"))
@@ -490,14 +506,14 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
 
         var notifierFunction = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository,
+            notifierTableStorageService: notifierTableStorageService,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
         // Act
         var result =
             await notifierFunction.Unsubscribe(new TestFunctionContext(),
-                "test-id-5",
+                publicationId.ToString(),
                 "unsubscription-code-5");
 
         var okResult = Assert.IsAssignableFrom<OkObjectResult>(result);
@@ -531,17 +547,21 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     private PublicationSubscriptionFunctions BuildFunction(
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
-        IPublicationSubscriptionRepository? publicationSubscriptionRepository = null) =>
+        INotifierTableStorageService? notifierTableStorageService = null) =>
         new(
-            Mock.Of<ILogger<PublicationSubscriptionFunctions>>(),
-            Options.Create(new AppSettingsOptions { PublicAppUrl = "https://localhost:3000" }),
-            Options.Create(new GovUkNotifyOptions
+            logger: Mock.Of<ILogger<PublicationSubscriptionFunctions>>(),
+            appSettingsOptions: Options.Create(new AppSettingsOptions { PublicAppUrl = "https://localhost:3000" }),
+            govUkNotifyOptions: Options.Create(new GovUkNotifyOptions
             {
                 ApiKey = "",
                 EmailTemplates = EmailTemplateOptions
             }),
-            tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
-            emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
-            publicationSubscriptionRepository ?? Mock.Of<IPublicationSubscriptionRepository>(MockBehavior.Strict),
-            new PendingPublicationSubscriptionCreateRequest.Validator());
+            tokenService: tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
+            emailService: emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
+            requestValidator: new PendingPublicationSubscriptionCreateRequest.Validator(),
+            notifierTableStorageService: notifierTableStorageService
+                                         ?? Mock.Of<INotifierTableStorageService>(MockBehavior.Strict),
+            subscriptionRepository: notifierTableStorageService != null
+                ? new SubscriptionRepository(notifierTableStorageService)
+                : Mock.Of<ISubscriptionRepository>(MockBehavior.Strict));
 }

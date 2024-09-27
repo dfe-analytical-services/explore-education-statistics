@@ -7,26 +7,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IReleasePublishingStatusService
     {
-        Task<ReleasePublishingKey> Create(
+        Task Create(
             ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state,
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null);
 
-        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayWithStages(
+        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueToday(
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null);
 
-        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFutureWithStages(
+        Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFuture(
             IReadOnlyList<Guid> releaseVersionIds,
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null);
 
-        Task<IReadOnlyList<ReleasePublishingStatus>> GetAllByOverallStage(
+        Task<List<ReleasePublishingStatus>> GetAllByOverallStage(
             Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages);
 
