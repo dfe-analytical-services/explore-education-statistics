@@ -13,15 +13,18 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Types;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
 public class PublicationSubscriptionFunctions(
+    ContentDbContext contentDbContext,
     ILogger<PublicationSubscriptionFunctions> logger,
     IOptions<AppOptions> appOptions,
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
@@ -190,6 +193,20 @@ public class PublicationSubscriptionFunctions(
                 tableName: NotifierTableStorage.PublicationSubscriptionsTable,
                 partitionKey: publicationId,
                 rowKey: email);
+
+        var supersededPublicationIds = await contentDbContext.Publications
+            .Where(p => p.SupersededById == Guid.Parse(publicationId))
+            .Select(p => p.Id)
+            .ToListAsync();
+
+        foreach (var supersededPubId in supersededPublicationIds)
+        {
+            await notifierTableStorageService
+                .DeleteEntity(
+                    tableName: NotifierTableStorage.PublicationSubscriptionsTable,
+                    partitionKey: supersededPubId.ToString(),
+                    rowKey: email);
+        }
 
         return new OkObjectResult(new SubscriptionStateDto
         {
