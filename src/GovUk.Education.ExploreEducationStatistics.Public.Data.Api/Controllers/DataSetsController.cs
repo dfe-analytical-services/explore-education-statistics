@@ -27,7 +27,7 @@ public class DataSetsController(
     /// </remarks>
     [HttpGet("{dataSetId:guid}")]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The requested data set summary", type: typeof(DataSetViewModel))]
+    [SwaggerResponse(200, "The requested data set summary.", type: typeof(DataSetViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetViewModel>> GetDataSet(
@@ -49,7 +49,7 @@ public class DataSetsController(
     /// </remarks>
     [HttpGet("{dataSetId:guid}/meta")]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The requested data set version metadata", type: typeof(DataSetMetaViewModel))]
+    [SwaggerResponse(200, "The requested data set version metadata.", type: typeof(DataSetMetaViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetMetaViewModel>> GetDataSetMeta(
@@ -207,7 +207,7 @@ public class DataSetsController(
     /// </remarks>
     [HttpGet("{dataSetId:guid}/query")]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The paginated list of query results", type: typeof(DataSetQueryPaginatedResultsViewModel))]
+    [SwaggerResponse(200, "The paginated list of query results.", type: typeof(DataSetQueryPaginatedResultsViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
@@ -238,7 +238,7 @@ public class DataSetsController(
     [HttpPost("{dataSetId:guid}/query")]
     [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The paginated list of query results", type: typeof(DataSetQueryPaginatedResultsViewModel))]
+    [SwaggerResponse(200, "The paginated list of query results.", type: typeof(DataSetQueryPaginatedResultsViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]

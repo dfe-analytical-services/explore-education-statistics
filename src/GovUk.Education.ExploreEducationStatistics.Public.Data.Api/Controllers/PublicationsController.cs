@@ -24,7 +24,7 @@ public class PublicationsController(IPublicationService publicationService, IDat
     /// </remarks>
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The paginated list of publications", type: typeof(PublicationPaginatedListViewModel))]
+    [SwaggerResponse(200, "The paginated list of publications.", type: typeof(PublicationPaginatedListViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     public async Task<ActionResult<PublicationPaginatedListViewModel>> ListPublications(
         [FromQuery] PublicationListRequest request,
@@ -47,7 +47,7 @@ public class PublicationsController(IPublicationService publicationService, IDat
     /// </remarks>
     [HttpGet("{publicationId:guid}")]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The requested publication summary", type: typeof(PublicationSummaryViewModel))]
+    [SwaggerResponse(200, "The requested publication summary.", type: typeof(PublicationSummaryViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     // add other responses
     public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication(
@@ -69,7 +69,7 @@ public class PublicationsController(IPublicationService publicationService, IDat
     /// </remarks>
     [HttpGet("{publicationId:guid}/data-sets")]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The paginated list of data sets", type: typeof(DataSetPaginatedListViewModel))]
+    [SwaggerResponse(200, "The paginated list of data sets.", type: typeof(DataSetPaginatedListViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     public async Task<ActionResult<DataSetPaginatedListViewModel>> ListPublicationDataSets(
         [FromQuery] DataSetListRequest request,

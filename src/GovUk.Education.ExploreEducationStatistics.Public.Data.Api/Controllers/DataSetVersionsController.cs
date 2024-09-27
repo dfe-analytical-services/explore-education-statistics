@@ -26,7 +26,7 @@ public class DataSetVersionsController(
     /// </remarks>
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The paginated list of data set versions", type: typeof(DataSetVersionPaginatedListViewModel))]
+    [SwaggerResponse(200, "The paginated list of data set versions.", type: typeof(DataSetVersionPaginatedListViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListDataSetVersions(
@@ -51,7 +51,7 @@ public class DataSetVersionsController(
     /// </remarks>
     [HttpGet("{dataSetVersion}")]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The requested data set version", type: typeof(DataSetVersionViewModel))]
+    [SwaggerResponse(200, "The requested data set version.", type: typeof(DataSetVersionViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionViewModel>> GetDataSetVersion(
@@ -75,7 +75,7 @@ public class DataSetVersionsController(
     /// </remarks>
     [HttpGet("{dataSetVersion}/changes")]
     [Produces(MediaTypeNames.Application.Json)]
-    [SwaggerResponse(200, "The changes for this data set version", type: typeof(DataSetVersionChangesViewModel))]
+    [SwaggerResponse(200, "The changes for the data set version.", type: typeof(DataSetVersionChangesViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionChangesViewModel>> GetDataSetVersionChanges(
