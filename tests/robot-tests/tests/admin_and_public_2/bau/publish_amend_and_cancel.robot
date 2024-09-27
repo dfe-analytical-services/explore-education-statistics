@@ -28,7 +28,7 @@ Go to "Release summary" page
     ...    ${RELEASE_NAME}
 
 Upload subject
-    user uploads subject    Dates test subject    dates.csv    dates.meta.csv
+    user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
 
 Add data guidance
     user clicks link    Data guidance

@@ -154,7 +154,7 @@
     "theme": "Further education"
   },
   {
-    "publication_summary": "Number of practitioners and settings that have registered to take part in strands of the early years education recovery (EYER) programme in England.",
+    "publication_summary": "Number of practitioners and settings that have registered for, and completed, strands of the early years education recovery (EYER) programme. .",
     "publication_title": "Early years education recovery",
     "published": "25 Jan 2024",
     "release_type": "Management information",
@@ -441,6 +441,13 @@
     "theme": "Destination of pupils and students"
   },
   {
+    "publication_summary": "Data and commentary on demand for occupations, using 4-digit SOC20 definitions, and industries, using grouped SIC, across the UK labour market.",
+    "publication_title": "Occupations in demand",
+    "published": "19 Sep 2024",
+    "release_type": "Official statistics in development",
+    "theme": "Labour market and skills"
+  },
+  {
     "publication_summary": "Children in need, including children looked after by local authorities in England, national and local authority level outcomes including key stage 4 and absence",
     "publication_title": "Outcomes for children in need, including children looked after by local authorities in England",
     "published": "18 Apr 2024",
@@ -464,7 +471,7 @@
   {
     "publication_summary": "Participation and not in education, employment or training (NEET) figures ages 16 to 18 in England. Includes institution type and qualification aim breakdowns.",
     "publication_title": "Participation in education, training and employment age 16 to 18",
-    "published": "19 Oct 2023",
+    "published": "26 Sep 2024",
     "release_type": "Accredited official statistics",
     "theme": "Destination of pupils and students"
   },
@@ -485,7 +492,7 @@
   {
     "publication_summary": "Local authority (LA) spending plans for education, children's services and social care.",
     "publication_title": "Planned LA and school expenditure",
-    "published": "28 Sep 2023",
+    "published": "26 Sep 2024",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
   },
@@ -520,7 +527,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "8 Aug 2024",
+    "published": "26 Sep 2024",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
@@ -604,8 +611,8 @@
   {
     "publication_summary": "Statistics on Skills Bootcamps participants in England. Data includes completions and outcomes.",
     "publication_title": "Skills Bootcamps Completions and Outcomes",
-    "published": "9 Dec 2021",
-    "release_type": "Ad hoc statistics",
+    "published": "19 Sep 2024",
+    "release_type": "Management information",
     "theme": "Further education"
   },
   {

@@ -100,9 +100,7 @@ public class RequestTimeoutTests(TestApplicationFactory testApp) : IntegrationTe
             return NoContent();
         }
 
-        private readonly int _requestTimeout = requestTimeoutOptions.Value.TimeoutMilliseconds
-            ?? throw new Exception(
-                $"Must populate '{RequestTimeoutOptions.Section}:{nameof(RequestTimeoutOptions.TimeoutMilliseconds)}' in the integration test app settings.");
+        private readonly int _requestTimeout = requestTimeoutOptions.Value.TimeoutMilliseconds;
     }
 
     private WebApplicationFactory<Startup> BuildApp()
@@ -111,8 +109,8 @@ public class RequestTimeoutTests(TestApplicationFactory testApp) : IntegrationTe
             .WithWebHostBuilder(builder =>
             {
                 builder.WithAdditionalControllers(typeof(TestController));
-                builder.ConfigureAppConfiguration((hostContext, config) => 
-                    config.AddInMemoryCollection(new Dictionary<string, string?>()
+                builder.ConfigureAppConfiguration((_, config) =>
+                    config.AddInMemoryCollection(new Dictionary<string, string?>
                     {
                         { $"{RequestTimeoutOptions.Section}:{nameof(RequestTimeoutOptions.TimeoutMilliseconds)}", "100" }
                     }));

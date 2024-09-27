@@ -37,12 +37,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 [ExcludeFromCodeCoverage]
 public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
 {
-    private readonly IConfiguration _miniProfilerConfig =
-        configuration.GetRequiredSection(MiniProfilerOptions.Section);
-    private readonly IConfiguration _openIdConnectConfig =
-        configuration.GetRequiredSection(OpenIdConnectOptions.Section);
-    private readonly IConfiguration _requestTimeoutConfig =
-        configuration.GetSection(RequestTimeoutOptions.Section);
+    private readonly MiniProfilerOptions _miniProfilerOptions = configuration
+        .GetRequiredSection(MiniProfilerOptions.Section)
+        .Get<MiniProfilerOptions>()!;
+
+    private readonly OpenIdConnectOptions _openIdConnectOptions = configuration
+        .GetRequiredSection(OpenIdConnectOptions.Section)
+        .Get<OpenIdConnectOptions>()!;
+
+    private readonly RequestTimeoutOptions _requestTimeoutOptions = configuration
+        .GetSection(RequestTimeoutOptions.Section)
+        .Get<RequestTimeoutOptions>()!;
+
+    private readonly AppInsightsOptions _appInsightsOptions = configuration
+        .GetSection(AppInsightsOptions.Section)
+        .Get<AppInsightsOptions>()!;
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -52,14 +61,15 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddHealthChecks();
 
         services
-            .AddApplicationInsightsTelemetry()
+            .AddApplicationInsightsTelemetry(options =>
+            {
+                options.ConnectionString = _appInsightsOptions.ConnectionString;
+            })
             .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
 
         // Profiling
 
-        var isMiniProfilerEnabled = _miniProfilerConfig.GetValue<bool>(nameof(MiniProfilerOptions.Enabled));
-
-        if (isMiniProfilerEnabled)
+        if (_miniProfilerOptions.Enabled)
         {
             services
                 .AddMiniProfiler(options =>
@@ -81,8 +91,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    var tenantId = _openIdConnectConfig.GetValue<Guid>(nameof(OpenIdConnectOptions.TenantId));
-                    var clientId = _openIdConnectConfig.GetValue<Guid>(nameof(OpenIdConnectOptions.ClientId));
+                    var tenantId = _openIdConnectOptions.TenantId;
+                    var clientId = _openIdConnectOptions.ClientId;
                     options.Authority = $"https://login.microsoftonline.com/{tenantId}";
                     options.Audience = $"api://{clientId}";
                 });
@@ -95,7 +105,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             options.DefaultPolicy =
                 new RequestTimeoutPolicy
                 {
-                    Timeout = TimeSpan.FromMilliseconds(_requestTimeoutConfig.GetValue<int?>(nameof(RequestTimeoutOptions.TimeoutMilliseconds)) ?? 30000),
+                    Timeout = TimeSpan.FromMilliseconds(_requestTimeoutOptions.TimeoutMilliseconds),
                     TimeoutStatusCode = (int)HttpStatusCode.GatewayTimeout
                 };
         });
@@ -152,7 +162,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Configure Dapper to match CSV columns with underscores
         DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-        services.AddScoped<IDuckDbConnection>(_ => isMiniProfilerEnabled
+        services.AddScoped<IDuckDbConnection>(_ => _miniProfilerOptions.Enabled
             ? new ProfiledDuckDbConnection()
             : new DuckDbConnection()
         );
@@ -165,16 +175,16 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             options.EnableForHttps = true;
         });
 
-        // Options
+        // Options - only need to add ones that will be used in services
 
+        services.AddOptions<AppSettingsOptions>()
+            .Bind(configuration.GetRequiredSection(AppSettingsOptions.Section));
         services.AddOptions<ContentApiOptions>()
             .Bind(configuration.GetRequiredSection(ContentApiOptions.Section));
-        services.AddOptions<RequestTimeoutOptions>()
-            .Bind(configuration.GetSection(RequestTimeoutOptions.Section));
         services.AddOptions<DataFilesOptions>()
             .Bind(configuration.GetRequiredSection(DataFilesOptions.Section));
-        services.AddOptions<MiniProfilerOptions>()
-            .Bind(_miniProfilerConfig);
+        services.AddOptions<RequestTimeoutOptions>()
+            .Bind(configuration.GetRequiredSection(RequestTimeoutOptions.Section));
 
         // Services
 
@@ -190,7 +200,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         });
 
         services.AddSecurity();
-        
+
         services.AddScoped<IAuthorizationHandlerService, AuthorizationHandlerService>();
 
         services.AddScoped<IPreviewTokenService, PreviewTokenService>();
@@ -214,7 +224,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     {
         UpdateDatabase(app);
 
-        if (_miniProfilerConfig.GetValue<bool>(nameof(MiniProfilerOptions.Enabled)))
+        if (_miniProfilerOptions.Enabled)
         {
             app.UseMiniProfiler();
         }

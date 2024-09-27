@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -14,6 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -60,10 +60,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseVersionId:guid}")]
-        public async Task<ActionResult> DeleteReleaseVersion(Guid releaseVersionId)
+        public async Task<ActionResult> DeleteReleaseVersion(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken)
         {
             return await _releaseService
-                .DeleteReleaseVersion(releaseVersionId)
+                .DeleteReleaseVersion(releaseVersionId, cancellationToken)
                 .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
 
@@ -244,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}/delete-plan")]
         public async Task<ActionResult<DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
-            Guid releaseVersionId, 
+            Guid releaseVersionId,
             Guid fileId,
             CancellationToken cancellationToken = default)
         {

@@ -44,7 +44,7 @@ public static class FilterOptionMetaLinkGeneratorExtensions
     public static InstanceSetters<FilterOptionMetaLink> SetDefaults(
         this InstanceSetters<FilterOptionMetaLink> setters)
         => setters
-            .SetDefault(l => l.PublicId);
+            .Set(m => m.PublicId, f => f.Random.AlphaNumeric(10));
 
     public static InstanceSetters<FilterOptionMetaLink> SetMeta(
         this InstanceSetters<FilterOptionMetaLink> setters,

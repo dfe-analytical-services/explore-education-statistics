@@ -3,27 +3,31 @@ import Modal from '@common/components/Modal';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Pagination from '@common/components/Pagination';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useMemo, useState } from 'react';
 import chunk from 'lodash/chunk';
 
-const itemsPerPage = 10;
-
 interface Props {
-  id: string;
+  column: string;
   label: string;
-  modalLabel: string;
   options: string[];
+  pageSize?: number;
+  publicId?: string;
 }
 
 export default function ApiDataSetMappableFilterColumnOptionsModal({
-  id,
+  column,
   label,
   options,
-  modalLabel,
+  pageSize = 10,
+  publicId,
 }: Props) {
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const optionChunks = useMemo(() => chunk(options, itemsPerPage), [options]);
+  const optionChunks = useMemo(
+    () => chunk(options, pageSize),
+    [options, pageSize],
+  );
 
   const totalPages = optionChunks.length;
 
@@ -31,17 +35,24 @@ export default function ApiDataSetMappableFilterColumnOptionsModal({
     <Modal
       showClose
       title="View filter options"
-      triggerButton={<ButtonText>View filter options</ButtonText>}
+      triggerButton={
+        <ButtonText>
+          View filter options<VisuallyHidden> for {label}</VisuallyHidden>
+        </ButtonText>
+      }
     >
-      <h3>{modalLabel}</h3>
+      <h3>Filter column</h3>
       <SummaryList>
         <SummaryListItem term="Label">{label}</SummaryListItem>
-        <SummaryListItem term="ID">{id}</SummaryListItem>
+        <SummaryListItem term="Column">{column}</SummaryListItem>
+        {publicId && (
+          <SummaryListItem term="Identifier">{publicId}</SummaryListItem>
+        )}
       </SummaryList>
 
       <h3>Filter options</h3>
 
-      <ul className="govuk-list">
+      <ul className="govuk-list" data-testid="filter-options">
         {optionChunks[currentPage - 1].map((option, index) => {
           return (
             <li

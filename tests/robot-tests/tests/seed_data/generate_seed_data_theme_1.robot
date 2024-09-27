@@ -87,13 +87,13 @@ Create ${RELEASE_1_NAME} release
     ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
 Add data files to ${RELEASE_1_NAME}
-    user uploads subject
+    user uploads subject and waits until complete
     ...    Absence by characteristic
     ...    absence_by_characteristic.csv
     ...    absence_by_characteristic.meta.csv
     ...    ${UNZIPPED_FILES_DIR}
 
-    user uploads subject
+    user uploads subject and waits until complete
     ...    Absence in PRUs
     ...    absence_in_prus.csv
     ...    absence_in_prus.meta.csv
@@ -563,7 +563,7 @@ Create ${RELEASE_2_NAME} release
     ...    ${EXCLUSIONS_TOPIC_TITLE}
 
 Add data files to ${RELEASE_2_NAME}
-    user uploads subject
+    user uploads subject and waits until complete
     ...    Exclusions by geographic level
     ...    exclusions_by_geographic_level.csv
     ...    exclusions_by_geographic_level.meta.csv

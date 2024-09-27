@@ -33,8 +33,8 @@ Verify release summary
     user verifies release summary    Financial year    3000-01    Accredited official statistics
 
 Upload datafiles
-    user uploads subject    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv
-    user uploads subject    ${SUBJECT_NAME_2}    tiny-two-filters.csv    tiny-two-filters.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_2}    tiny-two-filters.csv    tiny-two-filters.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to subjects
     user clicks link    Data and files
@@ -120,6 +120,8 @@ Remove draft API dataset
     
     ${modal}=    user waits until modal is visible     Remove this draft API data set version
     user clicks button     Remove this API data set version
+
+    user waits until modal is not visible     Remove this draft API data set version
     user waits until h2 is visible    API data sets
 
 User creates 1st API dataset again

@@ -28,7 +28,7 @@ Verify release summary
     ...    Accredited official statistics
 
 Upload subject
-    user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Check release isn't publically visible
     user clicks link    Sign off

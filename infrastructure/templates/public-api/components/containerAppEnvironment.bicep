@@ -1,6 +1,3 @@
-@description('Specifies the subscription name of the Container App Environment - used for creating name prefix')
-param subscription string
-
 @description('Specifies the location of the Container App Environment - defaults to that of the Resource Group')
 param location string
 
@@ -29,7 +26,7 @@ param workloadProfiles {
 param tagValues object
 
 @description('Specifies a suffix to append to the full name of the Container App Environment')
-param containerAppEnvironmentNameSuffix string = ''
+param containerAppEnvironmentName string = ''
 
 @description('Specifies an array of Azure File Shares to be available for Container Apps hosted within this Container App Environment')
 param azureFileStorages {
@@ -39,10 +36,6 @@ param azureFileStorages {
   fileShareName: string
   accessMode: 'ReadWrite' | 'ReadOnly'
 }[] = []
-
-var containerAppEnvironmentName = empty(containerAppEnvironmentNameSuffix)
-  ? '${subscription}-ees-cae'
-  : '${subscription}-ees-cae-${containerAppEnvironmentNameSuffix}'
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: logAnalyticsWorkspaceName
@@ -83,3 +76,4 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' 
 
 output containerAppEnvironmentName string = containerAppEnvironmentName
 output containerAppEnvironmentId string = containerAppEnvironment.id
+output containerAppEnvironmentIpAddress string = containerAppEnvironment.properties.staticIp

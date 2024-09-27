@@ -1,8 +1,9 @@
+import redirectPages from '@frontend/middleware/pages/redirectPages';
 import _redirectService, {
   Redirects,
 } from '@frontend/services/redirectService';
-import redirectPages from '@frontend/middleware/pages/redirectPages';
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import runMiddleware from './util/runMiddleware';
 
 jest.mock('@frontend/services/redirectService');
 const redirectService = _redirectService as jest.Mocked<
@@ -26,40 +27,37 @@ describe('redirectPages', () => {
 
   test('does not re-request the list of redirects once it has been fetched', async () => {
     redirectService.list.mockResolvedValue(testRedirects);
-    const req = new NextRequest(
-      new Request('https://my-env/methodology/original-slug'),
+
+    await runMiddleware(
+      redirectPages,
+      'https://my-env/methodology/original-slug',
     );
-    await redirectPages(req);
 
     expect(redirectService.list).toHaveBeenCalledTimes(1);
 
-    const req2 = new NextRequest(
-      new Request('https://my-env/methodology/another-slug'),
+    await runMiddleware(
+      redirectPages,
+      'https://my-env/methodology/another-slug',
     );
-    await redirectPages(req2);
 
     expect(redirectService.list).toHaveBeenCalledTimes(1);
   });
 
   test('does not check for redirects for non release or methodology pages', async () => {
-    await redirectPages(
-      new NextRequest(new Request('https://my-env/find-statistics')),
-    );
+    await runMiddleware(redirectPages, 'https://my-env/find-statistics');
 
     expect(redirectService.list).not.toHaveBeenCalled();
     expect(redirectSpy).not.toHaveBeenCalled();
     expect(nextSpy).toHaveBeenCalledTimes(1);
 
-    await redirectPages(
-      new NextRequest(new Request('https://my-env/methodology')),
-    );
+    await runMiddleware(redirectPages, 'https://my-env/methodology');
+
     expect(redirectService.list).not.toHaveBeenCalled();
     expect(redirectSpy).not.toHaveBeenCalled();
     expect(nextSpy).toHaveBeenCalledTimes(2);
 
-    await redirectPages(
-      new NextRequest(new Request('https://my-env/data-tables/something')),
-    );
+    await runMiddleware(redirectPages, 'https://my-env/data-tables/something');
+
     expect(redirectService.list).not.toHaveBeenCalled();
     expect(redirectSpy).not.toHaveBeenCalled();
     expect(nextSpy).toHaveBeenCalledTimes(3);
@@ -67,9 +65,7 @@ describe('redirectPages', () => {
 
   test('redirects urls with uppercase characters to lowercase', async () => {
     redirectService.list.mockResolvedValue(testRedirects);
-    await redirectPages(
-      new NextRequest(new Request('https://my-env/Find-Statistics')),
-    );
+    await runMiddleware(redirectPages, 'https://my-env/Find-Statistics');
 
     expect(redirectSpy).toHaveBeenCalledTimes(1);
     expect(redirectSpy).toHaveBeenCalledWith(
@@ -80,12 +76,9 @@ describe('redirectPages', () => {
     );
     expect(nextSpy).not.toHaveBeenCalled();
 
-    await redirectPages(
-      new NextRequest(
-        new Request(
-          'https://my-env/find-statistics/RELEASE-NAME?testParam=Something',
-        ),
-      ),
+    await runMiddleware(
+      redirectPages,
+      'https://my-env/find-statistics/RELEASE-NAME?testParam=Something',
     );
 
     expect(redirectSpy).toHaveBeenCalledTimes(2);
@@ -101,10 +94,11 @@ describe('redirectPages', () => {
   describe('redirect methodology pages', () => {
     test('redirects the request when the slug for the requested page has changed', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request('https://my-env/methodology/original-slug-1'),
+
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/methodology/original-slug-1',
       );
-      await redirectPages(req);
 
       expect(redirectSpy).toHaveBeenCalledTimes(1);
       expect(redirectSpy).toHaveBeenCalledWith(
@@ -118,10 +112,11 @@ describe('redirectPages', () => {
 
     test('does not redirect when the slug for the requested page has not changed', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request('https://my-env/methodology/my-methodology'),
+
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/methodology/my-methodology',
       );
-      await redirectPages(req);
 
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(1);
@@ -129,18 +124,16 @@ describe('redirectPages', () => {
 
     test('does not redirect if the `fromSlug` only partially matches', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request('https://my-env/methodology/original'),
-      );
-      await redirectPages(req);
+
+      await runMiddleware(redirectPages, 'https://my-env/methodology/original');
 
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(1);
 
-      const req2 = new NextRequest(
-        new Request('https://my-env/methodology/original-slug-and-something'),
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/methodology/original-slug-and-something',
       );
-      await redirectPages(req2);
 
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(2);
@@ -148,10 +141,11 @@ describe('redirectPages', () => {
 
     test('redirects child pages', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request('https://my-env/methodology/original-slug-1/child-page'),
+
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/methodology/original-slug-1/child-page',
       );
-      await redirectPages(req);
 
       expect(redirectSpy).toHaveBeenCalledTimes(1);
       expect(redirectSpy).toHaveBeenCalledWith(
@@ -165,12 +159,11 @@ describe('redirectPages', () => {
 
     test('redirects with query params', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request(
-          'https://my-env/methodology/original-slug-1?search=something',
-        ),
+
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/methodology/original-slug-1?search=something',
       );
-      await redirectPages(req);
 
       expect(redirectSpy).toHaveBeenCalledTimes(1);
       expect(redirectSpy).toHaveBeenCalledWith(
@@ -184,11 +177,11 @@ describe('redirectPages', () => {
 
     test('does not redirect when the slug matches a `fromSlug` in a different page type', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request('https://my-env/methodology/original-slug-4'),
-      );
 
-      await redirectPages(req);
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/methodology/original-slug-4',
+      );
 
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(1);
@@ -196,10 +189,11 @@ describe('redirectPages', () => {
 
     test('redirects with uppercase characters', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request('https://my-env/Methodology/original-SLUG-1'),
+
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/Methodology/original-SLUG-1',
       );
-      await redirectPages(req);
 
       expect(redirectSpy).toHaveBeenCalledTimes(1);
       expect(redirectSpy).toHaveBeenCalledWith(
@@ -215,10 +209,11 @@ describe('redirectPages', () => {
   describe('redirect publication pages', () => {
     test('redirects the request when the slug for the requested page has changed', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request('https://my-env/find-statistics/original-slug-3'),
+
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/find-statistics/original-slug-3',
       );
-      await redirectPages(req);
 
       expect(redirectSpy).toHaveBeenCalledTimes(1);
       expect(redirectSpy).toHaveBeenCalledWith(
@@ -232,10 +227,11 @@ describe('redirectPages', () => {
 
     test('does not redirect when the slug for the requested page has not changed', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request('https://my-env/find-statistics/my-publication'),
+
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/find-statistics/my-publication',
       );
-      await redirectPages(req);
 
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(1);
@@ -243,20 +239,19 @@ describe('redirectPages', () => {
 
     test('does not redirect if the `fromSlug` only partially matches', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request('https://my-env/find-statistics/original'),
+
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/find-statistics/original',
       );
-      await redirectPages(req);
 
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(1);
 
-      const req2 = new NextRequest(
-        new Request(
-          'https://my-env/find-statistics/original-slug-and-something',
-        ),
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/find-statistics/original-slug-and-something',
       );
-      await redirectPages(req2);
 
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(2);
@@ -264,12 +259,11 @@ describe('redirectPages', () => {
 
     test('redirects child pages', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request(
-          'https://my-env/find-statistics/original-slug-3/child-page',
-        ),
+
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/find-statistics/original-slug-3/child-page',
       );
-      await redirectPages(req);
 
       expect(redirectSpy).toHaveBeenCalledTimes(1);
       expect(redirectSpy).toHaveBeenCalledWith(
@@ -283,12 +277,11 @@ describe('redirectPages', () => {
 
     test('redirects with query params', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request(
-          'https://my-env/find-statistics/original-slug-3?search=something',
-        ),
+
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/find-statistics/original-slug-3?search=something',
       );
-      await redirectPages(req);
 
       expect(redirectSpy).toHaveBeenCalledTimes(1);
 
@@ -303,11 +296,11 @@ describe('redirectPages', () => {
 
     test('does not redirect when the slug matches a `fromSlug` in a different page type', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request('https://my-env/find-statistics/original-slug-1'),
-      );
 
-      await redirectPages(req);
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/find-statistics/original-slug-1',
+      );
 
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(1);
@@ -315,10 +308,11 @@ describe('redirectPages', () => {
 
     test('redirects with uppercase characters', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
-      const req = new NextRequest(
-        new Request('https://my-env/find-Statistics/original-SLUG-3'),
+
+      await runMiddleware(
+        redirectPages,
+        'https://my-env/find-Statistics/original-SLUG-3',
       );
-      await redirectPages(req);
 
       expect(redirectSpy).toHaveBeenCalledTimes(1);
       expect(redirectSpy).toHaveBeenCalledWith(

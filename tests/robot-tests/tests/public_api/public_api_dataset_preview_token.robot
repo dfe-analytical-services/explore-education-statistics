@@ -37,8 +37,8 @@ Verify release summary
     user verifies release summary    Academic year Q1    3000/01    Accredited official statistics
 
 Upload data files
-    user uploads subject    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv
-    user uploads subject    ${SUBJECT_NAME_2}    tiny-two-filters.csv    tiny-two-filters.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv     ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_2}    tiny-two-filters.csv    tiny-two-filters.meta.csv     ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to subjects
     user clicks link    Data and files

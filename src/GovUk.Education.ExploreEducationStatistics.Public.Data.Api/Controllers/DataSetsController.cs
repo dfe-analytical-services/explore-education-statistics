@@ -1,11 +1,13 @@
 using Asp.Versioning;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net.Mime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers;
 
@@ -58,7 +60,7 @@ public class DataSetsController(
     {
         return await dataSetService
             .GetMeta(
-                dataSetId: dataSetId, 
+                dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion,
                 types: request.ParsedTypes(),
                 cancellationToken: cancellationToken)
@@ -249,5 +251,38 @@ public class DataSetsController(
         return await dataSetQueryService
             .Query(dataSetId, request, dataSetVersion, cancellationToken)
             .HandleFailuresOrOk();
+    }
+
+    /// <summary>
+    /// Download a data set as CSV
+    /// </summary>
+    /// <remarks>
+    /// The CSV response will render its metadata in a human-readable format (instead of
+    /// machine-readable IDs). The CSV is not subject to the same backward compatibility
+    /// guarantees as the data set's JSON representation in other endpoints.
+    /// </remarks>
+    [HttpGet("{dataSetId:guid}/csv")]
+    [Produces(MediaTypeNames.Text.Csv, MediaTypeNames.Application.Json)]
+    [SwaggerResponse(200, description: "The data set CSV file.", contentTypes: MediaTypeNames.Text.Csv)]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
+    [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
+    public async Task<ActionResult> DownloadDataSetCsv(
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
+        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")][FromQuery] string? dataSetVersion,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetService
+            .DownloadDataSet(
+                dataSetId: dataSetId,
+                dataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken
+            )
+            .OnSuccess(fileStreamResult =>
+            {
+                HttpContext.Response.Headers.ContentEncoding = ContentEncodings.Gzip;
+
+                return fileStreamResult;
+            })
+            .HandleFailures();
     }
 }

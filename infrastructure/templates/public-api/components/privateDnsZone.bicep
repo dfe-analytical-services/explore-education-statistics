@@ -1,19 +1,23 @@
+import { privateDnsZoneType } from '../types.bicep'
+
 @description('Specifies the type of zone to create')
-@allowed([
-  'sites'
-  'postgres'
-])
-param zoneType string
+param zoneType privateDnsZoneType
+
+@description('Specifies an optional name for the zone, if "custom" zoneType was chosen')
+param customName string?
 
 @description('Specifies the name of the VNet that this DNS Zone will be attached to')
 param vnetName string
+
+@description('Specifies a set of tags with which to tag the resource in Azure')
+param tagValues object
 
 var zoneTypeToNames = {
   sites: 'privatelink.azurewebsites.net'
   postgres: 'privatelink.postgres.database.azure.com'
 }
 
-var zoneName = zoneTypeToNames[zoneType]
+var zoneName = zoneType == 'custom' ? customName : zoneTypeToNames[zoneType]
 
 resource vnet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: vnetName
@@ -24,6 +28,7 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: zoneName
   location: 'global'
   properties: {}
+  tags: tagValues
 }
 
 // A link which makes the internal DNS records within the DNS zone available to other resources on the VNet.
@@ -37,6 +42,7 @@ resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLin
       id: vnet.id
     }
   }
+  tags: tagValues
 }
 
 output privateDnsZoneId string = privateDnsZone.id

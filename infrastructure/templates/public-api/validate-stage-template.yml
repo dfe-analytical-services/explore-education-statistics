@@ -55,7 +55,9 @@ stages:
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                     postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
+                    postgreSqlEntraIdAdminPrincipals='$(postgreSqlEntraIdAdminPrincipals)' \
                     storageFirewallRules='$(maintenanceFirewallRules)' \
+                    acrResourceGroupName='$(acrResourceGroupName)' \
                     dockerImagesTag='$(upstreamPipelineBuildNumber)' \
                     deployContainerApp=true \
                     updatePsqlFlexibleServer=true \

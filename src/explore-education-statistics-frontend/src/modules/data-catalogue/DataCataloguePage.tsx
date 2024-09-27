@@ -526,30 +526,32 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                                 </Link>
                               </div>
 
-                              <p>
-                                <ButtonLink
-                                  className="govuk-!-margin-bottom-2"
-                                  to={`${process.env.CONTENT_API_BASE_URL}/releases/${selectedRelease.id}/files`}
-                                  onClick={() => {
-                                    logEvent({
-                                      category: 'Data catalogue',
-                                      action: 'Data set file download - all',
-                                      label: `Publication: ${selectedPublication.title}, Release: ${selectedRelease.title}`,
-                                    });
-                                  }}
-                                >
-                                  {`Download ${
-                                    totalResults === 1
-                                      ? '1 data set'
-                                      : `all ${totalResults} data sets`
-                                  } (ZIP)`}
-                                </ButtonLink>
-                                <br />
-                                <span>
-                                  Download includes data guidance and supporting
-                                  files.
-                                </span>
-                              </p>
+                              {!searchTerm && (
+                                <p>
+                                  <ButtonLink
+                                    className="govuk-!-margin-bottom-2"
+                                    to={`${process.env.CONTENT_API_BASE_URL}/releases/${selectedRelease.id}/files`}
+                                    onClick={() => {
+                                      logEvent({
+                                        category: 'Data catalogue',
+                                        action: 'Data set file download - all',
+                                        label: `Publication: ${selectedPublication.title}, Release: ${selectedRelease.title}`,
+                                      });
+                                    }}
+                                  >
+                                    {`Download ${
+                                      totalResults === 1
+                                        ? '1 data set'
+                                        : `all ${totalResults} data sets`
+                                    } (ZIP)`}
+                                  </ButtonLink>
+                                  <br />
+                                  <span>
+                                    Download includes data guidance and
+                                    supporting files.
+                                  </span>
+                                </p>
+                              )}
                             </>
                           )}
                         </div>
