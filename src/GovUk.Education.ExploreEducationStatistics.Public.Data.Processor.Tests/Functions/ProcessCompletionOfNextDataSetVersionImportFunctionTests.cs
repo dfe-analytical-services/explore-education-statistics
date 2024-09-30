@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
@@ -14,10 +13,8 @@ using Microsoft.DurableTask;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using FilterMeta = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta;
-using IndicatorMeta = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
@@ -143,88 +140,677 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateChangesTests(fixture)
     {
-
-        //        // filter DELETED, with all options DELETED. ===> Should just have 1 change for the DELETED filter.
-        //        // filter ADDED, with ADDED options. ===> Should have 1 change for the ADDED filter, and 1 change for EACH of the ADDED options.
-        //        // filter UNCHANGED, options UNCHANGED. ===> Should have NO changes.
-        //        // filter UNCHANGED, with some DELETED options and some ADDED options. ===> Should have 1 change for EACH of the DELETED options and EACH of the ADDED options.
-        //        // filter UNCHANGED, SOME options CHANGED. ===> Should have 1 change for EACH of the CHANGED options.
-        //        // filter CHANGED, options UNCHANGED. ===> Should just have 1 change for the CHANGED filter.
-        //        // filter CHANGED + SOME options CHANGED. ===> Should have 1 change for the CHANGED filter, and 1 change for EACH of the CHANGED options.
+        // Cases covered:
+        // filter ADDED, with ADDED options. ===> Should have 1 change for the ADDED filter, and 1 change for EACH of the ADDED options.
+        // filter DELETED, with all options DELETED. ===> Should just have 1 change for the DELETED filter.
+        // filter CHANGED, options UNCHANGED. ===> Should just have 1 change for the CHANGED filter.
+        // filter CHANGED, SOME DELETED options. ===> Should have 1 change for the CHANGED filter, and 1 change for EACH of the DELTED options.
+        // filter CHANGED, SOME ADDED options. ===> Should have 1 change for the CHANGED filter, and 1 change for EACH of the ADDED options.
+        // filter CHANGED, SOME CHANGED options. ===> Should have 1 change for the CHANGED filter, and 1 change for EACH of the CHANGED options.
+        // filter UNCHANGED, options UNCHANGED. ===> Should have NO changes.
+        // filter UNCHANGED, SOME DELETED options. ===> Should have 1 change for EACH of the DELETED options.
+        // filter UNCHANGED, SOME ADDED options. ===> Should have 1 change for EACH of the ADDED options.
+        // filter UNCHANGED, SOME CHANGED options. ===> Should have 1 change for EACH of the CHANGED options.
 
         [Fact]
-        public async Task FiltersAddedAndDeletedAndChanged_ChangesContainAdditionsAndDeletionsAndChanges()
+        public async Task FiltersAdded_ChangesContainOnlyAddedFiltersAndAddedOptions()
         {
             var oldFilterMeta = DataFixture.DefaultFilterMeta()
-                .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                .ForIndex(1, s => s.SetPublicId("O7CLF"))
-                .ForIndex(2, s => s.SetPublicId("7zXob")) // Deleted
-                .GenerateList(3);
+                .ForIndex(0, s =>
+                    s.SetPublicId("dP0Zw")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .Generate(1)))
+                .GenerateList(1);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
 
             var newFilterMeta = DataFixture.DefaultFilterMeta()
-                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Unchanged
-                .ForIndex(1, s => s.SetPublicId("O7CLF")) // Changed
-                .ForIndex(2, s => s.SetPublicId("pTSoj")) // Added
+                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Filter and ALL options unchanged
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF") // Filter added
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("O7CLF")) // Filter Option added
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("7zXob")) // Filter Option added
+                        .Generate(2)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("7zXob") // Filter added
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("pTSoj")) // Filter Option added
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg")) // Filter Option added
+                        .Generate(2)))
                 .GenerateList(3);
 
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                oldFilterMeta: oldFilterMeta,
-                newFilterMeta: newFilterMeta);
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                filterMeta: newFilterMeta);
 
             await CreateChanges(instanceId);
 
-            var actualChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
-            Assert.Equal(3, actualChanges.Count);
-            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            // 2 Filter additions
+            Assert.Equal(2, actualFilterMetaChanges.Count);
+            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
-            var oldFilterMetas = originalVersion.FilterMetas
-                .ToDictionary(m => m.PublicId);
+            // 4 Filter Option additions
+            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
+            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var newFilterMetas = newVersion.FilterMetas
-                .ToDictionary(m => m.PublicId);
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
-            // Deleted
-            Assert.Single(actualChanges, 
-                c => c.PreviousStateId == oldFilterMetas["7zXob"].Id
-                     && c.CurrentStateId is null);
-
-            // Changed
-            Assert.Single(actualChanges, 
-                c => c.PreviousStateId == oldFilterMetas["O7CLF"].Id
-                     && c.CurrentStateId == newFilterMetas["O7CLF"].Id);
-
-            // Added
-            Assert.Single(actualChanges, 
+            // Filter added
+            Assert.Single(actualFilterMetaChanges,
                 c => c.PreviousStateId is null
-                     && c.CurrentStateId == newFilterMetas["pTSoj"].Id);
+                     && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
+
+            // Filter added
+            Assert.Single(actualFilterMetaChanges,
+                c => c.PreviousStateId is null
+                     && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
+
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["O7CLF"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["O7CLF"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["O7CLF"].OptionId);
+
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["7zXob"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["7zXob"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["7zXob"].OptionId);
+
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["pTSoj"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["pTSoj"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["pTSoj"].OptionId);
+
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["IzBzg"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["IzBzg"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["IzBzg"].OptionId);
         }
 
         [Fact]
-        public async Task FiltersChanged_ChangesContainOnlyChanged()
+        public async Task FiltersDeleted_ChangesContainOnlyDeletedFilters()
         {
             var oldFilterMeta = DataFixture.DefaultFilterMeta()
-                .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                .ForIndex(1, s => s.SetPublicId("O7CLF"))
-                .ForIndex(2, s => s.SetPublicId("7zXob"))
+                .ForIndex(0, s =>
+                    s.SetPublicId("dP0Zw")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .Generate(2)))
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF") // Filter and ALL options deleted
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("pTSoj"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg"))
+                        .Generate(2)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("7zXob") // Filter and ALL options deleted
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("LxWjE"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("6jrfe"))
+                        .Generate(2)))
                 .GenerateList(3);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
 
             var newFilterMeta = DataFixture.DefaultFilterMeta()
-                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Unchanged
-                .ForIndex(1, s => s.SetPublicId("O7CLF")) // Changed
-                .ForIndex(2, s => s.SetPublicId("7zXob")) // Changed
-                .GenerateList(3);
+                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Filter and ALL options unchanged
+                .GenerateList(1);
 
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                oldFilterMeta: oldFilterMeta, 
-                newFilterMeta: newFilterMeta);
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                filterMeta: newFilterMeta);
 
             await CreateChanges(instanceId);
 
-            var actualChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
-            Assert.Equal(2, actualChanges.Count);
-            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            // 2 Filter deletions
+            Assert.Equal(2, actualFilterMetaChanges.Count);
+            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            // No Filter Option deletions
+            Assert.Empty(actualFilterOptionMetaChanges);
+
+            var oldFilterMetas = originalVersion.FilterMetas
+                .ToDictionary(m => m.PublicId);
+
+            // Filter deleted
+            Assert.Single(actualFilterMetaChanges,
+                c => c.PreviousStateId == oldFilterMetas["O7CLF"].Id
+                     && c.CurrentStateId is null);
+
+            // Filter deleted
+            Assert.Single(actualFilterMetaChanges,
+                c => c.PreviousStateId == oldFilterMetas["7zXob"].Id
+                     && c.CurrentStateId is null);
+        }
+
+        [Fact]
+        public async Task FiltersChangedOptionsAdded_ChangesContainOnlyChangedFiltersAndAddedOptions()
+        {
+            var oldFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, s =>
+                    s.SetPublicId("dP0Zw")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .Generate(2)))
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("7zXob"))
+                        .Generate(1)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("7zXob")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("pTSoj"))
+                        .Generate(1)))
+                .GenerateList(3);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
+
+            var newFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Filter and ALL options unchanged
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF") // Filter changed
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[1].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg")) // Filter Option added
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("it6Xr")) // Filter Option added
+                        .Generate(3)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("7zXob") // Filter changed
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[2].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("LxWjE")) // Filter Option added
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("6jrfe")) // Filter Option added
+                        .Generate(3)))
+                .GenerateList(3);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                filterMeta: newFilterMeta);
+
+            await CreateChanges(instanceId);
+
+            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+
+            // 2 Filter changes
+            Assert.Equal(2, actualFilterMetaChanges.Count);
+            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            // 4 Filter Option changes
+            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
+            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldFilterMetas = originalVersion.FilterMetas
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => new { FilterMeta = m, OldFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
+
+            var newFilterMetas = newVersion.FilterMetas
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
+
+            // Filter changed
+            Assert.Single(actualFilterMetaChanges,
+                c => c.PreviousStateId == oldFilterMetas["O7CLF"].FilterMeta.Id
+                     && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
+
+            // Filter changed
+            Assert.Single(actualFilterMetaChanges,
+                c => c.PreviousStateId == oldFilterMetas["7zXob"].FilterMeta.Id
+                     && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
+
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].OptionId);
+
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["it6Xr"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["it6Xr"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["it6Xr"].OptionId);
+
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].OptionId);
+
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].OptionId);
+        }
+
+        [Fact]
+        public async Task FiltersChangedOptionsDeleted_ChangesContainOnlyChangedFiltersAndDeletedOptions()
+        {
+            var oldFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, s =>
+                    s.SetPublicId("dP0Zw")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .Generate(2)))
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("7zXob"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("pTSoj")) // Filter Option deleted
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg")) // Filter Option deleted
+                        .Generate(3)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("7zXob")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("it6Xr"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("LxWjE")) // Filter Option deleted
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("6jrfe")) // Filter Option deleted
+                        .Generate(3)))
+                .GenerateList(3);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
+
+            var newFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Filter and ALL options unchanged
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF") // Filter changed
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[1].OptionLinks[0])) // Filter Option unchanged
+                        .Generate(1)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("7zXob") // Filter changed
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[2].OptionLinks[0])) // Filter Option unchanged
+                        .Generate(1)))
+                .GenerateList(3);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                filterMeta: newFilterMeta);
+
+            await CreateChanges(instanceId);
+
+            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+
+            // 2 Filter changes
+            Assert.Equal(2, actualFilterMetaChanges.Count);
+            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            // 4 Filter Option changes
+            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
+            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldFilterMetas = originalVersion.FilterMetas
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => new { FilterMeta = m, OldFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
+
+            var newFilterMetas = newVersion.FilterMetas
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
+
+            // Filter changed
+            Assert.Single(actualFilterMetaChanges,
+                c => c.PreviousStateId == oldFilterMetas["O7CLF"].FilterMeta.Id
+                     && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
+
+            // Filter changed
+            Assert.Single(actualFilterMetaChanges,
+                c => c.PreviousStateId == oldFilterMetas["7zXob"].FilterMeta.Id
+                     && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
+
+            // Filter Option deleted
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].OptionId
+                     && c.CurrentState is null);
+
+            // Filter Option deleted
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].OptionId
+                     && c.CurrentState is null);
+
+            // Filter Option deleted
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].OptionId
+                     && c.CurrentState is null);
+
+            // Filter Option deleted
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].OptionId
+                     && c.CurrentState is null);
+        }
+
+        [Fact]
+        public async Task FiltersChangedOptionsChanged_ChangesContainOnlyChangedFiltersAndChangedOptions()
+        {
+            var oldFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, s =>
+                    s.SetPublicId("dP0Zw")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .Generate(2)))
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("7zXob"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("pTSoj"))
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg"))
+                        .Generate(3)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("7zXob")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("it6Xr"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("LxWjE"))
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("6jrfe"))
+                        .Generate(3)))
+                .GenerateList(3);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
+
+            var newFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Filter and ALL options unchanged
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF") // Filter changed
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[1].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("pTSoj")) // Filter Option changed
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg")) // Filter Option changed
+                        .Generate(3)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("7zXob") // Filter changed
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[2].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("LxWjE")) // Filter Option changed
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("6jrfe")) // Filter Option changed
+                        .Generate(3)))
+                .GenerateList(3);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                filterMeta: newFilterMeta);
+
+            await CreateChanges(instanceId);
+
+            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+
+            // 2 Filter changes
+            Assert.Equal(2, actualFilterMetaChanges.Count);
+            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            // 4 Filter Option changes
+            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
+            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldFilterMetas = originalVersion.FilterMetas
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => new { FilterMeta = m, OldFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
+
+            var newFilterMetas = newVersion.FilterMetas
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
+
+            // Filter changed
+            Assert.Single(actualFilterMetaChanges,
+                c => c.PreviousStateId == oldFilterMetas["O7CLF"].FilterMeta.Id
+                     && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
+
+            // Filter changed
+            Assert.Single(actualFilterMetaChanges,
+                c => c.PreviousStateId == oldFilterMetas["7zXob"].FilterMeta.Id
+                     && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
+
+            // Filter Option changed
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].OptionId
+                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["pTSoj"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["pTSoj"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["pTSoj"].OptionId);
+
+            // Filter Option changed
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].OptionId
+                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].OptionId);
+
+            // Filter Option changed
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].OptionId
+                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].OptionId);
+
+            // Filter Option changed
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].OptionId
+                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].OptionId);
+        }
+
+        [Fact]
+        public async Task FiltersChangedOptionsUnchanged_ChangesContainOnlyChangedFilters()
+        {
+            var oldFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, s =>
+                    s.SetPublicId("dP0Zw")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .Generate(2)))
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("7zXob"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("pTSoj"))
+                        .Generate(2)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("7zXob")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("it6Xr"))
+                        .Generate(2)))
+                .GenerateList(3);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
+
+            var newFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Filter and ALL options unchanged
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF") // Filter changed
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[1].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[1].OptionLinks[1])) // Filter Option unchanged
+                        .Generate(2)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("7zXob") // Filter changed
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[2].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[2].OptionLinks[1])) // Filter Option unchanged
+                        .Generate(2)))
+                .GenerateList(3);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                filterMeta: newFilterMeta);
+
+            await CreateChanges(instanceId);
+
+            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+
+            // 2 Filter changes
+            Assert.Equal(2, actualFilterMetaChanges.Count);
+            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            // No Filter Option changes
+            Assert.Empty(actualFilterOptionMetaChanges);
 
             var oldFilterMetas = originalVersion.FilterMetas
                 .ToDictionary(m => m.PublicId);
@@ -232,91 +818,337 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             var newFilterMetas = newVersion.FilterMetas
                 .ToDictionary(m => m.PublicId);
 
-            // Changed
-            Assert.Single(actualChanges,
+            // Filter changed
+            Assert.Single(actualFilterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["O7CLF"].Id
                      && c.CurrentStateId == newFilterMetas["O7CLF"].Id);
 
-            // Changed
-            Assert.Single(actualChanges,
+            // Filter changed
+            Assert.Single(actualFilterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["7zXob"].Id
                      && c.CurrentStateId == newFilterMetas["7zXob"].Id);
         }
 
         [Fact]
-        public async Task FiltersAdded_ChangesContainOnlyAdditions()
+        public async Task FiltersUnchangedOptionsAdded_ChangesContainOnlyAddedOptions()
         {
             var oldFilterMeta = DataFixture.DefaultFilterMeta()
-                .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                .GenerateList(1);
+                .ForIndex(0, s =>
+                    s.SetPublicId("dP0Zw")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .Generate(1)))
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .Generate(1)))
+                .GenerateList(2);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
 
             var newFilterMeta = DataFixture.DefaultFilterMeta()
-                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Unchanged
-                .ForIndex(1, s => s.SetPublicId("O7CLF")) // Added
-                .ForIndex(2, s => s.SetPublicId("7zXob")) // Added
-                .GenerateList(3);
+                .ForIndex(0, UnchangedFilterMetaSetter(
+                    filterMeta: oldFilterMeta[0], // Filter unchanged
+                    newOptionLinks: () => DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[0].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("7zXob")) // Filter Option added
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("pTSoj")) // Filter Option added
+                        .Generate(3)))
+                .ForIndex(1, UnchangedFilterMetaSetter(
+                    filterMeta: oldFilterMeta[1], // Filter unchanged
+                    newOptionLinks: () => DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[1].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg")) // Filter Option added
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("it6Xr")) // Filter Option added
+                        .Generate(3)))
+                .GenerateList(2);
 
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                oldFilterMeta: oldFilterMeta,
-                newFilterMeta: newFilterMeta);
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                filterMeta: newFilterMeta);
 
             await CreateChanges(instanceId);
 
-            var actualChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
-            Assert.Equal(2, actualChanges.Count);
-            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            // No Filter changes
+            Assert.Empty(actualFilterMetaChanges);
+
+            // 4 Filter Option changes
+            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
+            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var newFilterMetas = newVersion.FilterMetas
-                .ToDictionary(m => m.PublicId);
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
-            // Added
-            Assert.Single(actualChanges,
-                c => c.PreviousStateId is null
-                     && c.CurrentStateId == newFilterMetas["O7CLF"].Id);
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["dP0Zw"]["7zXob"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["dP0Zw"]["7zXob"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["7zXob"].OptionId);
 
-            // Added
-            Assert.Single(actualChanges,
-                c => c.PreviousStateId is null
-                     && c.CurrentStateId == newFilterMetas["7zXob"].Id);
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["dP0Zw"]["pTSoj"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["dP0Zw"]["pTSoj"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["pTSoj"].OptionId);
+
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"]["IzBzg"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"]["IzBzg"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"]["IzBzg"].OptionId);
+
+            // Filter Option added
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"]["it6Xr"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"]["it6Xr"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"]["it6Xr"].OptionId);
         }
 
         [Fact]
-        public async Task FiltersDeleted_ChangesContainOnlyDeletions()
+        public async Task FiltersUnchangedOptionsDeleted_ChangesContainOnlyDeletedOptions()
         {
             var oldFilterMeta = DataFixture.DefaultFilterMeta()
-                .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                .ForIndex(1, s => s.SetPublicId("O7CLF")) // Deleted
-                .ForIndex(2, s => s.SetPublicId("7zXob")) // Deleted
-                .GenerateList(3);
+                .ForIndex(0, s =>
+                    s.SetPublicId("dP0Zw")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("O7CLF")) // Filter Option deleted
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("7zXob")) // Filter Option deleted
+                        .Generate(3)))
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("pTSoj"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg")) // Filter Option deleted
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("it6Xr")) // Filter Option deleted
+                        .Generate(3)))
+                .GenerateList(2);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
 
             var newFilterMeta = DataFixture.DefaultFilterMeta()
-                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Unchanged
-                .GenerateList(1);
+                .ForIndex(0, UnchangedFilterMetaSetter(
+                    filterMeta: oldFilterMeta[0], // Filter unchanged
+                    newOptionLinks: () => DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[0].OptionLinks[0])) // Filter Option unchanged
+                        .Generate(1)))
+                .ForIndex(1, UnchangedFilterMetaSetter(
+                    filterMeta: oldFilterMeta[1], // Filter unchanged
+                    newOptionLinks: () => DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[1].OptionLinks[0])) // Filter Option unchanged
+                        .Generate(1)))
+                .GenerateList(2);
 
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                oldFilterMeta: oldFilterMeta,
-                newFilterMeta: newFilterMeta);
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                filterMeta: newFilterMeta);
 
             await CreateChanges(instanceId);
 
-            var actualChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
-            Assert.Equal(2, actualChanges.Count);
-            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            // No Filter changes
+            Assert.Empty(actualFilterMetaChanges);
+
+            // 4 Filter Option changes
+            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
+            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var oldFilterMetas = originalVersion.FilterMetas
-                .ToDictionary(m => m.PublicId);
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
-            // Deleted
-            Assert.Single(actualChanges,
-                c => c.PreviousStateId == oldFilterMetas["O7CLF"].Id
-                     && c.CurrentStateId is null);
+            // Filter Option deleted
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["O7CLF"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["O7CLF"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["O7CLF"].OptionId
+                     && c.CurrentState is null);
 
-            // Deleted
-            Assert.Single(actualChanges,
-                c => c.PreviousStateId == oldFilterMetas["7zXob"].Id
-                     && c.CurrentStateId is null);
+            // Filter Option deleted
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["7zXob"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["7zXob"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["7zXob"].OptionId
+                     && c.CurrentState is null);
+
+            // Filter Option deleted
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["IzBzg"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["IzBzg"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["IzBzg"].OptionId
+                     && c.CurrentState is null);
+
+            // Filter Option deleted
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["it6Xr"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["it6Xr"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["it6Xr"].OptionId
+                     && c.CurrentState is null);
+        }
+
+        [Fact]
+        public async Task FiltersUnchangedOptionsChanged_ChangesContainOnlyChangedOptions()
+        {
+            var oldFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, s =>
+                    s.SetPublicId("dP0Zw")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("7zXob"))
+                        .Generate(3)))
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("pTSoj"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg"))
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("it6Xr"))
+                        .Generate(3)))
+                .GenerateList(2);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
+
+            var newFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, UnchangedFilterMetaSetter(
+                    filterMeta: oldFilterMeta[0], // Filter unchanged
+                    newOptionLinks: () => DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[0].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("O7CLF")) // Filter Option changed
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("7zXob")) // Filter Option changed
+                        .Generate(3)))
+                .ForIndex(1, UnchangedFilterMetaSetter(
+                    filterMeta: oldFilterMeta[1], // Filter unchanged
+                    newOptionLinks: () => DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[1].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg")) // Filter Option changed
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("it6Xr")) // Filter Option changed
+                        .Generate(3)))
+                .GenerateList(2);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                filterMeta: newFilterMeta);
+
+            await CreateChanges(instanceId);
+
+            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+
+            // No Filter changes
+            Assert.Empty(actualFilterMetaChanges);
+
+            // 4 Filter Option changes
+            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
+            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldFilterMetas = originalVersion.FilterMetas
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => m.OptionLinks.ToDictionary(l => l.PublicId));
+
+            var newFilterMetas = newVersion.FilterMetas
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => m.OptionLinks.ToDictionary(l => l.PublicId));
+
+            // Filter Option changed
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["O7CLF"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["O7CLF"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["O7CLF"].OptionId
+                     && c.CurrentState!.PublicId == newFilterMetas["dP0Zw"]["O7CLF"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["dP0Zw"]["O7CLF"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["O7CLF"].OptionId);
+
+            // Filter Option changed
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["7zXob"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["7zXob"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["7zXob"].OptionId
+                     && c.CurrentState!.PublicId == newFilterMetas["dP0Zw"]["7zXob"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["dP0Zw"]["7zXob"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["7zXob"].OptionId);
+
+            // Filter Option changed
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["IzBzg"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["IzBzg"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["IzBzg"].OptionId
+                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"]["IzBzg"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"]["IzBzg"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"]["IzBzg"].OptionId);
+
+            // Filter Option changed
+            Assert.Single(actualFilterOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["it6Xr"].PublicId
+                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["it6Xr"].MetaId
+                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["it6Xr"].OptionId
+                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"]["it6Xr"].PublicId
+                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"]["it6Xr"].MetaId
+                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"]["it6Xr"].OptionId);
         }
 
         [Fact]
@@ -343,35 +1175,39 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                         DataFixture.DefaultFilterOptionMetaLink()
                         .ForIndex(0, s =>
                             s.SetOption(DataFixture.DefaultFilterOptionMeta())
-                            .SetPublicId("dP0Zw"))
+                            .SetPublicId("pTSoj"))
                         .ForIndex(1, s =>
                             s.SetOption(DataFixture.DefaultFilterOptionMeta())
-                            .SetPublicId("O7CLF"))
+                            .SetPublicId("IzBzg"))
                         .ForIndex(2, s =>
                             s.SetOption(DataFixture.DefaultFilterOptionMeta())
-                            .SetPublicId("7zXob"))
+                            .SetPublicId("it6Xr"))
                         .Generate(3)))
                 .GenerateList(2);
 
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
+
             var newFilterMeta = DataFixture.DefaultFilterMeta()
-                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0]))
-                .ForIndex(1, UnchangedFilterMetaSetter(oldFilterMeta[1]))
+                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Filter and ALL options unchanged
+                .ForIndex(1, UnchangedFilterMetaSetter(oldFilterMeta[1])) // Filter and ALL options unchanged
                 .GenerateList(2);
 
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                oldFilterMeta: oldFilterMeta,
-                newFilterMeta: newFilterMeta);
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                filterMeta: newFilterMeta);
 
             await CreateChanges(instanceId);
 
-            var actualChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
-            Assert.Empty(actualChanges);
+            Assert.Empty(actualFilterMetaChanges);
+            Assert.Empty(actualFilterOptionMetaChanges);
         }
 
-        private static Action<InstanceSetters<FilterMeta>> UnchangedFilterMetaSetter(
+        private Action<InstanceSetters<FilterMeta>> UnchangedFilterMetaSetter(
             FilterMeta filterMeta,
-            Action<InstanceSetters<FilterMeta>>)
+            Func<IEnumerable<FilterOptionMetaLink>>? newOptionLinks = null)
         {
             return s =>
             {
@@ -380,7 +1216,31 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 s.SetLabel(filterMeta.Label);
                 s.SetHint(filterMeta.Hint);
 
-                s.SetOptionLinks();
+                newOptionLinks ??= () =>
+                {
+                    var newOptionLinks = new List<FilterOptionMetaLink>();
+
+                    foreach (var oldOptionLink in filterMeta.OptionLinks)
+                    {
+                        FilterOptionMetaLink newOptionLink = DataFixture.DefaultFilterOptionMetaLink()
+                            .ForInstance(UnchangedFilterOptionMetaLinkSetter(oldOptionLink));
+
+                        newOptionLinks.Add(newOptionLink);
+                    }
+
+                    return newOptionLinks;
+                };
+
+                s.SetOptionLinks(newOptionLinks);
+            };
+        }
+
+        private static Action<InstanceSetters<FilterOptionMetaLink>> UnchangedFilterOptionMetaLinkSetter(FilterOptionMetaLink filterOptionMetaLink)
+        {
+            return s =>
+            {
+                s.SetPublicId(filterOptionMetaLink.PublicId);
+                s.SetOptionId(filterOptionMetaLink.OptionId);
             };
         }
 
@@ -393,22 +1253,41 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .ToListAsync();
         }
 
-        private async Task<(DataSetVersion originalVersion, DataSetVersion newVersion, Guid instanceId)> CreateDataSetInitialAndNextVersion(
-            List<FilterMeta> oldFilterMeta,
-            List<FilterMeta> newFilterMeta)
+        private async Task<IReadOnlyList<FilterOptionMetaChange>> GetFilterOptionMetaChanges(DataSetVersion version)
         {
-            return await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionMeta: new DataSetVersionMeta
+            return await GetDbContext<PublicDataDbContext>()
+                .FilterOptionMetaChanges
+                .AsNoTracking()
+                .Where(c => c.DataSetVersionId == version.Id)
+                .ToListAsync();
+        }
+
+        private async Task<(DataSetVersion originalVersion, Guid instanceId)> CreateDataSetInitialVersion(
+            List<FilterMeta> filterMeta)
+        {
+            return await CreateDataSetInitialVersion(
+                dataSetStatus: DataSetStatus.Published,
+                dataSetVersionStatus: DataSetVersionStatus.Published,
+                importStage: DataSetVersionImportStage.Completing,
+                meta: new DataSetVersionMeta
                 {
                     GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    FilterMetas = oldFilterMeta
-                },
-                nextVersionMeta: new DataSetVersionMeta
+                    FilterMetas = filterMeta
+                });
+        }
+
+        private async Task<(DataSetVersion nextVersion, Guid instanceId)> CreateDataSetNextVersion(
+            DataSetVersion originalVersion,
+            List<FilterMeta> filterMeta)
+        {
+            return await CreateDataSetNextVersion(
+                initialVersion: originalVersion,
+                status: DataSetVersionStatus.Mapping,
+                importStage: Stage.PreviousStage(),
+                meta: new DataSetVersionMeta
                 {
                     GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    FilterMetas = newFilterMeta
+                    FilterMetas = filterMeta
                 });
         }
     }
@@ -417,490 +1296,649 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateChangesTests(fixture)
     {
+        // Cases covered:
+        // location ADDED, with ADDED options. ===> Should have 1 change for the ADDED location, and 1 change for EACH of the ADDED options.
+        // location DELETED, with all options DELETED. ===> Should just have 1 change for the DELETED location.
+        // location UNCHANGED, options UNCHANGED. ===> Should have NO changes.
+        // location UNCHANGED, SOME DELETED options. ===> Should have 1 change for EACH of the DELETED options.
+        // location UNCHANGED, SOME ADDED options. ===> Should have 1 change for EACH of the ADDED options.
+        // location UNCHANGED, SOME CHANGED options. ===> Should have 1 change for EACH of the CHANGED options.
+
         [Fact]
-        public async Task Success()
+        public async Task LocationsAdded_ChangesContainOnlyAddedLocationsAndAddedOptions()
         {
-            // SCENARIOS WE TEST:
-            // location DELETED, with all options DELETED. ===> Should just have 1 change for the DELETED location.
-            // location ADDED, with ADDED options. ===> Should have 1 change for the ADDED location, and 1 change for EACH of the ADDED options.
-            // location UNCHANGED, options UNCHANGED. ===> Should have NO changes.
-            // location UNCHANGED, with some DELETED options and some ADDED options. ===> Should have 1 change for EACH of the DELETED options and EACH of the ADDED options.
-            // location UNCHANGED, SOME options CHANGED. ===> Should have 1 change for EACH of the CHANGED options.
+            var oldLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, s =>
+                    s.SetLevel(GeographicLevel.LocalAuthority)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .Generate(1)))
+                .GenerateList(1);
 
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage.PreviousStage());
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldLocationMeta);
 
-            // Here we define what changes have occurred between the original and new data set versions.
-            // The metadata and mappings are then automatically calculated and stored from this, which can then be used
-            // to create the changes.
-            List<LocationChange> allChanges =
-            [
-                new()
-                {
-                    ParentIdentifier = GeographicLevel.LocalAuthority,
-                    ChangeType = ChangeType.Deleted,
-                    OptionChanges =
-                    [
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Deleted,
-                            OptionIndex = 0
-                        },
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Deleted,
-                            OptionIndex = 1
-                        }
-                    ]
-                },
-                new()
-                {
-                    ParentIdentifier = GeographicLevel.School,
-                    ChangeType = ChangeType.Added,
-                    OptionChanges =
-                    [
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Added,
-                            OptionIndex = 0
-                        },
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Added,
-                            OptionIndex = 1
-                        }
-                    ]
-                },
-                new()
-                {
-                    ParentIdentifier = GeographicLevel.Country,
-                    ChangeType = ChangeType.Unchanged,
-                    OptionChanges =
-                    [
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Unchanged,
-                            OptionIndex = 0
-                        },
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Unchanged,
-                            OptionIndex = 1
-                        }
-                    ]
-                },
-                new()
-                {
-                    ParentIdentifier = GeographicLevel.RscRegion,
-                    ChangeType = ChangeType.Unchanged,
-                    OptionChanges =
-                    [
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Unchanged,
-                            OptionIndex = 0
-                        },
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Deleted,
-                            OptionIndex = 1
-                        },
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Added,
-                            OptionIndex = 1
-                        }
-                    ]
-                },
-                new()
-                {
-                    ParentIdentifier = GeographicLevel.Provider,
-                    ChangeType = ChangeType.Unchanged,
-                    OptionChanges =
-                    [
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Unchanged,
-                            OptionIndex = 0
-                        },
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Changed,
-                            OptionIndex = 1
-                        },
-                        new OptionChange
-                        {
-                            ChangeType = ChangeType.Changed,
-                            OptionIndex = 2
-                        }
-                    ]
-                }
-            ];
+            var newLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, UnchangedLocationMetaSetter(oldLocationMeta[0])) // Location and ALL options unchanged
+                .ForIndex(1, s =>
+                    s.SetLevel(GeographicLevel.School) // Location added
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("O7CLF")) // Location Option added
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("7zXob")) // Location Option added
+                        .Generate(2)))
+                .ForIndex(2, s =>
+                    s.SetLevel(GeographicLevel.RscRegion) // Location added
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationRscRegionOptionMeta())
+                            .SetPublicId("pTSoj")) // Location Option added
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationRscRegionOptionMeta())
+                            .SetPublicId("IzBzg")) // Location Option added
+                        .Generate(2)))
+                .GenerateList(3);
 
-            var (originalVersionLocationMetasWithLinksByLevel, newVersionLocationMetasWithLinksByLevel) =
-                await CreateMeta(
-                    allChanges: allChanges,
-                    originalVersion: originalVersion,
-                    newVersion: newVersion);
-
-            await CreateMappings(
-                allChanges: allChanges,
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
                 originalVersion: originalVersion,
-                newVersion: newVersion,
-                originalVersionLocationMetasWithLinksByLevel: originalVersionLocationMetasWithLinksByLevel,
-                newVersionLocationMetasWithLinksByLevel: newVersionLocationMetasWithLinksByLevel);
+                locationMeta: newLocationMeta);
 
             await CreateChanges(instanceId);
 
-            var newVersionWithChanges = await GetDbContext<PublicDataDbContext>()
-                .DataSetVersions
-                .AsNoTracking()
-                .Include(dsv => dsv.LocationMetaChanges)
-                .Include(dsv => dsv.LocationOptionMetaChanges)
-                .SingleAsync(dsv => dsv.Id == newVersion.Id);
+            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
 
-            // Should only have 2 LocationMetaChanges:
-            // 1 for the DELETED 'LocalAuthority' level
-            // 1 for the ADDED 'School' level.
-            Assert.Equal(2, newVersionWithChanges.LocationMetaChanges.Count);
+            // 2 Location additions
+            Assert.Equal(2, actualLocationMetaChanges.Count);
+            Assert.All(actualLocationMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
-            // Should have 6 LocationOptionMetaChanges:
-            // 2 for the 2 ADDED 'School' options
-            // 1 for the ADDED 'RscRegion' option
-            // 1 for the DELETED 'RscRegion' option
-            // 2 for the 2 CHANGED 'Provider' options
-            Assert.Equal(6, newVersionWithChanges.LocationOptionMetaChanges.Count);
+            // 4 Location Option additions
+            Assert.Equal(4, actualLocationOptionMetaChanges.Count);
+            Assert.All(actualLocationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
-            // All changes should be for the new data set version
-            Assert.All(newVersionWithChanges.LocationMetaChanges,
-                lmc => Assert.Equal(newVersionWithChanges.Id, lmc.DataSetVersionId));
-            Assert.All(newVersionWithChanges.LocationOptionMetaChanges,
-                lomc => Assert.Equal(newVersionWithChanges.Id, lomc.DataSetVersionId));
-
-            foreach (var parentChange in allChanges)
-            {
-                originalVersionLocationMetasWithLinksByLevel.TryGetValue(parentChange.ParentIdentifier,
-                    out var originalLocationMeta);
-                newVersionLocationMetasWithLinksByLevel.TryGetValue(parentChange.ParentIdentifier,
-                    out var newLocationMeta);
-
-                // If the parent level has been DELETED, there should just be 1 change for this but none for the options - hence, we exit early
-                if (parentChange.ChangeType is ChangeType.Deleted)
-                {
-                    Assert.Single(newVersionWithChanges.LocationMetaChanges,
-                        lmc =>
-                            lmc.PreviousStateId == originalLocationMeta!.Id
-                            && lmc.CurrentStateId == null);
-
-                    continue;
-                }
-
-                // If the parent level has been ADDED, there should be 1 change for this. There will also be changes for the options - hence, we DON'T exit early
-                if (parentChange.ChangeType is ChangeType.Added)
-                {
-                    Assert.Single(newVersionWithChanges.LocationMetaChanges,
-                        lmc =>
-                            lmc.PreviousStateId == null
-                            && lmc.CurrentStateId == newLocationMeta!.Id);
-                }
-
-                foreach (var optionChange in parentChange.OptionChanges)
-                {
-                    // If the option is UNCHANGED, there should be no change for this
-                    if (optionChange.ChangeType is ChangeType.Unchanged)
-                    {
-                        continue;
-                    }
-
-                    var originalOptionLink = originalLocationMeta?.OptionLinks[optionChange.OptionIndex];
-                    var newOptionLink = newLocationMeta?.OptionLinks[optionChange.OptionIndex];
-
-                    switch (optionChange.ChangeType)
-                    {
-                        // If the option has been DELETED, ADDED or CHANGED, there should be 1 change for this
-                        case ChangeType.Deleted:
-                            Assert.Single(newVersionWithChanges.LocationOptionMetaChanges,
-                                lmc =>
-                                    lmc.PreviousState?.MetaId == originalOptionLink!.MetaId
-                                    && lmc.PreviousState?.OptionId == originalOptionLink.OptionId
-                                    && lmc.PreviousState?.PublicId == originalOptionLink.PublicId
-                                    && lmc.CurrentState == null);
-                            break;
-                        case ChangeType.Added:
-                            Assert.Single(newVersionWithChanges.LocationOptionMetaChanges,
-                                lmc =>
-                                    lmc.PreviousState == null
-                                    && lmc.CurrentState?.MetaId == newOptionLink!.MetaId
-                                    && lmc.CurrentState?.OptionId == newOptionLink.OptionId
-                                    && lmc.CurrentState?.PublicId == newOptionLink.PublicId);
-                            break;
-                        case ChangeType.Changed:
-                            Assert.Single(newVersionWithChanges.LocationOptionMetaChanges,
-                                lmc =>
-                                    lmc.PreviousState?.MetaId == originalOptionLink!.MetaId
-                                    && lmc.PreviousState?.OptionId == originalOptionLink.OptionId
-                                    && lmc.PreviousState?.PublicId == originalOptionLink.PublicId
-                                    && lmc.CurrentState?.MetaId == newOptionLink!.MetaId
-                                    && lmc.CurrentState?.OptionId == newOptionLink.OptionId
-                                    && lmc.CurrentState?.PublicId == newOptionLink.PublicId);
-                            break;
-                    }
-                }
-            }
-        }
-
-        private async Task<(
-                IReadOnlyDictionary<GeographicLevel, LocationMeta> originalVersionLocationMetasWithLinksByLevel,
-                IReadOnlyDictionary<GeographicLevel, LocationMeta> newVersionLocationMetasWithLinksByLevel)>
-            CreateMeta(
-                IReadOnlyList<LocationChange> allChanges,
-                DataSetVersion originalVersion,
-                DataSetVersion newVersion)
-        {
-            var oldGeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
-                .WithDataSetVersionId(originalVersion.Id);
-            await CreateMeta(geographicLevelMeta: oldGeographicLevelMeta);
-
-            var oldLocationMetasByLevel = allChanges
-                .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Deleted)
-                .Select(pc => DataFixture
-                    .DefaultLocationMeta()
-                    .WithDataSetVersionId(originalVersion.Id)
-                    .WithLevel(pc.ParentIdentifier)
-                    .Generate())
-                .ToDictionary(lm => lm.Level);
-
-            await CreateMeta(locationMetas: oldLocationMetasByLevel.Values);
-
-            var newGeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
-                .WithDataSetVersionId(newVersion.Id);
-            await CreateMeta(geographicLevelMeta: newGeographicLevelMeta);
-
-            var newLocationMetasByLevel = allChanges
-                .Where(pc => pc.ChangeType is ChangeType.Unchanged or ChangeType.Added)
-                .Select(pc => DataFixture
-                    .DefaultLocationMeta()
-                    .WithDataSetVersionId(newVersion.Id)
-                    .WithLevel(pc.ParentIdentifier)
-                    .Generate())
-                .ToDictionary(lm => lm.Level);
-
-            await CreateMeta(locationMetas: newLocationMetasByLevel.Values);
-
-            var oldLocationOptionMetaLinks = new List<LocationOptionMetaLink>();
-
-            foreach (var parentChange in allChanges)
-            {
-                foreach (var optionChange in parentChange.OptionChanges)
-                {
-                    if (optionChange.ChangeType
-                        is ChangeType.Unchanged
-                        or ChangeType.Changed
-                        or ChangeType.Deleted)
-                    {
-                        var metaId = oldLocationMetasByLevel[parentChange.ParentIdentifier].Id;
-
-                        oldLocationOptionMetaLinks.Add(CreateAddedLocationOptionLink(
-                            level: parentChange.ParentIdentifier,
-                            metaId: metaId));
-                    }
-                }
-            }
-
-            await CreateMeta(locationOptionMetaLinks: oldLocationOptionMetaLinks);
-
-            var originalVersionLocationMetasWithLinksByLevel = (await GetLocationMeta(originalVersion))
-                .ToDictionary(lm => lm.Level);
-
-            var newLocationOptionMetaLinks = new List<LocationOptionMetaLink>();
-
-            foreach (var parentChange in allChanges)
-            {
-                if (parentChange.ChangeType is ChangeType.Deleted)
-                {
-                    continue;
-                }
-
-                originalVersionLocationMetasWithLinksByLevel.TryGetValue(parentChange.ParentIdentifier,
-                    out var originalLocationMeta);
-                var newLocationMeta = newLocationMetasByLevel[parentChange.ParentIdentifier];
-
-                foreach (var optionChange in parentChange.OptionChanges)
-                {
-                    if (optionChange.ChangeType is ChangeType.Deleted)
-                    {
-                        continue;
-                    }
-
-                    var metaId = newLocationMeta.Id;
-
-                    if (optionChange.ChangeType is ChangeType.Added)
-                    {
-                        newLocationOptionMetaLinks.Add(CreateAddedLocationOptionLink(
-                            level: parentChange.ParentIdentifier,
-                            metaId: metaId));
-
-                        continue;
-                    }
-
-                    if (optionChange.ChangeType is ChangeType.Changed)
-                    {
-                        newLocationOptionMetaLinks.Add(CreateChangedLocationOptionLink(
-                            level: parentChange.ParentIdentifier,
-                            metaId: metaId,
-                            originalLocationMeta: originalLocationMeta!,
-                            optionChange: optionChange));
-
-                        continue;
-                    }
-
-                    newLocationOptionMetaLinks.Add(CreateUnchangedLocationOptionLink(
-                        metaId: metaId,
-                        originalLocationMeta: originalLocationMeta!,
-                        optionChange: optionChange));
-                }
-            }
-
-            await CreateMeta(locationOptionMetaLinks: newLocationOptionMetaLinks);
-
-            var newVersionLocationMetasWithLinksByLevel = (await GetLocationMeta(newVersion))
-                .ToDictionary(lm => lm.Level); // Re-fetching to get the links back this time
-
-            return (originalVersionLocationMetasWithLinksByLevel, newVersionLocationMetasWithLinksByLevel);
-        }
-
-        private LocationOptionMetaLink CreateAddedLocationOptionLink(GeographicLevel level, int metaId)
-        {
-            switch (level)
-            {
-                case GeographicLevel.LocalAuthority:
-                    return DataFixture
-                        .DefaultLocationOptionMetaLink()
-                        .WithOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
-                        .WithMetaId(metaId);
-                case GeographicLevel.School:
-                    return DataFixture
-                        .DefaultLocationOptionMetaLink()
-                        .WithOption(DataFixture.DefaultLocationSchoolOptionMeta())
-                        .WithMetaId(metaId);
-                case GeographicLevel.RscRegion:
-                    return DataFixture
-                        .DefaultLocationOptionMetaLink()
-                        .WithOption(DataFixture.DefaultLocationRscRegionOptionMeta())
-                        .WithMetaId(metaId);
-                case GeographicLevel.Provider:
-                    return DataFixture
-                        .DefaultLocationOptionMetaLink()
-                        .WithOption(DataFixture.DefaultLocationProviderOptionMeta())
-                        .WithMetaId(metaId);
-                default:
-                    return DataFixture
-                        .DefaultLocationOptionMetaLink()
-                        .WithOption(DataFixture.DefaultLocationCodedOptionMeta())
-                        .WithMetaId(metaId);
-            }
-        }
-
-        private LocationOptionMetaLink CreateChangedLocationOptionLink(
-            GeographicLevel level,
-            int metaId,
-            LocationMeta originalLocationMeta,
-            OptionChange optionChange)
-        {
-            switch (level)
-            {
-                case GeographicLevel.LocalAuthority:
-                    return DataFixture
-                        .DefaultLocationOptionMetaLink()
-                        .WithOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
-                        .WithMetaId(metaId)
-                        .WithPublicId(originalLocationMeta!.OptionLinks[optionChange.OptionIndex].PublicId);
-                case GeographicLevel.School:
-                    return DataFixture
-                        .DefaultLocationOptionMetaLink()
-                        .WithOption(DataFixture.DefaultLocationSchoolOptionMeta())
-                        .WithMetaId(metaId)
-                        .WithPublicId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].PublicId);
-                case GeographicLevel.RscRegion:
-                    return DataFixture
-                        .DefaultLocationOptionMetaLink()
-                        .WithOption(DataFixture.DefaultLocationRscRegionOptionMeta())
-                        .WithMetaId(metaId)
-                        .WithPublicId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].PublicId);
-                case GeographicLevel.Provider:
-                    return DataFixture
-                        .DefaultLocationOptionMetaLink()
-                        .WithOption(DataFixture.DefaultLocationProviderOptionMeta())
-                        .WithMetaId(metaId)
-                        .WithPublicId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].PublicId);
-                default:
-                    return DataFixture
-                        .DefaultLocationOptionMetaLink()
-                        .WithOption(DataFixture.DefaultLocationCodedOptionMeta())
-                        .WithMetaId(metaId)
-                        .WithPublicId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].PublicId);
-            }
-        }
-
-        private LocationOptionMetaLink CreateUnchangedLocationOptionLink(
-            int metaId,
-            LocationMeta originalLocationMeta,
-            OptionChange optionChange)
-        {
-            return DataFixture
-                .DefaultLocationOptionMetaLink()
-                .WithMetaId(metaId)
-                .WithOptionId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].OptionId)
-                .WithPublicId(originalLocationMeta.OptionLinks[optionChange.OptionIndex].PublicId);
-        }
-
-        private async Task CreateMappings(
-            List<LocationChange> allChanges,
-            DataSetVersion originalVersion,
-            DataSetVersion newVersion,
-            IReadOnlyDictionary<GeographicLevel, LocationMeta> originalVersionLocationMetasWithLinksByLevel,
-            IReadOnlyDictionary<GeographicLevel, LocationMeta> newVersionLocationMetasWithLinksByLevel)
-        {
-            var mappedOptionCandidateKeysByOptionSourceKey = allChanges
-                .SelectMany(
-                    pc => pc.OptionChanges,
-                    (pc, oc) => new
-                    {
-                        GeographicLevel = pc.ParentIdentifier,
-                        OptionChange = oc
-                    })
-                // Only 'Unchanged' and 'Changed' change types correspond to an option which can be mapped
-                .Where(a => a.OptionChange.ChangeType is ChangeType.Unchanged or ChangeType.Changed)
+            var newLocationMetas = newVersion.LocationMetas
                 .ToDictionary(
-                    a => MappingKeyGenerators.LocationOptionMetaLink(
-                        originalVersionLocationMetasWithLinksByLevel[a.GeographicLevel]
-                            .OptionLinks[a.OptionChange.OptionIndex]),
-                    a => MappingKeyGenerators.LocationOptionMetaLink(
-                        newVersionLocationMetasWithLinksByLevel[a.GeographicLevel]
-                            .OptionLinks[a.OptionChange.OptionIndex]));
+                    m => m.Level,
+                    m => new { LocationMeta = m, NewLocationOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
-            DataSetVersionMapping mappings = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(originalVersion.Id)
-                .WithTargetDataSetVersionId(newVersion.Id)
-                .WithLocationMappingPlan(
-                    DataFixture.LocationMappingPlanFromLocationMeta(
-                        sourceLocations: [.. originalVersionLocationMetasWithLinksByLevel.Values],
-                        targetLocations: [.. newVersionLocationMetasWithLinksByLevel.Values],
-                        mappedOptionCandidateKeysByOptionSourceKey: mappedOptionCandidateKeysByOptionSourceKey));
+            // Location added
+            Assert.Single(actualLocationMetaChanges,
+                c => c.PreviousStateId is null
+                     && c.CurrentStateId == newLocationMetas[GeographicLevel.School].LocationMeta.Id);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
+            // Location added
+            Assert.Single(actualLocationMetaChanges,
+                c => c.PreviousStateId is null
+                     && c.CurrentStateId == newLocationMetas[GeographicLevel.RscRegion].LocationMeta.Id);
+
+            // Location Option added
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["O7CLF"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["O7CLF"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["O7CLF"].OptionId);
+
+            // Location Option added
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["7zXob"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["7zXob"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["7zXob"].OptionId);
+
+            // Location Option added
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["pTSoj"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["pTSoj"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["pTSoj"].OptionId);
+
+            // Location Option added
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["IzBzg"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["IzBzg"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["IzBzg"].OptionId);
         }
 
-        private async Task<IReadOnlyList<LocationMeta>> GetLocationMeta(DataSetVersion version)
+        [Fact]
+        public async Task LocationsDeleted_ChangesContainOnlyDeletedLocations()
+        {
+            var oldLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, s =>
+                    s.SetLevel(GeographicLevel.LocalAuthority)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .Generate(2)))
+                .ForIndex(1, s =>
+                    s.SetLevel(GeographicLevel.School) // Location and ALL options deleted
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("pTSoj"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("IzBzg"))
+                        .Generate(2)))
+                .ForIndex(2, s =>
+                    s.SetLevel(GeographicLevel.RscRegion) // Location and ALL options deleted
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationRscRegionOptionMeta())
+                            .SetPublicId("LxWjE"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationRscRegionOptionMeta())
+                            .SetPublicId("6jrfe"))
+                        .Generate(2)))
+                .GenerateList(3);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldLocationMeta);
+
+            var newLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, UnchangedLocationMetaSetter(oldLocationMeta[0])) // Location and ALL options unchanged
+                .GenerateList(1);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                locationMeta: newLocationMeta);
+
+            await CreateChanges(instanceId);
+
+            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+
+            // 2 Location deletions
+            Assert.Equal(2, actualLocationMetaChanges.Count);
+            Assert.All(actualLocationMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            // No Location Option deletions
+            Assert.Empty(actualLocationOptionMetaChanges);
+
+            var oldLocationMetas = originalVersion.LocationMetas
+                .ToDictionary(m => m.Level);
+
+            // Location deleted
+            Assert.Single(actualLocationMetaChanges,
+                c => c.PreviousStateId == oldLocationMetas[GeographicLevel.School].Id
+                     && c.CurrentStateId is null);
+
+            // Location deleted
+            Assert.Single(actualLocationMetaChanges,
+                c => c.PreviousStateId == oldLocationMetas[GeographicLevel.RscRegion].Id
+                     && c.CurrentStateId is null);
+        }
+
+        [Fact]
+        public async Task LocationsUnchangedOptionsAdded_ChangesContainOnlyAddedOptions()
+        {
+            var oldLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, s =>
+                    s.SetLevel(GeographicLevel.LocalAuthority)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .Generate(1)))
+                .ForIndex(1, s =>
+                    s.SetLevel(GeographicLevel.School)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .Generate(1)))
+                .GenerateList(2);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldLocationMeta);
+
+            var newLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, UnchangedLocationMetaSetter(
+                    locationMeta: oldLocationMeta[0], // Location unchanged
+                    newOptionLinks: () => DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, UnchangedLocationOptionMetaLinkSetter(oldLocationMeta[0].OptionLinks[0])) // Location Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("7zXob")) // Location Option added
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("pTSoj")) // Location Option added
+                        .Generate(3)))
+                .ForIndex(1, UnchangedLocationMetaSetter(
+                    locationMeta: oldLocationMeta[1], // Location unchanged
+                    newOptionLinks: () => DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, UnchangedLocationOptionMetaLinkSetter(oldLocationMeta[1].OptionLinks[0])) // Location Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("IzBzg")) // Location Option added
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("it6Xr")) // Location Option added
+                        .Generate(3)))
+                .GenerateList(2);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                locationMeta: newLocationMeta);
+
+            await CreateChanges(instanceId);
+
+            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+
+            // No Location changes
+            Assert.Empty(actualLocationMetaChanges);
+
+            // 4 Location Option changes
+            Assert.Equal(4, actualLocationOptionMetaChanges.Count);
+            Assert.All(actualLocationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var newLocationMetas = newVersion.LocationMetas
+                .ToDictionary(
+                    m => m.Level,
+                    m => m.OptionLinks.ToDictionary(l => l.PublicId));
+
+            // Location Option added
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId);
+
+            // Location Option added
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.LocalAuthority]["pTSoj"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.LocalAuthority]["pTSoj"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["pTSoj"].OptionId);
+
+            // Location Option added
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School]["IzBzg"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School]["IzBzg"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School]["IzBzg"].OptionId);
+
+            // Location Option added
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School]["it6Xr"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School]["it6Xr"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School]["it6Xr"].OptionId);
+        }
+
+        [Fact]
+        public async Task LocationsUnchangedOptionsDeleted_ChangesContainOnlyDeletedOptions()
+        {
+            var oldLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, s =>
+                    s.SetLevel(GeographicLevel.LocalAuthority)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("O7CLF")) // Location Option deleted
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("7zXob")) // Location Option deleted
+                        .Generate(3)))
+                .ForIndex(1, s =>
+                    s.SetLevel(GeographicLevel.School)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("pTSoj"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("IzBzg")) // Location Option deleted
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("it6Xr")) // Location Option deleted
+                        .Generate(3)))
+                .GenerateList(2);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldLocationMeta);
+
+            var newLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, UnchangedLocationMetaSetter(
+                    locationMeta: oldLocationMeta[0], // Location unchanged
+                    newOptionLinks: () => DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, UnchangedLocationOptionMetaLinkSetter(oldLocationMeta[0].OptionLinks[0])) // Location Option unchanged
+                        .Generate(1)))
+                .ForIndex(1, UnchangedLocationMetaSetter(
+                    locationMeta: oldLocationMeta[1], // Location unchanged
+                    newOptionLinks: () => DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, UnchangedLocationOptionMetaLinkSetter(oldLocationMeta[1].OptionLinks[0])) // Location Option unchanged
+                        .Generate(1)))
+                .GenerateList(2);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                locationMeta: newLocationMeta);
+
+            await CreateChanges(instanceId);
+
+            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+
+            // No Location changes
+            Assert.Empty(actualLocationMetaChanges);
+
+            // 4 Location Option changes
+            Assert.Equal(4, actualLocationOptionMetaChanges.Count);
+            Assert.All(actualLocationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldLocationMetas = originalVersion.LocationMetas
+                .ToDictionary(
+                    m => m.Level,
+                    m => m.OptionLinks.ToDictionary(l => l.PublicId));
+
+            // Location Option deleted
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].PublicId
+                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].MetaId
+                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].OptionId
+                     && c.CurrentState is null);
+
+            // Location Option deleted
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].PublicId
+                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].MetaId
+                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId
+                     && c.CurrentState is null);
+
+            // Location Option deleted
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["IzBzg"].PublicId
+                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["IzBzg"].MetaId
+                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["IzBzg"].OptionId
+                     && c.CurrentState is null);
+
+            // Location Option deleted
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["it6Xr"].PublicId
+                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["it6Xr"].MetaId
+                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["it6Xr"].OptionId
+                     && c.CurrentState is null);
+        }
+
+        [Fact]
+        public async Task LocationsUnchangedOptionsChanged_ChangesContainOnlyChangedOptions()
+        {
+            var oldLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, s =>
+                    s.SetLevel(GeographicLevel.LocalAuthority)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("7zXob"))
+                        .Generate(3)))
+                .ForIndex(1, s =>
+                    s.SetLevel(GeographicLevel.School)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("pTSoj"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("IzBzg"))
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("it6Xr"))
+                        .Generate(3)))
+                .GenerateList(2);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldLocationMeta);
+
+            var newLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, UnchangedLocationMetaSetter(
+                    locationMeta: oldLocationMeta[0], // Location unchanged
+                    newOptionLinks: () => DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, UnchangedLocationOptionMetaLinkSetter(oldLocationMeta[0].OptionLinks[0])) // Location Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("O7CLF")) // Location Option changed
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("7zXob")) // Location Option changed
+                        .Generate(3)))
+                .ForIndex(1, UnchangedLocationMetaSetter(
+                    locationMeta: oldLocationMeta[1], // Location unchanged
+                    newOptionLinks: () => DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, UnchangedLocationOptionMetaLinkSetter(oldLocationMeta[1].OptionLinks[0])) // Location Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("IzBzg")) // Location Option changed
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("it6Xr")) // Location Option changed
+                        .Generate(3)))
+                .GenerateList(2);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                locationMeta: newLocationMeta);
+
+            await CreateChanges(instanceId);
+
+            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+
+            // No Location changes
+            Assert.Empty(actualLocationMetaChanges);
+
+            // 4 Location Option changes
+            Assert.Equal(4, actualLocationOptionMetaChanges.Count);
+            Assert.All(actualLocationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldLocationMetas = originalVersion.LocationMetas
+                .ToDictionary(
+                    m => m.Level,
+                    m => m.OptionLinks.ToDictionary(l => l.PublicId));
+
+            var newLocationMetas = newVersion.LocationMetas
+                .ToDictionary(
+                    m => m.Level,
+                    m => m.OptionLinks.ToDictionary(l => l.PublicId));
+
+            // Location Option changed
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].PublicId
+                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].MetaId
+                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].OptionId
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].OptionId);
+
+            // Location Option changed
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].PublicId
+                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].MetaId
+                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId);
+
+            // Location Option changed
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["IzBzg"].PublicId
+                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["IzBzg"].MetaId
+                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["IzBzg"].OptionId
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School]["IzBzg"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School]["IzBzg"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School]["IzBzg"].OptionId);
+
+            // Location Option changed
+            Assert.Single(actualLocationOptionMetaChanges,
+                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["it6Xr"].PublicId
+                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["it6Xr"].MetaId
+                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["it6Xr"].OptionId
+                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School]["it6Xr"].PublicId
+                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School]["it6Xr"].MetaId
+                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School]["it6Xr"].OptionId);
+        }
+
+        [Fact]
+        public async Task LocationsUnchangedOptionsUnchanged_ChangesAreEmpty()
+        {
+            var oldLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, s =>
+                    s.SetLevel(GeographicLevel.LocalAuthority)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
+                            .SetPublicId("7zXob"))
+                        .Generate(3)))
+                .ForIndex(1, s =>
+                    s.SetLevel(GeographicLevel.School)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("pTSoj"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("IzBzg"))
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
+                            .SetPublicId("it6Xr"))
+                        .Generate(3)))
+                .GenerateList(2);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldLocationMeta);
+
+            var newLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, UnchangedLocationMetaSetter(oldLocationMeta[0])) // Location and ALL options unchanged
+                .ForIndex(1, UnchangedLocationMetaSetter(oldLocationMeta[1])) // Location and ALL options unchanged
+                .GenerateList(2);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                locationMeta: newLocationMeta);
+
+            await CreateChanges(instanceId);
+
+            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+
+            Assert.Empty(actualLocationMetaChanges);
+            Assert.Empty(actualLocationOptionMetaChanges);
+        }
+
+        private Action<InstanceSetters<LocationMeta>> UnchangedLocationMetaSetter(
+            LocationMeta locationMeta,
+            Func<IEnumerable<LocationOptionMetaLink>>? newOptionLinks = null)
+        {
+            return s =>
+            {
+                s.SetLevel(locationMeta.Level);
+
+                newOptionLinks ??= () =>
+                {
+                    var newOptionLinks = new List<LocationOptionMetaLink>();
+
+                    foreach (var oldOptionLink in locationMeta.OptionLinks)
+                    {
+                        LocationOptionMetaLink newOptionLink = DataFixture.DefaultLocationOptionMetaLink()
+                            .ForInstance(UnchangedLocationOptionMetaLinkSetter(oldOptionLink));
+
+                        newOptionLinks.Add(newOptionLink);
+                    }
+
+                    return newOptionLinks;
+                };
+
+                s.SetOptionLinks(newOptionLinks);
+            };
+        }
+
+        private static Action<InstanceSetters<LocationOptionMetaLink>> UnchangedLocationOptionMetaLinkSetter(LocationOptionMetaLink locationOptionMetaLink)
+        {
+            return s =>
+            {
+                s.SetPublicId(locationOptionMetaLink.PublicId);
+                s.SetOptionId(locationOptionMetaLink.OptionId);
+            };
+        }
+
+        private async Task<IReadOnlyList<LocationMetaChange>> GetLocationMetaChanges(DataSetVersion version)
         {
             return await GetDbContext<PublicDataDbContext>()
-                .LocationMetas
-                .Include(dsv => dsv.Options)
-                .Include(dsv => dsv.OptionLinks)
-                .Where(lm => lm.DataSetVersionId == version.Id)
+                .LocationMetaChanges
+                .AsNoTracking()
+                .Where(c => c.DataSetVersionId == version.Id)
                 .ToListAsync();
+        }
+
+        private async Task<IReadOnlyList<LocationOptionMetaChange>> GetLocationOptionMetaChanges(DataSetVersion version)
+        {
+            return await GetDbContext<PublicDataDbContext>()
+                .LocationOptionMetaChanges
+                .AsNoTracking()
+                .Where(c => c.DataSetVersionId == version.Id)
+                .ToListAsync();
+        }
+
+        private async Task<(DataSetVersion originalVersion, Guid instanceId)> CreateDataSetInitialVersion(
+            List<LocationMeta> locationMeta)
+        {
+            return await CreateDataSetInitialVersion(
+                dataSetStatus: DataSetStatus.Published,
+                dataSetVersionStatus: DataSetVersionStatus.Published,
+                importStage: DataSetVersionImportStage.Completing,
+                meta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    LocationMetas = locationMeta
+                });
+        }
+
+        private async Task<(DataSetVersion nextVersion, Guid instanceId)> CreateDataSetNextVersion(
+            DataSetVersion originalVersion,
+            List<LocationMeta> locationMeta)
+        {
+            return await CreateDataSetNextVersion(
+                initialVersion: originalVersion,
+                status: DataSetVersionStatus.Mapping,
+                importStage: Stage.PreviousStage(),
+                meta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    LocationMetas = locationMeta
+                });
         }
     }
 
@@ -1551,87 +2589,5 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunction>();
             await function.CompleteNextDataSetVersionImportProcessing(instanceId, CancellationToken.None);
         }
-    }
-
-    private async Task CreateMeta(
-        IEnumerable<FilterMeta>? filterMetas = null,
-        IEnumerable<FilterOptionMetaLink>? filterOptionMetaLinks = null,
-        IEnumerable<LocationMeta>? locationMetas = null,
-        IEnumerable<LocationOptionMetaLink>? locationOptionMetaLinks = null,
-        GeographicLevelMeta? geographicLevelMeta = null,
-        IEnumerable<IndicatorMeta>? indicatorMetas = null,
-        IEnumerable<TimePeriodMeta>? timePeriodMetas = null)
-    {
-        await AddTestData<PublicDataDbContext>(context =>
-        {
-            if (filterMetas is not null)
-            {
-                context.FilterMetas.AddRange(filterMetas);
-            }
-
-            if (filterOptionMetaLinks is not null)
-            {
-                context.FilterOptionMetaLinks.AddRange(filterOptionMetaLinks);
-            }
-
-            if (locationMetas is not null)
-            {
-                context.LocationMetas.AddRange(locationMetas);
-            }
-
-            if (locationOptionMetaLinks is not null)
-            {
-                context.LocationOptionMetaLinks.AddRange(locationOptionMetaLinks);
-            }
-
-            if (geographicLevelMeta is not null)
-            {
-                context.GeographicLevelMetas.Add(geographicLevelMeta);
-            }
-
-            if (indicatorMetas is not null)
-            {
-                context.IndicatorMetas.AddRange(indicatorMetas);
-            }
-
-            if (timePeriodMetas is not null)
-            {
-                context.TimePeriodMetas.AddRange(timePeriodMetas);
-            }
-        });
-    }
-
-    // These classes are to make setting up the tests easier and safer to change.
-    // We define what changes we want the hypothetical new data set version to have, relative to its original version, and
-    // the metadata and mappings are then worked out for us.
-    private abstract record ParentChange<TParentIdentifier>
-    {
-        public required TParentIdentifier ParentIdentifier { get; init; }
-        public required ChangeType ChangeType { get; init; }
-        public required IReadOnlyList<OptionChange> OptionChanges { get; init; }
-    }
-
-    private record OptionChange
-    {
-        public required ChangeType ChangeType { get; init; }
-
-        // This is the index of the corresponding option for the original data set version, or for the new data set version
-        public required int OptionIndex { get; init; }
-    }
-
-    private record LocationChange : ParentChange<GeographicLevel>;
-
-    private record FilterChange : ParentChange<string>
-    {
-        // This is the index of the corresponding filter for the original data set version, or for the new data set version
-        public required int FilterIndex { get; init; }
-    }
-
-    private enum ChangeType
-    {
-        Unchanged, // This is essentially an option that has been auto-mapped
-        Changed, // This is an option that has had its label changed, and has been manually mapped to the new option
-        Deleted, // This is an option that had been deleted
-        Added // This is an option that has been added
     }
 }

@@ -72,14 +72,10 @@ public abstract class ProcessorFunctionsIntegrationTest(
             importStage: DataSetVersionImportStage.Completing,
             meta: initialVersionMeta);
 
-        var defaultNextVersion = initialVersion.DefaultNextVersion();
-
-        var (nextVersion, instanceId) = await CreateDataSetVersion(
-            dataSetId: initialVersion.DataSetId,
+        var (nextVersion, instanceId) = await CreateDataSetNextVersion(
+            initialVersion: initialVersion,
             status: nextVersionStatus,
             importStage: nextVersionImportStage,
-            versionMajor: defaultNextVersion.Major,
-            versionMinor: defaultNextVersion.Minor,
             meta: nextVersionMeta);
 
         return (initialVersion, nextVersion, instanceId);
@@ -104,6 +100,24 @@ public abstract class ProcessorFunctionsIntegrationTest(
             importStage: importStage,
             status: dataSetVersionStatus,
             releaseFileId: releaseFileId,
+            meta: meta);
+    }
+
+    protected async Task<(DataSetVersion nextVersion, Guid instanceId)>
+        CreateDataSetNextVersion(
+            DataSetVersion initialVersion,
+            DataSetVersionStatus status,
+            DataSetVersionImportStage importStage,
+            DataSetVersionMeta? meta = null)
+    {
+        var defaultNextVersion = initialVersion.DefaultNextVersion();
+
+        return await CreateDataSetVersion(
+            dataSetId: initialVersion.DataSetId,
+            status: status,
+            importStage: importStage,
+            versionMajor: defaultNextVersion.Major,
+            versionMinor: defaultNextVersion.Minor,
             meta: meta);
     }
 
