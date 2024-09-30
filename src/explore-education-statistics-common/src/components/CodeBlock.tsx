@@ -1,4 +1,4 @@
-import styles from '@common/components/Code.module.scss';
+import styles from '@common/components/CodeBlock.module.scss';
 import useToggle from '@common/hooks/useToggle';
 import React, { useEffect } from 'react';
 import pythonLang from 'react-syntax-highlighter/dist/cjs/languages/hljs/python';
@@ -11,11 +11,11 @@ SyntaxHighlighter.registerLanguage('r', rLang);
 SyntaxHighlighter.registerLanguage('python', pythonLang);
 
 export interface CodeBlockProps {
+  children: string;
   language: 'python' | 'r';
-  code: string;
 }
 
-export default function CodeBlock({ code, language }: CodeBlockProps) {
+export default function CodeBlock({ children, language }: CodeBlockProps) {
   const [copied, toggleCopied] = useToggle(false);
 
   useEffect(() => {
@@ -33,19 +33,20 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
       <Button
         className={styles.copyButton}
         onClick={async () => {
-          await navigator.clipboard.writeText(code);
+          await navigator.clipboard.writeText(children);
           toggleCopied.on();
         }}
       >
-        {copied ? <span aria-live="polite">Code copied</span> : 'Copy code'}
+        <span aria-live="polite">{copied ? 'Code copied' : 'Copy code'}</span>
       </Button>
+
       <SyntaxHighlighter
         className={styles.pre}
+        codeTagProps={{ tabIndex: 0 }}
         language={language}
         style={a11yLight}
-        codeTagProps={{ tabIndex: 0 }}
       >
-        {code}
+        {children}
       </SyntaxHighlighter>
     </div>
   );
