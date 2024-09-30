@@ -1820,21 +1820,21 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             var result = viewModel.Results[0];
 
             Assert.Equal(2, result.Filters.Count);
-            Assert.Equal(AbsenceSchoolData.FilterNcYear10, result.Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal(AbsenceSchoolData.FilterNcYear4, result.Filters[AbsenceSchoolData.FilterNcYear]);
             Assert.Equal(AbsenceSchoolData.FilterSchoolTypeTotal, result.Filters[AbsenceSchoolData.FilterSchoolType]);
 
             Assert.Equal(GeographicLevel.LocalAuthority, result.GeographicLevel);
 
             Assert.Equal(3, result.Locations.Count);
-            Assert.Equal(AbsenceSchoolData.LocationLaKingstonUponThames, result.Locations["LA"]);
+            Assert.Equal(AbsenceSchoolData.LocationLaBarnsley, result.Locations["LA"]);
             Assert.Equal(AbsenceSchoolData.LocationNatEngland, result.Locations["NAT"]);
-            Assert.Equal(AbsenceSchoolData.LocationRegionOuterLondon, result.Locations["REG"]);
+            Assert.Equal(AbsenceSchoolData.LocationRegionYorkshire, result.Locations["REG"]);
 
             Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriod.Code);
             Assert.Equal("2022/2023", result.TimePeriod.Period);
 
             Assert.Single(result.Values);
-            Assert.Equal("4064499", result.Values[AbsenceSchoolData.IndicatorSessAuthorised]);
+            Assert.Equal("577798", result.Values[AbsenceSchoolData.IndicatorSessAuthorised]);
         }
 
         [Fact]
@@ -3020,6 +3020,117 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
     public class SortsTests(TestApplicationFactory testApp) : DataSetsControllerPostQueryTests(testApp)
     {
         [Fact]
+        public async Task NoFields_SingleTimePeriod_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                request: new DataSetQueryRequest
+                {
+                    Indicators = [AbsenceSchoolData.IndicatorEnrolments],
+                    Criteria = new DataSetQueryCriteriaFacets
+                    {
+                        Filters = new DataSetQueryCriteriaFilters
+                        {
+                            Eq = AbsenceSchoolData.FilterSchoolTypeTotal
+                        },
+                        GeographicLevels = new DataSetQueryCriteriaGeographicLevels
+                        {
+                            Eq = "NAT"
+                        },
+                        TimePeriods = new DataSetQueryCriteriaTimePeriods
+                        {
+                            Eq = new DataSetQueryTimePeriod { Code = "AY", Period = "2020/2021"}
+                        }
+                    }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(4, viewModel.Results.Count);
+
+            Assert.All(viewModel.Results, result =>
+            {
+                Assert.Equal(AbsenceSchoolData.FilterSchoolTypeTotal, result.Filters[AbsenceSchoolData.FilterSchoolType]);
+                Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
+                Assert.Equal("2020/2021", result.TimePeriod.Period);
+            });
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("930365", viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("390233", viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear8, viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("966035", viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear10, viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("687704", viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]);
+        }
+
+        [Fact]
+        public async Task NoFields_MultipleTimePeriods_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                request: new DataSetQueryRequest
+                {
+                    Indicators = [AbsenceSchoolData.IndicatorEnrolments],
+                    Criteria = new DataSetQueryCriteriaFacets
+                    {
+                        Filters = new DataSetQueryCriteriaFilters
+                        {
+                            Eq = AbsenceSchoolData.FilterSchoolTypePrimary
+                        },
+                        GeographicLevels = new DataSetQueryCriteriaGeographicLevels
+                        {
+                            Eq = "NAT"
+                        },
+                        TimePeriods = new DataSetQueryCriteriaTimePeriods
+                        {
+                            In =
+                            [
+                                new DataSetQueryTimePeriod { Code = "AY", Period = "2021/2022" },
+                                new DataSetQueryTimePeriod { Code = "AY", Period = "2022/2023" }
+                            ]
+                        }
+                    }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(4, viewModel.Results.Count);
+
+            Assert.All(viewModel.Results, result =>
+            {
+                Assert.Equal(AbsenceSchoolData.FilterSchoolTypePrimary, result.Filters[AbsenceSchoolData.FilterSchoolType]);
+                Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
+            });
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2022/2023", viewModel.Results[0].TimePeriod.Period);
+            Assert.Equal("654884", viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2022/2023", viewModel.Results[1].TimePeriod.Period);
+            Assert.Equal("235647", viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2021/2022", viewModel.Results[2].TimePeriod.Period);
+            Assert.Equal("611553", viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2021/2022", viewModel.Results[3].TimePeriod.Period);
+            Assert.Equal("752711", viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]);
+        }
+
+        [Fact]
         public async Task SingleField_TimePeriodAsc_Returns200()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
@@ -3034,7 +3145,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                     {
                         Filters = new DataSetQueryCriteriaFilters
                         {
-                            Eq = AbsenceSchoolData.FilterNcYear4
+                            Eq = AbsenceSchoolData.FilterSchoolTypePrimary
                         },
                         GeographicLevels = new DataSetQueryCriteriaGeographicLevels
                         {
@@ -3048,14 +3159,35 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
             Assert.Equal(6, viewModel.Results.Count);
 
-            string[] expectedSequence =
-            [
-                "2020/2021",
-                "2021/2022",
-                "2022/2023"
-            ];
+            Assert.All(viewModel.Results, result =>
+            {
+                Assert.Equal(AbsenceSchoolData.FilterSchoolTypePrimary, result.Filters[AbsenceSchoolData.FilterSchoolType]);
+                Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
+            });
 
-            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.TimePeriod.Period)));
+            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2020/2021", viewModel.Results[0].TimePeriod.Period);
+            Assert.Equal("233870", viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2020/2021", viewModel.Results[1].TimePeriod.Period);
+            Assert.Equal("510682", viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2021/2022", viewModel.Results[2].TimePeriod.Period);
+            Assert.Equal("611553", viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2021/2022", viewModel.Results[3].TimePeriod.Period);
+            Assert.Equal("752711", viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[4].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2022/2023", viewModel.Results[4].TimePeriod.Period);
+            Assert.Equal("654884", viewModel.Results[4].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[5].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2022/2023", viewModel.Results[5].TimePeriod.Period);
+            Assert.Equal("235647", viewModel.Results[5].Values[AbsenceSchoolData.IndicatorEnrolments]);
         }
 
         [Fact]
@@ -3073,7 +3205,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                     {
                         Filters = new DataSetQueryCriteriaFilters
                         {
-                            Eq = AbsenceSchoolData.FilterNcYear4
+                            Eq = AbsenceSchoolData.FilterSchoolTypePrimary
                         },
                         GeographicLevels = new DataSetQueryCriteriaGeographicLevels
                         {
@@ -3087,18 +3219,39 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
             Assert.Equal(6, viewModel.Results.Count);
 
-            string[] expectedSequence =
-            [
-                "2022/2023",
-                "2021/2022",
-                "2020/2021"
-            ];
+            Assert.All(viewModel.Results, result =>
+            {
+                Assert.Equal(AbsenceSchoolData.FilterSchoolTypePrimary, result.Filters[AbsenceSchoolData.FilterSchoolType]);
+                Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
+            });
 
-            Assert.Equal(expectedSequence, GetSequence(viewModel.Results.Select(r => r.TimePeriod.Period)));
+            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[0].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2022/2023", viewModel.Results[0].TimePeriod.Period);
+            Assert.Equal("654884", viewModel.Results[0].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[1].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2022/2023", viewModel.Results[1].TimePeriod.Period);
+            Assert.Equal("235647", viewModel.Results[1].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[2].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2021/2022", viewModel.Results[2].TimePeriod.Period);
+            Assert.Equal("611553", viewModel.Results[2].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[3].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2021/2022", viewModel.Results[3].TimePeriod.Period);
+            Assert.Equal("752711", viewModel.Results[3].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear4, viewModel.Results[4].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2020/2021", viewModel.Results[4].TimePeriod.Period);
+            Assert.Equal("233870", viewModel.Results[4].Values[AbsenceSchoolData.IndicatorEnrolments]);
+
+            Assert.Equal(AbsenceSchoolData.FilterNcYear6, viewModel.Results[5].Filters[AbsenceSchoolData.FilterNcYear]);
+            Assert.Equal("2020/2021", viewModel.Results[5].TimePeriod.Period);
+            Assert.Equal("510682", viewModel.Results[5].Values[AbsenceSchoolData.IndicatorEnrolments]);
         }
 
         [Fact]
-        public async Task SingleField_GeographicLevelAsc_Returns200()
+        public async Task SingleField_GeographicLevelAsc_Returns200_CorrectSequence()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -3142,7 +3295,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         }
 
         [Fact]
-        public async Task SingleField_GeographicLevelDesc_Returns200()
+        public async Task SingleField_GeographicLevelDesc_Returns200_CorrectSequence()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
             
@@ -3186,7 +3339,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         }
 
         [Fact]
-        public async Task SingleField_LocationAsc_Returns200()
+        public async Task SingleField_LocationAsc_Returns200_CorrectSequence()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -3230,7 +3383,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         }
 
         [Fact]
-        public async Task SingleField_LocationDesc_Returns200()
+        public async Task SingleField_LocationDesc_Returns200_CorrectSequence()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -3274,7 +3427,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         }
 
         [Fact]
-        public async Task SingleField_FilterAsc_Returns200()
+        public async Task SingleField_FilterAsc_Returns200_CorrectSequence()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -3324,7 +3477,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         }
 
         [Fact]
-        public async Task SingleField_FilterDesc_Returns200()
+        public async Task SingleField_FilterDesc_Returns200_CorrectSequence()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -3374,7 +3527,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         }
 
         [Fact]
-        public async Task SingleField_IndicatorAsc_Returns200()
+        public async Task SingleField_IndicatorAsc_Returns200_CorrectSequence()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -3428,7 +3581,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         }
 
         [Fact]
-        public async Task SingleField_IndicatorDesc_Returns200()
+        public async Task SingleField_IndicatorDesc_Returns200_CorrectSequence()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
@@ -3482,7 +3635,7 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         }
 
         [Fact]
-        public async Task MultipleFields_Returns200()
+        public async Task MultipleFields_Returns200_CorrectSequence()
         {
             var dataSetVersion = await SetupDefaultDataSetVersion();
 
