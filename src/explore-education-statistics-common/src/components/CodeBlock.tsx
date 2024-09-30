@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import pythonLang from 'react-syntax-highlighter/dist/cjs/languages/hljs/python';
 import rLang from 'react-syntax-highlighter/dist/cjs/languages/hljs/r';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/light';
-import a11yLight from 'react-syntax-highlighter/dist/cjs/styles/hljs/a11y-light';
 import Button from './Button';
 
 SyntaxHighlighter.registerLanguage('r', rLang);
@@ -44,7 +43,7 @@ export default function CodeBlock({ children, language }: CodeBlockProps) {
         className={styles.pre}
         codeTagProps={{ tabIndex: 0 }}
         language={language}
-        style={a11yLight}
+        useInlineStyles={false}
       >
         {children}
       </SyntaxHighlighter>
