@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
+public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
     ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
@@ -28,7 +28,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
     public class UpdateFileStoragePathTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessCompletionOfNextDataSetVersionImportFunctionTests(fixture)
+        : ProcessCompletionOfNextDataSetVersionFunctionsTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ManualMapping;
 
@@ -100,7 +100,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
     public class CompleteNextDataSetVersionImportProcessingTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessCompletionOfNextDataSetVersionImportFunctionTests(fixture)
+        : ProcessCompletionOfNextDataSetVersionFunctionsTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
 
@@ -112,7 +112,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             Directory.CreateDirectory(dataSetVersionPathResolver.DirectoryPath(dataSetVersion));
 
-            await CompleteProcessing(instanceId);
+            await CompleteNextDataSetVersionImportProcessing(instanceId);
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
@@ -140,7 +140,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 await File.Create(Path.Combine(directoryPath, filename)).DisposeAsync();
             }
 
-            await CompleteProcessing(instanceId);
+            await CompleteNextDataSetVersionImportProcessing(instanceId);
 
             // Ensure the duck db database file is the only file that was deleted
             AssertDataSetVersionDirectoryContainsOnlyFiles(dataSetVersion,
@@ -149,7 +149,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     .ToArray());
         }
 
-        private async Task CompleteProcessing(Guid instanceId)
+        private async Task CompleteNextDataSetVersionImportProcessing(Guid instanceId)
         {
             var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunctions>();
             await function.CompleteNextDataSetVersionImportProcessing(instanceId, CancellationToken.None);

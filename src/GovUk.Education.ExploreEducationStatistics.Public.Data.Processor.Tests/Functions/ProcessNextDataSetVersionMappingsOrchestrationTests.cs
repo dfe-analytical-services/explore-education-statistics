@@ -35,7 +35,7 @@ public abstract class ProcessNextDataSetVersionMappingsOrchestrationTests
                     .Returns(Task.CompletedTask);
             }
 
-            await ProcessNextDataSetVersion(mockOrchestrationContext.Object);
+            await ProcessNextDataSetVersionMappings(mockOrchestrationContext.Object);
 
             VerifyAllMocks(mockOrchestrationContext);
         }
@@ -63,12 +63,12 @@ public abstract class ProcessNextDataSetVersionMappingsOrchestrationTests
                         null))
                 .Returns(Task.CompletedTask);
 
-            await ProcessNextDataSetVersion(mockOrchestrationContext.Object);
+            await ProcessNextDataSetVersionMappings(mockOrchestrationContext.Object);
 
             VerifyAllMocks(mockOrchestrationContext);
         }
 
-        private async Task ProcessNextDataSetVersion(TaskOrchestrationContext orchestrationContext)
+        private async Task ProcessNextDataSetVersionMappings(TaskOrchestrationContext orchestrationContext)
         {
             await ProcessNextDataSetVersionMappingsFunctionOrchestration.ProcessNextDataSetVersionMappings(
                 orchestrationContext,
