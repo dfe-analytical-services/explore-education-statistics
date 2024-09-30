@@ -98,7 +98,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
         value: apiContainerAppManagedIdentity.properties.clientId
       }
       {
-        name: 'App_Url'
+        name: 'App__Url'
         value: publicApiUrl
       }
       {
