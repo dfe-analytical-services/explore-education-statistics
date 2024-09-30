@@ -117,7 +117,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                                 ReleaseSlug = release1Version.Slug,
                                 Amendment = false,
                                 UpdateNote = "No update note provided.",
-                                SupersededPublications = new List<IdTitleViewModel>(),
                             },
                             new()
                             {
@@ -128,85 +127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                                 ReleaseSlug = amendedReleaseVersion.Slug,
                                 Amendment = true,
                                 UpdateNote = "latest update note",
-                                SupersededPublications = new List<IdTitleViewModel>(),
-                            },
-                        }),
-                        CancellationToken.None),
-                    Times.Once);
-            }
-
-            MockUtils.VerifyAllMocks(notifierClient);
-        }
-
-        [Fact]
-        public async Task NotifySubscribersIfApplicable_HasSupersededPublication()
-        {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                Slug = "2000-01",
-                NotifySubscribers = true,
-                Version = 0,
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "pub1 title",
-                    Slug = "pub1-slug",
-                }
-            };
-
-            var supersededPublication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                Title = "pub2 title",
-                Slug = "pub2-slug",
-                SupersededBy = releaseVersion.Publication,
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Publications.Add(supersededPublication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var notifierClient = new Mock<INotifierClient>(MockBehavior.Strict);
-            notifierClient.Setup(mock => mock.NotifyPublicationSubscribers(
-                    It.IsAny<IReadOnlyList<ReleaseNotificationMessage>>(),
-                    CancellationToken.None))
-                .Returns(Task.CompletedTask);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var notificationsService = BuildNotificationsService(
-                    contentDbContext,
-                    notifierClient.Object);
-
-                await notificationsService.NotifySubscribersIfApplicable(releaseVersion.Id);
-
-                notifierClient.Verify(mock => mock.NotifyPublicationSubscribers(
-                        ItIs.DeepEqualTo(new List<ReleaseNotificationMessage>
-                        {
-                            new()
-                            {
-                                PublicationId = releaseVersion.Publication.Id,
-                                PublicationName = releaseVersion.Publication.Title,
-                                PublicationSlug = releaseVersion.Publication.Slug,
-                                ReleaseName = releaseVersion.Title,
-                                ReleaseSlug = releaseVersion.Slug,
-                                Amendment = false,
-                                UpdateNote = "No update note provided.",
-                                SupersededPublications = new List<IdTitleViewModel>
-                                {
-                                    new()
-                                    {
-                                        Id = supersededPublication.Id,
-                                        Title = supersededPublication.Title,
-                                    },
-                                },
                             },
                         }),
                         CancellationToken.None),

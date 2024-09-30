@@ -43,9 +43,6 @@ public static class NotifierHostBuilder
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
-                    // @MarkFix Create migration with CREATE USER and GRANTs for access required
-                    // @MarkFix add sqlNotifierUser to release infra deploy validate/deploy steps
-                    // @MarkFix add sqlNotifierUserPassword to release infra deploy validate/deploy steps
                     .AddDbContext<ContentDbContext>(options =>
                         options.UseSqlServer(
                             ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),

@@ -167,8 +167,8 @@ public static class PublisherHostBuilderExtensions
                     }
                 }
 
-                StartupUtils.AddPersistenceHelper<ContentDbContext>(services); // @MarkFix Can be removed?
-                StartupUtils.AddPersistenceHelper<StatisticsDbContext>(services); // @MarkFix Can be removed?
+                StartupUtils.AddPersistenceHelper<ContentDbContext>(services);
+                StartupUtils.AddPersistenceHelper<StatisticsDbContext>(services);
             });
     }
 
