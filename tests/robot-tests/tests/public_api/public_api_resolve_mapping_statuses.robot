@@ -10,7 +10,6 @@ Force Tags          Admin    Local    Dev    AltersData
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
-Test Teardown       run keyword if test failed    record test failure
 
 
 
@@ -67,7 +66,7 @@ Create 1st API dataset
 
 User waits until the 1st API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    5s    Verify status of API Datasets    Ready
+    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
 
 Add headline text block to Content page
     user clicks link    Back to API data sets

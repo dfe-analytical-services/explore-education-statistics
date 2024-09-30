@@ -5,7 +5,6 @@ Resource            ../../libs/admin-common.robot
 Suite Setup         user signs in as bau1
 Suite Teardown      teardown suite
 Test Setup          fail test fast if required
-Test Teardown       run keyword if test failed    record test failure
 
 Force Tags          Admin    Local    Dev    AltersData
 

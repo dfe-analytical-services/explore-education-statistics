@@ -93,7 +93,7 @@ def retry_or_fail_with_delay(func, retries=5, delay=1.0, *args, **kwargs):
             return func(*args, **kwargs)
         except Exception as e:
             last_exception = e
-            logger.warn(f"Attempt {attempt + 1}/{retries} failed with error: {e}. Retrying in {delay} seconds...")
+            logger.info(f"Attempt {attempt + 1}/{retries} failed with error: {e}. Retrying in {delay} seconds...")
             time.sleep(delay)
     # Raise the last exception if all retries failed
     raise last_exception
@@ -104,7 +104,8 @@ def user_waits_until_parent_contains_element(
     retries: int = 5, delay: float = 1.0
 ):
     try:
-        timeout_per_retry = timeout / retries if timeout is not None else None
+        default_timeout = BuiltIn().get_variable_value('${TIMEOUT}')
+        timeout_per_retry = timeout / retries if timeout is not None else int(default_timeout) / retries
 
         child_locator = _normalise_child_locator(child_locator)
 
@@ -312,32 +313,9 @@ def user_should_be_at_top_of_page():
         raise_assertion_error(f"Windows position Y is {y} not 0! User should be at the top of the page!")
 
 
-def prompt_to_continue():
-    logger.warn("Continue? (Y/n)")
-    choice = input()
-    if choice.lower().startswith("n"):
-        raise_assertion_error("Tests stopped!")
-
-
 def capture_large_screenshot_and_prompt_to_continue():
     visual.capture_large_screenshot()
     prompt_to_continue()
-
-
-def capture_screenshots_and_html():
-    visual.capture_screenshot()
-    visual.capture_large_screenshot()
-    capture_html()
-
-
-def capture_html():
-    html = sl().get_source()
-    current_time_millis = round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
-    output_dir = BuiltIn().get_variable_value('${OUTPUT DIR}')
-    html_file = open(f"{output_dir}{os.sep}captured-html-{current_time_millis}.html", "w", encoding="utf-8")
-    html_file.write(html)
-    html_file.close()
-    logger.warn(f"Captured HTML of {sl().get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
 
 
 def user_gets_row_number_with_heading(heading: str, table_locator: str = "css:table"):

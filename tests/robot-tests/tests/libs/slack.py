@@ -31,11 +31,12 @@ class SlackService:
             tests = soup.find("total").find("stat")
             failed_tests = int(tests["fail"])
             passed_tests = int(tests["pass"])
+            skipped_tests = int(tests["skip"])
 
         except AttributeError as e:
             raise Exception("Error parsing the XML report") from e
 
-        total_tests_count = passed_tests + failed_tests
+        total_tests_count = passed_tests + failed_tests + skipped_tests
 
         blocks = [
             {
@@ -54,6 +55,7 @@ class SlackService:
                     {"type": "mrkdwn", "text": f"*Total test cases*\n{total_tests_count}"},
                     {"type": "mrkdwn", "text": f"*Passed test cases*\n{passed_tests}"},
                     {"type": "mrkdwn", "text": f"*Failed test cases*\n{failed_tests}"},
+                    {"type": "mrkdwn", "text": f"*Skipped test cases*\n{skipped_tests}"},
                 ],
             },
         ]

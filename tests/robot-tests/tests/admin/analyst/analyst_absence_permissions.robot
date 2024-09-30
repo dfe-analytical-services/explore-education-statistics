@@ -6,7 +6,6 @@ Resource            ../../seed_data/seed_data_theme_1_constants.robot
 Suite Setup         user signs in as analyst1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
-Test Teardown       run keyword if test failed    record test failure
 
 Force Tags          Admin    Local    Dev
 
