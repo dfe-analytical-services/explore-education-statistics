@@ -85,7 +85,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     ]
     appSettings: [
       {
-        name: 'ConnectionStrings__PublicDataDb'
+        name: 'ConnectionStrings:PublicDataDb'
         value: 'Server=${resourceNames.sharedResources.postgreSqlFlexibleServer}.postgres.database.azure.com;Database=public_data;Port=5432;User Id=${resourceNames.publicApi.apiAppIdentity}'
       }
       {
@@ -98,31 +98,31 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
         value: apiContainerAppManagedIdentity.properties.clientId
       }
       {
-        name: 'AppSettings__HostUrl'
+        name: 'App:Url'
         value: publicApiUrl
       }
       {
-        name: 'AppInsights__ConnectionString'
+        name: 'AppInsights:ConnectionString'
         value: appInsightsConnectionString
       }
       {
-        name: 'ContentApi__Url'
+        name: 'ContentApi:Url'
         value: contentApiUrl
       }
       {
-        name: 'MiniProfiler__Enabled'
+        name: 'MiniProfiler:Enabled'
         value: 'true'
       }
       {
-        name: 'DataFiles__BasePath'
+        name: 'DataFiles:BasePath'
         value: dataFilesFileShareMountPath
       }
       {
-        name: 'OpenIdConnect__TenantId'
+        name: 'OpenIdConnect:TenantId'
         value: tenant().tenantId
       }
       {
-        name: 'OpenIdConnect__ClientId'
+        name: 'OpenIdConnect:ClientId'
         value: apiAppRegistrationClientId
       }
     ]
