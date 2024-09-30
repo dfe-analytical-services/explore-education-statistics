@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ProcessInitialDataSetVersionFunctionTests(
+public abstract class CompleteInitialDataSetVersionProcessingFunctionTests(
     ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
@@ -26,9 +26,9 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
         TimePeriodsTable.ParquetFile
     ];
 
-    public class CompleteInitialDataSetVersionProcessingTests(
+    public class CompleteInitialDataSetVersionProcessingProcessingTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessInitialDataSetVersionFunctionTests(fixture)
+        : CompleteInitialDataSetVersionProcessingFunctionTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
 
@@ -40,7 +40,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             Directory.CreateDirectory(dataSetVersionPathResolver.DirectoryPath(dataSetVersion));
 
-            await CompleteProcessing(instanceId);
+            await CompleteInitialDataSetVersionProcessing(instanceId);
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
@@ -68,7 +68,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
                 await File.Create(Path.Combine(directoryPath, filename)).DisposeAsync();
             }
 
-            await CompleteProcessing(instanceId);
+            await CompleteInitialDataSetVersionProcessing(instanceId);
 
             // Ensure the duck db database file is the only file that was deleted
             AssertDataSetVersionDirectoryContainsOnlyFiles(dataSetVersion,
@@ -77,7 +77,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
                     .ToArray());
         }
 
-        private async Task CompleteProcessing(Guid instanceId)
+        private async Task CompleteInitialDataSetVersionProcessing(Guid instanceId)
         {
             var function = GetRequiredService<CompleteInitialDataSetVersionProcessingFunction>();
             await function.CompleteInitialDataSetVersionProcessing(instanceId, CancellationToken.None);

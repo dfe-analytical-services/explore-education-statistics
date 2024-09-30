@@ -14,13 +14,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
+public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
     ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
     public abstract class CreateMappingsTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessNextDataSetVersionMappingsFunctionTests(fixture)
+        : ProcessNextDataSetVersionMappingsFunctionsTests(fixture)
     {
         protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.CreatingMappings;
 
@@ -534,7 +534,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
     public abstract class ApplyAutoMappingsTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessNextDataSetVersionMappingsFunctionTests(fixture)
+        : ProcessNextDataSetVersionMappingsFunctionsTests(fixture)
     {
         protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.AutoMapping;
 
@@ -1673,7 +1673,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
     public class CompleteNextDataSetVersionMappingsMappingProcessingTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessNextDataSetVersionMappingsFunctionTests(fixture)
+        : ProcessNextDataSetVersionMappingsFunctionsTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ManualMapping;
 

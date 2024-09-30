@@ -9,7 +9,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ProcessCompletionOfNextDataSetVersionImportOrchestrationTests
+public abstract class ProcessCompletionOfNextDataSetVersionOrchestrationTests
 {
     public class ProcessCompletionOfNextDataSetVersionImportTests
     {

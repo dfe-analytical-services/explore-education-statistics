@@ -193,7 +193,7 @@ Verify location mapping changes
     user waits until element contains    xpath://table[@data-testid='mappable-table-region']/caption//strong[1]
     ...    1 mapped location    %{WAIT_LONG}
 
-Validate the row headings and its contents in the 'Regions' section(after mapping)
+Validate the row headings and its contents in the 'Regions' section after mapping
     user waits until h3 is visible    Locations not found in new data set
     user checks table column heading contains    1    1    Current data set
     user checks table column heading contains    1    2    New data set
@@ -207,12 +207,12 @@ Validate the row headings and its contents in the 'Regions' section(after mappin
 
     user clicks link    Back
 
-Validate the version status of location task
+Validate the version status of location task is now complete
     user waits until h3 is visible    Draft version tasks
     user waits until parent contains element    testid:map-locations-task    link:Map locations
     user waits until parent contains element    id:map-locations-task-status    text:Complete
     user waits until parent contains element    testid:map-filters-task    link:Map filters
-    user waits until parent contains element    id:map-filters-task-status    text:Complete
+    user waits until parent contains element    id:map-filters-task-status    text:Incomplete
 
 User clicks on Map filters link
     user clicks link    Map filters
@@ -247,7 +247,7 @@ Verify filter mapping changes
     user waits until element contains    xpath://table[@data-testid='mappable-table-school_type']/caption//strong[1]
     ...    1 mapped filter option    %{WAIT_LONG}
 
-Validate the row headings and its contents in the 'filters options' section(after mapping)
+Validate the row headings and its contents in the 'filters options' section after mapping
     user waits until h3 is visible    Filter options not found in new data set
     user checks table column heading contains    1    1    Current data set
     user checks table column heading contains    1    2    New data set
