@@ -14,6 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                                  CREATE USER [notifier] FROM LOGIN [notifier];
                                  
                                  GRANT SELECT ON [dbo].[Publications] TO [notifier];
+                                 GRANT SELECT ON [dbo].[ExternalMethodology] TO [notifier];
                                  """);
         }
 
