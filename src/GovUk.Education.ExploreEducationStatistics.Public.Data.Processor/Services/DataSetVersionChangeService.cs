@@ -388,18 +388,23 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             Guid dataSetVersionId,
             CancellationToken cancellationToken)
     {
-        return await publicDataDbContext
+        var filterMetas = await publicDataDbContext
             .FilterMetas
-            .Include(m => m.OptionLinks)
+            .Include(m => m.OptionLinks.OrderBy(ol => ol.Option.Label))
             .ThenInclude(l => l.Option)
             .Where(m => m.DataSetVersionId == dataSetVersionId)
-            .ToDictionaryAsync(
+            .ToListAsync(cancellationToken);
+        
+        return filterMetas
+            .NaturalOrderBy(m => m.Label)
+            .ToDictionary(
                 m => m.PublicId,
                 m => (
                     FilterMeta: m,
-                    OptionLinks: m.OptionLinks.ToDictionary(l => l.PublicId)
-                ),
-                cancellationToken);
+                    OptionLinks: m.OptionLinks
+                        .NaturalOrderBy(ol => ol.Option.Label)
+                        .ToDictionary(l => l.PublicId)
+                ));
     }
 
     private async Task<GeographicLevelMeta> GetGeographicLevelMeta(
@@ -416,12 +421,14 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
     {
-        return await publicDataDbContext
+        var indicatorMetas = await publicDataDbContext
             .IndicatorMetas
             .Where(m => m.DataSetVersionId == dataSetVersionId)
-            .ToDictionaryAsync(
-                i => i.PublicId,
-                cancellationToken);
+            .ToListAsync(cancellationToken);
+
+        return indicatorMetas
+            .NaturalOrderBy(m => m.Label)
+            .ToDictionary(i => i.PublicId);
     }
 
     private async Task<Dictionary<GeographicLevel,
@@ -433,14 +440,41 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             .Include(lm => lm.OptionLinks)
             .ThenInclude(oml => oml.Option)
             .Where(lm => lm.DataSetVersionId == previousVersionId)
+            .OrderBy(lm => lm.Level)
             .ToDictionaryAsync(
                 lm => lm.Level,
                 lm =>
                 (
                     LocationMeta: lm,
-                    OptionLinks: lm.OptionLinks.ToDictionary(l => l.PublicId)
+                    OptionLinks: OrderLocationOptionLinks(lm.Level, lm.OptionLinks)
+                        .ToDictionary(loml => loml.PublicId)
                 ),
                 cancellationToken);
+    }
+
+    private static IOrderedEnumerable<LocationOptionMetaLink> OrderLocationOptionLinks(
+        GeographicLevel level, 
+        IReadOnlyList<LocationOptionMetaLink> optionLinks)
+    {
+        return level switch
+        {
+            GeographicLevel.LocalAuthority => optionLinks
+                .NaturalOrderBy(ol => ((LocationLocalAuthorityOptionMeta)ol.Option).Label)
+                .NaturalThenBy(ol => ((LocationLocalAuthorityOptionMeta)ol.Option).Code)
+                .NaturalThenBy(ol => ((LocationLocalAuthorityOptionMeta)ol.Option).OldCode),
+            GeographicLevel.Provider => optionLinks
+                .NaturalOrderBy(ol => ((LocationProviderOptionMeta)ol.Option).Label)
+                .NaturalThenBy(ol => ((LocationProviderOptionMeta)ol.Option).Ukprn),
+            GeographicLevel.RscRegion => optionLinks
+                .NaturalOrderBy(ol => ((LocationRscRegionOptionMeta)ol.Option).Label),
+            GeographicLevel.School => optionLinks
+                .NaturalOrderBy(ol => ((LocationSchoolOptionMeta)ol.Option).Label)
+                .NaturalThenBy(ol => ((LocationSchoolOptionMeta)ol.Option).Urn)
+                .NaturalThenBy(ol => ((LocationSchoolOptionMeta)ol.Option).LaEstab),
+            _ => optionLinks
+                .NaturalOrderBy(ol => ((LocationCodedOptionMeta)ol.Option).Label)
+                .NaturalThenBy(ol => ((LocationCodedOptionMeta)ol.Option).Code)
+        };
     }
 
     private async Task<IReadOnlyList<TimePeriodMeta>> GetTimePeriodMetas(
