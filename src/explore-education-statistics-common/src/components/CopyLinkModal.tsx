@@ -4,6 +4,7 @@ import Modal from '@common/components/Modal';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import CopyTextButton from '@common/components/CopyTextButton';
 import React from 'react';
+import styles from './CopyLinkModal.module.scss';
 
 interface Props {
   buttonClassName?: string;
@@ -24,6 +25,7 @@ export default function CopyLinkModal({ buttonClassName, url }: Props) {
     >
       <CopyTextButton
         buttonText="Copy link"
+        className={styles.copyLink}
         confirmText="Link copied"
         id="copy-link-url"
         label="URL"
