@@ -140,18 +140,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateChangesTests(fixture)
     {
-        // Cases covered:
-        // filter ADDED, with ADDED options. ===> Should have 1 change for the ADDED filter, and 1 change for EACH of the ADDED options.
-        // filter DELETED, with all options DELETED. ===> Should just have 1 change for the DELETED filter.
-        // filter CHANGED, options UNCHANGED. ===> Should just have 1 change for the CHANGED filter.
-        // filter CHANGED, SOME DELETED options. ===> Should have 1 change for the CHANGED filter, and 1 change for EACH of the DELTED options.
-        // filter CHANGED, SOME ADDED options. ===> Should have 1 change for the CHANGED filter, and 1 change for EACH of the ADDED options.
-        // filter CHANGED, SOME CHANGED options. ===> Should have 1 change for the CHANGED filter, and 1 change for EACH of the CHANGED options.
-        // filter UNCHANGED, options UNCHANGED. ===> Should have NO changes.
-        // filter UNCHANGED, SOME DELETED options. ===> Should have 1 change for EACH of the DELETED options.
-        // filter UNCHANGED, SOME ADDED options. ===> Should have 1 change for EACH of the ADDED options.
-        // filter UNCHANGED, SOME CHANGED options. ===> Should have 1 change for EACH of the CHANGED options.
-
         [Fact]
         public async Task FiltersAdded_ChangesContainOnlyAddedFiltersAndAddedOptions()
         {
@@ -200,16 +188,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
-            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+            var filterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var filterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
             // 2 Filter additions
-            Assert.Equal(2, actualFilterMetaChanges.Count);
-            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(2, filterMetaChanges.Count);
+            Assert.All(filterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             // 4 Filter Option additions
-            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
-            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(4, filterOptionMetaChanges.Count);
+            Assert.All(filterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var newFilterMetas = newVersion.FilterMetas
                 .ToDictionary(
@@ -217,38 +205,38 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
             // Filter added
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId is null
                      && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
 
             // Filter added
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId is null
                      && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["O7CLF"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["O7CLF"].MetaId
                      && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["O7CLF"].OptionId);
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["7zXob"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["7zXob"].MetaId
                      && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["7zXob"].OptionId);
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["pTSoj"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["pTSoj"].MetaId
                      && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["pTSoj"].OptionId);
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["IzBzg"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["IzBzg"].MetaId
@@ -306,26 +294,26 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
-            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+            var filterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var filterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
             // 2 Filter deletions
-            Assert.Equal(2, actualFilterMetaChanges.Count);
-            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(2, filterMetaChanges.Count);
+            Assert.All(filterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             // No Filter Option deletions
-            Assert.Empty(actualFilterOptionMetaChanges);
+            Assert.Empty(filterOptionMetaChanges);
 
             var oldFilterMetas = originalVersion.FilterMetas
                 .ToDictionary(m => m.PublicId);
 
             // Filter deleted
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["O7CLF"].Id
                      && c.CurrentStateId is null);
 
             // Filter deleted
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["7zXob"].Id
                      && c.CurrentStateId is null);
         }
@@ -399,16 +387,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
-            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+            var filterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var filterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
             // 2 Filter changes
-            Assert.Equal(2, actualFilterMetaChanges.Count);
-            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(2, filterMetaChanges.Count);
+            Assert.All(filterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             // 4 Filter Option changes
-            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
-            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(4, filterOptionMetaChanges.Count);
+            Assert.All(filterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var oldFilterMetas = originalVersion.FilterMetas
                 .ToDictionary(
@@ -421,38 +409,38 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
             // Filter changed
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["O7CLF"].FilterMeta.Id
                      && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
 
             // Filter changed
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["7zXob"].FilterMeta.Id
                      && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].MetaId
                      && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].OptionId);
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["it6Xr"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["it6Xr"].MetaId
                      && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["it6Xr"].OptionId);
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].MetaId
                      && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].OptionId);
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].MetaId
@@ -528,16 +516,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
-            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+            var filterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var filterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
             // 2 Filter changes
-            Assert.Equal(2, actualFilterMetaChanges.Count);
-            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(2, filterMetaChanges.Count);
+            Assert.All(filterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             // 4 Filter Option changes
-            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
-            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(4, filterOptionMetaChanges.Count);
+            Assert.All(filterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var oldFilterMetas = originalVersion.FilterMetas
                 .ToDictionary(
@@ -550,38 +538,38 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
             // Filter changed
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["O7CLF"].FilterMeta.Id
                      && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
 
             // Filter changed
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["7zXob"].FilterMeta.Id
                      && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
 
             // Filter Option deleted
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].OptionId
                      && c.CurrentState is null);
 
             // Filter Option deleted
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].OptionId
                      && c.CurrentState is null);
 
             // Filter Option deleted
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].OptionId
                      && c.CurrentState is null);
 
             // Filter Option deleted
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].OptionId
@@ -669,16 +657,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
-            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+            var filterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var filterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
             // 2 Filter changes
-            Assert.Equal(2, actualFilterMetaChanges.Count);
-            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(2, filterMetaChanges.Count);
+            Assert.All(filterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             // 4 Filter Option changes
-            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
-            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(4, filterOptionMetaChanges.Count);
+            Assert.All(filterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var oldFilterMetas = originalVersion.FilterMetas
                 .ToDictionary(
@@ -691,17 +679,17 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
             // Filter changed
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["O7CLF"].FilterMeta.Id
                      && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
 
             // Filter changed
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["7zXob"].FilterMeta.Id
                      && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
 
             // Filter Option changed
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].OptionId
@@ -710,7 +698,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                      && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["pTSoj"].OptionId);
 
             // Filter Option changed
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].OptionId
@@ -719,7 +707,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                      && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].OptionId);
 
             // Filter Option changed
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].OptionId
@@ -728,7 +716,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                      && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].OptionId);
 
             // Filter Option changed
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].OptionId
@@ -802,15 +790,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
-            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+            var filterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var filterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
             // 2 Filter changes
-            Assert.Equal(2, actualFilterMetaChanges.Count);
-            Assert.All(actualFilterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(2, filterMetaChanges.Count);
+            Assert.All(filterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             // No Filter Option changes
-            Assert.Empty(actualFilterOptionMetaChanges);
+            Assert.Empty(filterOptionMetaChanges);
 
             var oldFilterMetas = originalVersion.FilterMetas
                 .ToDictionary(m => m.PublicId);
@@ -819,12 +807,12 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .ToDictionary(m => m.PublicId);
 
             // Filter changed
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["O7CLF"].Id
                      && c.CurrentStateId == newFilterMetas["O7CLF"].Id);
 
             // Filter changed
-            Assert.Single(actualFilterMetaChanges,
+            Assert.Single(filterMetaChanges,
                 c => c.PreviousStateId == oldFilterMetas["7zXob"].Id
                      && c.CurrentStateId == newFilterMetas["7zXob"].Id);
         }
@@ -884,15 +872,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
-            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+            var filterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var filterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
             // No Filter changes
-            Assert.Empty(actualFilterMetaChanges);
+            Assert.Empty(filterMetaChanges);
 
             // 4 Filter Option changes
-            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
-            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(4, filterOptionMetaChanges.Count);
+            Assert.All(filterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var newFilterMetas = newVersion.FilterMetas
                 .ToDictionary(
@@ -900,28 +888,28 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["dP0Zw"]["7zXob"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["dP0Zw"]["7zXob"].MetaId
                      && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["7zXob"].OptionId);
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["dP0Zw"]["pTSoj"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["dP0Zw"]["pTSoj"].MetaId
                      && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["pTSoj"].OptionId);
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["O7CLF"]["IzBzg"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["O7CLF"]["IzBzg"].MetaId
                      && c.CurrentState.OptionId == newFilterMetas["O7CLF"]["IzBzg"].OptionId);
 
             // Filter Option added
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newFilterMetas["O7CLF"]["it6Xr"].PublicId
                      && c.CurrentState.MetaId == newFilterMetas["O7CLF"]["it6Xr"].MetaId
@@ -983,15 +971,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
-            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+            var filterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var filterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
             // No Filter changes
-            Assert.Empty(actualFilterMetaChanges);
+            Assert.Empty(filterMetaChanges);
 
             // 4 Filter Option changes
-            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
-            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(4, filterOptionMetaChanges.Count);
+            Assert.All(filterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var oldFilterMetas = originalVersion.FilterMetas
                 .ToDictionary(
@@ -999,28 +987,28 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Filter Option deleted
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["O7CLF"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["O7CLF"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["O7CLF"].OptionId
                      && c.CurrentState is null);
 
             // Filter Option deleted
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["7zXob"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["7zXob"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["7zXob"].OptionId
                      && c.CurrentState is null);
 
             // Filter Option deleted
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["IzBzg"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["IzBzg"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["IzBzg"].OptionId
                      && c.CurrentState is null);
 
             // Filter Option deleted
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["it6Xr"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["it6Xr"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["it6Xr"].OptionId
@@ -1094,15 +1082,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
-            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+            var filterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var filterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
             // No Filter changes
-            Assert.Empty(actualFilterMetaChanges);
+            Assert.Empty(filterMetaChanges);
 
             // 4 Filter Option changes
-            Assert.Equal(4, actualFilterOptionMetaChanges.Count);
-            Assert.All(actualFilterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(4, filterOptionMetaChanges.Count);
+            Assert.All(filterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var oldFilterMetas = originalVersion.FilterMetas
                 .ToDictionary(
@@ -1115,7 +1103,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Filter Option changed
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["O7CLF"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["O7CLF"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["O7CLF"].OptionId
@@ -1124,7 +1112,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                      && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["O7CLF"].OptionId);
 
             // Filter Option changed
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["7zXob"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["7zXob"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["7zXob"].OptionId
@@ -1133,7 +1121,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                      && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["7zXob"].OptionId);
 
             // Filter Option changed
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["IzBzg"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["IzBzg"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["IzBzg"].OptionId
@@ -1142,7 +1130,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                      && c.CurrentState.OptionId == newFilterMetas["O7CLF"]["IzBzg"].OptionId);
 
             // Filter Option changed
-            Assert.Single(actualFilterOptionMetaChanges,
+            Assert.Single(filterOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["it6Xr"].PublicId
                      && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["it6Xr"].MetaId
                      && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["it6Xr"].OptionId
@@ -1198,11 +1186,14 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualFilterMetaChanges = await GetFilterMetaChanges(newVersion);
-            var actualFilterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+            var filterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var filterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
 
-            Assert.Empty(actualFilterMetaChanges);
-            Assert.Empty(actualFilterOptionMetaChanges);
+            // No Filter changes
+            Assert.Empty(filterMetaChanges);
+
+            // No Filter Option changes
+            Assert.Empty(filterOptionMetaChanges);
         }
 
         private Action<InstanceSetters<FilterMeta>> UnchangedFilterMetaSetter(
@@ -1296,14 +1287,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : CreateChangesTests(fixture)
     {
-        // Cases covered:
-        // location ADDED, with ADDED options. ===> Should have 1 change for the ADDED location, and 1 change for EACH of the ADDED options.
-        // location DELETED, with all options DELETED. ===> Should just have 1 change for the DELETED location.
-        // location UNCHANGED, options UNCHANGED. ===> Should have NO changes.
-        // location UNCHANGED, SOME DELETED options. ===> Should have 1 change for EACH of the DELETED options.
-        // location UNCHANGED, SOME ADDED options. ===> Should have 1 change for EACH of the ADDED options.
-        // location UNCHANGED, SOME CHANGED options. ===> Should have 1 change for EACH of the CHANGED options.
-
         [Fact]
         public async Task LocationsAdded_ChangesContainOnlyAddedLocationsAndAddedOptions()
         {
@@ -1352,16 +1335,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
-            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+            var locationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var locationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
 
             // 2 Location additions
-            Assert.Equal(2, actualLocationMetaChanges.Count);
-            Assert.All(actualLocationMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(2, locationMetaChanges.Count);
+            Assert.All(locationMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             // 4 Location Option additions
-            Assert.Equal(4, actualLocationOptionMetaChanges.Count);
-            Assert.All(actualLocationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(4, locationOptionMetaChanges.Count);
+            Assert.All(locationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var newLocationMetas = newVersion.LocationMetas
                 .ToDictionary(
@@ -1369,38 +1352,38 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => new { LocationMeta = m, NewLocationOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
             // Location added
-            Assert.Single(actualLocationMetaChanges,
+            Assert.Single(locationMetaChanges,
                 c => c.PreviousStateId is null
                      && c.CurrentStateId == newLocationMetas[GeographicLevel.School].LocationMeta.Id);
 
             // Location added
-            Assert.Single(actualLocationMetaChanges,
+            Assert.Single(locationMetaChanges,
                 c => c.PreviousStateId is null
                      && c.CurrentStateId == newLocationMetas[GeographicLevel.RscRegion].LocationMeta.Id);
 
             // Location Option added
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["O7CLF"].PublicId
                      && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["O7CLF"].MetaId
                      && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["O7CLF"].OptionId);
 
             // Location Option added
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["7zXob"].PublicId
                      && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["7zXob"].MetaId
                      && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["7zXob"].OptionId);
 
             // Location Option added
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["pTSoj"].PublicId
                      && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["pTSoj"].MetaId
                      && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["pTSoj"].OptionId);
 
             // Location Option added
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["IzBzg"].PublicId
                      && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["IzBzg"].MetaId
@@ -1458,26 +1441,26 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
-            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+            var locationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var locationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
 
             // 2 Location deletions
-            Assert.Equal(2, actualLocationMetaChanges.Count);
-            Assert.All(actualLocationMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(2, locationMetaChanges.Count);
+            Assert.All(locationMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             // No Location Option deletions
-            Assert.Empty(actualLocationOptionMetaChanges);
+            Assert.Empty(locationOptionMetaChanges);
 
             var oldLocationMetas = originalVersion.LocationMetas
                 .ToDictionary(m => m.Level);
 
             // Location deleted
-            Assert.Single(actualLocationMetaChanges,
+            Assert.Single(locationMetaChanges,
                 c => c.PreviousStateId == oldLocationMetas[GeographicLevel.School].Id
                      && c.CurrentStateId is null);
 
             // Location deleted
-            Assert.Single(actualLocationMetaChanges,
+            Assert.Single(locationMetaChanges,
                 c => c.PreviousStateId == oldLocationMetas[GeographicLevel.RscRegion].Id
                      && c.CurrentStateId is null);
         }
@@ -1537,15 +1520,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
-            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+            var locationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var locationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
 
             // No Location changes
-            Assert.Empty(actualLocationMetaChanges);
+            Assert.Empty(locationMetaChanges);
 
             // 4 Location Option changes
-            Assert.Equal(4, actualLocationOptionMetaChanges.Count);
-            Assert.All(actualLocationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(4, locationOptionMetaChanges.Count);
+            Assert.All(locationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var newLocationMetas = newVersion.LocationMetas
                 .ToDictionary(
@@ -1553,28 +1536,28 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Location Option added
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].PublicId
                      && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].MetaId
                      && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId);
 
             // Location Option added
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.LocalAuthority]["pTSoj"].PublicId
                      && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.LocalAuthority]["pTSoj"].MetaId
                      && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["pTSoj"].OptionId);
 
             // Location Option added
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School]["IzBzg"].PublicId
                      && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School]["IzBzg"].MetaId
                      && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School]["IzBzg"].OptionId);
 
             // Location Option added
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState is null
                      && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School]["it6Xr"].PublicId
                      && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School]["it6Xr"].MetaId
@@ -1636,15 +1619,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
-            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+            var locationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var locationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
 
             // No Location changes
-            Assert.Empty(actualLocationMetaChanges);
+            Assert.Empty(locationMetaChanges);
 
             // 4 Location Option changes
-            Assert.Equal(4, actualLocationOptionMetaChanges.Count);
-            Assert.All(actualLocationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(4, locationOptionMetaChanges.Count);
+            Assert.All(locationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var oldLocationMetas = originalVersion.LocationMetas
                 .ToDictionary(
@@ -1652,28 +1635,28 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Location Option deleted
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].PublicId
                      && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].MetaId
                      && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].OptionId
                      && c.CurrentState is null);
 
             // Location Option deleted
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].PublicId
                      && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].MetaId
                      && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId
                      && c.CurrentState is null);
 
             // Location Option deleted
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["IzBzg"].PublicId
                      && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["IzBzg"].MetaId
                      && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["IzBzg"].OptionId
                      && c.CurrentState is null);
 
             // Location Option deleted
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["it6Xr"].PublicId
                      && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["it6Xr"].MetaId
                      && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["it6Xr"].OptionId
@@ -1747,15 +1730,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
-            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+            var locationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var locationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
 
             // No Location changes
-            Assert.Empty(actualLocationMetaChanges);
+            Assert.Empty(locationMetaChanges);
 
             // 4 Location Option changes
-            Assert.Equal(4, actualLocationOptionMetaChanges.Count);
-            Assert.All(actualLocationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            Assert.Equal(4, locationOptionMetaChanges.Count);
+            Assert.All(locationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var oldLocationMetas = originalVersion.LocationMetas
                 .ToDictionary(
@@ -1768,7 +1751,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Location Option changed
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].PublicId
                      && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].MetaId
                      && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].OptionId
@@ -1777,7 +1760,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                      && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].OptionId);
 
             // Location Option changed
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].PublicId
                      && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].MetaId
                      && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId
@@ -1786,7 +1769,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                      && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId);
 
             // Location Option changed
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["IzBzg"].PublicId
                      && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["IzBzg"].MetaId
                      && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["IzBzg"].OptionId
@@ -1795,7 +1778,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                      && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School]["IzBzg"].OptionId);
 
             // Location Option changed
-            Assert.Single(actualLocationOptionMetaChanges,
+            Assert.Single(locationOptionMetaChanges,
                 c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["it6Xr"].PublicId
                      && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["it6Xr"].MetaId
                      && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["it6Xr"].OptionId
@@ -1851,11 +1834,14 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             await CreateChanges(instanceId);
 
-            var actualLocationMetaChanges = await GetLocationMetaChanges(newVersion);
-            var actualLocationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+            var locationMetaChanges = await GetLocationMetaChanges(newVersion);
+            var locationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
 
-            Assert.Empty(actualLocationMetaChanges);
-            Assert.Empty(actualLocationOptionMetaChanges);
+            // No Location changes
+            Assert.Empty(locationMetaChanges);
+
+            // No Location Option changes
+            Assert.Empty(locationOptionMetaChanges);
         }
 
         private Action<InstanceSetters<LocationMeta>> UnchangedLocationMetaSetter(
@@ -2097,177 +2083,232 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         : CreateChangesTests(fixture)
     {
         [Fact]
-        public async Task IndicatorsAddedAndDeleted_ChangesContainAdditionsAndDeletions()
+        public async Task IndicatorsAddedAndDeletedAndChanged_ChangesContainAddedAndDeletedAndChangedIndicators()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
-                        .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                        .ForIndex(1, s => s.SetPublicId("O7CLF"))
-                        .ForIndex(2, s => s.SetPublicId("7zXob"))
-                        .Generate(3)
-                },
-                nextVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
-                        .ForIndex(0, s => s.SetPublicId("7zXob"))
-                        .ForIndex(1, s => s.SetPublicId("pTSoj"))
-                        .ForIndex(2, s => s.SetPublicId("IzBzg"))
-                        .Generate(3)
-                });
+            var oldIndicatorMeta = DataFixture.DefaultIndicatorMeta()
+                .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                .ForIndex(1, s => s.SetPublicId("O7CLF")) // Indicator deleted
+                .ForIndex(2, s => s.SetPublicId("7zXob")) // Indicator deleted
+                .ForIndex(3, s => s.SetPublicId("pTSoj"))
+                .ForIndex(4, s => s.SetPublicId("IzBzg"))
+                .GenerateList(5);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldIndicatorMeta);
+
+            var newIndicatorMeta = DataFixture.DefaultIndicatorMeta()
+                .ForIndex(0, UnchangedIndicatorMetaSetter(oldIndicatorMeta[0])) // Indicator unchanged
+                .ForIndex(1, s => s.SetPublicId("pTSoj")) // Indicator changed
+                .ForIndex(2, s => s.SetPublicId("IzBzg")) // Indicator changed
+                .ForIndex(3, s => s.SetPublicId("it6Xr")) // Indicator added
+                .ForIndex(4, s => s.SetPublicId("LxWjE")) // Indicator added
+                .GenerateList(5);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                indicatorMeta: newIndicatorMeta);
 
             await CreateChanges(instanceId);
 
-            var actualChanges = await GetDbContext<PublicDataDbContext>()
-                .IndicatorMetaChanges
-                .AsNoTracking()
-                .Where(c => c.DataSetVersionId == newVersion.Id)
-                .OrderBy(c => c.Id)
-                .ToListAsync();
+            var changes = await GetIndicatorMetaChanges(newVersion);
 
-            Assert.Equal(4, actualChanges.Count);
-            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            // 2 Indicator changes
+            Assert.Equal(6, changes.Count);
+            Assert.All(changes, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var oldIndicatorMetas = originalVersion.IndicatorMetas
                 .ToDictionary(m => m.PublicId);
 
-            Assert.Equal(oldIndicatorMetas["dP0Zw"].Id, actualChanges[0].PreviousStateId);
-            Assert.Null(actualChanges[0].CurrentStateId);
+            var newIndicatorMetas = newVersion.IndicatorMetas
+                .ToDictionary(m => m.PublicId);
 
-            Assert.Equal(oldIndicatorMetas["O7CLF"].Id, actualChanges[1].PreviousStateId);
-            Assert.Null(actualChanges[1].CurrentStateId);
+            // Indicator deleted
+            Assert.Single(changes,
+                c => c.PreviousStateId == oldIndicatorMetas["O7CLF"].Id
+                     && c.CurrentStateId is null);
+
+            // Indicator deleted
+            Assert.Single(changes,
+                c => c.PreviousStateId == oldIndicatorMetas["7zXob"].Id
+                     && c.CurrentStateId is null);
+
+            // Indicator changed
+            Assert.Single(changes,
+                c => c.PreviousStateId == oldIndicatorMetas["pTSoj"].Id
+                     && c.CurrentStateId == newIndicatorMetas["pTSoj"].Id);
+
+            // Indicator changed
+            Assert.Single(changes,
+                c => c.PreviousStateId == oldIndicatorMetas["IzBzg"].Id
+                     && c.CurrentStateId == newIndicatorMetas["IzBzg"].Id);
+
+            // Indicator added
+            Assert.Single(changes,
+                c => c.PreviousStateId is null
+                     && c.CurrentStateId == newIndicatorMetas["it6Xr"].Id);
+
+            // Indicator added
+            Assert.Single(changes,
+                c => c.PreviousStateId is null
+                     && c.CurrentStateId == newIndicatorMetas["LxWjE"].Id);
+        }
+
+        [Fact]
+        public async Task IndicatorsAdded_ChangesContainOnlyAddedIndicators()
+        {
+            var oldIndicatorMeta = DataFixture.DefaultIndicatorMeta()
+                .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                .GenerateList(1);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldIndicatorMeta);
+
+            var newIndicatorMeta = DataFixture.DefaultIndicatorMeta()
+                .ForIndex(0, UnchangedIndicatorMetaSetter(oldIndicatorMeta[0])) // Indicator unchanged
+                .ForIndex(1, s => s.SetPublicId("O7CLF")) // Indicator added
+                .ForIndex(2, s => s.SetPublicId("7zXob")) // Indicator added
+                .GenerateList(3);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                indicatorMeta: newIndicatorMeta);
+
+            await CreateChanges(instanceId);
+
+            var changes = await GetIndicatorMetaChanges(newVersion);
+
+            // 2 Indicator changes
+            Assert.Equal(2, changes.Count);
+            Assert.All(changes, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
             var newIndicatorMetas = newVersion.IndicatorMetas
                 .ToDictionary(m => m.PublicId);
 
-            Assert.Null(actualChanges[2].PreviousStateId);
-            Assert.Equal(newIndicatorMetas["pTSoj"].Id, actualChanges[2].CurrentStateId);
+            // Indicator added
+            Assert.Single(changes,
+                c => c.PreviousStateId is null
+                     && c.CurrentStateId == newIndicatorMetas["O7CLF"].Id);
 
-            Assert.Null(actualChanges[3].PreviousStateId);
-            Assert.Equal(newIndicatorMetas["IzBzg"].Id, actualChanges[3].CurrentStateId);
+            // Indicator added
+            Assert.Single(changes,
+                c => c.PreviousStateId is null
+                     && c.CurrentStateId == newIndicatorMetas["7zXob"].Id);
+        }
+
+        [Fact]
+        public async Task IndicatorsDeleted_ChangesContainOnlyDeletedIndicators()
+        {
+            var oldIndicatorMeta = DataFixture.DefaultIndicatorMeta()
+                .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                .ForIndex(1, s => s.SetPublicId("O7CLF")) // Indicator deleted
+                .ForIndex(2, s => s.SetPublicId("7zXob")) // Indicator deleted
+                .GenerateList(3);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldIndicatorMeta);
+
+            var newIndicatorMeta = DataFixture.DefaultIndicatorMeta()
+                .ForIndex(0, UnchangedIndicatorMetaSetter(oldIndicatorMeta[0])) // Indicator unchanged
+                .GenerateList(1);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                indicatorMeta: newIndicatorMeta);
+
+            await CreateChanges(instanceId);
+
+            var changes = await GetIndicatorMetaChanges(newVersion);
+
+            // 2 Indicator changes
+            Assert.Equal(2, changes.Count);
+            Assert.All(changes, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldIndicatorMetas = originalVersion.IndicatorMetas
+                .ToDictionary(m => m.PublicId);
+
+            // Indicator deleted
+            Assert.Single(changes,
+                c => c.PreviousStateId == oldIndicatorMetas["O7CLF"].Id
+                     && c.CurrentStateId is null);
+
+            // Indicator deleted
+            Assert.Single(changes,
+                c => c.PreviousStateId == oldIndicatorMetas["7zXob"].Id
+                     && c.CurrentStateId is null);
         }
 
         [Fact]
         public async Task IndicatorsUnchanged_ChangesAreEmpty()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
-                        .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                        .ForIndex(1, s => s.SetPublicId("O7CLF"))
-                        .ForIndex(2, s => s.SetPublicId("7zXob"))
-                        .Generate(3)
-                },
-                nextVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
-                        .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                        .ForIndex(1, s => s.SetPublicId("O7CLF"))
-                        .ForIndex(2, s => s.SetPublicId("7zXob"))
-                        .Generate(3)
-                });
+            var oldIndicatorMeta = DataFixture.DefaultIndicatorMeta()
+                .ForIndex(0, s => s.SetPublicId("dP0Zw"))
+                .ForIndex(1, s => s.SetPublicId("O7CLF"))
+                .GenerateList(2);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldIndicatorMeta);
+
+            var newIndicatorMeta = DataFixture.DefaultIndicatorMeta()
+                .ForIndex(0, UnchangedIndicatorMetaSetter(oldIndicatorMeta[0])) // Indicator unchanged
+                .ForIndex(1, UnchangedIndicatorMetaSetter(oldIndicatorMeta[1])) // Indicator unchanged
+                .GenerateList(2);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                indicatorMeta: newIndicatorMeta);
 
             await CreateChanges(instanceId);
 
-            Assert.False(await GetDbContext<PublicDataDbContext>()
-                .IndicatorMetaChanges
-                .AnyAsync(c => c.DataSetVersionId == newVersion.Id));
+            var changes = await GetIndicatorMetaChanges(newVersion);
+
+            // No Indicator changes
+            Assert.Empty(changes);
         }
 
-        [Fact]
-        public async Task IndicatorsAdded_ChangesContainOnlyAdditions()
+        private static Action<InstanceSetters<IndicatorMeta>> UnchangedIndicatorMetaSetter(IndicatorMeta indicatorMeta)
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
-                        .WithPublicId("dP0Zw")
-                        .Generate(1)
-                },
-                nextVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
-                        .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                        .ForIndex(1, s => s.SetPublicId("O7CLF"))
-                        .ForIndex(2, s => s.SetPublicId("7zXob"))
-                        .Generate(3)
-                });
-
-            await CreateChanges(instanceId);
-
-            var actualChanges = await GetDbContext<PublicDataDbContext>()
-                .IndicatorMetaChanges
-                .AsNoTracking()
-                .Where(c => c.DataSetVersionId == newVersion.Id)
-                .OrderBy(c => c.Id)
-                .ToListAsync();
-
-            Assert.Equal(2, actualChanges.Count);
-            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
-            Assert.All(actualChanges, c => Assert.Null(c.PreviousStateId));
-
-            var newIndicatorMetas = newVersion.IndicatorMetas
-                .ToDictionary(m => m.PublicId);
-
-            Assert.Equal(newIndicatorMetas["O7CLF"].Id, actualChanges[0].CurrentStateId);
-            Assert.Equal(newIndicatorMetas["7zXob"].Id, actualChanges[1].CurrentStateId);
+            return s =>
+            {
+                s.SetPublicId(indicatorMeta.PublicId);
+                s.SetColumn(indicatorMeta.Column);
+                s.SetLabel(indicatorMeta.Label);
+                s.SetUnit(indicatorMeta.Unit);
+                s.SetDecimalPlaces(indicatorMeta.DecimalPlaces);
+            };
         }
 
-        [Fact]
-        public async Task IndicatorsDeleted_ChangesContainOnlyDeletions()
+        private async Task<IReadOnlyList<IndicatorMetaChange>> GetIndicatorMetaChanges(DataSetVersion version)
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
-                        .ForIndex(0, s => s.SetPublicId("dP0Zw"))
-                        .ForIndex(1, s => s.SetPublicId("O7CLF"))
-                        .ForIndex(2, s => s.SetPublicId("7zXob"))
-                        .Generate(3)
-                },
-                nextVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    IndicatorMetas = DataFixture.DefaultIndicatorMeta()
-                        .WithPublicId("dP0Zw")
-                        .Generate(1)
-                });
-
-            await CreateChanges(instanceId);
-
-            var actualChanges = await GetDbContext<PublicDataDbContext>()
+            return await GetDbContext<PublicDataDbContext>()
                 .IndicatorMetaChanges
                 .AsNoTracking()
-                .Where(c => c.DataSetVersionId == newVersion.Id)
-                .OrderBy(c => c.Id)
+                .Where(c => c.DataSetVersionId == version.Id)
                 .ToListAsync();
+        }
 
-            Assert.Equal(2, actualChanges.Count);
-            Assert.All(actualChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
-            Assert.All(actualChanges, c => Assert.Null(c.CurrentStateId));
+        private async Task<(DataSetVersion originalVersion, Guid instanceId)> CreateDataSetInitialVersion(
+            List<IndicatorMeta> indicatorMeta)
+        {
+            return await CreateDataSetInitialVersion(
+                dataSetStatus: DataSetStatus.Published,
+                dataSetVersionStatus: DataSetVersionStatus.Published,
+                importStage: DataSetVersionImportStage.Completing,
+                meta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    IndicatorMetas = indicatorMeta
+                });
+        }
 
-            var oldIndicatorMetas = originalVersion.IndicatorMetas
-                .ToDictionary(m => m.PublicId);
-
-            Assert.Equal(oldIndicatorMetas["O7CLF"].Id, actualChanges[0].PreviousStateId);
-            Assert.Equal(oldIndicatorMetas["7zXob"].Id, actualChanges[1].PreviousStateId);
+        private async Task<(DataSetVersion nextVersion, Guid instanceId)> CreateDataSetNextVersion(
+            DataSetVersion originalVersion,
+            List<IndicatorMeta> indicatorMeta)
+        {
+            return await CreateDataSetNextVersion(
+                initialVersion: originalVersion,
+                status: DataSetVersionStatus.Mapping,
+                importStage: Stage.PreviousStage(),
+                meta: new DataSetVersionMeta
+                {
+                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                    IndicatorMetas = indicatorMeta
+                });
         }
     }
 
