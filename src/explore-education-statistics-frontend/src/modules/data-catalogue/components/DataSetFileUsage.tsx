@@ -82,17 +82,16 @@ export default function DataSetFileUsage({
         <TabsSection title="Python">
           <h5 className="govuk-heading-s">Python</h5>
 
-          <CodeBlock
-            language="python"
-            code={`import pandas as pd
-            
+          <CodeBlock language="python">
+            {`import pandas as pd
+
 pd.read_csv("${downloadLink}")`}
-          />
+          </CodeBlock>
         </TabsSection>
         <TabsSection title="R">
           <h5 className="govuk-heading-s">R</h5>
 
-          <CodeBlock language="r" code={`read.csv("${downloadLink}")`} />
+          <CodeBlock language="r">{`read.csv("${downloadLink}")`}</CodeBlock>
         </TabsSection>
       </Tabs>
     </DataSetFilePageSection>
