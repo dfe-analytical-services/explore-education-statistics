@@ -1196,6 +1196,329 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             Assert.Empty(filterOptionMetaChanges);
         }
 
+        [Fact]
+        public async Task FiltersAddedAndDeletedAndChangedOptionsAddedAndDeletedAndChanged_ChangesInsertedIntoDatabaseInCorrectOrder()
+        {
+            var oldFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, s =>
+                    s.SetPublicId("dP0Zw")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("dP0Zw"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("O7CLF"))
+                        .Generate(2)))
+                .ForIndex(1, s =>
+                    s.SetPublicId("O7CLF") // Filter and ALL options deleted
+                    .SetLabel("f")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("7zXob"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("pTSoj"))
+                        .Generate(2)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("7zXob") // Filter and ALL options deleted
+                    .SetLabel("a")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("IzBzg"))
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("it6Xr"))
+                        .Generate(2)))
+                .ForIndex(3, s =>
+                    s.SetPublicId("pTSoj")
+                    .SetLabel("e")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("LxWjE"))
+                        .ForIndex(1, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("e"))
+                            .SetPublicId("6jrfe")) // Filter Option deleted
+                        .ForIndex(2, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("a"))
+                            .SetPublicId("0kT5D")) // Filter Option deleted
+                        .ForIndex(3, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("b"))
+                            .SetPublicId("HTzLj"))
+                        .ForIndex(4, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("o"))
+                            .SetPublicId("CpId1"))
+                        .Generate(5)))
+                .ForIndex(4, s =>
+                    s.SetPublicId("IzBzg")
+                    .SetLabel("b")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("YPHKM"))
+                        .ForIndex(1, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("d"))
+                            .SetPublicId("qFjG7")) // Filter Option deleted
+                        .ForIndex(2, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("j"))
+                            .SetPublicId("arLPb")) // Filter Option deleted
+                        .ForIndex(3, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("g"))
+                            .SetPublicId("BT7J3"))
+                        .ForIndex(4, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("l"))
+                            .SetPublicId("z4FQE"))
+                        .Generate(5)))
+                .GenerateList(5);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
+
+            var newFilterMeta = DataFixture.DefaultFilterMeta()
+                .ForIndex(0, UnchangedFilterMetaSetter(oldFilterMeta[0])) // Filter and ALL options unchanged
+                .ForIndex(1, s =>
+                    s.SetPublicId("pTSoj") // Filter changed
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[3].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("HTzLj")) // Filter Option changed
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("CpId1")) // Filter Option changed
+                        .ForIndex(3, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("m"))
+                            .SetPublicId("krhsL")) // Filter Option added
+                        .ForIndex(4, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("f"))
+                            .SetPublicId("uxo41")) // Filter Option added
+                        .Generate(5)))
+                .ForIndex(2, s =>
+                    s.SetPublicId("IzBzg") // Filter changed
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, UnchangedFilterOptionMetaLinkSetter(oldFilterMeta[4].OptionLinks[0])) // Filter Option unchanged
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("BT7J3")) // Filter Option changed
+                        .ForIndex(2, s =>
+                            s.SetOption(DataFixture.DefaultFilterOptionMeta())
+                            .SetPublicId("z4FQE")) // Filter Option changed
+                        .ForIndex(3, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("h"))
+                            .SetPublicId("X9fKb")) // Filter Option added
+                        .ForIndex(4, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("p"))
+                            .SetPublicId("TsPJP")) // Filter Option added
+                        .Generate(5)))
+                .ForIndex(3, s =>
+                    s.SetPublicId("it6Xr") // Filter added
+                    .SetLabel("d")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("c"))
+                            .SetPublicId("cg31S")) // Filter Option added
+                        .ForIndex(1, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("k"))
+                            .SetPublicId("5Zdi9")) // Filter Option added
+                        .Generate(2)))
+                .ForIndex(4, s =>
+                    s.SetPublicId("LxWjE") // Filter added
+                    .SetLabel("c")
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultFilterOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("n"))
+                            .SetPublicId("tdEm5")) // Filter Option added
+                        .ForIndex(1, s =>
+                            s.SetOption(
+                                DataFixture.DefaultFilterOptionMeta()
+                                .WithLabel("i"))
+                            .SetPublicId("fyYFZ")) // Filter Option added
+                        .Generate(2)))
+                .GenerateList(5);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                filterMeta: newFilterMeta);
+
+            await CreateChanges(instanceId);
+
+            var filterMetaChanges = await GetFilterMetaChanges(newVersion);
+            var filterOptionMetaChanges = await GetFilterOptionMetaChanges(newVersion);
+
+            // 6 Filter changes
+            Assert.Equal(6, filterMetaChanges.Count);
+            Assert.All(filterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            // 16 Filter Option changes
+            Assert.Equal(16, filterOptionMetaChanges.Count);
+            Assert.All(filterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldFilterMetas = originalVersion.FilterMetas
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => new { FilterMeta = m, OldFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
+
+            var newFilterMetas = newVersion.FilterMetas
+                .ToDictionary(
+                    m => m.PublicId,
+                    m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
+
+            // The changes should be inserted into each database table ordered alphabetically by 'Label'.
+            // They should also be ordered such that all additions come last.
+
+            // Therefore, the expected order of Filter changes are (as per their Public IDs):
+            // 7zXob deleted
+            // IzBzg changed
+            // pTSoj changed
+            // O7CLF deleted
+            // LxWjE added
+            // it6Xr added
+            Assert.True(filterMetaChanges[0].PreviousStateId == oldFilterMetas["7zXob"].FilterMeta.Id
+                     && filterMetaChanges[0].CurrentStateId is null);
+            Assert.True(filterMetaChanges[1].PreviousStateId == oldFilterMetas["IzBzg"].FilterMeta.Id
+                     && filterMetaChanges[1].CurrentStateId == newFilterMetas["IzBzg"].FilterMeta.Id);
+            Assert.True(filterMetaChanges[2].PreviousStateId == oldFilterMetas["pTSoj"].FilterMeta.Id
+                     && filterMetaChanges[2].CurrentStateId == newFilterMetas["pTSoj"].FilterMeta.Id);
+            Assert.True(filterMetaChanges[3].PreviousStateId == oldFilterMetas["O7CLF"].FilterMeta.Id
+                     && filterMetaChanges[3].CurrentStateId is null);
+            Assert.True(filterMetaChanges[4].PreviousStateId is null
+                     && filterMetaChanges[4].CurrentStateId == newFilterMetas["LxWjE"].FilterMeta.Id);
+            Assert.True(filterMetaChanges[5].PreviousStateId is null
+                     && filterMetaChanges[5].CurrentStateId == newFilterMetas["it6Xr"].FilterMeta.Id);
+
+            // And, the expected order of Filter Option changes are (as per their Public IDs):
+            // 0kT5D in filter pTSoj deleted
+            // HTzLj in filter pTSoj changed
+            // qFjG7 in filter IzBzg deleted
+            // 6jrfe in filter pTSoj deleted
+            // BT7J3 in filter IzBzg changed
+            // arLPb in filter IzBzg deleted
+            // z4FQE in filter IzBzg changed
+            // CpId1 in filter pTSoj changed
+            // cg31S in filter it6Xr added
+            // uxo41 in filter pTSoj added
+            // X9fKb in filter IzBzg added
+            // fyYFZ in filter LxWjE added
+            // 5Zdi9 in filter it6Xr added
+            // krhsL in filter pTSoj added
+            // tdEm5 in filter LxWjE added
+            // TsPJP in filter IzBzg added
+
+            Assert.True(filterOptionMetaChanges[0].PreviousState!.PublicId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["0kT5D"].PublicId
+                     && filterOptionMetaChanges[0].PreviousState!.MetaId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["0kT5D"].MetaId
+                     && filterOptionMetaChanges[0].PreviousState!.OptionId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["0kT5D"].OptionId
+                     && filterOptionMetaChanges[0].CurrentState is null);
+            Assert.True(filterOptionMetaChanges[1].PreviousState!.PublicId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["HTzLj"].PublicId
+                     && filterOptionMetaChanges[1].PreviousState!.MetaId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["HTzLj"].MetaId
+                     && filterOptionMetaChanges[1].PreviousState!.OptionId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["HTzLj"].OptionId
+                     && filterOptionMetaChanges[1].CurrentState!.PublicId == newFilterMetas["pTSoj"].NewFilterOptionMetas["HTzLj"].PublicId
+                     && filterOptionMetaChanges[1].CurrentState!.MetaId == newFilterMetas["pTSoj"].NewFilterOptionMetas["HTzLj"].MetaId
+                     && filterOptionMetaChanges[1].CurrentState!.OptionId == newFilterMetas["pTSoj"].NewFilterOptionMetas["HTzLj"].OptionId);
+            Assert.True(filterOptionMetaChanges[2].PreviousState!.PublicId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["qFjG7"].PublicId
+                     && filterOptionMetaChanges[2].PreviousState!.MetaId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["qFjG7"].MetaId
+                     && filterOptionMetaChanges[2].PreviousState!.OptionId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["qFjG7"].OptionId
+                     && filterOptionMetaChanges[2].CurrentState is null);
+            Assert.True(filterOptionMetaChanges[3].PreviousState!.PublicId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["6jrfe"].PublicId
+                     && filterOptionMetaChanges[3].PreviousState!.MetaId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["6jrfe"].MetaId
+                     && filterOptionMetaChanges[3].PreviousState!.OptionId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["6jrfe"].OptionId
+                     && filterOptionMetaChanges[3].CurrentState is null);
+            Assert.True(filterOptionMetaChanges[4].PreviousState!.PublicId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["BT7J3"].PublicId
+                     && filterOptionMetaChanges[4].PreviousState!.MetaId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["BT7J3"].MetaId
+                     && filterOptionMetaChanges[4].PreviousState!.OptionId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["BT7J3"].OptionId
+                     && filterOptionMetaChanges[4].CurrentState!.PublicId == newFilterMetas["IzBzg"].NewFilterOptionMetas["BT7J3"].PublicId
+                     && filterOptionMetaChanges[4].CurrentState!.MetaId == newFilterMetas["IzBzg"].NewFilterOptionMetas["BT7J3"].MetaId
+                     && filterOptionMetaChanges[4].CurrentState!.OptionId == newFilterMetas["IzBzg"].NewFilterOptionMetas["BT7J3"].OptionId);
+            Assert.True(filterOptionMetaChanges[5].PreviousState!.PublicId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["arLPb"].PublicId
+                     && filterOptionMetaChanges[5].PreviousState!.MetaId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["arLPb"].MetaId
+                     && filterOptionMetaChanges[5].PreviousState!.OptionId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["arLPb"].OptionId
+                     && filterOptionMetaChanges[5].CurrentState is null);              
+            Assert.True(filterOptionMetaChanges[6].PreviousState!.PublicId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["z4FQE"].PublicId
+                     && filterOptionMetaChanges[6].PreviousState!.MetaId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["z4FQE"].MetaId
+                     && filterOptionMetaChanges[6].PreviousState!.OptionId == oldFilterMetas["IzBzg"].OldFilterOptionMetas["z4FQE"].OptionId
+                     && filterOptionMetaChanges[6].CurrentState!.PublicId == newFilterMetas["IzBzg"].NewFilterOptionMetas["z4FQE"].PublicId
+                     && filterOptionMetaChanges[6].CurrentState!.MetaId == newFilterMetas["IzBzg"].NewFilterOptionMetas["z4FQE"].MetaId
+                     && filterOptionMetaChanges[6].CurrentState!.OptionId == newFilterMetas["IzBzg"].NewFilterOptionMetas["z4FQE"].OptionId);
+            Assert.True(filterOptionMetaChanges[7].PreviousState!.PublicId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["CpId1"].PublicId
+                     && filterOptionMetaChanges[7].PreviousState!.MetaId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["CpId1"].MetaId
+                     && filterOptionMetaChanges[7].PreviousState!.OptionId == oldFilterMetas["pTSoj"].OldFilterOptionMetas["CpId1"].OptionId
+                     && filterOptionMetaChanges[7].CurrentState!.PublicId == newFilterMetas["pTSoj"].NewFilterOptionMetas["CpId1"].PublicId
+                     && filterOptionMetaChanges[7].CurrentState!.MetaId == newFilterMetas["pTSoj"].NewFilterOptionMetas["CpId1"].MetaId
+                     && filterOptionMetaChanges[7].CurrentState!.OptionId == newFilterMetas["pTSoj"].NewFilterOptionMetas["CpId1"].OptionId);
+            Assert.True(filterOptionMetaChanges[8].PreviousState is null
+                     && filterOptionMetaChanges[8].CurrentState!.PublicId == newFilterMetas["it6Xr"].NewFilterOptionMetas["cg31S"].PublicId
+                     && filterOptionMetaChanges[8].CurrentState!.MetaId == newFilterMetas["it6Xr"].NewFilterOptionMetas["cg31S"].MetaId
+                     && filterOptionMetaChanges[8].CurrentState!.OptionId == newFilterMetas["it6Xr"].NewFilterOptionMetas["cg31S"].OptionId);
+            Assert.True(filterOptionMetaChanges[9].PreviousState is null
+                     && filterOptionMetaChanges[9].CurrentState!.PublicId == newFilterMetas["pTSoj"].NewFilterOptionMetas["uxo41"].PublicId
+                     && filterOptionMetaChanges[9].CurrentState!.MetaId == newFilterMetas["pTSoj"].NewFilterOptionMetas["uxo41"].MetaId
+                     && filterOptionMetaChanges[9].CurrentState!.OptionId == newFilterMetas["pTSoj"].NewFilterOptionMetas["uxo41"].OptionId);
+            Assert.True(filterOptionMetaChanges[10].PreviousState is null
+                     && filterOptionMetaChanges[10].CurrentState!.PublicId == newFilterMetas["IzBzg"].NewFilterOptionMetas["X9fKb"].PublicId
+                     && filterOptionMetaChanges[10].CurrentState!.MetaId == newFilterMetas["IzBzg"].NewFilterOptionMetas["X9fKb"].MetaId
+                     && filterOptionMetaChanges[10].CurrentState!.OptionId == newFilterMetas["IzBzg"].NewFilterOptionMetas["X9fKb"].OptionId);
+            Assert.True(filterOptionMetaChanges[11].PreviousState is null
+                     && filterOptionMetaChanges[11].CurrentState!.PublicId == newFilterMetas["LxWjE"].NewFilterOptionMetas["fyYFZ"].PublicId
+                     && filterOptionMetaChanges[11].CurrentState!.MetaId == newFilterMetas["LxWjE"].NewFilterOptionMetas["fyYFZ"].MetaId
+                     && filterOptionMetaChanges[11].CurrentState!.OptionId == newFilterMetas["LxWjE"].NewFilterOptionMetas["fyYFZ"].OptionId);
+            Assert.True(filterOptionMetaChanges[12].PreviousState is null
+                     && filterOptionMetaChanges[12].CurrentState!.PublicId == newFilterMetas["it6Xr"].NewFilterOptionMetas["5Zdi9"].PublicId
+                     && filterOptionMetaChanges[12].CurrentState!.MetaId == newFilterMetas["it6Xr"].NewFilterOptionMetas["5Zdi9"].MetaId
+                     && filterOptionMetaChanges[12].CurrentState!.OptionId == newFilterMetas["it6Xr"].NewFilterOptionMetas["5Zdi9"].OptionId);
+            Assert.True(filterOptionMetaChanges[13].PreviousState is null
+                     && filterOptionMetaChanges[13].CurrentState!.PublicId == newFilterMetas["pTSoj"].NewFilterOptionMetas["krhsL"].PublicId
+                     && filterOptionMetaChanges[13].CurrentState!.MetaId == newFilterMetas["pTSoj"].NewFilterOptionMetas["krhsL"].MetaId
+                     && filterOptionMetaChanges[13].CurrentState!.OptionId == newFilterMetas["pTSoj"].NewFilterOptionMetas["krhsL"].OptionId);
+            Assert.True(filterOptionMetaChanges[14].PreviousState is null
+                     && filterOptionMetaChanges[14].CurrentState!.PublicId == newFilterMetas["LxWjE"].NewFilterOptionMetas["tdEm5"].PublicId
+                     && filterOptionMetaChanges[14].CurrentState!.MetaId == newFilterMetas["LxWjE"].NewFilterOptionMetas["tdEm5"].MetaId
+                     && filterOptionMetaChanges[14].CurrentState!.OptionId == newFilterMetas["LxWjE"].NewFilterOptionMetas["tdEm5"].OptionId);
+            Assert.True(filterOptionMetaChanges[15].PreviousState is null
+                     && filterOptionMetaChanges[15].CurrentState!.PublicId == newFilterMetas["IzBzg"].NewFilterOptionMetas["TsPJP"].PublicId
+                     && filterOptionMetaChanges[15].CurrentState!.MetaId == newFilterMetas["IzBzg"].NewFilterOptionMetas["TsPJP"].MetaId
+                     && filterOptionMetaChanges[15].CurrentState!.OptionId == newFilterMetas["IzBzg"].NewFilterOptionMetas["TsPJP"].OptionId);
+        }
+
         private Action<InstanceSetters<FilterMeta>> UnchangedFilterMetaSetter(
             FilterMeta filterMeta,
             Func<IEnumerable<FilterOptionMetaLink>>? newOptionLinks = null)
@@ -1241,6 +1564,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .FilterMetaChanges
                 .AsNoTracking()
                 .Where(c => c.DataSetVersionId == version.Id)
+                .OrderBy(c => c.Id)
                 .ToListAsync();
         }
 
@@ -1250,6 +1574,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .FilterOptionMetaChanges
                 .AsNoTracking()
                 .Where(c => c.DataSetVersionId == version.Id)
+                .OrderBy(c => c.Id)
                 .ToListAsync();
         }
 
