@@ -183,7 +183,6 @@ def validate_environment_variables():
         "WAIT_LONG",
         "WAIT_SMALL",
         "WAIT_DATA_FILE_IMPORT",
-        "FAIL_TEST_SUITES_FAST",
         "IDENTITY_PROVIDER",
         "WAIT_CACHE_EXPIRY",
         "ADMIN_EMAIL",
