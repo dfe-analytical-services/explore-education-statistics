@@ -1,5 +1,5 @@
 *** Settings ***
-Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=do this on failure
+Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=record test failure
 Library     OperatingSystem
 Library     Collections
 Library     file_operations.py
@@ -20,31 +20,10 @@ ${DOWNLOADS_DIR}=                       ${EXECDIR}${/}test-results${/}downloads$
 ${timeout}=                             %{TIMEOUT}
 ${implicit_wait}=                       %{IMPLICIT_WAIT}
 ${prompt_to_continue_on_failure}=       0
-${FAIL_TEST_SUITES_FAST}=               %{FAIL_TEST_SUITES_FAST}
 ${DATE_FORMAT_MEDIUM}=                  %-d %B %Y
 
 
 *** Keywords ***
-do this on failure
-    # See if the currently executing Test Suite is failing fast and if not, take a screenshot and HTML grab of the
-    # failing page.
-    ${currently_failing_fast}=    current test suite failing fast
-
-    IF    "${currently_failing_fast}" == "${FALSE}"
-        capture screenshots and html
-
-        # Additionally, mark the current Test Suite as failing if the "FAIL_TEST_SUITES_FAST" option is enabled, and
-        # this will cause subsequent tests within this same Test Suite to fail immediately (by virtue of their "Test
-        # Setup" steps checking to see if their owning Test Suite is currently failing fast).
-        IF    ${FAIL_TEST_SUITES_FAST} == 1
-            record failing test suite
-        END
-    END
-
-    IF    ${prompt_to_continue_on_failure} == 1
-        prompt to continue
-    END
-
 user opens the browser
     [Arguments]    ${alias}=main
     IF    "${browser}" == "chrome"

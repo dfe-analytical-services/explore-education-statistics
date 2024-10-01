@@ -70,7 +70,7 @@ Create 1st API dataset
 
 User waits until the 1st API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    5s    Verify status of API Datasets    Ready
+    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
 
 Create 2nd API dataset
     user clicks link    Back to API data sets
@@ -84,7 +84,7 @@ Create 2nd API dataset
 
 User waits until the 2nd API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    5s    Verify status of API Datasets    Ready
+    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
 
 Verify the contents inside the 'Draft API datasets' table
     user clicks link    Back to API data sets
