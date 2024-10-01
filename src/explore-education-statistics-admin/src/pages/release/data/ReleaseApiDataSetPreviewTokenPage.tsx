@@ -109,9 +109,8 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
 
                 <CopyTextButton
                   buttonText="Copy preview token"
-                  className="govuk-!-margin-bottom-6"
-                  confirmMessage="Token copied to the clipboard"
-                  inlineButton={false}
+                  confirmText="Preview token copied"
+                  id="copy-preview-token"
                   label="Preview token"
                   text={previewToken.id}
                 />

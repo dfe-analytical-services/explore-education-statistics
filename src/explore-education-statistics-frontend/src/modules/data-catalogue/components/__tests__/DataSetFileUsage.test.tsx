@@ -95,6 +95,6 @@ describe('DataSetFileUsage', () => {
       />,
     );
 
-    expect(screen.getByTestId('copy-link-url')).toBeInTheDocument();
+    expect(screen.getByTestId('copy-download-url')).toBeInTheDocument();
   });
 });
