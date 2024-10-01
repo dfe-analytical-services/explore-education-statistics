@@ -15,6 +15,10 @@ using Xunit;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
@@ -487,7 +491,30 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
                 DateTimeCreated = DateTime.UtcNow.AddDays(-4)
             });
 
+        var supersededPublicationId = Guid.NewGuid();
+        await notifierTableStorageService.CreateEntity(
+            NotifierTableStorage.PublicationSubscriptionsTable,
+            new SubscriptionEntity
+            {
+                PartitionKey = supersededPublicationId.ToString(),
+                RowKey = "test5@test.com",
+                Slug = "test-superseded-publication-slug",
+                Title = "Test Superseded Publication Title",
+                DateTimeCreated = DateTime.UtcNow.AddDays(-4)
+            });
+
         // Arrange (mocks)
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.Publications.Add(new Publication
+            {
+                Id = supersededPublicationId,
+                SupersededById = publicationId,
+            });
+            await contentDbContext.SaveChangesAsync();
+        }
+
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
                 mock.GetEmailFromToken("unsubscription-code-5"))
@@ -495,22 +522,38 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
 
-        var notifierFunction = BuildFunction(
-            notifierTableStorageService: notifierTableStorageService,
-            tokenService: tokenService.Object,
-            emailService: emailService.Object);
+        await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            var notifierFunction = BuildFunction(
+                contentDbContext: contentDbContext,
+                notifierTableStorageService: notifierTableStorageService,
+                tokenService: tokenService.Object,
+                emailService: emailService.Object);
 
-        // Act
-        var result =
-            await notifierFunction.Unsubscribe(new TestFunctionContext(),
+            // Act
+            var result =
+                await notifierFunction.Unsubscribe(new TestFunctionContext(),
+                    publicationId.ToString(),
+                    "unsubscription-code-5");
+
+            var okResult = Assert.IsAssignableFrom<OkObjectResult>(result);
+            var subscription = Assert.IsAssignableFrom<SubscriptionStateDto>(okResult.Value);
+            Assert.Equal(SubscriptionStatus.NotSubscribed, subscription.Status);
+            Assert.Equal("test-publication-slug-5", subscription.Slug);
+            Assert.Equal("Test Publication Title 5", subscription.Title);
+
+            var publication = await notifierTableStorageService.GetEntityIfExists<SubscriptionEntity>(
+                NotifierTableStorage.PublicationSubscriptionsTable,
                 publicationId.ToString(),
-                "unsubscription-code-5");
+                "test5@test.com");
+            Assert.Null(publication);
 
-        var okResult = Assert.IsAssignableFrom<OkObjectResult>(result);
-        var subscription = Assert.IsAssignableFrom<SubscriptionStateDto>(okResult.Value);
-        Assert.Equal(SubscriptionStatus.NotSubscribed, subscription.Status);
-        Assert.Equal("test-publication-slug-5", subscription.Slug);
-        Assert.Equal("Test Publication Title 5", subscription.Title);
+            var supersededPublication = await notifierTableStorageService.GetEntityIfExists<SubscriptionEntity>(
+                NotifierTableStorage.PublicationSubscriptionsTable,
+                supersededPublicationId.ToString(),
+                "test5@test.com");
+            Assert.Null(supersededPublication);
+        }
     }
 
     private static bool AssertEmailTemplateValues(
@@ -535,10 +578,12 @@ public class PublicationSubscriptionFunctionsTests(NotifierFunctionsIntegrationT
     }
 
     private PublicationSubscriptionFunctions BuildFunction(
+        ContentDbContext? contentDbContext = null,
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
         INotifierTableStorageService? notifierTableStorageService = null) =>
         new(
+            contentDbContext ?? Mock.Of<ContentDbContext>(),
             logger: Mock.Of<ILogger<PublicationSubscriptionFunctions>>(),
             appOptions: new AppOptions { PublicAppUrl = "https://localhost:3000" }.ToOptionsWrapper(),
             govUkNotifyOptions: new GovUkNotifyOptions

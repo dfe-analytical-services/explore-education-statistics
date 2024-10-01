@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
@@ -62,40 +64,50 @@ public class ReleaseNotifierTests
             mock.SendEmail("superseded@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
-        var function = BuildFunction(
-            subscriptionRepository: subscriptionRepository.Object,
-            tokenService: tokenService.Object,
-            emailService: emailService.Object);
-
-        var releaseNotificationMessage = new ReleaseNotificationMessage
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
         {
-            PublicationId = publication1Id,
-            PublicationName = "Publication 1",
-            PublicationSlug = "publication-1",
-            ReleaseName = "2000",
-            ReleaseSlug = "2000",
-            Amendment = false,
-            UpdateNote = string.Empty,
-            SupersededPublications = new List<IdTitleViewModel>
+            context.Publications.Add(new Publication
             {
-                new()
-                {
-                    Id = supersededPubId,
-                    Title = "Superseded publication",
-                },
-            },
-        };
+                Id = supersededPubId,
+                Title = "Superseded publication",
+                Slug = "superseded-publication",
+                SupersededById = publication1Id,
+            });
+            await context.SaveChangesAsync();
+        }
 
-        await function.NotifySubscribers(
-            releaseNotificationMessage,
-            new TestFunctionContext());
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            var function = BuildFunction(
+                contentDbContext: context,
+                subscriptionRepository: subscriptionRepository.Object,
+                tokenService: tokenService.Object,
+                emailService: emailService.Object);
+
+            var releaseNotificationMessage = new ReleaseNotificationMessage
+            {
+                PublicationId = publication1Id,
+                PublicationName = "Publication 1",
+                PublicationSlug = "publication-1",
+                ReleaseName = "2000",
+                ReleaseSlug = "2000",
+                Amendment = false,
+                UpdateNote = string.Empty,
+            };
+
+            await function.NotifySubscribers(
+                releaseNotificationMessage,
+                new TestFunctionContext());
+        }
 
         emailService.Verify(mock =>
             mock.SendEmail("test@test.com", "release-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
                         "Publication 1", "publication-1",
-                        "2000", "2000", null, null)
+                        "2000", "2000", null,
+                        "publication-1", null)
                 )), Times.Once);
 
         emailService.Verify(mock =>
@@ -104,6 +116,7 @@ public class ReleaseNotifierTests
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
                         "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-publication",
                         "Superseded publication")
                 )), Times.Once);
     }
@@ -139,7 +152,10 @@ public class ReleaseNotifierTests
             mock.SendEmail("test3@test.com", "release-published-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
+        await using var context = ContentDbUtils.InMemoryContentDbContext(Guid.NewGuid().ToString());
+
         var function = BuildFunction(
+            contentDbContext: context,
             subscriptionRepository: subscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
@@ -153,7 +169,6 @@ public class ReleaseNotifierTests
             ReleaseSlug = "2000",
             Amendment = false,
             UpdateNote = string.Empty,
-            SupersededPublications = new List<IdTitleViewModel>(),
         };
 
         await function.NotifySubscribers(
@@ -165,21 +180,24 @@ public class ReleaseNotifierTests
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
                         "Publication 1", "publication-1",
-                        "2000", "2000", null, null)
+                        "2000", "2000", null,
+                        "publication-1", null)
                 )), Times.Once);
         emailService.Verify(mock =>
             mock.SendEmail("test2@test.com", "release-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
                         "Publication 1", "publication-1",
-                        "2000", "2000", null, null)
+                        "2000", "2000", null,
+                        "publication-1", null)
                 )), Times.Once);
         emailService.Verify(mock =>
             mock.SendEmail("test3@test.com", "release-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-3",
                         "Publication 1", "publication-1",
-                        "2000", "2000", null, null)
+                        "2000", "2000", null,
+                        "publication-1", null)
                 )), Times.Once);
     }
 
@@ -218,10 +236,18 @@ public class ReleaseNotifierTests
             mock.SendEmail("superseded3@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
-        var function = BuildFunction(
-            subscriptionRepository: subscriptionRepository.Object,
-            tokenService: tokenService.Object,
-            emailService: emailService.Object);
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            context.Publications.Add(new Publication
+            {
+                Id = supersededPubId,
+                Title = "Superseded publication",
+                Slug = "superseded-publication",
+                SupersededById = publicationId,
+            });
+            await context.SaveChangesAsync();
+        }
 
         var releaseNotificationMessage = new ReleaseNotificationMessage
         {
@@ -232,19 +258,20 @@ public class ReleaseNotifierTests
             ReleaseSlug = "2000",
             Amendment = false,
             UpdateNote = string.Empty,
-            SupersededPublications = new List<IdTitleViewModel>
-            {
-                new()
-                {
-                    Id = supersededPubId,
-                    Title = "Superseded publication",
-                },
-            },
         };
 
-        await function.NotifySubscribers(
-            releaseNotificationMessage,
-            new TestFunctionContext());
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            var function = BuildFunction(
+                contentDbContext: context,
+                subscriptionRepository: subscriptionRepository.Object,
+                tokenService: tokenService.Object,
+                emailService: emailService.Object);
+
+            await function.NotifySubscribers(
+                releaseNotificationMessage,
+                new TestFunctionContext());
+        }
 
         emailService.Verify(mock =>
             mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
@@ -252,6 +279,7 @@ public class ReleaseNotifierTests
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
                         "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-publication",
                         "Superseded publication")
                 )), Times.Once);
         emailService.Verify(mock =>
@@ -260,6 +288,7 @@ public class ReleaseNotifierTests
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
                         "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-publication",
                         "Superseded publication")
                 )), Times.Once);
         emailService.Verify(mock =>
@@ -268,6 +297,7 @@ public class ReleaseNotifierTests
                     AssertEmailTemplateValues(d, "unsubscribe-token-3",
                         "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-publication",
                         "Superseded publication")
                 )), Times.Once);
     }
@@ -305,38 +335,50 @@ public class ReleaseNotifierTests
             mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
-        var function = BuildFunction(
-            subscriptionRepository: subscriptionRepository.Object,
-            tokenService: tokenService.Object,
-            emailService: emailService.Object);
-
-        var releaseNotificationMessage = new ReleaseNotificationMessage
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
         {
-            PublicationId = publicationId,
-            PublicationName = "Publication 1",
-            PublicationSlug = "publication-1",
-            ReleaseName = "2000",
-            ReleaseSlug = "2000",
-            Amendment = false,
-            UpdateNote = string.Empty,
-            SupersededPublications = new List<IdTitleViewModel>
-            {
-                new()
+            context.Publications.AddRange(
+                new Publication
                 {
                     Id = supersededPub1Id,
                     Title = "Superseded 1 publication",
+                    Slug = "superseded-1-publication",
+                    SupersededById = publicationId,
                 },
-                new()
+                new Publication
                 {
                     Id = supersededPub2Id,
                     Title = "Superseded 2 publication",
-                }
-            },
-        };
+                    Slug = "superseded-2-publication",
+                    SupersededById = publicationId,
+                });
+            await context.SaveChangesAsync();
+        }
 
-        await function.NotifySubscribers(
-            releaseNotificationMessage,
-            new TestFunctionContext());
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            var function = BuildFunction(
+                contentDbContext: context,
+                subscriptionRepository: subscriptionRepository.Object,
+                tokenService: tokenService.Object,
+                emailService: emailService.Object);
+
+            var releaseNotificationMessage = new ReleaseNotificationMessage
+            {
+                PublicationId = publicationId,
+                PublicationName = "Publication 1",
+                PublicationSlug = "publication-1",
+                ReleaseName = "2000",
+                ReleaseSlug = "2000",
+                Amendment = false,
+                UpdateNote = string.Empty,
+            };
+
+            await function.NotifySubscribers(
+                releaseNotificationMessage,
+                new TestFunctionContext());
+        }
 
         emailService.Verify(mock =>
             mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
@@ -344,6 +386,7 @@ public class ReleaseNotifierTests
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
                         "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-1-publication",
                         "Superseded 1 publication")
                 )), Times.Once);
         emailService.Verify(mock =>
@@ -352,6 +395,7 @@ public class ReleaseNotifierTests
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
                         "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-2-publication",
                         "Superseded 2 publication")
                 )), Times.Once);
     }
@@ -386,40 +430,50 @@ public class ReleaseNotifierTests
                 "release-amendment-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
-        var function = BuildFunction(
-            subscriptionRepository: subscriptionRepository.Object,
-            tokenService: tokenService.Object,
-            emailService: emailService.Object);
-
-        var releaseNotificationMessage = new ReleaseNotificationMessage
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
         {
-            PublicationId = publicationId,
-            PublicationName = "Publication 1",
-            PublicationSlug = "publication-1",
-            ReleaseName = "2000",
-            ReleaseSlug = "2000",
-            Amendment = true,
-            UpdateNote = "Update note",
-            SupersededPublications = new List<IdTitleViewModel>
+            context.Publications.Add(new Publication
             {
-                new()
-                {
-                    Id = supersededPubId,
-                    Title = "Superseded publication",
-                },
-            },
-        };
+                Id = supersededPubId,
+                Title = "Superseded publication",
+                Slug = "superseded-publication",
+                SupersededById = publicationId,
+            });
+            await context.SaveChangesAsync();
+        }
 
-        await function.NotifySubscribers(
-            releaseNotificationMessage,
-            new TestFunctionContext());
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            var function = BuildFunction(
+                contentDbContext: context,
+                subscriptionRepository: subscriptionRepository.Object,
+                tokenService: tokenService.Object,
+                emailService: emailService.Object);
+
+            var releaseNotificationMessage = new ReleaseNotificationMessage
+            {
+                PublicationId = publicationId,
+                PublicationName = "Publication 1",
+                PublicationSlug = "publication-1",
+                ReleaseName = "2000",
+                ReleaseSlug = "2000",
+                Amendment = true,
+                UpdateNote = "Update note",
+            };
+
+            await function.NotifySubscribers(
+                releaseNotificationMessage,
+                new TestFunctionContext());
+        }
 
         emailService.Verify(mock =>
             mock.SendEmail("test@test.com", "release-amendment-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
                         "Publication 1", "publication-1",
-                        "2000", "2000", "Update note", null)
+                        "2000", "2000", "Update note",
+                        "publication-1", null)
                 )), Times.Once);
 
         emailService.Verify(mock =>
@@ -429,6 +483,7 @@ public class ReleaseNotifierTests
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
                         "Publication 1", "publication-1",
                         "2000", "2000", "Update note",
+                        "superseded-publication",
                         "Superseded publication")
                 )), Times.Once);
     }
@@ -437,13 +492,14 @@ public class ReleaseNotifierTests
         string unsubToken,
         string pubName, string pubSlug,
         string releaseName, string releaseSlug, string? updateNote,
+        string unsubPubSlug,
         string? supersededPublicationTitle = null)
     {
         Assert.Equal(pubName, values["publication_name"]);
         Assert.Equal(releaseName, values["release_name"]);
         Assert.Equal($"{AppOptions.PublicAppUrl}/find-statistics/{pubSlug}/{releaseSlug}",
             values["release_link"]);
-        Assert.Equal($"{AppOptions.PublicAppUrl}/subscriptions/{pubSlug}/confirm-unsubscription/{unsubToken}", values["unsubscribe_link"]);
+        Assert.Equal($"{AppOptions.PublicAppUrl}/subscriptions/{unsubPubSlug}/confirm-unsubscription/{unsubToken}", values["unsubscribe_link"]);
 
         if (updateNote != null)
         {
@@ -467,11 +523,13 @@ public class ReleaseNotifierTests
     }
 
     private static ReleaseNotifier BuildFunction(
+        ContentDbContext? contentDbContext = null,
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
         ISubscriptionRepository? subscriptionRepository = null)
     {
         return new ReleaseNotifier(
+            contentDbContext ?? Mock.Of<ContentDbContext>(),
             Mock.Of<ILogger<ReleaseNotifier>>(),
             AppOptions.ToOptionsWrapper(),
             new GovUkNotifyOptions
