@@ -317,21 +317,23 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         Guid nextVersionId,
         CancellationToken cancellationToken)
     {
-        var oldIndicatorMetas = await GetIndicatorMetas(previousVersionId, cancellationToken);
-        var newIndicatorMetas = await GetIndicatorMetas(nextVersionId, cancellationToken);
+        var oldMetas = await GetIndicatorMetas(previousVersionId, cancellationToken);
+        var newMetas = await GetIndicatorMetas(nextVersionId, cancellationToken);
 
-        var indicatorMetaChanges = new List<IndicatorMetaChange>();
+        var metaDeletionsAndChanges = new List<IndicatorMetaChange>();
+        var metaAdditions = new List<IndicatorMetaChange>();
 
-        foreach (var (indicatorPublicId, oldIndicator) in oldIndicatorMetas)
+        foreach (var (indicatorPublicId, oldIndicator) in oldMetas)
         {
-            if (newIndicatorMetas.TryGetValue(indicatorPublicId, out var newIndicator))
+            if (newMetas.TryGetValue(indicatorPublicId, out var newIndicator))
             {
                 // Indicator changed
                 if (!IsIndicatorEqual(newIndicator, oldIndicator))
                 {
-                    indicatorMetaChanges.Add(new IndicatorMetaChange
+                    metaDeletionsAndChanges.Add(new IndicatorMetaChange
                     {
                         DataSetVersionId = nextVersionId,
+                        PreviousState = oldIndicator,
                         PreviousStateId = oldIndicator.Id,
                         CurrentStateId = newIndicator.Id
                     });
@@ -340,28 +342,35 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             else
             {
                 // Indicator deleted
-                indicatorMetaChanges.Add(new IndicatorMetaChange
+                metaDeletionsAndChanges.Add(new IndicatorMetaChange
                 {
                     DataSetVersionId = nextVersionId,
+                    PreviousState = oldIndicator,
                     PreviousStateId = oldIndicator.Id,
                 });
             }
         }
 
-        foreach (var (indicatorPublicId, newIndicator) in newIndicatorMetas)
+        foreach (var (indicatorPublicId, newIndicator) in newMetas)
         {
-            if (!oldIndicatorMetas.TryGetValue(indicatorPublicId, out var oldIndicator))
+            if (!oldMetas.TryGetValue(indicatorPublicId, out var oldIndicator))
             {
                 // Indicator added
-                indicatorMetaChanges.Add(new IndicatorMetaChange
+                metaAdditions.Add(new IndicatorMetaChange
                 {
                     DataSetVersionId = nextVersionId,
+                    CurrentState = newIndicator,
                     CurrentStateId = newIndicator.Id
                 });
             }
         }
 
-        publicDataDbContext.IndicatorMetaChanges.AddRange(indicatorMetaChanges);
+        metaDeletionsAndChanges = [.. metaDeletionsAndChanges.NaturalOrderBy(c => c.PreviousState!.Label)];
+
+        // Additions are inserted into the DB last
+        metaAdditions = [.. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label)];
+
+        publicDataDbContext.IndicatorMetaChanges.AddRange([.. metaDeletionsAndChanges, .. metaAdditions]);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -443,14 +452,12 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
     {
-        var indicatorMetas = await publicDataDbContext
+        return await publicDataDbContext
             .IndicatorMetas
             .Where(m => m.DataSetVersionId == dataSetVersionId)
-            .ToListAsync(cancellationToken);
-
-        return indicatorMetas
-            .NaturalOrderBy(m => m.Label)
-            .ToDictionary(i => i.PublicId);
+            .ToDictionaryAsync(
+                i => i.PublicId,
+                cancellationToken);
     }
 
     private async Task<Dictionary<GeographicLevel,

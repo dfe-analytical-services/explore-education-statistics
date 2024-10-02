@@ -2859,6 +2859,109 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             Assert.Empty(changes);
         }
 
+        [Fact]
+        public async Task FiltersAddedAndDeletedAndChanged_ChangesInsertedIntoDatabaseInCorrectOrder()
+        {
+            var oldIndicatorMeta = DataFixture.DefaultIndicatorMeta()
+                .ForIndex(0, s =>
+                    s.SetPublicId(SqidEncoder.Encode(1)) // Indicator deleted
+                    .SetLabel("f"))
+                .ForIndex(1, s =>
+                    s.SetPublicId(SqidEncoder.Encode(2)) // Indicator deleted
+                    .SetLabel("a"))
+                .ForIndex(2, s =>
+                    s.SetPublicId(SqidEncoder.Encode(3))
+                    .SetLabel("e"))
+                .ForIndex(3, s =>
+                    s.SetPublicId(SqidEncoder.Encode(4))
+                    .SetLabel("b"))
+                .GenerateList(4);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldIndicatorMeta);
+
+            var newIndicatorMeta = DataFixture.DefaultIndicatorMeta()
+                .ForIndex(0, s => s.SetPublicId(SqidEncoder.Encode(3))) // Indicator changed
+                .ForIndex(1, s => s.SetPublicId(SqidEncoder.Encode(4))) // Indicator changed
+                .ForIndex(2, s =>
+                    s.SetPublicId(SqidEncoder.Encode(5)) // Indicator added
+                    .SetLabel("d"))
+                .ForIndex(3, s =>
+                    s.SetPublicId(SqidEncoder.Encode(6)) // Indicator added
+                    .SetLabel("c"))
+                .GenerateList(4);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                indicatorMeta: newIndicatorMeta);
+
+            await CreateChanges(instanceId);
+
+            var indicatorMetaChanges = await GetIndicatorMetaChanges(newVersion);
+
+            // 6 Indicator changes
+            Assert.Equal(6, indicatorMetaChanges.Count);
+            Assert.All(indicatorMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldIndicatorMetas = originalVersion.IndicatorMetas
+                .ToDictionary(m => m.PublicId);
+
+            var newIndicatorMetas = newVersion.IndicatorMetas
+                .ToDictionary(m => m.PublicId);
+
+            // The changes should be inserted into each database table ordered alphabetically by 'Label'.
+            // They should also be ordered such that all additions come last.
+
+            // Therefore, the expected order of Indicator changes are (as per their Public IDs):
+            // Sqid index 2 deleted
+            // Sqid index 4 changed
+            // Sqid index 3 changed
+            // Sqid index 1 deleted
+            // Sqid index 6 added
+            // Sqid index 5 added
+
+            AssertIndicatorDeleted(
+                expectedIndicatorMeta: oldIndicatorMetas[SqidEncoder.Encode(2)],
+                change: indicatorMetaChanges[0]);
+            AssertIndicatorChanged(
+                expectedOldIndicatorMeta: oldIndicatorMetas[SqidEncoder.Encode(4)],
+                expectedNewIndicatorMeta: newIndicatorMetas[SqidEncoder.Encode(4)],
+                change: indicatorMetaChanges[1]);
+            AssertIndicatorChanged(
+                expectedOldIndicatorMeta: oldIndicatorMetas[SqidEncoder.Encode(3)],
+                expectedNewIndicatorMeta: newIndicatorMetas[SqidEncoder.Encode(3)],
+                change: indicatorMetaChanges[2]);
+            AssertIndicatorDeleted(
+                expectedIndicatorMeta: oldIndicatorMetas[SqidEncoder.Encode(1)],
+                change: indicatorMetaChanges[3]);
+            AssertIndicatorAdded(
+                expectedIndicatorMeta: newIndicatorMetas[SqidEncoder.Encode(6)],
+                change: indicatorMetaChanges[4]);
+            AssertIndicatorAdded(
+                expectedIndicatorMeta: newIndicatorMetas[SqidEncoder.Encode(5)],
+                change: indicatorMetaChanges[5]);
+        }
+
+        private static void AssertIndicatorDeleted(IndicatorMeta expectedIndicatorMeta, IndicatorMetaChange change)
+        {
+            Assert.Equal(expectedIndicatorMeta.Id, change.PreviousStateId);
+            Assert.Null(change.CurrentState);
+        }
+
+        private static void AssertIndicatorAdded(IndicatorMeta expectedIndicatorMeta, IndicatorMetaChange change)
+        {
+            Assert.Null(change.PreviousState);
+            Assert.Equal(expectedIndicatorMeta.Id, change.CurrentStateId);
+        }
+
+        private static void AssertIndicatorChanged(
+            IndicatorMeta expectedOldIndicatorMeta,
+            IndicatorMeta expectedNewIndicatorMeta,
+            IndicatorMetaChange change)
+        {
+            Assert.Equal(expectedOldIndicatorMeta.Id, change.PreviousStateId);
+            Assert.Equal(expectedNewIndicatorMeta.Id, change.CurrentStateId);
+        }
+
         private static Action<InstanceSetters<IndicatorMeta>> UnchangedIndicatorMetaSetter(IndicatorMeta indicatorMeta)
         {
             return s =>
@@ -2877,6 +2980,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .IndicatorMetaChanges
                 .AsNoTracking()
                 .Where(c => c.DataSetVersionId == version.Id)
+                .OrderBy(c => c.Id)
                 .ToListAsync();
         }
 
