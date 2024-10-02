@@ -29,7 +29,7 @@ Create test publication and release via API
 Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Academic year 2025/26
-    user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Navigate to 'Footnotes' page
     user waits until page finishes loading

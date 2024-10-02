@@ -1,5 +1,6 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -11,9 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly AccessWindowOptions _preReleaseOptions;
 
-        public PreReleaseService(IOptions<PreReleaseOptions> config)
+        public PreReleaseService(IOptions<PreReleaseAccessOptions> options)
         {
-            _preReleaseOptions = config.Value.PreReleaseAccess.AccessWindow;
+            _preReleaseOptions = options.Value.AccessWindow;
         }
 
         public PreReleaseWindow GetPreReleaseWindow(ReleaseVersion releaseVersion)
@@ -84,20 +85,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return releaseVersion.Live ? PreReleaseAccess.After : PreReleaseAccess.Within;
         }
-    }
-
-    public class PreReleaseOptions
-    {
-        public PreReleaseAccessOptions PreReleaseAccess { get; set; }
-    }
-
-    public class AccessWindowOptions
-    {
-        public int MinutesBeforeReleaseTimeStart { get; set; }
-    }
-
-    public class PreReleaseAccessOptions
-    {
-        public AccessWindowOptions AccessWindow { get; set; }
     }
 }

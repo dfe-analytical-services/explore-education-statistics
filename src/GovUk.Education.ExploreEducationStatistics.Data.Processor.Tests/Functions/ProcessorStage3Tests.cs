@@ -18,8 +18,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
@@ -169,7 +169,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
+            new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -394,7 +394,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
+            new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -526,7 +526,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
+            new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -676,7 +676,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
+            new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -812,7 +812,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
+            new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -974,7 +974,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
+            new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1116,7 +1116,7 @@ public class ProcessorStage3Tests
         var observationBatchImporterMock = new Mock<TestObservationBatchImporter> { CallBase = true };
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
+            new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1238,7 +1238,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingsOptions { RowsPerBatch = 3 }),
+            new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1388,7 +1388,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
+            new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -1556,7 +1556,7 @@ public class ProcessorStage3Tests
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
-            Options.Create(new AppSettingsOptions { RowsPerBatch = 5000 }),
+            new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,

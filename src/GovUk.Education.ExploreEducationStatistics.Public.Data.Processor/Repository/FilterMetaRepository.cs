@@ -17,10 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public class FilterMetaRepository(
     PublicDataDbContext publicDataDbContext,
-    IOptions<AppSettingsOptions> appSettingsOptions,
+    IOptions<AppOptions> appOptions,
     IDataSetVersionPathResolver dataSetVersionPathResolver) : IFilterMetaRepository
 {
-    private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+    private readonly AppOptions _appOptions = appOptions.Value;
 
     public async Task<IDictionary<FilterMeta, List<FilterOptionMeta>>> ReadFilterMetas(
         IDuckDbConnection duckDbConnection,
@@ -104,7 +104,7 @@ public class FilterMetaRepository(
             {
                 var batch = options
                     .Skip(current)
-                    .Take(_appSettingsOptions.MetaInsertBatchSize)
+                    .Take(_appOptions.MetaInsertBatchSize)
                     .ToList();
 
                 // Although not necessary for filter options, we've adopted the 'row key'
@@ -136,7 +136,7 @@ public class FilterMetaRepository(
                 publicDataDbContext.FilterOptionMetaLinks.AddRange(links);
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-                current += _appSettingsOptions.MetaInsertBatchSize;
+                current += _appOptions.MetaInsertBatchSize;
             }
 
             var insertedLinks = await publicDataDbContext.FilterOptionMetaLinks

@@ -72,8 +72,8 @@ Verify new release summary
     user checks summary list contains    Release type    Accredited official statistics
 
 Upload subjects to release
-    user uploads subject    ${SUBJECT_1_NAME}    tiny-two-filters.csv    tiny-two-filters.meta.csv
-    user uploads subject    ${SUBJECT_2_NAME}    upload-file-test.csv    upload-file-test-with-filter.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_1_NAME}    tiny-two-filters.csv    tiny-two-filters.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_2_NAME}    upload-file-test.csv    upload-file-test-with-filter.meta.csv
 
 Navigate to Footnotes page
     user clicks link    Footnotes

@@ -25,7 +25,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
   const history = useHistory();
   const lastLocation = useLastLocation();
 
-  const { publicApiBaseUrl, publicApiDocsUrl } = useConfig();
+  const { publicApiUrl, publicApiDocsUrl } = useConfig();
 
   const { dataSetId, previewTokenId, releaseId, publicationId } =
     useParams<ReleaseDataSetPreviewTokenRouteParams>();
@@ -139,8 +139,8 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                 <h3>API data set endpoints quick start</h3>
                 {dataSet?.draftVersion && (
                   <ApiDataSetQuickStart
-                    publicApiBaseUrl={publicApiBaseUrl ?? ''}
-                    publicApiDocsUrl={publicApiDocsUrl ?? ''}
+                    publicApiBaseUrl={`${publicApiUrl}/api/v1.0`}
+                    publicApiDocsUrl={publicApiDocsUrl}
                     dataSetId={dataSet.id}
                     dataSetName={dataSet.title}
                     dataSetVersion={dataSet.draftVersion?.version}

@@ -62,38 +62,38 @@ export default function DataSetFileUsage({
             }
           />
         )}
-        <ChevronCard
-          link={<>Download this data using code</>}
-          cardSize="l"
-          description="Access this data using common programming languages"
-          descriptionAfter={
-            <>
-              <CopyTextButton
-                className="govuk-!-margin-top-5"
-                text={downloadLink}
-                labelHidden={false}
-              />
-              <h4>Example code</h4>
-              <Tabs id="dataSetUsage-code">
-                <TabsSection title="Python" headingTag="h4">
-                  <CodeBlock
-                    language="python"
-                    code={`import pandas as pd
-pd.read_csv("${downloadLink}")`}
-                  />
-                </TabsSection>
-                <TabsSection title="R" headingTag="h4">
-                  <CodeBlock
-                    language="r"
-                    code={`read.csv("${downloadLink}")`}
-                  />
-                </TabsSection>
-              </Tabs>
-            </>
-          }
-          noChevron
-        />
       </ChevronGrid>
+
+      <h3>Download this data using code</h3>
+
+      <p>
+        Access this data using common programming languages using the URL below.
+      </p>
+
+      <CopyTextButton
+        className="govuk-!-margin-top-5"
+        text={downloadLink}
+        labelHidden={false}
+      />
+
+      <h4>Example code</h4>
+
+      <Tabs id="dataSetUsage-code">
+        <TabsSection title="Python">
+          <h5 className="govuk-heading-s">Python</h5>
+
+          <CodeBlock language="python">
+            {`import pandas as pd
+
+pd.read_csv("${downloadLink}")`}
+          </CodeBlock>
+        </TabsSection>
+        <TabsSection title="R">
+          <h5 className="govuk-heading-s">R</h5>
+
+          <CodeBlock language="r">{`read.csv("${downloadLink}")`}</CodeBlock>
+        </TabsSection>
+      </Tabs>
     </DataSetFilePageSection>
   );
 }

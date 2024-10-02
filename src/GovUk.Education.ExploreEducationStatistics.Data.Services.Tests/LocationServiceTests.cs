@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -131,20 +130,16 @@ public class LocationServiceTests
             location1, location2, location3, location4, location5, location6
         };
 
-        var options = Options.Create(new LocationsOptions
+        var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            Hierarchies = new Dictionary<GeographicLevel, List<string>>
-                {
-                    {
-                        GeographicLevel.LocalAuthority,
-                        new List<string>
-                        {
-                            "Country",
-                            "Region"
-                        }
-                    }
-                }
-        });
+            {
+                GeographicLevel.LocalAuthority,
+                [
+                    "Country",
+                    "Region"
+                ]
+            }
+        };
 
         _context.BoundaryLevel.Add(_countriesBoundaryLevel);
         await _context.SaveChangesAsync();
@@ -153,7 +148,7 @@ public class LocationServiceTests
         var result = await _sut.GetLocationViewModels(
             locations,
             null,
-            options.Value.Hierarchies);
+            hierarchies);
 
         // Assert
         // Result has Country, Region and Local Authority levels
@@ -273,19 +268,12 @@ public class LocationServiceTests
             location1, location2, location3
         };
 
-        var options = Options.Create(new LocationsOptions
+        var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            Hierarchies = new Dictionary<GeographicLevel, List<string>>
-                {
-                    {
-                        GeographicLevel.Region,
-                        new List<string>
-                        {
-                            "Country"
-                        }
-                    }
-                }
-        });
+            {
+                GeographicLevel.Region, ["Country"]
+            }
+        };
 
         _context.BoundaryLevel.Add(new() { Id = 123, Label = "Boundary Level 1", Level = GeographicLevel.Region });
         await _context.SaveChangesAsync();
@@ -314,7 +302,7 @@ public class LocationServiceTests
         var result = await _sut.GetLocationViewModels(
             locations,
             boundaryLevelId: 123,
-            options.Value.Hierarchies);
+            hierarchies);
 
         // Assert
         VerifyAllMocks(_boundaryDataRepository);

@@ -1,8 +1,9 @@
 #nullable enable
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
@@ -29,24 +30,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             DeleteSpecificReleaseRequirement requirement,
             ReleaseVersion releaseVersion)
         {
-            if (!releaseVersion.Amendment || releaseVersion.ApprovalStatus == Approved)
+            if (releaseVersion.ApprovalStatus != Draft)
             {
                 return;
             }
 
-            if (SecurityUtils.HasClaim(context.User, DeleteAllReleaseAmendments))
+            if (!releaseVersion.Amendment)
             {
-                context.Succeed(requirement);
-                return;
+                if (context.User.IsInRole(RoleNames.BauUser))
+                {
+                    context.Succeed(requirement);
+                }
             }
-
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        userId: context.User.GetUserId(),
-                        publicationId: releaseVersion.PublicationId,
-                        Owner))
+            else
             {
-                context.Succeed(requirement);
+                if (SecurityUtils.HasClaim(context.User, DeleteAllReleaseAmendments))
+                {
+                    context.Succeed(requirement);
+                    return;
+                }
+
+                if (await _authorizationHandlerService
+                        .HasRolesOnPublication(
+                            userId: context.User.GetUserId(),
+                            publicationId: releaseVersion.PublicationId,
+                            Owner))
+                {
+                    context.Succeed(requirement);
+                }
             }
         }
     }

@@ -31,7 +31,7 @@ Navigate to archive-publication release
     ...    ${RELEASE_NAME_ARCHIVE}
 
 Import archive-publication subject to release
-    user uploads subject    ${SUBJECT_NAME_ARCHIVE}    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_NAME_ARCHIVE}    upload-file-test.csv    upload-file-test.meta.csv
 
 Add data guidance to archive-publication subject
     user clicks link    Data guidance
@@ -176,7 +176,7 @@ Navigate to superseding-publication release on Admin site
     ...    ${RELEASE_NAME_SUPERSEDE}
 
 Import superseding-publication subject to release
-    user uploads subject    ${SUBJECT_NAME_SUPERSEDE}    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_NAME_SUPERSEDE}    upload-file-test.csv    upload-file-test.meta.csv
 
 Add data guidance to superseding-publication subject
     user clicks link    Data guidance

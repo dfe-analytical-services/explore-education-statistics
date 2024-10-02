@@ -24,6 +24,7 @@ interface FormValues {
   summary: string;
   supersededById?: string;
   title: string;
+  themeId: string;
   topicId: string;
 }
 
@@ -79,6 +80,7 @@ export default function PublicationDetailsForm({
         .max(160, 'Summary must be 160 characters or less'),
       supersededById: Yup.string(),
       title: Yup.string().required('Enter a title'),
+      themeId: Yup.string().required('Choose a theme'),
       topicId: Yup.string().required('Choose a topic'),
     });
   }, []);
@@ -94,6 +96,7 @@ export default function PublicationDetailsForm({
             theme: '',
             title: '',
             summary: '',
+            themeId: '',
             topicId: '',
           }),
         }}
@@ -128,6 +131,7 @@ export default function PublicationDetailsForm({
                       legend="Choose a topic for this publication"
                       legendHidden
                       name="topicId"
+                      themeInputName="themeId"
                       themes={themes}
                     />
                   )}

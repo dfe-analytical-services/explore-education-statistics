@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -17,7 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -53,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserReleaseInviteRepository userReleaseInviteRepository,
             IUserPublicationInviteRepository userPublicationInviteRepository,
             UserManager<ApplicationUser> userManager,
-            IConfiguration configuration)
+            IOptions<AppOptions> appOptions)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -66,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userReleaseInviteRepository = userReleaseInviteRepository;
             _userPublicationInviteRepository = userPublicationInviteRepository;
             _userManager = userManager;
-            _userDeletionAllowed = configuration.GetValue<bool>("enableThemeDeletion");
+            _userDeletionAllowed = appOptions.Value.EnableThemeDeletion;
         }
 
         public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()

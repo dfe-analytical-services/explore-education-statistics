@@ -1,8 +1,8 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -17,15 +17,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [MaxLength(160)]
         public string Summary { get; set; } = string.Empty;
 
-        public List<ReleaseVersion> ReleaseVersions { get; set; } = new();
+        public List<ReleaseVersion> ReleaseVersions { get; set; } = [];
 
-        public List<PublicationMethodology> Methodologies { get; set; } = new();
+        public List<PublicationMethodology> Methodologies { get; set; } = [];
 
         public ExternalMethodology? ExternalMethodology { get; set; }
 
         public Guid TopicId { get; set; }
 
         public Topic Topic { get; set; } = null!;
+
+        public Guid ThemeId { get; set; }
+
+        public Theme Theme { get; set; } = null!;
 
         public Guid ContactId { get; set; }
 
@@ -43,6 +47,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public ReleaseVersion? LatestPublishedReleaseVersion { get; set; }
 
-        public List<ReleaseSeriesItem> ReleaseSeries { get; set; } = new();
+        public List<ReleaseSeriesItem> ReleaseSeries { get; set; } = [];
     }
 }

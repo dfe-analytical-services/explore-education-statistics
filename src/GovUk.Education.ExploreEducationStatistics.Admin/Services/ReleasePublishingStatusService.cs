@@ -14,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -46,13 +45,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async _ =>
                 {
-                    var query = new TableQuery<ReleasePublishingStatus>()
-                        .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                            QueryComparisons.Equal, releaseVersionId.ToString()));
+                    var asyncPageable = await _publisherTableStorageService.QueryEntities<ReleasePublishingStatus>(
+                        PublisherReleaseStatusTableName,
+                        ent => ent.PartitionKey == releaseVersionId.ToString());
+                    var statusList = await asyncPageable.ToListAsync();
+                    var latestStatus = statusList.MaxBy(status => status.Created);
 
-                    var result = await _publisherTableStorageService.ExecuteQuery(PublisherReleaseStatusTableName, query);
-                    var first = result.OrderByDescending(status => status.Created).FirstOrDefault();
-                    return _mapper.Map<ReleasePublishingStatusViewModel>(first);
+                    return _mapper.Map<ReleasePublishingStatusViewModel>(latestStatus);
                 });
         }
     }

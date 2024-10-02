@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+namespace GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 
 public class GovUkNotifyOptions
 {
