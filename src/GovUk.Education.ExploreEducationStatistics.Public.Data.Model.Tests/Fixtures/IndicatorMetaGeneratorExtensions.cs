@@ -16,8 +16,7 @@ public static class IndicatorMetaGeneratorExtensions
         DataSetVersion dataSetVersion)
         => generator.ForInstance(s => s.SetDataSetVersion(dataSetVersion));
 
-    public static Generator<IndicatorMeta> WithDataSetVersionId(
-        this Generator<IndicatorMeta> generator,
+    public static Generator<IndicatorMeta> WithDataSetVersionId(this Generator<IndicatorMeta> generator,
         Guid dataSetVersionId)
         => generator.ForInstance(s => s.SetDataSetVersionId(dataSetVersionId));
 
@@ -38,14 +37,12 @@ public static class IndicatorMetaGeneratorExtensions
         byte? decimalPlaces)
         => generator.ForInstance(s => s.SetDecimalPlaces(decimalPlaces));
 
-
     public static InstanceSetters<IndicatorMeta> SetDefaults(this InstanceSetters<IndicatorMeta> setters)
         => setters
             .Set(m => m.PublicId, f => f.Random.AlphaNumeric(10))
             .SetDefault(m => m.Column)
             .SetDefault(m => m.Label)
             .SetDefault(m => m.Unit)
-            .SetDefault(m => m.PublicId)
             .Set(
                 m => m.DecimalPlaces,
                 (f, im) => im switch

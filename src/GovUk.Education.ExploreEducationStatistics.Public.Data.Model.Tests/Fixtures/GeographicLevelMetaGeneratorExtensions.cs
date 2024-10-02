@@ -12,11 +12,6 @@ public static class GeographicLevelMetaGeneratorExtensions
     public static Generator<GeographicLevelMeta> WithDefaults(this Generator<GeographicLevelMeta> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
-    public static Generator<GeographicLevelMeta> WithDataSetVersionId(
-        this Generator<GeographicLevelMeta> generator,
-        Guid dataSetVersionId)
-        => generator.ForInstance(s => s.SetDataSetVersionId(dataSetVersionId));
-
     public static Generator<GeographicLevelMeta> WithDataSetVersion(
         this Generator<GeographicLevelMeta> generator,
         DataSetVersion dataSetVersion)
@@ -40,11 +35,6 @@ public static class GeographicLevelMetaGeneratorExtensions
         => setters
             .Set(m => m.DataSetVersion, dataSetVersion)
             .Set(m => m.DataSetVersionId, (_, f) => f.DataSetVersion.Id);
-
-    public static InstanceSetters<GeographicLevelMeta> SetDataSetVersionId(
-        this InstanceSetters<GeographicLevelMeta> setters,
-        Guid dataSetVersionId)
-        => setters.Set(c => c.DataSetVersionId, dataSetVersionId);
 
     public static InstanceSetters<GeographicLevelMeta> SetLevels(
         this InstanceSetters<GeographicLevelMeta> setters,

@@ -50,39 +50,4 @@ public class IndicatorMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeO
                 .IsUnique();
         }
     }
-
-    private sealed class PublicIdEqualityComparer : IEqualityComparer<IndicatorMeta>
-    {
-        public bool Equals(IndicatorMeta? x, IndicatorMeta? y)
-        {
-            if (ReferenceEquals(x, y))
-            {
-                return true;
-            }
-
-            if (x is null)
-            {
-                return false;
-            }
-
-            if (y is null)
-            {
-                return false;
-            }
-
-            if (x.GetType() != y.GetType())
-            {
-                return false;
-            }
-
-            return x.PublicId == y.PublicId;
-        }
-
-        public int GetHashCode(IndicatorMeta obj)
-        {
-            return obj.PublicId.GetHashCode();
-        }
-    }
-
-    public static IEqualityComparer<IndicatorMeta> PublicIdComparer { get; } = new PublicIdEqualityComparer();
 }

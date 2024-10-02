@@ -15,8 +15,7 @@ public static class LocationMappingPlanGeneratorExtensions
     public static Generator<LocationMappingPlan> LocationMappingPlanFromLocationMeta(
         this DataFixture fixture,
         List<LocationMeta>? sourceLocations = null,
-        List<LocationMeta>? targetLocations = null,
-        IReadOnlyDictionary<string, string>? mappedOptionCandidateKeysByOptionSourceKey = null)
+        List<LocationMeta>? targetLocations = null)
     {
         var locationMappingPlanGenerator = fixture.Generator<LocationMappingPlan>();
 
@@ -36,24 +35,13 @@ public static class LocationMappingPlanGeneratorExtensions
 
             sourceLocationsForLevel?.Options.ForEach(option =>
             {
-                var sourceKey = MappingKeyGenerators.LocationOptionMeta(option);
-
-                var locationOptionMapping = fixture
-                    .DefaultLocationOptionMapping()
-                    .WithSource(fixture.DefaultMappableLocationOption()
-                        .WithLabel(option.Label)
-                        .WithCodes(option.ToRow()));
-
-                if (mappedOptionCandidateKeysByOptionSourceKey is not null &&
-                    mappedOptionCandidateKeysByOptionSourceKey.TryGetValue(sourceKey, out var candidateKey))
-                {
-                    locationOptionMapping = locationOptionMapping
-                        .WithManualMapped(candidateKey);
-                }
-
                 levelGenerator.AddMapping(
-                    sourceKey: sourceKey,
-                    mapping: locationOptionMapping);
+                    sourceKey: MappingKeyGenerators.LocationOptionMeta(option),
+                    mapping: fixture
+                        .DefaultLocationOptionMapping()
+                        .WithSource(fixture.DefaultMappableLocationOption()
+                            .WithLabel(option.Label)
+                            .WithCodes(option.ToRow())));
             });
 
             var targetLocationsForLevel = targetLocations?
@@ -245,7 +233,8 @@ public static class LocationMappingPlanGeneratorExtensions
         this InstanceSetters<LocationOptionMapping> setters)
         => setters
             .SetDefault(mapping => mapping.PublicId)
-            .SetDefault(mapping => mapping.Type);
+            .SetDefault(mapping => mapping.Type)
+            .SetDefault(mapping => mapping.CandidateKey);
 
     public static InstanceSetters<LocationOptionMapping> SetSource(
         this InstanceSetters<LocationOptionMapping> setters,

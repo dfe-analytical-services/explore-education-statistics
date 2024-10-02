@@ -322,16 +322,23 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                     .Generate(1))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
+            var dataSetVersionMapping = new DataSetVersionMapping
+            {
+                SourceDataSetVersionId = dataSet.LatestLiveVersionId!.Value,
+                TargetDataSetVersionId = nextDataSetVersion.Id,
+                FilterMappingPlan = new FilterMappingPlan(),
+                LocationMappingPlan = new LocationMappingPlan(),
+                LocationMappingsComplete = true,
+                FilterMappingsComplete = true
+            };
+
             await AddTestData<PublicDataDbContext>(context =>
             {
                 context.DataSetVersions.Add(nextDataSetVersion);
                 context.DataSets.Update(dataSet);
+                context.DataSetVersionMappings.Add(dataSetVersionMapping);
             });
 
-            await CreateDefaultCompleteMappings(
-                sourceDataSetVersionId: dataSet.LatestLiveVersionId!.Value,
-                targetDataSetVersionId: nextDataSetVersion.Id);
-            
             return nextDataSetVersion;
         }
 
