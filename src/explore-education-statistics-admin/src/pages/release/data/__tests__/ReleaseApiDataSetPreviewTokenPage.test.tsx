@@ -95,7 +95,7 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('link', { name: 'View API data set token log' }),
+      screen.getByRole('link', { name: 'View preview token log' }),
     ).toBeInTheDocument();
 
     expect(

@@ -14,7 +14,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - public api cancel and removal %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    UI tests - Public API - cancel and removal %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
@@ -117,7 +117,7 @@ Verify the contents inside the 'Draft API datasets' table
 
 Remove draft API dataset
     user clicks button in table cell    1    4    Remove draft    xpath://table[@data-testid='draft-api-data-sets']
-    
+
     ${modal}=    user waits until modal is visible     Remove this draft API data set version
     user clicks button     Remove this API data set version
 
