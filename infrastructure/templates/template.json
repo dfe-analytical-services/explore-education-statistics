@@ -1759,7 +1759,7 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "WEBSITE_LOAD_CERTIFICATES": "*",
         "ASPNETCORE_DETAILEDERRORS": "[parameters('detailedErrors')]",
-        "App:HostUrl": "[concat('https://', parameters('adminUri'))]",
+        "App:Url": "[concat('https://', parameters('adminUri'))]",
         "App:EnableSwagger": "[parameters('enableSwagger')]",
         "App:EnableThemeDeletion": "[parameters('enableThemeDeletion')]",
         "Azure:SignalR:ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-signalr-admin-connectionstring'), '2018-02-14').secretUriWithVersion, ')')]",
