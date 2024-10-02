@@ -6,13 +6,13 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters;
 
-public class EnumToEnumValueJsonConverter<TEnum> : JsonConverter<TEnum> where TEnum : Enum
+public class EnumToEnumLabelJsonConverter<TEnum> : JsonConverter<TEnum> where TEnum : Enum
 {
     public override void WriteJson(JsonWriter writer, TEnum? value, JsonSerializer serializer)
     {
         if (value != null)
         {
-            writer.WriteValue(value.GetEnumValue());
+            writer.WriteValue(value.GetEnumLabel());
         }
     }
 
@@ -23,6 +23,6 @@ public class EnumToEnumValueJsonConverter<TEnum> : JsonConverter<TEnum> where TE
         bool hasExistingValue,
         JsonSerializer serializer)
     {
-        return EnumUtil.GetFromEnumValue<TEnum>(reader.Value?.ToString() ?? string.Empty);
+        return EnumUtil.GetFromEnumLabel<TEnum>(reader.Value?.ToString() ?? string.Empty);
     }
 }

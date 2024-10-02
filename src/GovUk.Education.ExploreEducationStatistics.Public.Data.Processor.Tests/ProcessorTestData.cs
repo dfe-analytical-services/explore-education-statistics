@@ -329,6 +329,7 @@ public record ProcessorTestData
                 Column = "sess_unauthorised_percent",
                 Label = "Percentage of unauthorised sessions",
                 DecimalPlaces = 2,
+                Unit = IndicatorUnit.Percent,
                 DataSetVersionId = Guid.Empty
             },
         ],

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters;
 
-public class EnumToEnumValueJsonConverterTests
+public class EnumToEnumLabelJsonConverterTests
 {
     private enum SampleEnum
     {
@@ -16,7 +16,7 @@ public class EnumToEnumValueJsonConverterTests
 
     private record SampleClass
     {
-        [JsonConverter(typeof(EnumToEnumValueJsonConverter<SampleEnum>))]
+        [JsonConverter(typeof(EnumToEnumLabelJsonConverter<SampleEnum>))]
         public SampleEnum SampleField { get; init; }
     }
 
@@ -28,13 +28,13 @@ public class EnumToEnumValueJsonConverterTests
             SampleField = SampleEnum.Sample
         };
 
-        Assert.Equal("{\"SampleField\":\"SampleValue\"}", JsonConvert.SerializeObject(objectToSerialize));
+        Assert.Equal("{\"SampleField\":\"SampleLabel\"}", JsonConvert.SerializeObject(objectToSerialize));
     }
 
     [Fact]
     public void DeserializeObject()
     {
-        const string jsonText = "{\"SampleField\":\"SampleValue\"}";
+        const string jsonText = "{\"SampleField\":\"SampleLabel\"}";
 
         var expected = new SampleClass
         {
