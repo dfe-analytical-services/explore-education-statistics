@@ -1359,7 +1359,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                             .SetPublicId(SqidEncoder.Encode(10))) // Filter Option added
                         .Generate(4)))
                 .ForIndex(1, UnchangedFilterMetaSetter(
-                     filterMeta: oldFilterMeta[1],
+                    filterMeta: oldFilterMeta[1],
                     newOptionLinks: () => DataFixture.DefaultFilterOptionMetaLink()
                         .ForIndex(0, s =>
                             s.SetOption(DataFixture.DefaultFilterOptionMeta())
@@ -2161,6 +2161,285 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             Assert.Empty(locationOptionMetaChanges);
         }
 
+        [Fact]
+        public async Task LocationsAddedAndDeleted_ChangesInsertedIntoDatabaseInCorrectOrder()
+        {
+            var oldLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, s => s.SetLevel(GeographicLevel.School)) // Location deleted
+                .ForIndex(1, s => s.SetLevel(GeographicLevel.LocalAuthority)) // Location deleted
+                .GenerateList(2);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldLocationMeta);
+
+            var newLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, s => s.SetLevel(GeographicLevel.RscRegion)) // Location added
+                .ForIndex(1, s => s.SetLevel(GeographicLevel.Provider)) // Location added
+                .GenerateList(2);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                locationMeta: newLocationMeta);
+
+            await CreateChanges(instanceId);
+
+            var locationMetaChanges = await GetLocationMetaChanges(newVersion);
+
+            // 4 Location changes
+            Assert.Equal(4, locationMetaChanges.Count);
+            Assert.All(locationMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldLocationMetas = originalVersion.LocationMetas
+                .ToDictionary(m => m.Level);
+
+            var newLocationMetas = newVersion.LocationMetas
+                .ToDictionary(m => m.Level);
+
+            // The changes should be inserted into each database table ordered alphabetically by 'Level'.
+            // They should also be ordered such that all additions come last.
+
+            // Therefore, the expected order of Location changes are (as per their Geographic Level):
+            // LocalAuthority deleted
+            // School deleted
+            // Provider added
+            // RscRegion added
+
+            AssertLocationDeleted(
+                expectedLocationMeta: oldLocationMetas[GeographicLevel.LocalAuthority],
+                change: locationMetaChanges[0]);
+            AssertLocationDeleted(
+                expectedLocationMeta: oldLocationMetas[GeographicLevel.School],
+                change: locationMetaChanges[1]);
+            AssertLocationAdded(
+                expectedLocationMeta: newLocationMetas[GeographicLevel.Provider],
+                change: locationMetaChanges[2]);
+            AssertLocationAdded(
+                expectedLocationMeta: newLocationMetas[GeographicLevel.RscRegion],
+                change: locationMetaChanges[3]);
+        }
+
+        [Fact]
+        public async Task LocationsOptionsAddedAndDeletedAndChanged_ChangesInsertedIntoDatabaseInCorrectOrder()
+        {
+            var oldLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, s =>
+                    s.SetLevel(GeographicLevel.EnglishDevolvedArea)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("d"))
+                            .SetPublicId(SqidEncoder.Encode(1))) // Location Option deleted
+                        .ForIndex(1, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("a"))
+                            .SetPublicId(SqidEncoder.Encode(2))) // Location Option deleted
+                        .ForIndex(2, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("b"))
+                            .SetPublicId(SqidEncoder.Encode(3)))
+                        .ForIndex(3, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("k"))
+                            .SetPublicId(SqidEncoder.Encode(4)))
+                        .Generate(4)))
+                .ForIndex(1, s =>
+                    s.SetLevel(GeographicLevel.Country)
+                    .SetOptionLinks(() =>
+                        DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("c"))
+                            .SetPublicId(SqidEncoder.Encode(5))) // Location Option deleted
+                        .ForIndex(1, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("h"))
+                            .SetPublicId(SqidEncoder.Encode(6))) // Location Option deleted
+                        .ForIndex(2, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("f"))
+                            .SetPublicId(SqidEncoder.Encode(7)))
+                        .ForIndex(3, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("i"))
+                            .SetPublicId(SqidEncoder.Encode(8)))
+                        .Generate(4)))
+                .GenerateList(2);
+
+            var (originalVersion, _) = await CreateDataSetInitialVersion(oldLocationMeta);
+
+            var newLocationMeta = DataFixture.DefaultLocationMeta()
+                .ForIndex(0, UnchangedLocationMetaSetter(
+                    locationMeta: oldLocationMeta[0],
+                    newOptionLinks: () => DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationCodedOptionMeta())
+                            .SetPublicId(SqidEncoder.Encode(3))) // Location Option changed
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationCodedOptionMeta())
+                            .SetPublicId(SqidEncoder.Encode(4))) // Location Option changed
+                        .ForIndex(2, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("j"))
+                            .SetPublicId(SqidEncoder.Encode(9))) // Location Option added
+                        .ForIndex(3, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("e"))
+                            .SetPublicId(SqidEncoder.Encode(10))) // Location Option added
+                        .Generate(4)))
+                .ForIndex(1, UnchangedLocationMetaSetter(
+                    locationMeta: oldLocationMeta[1],
+                    newOptionLinks: () => DataFixture.DefaultLocationOptionMetaLink()
+                        .ForIndex(0, s =>
+                            s.SetOption(DataFixture.DefaultLocationCodedOptionMeta())
+                            .SetPublicId(SqidEncoder.Encode(7))) // Location Option changed
+                        .ForIndex(1, s =>
+                            s.SetOption(DataFixture.DefaultLocationCodedOptionMeta())
+                            .SetPublicId(SqidEncoder.Encode(8))) // Location Option changed
+                        .ForIndex(2, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("g"))
+                            .SetPublicId(SqidEncoder.Encode(11))) // Location Option added
+                        .ForIndex(3, s =>
+                            s.SetOption(
+                                DataFixture.DefaultLocationCodedOptionMeta()
+                                .WithLabel("l"))
+                            .SetPublicId(SqidEncoder.Encode(12))) // Location Option added
+                        .Generate(4)))
+                .GenerateList(2);
+
+            var (newVersion, instanceId) = await CreateDataSetNextVersion(
+                originalVersion: originalVersion,
+                locationMeta: newLocationMeta);
+
+            await CreateChanges(instanceId);
+
+            var locationOptionMetaChanges = await GetLocationOptionMetaChanges(newVersion);
+
+            // 12 Location Option changes
+            Assert.Equal(12, locationOptionMetaChanges.Count);
+            Assert.All(locationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+
+            var oldLocationMetas = originalVersion.LocationMetas
+                .ToDictionary(
+                    m => m.Level,
+                    m => m.OptionLinks.ToDictionary(l => l.PublicId));
+
+            var newLocationMetas = newVersion.LocationMetas
+                .ToDictionary(
+                    m => m.Level,
+                    m => m.OptionLinks.ToDictionary(l => l.PublicId));
+
+            // The changes should be inserted into each database table ordered alphabetically by 'Label'.
+            // They should also be ordered such that all additions come last.
+
+            // Therefore, the expected order of Location Option changes are (as per their Public IDs):
+            // Sqid index 2 in Location with Level EnglishDevolvedArea deleted
+            // Sqid index 3 in Location with Level EnglishDevolvedArea changed
+            // Sqid index 5 in Location with Level Country deleted
+            // Sqid index 1 in Location with Level EnglishDevolvedArea deleted
+            // Sqid index 7 in Location with Level Country changed
+            // Sqid index 6 in Location with Level Country deleted
+            // Sqid index 8 in Location with Level Country changed
+            // Sqid index 4 in Location with Level EnglishDevolvedArea changed
+            // Sqid index 10 in Location with Level EnglishDevolvedArea added
+            // Sqid index 11 in Location with Level Country added
+            // Sqid index 9 in Location with Level EnglishDevolvedArea added
+            // Sqid index 12 in Location with Level Country added
+
+            AssertLocationOptionDeleted(
+                expectedOptionLink: oldLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(2)],
+                change: locationOptionMetaChanges[0]);
+            AssertLocationOptionChanged(
+                expectedOldOptionLink: oldLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(3)],
+                expectedNewOptionLink: newLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(3)],
+                change: locationOptionMetaChanges[1]);
+            AssertLocationOptionDeleted(
+                expectedOptionLink: oldLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(5)],
+                change: locationOptionMetaChanges[2]);
+            AssertLocationOptionDeleted(
+                expectedOptionLink: oldLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(1)],
+                change: locationOptionMetaChanges[3]);
+            AssertLocationOptionChanged(
+                expectedOldOptionLink: oldLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(7)],
+                expectedNewOptionLink: newLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(7)],
+                change: locationOptionMetaChanges[4]);
+            AssertLocationOptionDeleted(
+                expectedOptionLink: oldLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(6)],
+                change: locationOptionMetaChanges[5]);
+            AssertLocationOptionChanged(
+                expectedOldOptionLink: oldLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(8)],
+                expectedNewOptionLink: newLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(8)],
+                change: locationOptionMetaChanges[6]);
+            AssertLocationOptionChanged(
+                expectedOldOptionLink: oldLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(4)],
+                expectedNewOptionLink: newLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(4)],
+                change: locationOptionMetaChanges[7]);
+            AssertLocationOptionAdded(
+                expectedOptionLink: newLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(10)],
+                change: locationOptionMetaChanges[8]);
+            AssertLocationOptionAdded(
+                expectedOptionLink: newLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(11)],
+                change: locationOptionMetaChanges[9]);
+            AssertLocationOptionAdded(
+                expectedOptionLink: newLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(9)],
+                change: locationOptionMetaChanges[10]);
+            AssertLocationOptionAdded(
+                expectedOptionLink: newLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(12)],
+                change: locationOptionMetaChanges[11]);
+        }
+
+        private static void AssertLocationDeleted(LocationMeta expectedLocationMeta, LocationMetaChange change)
+        {
+            Assert.Equal(expectedLocationMeta.Id, change.PreviousStateId);
+            Assert.Null(change.CurrentState);
+        }
+
+        private static void AssertLocationAdded(LocationMeta expectedLocationMeta, LocationMetaChange change)
+        {
+            Assert.Null(change.PreviousState);
+            Assert.Equal(expectedLocationMeta.Id, change.CurrentStateId);
+        }
+
+        private static void AssertLocationOptionDeleted(LocationOptionMetaLink expectedOptionLink, LocationOptionMetaChange change)
+        {
+            Assert.Equal(expectedOptionLink.PublicId, change.PreviousState!.PublicId);
+            Assert.Equal(expectedOptionLink.MetaId, change.PreviousState.MetaId);
+            Assert.Equal(expectedOptionLink.OptionId, change.PreviousState.OptionId);
+            Assert.Null(change.CurrentState);
+        }
+
+        private static void AssertLocationOptionAdded(LocationOptionMetaLink expectedOptionLink, LocationOptionMetaChange change)
+        {
+            Assert.Null(change.PreviousState);
+            Assert.Equal(expectedOptionLink.PublicId, change.CurrentState!.PublicId);
+            Assert.Equal(expectedOptionLink.MetaId, change.CurrentState.MetaId);
+            Assert.Equal(expectedOptionLink.OptionId, change.CurrentState.OptionId);
+        }
+
+        private static void AssertLocationOptionChanged(
+            LocationOptionMetaLink expectedOldOptionLink,
+            LocationOptionMetaLink expectedNewOptionLink,
+            LocationOptionMetaChange change)
+        {
+            Assert.Equal(expectedOldOptionLink.PublicId, change.PreviousState!.PublicId);
+            Assert.Equal(expectedOldOptionLink.MetaId, change.PreviousState.MetaId);
+            Assert.Equal(expectedOldOptionLink.OptionId, change.PreviousState.OptionId);
+            Assert.Equal(expectedNewOptionLink.PublicId, change.CurrentState!.PublicId);
+            Assert.Equal(expectedNewOptionLink.MetaId, change.CurrentState.MetaId);
+            Assert.Equal(expectedNewOptionLink.OptionId, change.CurrentState.OptionId);
+        }
+
         private Action<InstanceSetters<LocationMeta>> UnchangedLocationMetaSetter(
             LocationMeta locationMeta,
             Func<IEnumerable<LocationOptionMetaLink>>? newOptionLinks = null)
@@ -2203,6 +2482,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .LocationMetaChanges
                 .AsNoTracking()
                 .Where(c => c.DataSetVersionId == version.Id)
+                .OrderBy(c => c.Id)
                 .ToListAsync();
         }
 
@@ -2212,6 +2492,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .LocationOptionMetaChanges
                 .AsNoTracking()
                 .Where(c => c.DataSetVersionId == version.Id)
+                .OrderBy(c => c.Id)
                 .ToListAsync();
         }
 
