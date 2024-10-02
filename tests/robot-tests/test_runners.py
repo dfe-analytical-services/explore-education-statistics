@@ -14,22 +14,16 @@ def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) 
         "UI Tests",
         "--outputdir",
         f"{test_run_folder}/",
-        "--exclude",
-        "Failing",
-        "--exclude",
-        "UnderConstruction",
-        "--exclude",
-        "VisualTesting",
         "--xunit",
         "xunit",
     ]
 
+    robot_args += _create_include_and_exclude_args(arguments)
+    
     robot_args += ["-v", f"timeout:{os.getenv('TIMEOUT')}", "-v", f"implicit_wait:{os.getenv('IMPLICIT_WAIT')}"]
     
     if arguments.fail_fast:
         robot_args += ["--exitonfailure"]
-    if arguments.tags:
-        robot_args += ["--include", arguments.tags]
     if arguments.print_keywords:
         robot_args += ["--listener", "listeners/KeywordListener.py"]
     if arguments.ci:
@@ -37,14 +31,10 @@ def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) 
         robot_args += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
         robot_args += ["--removekeywords", "name:common.user goes to url"]  # To hide basic auth credentials
     
-    process_includes_and_excludes(robot_args, arguments)
-    
     if arguments.visual:
         robot_args += ["-v", "headless:0"]
     else:
         robot_args += ["-v", "headless:1"]
-    if os.getenv("RELEASE_COMPLETE_WAIT"):
-        robot_args += ["-v", f"release_complete_wait:{os.getenv('RELEASE_COMPLETE_WAIT')}"]
     if arguments.prompt_to_continue:
         robot_args += ["-v", "prompt_to_continue_on_failure:1"]
     if arguments.debug:
@@ -57,23 +47,29 @@ def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) 
     return robot_args
 
 
-def process_includes_and_excludes(robot_args: [], arguments: argparse.Namespace):
+def _create_include_and_exclude_args(arguments: argparse.Namespace) -> []:
+    include_exclude_args = ["--exclude", "Failing"]
+    include_exclude_args += ["--exclude", "UnderConstruction"]
+    include_exclude_args += ["--exclude", "VisualTesting"]
+    if arguments.tags:
+        include_exclude_args += ["--include", arguments.tags]
     if arguments.reseed:
-        robot_args += ["--include", "SeedDataGeneration"]
+        include_exclude_args += ["--include", "SeedDataGeneration"]
     else:
-        robot_args += ["--exclude", "SeedDataGeneration"]
+        include_exclude_args += ["--exclude", "SeedDataGeneration"]
     if arguments.env == "local":
-        robot_args += ["--include", "Local", "--exclude", "NotAgainstLocal"]
+        include_exclude_args += ["--include", "Local", "--exclude", "NotAgainstLocal"]
     if arguments.env == "dev":
-        robot_args += ["--include", "Dev", "--exclude", "NotAgainstDev"]
+        include_exclude_args += ["--include", "Dev", "--exclude", "NotAgainstDev"]
     if arguments.env == "test":
-        robot_args += ["--include", "Test", "--exclude", "NotAgainstTest", "--exclude", "AltersData"]
+        include_exclude_args += ["--include", "Test", "--exclude", "NotAgainstTest", "--exclude", "AltersData"]
     # fmt off
     if arguments.env == "preprod":
-        robot_args += ["--include", "Preprod", "--exclude", "AltersData", "--exclude", "NotAgainstPreProd"]
+        include_exclude_args += ["--include", "Preprod", "--exclude", "AltersData", "--exclude", "NotAgainstPreProd"]
     # fmt on
     if arguments.env == "prod":
-        robot_args += ["--include", "Prod", "--exclude", "AltersData", "--exclude", "NotAgainstProd"]
+        include_exclude_args += ["--include", "Prod", "--exclude", "AltersData", "--exclude", "NotAgainstProd"]
+    return include_exclude_args
 
 
 def execute_tests(arguments: argparse.Namespace, test_run_folder: str, path_to_previous_report_file: str):
@@ -91,7 +87,7 @@ def execute_tests(arguments: argparse.Namespace, test_run_folder: str, path_to_p
 
     elif arguments.interp == "pabot":
 
-        logger.info('Performing test run with Pabot')
+        logger.info(f'Performing test run with Pabot ({arguments.processes} processes)')
         
         if path_to_previous_report_file is not None:
             
