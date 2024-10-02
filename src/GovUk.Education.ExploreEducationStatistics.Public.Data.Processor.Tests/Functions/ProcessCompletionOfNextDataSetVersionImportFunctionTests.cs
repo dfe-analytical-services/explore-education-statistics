@@ -206,42 +206,22 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
             // Filter added
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId is null
-                     && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
+            AssertSingleFilterAdded(filterMetaChanges, newFilterMetas["O7CLF"].FilterMeta);
 
             // Filter added
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId is null
-                     && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
+            AssertSingleFilterAdded(filterMetaChanges, newFilterMetas["7zXob"].FilterMeta);
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["O7CLF"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["O7CLF"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["O7CLF"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["O7CLF"].NewFilterOptionMetas["O7CLF"]);
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["7zXob"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["7zXob"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["7zXob"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["O7CLF"].NewFilterOptionMetas["7zXob"]);
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["pTSoj"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["pTSoj"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["pTSoj"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["7zXob"].NewFilterOptionMetas["pTSoj"]);
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["IzBzg"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["IzBzg"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["IzBzg"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["7zXob"].NewFilterOptionMetas["IzBzg"]);
         }
 
         [Fact]
@@ -309,14 +289,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .ToDictionary(m => m.PublicId);
 
             // Filter deleted
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId == oldFilterMetas["O7CLF"].Id
-                     && c.CurrentStateId is null);
+            AssertSingleFilterDeleted(filterMetaChanges, oldFilterMetas["O7CLF"]);
 
             // Filter deleted
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId == oldFilterMetas["7zXob"].Id
-                     && c.CurrentStateId is null);
+            AssertSingleFilterDeleted(filterMetaChanges, oldFilterMetas["7zXob"]);
         }
 
         [Fact]
@@ -410,42 +386,28 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
             // Filter changed
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId == oldFilterMetas["O7CLF"].FilterMeta.Id
-                     && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
+            AssertSingleFilterChanged(
+                changes: filterMetaChanges, 
+                expectedOldFilterMeta: oldFilterMetas["O7CLF"].FilterMeta,
+                expectedNewFilterMeta: newFilterMetas["O7CLF"].FilterMeta);
 
             // Filter changed
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId == oldFilterMetas["7zXob"].FilterMeta.Id
-                     && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
+            AssertSingleFilterChanged(
+                changes: filterMetaChanges,
+                expectedOldFilterMeta: oldFilterMetas["7zXob"].FilterMeta,
+                expectedNewFilterMeta: newFilterMetas["7zXob"].FilterMeta);
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"]);
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["it6Xr"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["it6Xr"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["it6Xr"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["O7CLF"].NewFilterOptionMetas["it6Xr"]);
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"]);
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"]);
         }
 
         [Fact]
@@ -539,42 +501,28 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
             // Filter changed
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId == oldFilterMetas["O7CLF"].FilterMeta.Id
-                     && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
+            AssertSingleFilterChanged(
+                changes: filterMetaChanges,
+                expectedOldFilterMeta: oldFilterMetas["O7CLF"].FilterMeta,
+                expectedNewFilterMeta: newFilterMetas["O7CLF"].FilterMeta);
 
             // Filter changed
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId == oldFilterMetas["7zXob"].FilterMeta.Id
-                     && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
+            AssertSingleFilterChanged(
+                changes: filterMetaChanges,
+                expectedOldFilterMeta: oldFilterMetas["7zXob"].FilterMeta,
+                expectedNewFilterMeta: newFilterMetas["7zXob"].FilterMeta);
 
             // Filter Option deleted
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleFilterOptionDeleted(filterOptionMetaChanges, oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"]);
 
             // Filter Option deleted
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleFilterOptionDeleted(filterOptionMetaChanges, oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"]);
 
             // Filter Option deleted
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleFilterOptionDeleted(filterOptionMetaChanges, oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"]);
 
             // Filter Option deleted
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleFilterOptionDeleted(filterOptionMetaChanges, oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"]);
         }
 
         [Fact]
@@ -680,50 +628,40 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => new { FilterMeta = m, NewFilterOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
             // Filter changed
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId == oldFilterMetas["O7CLF"].FilterMeta.Id
-                     && c.CurrentStateId == newFilterMetas["O7CLF"].FilterMeta.Id);
+            AssertSingleFilterChanged(
+                changes: filterMetaChanges,
+                expectedOldFilterMeta: oldFilterMetas["O7CLF"].FilterMeta,
+                expectedNewFilterMeta: newFilterMetas["O7CLF"].FilterMeta);
 
             // Filter changed
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId == oldFilterMetas["7zXob"].FilterMeta.Id
-                     && c.CurrentStateId == newFilterMetas["7zXob"].FilterMeta.Id);
+            AssertSingleFilterChanged(
+                changes: filterMetaChanges,
+                expectedOldFilterMeta: oldFilterMetas["7zXob"].FilterMeta,
+                expectedNewFilterMeta: newFilterMetas["7zXob"].FilterMeta);
 
             // Filter Option changed
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"].OptionId
-                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["pTSoj"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["pTSoj"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["pTSoj"].OptionId);
+            AssertSingleFilterOptionChanged(
+                changes: filterOptionMetaChanges,
+                expectedOldOptionLink: oldFilterMetas["O7CLF"].OldFilterOptionMetas["pTSoj"],
+                expectedNewOptionLink: newFilterMetas["O7CLF"].NewFilterOptionMetas["pTSoj"]);
 
             // Filter Option changed
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"].OptionId
-                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"].OptionId);
+            AssertSingleFilterOptionChanged(
+                changes: filterOptionMetaChanges,
+                expectedOldOptionLink: oldFilterMetas["O7CLF"].OldFilterOptionMetas["IzBzg"],
+                expectedNewOptionLink: newFilterMetas["O7CLF"].NewFilterOptionMetas["IzBzg"]);
 
             // Filter Option changed
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"].OptionId
-                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"].OptionId);
+            AssertSingleFilterOptionChanged(
+                changes: filterOptionMetaChanges,
+                expectedOldOptionLink: oldFilterMetas["7zXob"].OldFilterOptionMetas["LxWjE"],
+                expectedNewOptionLink: newFilterMetas["7zXob"].NewFilterOptionMetas["LxWjE"]);
 
             // Filter Option changed
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"].OptionId
-                     && c.CurrentState!.PublicId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"].OptionId);
+            AssertSingleFilterOptionChanged(
+                changes: filterOptionMetaChanges,
+                expectedOldOptionLink: oldFilterMetas["7zXob"].OldFilterOptionMetas["6jrfe"],
+                expectedNewOptionLink: newFilterMetas["7zXob"].NewFilterOptionMetas["6jrfe"]);
         }
 
         [Fact]
@@ -808,14 +746,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .ToDictionary(m => m.PublicId);
 
             // Filter changed
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId == oldFilterMetas["O7CLF"].Id
-                     && c.CurrentStateId == newFilterMetas["O7CLF"].Id);
+            AssertSingleFilterChanged(
+                changes: filterMetaChanges,
+                expectedOldFilterMeta: oldFilterMetas["O7CLF"],
+                expectedNewFilterMeta: newFilterMetas["O7CLF"]);
 
             // Filter changed
-            Assert.Single(filterMetaChanges,
-                c => c.PreviousStateId == oldFilterMetas["7zXob"].Id
-                     && c.CurrentStateId == newFilterMetas["7zXob"].Id);
+            AssertSingleFilterChanged(
+                changes: filterMetaChanges,
+                expectedOldFilterMeta: oldFilterMetas["7zXob"],
+                expectedNewFilterMeta: newFilterMetas["7zXob"]);
         }
 
         [Fact]
@@ -889,32 +829,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["dP0Zw"]["7zXob"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["dP0Zw"]["7zXob"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["7zXob"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["dP0Zw"]["7zXob"]);
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["dP0Zw"]["pTSoj"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["dP0Zw"]["pTSoj"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["pTSoj"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["dP0Zw"]["pTSoj"]);
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"]["IzBzg"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"]["IzBzg"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"]["IzBzg"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["O7CLF"]["IzBzg"]);
 
             // Filter Option added
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"]["it6Xr"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"]["it6Xr"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"]["it6Xr"].OptionId);
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges, newFilterMetas["O7CLF"]["it6Xr"]);
         }
 
         [Fact]
@@ -988,32 +912,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Filter Option deleted
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["O7CLF"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["O7CLF"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["O7CLF"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleFilterOptionDeleted(filterOptionMetaChanges, oldFilterMetas["dP0Zw"]["O7CLF"]);
 
             // Filter Option deleted
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["7zXob"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["7zXob"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["7zXob"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleFilterOptionDeleted(filterOptionMetaChanges, oldFilterMetas["dP0Zw"]["7zXob"]);
 
             // Filter Option deleted
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["IzBzg"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["IzBzg"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["IzBzg"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleFilterOptionDeleted(filterOptionMetaChanges, oldFilterMetas["O7CLF"]["IzBzg"]);
 
             // Filter Option deleted
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["it6Xr"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["it6Xr"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["it6Xr"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleFilterOptionDeleted(filterOptionMetaChanges, oldFilterMetas["O7CLF"]["it6Xr"]);
         }
 
         [Fact]
@@ -1104,40 +1012,28 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Filter Option changed
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["O7CLF"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["O7CLF"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["O7CLF"].OptionId
-                     && c.CurrentState!.PublicId == newFilterMetas["dP0Zw"]["O7CLF"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["dP0Zw"]["O7CLF"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["O7CLF"].OptionId);
+            AssertSingleFilterOptionChanged(
+                changes: filterOptionMetaChanges,
+                expectedOldOptionLink: oldFilterMetas["dP0Zw"]["O7CLF"],
+                expectedNewOptionLink: newFilterMetas["dP0Zw"]["O7CLF"]);
 
             // Filter Option changed
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["dP0Zw"]["7zXob"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["dP0Zw"]["7zXob"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["dP0Zw"]["7zXob"].OptionId
-                     && c.CurrentState!.PublicId == newFilterMetas["dP0Zw"]["7zXob"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["dP0Zw"]["7zXob"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["dP0Zw"]["7zXob"].OptionId);
+            AssertSingleFilterOptionChanged(
+                changes: filterOptionMetaChanges,
+                expectedOldOptionLink: oldFilterMetas["dP0Zw"]["7zXob"],
+                expectedNewOptionLink: newFilterMetas["dP0Zw"]["7zXob"]);
 
             // Filter Option changed
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["IzBzg"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["IzBzg"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["IzBzg"].OptionId
-                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"]["IzBzg"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"]["IzBzg"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"]["IzBzg"].OptionId);
+            AssertSingleFilterOptionChanged(
+                changes: filterOptionMetaChanges,
+                expectedOldOptionLink: oldFilterMetas["O7CLF"]["IzBzg"],
+                expectedNewOptionLink: newFilterMetas["O7CLF"]["IzBzg"]);
 
             // Filter Option changed
-            Assert.Single(filterOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldFilterMetas["O7CLF"]["it6Xr"].PublicId
-                     && c.PreviousState.MetaId == oldFilterMetas["O7CLF"]["it6Xr"].MetaId
-                     && c.PreviousState.OptionId == oldFilterMetas["O7CLF"]["it6Xr"].OptionId
-                     && c.CurrentState!.PublicId == newFilterMetas["O7CLF"]["it6Xr"].PublicId
-                     && c.CurrentState.MetaId == newFilterMetas["O7CLF"]["it6Xr"].MetaId
-                     && c.CurrentState.OptionId == newFilterMetas["O7CLF"]["it6Xr"].OptionId);
+            AssertSingleFilterOptionChanged(
+                changes: filterOptionMetaChanges,
+                expectedOldOptionLink: oldFilterMetas["O7CLF"]["it6Xr"],
+                expectedNewOptionLink: newFilterMetas["O7CLF"]["it6Xr"]);
         }
 
         [Fact]
@@ -1461,15 +1357,39 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 change: filterOptionMetaChanges[11]);
         }
 
+        private static void AssertSingleFilterDeleted(IReadOnlyList<FilterMetaChange> changes, FilterMeta expectedFilterMeta)
+        {
+            Assert.Single(changes,
+                c => c.PreviousStateId == expectedFilterMeta.Id
+                     && c.CurrentStateId is null);
+        }
+
+        private static void AssertSingleFilterAdded(IReadOnlyList<FilterMetaChange> changes, FilterMeta expectedFilterMeta)
+        {
+            Assert.Single(changes,
+                c => c.PreviousStateId is null
+                     && c.CurrentStateId == expectedFilterMeta.Id);
+        }
+
+        private static void AssertSingleFilterChanged(
+            IReadOnlyList<FilterMetaChange> changes,
+            FilterMeta expectedOldFilterMeta,
+            FilterMeta expectedNewFilterMeta)
+        {
+            Assert.Single(changes,
+                c => c.PreviousStateId == expectedOldFilterMeta.Id
+                     && c.CurrentStateId == expectedNewFilterMeta.Id);
+        }
+
         private static void AssertFilterDeleted(FilterMeta expectedFilterMeta, FilterMetaChange change)
         {
             Assert.Equal(expectedFilterMeta.Id, change.PreviousStateId);
-            Assert.Null(change.CurrentState);
+            Assert.Null(change.CurrentStateId);
         }
 
         private static void AssertFilterAdded(FilterMeta expectedFilterMeta, FilterMetaChange change)
         {
-            Assert.Null(change.PreviousState);
+            Assert.Null(change.PreviousStateId);
             Assert.Equal(expectedFilterMeta.Id, change.CurrentStateId);
         }
 
@@ -1480,6 +1400,38 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         {
             Assert.Equal(expectedOldFilterMeta.Id, change.PreviousStateId);
             Assert.Equal(expectedNewFilterMeta.Id, change.CurrentStateId);
+        }
+
+        private static void AssertSingleFilterOptionDeleted(IReadOnlyList<FilterOptionMetaChange> changes, FilterOptionMetaLink expectedOptionLink)
+        {
+            Assert.Single(changes,
+                c => c.PreviousState!.PublicId == expectedOptionLink.PublicId
+                     && c.PreviousState.MetaId == expectedOptionLink.MetaId
+                     && c.PreviousState.OptionId == expectedOptionLink.OptionId
+                     && c.CurrentState is null);
+        }
+
+        private static void AssertSingleFilterOptionAdded(IReadOnlyList<FilterOptionMetaChange> changes, FilterOptionMetaLink expectedOptionLink)
+        {
+            Assert.Single(changes,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == expectedOptionLink.PublicId
+                     && c.CurrentState.MetaId == expectedOptionLink.MetaId
+                     && c.CurrentState.OptionId == expectedOptionLink.OptionId);
+        }
+
+        private static void AssertSingleFilterOptionChanged(
+            IReadOnlyList<FilterOptionMetaChange> changes,
+            FilterOptionMetaLink expectedOldOptionLink,
+            FilterOptionMetaLink expectedNewOptionLink)
+        {
+            Assert.Single(changes,
+                c => c.PreviousState!.PublicId == expectedOldOptionLink.PublicId
+                     && c.PreviousState.MetaId == expectedOldOptionLink.MetaId
+                     && c.PreviousState.OptionId == expectedOldOptionLink.OptionId
+                     && c.CurrentState!.PublicId == expectedNewOptionLink.PublicId
+                     && c.CurrentState.MetaId == expectedNewOptionLink.MetaId
+                     && c.CurrentState.OptionId == expectedNewOptionLink.OptionId);
         }
 
         private static void AssertFilterOptionDeleted(FilterOptionMetaLink expectedOptionLink, FilterOptionMetaChange change)
@@ -1669,42 +1621,22 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => new { LocationMeta = m, NewLocationOptionMetas = m.OptionLinks.ToDictionary(l => l.PublicId) });
 
             // Location added
-            Assert.Single(locationMetaChanges,
-                c => c.PreviousStateId is null
-                     && c.CurrentStateId == newLocationMetas[GeographicLevel.School].LocationMeta.Id);
+            AssertSingleLocationAdded(locationMetaChanges, newLocationMetas[GeographicLevel.School].LocationMeta);
 
             // Location added
-            Assert.Single(locationMetaChanges,
-                c => c.PreviousStateId is null
-                     && c.CurrentStateId == newLocationMetas[GeographicLevel.RscRegion].LocationMeta.Id);
+            AssertSingleLocationAdded(locationMetaChanges, newLocationMetas[GeographicLevel.RscRegion].LocationMeta);
 
             // Location Option added
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["O7CLF"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["O7CLF"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["O7CLF"].OptionId);
+            AssertSingleLocationOptionAdded(locationOptionMetaChanges, newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["O7CLF"]);
 
             // Location Option added
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["7zXob"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["7zXob"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["7zXob"].OptionId);
+            AssertSingleLocationOptionAdded(locationOptionMetaChanges, newLocationMetas[GeographicLevel.School].NewLocationOptionMetas["7zXob"]);
 
             // Location Option added
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["pTSoj"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["pTSoj"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["pTSoj"].OptionId);
+            AssertSingleLocationOptionAdded(locationOptionMetaChanges, newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["pTSoj"]);
 
             // Location Option added
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["IzBzg"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["IzBzg"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["IzBzg"].OptionId);
+            AssertSingleLocationOptionAdded(locationOptionMetaChanges, newLocationMetas[GeographicLevel.RscRegion].NewLocationOptionMetas["IzBzg"]);
         }
 
         [Fact]
@@ -1772,14 +1704,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .ToDictionary(m => m.Level);
 
             // Location deleted
-            Assert.Single(locationMetaChanges,
-                c => c.PreviousStateId == oldLocationMetas[GeographicLevel.School].Id
-                     && c.CurrentStateId is null);
+            AssertSingleLocationDeleted(locationMetaChanges, oldLocationMetas[GeographicLevel.School]);
 
             // Location deleted
-            Assert.Single(locationMetaChanges,
-                c => c.PreviousStateId == oldLocationMetas[GeographicLevel.RscRegion].Id
-                     && c.CurrentStateId is null);
+            AssertSingleLocationDeleted(locationMetaChanges, oldLocationMetas[GeographicLevel.RscRegion]);
         }
 
         [Fact]
@@ -1853,32 +1781,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Location Option added
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId);
+            AssertSingleLocationOptionAdded(locationOptionMetaChanges, newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"]);
 
             // Location Option added
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.LocalAuthority]["pTSoj"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.LocalAuthority]["pTSoj"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["pTSoj"].OptionId);
+            AssertSingleLocationOptionAdded(locationOptionMetaChanges, newLocationMetas[GeographicLevel.LocalAuthority]["pTSoj"]);
 
             // Location Option added
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School]["IzBzg"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School]["IzBzg"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School]["IzBzg"].OptionId);
+            AssertSingleLocationOptionAdded(locationOptionMetaChanges, newLocationMetas[GeographicLevel.School]["IzBzg"]);
 
             // Location Option added
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState is null
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School]["it6Xr"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School]["it6Xr"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School]["it6Xr"].OptionId);
+            AssertSingleLocationOptionAdded(locationOptionMetaChanges, newLocationMetas[GeographicLevel.School]["it6Xr"]);
         }
 
         [Fact]
@@ -1952,32 +1864,16 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Location Option deleted
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].PublicId
-                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].MetaId
-                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleLocationOptionDeleted(locationOptionMetaChanges, oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"]);
 
             // Location Option deleted
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].PublicId
-                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].MetaId
-                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleLocationOptionDeleted(locationOptionMetaChanges, oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"]);
 
             // Location Option deleted
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["IzBzg"].PublicId
-                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["IzBzg"].MetaId
-                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["IzBzg"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleLocationOptionDeleted(locationOptionMetaChanges, oldLocationMetas[GeographicLevel.School]["IzBzg"]);
 
             // Location Option deleted
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["it6Xr"].PublicId
-                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["it6Xr"].MetaId
-                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["it6Xr"].OptionId
-                     && c.CurrentState is null);
+            AssertSingleLocationOptionDeleted(locationOptionMetaChanges, oldLocationMetas[GeographicLevel.School]["it6Xr"]);
         }
 
         [Fact]
@@ -2068,40 +1964,28 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // Location Option changed
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].PublicId
-                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].MetaId
-                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].OptionId
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"].OptionId);
+            AssertSingleLocationOptionChanged(
+                changes: locationOptionMetaChanges,
+                expectedOldOptionLink: oldLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"],
+                expectedNewOptionLink: newLocationMetas[GeographicLevel.LocalAuthority]["O7CLF"]);
 
             // Location Option changed
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].PublicId
-                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].MetaId
-                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"].OptionId);
+            AssertSingleLocationOptionChanged(
+                changes: locationOptionMetaChanges,
+                expectedOldOptionLink: oldLocationMetas[GeographicLevel.LocalAuthority]["7zXob"],
+                expectedNewOptionLink: newLocationMetas[GeographicLevel.LocalAuthority]["7zXob"]);
 
             // Location Option changed
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["IzBzg"].PublicId
-                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["IzBzg"].MetaId
-                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["IzBzg"].OptionId
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School]["IzBzg"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School]["IzBzg"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School]["IzBzg"].OptionId);
+            AssertSingleLocationOptionChanged(
+                changes: locationOptionMetaChanges,
+                expectedOldOptionLink: oldLocationMetas[GeographicLevel.School]["IzBzg"],
+                expectedNewOptionLink: newLocationMetas[GeographicLevel.School]["IzBzg"]);
 
             // Location Option changed
-            Assert.Single(locationOptionMetaChanges,
-                c => c.PreviousState!.PublicId == oldLocationMetas[GeographicLevel.School]["it6Xr"].PublicId
-                     && c.PreviousState.MetaId == oldLocationMetas[GeographicLevel.School]["it6Xr"].MetaId
-                     && c.PreviousState.OptionId == oldLocationMetas[GeographicLevel.School]["it6Xr"].OptionId
-                     && c.CurrentState!.PublicId == newLocationMetas[GeographicLevel.School]["it6Xr"].PublicId
-                     && c.CurrentState.MetaId == newLocationMetas[GeographicLevel.School]["it6Xr"].MetaId
-                     && c.CurrentState.OptionId == newLocationMetas[GeographicLevel.School]["it6Xr"].OptionId);
+            AssertSingleLocationOptionChanged(
+                changes: locationOptionMetaChanges,
+                expectedOldOptionLink: oldLocationMetas[GeographicLevel.School]["it6Xr"],
+                expectedNewOptionLink: newLocationMetas[GeographicLevel.School]["it6Xr"]);
         }
 
         [Fact]
@@ -2399,16 +2283,72 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 change: locationOptionMetaChanges[11]);
         }
 
+        private static void AssertSingleLocationDeleted(IReadOnlyList<LocationMetaChange> changes, LocationMeta expectedLocationMeta)
+        {
+            Assert.Single(changes,
+                c => c.PreviousStateId == expectedLocationMeta.Id
+                     && c.CurrentStateId is null);
+        }
+
+        private static void AssertSingleLocationAdded(IReadOnlyList<LocationMetaChange> changes, LocationMeta expectedLocationMeta)
+        {
+            Assert.Single(changes,
+                c => c.PreviousStateId is null
+                     && c.CurrentStateId == expectedLocationMeta.Id);
+        }
+
+        private static void AssertSingleLocationChanged(
+            IReadOnlyList<LocationMetaChange> changes,
+            LocationMeta expectedOldLocationMeta,
+            LocationMeta expectedNewLocationMeta)
+        {
+            Assert.Single(changes,
+                c => c.PreviousStateId == expectedOldLocationMeta.Id
+                     && c.CurrentStateId == expectedNewLocationMeta.Id);
+        }
+
         private static void AssertLocationDeleted(LocationMeta expectedLocationMeta, LocationMetaChange change)
         {
             Assert.Equal(expectedLocationMeta.Id, change.PreviousStateId);
-            Assert.Null(change.CurrentState);
+            Assert.Null(change.CurrentStateId);
         }
 
         private static void AssertLocationAdded(LocationMeta expectedLocationMeta, LocationMetaChange change)
         {
-            Assert.Null(change.PreviousState);
+            Assert.Null(change.PreviousStateId);
             Assert.Equal(expectedLocationMeta.Id, change.CurrentStateId);
+        }
+
+        private static void AssertSingleLocationOptionDeleted(IReadOnlyList<LocationOptionMetaChange> changes, LocationOptionMetaLink expectedOptionLink)
+        {
+            Assert.Single(changes,
+                c => c.PreviousState!.PublicId == expectedOptionLink.PublicId
+                     && c.PreviousState.MetaId == expectedOptionLink.MetaId
+                     && c.PreviousState.OptionId == expectedOptionLink.OptionId
+                     && c.CurrentState is null);
+        }
+
+        private static void AssertSingleLocationOptionAdded(IReadOnlyList<LocationOptionMetaChange> changes, LocationOptionMetaLink expectedOptionLink)
+        {
+            Assert.Single(changes,
+                c => c.PreviousState is null
+                     && c.CurrentState!.PublicId == expectedOptionLink.PublicId
+                     && c.CurrentState.MetaId == expectedOptionLink.MetaId
+                     && c.CurrentState.OptionId == expectedOptionLink.OptionId);
+        }
+
+        private static void AssertSingleLocationOptionChanged(
+            IReadOnlyList<LocationOptionMetaChange> changes,
+            LocationOptionMetaLink expectedOldOptionLink,
+            LocationOptionMetaLink expectedNewOptionLink)
+        {
+            Assert.Single(changes,
+                c => c.PreviousState!.PublicId == expectedOldOptionLink.PublicId
+                     && c.PreviousState.MetaId == expectedOldOptionLink.MetaId
+                     && c.PreviousState.OptionId == expectedOldOptionLink.OptionId
+                     && c.CurrentState!.PublicId == expectedNewOptionLink.PublicId
+                     && c.CurrentState.MetaId == expectedNewOptionLink.MetaId
+                     && c.CurrentState.OptionId == expectedNewOptionLink.OptionId);
         }
 
         private static void AssertLocationOptionDeleted(LocationOptionMetaLink expectedOptionLink, LocationOptionMetaChange change)
@@ -2720,34 +2660,28 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .ToDictionary(m => m.PublicId);
 
             // Indicator deleted
-            Assert.Single(changes,
-                c => c.PreviousStateId == oldIndicatorMetas["O7CLF"].Id
-                     && c.CurrentStateId is null);
+            AssertSingleIndicatorDeleted(changes, oldIndicatorMetas["O7CLF"]);
 
             // Indicator deleted
-            Assert.Single(changes,
-                c => c.PreviousStateId == oldIndicatorMetas["7zXob"].Id
-                     && c.CurrentStateId is null);
+            AssertSingleIndicatorDeleted(changes, oldIndicatorMetas["7zXob"]);
 
             // Indicator changed
-            Assert.Single(changes,
-                c => c.PreviousStateId == oldIndicatorMetas["pTSoj"].Id
-                     && c.CurrentStateId == newIndicatorMetas["pTSoj"].Id);
+            AssertSingleIndicatorChanged(
+                changes: changes,
+                expectedOldIndicatorMeta: oldIndicatorMetas["pTSoj"],
+                expectedNewIndicatorMeta: newIndicatorMetas["pTSoj"]);
 
             // Indicator changed
-            Assert.Single(changes,
-                c => c.PreviousStateId == oldIndicatorMetas["IzBzg"].Id
-                     && c.CurrentStateId == newIndicatorMetas["IzBzg"].Id);
+            AssertSingleIndicatorChanged(
+                changes: changes,
+                expectedOldIndicatorMeta: oldIndicatorMetas["IzBzg"],
+                expectedNewIndicatorMeta: newIndicatorMetas["IzBzg"]);
 
             // Indicator added
-            Assert.Single(changes,
-                c => c.PreviousStateId is null
-                     && c.CurrentStateId == newIndicatorMetas["it6Xr"].Id);
+            AssertSingleIndicatorAdded(changes, newIndicatorMetas["it6Xr"]);
 
             // Indicator added
-            Assert.Single(changes,
-                c => c.PreviousStateId is null
-                     && c.CurrentStateId == newIndicatorMetas["LxWjE"].Id);
+            AssertSingleIndicatorAdded(changes, newIndicatorMetas["LxWjE"]);
         }
 
         [Fact]
@@ -2781,14 +2715,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .ToDictionary(m => m.PublicId);
 
             // Indicator added
-            Assert.Single(changes,
-                c => c.PreviousStateId is null
-                     && c.CurrentStateId == newIndicatorMetas["O7CLF"].Id);
+            AssertSingleIndicatorAdded(changes, newIndicatorMetas["O7CLF"]);
 
             // Indicator added
-            Assert.Single(changes,
-                c => c.PreviousStateId is null
-                     && c.CurrentStateId == newIndicatorMetas["7zXob"].Id);
+            AssertSingleIndicatorAdded(changes, newIndicatorMetas["7zXob"]);
         }
 
         [Fact]
@@ -2822,14 +2752,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .ToDictionary(m => m.PublicId);
 
             // Indicator deleted
-            Assert.Single(changes,
-                c => c.PreviousStateId == oldIndicatorMetas["O7CLF"].Id
-                     && c.CurrentStateId is null);
+            AssertSingleIndicatorDeleted(changes, oldIndicatorMetas["O7CLF"]);
 
             // Indicator deleted
-            Assert.Single(changes,
-                c => c.PreviousStateId == oldIndicatorMetas["7zXob"].Id
-                     && c.CurrentStateId is null);
+            AssertSingleIndicatorDeleted(changes, oldIndicatorMetas["7zXob"]);
         }
 
         [Fact]
@@ -2941,15 +2867,39 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 change: indicatorMetaChanges[5]);
         }
 
+        private static void AssertSingleIndicatorDeleted(IReadOnlyList<IndicatorMetaChange> changes, IndicatorMeta expectedIndicatorMeta)
+        {
+            Assert.Single(changes,
+                c => c.PreviousStateId == expectedIndicatorMeta.Id
+                     && c.CurrentStateId is null);
+        }
+
+        private static void AssertSingleIndicatorAdded(IReadOnlyList<IndicatorMetaChange> changes, IndicatorMeta expectedIndicatorMeta)
+        {
+            Assert.Single(changes,
+                c => c.PreviousStateId is null
+                     && c.CurrentStateId == expectedIndicatorMeta.Id);
+        }
+
+        private static void AssertSingleIndicatorChanged(
+            IReadOnlyList<IndicatorMetaChange> changes,
+            IndicatorMeta expectedOldIndicatorMeta,
+            IndicatorMeta expectedNewIndicatorMeta)
+        {
+            Assert.Single(changes,
+                c => c.PreviousStateId == expectedOldIndicatorMeta.Id
+                     && c.CurrentStateId == expectedNewIndicatorMeta.Id);
+        }
+
         private static void AssertIndicatorDeleted(IndicatorMeta expectedIndicatorMeta, IndicatorMetaChange change)
         {
             Assert.Equal(expectedIndicatorMeta.Id, change.PreviousStateId);
-            Assert.Null(change.CurrentState);
+            Assert.Null(change.CurrentStateId);
         }
 
         private static void AssertIndicatorAdded(IndicatorMeta expectedIndicatorMeta, IndicatorMetaChange change)
         {
-            Assert.Null(change.PreviousState);
+            Assert.Null(change.PreviousStateId);
             Assert.Equal(expectedIndicatorMeta.Id, change.CurrentStateId);
         }
 
