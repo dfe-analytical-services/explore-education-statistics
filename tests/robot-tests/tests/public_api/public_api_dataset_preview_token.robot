@@ -254,9 +254,7 @@ User verifies the relevant fields on the 'View Log Details' page for the Active 
 
     ${current_time_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    1    Europe/London
 
-    ${time_with_leading_zero}=    format uk to local datetime    ${current_time_tomorrow}    %I:%M %p
-    
-    ${time_end}=    format time without leading zero     ${time_with_leading_zero}
+    ${time_end}=    format uk to local datetime    ${current_time_tomorrow}    %-I:%M %p
 
     user checks page contains    
     ...     Token expiry time: tomorrow at ${time_end}
