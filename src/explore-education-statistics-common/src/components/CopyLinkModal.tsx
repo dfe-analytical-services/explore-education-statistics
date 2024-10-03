@@ -2,24 +2,16 @@ import Button from '@common/components/Button';
 import LinkIcon from '@common/components/LinkIcon';
 import Modal from '@common/components/Modal';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import CopyTextButton, {
-  CopyTextButtonProps,
-} from '@common/components/CopyTextButton';
-import { OmitStrict } from '@common/types';
+import CopyTextButton from '@common/components/CopyTextButton';
 import React from 'react';
+import styles from './CopyLinkModal.module.scss';
 
-interface Props extends OmitStrict<CopyTextButtonProps, 'text'> {
+interface Props {
   buttonClassName?: string;
   url: string;
 }
 
-export default function CopyLinkModal({
-  buttonClassName,
-  className,
-  confirmMessage = 'Link copied to the clipboard.',
-  inlineButton = true,
-  url,
-}: Props) {
+export default function CopyLinkModal({ buttonClassName, url }: Props) {
   return (
     <Modal
       showClose
@@ -32,9 +24,12 @@ export default function CopyLinkModal({
       }
     >
       <CopyTextButton
-        className={className}
-        confirmMessage={confirmMessage}
-        inlineButton={inlineButton}
+        buttonText="Copy link"
+        className={styles.copyLink}
+        confirmText="Link copied"
+        id="copy-link-url"
+        label="URL"
+        labelHidden={false}
         text={url}
       />
     </Modal>

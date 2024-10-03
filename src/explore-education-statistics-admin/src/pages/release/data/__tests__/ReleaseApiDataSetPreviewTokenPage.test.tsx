@@ -78,11 +78,11 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
       minute: '2-digit',
     })}`;
 
-    expect(screen.getByText('Token expiry time:')).toBeInTheDocument();
+    expect(screen.getByText('The token expires:')).toBeInTheDocument();
     expect(screen.getByText(expiry)).toBeInTheDocument();
 
     expect(
-      screen.getByRole('heading', { name: 'Using this token' }),
+      screen.getByRole('heading', { name: 'Using the preview token' }),
     ).toBeInTheDocument();
 
     expect(screen.getByLabelText('Preview token')).toHaveValue('token-id');
@@ -91,11 +91,11 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Revoke this token' }),
+      screen.getByRole('button', { name: 'Revoke preview token' }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('link', { name: 'View API data set token log' }),
+      screen.getByRole('link', { name: 'View preview token log' }),
     ).toBeInTheDocument();
 
     expect(
@@ -143,10 +143,14 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
       await screen.findByText('API data set preview token'),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Revoke this token' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Revoke preview token' }),
+    );
 
     expect(
-      await screen.findByText('Are you sure you want to revoke this token?'),
+      await screen.findByText(
+        'Are you sure you want to revoke the preview token?',
+      ),
     ).toBeInTheDocument();
 
     expect(previewTokenService.revokePreviewToken).not.toHaveBeenCalled();

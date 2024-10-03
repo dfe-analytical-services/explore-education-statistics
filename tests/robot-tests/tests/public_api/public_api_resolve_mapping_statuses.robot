@@ -14,7 +14,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - public api resolve mapping statuses %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    UI tests - Public API - resolve mapping statuses %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
@@ -148,7 +148,7 @@ Validate the row headings and its contents in the 'Regions' section
 
     user checks table column heading contains    1    3    Type
     user checks table column heading contains   1    4    Actions
-    
+
     user checks table cell contains    1    1    Yorkshire and The Humber
     user checks table cell contains    1    2    Unmapped
     user checks table cell contains    1    3    N/A
@@ -241,7 +241,7 @@ Confirm finalization of this API data set version
 User navigates to 'changelog and guidance notes' page and update relevant details in it
     user clicks link by index    View changelog and guidance notes    1
     user waits until page contains     API data set changelog
-    
+
     user enters text into element    css:textarea[id="guidanceNotesForm-notes"]    public guidance notes
     user clicks button    Save public guidance notes
 

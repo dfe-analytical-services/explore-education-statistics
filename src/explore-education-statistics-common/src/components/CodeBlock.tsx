@@ -1,20 +1,30 @@
 import styles from '@common/components/CodeBlock.module.scss';
+import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import useToggle from '@common/hooks/useToggle';
 import React, { useEffect } from 'react';
+import bashLang from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash';
 import pythonLang from 'react-syntax-highlighter/dist/cjs/languages/hljs/python';
 import rLang from 'react-syntax-highlighter/dist/cjs/languages/hljs/r';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/light';
 import Button from './Button';
 
+SyntaxHighlighter.registerLanguage('bash', bashLang);
 SyntaxHighlighter.registerLanguage('r', rLang);
 SyntaxHighlighter.registerLanguage('python', pythonLang);
 
 export interface CodeBlockProps {
   children: string;
-  language: 'python' | 'r';
+  copyConfirmText?: string;
+  copyText?: string;
+  language: 'bash' | 'python' | 'r';
 }
 
-export default function CodeBlock({ children, language }: CodeBlockProps) {
+export default function CodeBlock({
+  children,
+  copyConfirmText = 'Code copied',
+  copyText = 'Copy code',
+  language,
+}: CodeBlockProps) {
   const [copied, toggleCopied] = useToggle(false);
 
   useEffect(() => {
@@ -36,8 +46,10 @@ export default function CodeBlock({ children, language }: CodeBlockProps) {
           toggleCopied.on();
         }}
       >
-        <span aria-live="polite">{copied ? 'Code copied' : 'Copy code'}</span>
+        {copied ? copyConfirmText : copyText}
       </Button>
+
+      <ScreenReaderMessage message={copied ? copyConfirmText : ''} />
 
       <SyntaxHighlighter
         className={styles.pre}
