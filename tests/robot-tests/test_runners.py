@@ -43,7 +43,6 @@ def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) 
     # We want to add arguments on the first rerun attempt, but on subsequent attempts, we just want
     # to change rerunfailedsuites xml file we use
     robot_args += ["--output", "output.xml"]
-
     return robot_args
 
 
@@ -75,32 +74,29 @@ def _create_include_and_exclude_args(arguments: argparse.Namespace) -> []:
 def execute_tests(arguments: argparse.Namespace, test_run_folder: str, path_to_previous_report_file: str):
     
     robot_args = create_robot_arguments(arguments, test_run_folder)
-    
-    if arguments.interp == "robot":
 
+    if arguments.interp == "robot":
         if path_to_previous_report_file is not None:
             robot_args += ["--rerunfailedsuites", path_to_previous_report_file]
-        
-        robot_args += [arguments.tests]
 
+        robot_args += [arguments.tests]
+        
+        logger.info(f'Performing test run with Robot')
         robot.run_cli(robot_args, exit=False)
 
     elif arguments.interp == "pabot":
 
-        logger.info(f'Performing test run with Pabot ({arguments.processes} processes)')
-        
+        robot_args = ['--processes', arguments.processes] + robot_args
+
         if path_to_previous_report_file is not None:
-            
-            logger.info(f'Re-running failed suites from {path_to_previous_report_file}')
         
             path_to_filtered_report_file = '_filtered.xml'.join(path_to_previous_report_file.rsplit('.xml', 1))
-
             reports.filter_out_passing_suites_from_report_file(path_to_previous_report_file, path_to_filtered_report_file)
             
             logger.info(f'Generated filtered report file containing only failing suites at {path_to_filtered_report_file}')
-
             robot_args = ['--suitesfrom', path_to_filtered_report_file] + robot_args
 
         robot_args += [arguments.tests]
 
+        logger.info(f'Performing test run with Pabot ({arguments.processes} processes)')
         pabot.main_program(robot_args)
