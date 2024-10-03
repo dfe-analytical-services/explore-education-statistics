@@ -27,7 +27,11 @@ def create_argument_parser() -> argparse.ArgumentParser:
         help="interpreter to use to run the tests",
     )
     parser.add_argument(
-        "--processes", dest="processes", help="how many processes should be used when using the pabot interpreter"
+        "--processes",
+        dest="processes",
+        type=int,
+        default=4,
+        help="how many processes should be used when using the pabot interpreter"
     )
     parser.add_argument(
         "-e",
@@ -78,7 +82,12 @@ def create_argument_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="rerun failed test suites and merge results into original run results",
     )
-    parser.add_argument("--rerun-attempts", dest="rerun_attempts", type=int, default=0, help="Number of rerun attempts")
+    parser.add_argument(
+        "--rerun-attempts",
+        dest="rerun_attempts",
+        type=int,
+        default=0,
+        help="Number of rerun attempts")
     parser.add_argument(
         "--print-keywords",
         dest="print_keywords",
