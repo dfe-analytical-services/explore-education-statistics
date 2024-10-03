@@ -1,5 +1,6 @@
 *** Settings ***
 Library             ../libs/admin_api.py
+Library             ../libs/debug.py
 Resource            ../libs/admin-common.robot
 Resource            ../libs/admin/manage-content-common.robot
 Resource            ../libs/public-api-common.robot
@@ -25,6 +26,11 @@ ${SUBJECT_NAME_2}=      UI test subject 2
 
 *** Test Cases ***
 Create publication and release
+
+    ${timezone}=    get browser timezone
+    ${offset}=    get browser utc offset
+    Log To Console    Browser timezone "${timezone}" with UTC offset ${offset}
+
     user selects dashboard theme and topic if possible
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
