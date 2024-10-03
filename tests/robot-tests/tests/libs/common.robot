@@ -966,7 +966,7 @@ user checks list item is visually hidden
     user checks element is visually hidden    ${item}
 
 user checks list contains exact items in order
-    [Arguments]    ${locator}    ${expected_items}    ${parent}=css:body
+    [Arguments]    ${locator}    @{expected_items}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
     ${actual}=    get child elements    ${list}    css:li
