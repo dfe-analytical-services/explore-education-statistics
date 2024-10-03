@@ -6,12 +6,14 @@
 Run 'python run_tests.py -h' to see argument options
 """
 
+import argparse
 import datetime
 import glob
 import os
 import random
 import shutil
 import string
+import sys
 import time
 from pathlib import Path
 from zipfile import ZipFile
@@ -35,7 +37,7 @@ unzipped_seed_data_folderpath = "tests/files/.unzipped-seed-data-files"
 logger = get_logger(__name__)
 
 
-def setup_python_path():
+def _setup_python_path():
     # This is super awkward but we have to explicitly
     # add the current directory to PYTHONPATH otherwise
     # the subprocesses started by pabot will not be able
@@ -47,7 +49,7 @@ def setup_python_path():
         os.environ["PYTHONPATH"] = str(current_dir)
 
 
-def unzip_data_files():
+def _unzip_data_files():
     if not os.path.exists(seed_data_files_filepath):
         logger.warn(f"Unable to find seed data files bundle at {seed_data_files_filepath}")
     else:
@@ -55,23 +57,18 @@ def unzip_data_files():
             zipfile.extractall(unzipped_seed_data_folderpath)
 
 
-def install_chromedriver(chromedriver_version: str):
+def _install_chromedriver(chromedriver_version: str):
     # Install chromedriver and add it to PATH
     get_webdriver(chromedriver_version)
 
 
-def create_run_identifier():
+def _create_run_identifier():
     # Add randomness to prevent multiple simultaneous run_tests.py generating the same run_identifier value
     random_str = "".join([random.choice(string.ascii_lowercase + string.digits) for n in range(6)])
     return datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S-" + random_str)
 
 
-def clear_files_before_test_run(rerunning_failures: bool):
-    # Remove any existing test results if running from scratch. Leave in place if re-running failures
-    # as we'll need the old results to merge in with the rerun results.
-    if not rerunning_failures and Path(main_results_folder).exists():
-        shutil.rmtree(main_results_folder)
-
+def _clear_files_before_next_test_run_attempt(rerunning_failures: bool):
     # Remove any prior failing suites so the new test run is not marking any running test suites as
     # failed already.
     if Path(failing_suites_filename).exists():
@@ -83,14 +80,36 @@ def clear_files_before_test_run(rerunning_failures: bool):
         os.remove(pabot_suite_names_filename)
 
 
+def _setup_main_results_folder_for_first_run(args: argparse.Namespace):
+    # If rerunning failing tests from a previous execution of run_tests.py, remove any existing "run-x" test run folders
+    # and copy the main results folder contents into a new "run-0" folder to represent the previous run. Start the first
+    # run of this rerun as "run-1".
+    if args.rerun_failed_suites:
+        previous_report_file_path = f"{main_results_folder}{os.sep}output.xml"
+        if not os.path.exists(previous_report_file_path):
+            logger.error(f'No previous report file found at {previous_report_file_path} - unable to rerun failed suites')
+            sys.exit(1)
+        logger.info(f"Clearing old run folders prior to rerunning failed tests")
+        for old_run_folders in glob.glob(rf"{main_results_folder}{os.sep}run-*"):
+            shutil.rmtree(old_run_folders)
+        test_run_1_folder = f'{main_results_folder}{os.sep}run-0'    
+        logger.info(f"Copying previous test results into new \"{test_run_1_folder}\" folder")
+        shutil.copytree(main_results_folder, test_run_1_folder)    
+    else:
+        # Remove any existing test results if running from scratch.
+        if Path(main_results_folder).exists():
+            shutil.rmtree(main_results_folder)
+            os.mkdir(main_results_folder)        
+
+
 def run():
 
-    robot_tests_folder = Path(__file__).absolute().parent
-    
     args = args_and_variables.initialise()
 
+    _setup_main_results_folder_for_first_run(args)
+
     # Unzip any data files that may be used in tests.
-    unzip_data_files()
+    _unzip_data_files()
 
     # Upload test data files to storage if running locally.
     if args.env == "local":
@@ -98,24 +117,19 @@ def run():
         files_generator.create_public_release_files()
         files_generator.create_private_release_files()
 
-    install_chromedriver(args.chromedriver_version)
+    _install_chromedriver(args.chromedriver_version)
 
-    test_run_index = -1
-    run_identifier_initial_value = create_run_identifier()
+    run_identifier_initial_value = _create_run_identifier()
+    
+    max_run_attempts = args.rerun_attempts + 1
+    test_run_index = 0
 
-    logger.info(f"Running Robot tests with {args.rerun_attempts} rerun attempts for any failing suites")
+    logger.info(f"Running Robot tests with {max_run_attempts} maximum run attempts")
 
-    if args.rerun_failed_suites: 
-        logger.info(f"Clearing old run folders prior to rerunning failed tests")
-        for old_run_folders in glob.glob(rf"{main_results_folder}{os.sep}run-*"):
-            shutil.rmtree(old_run_folders)
-            
     try:
         # Run tests
-        while args.rerun_attempts is None or test_run_index < args.rerun_attempts:
+        while test_run_index < max_run_attempts:
             try:
-                test_run_index += 1
-
                 # Ensure all SeleniumLibrary elements and keywords are updated to use a brand new
                 # Selenium instance for every test (re)run.
                 if test_run_index > 0:
@@ -124,7 +138,7 @@ def run():
                 rerunning_failed_suites = args.rerun_failed_suites or test_run_index > 0
                 
                 # Perform any cleanup before the test run.
-                clear_files_before_test_run(rerunning_failed_suites)
+                _clear_files_before_next_test_run_attempt(rerunning_failed_suites)
 
                 # Create a folder to contain this test run attempt's outputs and reports.
                 test_run_results_folder = f"{main_results_folder}{os.sep}run-{test_run_index + 1}"
@@ -141,21 +155,16 @@ def run():
                 if args_and_variables.includes_data_changing_tests(args):
                     admin_api.create_test_topic(run_identifier)
 
-                # If re-running failed suites, get the appropriate previous report file from which to determine which suites failed.
-                # If this is run 2 or more when using the `--rerun-attempts n` option, the path to the previous report will be in the
-                # previous run attempt's folder.
-                # If this is a rerun using the `--rerun-failed-suites` option, the path to the previous report will be in the main 
-                # test results folder directly.
+                # If re-running failed suites, get the appropriate report file from the previous "run-x" folder. This will contain details of
+                # any failed tests from the previous run.
                 if rerunning_failed_suites:
-                    if test_run_index == 0:
-                        previous_report_file = f"{robot_tests_folder}{os.sep}{main_results_folder}{os.sep}output.xml"
-                    else:
-                        previous_report_file = f"{robot_tests_folder}{os.sep}{main_results_folder}{os.sep}run-{test_run_index}{os.sep}output.xml"
+                    previous_report_file = f"{main_results_folder}{os.sep}run-{test_run_index}{os.sep}output.xml"
+                    logger.info(f"Using previous test run's results file \"{previous_report_file}\" to determine which failing suites to run")
                 else:
                     previous_report_file = None
 
                 # Run the tests.
-                logger.info(f"Performing test run {test_run_index + 1} with unique identifier {run_identifier}")
+                logger.info(f"Performing test run {test_run_index + 1} in test run folder \"{test_run_results_folder}\" with unique identifier {run_identifier}")
                 test_runners.execute_tests(args, test_run_results_folder, previous_report_file)
                 
                 if test_run_index > 0:
@@ -167,6 +176,8 @@ def run():
                     logger.info("Tearing down test data...")
                     admin_api.delete_test_topic()
 
+                test_run_index += 1
+
             # If all tests passed, return early.
             if not get_failing_test_suites():
                 break
@@ -174,8 +185,9 @@ def run():
         failing_suites = get_failing_test_suites()
 
         # Merge together all reports from all test runs.
-        number_of_test_runs = test_run_index + 1
-        reports.merge_robot_reports(number_of_test_runs)
+        number_of_test_runs = test_run_index
+        first_run_folder_number = 0 if args.rerun_failed_suites else 1
+        reports.merge_robot_reports(first_run_folder_number, number_of_test_runs)
 
         # Log the results of the merge test runs.
         reports.log_report_results(number_of_test_runs, failing_suites)
@@ -196,7 +208,7 @@ def run():
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
 
-setup_python_path()
+_setup_python_path()
 
 # Run the tests!
 run()

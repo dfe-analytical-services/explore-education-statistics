@@ -1,6 +1,7 @@
 import os
 import glob
 import shutil
+import time
 from bs4 import BeautifulSoup
 from robot import rebot_cli as robot_rebot_cli
 from tests.libs.logger import get_logger
@@ -11,14 +12,16 @@ logger = get_logger(__name__)
 
 
 # Merge multiple Robot test reports and assets together into the main test results folder.
-def merge_robot_reports(number_of_test_runs: int):
+def merge_robot_reports(first_run_attempt_number: int, number_of_test_runs: int):
 
-    run_1_folder=f"{main_results_folder}{os.sep}run-1"
+    first_run_folder=f"{main_results_folder}{os.sep}run-{first_run_attempt_number}"
 
-    for file in os.listdir(run_1_folder):
-        _copy_to_destination_folder(run_1_folder, file, main_results_folder)
+    logger.info(f"Merging test run {first_run_attempt_number} results into full results")
+        
+    for file in os.listdir(first_run_folder):
+        _copy_to_destination_folder(first_run_folder, file, main_results_folder)
 
-    for test_run in range(2, number_of_test_runs + 1):
+    for test_run in range(first_run_attempt_number + 1, number_of_test_runs + 1):
         
         logger.info(f"Merging test run {test_run} results into full results")
         
@@ -90,6 +93,9 @@ def filter_out_passing_suites_from_report_file(path_to_original_report: str, pat
         suite_stats = report.find_all('stat', recursive=True)
         [suite_stat.extract() for suite_stat in suite_stats if suite_stat.get('id') in passing_suite_ids]
     
+        if os.path.exists(path_to_filtered_report):
+            os.remove(path_to_filtered_report)
+
         with open(path_to_filtered_report, "a") as filtered_file:
             filtered_file.write(report.prettify())
 
