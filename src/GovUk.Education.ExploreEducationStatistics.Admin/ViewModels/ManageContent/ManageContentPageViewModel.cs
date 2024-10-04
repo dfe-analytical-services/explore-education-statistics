@@ -1,12 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent
 {
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; set; }
 
-            public TopicViewModel Topic { get; set; }
+            public ThemeViewModel Theme { get; set; }
 
             public Contact Contact { get; set; }
 
@@ -96,11 +96,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         public class ThemeViewModel
         {
             public string Title { get; set; }
-        }
-
-        public class TopicViewModel
-        {
-            public ThemeViewModel Theme;
         }
     }
 

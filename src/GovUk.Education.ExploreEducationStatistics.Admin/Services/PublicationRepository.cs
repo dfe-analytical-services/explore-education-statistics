@@ -1,13 +1,13 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
@@ -22,15 +22,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
         }
 
-        public IQueryable<Publication> QueryPublicationsForTopic(Guid? topicId = null)
+        public IQueryable<Publication> QueryPublicationsForTheme(Guid? themeId = null)
         {
             return _context.Publications
-                .Where(publication => topicId == null || publication.TopicId == topicId);
+                .Where(publication => themeId == null || publication.ThemeId == themeId);
         }
 
         public async Task<List<Publication>> ListPublicationsForUser(
             Guid userId,
-            Guid? topicId = null)
+            Guid? themeId = null)
         {
             var publicationsGrantedByPublicationRoleQueryable = _context
                 .UserPublicationRoles
@@ -39,11 +39,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                               ListOf(PublicationRole.Owner, PublicationRole.Approver)
                                                   .Contains(userPublicationRole.Role));
 
-            if (topicId.HasValue)
+            if (themeId.HasValue)
             {
                 publicationsGrantedByPublicationRoleQueryable =
                     publicationsGrantedByPublicationRoleQueryable.Where(userPublicationRole =>
-                        userPublicationRole.Publication.TopicId == topicId.Value);
+                        userPublicationRole.Publication.ThemeId == themeId.Value);
             }
 
             var publicationsGrantedByPublicationRole = await publicationsGrantedByPublicationRoleQueryable
@@ -59,11 +59,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(userReleaseRole => userReleaseRole.UserId == userId &&
                                           userReleaseRole.Role != ReleaseRole.PrereleaseViewer);
 
-            if (topicId.HasValue)
+            if (themeId.HasValue)
             {
                 releasesGrantedByReleaseRolesQueryable =
                     releasesGrantedByReleaseRolesQueryable.Where(userReleaseRole =>
-                        userReleaseRole.ReleaseVersion.Publication.TopicId == topicId.Value);
+                        userReleaseRole.ReleaseVersion.Publication.ThemeId == themeId.Value);
             }
 
             var releasesGrantedByReleaseRoles = await releasesGrantedByReleaseRolesQueryable

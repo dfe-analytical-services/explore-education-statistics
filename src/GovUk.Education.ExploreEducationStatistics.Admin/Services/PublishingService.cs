@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -12,6 +9,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         /// <summary>
         /// Notify the Publisher that there has been a change to the
-        /// taxonomy, such as themes and topics.
+        /// taxonomy, such as themes.
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>

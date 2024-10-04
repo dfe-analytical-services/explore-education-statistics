@@ -1,14 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -28,6 +18,14 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -116,8 +114,8 @@ public class DataSetFileService : IDataSetFileService
                 Content = result.Value.Summary ?? "",
                 Theme = new IdTitleViewModel
                 {
-                    Id = result.Value.ReleaseVersion.Publication.Topic.ThemeId,
-                    Title = result.Value.ReleaseVersion.Publication.Topic.Theme.Title
+                    Id = result.Value.ReleaseVersion.Publication.ThemeId,
+                    Title = result.Value.ReleaseVersion.Publication.Theme.Title
                 },
                 Publication = new IdTitleViewModel
                 {
@@ -179,7 +177,7 @@ public class DataSetFileService : IDataSetFileService
     public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(Guid dataSetFileId)
     {
         var releaseFile = await _contentDbContext.ReleaseFiles
-            .Include(rf => rf.ReleaseVersion.Publication.Topic.Theme)
+            .Include(rf => rf.ReleaseVersion.Publication.Theme)
             .Include(rf => rf.ReleaseVersion.Publication.SupersededBy)
             .Include(rf => rf.File)
             .Where(rf =>
@@ -227,7 +225,7 @@ public class DataSetFileService : IDataSetFileService
                     Id = releaseFile.ReleaseVersion.PublicationId,
                     Title = releaseFile.ReleaseVersion.Publication.Title,
                     Slug = releaseFile.ReleaseVersion.Publication.Slug,
-                    ThemeTitle = releaseFile.ReleaseVersion.Publication.Topic.Theme.Title,
+                    ThemeTitle = releaseFile.ReleaseVersion.Publication.Theme.Title,
                 },
             },
             File = new DataSetFileFileViewModel
@@ -457,7 +455,7 @@ internal static class ReleaseFileQueryableExtensions
         Guid? themeId)
     {
         return themeId.HasValue
-            ? query.Where(rf => rf.ReleaseVersion.Publication.Topic.ThemeId == themeId.Value)
+            ? query.Where(rf => rf.ReleaseVersion.Publication.ThemeId == themeId.Value)
             : query;
     }
 

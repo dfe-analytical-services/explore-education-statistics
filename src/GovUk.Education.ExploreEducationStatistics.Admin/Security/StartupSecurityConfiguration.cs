@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 
                 options.AddPolicy(SecurityPolicies.CanViewReleaseTeamAccess.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPublicationReleaseTeamAccessRequirement()));
-                
+
                 options.AddPolicy(SecurityPolicies.CanManagePublicationReleaseSeries.ToString(), policy =>
                     policy.Requirements.Add(new ManagePublicationReleaseSeriesRequirement()));
 
@@ -150,8 +150,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanManageAllTaxonomy.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.ManageAllTaxonomy.ToString()));
 
-                options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTopic.ToString(), policy =>
-                    policy.Requirements.Add(new CreatePublicationForSpecificTopicRequirement()));
+                options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTheme.ToString(), policy =>
+                    policy.Requirements.Add(new CreatePublicationForSpecificThemeRequirement()));
 
                 /**
                  * Methodology management
@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdatePublicationSummaryAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateContactAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificThemeAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateMethodologyForSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ManageExternalMethodologyForSpecificPublicationAuthorizationHandler>();

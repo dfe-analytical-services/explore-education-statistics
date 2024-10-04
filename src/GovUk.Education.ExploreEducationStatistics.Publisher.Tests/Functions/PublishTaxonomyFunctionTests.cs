@@ -1,15 +1,14 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
@@ -27,22 +26,21 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
         [Fact]
         public async Task MethodologyTree()
         {
-            Topic topic = DataFixture
-                .DefaultTopic()
-                .WithTheme(DataFixture
-                    .DefaultTheme());
+            var theme = DataFixture.DefaultTheme().Generate();
 
-            Publication publication = DataFixture
+            var publication = DataFixture
                 .DefaultPublication()
-                .WithTopic(topic);
+                .WithTheme(theme)
+                .Generate();
 
-            Methodology methodology = DataFixture
+            var methodology = DataFixture
                 .DefaultMethodology()
                 .WithMethodologyVersions(DataFixture
                     .DefaultMethodologyVersion()
                     .Generate(1))
                 .FinishWith(methodology => methodology.LatestPublishedVersion = methodology.Versions[0])
-                .WithOwningPublication(publication);
+                .WithOwningPublication(publication)
+                .Generate();
 
             await AddTestData<ContentDbContext>(context =>
             {
@@ -53,29 +51,21 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
             [
                 new AllMethodologiesThemeViewModel
                 {
-                    Id = topic.Theme.Id,
-                    Title = topic.Theme.Title,
-                    Topics =
+                    Id = theme.Id,
+                    Title = theme.Title,
+                    Publications =
                     [
-                        new AllMethodologiesTopicViewModel
+                        new AllMethodologiesPublicationViewModel
                         {
-                            Id = topic.Id,
-                            Title = topic.Title,
-                            Publications =
+                            Id = publication.Id,
+                            Title = publication.Title,
+                            Methodologies =
                             [
-                                new AllMethodologiesPublicationViewModel
+                                new MethodologyVersionSummaryViewModel
                                 {
-                                    Id = publication.Id,
-                                    Title = publication.Title,
-                                    Methodologies =
-                                    [
-                                        new MethodologyVersionSummaryViewModel
-                                        {
-                                            Id = methodology.Versions[0].Id,
-                                            Title = methodology.Versions[0].Title,
-                                            Slug = methodology.Versions[0].Slug
-                                        }
-                                    ]
+                                    Id = methodology.Versions[0].Id,
+                                    Title = methodology.Versions[0].Title,
+                                    Slug = methodology.Versions[0].Slug
                                 }
                             ]
                         }

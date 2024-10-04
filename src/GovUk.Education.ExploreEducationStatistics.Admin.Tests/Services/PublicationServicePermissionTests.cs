@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -16,6 +13,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -26,10 +26,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PublicationServicePermissionTests
     {
-        private readonly Topic _topic = new()
+        private readonly Theme _theme = new()
         {
             Id = Guid.NewGuid(),
-            Title = "Test topic"
+            Title = "Test theme"
         };
 
         private readonly Publication _publication = new()
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreatePublication()
         {
             await using var context = InMemoryApplicationDbContext();
-            context.Add(_topic);
+            context.Add(_theme);
             await context.SaveChangesAsync();
 
             var userService = AlwaysTrueUserService();
@@ -79,19 +79,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 async service =>
                     await service.CreatePublication(new PublicationCreateRequest
                     {
-                        TopicId = _topic.Id,
+                        ThemeId = _theme.Id,
                     }),
-                _topic,
+                _theme,
                 userService,
                 publicationService,
-                SecurityPolicies.CanCreatePublicationForSpecificTopic);
+                SecurityPolicies.CanCreatePublicationForSpecificTheme);
         }
 
         [Fact]
         public async Task UpdatePublication_CanUpdatePublicationTitles()
         {
             await using var context = InMemoryApplicationDbContext();
-            context.Add(_topic);
+            context.Add(_theme);
             context.Add(_publication);
             await context.SaveChangesAsync();
 
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 async service =>
                     await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
                     {
-                        TopicId = _topic.Id,
+                        ThemeId = _theme.Id,
                         Title = "Updated publication",
                     }),
                 _publication,
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdatePublication_CanUpdatePublication()
         {
             await using var context = InMemoryApplicationDbContext();
-            context.Add(_topic);
+            context.Add(_theme);
             context.Add(_publication);
             await context.SaveChangesAsync();
 
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 async service =>
                     await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
                     {
-                        TopicId = _topic.Id,
+                        ThemeId = _theme.Id,
                         Title = "Updated publication",
                     }),
                 _publication,
@@ -138,10 +138,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdatePublication_CanCreatePublicationForSpecificTopic()
+        public async Task UpdatePublication_CanCreatePublicationForSpecificTheme()
         {
             await using var context = InMemoryApplicationDbContext();
-            context.Add(_topic);
+            context.Add(_theme);
             context.Add(_publication);
             await context.SaveChangesAsync();
 
@@ -153,13 +153,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 async service =>
                     await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
                     {
-                        TopicId = _topic.Id,
+                        ThemeId = _theme.Id,
                         Title = "Updated publication",
                     }),
-                _topic,
+                _theme,
                 userService,
                 publicationService,
-                SecurityPolicies.CanCreatePublicationForSpecificTopic);
+                SecurityPolicies.CanCreatePublicationForSpecificTheme);
         }
 
         [Fact]
@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Old publication title",
                 Slug = "publication-slug",
-                Topic = new Topic { Title = "Old topic title" },
+                Theme = new() { Title = "Old theme title" },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -217,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Old publication title",
                 Slug = "publication-slug",
-                Topic = new Topic { Title = "Old topic title" },
+                Theme = new() { Title = "Old theme title" },
                 SupersededById = Guid.NewGuid(),
             };
 
@@ -261,23 +261,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdatePublication_NoPermissionToChangeTopic()
+        public async Task UpdatePublication_NoPermissionToChangeTheme()
         {
-            var newTopic = new Topic
+            var newTheme = new Theme
             {
-                Title = "New topic title"
+                Title = "New theme title"
             };
             var publication = new Publication
             {
                 Title = "Publication title",
                 Slug = "publication-slug",
-                Topic = new Topic { Title = "Old topic title" },
+                Theme = new() { Title = "Old theme title" },
             };
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddRangeAsync(publication, newTopic);
+                await context.AddRangeAsync(publication, newTheme);
                 await context.SaveChangesAsync();
             }
 
@@ -293,8 +293,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             userService
                 .Setup(s =>
                     s.MatchesPolicy(
-                        It.Is<Topic>(t => t.Id == newTopic.Id),
-                        SecurityPolicies.CanCreatePublicationForSpecificTopic))
+                        It.Is<Theme>(t => t.Id == newTheme.Id),
+                        SecurityPolicies.CanCreatePublicationForSpecificTheme))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -307,7 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveRequest
                     {
                         Title = "Publication title",
-                        TopicId = newTopic.Id,
+                        ThemeId = newTheme.Id,
                     }
                 );
 
@@ -318,21 +318,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdatePublication_NoPermissionToChangeSupersededById()
         {
-            var newTopic = new Topic
+            var newTheme = new Theme
             {
-                Title = "New topic title"
+                Title = "New theme title"
             };
             var publication = new Publication
             {
                 Title = "Publication title",
                 Slug = "publication-slug",
-                Topic = new Topic { Title = "Old topic title" },
+                Theme = new() { Title = "Old theme title" },
             };
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddRangeAsync(publication, newTopic);
+                await context.AddRangeAsync(publication, newTheme);
                 await context.SaveChangesAsync();
             }
 
@@ -353,8 +353,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             userService
                 .Setup(s =>
                     s.MatchesPolicy(
-                        It.Is<Topic>(t => t.Id == newTopic.Id),
-                        SecurityPolicies.CanCreatePublicationForSpecificTopic))
+                        It.Is<Theme>(t => t.Id == newTheme.Id),
+                        SecurityPolicies.CanCreatePublicationForSpecificTheme))
+                .ReturnsAsync(false);
+
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Theme>(t => t.Id == newTheme.Id),
+                        SecurityPolicies.CanCreatePublicationForSpecificTheme))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -367,7 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveRequest
                     {
                         Title = "Publication title",
-                        TopicId = publication.Topic.Id,
+                        ThemeId = publication.Theme.Id,
                         SupersededById = Guid.NewGuid(),
                     }
                 );
