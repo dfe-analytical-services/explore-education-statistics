@@ -11,13 +11,16 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class DataArchiveValidationService(
+        ContentDbContext contentDbContext,
         IFileTypeService fileTypeService,
         IFileUploadsValidatorService fileUploadsValidatorService)
         : IDataArchiveValidationService
@@ -64,7 +67,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 dataFile.FullName,
                 metaFile.FullName,
                 dataFile.Length,
-                metaFile.Length);
+                metaFile.Length,
+                replacingFile);
 
             await using (var dataFileStream = dataFile.Open())
             await using (var metaFileStream = metaFile.Open())
@@ -74,8 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         releaseVersionId,
                         archiveDataSet,
                         dataFileStream,
-                        metaFileStream,
-                        replacingFile));
+                        metaFileStream));
             }
 
             if (errors.Count > 0)
@@ -210,12 +213,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 if (dataFile != null && metaFile != null)
                 {
+                    // We replace files with the same title. If there is no releaseFile with the same title,
+                    // it's a new data set.
+                    var releaseFileToBeReplaced = contentDbContext.ReleaseFiles
+                        .Include(rf => rf.File)
+                        .SingleOrDefault(rf =>
+                            rf.ReleaseVersionId == releaseVersionId
+                            && rf.File.Type == FileType.Data
+                            && rf.Name == entry.Title);
+
                     var dataArchiveFile = new ArchiveDataSetFile(
                         entry.Title,
                         dataFile.FullName,
                         metaFile.FullName,
                         dataFile.Length,
-                        metaFile.Length);
+                        metaFile.Length,
+                        releaseFileToBeReplaced?.File);
 
                     await using (var dataFileStream = dataFile.Open())
                     await using (var metaFileStream = metaFile.Open())
