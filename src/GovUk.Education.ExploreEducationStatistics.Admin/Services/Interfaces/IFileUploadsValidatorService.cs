@@ -36,8 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseVersionId,
             ArchiveDataSetFile archiveDataSet,
             Stream dataFileStream,
-            Stream metaFileStream,
-            File? replacingFile = null);
+            Stream metaFileStream);
 
         Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type);
     }

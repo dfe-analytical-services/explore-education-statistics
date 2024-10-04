@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -36,8 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId,
                     It.IsAny<ArchiveDataSetFile>(),
                     It.IsAny<Stream>(),
-                    It.IsAny<Stream>(),
-                    null))
+                    It.IsAny<Stream>()))
                 .ReturnsAsync([]);
 
             fileTypeService
@@ -128,8 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId,
                     It.IsAny<ArchiveDataSetFile>(),
                     It.IsAny<Stream>(),
-                    It.IsAny<Stream>(),
-                    null))
+                    It.IsAny<Stream>()))
                 .ReturnsAsync([]);
 
             fileTypeService
@@ -338,8 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseVersionId,
                     It.IsAny<ArchiveDataSetFile>(),
                     It.IsAny<Stream>(),
-                    It.IsAny<Stream>(),
-                    null))
+                    It.IsAny<Stream>()))
                 .ReturnsAsync([]);
 
             fileTypeService
@@ -382,11 +380,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static DataArchiveValidationService SetupDataArchiveValidationService(
+            ContentDbContext? contentDbContext = null,
             IFileTypeService? fileTypeService = null,
             IFileUploadsValidatorService? fileUploadsValidatorService = null)
         {
             return new DataArchiveValidationService(
-                fileTypeService ?? Mock.Of<IFileTypeService>(Strict),
+                contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
+            fileTypeService ?? Mock.Of<IFileTypeService>(Strict),
                 fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(Strict)
             );
         }
