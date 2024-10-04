@@ -32,8 +32,8 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "execa": "^8.0.1",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.2.3",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
     "lodash": "^4.17.21",
     "prettier": "^3.0.1",
     "signal-exit": "^4.1.0",
@@ -46,7 +46,7 @@
     "typescript": "^5.5.4"
   },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky",
     "preinstall": "pnpm check:node",
     "clean": "pnpm -r --parallel exec rm -rf node_modules && rm -rf node_modules && rm -rf src/explore-education-statistics-frontend/.next",
     "check:node": "check-node-version --package",
