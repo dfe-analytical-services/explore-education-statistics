@@ -103,8 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             ArchiveDataSetFile archiveDataSet,
             Stream dataFileStream,
-            Stream metaFileStream,
-            File? replacingFile = null)
+            Stream metaFileStream)
         {
             return await ValidateDataSetFilesForUpload(
                 releaseVersionId: releaseVersionId,
@@ -115,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 metaFileName: archiveDataSet.MetaFilename,
                 metaFileLength: archiveDataSet.MetaFileSize,
                 metaFileStream: metaFileStream,
-                replacingFile: replacingFile);
+                replacingFile: archiveDataSet.ReplacingFile);
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
