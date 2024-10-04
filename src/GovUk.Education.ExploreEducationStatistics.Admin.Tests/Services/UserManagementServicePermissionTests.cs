@@ -131,36 +131,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             public async Task Success()
             {
                 await PolicyCheckBuilder<SecurityPolicies>()
+                    .SetupCheck(CanManageUsersOnSystem)
                     .AssertSuccess(async userService =>
                         {
                             var service = SetupUserManagementService(
-                                userService: userService.Object,
-                                enableDeletion: true);
+                                userService: userService.Object);
                             return await service.DeleteUser("ees-test.user@education.gov.uk");
-                        }
-                    );
-            }
-
-            [Fact]
-            public async Task Forbidden_EnvironmentConfiguration()
-            {
-                await PolicyCheckBuilder<SecurityPolicies>()
-                    .AssertForbidden(async userService =>
-                        {
-                            var service = SetupUserManagementService(userService: userService.Object);
-                            return await service.DeleteUser("ees.test-user@education.gov.uk");
-                        }
-                    );
-            }
-
-            [Fact]
-            public async Task Forbidden_InvalidEmailAddressFormat()
-            {
-                await PolicyCheckBuilder<SecurityPolicies>()
-                    .AssertForbidden(async userService =>
-                        {
-                            var service = SetupUserManagementService(userService: userService.Object);
-                            return await service.DeleteUser("invalid-email-to-delete@education.gov.uk");
                         }
                     );
             }
@@ -194,8 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
                 userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
-                userManager ?? MockUserManager().Object,
-                new AppOptions { EnableThemeDeletion = enableDeletion }.ToOptionsWrapper()
+                userManager ?? MockUserManager().Object
             );
         }
     }
