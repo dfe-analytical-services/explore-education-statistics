@@ -102,6 +102,7 @@ export interface DataGroupingConfig {
 export interface MapDataSetConfig {
   dataSet: DataSet;
   dataGrouping: DataGroupingConfig;
+  boundaryLevel?: number;
 }
 
 export interface MapConfig {
