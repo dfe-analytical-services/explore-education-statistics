@@ -1,53 +1,35 @@
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
-import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import ChartDataGroupingForm from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingForm';
+import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import generateDataSetLabel from '@admin/pages/release/datablocks/components/chart/utils/generateDataSetLabel';
-import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import ButtonText from '@common/components/ButtonText';
 import Effect from '@common/components/Effect';
 import Modal from '@common/components/Modal';
 import {
-  AxisConfiguration,
   MapConfig,
   MapDataSetConfig,
   dataGroupingTypes,
 } from '@common/modules/charts/types/chart';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
-import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
-import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import { TableDataResult } from '@common/services/tableBuilderService';
 import isEqual from 'lodash/isEqual';
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 const formId = 'chartDataGroupingsConfigurationForm';
 
-interface FormValues {
-  dataSetConfigs: MapDataSetConfig[];
-}
-
 interface Props {
-  axisMajor: AxisConfiguration;
   buttons?: ReactNode;
-  data: TableDataResult[];
-  legend: LegendConfiguration;
   map?: MapConfig;
   meta: FullTableMeta;
-  options: ChartOptions;
   onChange: (dataSetConfigs: MapDataSetConfig[]) => void;
   onSubmit: (dataSetConfigs: MapDataSetConfig[]) => void;
 }
 
 const ChartDataGroupingsConfiguration = ({
-  axisMajor,
   buttons,
-  data,
-  legend,
   map,
   meta,
-  options,
   onChange,
   onSubmit,
 }: Props) => {
@@ -57,38 +39,7 @@ const ChartDataGroupingsConfiguration = ({
   }>();
   const { forms, updateForm, submitForms } = useChartBuilderFormsContext();
 
-  const initialValues = useMemo<FormValues>(() => {
-    const dataSetCategories = createDataSetCategories({
-      axisConfiguration: {
-        ...axisMajor,
-        groupBy: 'locations',
-      },
-      data,
-      meta,
-    });
-
-    const dataSetCategoryConfigs = getDataSetCategoryConfigs({
-      dataSetCategories,
-      legendItems: legend.items,
-      meta,
-      deprecatedDataClassification: options.dataClassification,
-      deprecatedDataGroups: options.dataGroups,
-    });
-
-    return {
-      dataSetConfigs: dataSetCategoryConfigs.map(
-        ({ rawDataSet, dataGrouping }) => ({
-          dataSet: rawDataSet,
-          dataGrouping:
-            map?.dataSetConfigs.find(config =>
-              isEqual(config.dataSet, rawDataSet),
-            )?.dataGrouping ?? dataGrouping,
-        }),
-      ),
-    };
-  }, [axisMajor, data, meta, legend.items, map, options]);
-
-  if (!initialValues.dataSetConfigs?.length) {
+  if (!map?.dataSetConfigs?.length) {
     return <p>No data groupings to edit.</p>;
   }
 
@@ -112,7 +63,7 @@ const ChartDataGroupingsConfiguration = ({
           </tr>
         </thead>
         <tbody>
-          {initialValues.dataSetConfigs.map(dataSetConfig => {
+          {map.dataSetConfigs.map(dataSetConfig => {
             const expandedDataSet = expandDataSet(dataSetConfig.dataSet, meta);
             const label = generateDataSetLabel(expandedDataSet);
             const key = generateDataSetKey(dataSetConfig.dataSet);
@@ -153,12 +104,12 @@ const ChartDataGroupingsConfiguration = ({
         >
           <ChartDataGroupingForm
             dataSetConfig={editDataSetConfig.dataSetConfig}
-            dataSetConfigs={initialValues.dataSetConfigs}
+            dataSetConfigs={map.dataSetConfigs}
             meta={meta}
             unit={editDataSetConfig.unit}
             onCancel={() => setEditDataSetConfig(undefined)}
             onSubmit={values => {
-              const updated = initialValues.dataSetConfigs.map(config => {
+              const updated = map.dataSetConfigs.map(config => {
                 if (isEqual(config.dataSet, values.dataSet)) {
                   return values;
                 }
@@ -181,7 +132,7 @@ const ChartDataGroupingsConfiguration = ({
               ? forms.dataGroupings.submitCount + 1
               : 1,
           });
-          onSubmit(initialValues.dataSetConfigs);
+          onSubmit(map.dataSetConfigs);
           await submitForms();
         }}
       >

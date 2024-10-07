@@ -8,7 +8,6 @@ import FormProvider from '@common/components/form/FormProvider';
 import { MapDataSetConfig } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
-import Yup from '@common/validation/yup';
 import merge from 'lodash/merge';
 import React, { ReactNode, useCallback } from 'react';
 import ChartBoundaryLevelsDataSetConfiguration from './ChartBoundaryLevelsDataSetConfiguration';
@@ -67,14 +66,14 @@ export default function ChartBoundaryLevelsConfiguration({
         boundaryLevel,
         dataSetConfigs,
       }}
-      validationSchema={Yup.object({
+      /* validationSchema={Yup.object({
         boundaryLevel: Yup.number()
           .transform(value => (Number.isNaN(value) ? undefined : value))
           .nullable()
           .oneOf(meta.boundaryLevels.map(level => level.id))
           .required('Choose a boundary level'),
-        dataSetConfigs: Yup.array().required(),
-      })}
+        // dataSetConfigs: Yup.array(), //TODO
+      })} */
     >
       {({ formState, watch, control }) => {
         const values = watch();
@@ -82,12 +81,21 @@ export default function ChartBoundaryLevelsConfiguration({
           <Form
             id={formId}
             onSubmit={async () => {
-              console.log('submitting', { values });
               onSubmit(normalizeValues(values));
               await submitForms();
             }}
           >
             <Effect value={values} onChange={handleChange} />
+            <Effect
+              // update watcher of all forms for sibling validation
+              value={{
+                formKey: 'boundaryLevels',
+                isValid: formState.isValid,
+                submitCount: 0,
+              }}
+              onChange={updateForm}
+              onMount={updateForm}
+            />
             <FormFieldSelect<ChartBoundaryLevelsFormValues>
               label="Default Boundary level"
               hint="Select a version of geographical data to use across any data sets that don't have a specific one set for that dataset"

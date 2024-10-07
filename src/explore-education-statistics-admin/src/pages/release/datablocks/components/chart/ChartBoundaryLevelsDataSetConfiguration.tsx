@@ -1,22 +1,15 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import Form from '@common/components/form/Form';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
-import FormProvider from '@common/components/form/FormProvider';
 import Modal from '@common/components/Modal';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useFieldArray, UseFormReturn } from 'react-hook-form';
 import type { ChartBoundaryLevelsFormValues } from './ChartBoundaryLevelsConfiguration';
 import generateDataSetLabel from './utils/generateDataSetLabel';
-
-const formId = 'chartBoundaryLevelsDataSetConfigurationForm';
-type FormValues = {
-  dataSetBoundaryLevel?: number;
-};
 
 interface Props {
   control: UseFormReturn<ChartBoundaryLevelsFormValues>['control'];
@@ -28,6 +21,7 @@ export default function ChartBoundaryLevelsDataSetConfiguration({
   meta,
 }: Props) {
   const [updateIndex, setUpdateIndex] = useState<number>();
+  const [selectValue, setSelectValue] = useState<number>();
   const { fields: dataSetConfigs, update } = useFieldArray<
     ChartBoundaryLevelsFormValues,
     'dataSetConfigs'
@@ -36,9 +30,23 @@ export default function ChartBoundaryLevelsDataSetConfiguration({
     name: 'dataSetConfigs',
   });
 
+  const openFormModal = useCallback(
+    (i: number) => {
+      setUpdateIndex(i);
+      setSelectValue(dataSetConfigs[i].boundaryLevel);
+    },
+    [setUpdateIndex, dataSetConfigs],
+  );
+
+  const closeFormModal = useCallback(() => {
+    setUpdateIndex(undefined);
+    setSelectValue(undefined);
+  }, [setUpdateIndex]);
+
   return (
     <>
       <h4>Set boundary levels per data set</h4>
+      {/* {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>} */}
 
       {!!dataSetConfigs && dataSetConfigs.length > 1 && (
         <table data-testid="chart-boundary-level-selections">
@@ -72,7 +80,7 @@ export default function ChartBoundaryLevelsDataSetConfiguration({
                   <td className="govuk-!-text-align-right">
                     <ButtonText
                       onClick={() => {
-                        setUpdateIndex(index);
+                        openFormModal(index);
                       }}
                     >
                       Edit
@@ -86,62 +94,48 @@ export default function ChartBoundaryLevelsDataSetConfiguration({
       )}
 
       {updateIndex !== undefined && (
-        <Modal
-          open
-          title="Edit boundary"
-          onExit={() => setUpdateIndex(undefined)}
-        >
-          <FormProvider<FormValues>
-            enableReinitialize
-            initialValues={{
-              dataSetBoundaryLevel: dataSetConfigs[updateIndex].boundaryLevel,
-            }}
-          >
-            {() => {
-              return (
-                <Form<FormValues>
-                  id={formId}
-                  onSubmit={async ({ dataSetBoundaryLevel }) => {
-                    const { dataGrouping, dataSet } =
-                      dataSetConfigs[updateIndex];
-
-                    update(updateIndex, {
-                      dataSet,
-                      dataGrouping,
-                      boundaryLevel: dataSetBoundaryLevel,
-                    });
-                    setUpdateIndex(undefined);
-                  }}
-                >
-                  <FormFieldSelect<FormValues>
-                    label="Boundary level"
-                    hint="Select a version of geographical data to use for this dataset"
-                    name="dataSetBoundaryLevel"
-                    order={[]}
-                    options={[
-                      {
-                        label: 'Default',
-                        value: '',
-                      },
-                      ...meta.boundaryLevels.map(({ id, label }) => ({
-                        value: id,
-                        label,
-                      })),
-                    ]}
-                  />
-                  <ButtonGroup>
-                    <Button type="submit">Done</Button>
-                    <Button
-                      onClick={() => setUpdateIndex(undefined)}
-                      variant="secondary"
-                    >
-                      Cancel
-                    </Button>
-                  </ButtonGroup>
-                </Form>
+        <Modal open title="Edit boundary" onExit={closeFormModal}>
+          <FormFieldSelect
+            label="Boundary level"
+            hint="Select a version of geographical data to use for this dataset"
+            name="dataSetBoundaryLevel"
+            order={[]}
+            options={[
+              {
+                label: 'Default',
+                value: '',
+              },
+              ...meta.boundaryLevels.map(({ id, label }) => ({
+                value: id,
+                label,
+              })),
+            ]}
+            onChange={({ target }) => {
+              const { value } = target;
+              console.log({ value });
+              setSelectValue(
+                Number.isNaN(Number(value)) ? undefined : Number(value),
               );
             }}
-          </FormProvider>
+          />
+          <ButtonGroup>
+            <Button
+              onClick={() => {
+                const { dataSet, dataGrouping } = dataSetConfigs[updateIndex];
+                update(updateIndex, {
+                  dataSet,
+                  dataGrouping,
+                  boundaryLevel: selectValue,
+                });
+                closeFormModal();
+              }}
+            >
+              Done
+            </Button>
+            <Button onClick={closeFormModal} variant="secondary">
+              Cancel
+            </Button>
+          </ButtonGroup>
         </Modal>
       )}
     </>
