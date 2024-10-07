@@ -147,16 +147,6 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     CurrentState = newFilterTuple.FilterMeta,
                     CurrentStateId = newFilterTuple.FilterMeta.Id
                 });
-
-                foreach (var (_, newOptionLink) in newFilterTuple.OptionLinks)
-                {
-                    // Filter option added
-                    optionMetaAdditions.Add(new FilterOptionMetaChange
-                    {
-                        DataSetVersionId = nextVersionId,
-                        CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
-                    });
-                }
             }
         }
 
@@ -276,16 +266,6 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     CurrentState = newLocationTuple.LocationMeta,
                     CurrentStateId = newLocationTuple.LocationMeta.Id
                 });
-
-                foreach (var (_, newOptionLink) in newLocationTuple.OptionLinks)
-                {
-                    // Location option added
-                    optionMetaAdditions.Add(new LocationOptionMetaChange
-                    {
-                        DataSetVersionId = nextVersionId,
-                        CurrentState = LocationOptionMetaChange.State.Create(newOptionLink)
-                    });
-                }
             }
         }
 

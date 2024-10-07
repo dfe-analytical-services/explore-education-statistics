@@ -142,7 +142,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         : CreateChangesTests(fixture)
     {
         [Fact]
-        public async Task FiltersAdded_ChangesContainOnlyAddedFiltersAndAddedOptions()
+        public async Task FiltersAdded_ChangesContainOnlyAddedFilters()
         {
             var oldFilterMeta = DataFixture.DefaultFilterMeta()
                 .ForIndex(0, s =>
@@ -166,21 +166,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
                                         .SetPublicId(SqidEncoder.Encode(2))) // Filter Option added
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(3))) // Filter Option added
-                                .Generate(2)))
+                                .Generate(1)))
                 .ForIndex(2, s =>
                     s.SetPublicId(SqidEncoder.Encode(3)) // Filter added
                         .SetOptionLinks(() =>
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(4))) // Filter Option added
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(5))) // Filter Option added
-                                .Generate(2)))
+                                        .SetPublicId(SqidEncoder.Encode(3))) // Filter Option added
+                                .Generate(1)))
                 .GenerateList(3);
 
             var (newVersion, instanceId) = await CreateDataSetNextVersion(
@@ -196,36 +190,17 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             Assert.Equal(2, filterMetaChanges.Count);
             Assert.All(filterMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
-            // 4 Filter Option additions
-            Assert.Equal(4, filterOptionMetaChanges.Count);
-            Assert.All(filterOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            // No Filter Option additions
+            Assert.Empty(filterOptionMetaChanges);
 
             var newFilterMetas = newVersion.FilterMetas
-                .ToDictionary(
-                    m => m.PublicId,
-                    m => new { Meta = m, OptionLinks = m.OptionLinks.ToDictionary(l => l.PublicId) });
+                .ToDictionary(m => m.PublicId);
 
             // Filter added
-            AssertSingleFilterAdded(filterMetaChanges, newFilterMetas[SqidEncoder.Encode(2)].Meta);
+            AssertSingleFilterAdded(filterMetaChanges, newFilterMetas[SqidEncoder.Encode(2)]);
 
             // Filter added
-            AssertSingleFilterAdded(filterMetaChanges, newFilterMetas[SqidEncoder.Encode(3)].Meta);
-
-            // Filter Option added
-            AssertSingleFilterOptionAdded(filterOptionMetaChanges,
-                newFilterMetas[SqidEncoder.Encode(2)].OptionLinks[SqidEncoder.Encode(2)]);
-
-            // Filter Option added
-            AssertSingleFilterOptionAdded(filterOptionMetaChanges,
-                newFilterMetas[SqidEncoder.Encode(2)].OptionLinks[SqidEncoder.Encode(3)]);
-
-            // Filter Option added
-            AssertSingleFilterOptionAdded(filterOptionMetaChanges,
-                newFilterMetas[SqidEncoder.Encode(3)].OptionLinks[SqidEncoder.Encode(4)]);
-
-            // Filter Option added
-            AssertSingleFilterOptionAdded(filterOptionMetaChanges,
-                newFilterMetas[SqidEncoder.Encode(3)].OptionLinks[SqidEncoder.Encode(5)]);
+            AssertSingleFilterAdded(filterMetaChanges, newFilterMetas[SqidEncoder.Encode(3)]);
         }
 
         [Fact]
@@ -239,32 +214,23 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
                                         .SetPublicId(SqidEncoder.Encode(1)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(2)))
-                                .Generate(2)))
+                                .Generate(1)))
                 .ForIndex(1, s =>
                     s.SetPublicId(SqidEncoder.Encode(2)) // Filter and ALL options deleted
                         .SetOptionLinks(() =>
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(4)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(5)))
-                                .Generate(2)))
+                                        .SetPublicId(SqidEncoder.Encode(2)))
+                                .Generate(1)))
                 .ForIndex(2, s =>
                     s.SetPublicId(SqidEncoder.Encode(3)) // Filter and ALL options deleted
                         .SetOptionLinks(() =>
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(7)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(8)))
-                                .Generate(2)))
+                                        .SetPublicId(SqidEncoder.Encode(3)))
+                                .Generate(1)))
                 .GenerateList(3);
 
             var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
@@ -310,17 +276,14 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
                                         .SetPublicId(SqidEncoder.Encode(1)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(2)))
-                                .Generate(2)))
+                                .Generate(1)))
                 .ForIndex(1, s =>
                     s.SetPublicId(SqidEncoder.Encode(2))
                         .SetOptionLinks(() =>
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(3)))
+                                        .SetPublicId(SqidEncoder.Encode(2)))
                                 .Generate(1)))
                 .ForIndex(2, s =>
                     s.SetPublicId(SqidEncoder.Encode(3))
@@ -328,7 +291,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(4)))
+                                        .SetPublicId(SqidEncoder.Encode(3)))
                                 .Generate(1)))
                 .GenerateList(3);
 
@@ -345,10 +308,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                         .OptionLinks[0])) // Filter Option unchanged
                                 .ForIndex(1, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(5))) // Filter Option added
+                                        .SetPublicId(SqidEncoder.Encode(4))) // Filter Option added
                                 .ForIndex(2, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(6))) // Filter Option added
+                                        .SetPublicId(SqidEncoder.Encode(5))) // Filter Option added
                                 .Generate(3)))
                 .ForIndex(2, s =>
                     s.SetPublicId(SqidEncoder.Encode(3)) // Filter updated
@@ -359,10 +322,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                         .OptionLinks[0])) // Filter Option unchanged
                                 .ForIndex(1, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(7))) // Filter Option added
+                                        .SetPublicId(SqidEncoder.Encode(6))) // Filter Option added
                                 .ForIndex(2, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(8))) // Filter Option added
+                                        .SetPublicId(SqidEncoder.Encode(7))) // Filter Option added
                                 .Generate(3)))
                 .GenerateList(3);
 
@@ -405,19 +368,19 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             // Filter Option added
             AssertSingleFilterOptionAdded(filterOptionMetaChanges,
+                newFilterMetas[SqidEncoder.Encode(2)].OptionLinks[SqidEncoder.Encode(4)]);
+
+            // Filter Option added
+            AssertSingleFilterOptionAdded(filterOptionMetaChanges,
                 newFilterMetas[SqidEncoder.Encode(2)].OptionLinks[SqidEncoder.Encode(5)]);
 
             // Filter Option added
             AssertSingleFilterOptionAdded(filterOptionMetaChanges,
-                newFilterMetas[SqidEncoder.Encode(2)].OptionLinks[SqidEncoder.Encode(6)]);
+                newFilterMetas[SqidEncoder.Encode(3)].OptionLinks[SqidEncoder.Encode(6)]);
 
             // Filter Option added
             AssertSingleFilterOptionAdded(filterOptionMetaChanges,
                 newFilterMetas[SqidEncoder.Encode(3)].OptionLinks[SqidEncoder.Encode(7)]);
-
-            // Filter Option added
-            AssertSingleFilterOptionAdded(filterOptionMetaChanges,
-                newFilterMetas[SqidEncoder.Encode(3)].OptionLinks[SqidEncoder.Encode(8)]);
         }
 
         [Fact]
@@ -431,23 +394,20 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
                                         .SetPublicId(SqidEncoder.Encode(1)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(2)))
-                                .Generate(2)))
+                                .Generate(1)))
                 .ForIndex(1, s =>
                     s.SetPublicId(SqidEncoder.Encode(2))
                         .SetOptionLinks(() =>
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(3)))
+                                        .SetPublicId(SqidEncoder.Encode(2)))
                                 .ForIndex(1, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(4))) // Filter Option deleted
+                                        .SetPublicId(SqidEncoder.Encode(3))) // Filter Option deleted
                                 .ForIndex(2, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(5))) // Filter Option deleted
+                                        .SetPublicId(SqidEncoder.Encode(4))) // Filter Option deleted
                                 .Generate(3)))
                 .ForIndex(2, s =>
                     s.SetPublicId(SqidEncoder.Encode(3))
@@ -455,13 +415,13 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(6)))
+                                        .SetPublicId(SqidEncoder.Encode(5)))
                                 .ForIndex(1, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(7))) // Filter Option deleted
+                                        .SetPublicId(SqidEncoder.Encode(6))) // Filter Option deleted
                                 .ForIndex(2, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(8))) // Filter Option deleted
+                                        .SetPublicId(SqidEncoder.Encode(7))) // Filter Option deleted
                                 .Generate(3)))
                 .GenerateList(3);
 
@@ -526,19 +486,19 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
 
             // Filter Option deleted
             AssertSingleFilterOptionDeleted(filterOptionMetaChanges,
+                oldFilterMetas[SqidEncoder.Encode(2)].OptionLinks[SqidEncoder.Encode(3)]);
+
+            // Filter Option deleted
+            AssertSingleFilterOptionDeleted(filterOptionMetaChanges,
                 oldFilterMetas[SqidEncoder.Encode(2)].OptionLinks[SqidEncoder.Encode(4)]);
 
             // Filter Option deleted
             AssertSingleFilterOptionDeleted(filterOptionMetaChanges,
-                oldFilterMetas[SqidEncoder.Encode(2)].OptionLinks[SqidEncoder.Encode(5)]);
+                oldFilterMetas[SqidEncoder.Encode(3)].OptionLinks[SqidEncoder.Encode(6)]);
 
             // Filter Option deleted
             AssertSingleFilterOptionDeleted(filterOptionMetaChanges,
                 oldFilterMetas[SqidEncoder.Encode(3)].OptionLinks[SqidEncoder.Encode(7)]);
-
-            // Filter Option deleted
-            AssertSingleFilterOptionDeleted(filterOptionMetaChanges,
-                oldFilterMetas[SqidEncoder.Encode(3)].OptionLinks[SqidEncoder.Encode(8)]);
         }
 
         [Fact]
@@ -552,23 +512,20 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
                                         .SetPublicId(SqidEncoder.Encode(1)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(2)))
-                                .Generate(2)))
+                                .Generate(1)))
                 .ForIndex(1, s =>
                     s.SetPublicId(SqidEncoder.Encode(2))
                         .SetOptionLinks(() =>
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(3)))
+                                        .SetPublicId(SqidEncoder.Encode(2)))
                                 .ForIndex(1, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(4)))
+                                        .SetPublicId(SqidEncoder.Encode(3)))
                                 .ForIndex(2, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(5)))
+                                        .SetPublicId(SqidEncoder.Encode(4)))
                                 .Generate(3)))
                 .ForIndex(2, s =>
                     s.SetPublicId(SqidEncoder.Encode(3))
@@ -576,13 +533,13 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(6)))
+                                        .SetPublicId(SqidEncoder.Encode(5)))
                                 .ForIndex(1, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(7)))
+                                        .SetPublicId(SqidEncoder.Encode(6)))
                                 .ForIndex(2, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(8)))
+                                        .SetPublicId(SqidEncoder.Encode(7)))
                                 .Generate(3)))
                 .GenerateList(3);
 
@@ -599,10 +556,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                         .OptionLinks[0])) // Filter Option unchanged
                                 .ForIndex(1, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(4))) // Filter Option updated
+                                        .SetPublicId(SqidEncoder.Encode(3))) // Filter Option updated
                                 .ForIndex(2, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(5))) // Filter Option updated
+                                        .SetPublicId(SqidEncoder.Encode(4))) // Filter Option updated
                                 .Generate(3)))
                 .ForIndex(2, s =>
                     s.SetPublicId(SqidEncoder.Encode(3)) // Filter updated
@@ -613,10 +570,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                         .OptionLinks[0])) // Filter Option unchanged
                                 .ForIndex(1, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(7))) // Filter Option updated
+                                        .SetPublicId(SqidEncoder.Encode(6))) // Filter Option updated
                                 .ForIndex(2, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(8))) // Filter Option updated
+                                        .SetPublicId(SqidEncoder.Encode(7))) // Filter Option updated
                                 .Generate(3)))
                 .GenerateList(3);
 
@@ -663,6 +620,14 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             AssertSingleFilterOptionUpdated(
                 changes: filterOptionMetaChanges,
                 expectedOldOptionLink: oldFilterMetas[SqidEncoder.Encode(2)]
+                    .OptionLinks[SqidEncoder.Encode(3)],
+                expectedNewOptionLink: newFilterMetas[SqidEncoder.Encode(2)]
+                    .OptionLinks[SqidEncoder.Encode(3)]);
+
+            // Filter Option updated
+            AssertSingleFilterOptionUpdated(
+                changes: filterOptionMetaChanges,
+                expectedOldOptionLink: oldFilterMetas[SqidEncoder.Encode(2)]
                     .OptionLinks[SqidEncoder.Encode(4)],
                 expectedNewOptionLink: newFilterMetas[SqidEncoder.Encode(2)]
                     .OptionLinks[SqidEncoder.Encode(4)]);
@@ -670,10 +635,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             // Filter Option updated
             AssertSingleFilterOptionUpdated(
                 changes: filterOptionMetaChanges,
-                expectedOldOptionLink: oldFilterMetas[SqidEncoder.Encode(2)]
-                    .OptionLinks[SqidEncoder.Encode(5)],
-                expectedNewOptionLink: newFilterMetas[SqidEncoder.Encode(2)]
-                    .OptionLinks[SqidEncoder.Encode(5)]);
+                expectedOldOptionLink: oldFilterMetas[SqidEncoder.Encode(3)]
+                    .OptionLinks[SqidEncoder.Encode(6)],
+                expectedNewOptionLink: newFilterMetas[SqidEncoder.Encode(3)]
+                    .OptionLinks[SqidEncoder.Encode(6)]);
 
             // Filter Option updated
             AssertSingleFilterOptionUpdated(
@@ -682,14 +647,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     .OptionLinks[SqidEncoder.Encode(7)],
                 expectedNewOptionLink: newFilterMetas[SqidEncoder.Encode(3)]
                     .OptionLinks[SqidEncoder.Encode(7)]);
-
-            // Filter Option updated
-            AssertSingleFilterOptionUpdated(
-                changes: filterOptionMetaChanges,
-                expectedOldOptionLink: oldFilterMetas[SqidEncoder.Encode(3)]
-                    .OptionLinks[SqidEncoder.Encode(8)],
-                expectedNewOptionLink: newFilterMetas[SqidEncoder.Encode(3)]
-                    .OptionLinks[SqidEncoder.Encode(8)]);
         }
 
         [Fact]
@@ -703,20 +660,17 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
                                         .SetPublicId(SqidEncoder.Encode(1)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(2)))
-                                .Generate(2)))
+                                .Generate(1)))
                 .ForIndex(1, s =>
                     s.SetPublicId(SqidEncoder.Encode(2))
                         .SetOptionLinks(() =>
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(3)))
+                                        .SetPublicId(SqidEncoder.Encode(2)))
                                 .ForIndex(1, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(4)))
+                                        .SetPublicId(SqidEncoder.Encode(3)))
                                 .Generate(2)))
                 .ForIndex(2, s =>
                     s.SetPublicId(SqidEncoder.Encode(3))
@@ -724,10 +678,10 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(5)))
+                                        .SetPublicId(SqidEncoder.Encode(4)))
                                 .ForIndex(1, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(6)))
+                                        .SetPublicId(SqidEncoder.Encode(5)))
                                 .Generate(2)))
                 .GenerateList(3);
 
@@ -1103,27 +1057,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
                                         .SetPublicId(SqidEncoder.Encode(1)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(2)))
-                                .ForIndex(2, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(3)))
-                                .Generate(3)))
+                                .Generate(1)))
                 .ForIndex(1, s =>
                     s.SetPublicId(SqidEncoder.Encode(2))
                         .SetOptionLinks(() =>
                             DataFixture.DefaultFilterOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(4)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(5)))
-                                .ForIndex(2, ls =>
-                                    ls.SetOption(DataFixture.DefaultFilterOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(6)))
-                                .Generate(3)))
+                                        .SetPublicId(SqidEncoder.Encode(2)))
+                                .Generate(1)))
                 .GenerateList(2);
 
             var (originalVersion, _) = await CreateDataSetInitialVersion(oldFilterMeta);
@@ -1612,7 +1554,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         : CreateChangesTests(fixture)
     {
         [Fact]
-        public async Task LocationsAdded_ChangesContainOnlyAddedLocationsAndAddedOptions()
+        public async Task LocationsAdded_ChangesContainOnlyAddedLocations()
         {
             var oldLocationMeta = DataFixture.DefaultLocationMeta()
                 .ForIndex(0, s =>
@@ -1636,21 +1578,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
                                         .SetPublicId(SqidEncoder.Encode(2))) // Location Option added
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(3))) // Location Option added
-                                .Generate(2)))
+                                .Generate(1)))
                 .ForIndex(2, s =>
                     s.SetLevel(GeographicLevel.RscRegion) // Location added
                         .SetOptionLinks(() =>
                             DataFixture.DefaultLocationOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultLocationRscRegionOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(4))) // Location Option added
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultLocationRscRegionOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(5))) // Location Option added
-                                .Generate(2)))
+                                        .SetPublicId(SqidEncoder.Encode(3))) // Location Option added
+                                .Generate(1)))
                 .GenerateList(3);
 
             var (newVersion, instanceId) = await CreateDataSetNextVersion(
@@ -1666,40 +1602,17 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             Assert.Equal(2, locationMetaChanges.Count);
             Assert.All(locationMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
 
-            // 4 Location Option additions
-            Assert.Equal(4, locationOptionMetaChanges.Count);
-            Assert.All(locationOptionMetaChanges, c => Assert.Equal(newVersion.Id, c.DataSetVersionId));
+            // No Location Option additions
+            Assert.Empty(locationOptionMetaChanges);
 
             var newLocationMetas = newVersion.LocationMetas
-                .ToDictionary(
-                    m => m.Level,
-                    m => new
-                    {
-                        Meta = m,
-                        OptionLinks = m.OptionLinks.ToDictionary(l => l.PublicId)
-                    });
+                .ToDictionary(m => m.Level);
 
             // Location added
-            AssertSingleLocationAdded(locationMetaChanges, newLocationMetas[GeographicLevel.School].Meta);
+            AssertSingleLocationAdded(locationMetaChanges, newLocationMetas[GeographicLevel.School]);
 
             // Location added
-            AssertSingleLocationAdded(locationMetaChanges, newLocationMetas[GeographicLevel.RscRegion].Meta);
-
-            // Location Option added
-            AssertSingleLocationOptionAdded(locationOptionMetaChanges,
-                newLocationMetas[GeographicLevel.School].OptionLinks[SqidEncoder.Encode(2)]);
-
-            // Location Option added
-            AssertSingleLocationOptionAdded(locationOptionMetaChanges,
-                newLocationMetas[GeographicLevel.School].OptionLinks[SqidEncoder.Encode(3)]);
-
-            // Location Option added
-            AssertSingleLocationOptionAdded(locationOptionMetaChanges,
-                newLocationMetas[GeographicLevel.RscRegion].OptionLinks[SqidEncoder.Encode(4)]);
-
-            // Location Option added
-            AssertSingleLocationOptionAdded(locationOptionMetaChanges,
-                newLocationMetas[GeographicLevel.RscRegion].OptionLinks[SqidEncoder.Encode(5)]);
+            AssertSingleLocationAdded(locationMetaChanges, newLocationMetas[GeographicLevel.RscRegion]);
         }
 
         [Fact]
@@ -1713,32 +1626,23 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
                                         .SetPublicId(SqidEncoder.Encode(1)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(2)))
-                                .Generate(2)))
+                                .Generate(1)))
                 .ForIndex(1, s =>
                     s.SetLevel(GeographicLevel.School) // Location and ALL options deleted
                         .SetOptionLinks(() =>
                             DataFixture.DefaultLocationOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(4)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(5)))
-                                .Generate(2)))
+                                        .SetPublicId(SqidEncoder.Encode(2)))
+                                .Generate(1)))
                 .ForIndex(2, s =>
                     s.SetLevel(GeographicLevel.RscRegion) // Location and ALL options deleted
                         .SetOptionLinks(() =>
                             DataFixture.DefaultLocationOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultLocationRscRegionOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(7)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultLocationRscRegionOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(8)))
-                                .Generate(2)))
+                                        .SetPublicId(SqidEncoder.Encode(3)))
+                                .Generate(1)))
                 .GenerateList(3);
 
             var (originalVersion, _) = await CreateDataSetInitialVersion(oldLocationMeta);
@@ -2082,27 +1986,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
                                         .SetPublicId(SqidEncoder.Encode(1)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(2)))
-                                .ForIndex(2, ls =>
-                                    ls.SetOption(DataFixture.DefaultLocationLocalAuthorityOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(3)))
-                                .Generate(3)))
+                                .Generate(1)))
                 .ForIndex(1, s =>
                     s.SetLevel(GeographicLevel.School)
                         .SetOptionLinks(() =>
                             DataFixture.DefaultLocationOptionMetaLink()
                                 .ForIndex(0, ls =>
                                     ls.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(4)))
-                                .ForIndex(1, ls =>
-                                    ls.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(5)))
-                                .ForIndex(2, ls =>
-                                    ls.SetOption(DataFixture.DefaultLocationSchoolOptionMeta())
-                                        .SetPublicId(SqidEncoder.Encode(6)))
-                                .Generate(3)))
+                                        .SetPublicId(SqidEncoder.Encode(2)))
+                                .Generate(1)))
                 .GenerateList(2);
 
             var (originalVersion, _) = await CreateDataSetInitialVersion(oldLocationMeta);
