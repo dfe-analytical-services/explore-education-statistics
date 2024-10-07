@@ -361,7 +361,6 @@ const ChartBuilder = ({
                   />
                 </TabsSection>
               )}
-
               {forms.boundaryLevels &&
                 definition?.type === 'map' &&
                 options &&
@@ -397,13 +396,9 @@ const ChartBuilder = ({
                     id={forms.dataGroupings.id}
                   >
                     <ChartDataGroupingsConfiguration
-                      axisMajor={axes.major}
                       buttons={deleteButton}
-                      data={data}
                       map={map}
-                      legend={legend}
                       meta={meta}
-                      options={options}
                       onChange={handleMapConfigurationChange}
                       onSubmit={values => {
                         actions.updateChartMapConfiguration(values);
@@ -418,7 +413,6 @@ const ChartBuilder = ({
                     />
                   </TabsSection>
                 )}
-
               {forms.legend && axes.major && legend && (
                 <TabsSection
                   title="Legend"
