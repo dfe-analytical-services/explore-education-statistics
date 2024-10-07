@@ -11,11 +11,14 @@ import previewTokenQueries from '@admin/queries/previewTokenQueries';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import previewTokenService from '@admin/services/previewTokenService';
 import { useLastLocation } from '@admin/contexts/LastLocationContext';
+import CodeBlock from '@common/components/CodeBlock';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Button from '@common/components/Button';
 import CopyTextButton from '@common/components/CopyTextButton';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
+import Tabs from '@common/components/Tabs';
+import TabsSection from '@common/components/TabsSection';
 import ApiDataSetQuickStart from '@common/modules/data-catalogue/components/ApiDataSetQuickStart';
 import { useQuery } from '@tanstack/react-query';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
@@ -75,6 +78,8 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     );
   };
 
+  const tokenExampleUrl = `${publicApiUrl}/api/v1.0/data-sets/${dataSet?.draftVersion?.id}`;
+
   return (
     <>
       <Link
@@ -92,51 +97,97 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
       </Link>
       <LoadingSpinner loading={isLoadingDataSet || isLoadingPreviewTokenId}>
         <div className="govuk-grid-row">
-          <div className="govuk-grid-column-three-quarters">
+          <div className="govuk-grid-column-three-quarters-from-desktop">
             <span className="govuk-caption-l">API data set preview token</span>
             <h2>{dataSet?.title}</h2>
 
             {previewToken?.status === 'Active' ? (
               <>
                 <p>
-                  Token expiry time:{' '}
+                  Reference: <strong>{previewToken.label}</strong>
+                </p>
+
+                <CopyTextButton
+                  buttonText="Copy preview token"
+                  confirmText="Preview token copied"
+                  id="copy-preview-token"
+                  label="Preview token"
+                  text={previewToken.id}
+                />
+
+                <p>
+                  The token expires:{' '}
                   <strong>
                     <FormattedDate formatRelativeToNow>
                       {previewToken.expiry}
                     </FormattedDate>
                   </strong>
                 </p>
-                <h3>Using this token</h3>
-                <h4>Step 1</h4>
-                <p>TODO</p>
-                <h4>Step 2</h4>
-                <p>TODO else</p>
-                <h4>Final checks</h4>
-                <CopyTextButton
-                  buttonText="Copy preview token"
-                  className="govuk-!-margin-bottom-4"
-                  confirmMessage="Token copied to the clipboard"
-                  inlineButton={false}
-                  label="Preview token"
-                  text={previewToken.id}
-                />
+
+                <h3>Using the preview token</h3>
+
                 <p>
-                  Please revoke the token as soon as you have finished checking
-                  the API data set.
+                  To use the preview token, add it to your request using a{' '}
+                  <code>Preview-Token</code> header.
                 </p>
+                <p>
+                  The examples below illustrate how you can add the preview
+                  token header to your code.
+                </p>
+
+                <Tabs id="preview-token-examples">
+                  <TabsSection title="cURL" headingTitle="cURL" headingTag="h4">
+                    <CodeBlock language="bash">
+                      {`curl -X GET -H "Preview-Token: ${previewToken.id}" \\
+  ${tokenExampleUrl}`}
+                    </CodeBlock>
+                  </TabsSection>
+                  <TabsSection
+                    title="Python"
+                    headingTitle="Python"
+                    headingTag="h4"
+                  >
+                    <CodeBlock language="python">
+                      {`import requests
+
+url = "${tokenExampleUrl}"
+
+response = requests.get(url, headers={"Preview-Token": "${previewToken.id}"})`}
+                    </CodeBlock>
+                  </TabsSection>
+                  <TabsSection title="R" headingTitle="R" headingTag="h4">
+                    <CodeBlock language="r">{`library(httr)
+
+url <- "${tokenExampleUrl}"
+
+response <- GET(url, add_headers("Preview-Token" = "${previewToken.id}"))
+`}</CodeBlock>
+                  </TabsSection>
+                </Tabs>
+
+                <h3>Revoking the preview token</h3>
+
+                <p>
+                  Once you have checked the API data set, it is recommended that
+                  you revoke the preview token.
+                </p>
+
                 <ModalConfirm
-                  title="Revoke this token"
+                  title="Revoke preview token"
                   triggerButton={
-                    <Button variant="warning">Revoke this token</Button>
+                    <Button variant="warning">Revoke preview token</Button>
                   }
                   onConfirm={() => handleRevoke(previewToken.id)}
                 >
-                  <p>Are you sure you want to revoke this token?</p>
+                  <p>Are you sure you want to revoke the preview token?</p>
                 </ModalConfirm>
+
                 <p>
-                  <Link to={tokenLogPagePath}>View API data set token log</Link>
+                  <Link to={tokenLogPagePath}>View preview token log</Link>
                 </p>
+
                 <h3>API data set endpoints quick start</h3>
+
                 {dataSet?.draftVersion && (
                   <ApiDataSetQuickStart
                     publicApiBaseUrl={`${publicApiUrl}/api/v1.0`}

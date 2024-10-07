@@ -126,7 +126,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                             <VisuallyHidden> for {token.label}</VisuallyHidden>
                           </Link>
                           <ModalConfirm
-                            title="Revoke this token"
+                            title="Revoke preview token"
                             triggerButton={
                               <ButtonText className="govuk-!-margin-left-2">
                                 Revoke
@@ -135,7 +135,10 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                             }
                             onConfirm={() => handleRevoke(token.id)}
                           >
-                            <p>Are you sure you want to revoke this token?</p>
+                            <p>
+                              Are you sure you want to revoke this preview
+                              token?
+                            </p>
                           </ModalConfirm>
                         </>
                       )}

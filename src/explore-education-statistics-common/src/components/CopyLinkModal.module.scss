@@ -1,0 +1,9 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.copyLink {
+  margin-bottom: govuk-spacing(4);
+
+  @include govuk-media-query($from: desktop) {
+    min-width: map-get($govuk-breakpoints, 'tablet');
+  }
+}

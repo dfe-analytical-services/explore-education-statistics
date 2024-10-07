@@ -44,7 +44,7 @@ public class IndicatorMetaRepository(
                     PublicId = SqidEncoder.Encode(id),
                     Column = row.ColName,
                     Label = row.Label,
-                    Unit = row.IndicatorUnit,
+                    Unit = row.ParsedIndicatorUnit,
                     DecimalPlaces = row.IndicatorDp
                 };
             })

@@ -14,7 +14,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - public api restricted %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    UI tests - Public API - restricted %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
@@ -98,11 +98,11 @@ Verify the contents inside the 'Draft API datasets' table
     user checks table column heading contains    1    2    Name             xpath://table[@data-testid='draft-api-data-sets']
     user checks table column heading contains    1    3    Status           xpath://table[@data-testid='draft-api-data-sets']
     user checks table column heading contains    1    4    Actions          xpath://table[@data-testid='draft-api-data-sets']
-    
+
 
     user checks table cell contains    1    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
     user checks table cell contains    1    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
-    
+
     user checks table cell contains    2    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
     user checks table cell contains    2    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
 
@@ -119,7 +119,7 @@ User checks row data contents inside the 'Draft API datasets' summary table
     user checks contents inside the cell value    National                                   xpath://div[@data-testid="Geographic levels"]//dd[@data-testid="Geographic levels-value"]
     user checks contents inside the cell value    2012/13                                    xpath://div[@data-testid="Time periods"]//dd[@data-testid="Time periods-value"]
 
-    
+
     user checks contents inside the cell value    Lower quartile annualised earnings         xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[1]
     user checks contents inside the cell value    Median annualised earnings                 xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[2]
     user checks contents inside the cell value    Number of learners with earnings           xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[3]
@@ -131,7 +131,7 @@ User checks row data contents inside the 'Draft API datasets' summary table
     user checks contents inside the cell value    	Cheese                                   xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[1]
     user checks contents inside the cell value    	Colour                                   xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[2]
     user checks contents inside the cell value    	Ethnicity group                          xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[3]
-    
+
     user clicks button                              Show 4 more filters                      xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]
 
     user checks contents inside the cell value    	Gender                                    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[4]
@@ -156,7 +156,7 @@ Navigate to admin and create an amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-Upload third subject (which is invalid for Public API import) into the first amendment 
+Upload third subject (which is invalid for Public API import) into the first amendment
     user uploads subject and waits until complete
     ...    ${SUBJECT_NAME_3}
     ...    invalid-data-set.csv
@@ -206,7 +206,7 @@ Verify the contents inside the 'Live API datasets' table after the invalid impor
 
     user checks table cell contains    1    1    v1.0                       xpath://table[@data-testid='live-api-data-sets']
     user checks table cell contains    1    2    ${SUBJECT_NAME_1}          xpath://table[@data-testid='live-api-data-sets']
-    
+
     user checks table cell contains    2    1    v1.0                       xpath://table[@data-testid='live-api-data-sets']
     user checks table cell contains    2    2    ${SUBJECT_NAME_2}          xpath://table[@data-testid='live-api-data-sets']
 
@@ -258,7 +258,7 @@ Create a different version of an API dataset (minor version)
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
-    
+
     user waits until h3 is visible    Current live API data sets
 
     user checks table column heading contains    1    1    Version    xpath://table[@data-testid="live-api-data-sets"]

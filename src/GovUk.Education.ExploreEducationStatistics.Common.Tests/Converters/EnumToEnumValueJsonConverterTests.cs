@@ -1,64 +1,46 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters;
+
+public class EnumToEnumValueJsonConverterTests
 {
-    public class EnumToEnumValueJsonConverterTests
+    private enum SampleEnum
     {
-        private enum SampleEnum
+        [EnumLabelValue("SampleLabel", "SampleValue")]
+        Sample
+    }
+
+    private record SampleClass
+    {
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<SampleEnum>))]
+        public SampleEnum SampleField { get; init; }
+    }
+
+    [Fact]
+    public void SerializeObject()
+    {
+        var objectToSerialize = new SampleClass
         {
-            [EnumLabelValue("SampleLabel", "SampleValue")]
-            Sample
-        }
+            SampleField = SampleEnum.Sample
+        };
 
-        private class SampleClass
+        Assert.Equal("{\"SampleField\":\"SampleValue\"}", JsonConvert.SerializeObject(objectToSerialize));
+    }
+
+    [Fact]
+    public void DeserializeObject()
+    {
+        const string jsonText = "{\"SampleField\":\"SampleValue\"}";
+
+        var expected = new SampleClass
         {
-            [JsonConverter(typeof(EnumToEnumValueJsonConverter<SampleEnum>))]
-            public SampleEnum SampleField { get; set; }
+            SampleField = SampleEnum.Sample
+        };
 
-            protected bool Equals(SampleClass other)
-            {
-                return SampleField == other.SampleField;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
-                return Equals((SampleClass) obj);
-            }
-
-            public override int GetHashCode()
-            {
-                return (int) SampleField;
-            }
-        }
-
-        [Fact]
-        public void SerializeObject()
-        {
-            var objectToSerialize = new SampleClass
-            {
-                SampleField = SampleEnum.Sample
-            };
-
-            Assert.Equal("{\"SampleField\":\"SampleValue\"}", JsonConvert.SerializeObject(objectToSerialize));
-        }
-
-        [Fact]
-        public void DeserializeObject()
-        {
-            const string jsonText = "{\"SampleField\":\"SampleValue\"}";
-
-            var expected = new SampleClass
-            {
-                SampleField = SampleEnum.Sample
-            };
-
-            Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
-        }
+        Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
     }
 }

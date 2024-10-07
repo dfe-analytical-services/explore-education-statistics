@@ -1,6 +1,1 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-if [ -d "./node_modules/.bin/lint-staged" ]; then
-    ./node_modules/.bin/lint-staged
-fi
+lint-staged

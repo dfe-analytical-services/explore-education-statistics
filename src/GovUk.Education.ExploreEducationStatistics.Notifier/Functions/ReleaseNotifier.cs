@@ -1,18 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
 public class ReleaseNotifier(
+    ContentDbContext contentDbContext,
     ILogger<ReleaseNotifier> logger,
     IOptions<AppOptions> appOptions,
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
@@ -53,8 +57,12 @@ public class ReleaseNotifier(
             sentEmails.Count);
 
         // Then send emails to subscribers of any associated superseded publication
+        var supersededPublicationList = await contentDbContext.Publications
+            .Where(p => p.SupersededById == msg.PublicationId)
+            .ToListAsync();
+
         var numSupersededSubscriberEmailsSent = 0;
-        foreach (var supersededPublication in msg.SupersededPublications)
+        foreach (var supersededPublication in supersededPublicationList)
         {
             var supersededPubSubEmails = await subscriptionRepository.GetSubscriberEmails(
                 supersededPublication.Id);
@@ -119,7 +127,7 @@ public class ReleaseNotifier(
 
     private void SendSupersededSubscriberEmail(
         string email,
-        IdTitleViewModel supersededPublication,
+        Publication supersededPublication,
         ReleaseNotificationMessage msg)
     {
         var unsubscribeToken = tokenService.GenerateToken(email, DateTime.UtcNow.AddYears(1));
@@ -134,7 +142,7 @@ public class ReleaseNotifier(
             },
             {
                 "unsubscribe_link",
-                $"{_appOptions.PublicAppUrl}/subscriptions/{msg.PublicationSlug}/confirm-unsubscription/{unsubscribeToken}"
+                $"{_appOptions.PublicAppUrl}/subscriptions/{supersededPublication.Slug}/confirm-unsubscription/{unsubscribeToken}"
             },
             { "superseded_publication_title", supersededPublication.Title }
         };

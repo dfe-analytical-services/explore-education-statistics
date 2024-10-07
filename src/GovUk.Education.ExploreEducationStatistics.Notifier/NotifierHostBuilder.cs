@@ -1,12 +1,16 @@
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
+using GovUk.Education.ExploreEducationStatistics.Common.Functions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,6 +43,11 @@ public static class NotifierHostBuilder
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
+                    .AddDbContext<ContentDbContext>(options =>
+                        options.UseSqlServer(
+                            ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
+                            providerOptions =>
+                                SqlServerDbContextOptionsBuilderExtensions.EnableCustomRetryOnFailure(providerOptions)))
                     .AddFluentValidation()
                     .AddValidatorsFromAssembly(
                         typeof(ApiNotificationMessage.Validator).Assembly) // Adds *all* validators from Notifier.Model

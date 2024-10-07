@@ -362,6 +362,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 configuration.GetSection(AppInsightsOptions.Section));
             services.Configure<NotifyOptions>(
                 configuration.GetSection(NotifyOptions.Section));
+            services.Configure<PublicAppOptions>(
+                configuration.GetRequiredSection(PublicAppOptions.Section));
             services.Configure<PublicDataProcessorOptions>(
                 configuration.GetRequiredSection(PublicDataProcessorOptions.Section));
             services.Configure<PublicDataApiOptions>(

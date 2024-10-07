@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -17,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
@@ -1030,8 +1028,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserInviteRepository? userInviteRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             IUserPublicationInviteRepository? userPublicationInviteRepository = null,
-            UserManager<ApplicationUser>? userManager = null,
-            IConfiguration? configuration = null)
+            UserManager<ApplicationUser>? userManager = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -1047,8 +1044,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
                 userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
-                userManager ?? MockUserManager().Object,
-                new AppOptions { EnableThemeDeletion = true }.ToOptionsWrapper()
+                userManager ?? MockUserManager().Object
             );
         }
     }
