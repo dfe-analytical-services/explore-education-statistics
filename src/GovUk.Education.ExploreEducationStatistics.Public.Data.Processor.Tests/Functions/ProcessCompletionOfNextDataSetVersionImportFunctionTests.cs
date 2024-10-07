@@ -1203,30 +1203,30 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .ToDictionary(m => m.PublicId);
 
             // The changes should be inserted into each database table ordered alphabetically by 'Label'.
-            // They should also be ordered such that all additions come last.
+            // They should also be ordered such that all deletions come first, updates next, and additions last.
 
             // Therefore, the expected order of Filter changes are (as per their Public IDs):
             // Sqid index 2 deleted
+            // Sqid index 1 deleted
             // Sqid index 4 changed
             // Sqid index 3 changed
-            // Sqid index 1 deleted
             // Sqid index 6 added
             // Sqid index 5 added
 
             AssertFilterDeleted(
                 expectedFilterMeta: oldFilterMetas[SqidEncoder.Encode(2)],
                 change: filterMetaChanges[0]);
+            AssertFilterDeleted(
+                expectedFilterMeta: oldFilterMetas[SqidEncoder.Encode(1)],
+                change: filterMetaChanges[1]);
             AssertFilterChanged(
                 expectedOldFilterMeta: oldFilterMetas[SqidEncoder.Encode(4)],
                 expectedNewFilterMeta: newFilterMetas[SqidEncoder.Encode(4)],
-                change: filterMetaChanges[1]);
+                change: filterMetaChanges[2]);
             AssertFilterChanged(
                 expectedOldFilterMeta: oldFilterMetas[SqidEncoder.Encode(3)],
                 expectedNewFilterMeta: newFilterMetas[SqidEncoder.Encode(3)],
-                change: filterMetaChanges[2]);
-            AssertFilterDeleted(
-                expectedFilterMeta: oldFilterMetas[SqidEncoder.Encode(1)],
-                change: filterMetaChanges[3]);
+                change: filterMetaChanges[3]);            
             AssertFilterAdded(
                 expectedFilterMeta: newFilterMetas[SqidEncoder.Encode(6)],
                 change: filterMetaChanges[4]);
@@ -1359,15 +1359,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // The changes should be inserted into each database table ordered alphabetically by 'Label'.
-            // They should also be ordered such that all additions come last.
+            // They should also be ordered such that all deletions come first, updates next, and additions last.
 
             // Therefore, the expected order of Filter Option changes are (as per their Public IDs):
             // Sqid index 2 in filter with Sqid index 1 deleted
-            // Sqid index 3 in filter with Sqid index 1 changed
             // Sqid index 5 in filter with Sqid index 2 deleted
             // Sqid index 1 in filter with Sqid index 1 deleted
-            // Sqid index 7 in filter with Sqid index 2 changed
             // Sqid index 6 in filter with Sqid index 2 deleted
+            // Sqid index 3 in filter with Sqid index 1 changed
+            // Sqid index 7 in filter with Sqid index 2 changed
             // Sqid index 8 in filter with Sqid index 2 changed
             // Sqid index 4 in filter with Sqid index 1 changed
             // Sqid index 10 in filter with Sqid index 1 added
@@ -1378,23 +1378,23 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             AssertFilterOptionDeleted(
                 expectedOptionLink: oldFilterMetas[SqidEncoder.Encode(1)][SqidEncoder.Encode(2)],
                 change: filterOptionMetaChanges[0]);
+            AssertFilterOptionDeleted(
+                expectedOptionLink: oldFilterMetas[SqidEncoder.Encode(2)][SqidEncoder.Encode(5)],
+                change: filterOptionMetaChanges[1]);
+            AssertFilterOptionDeleted(
+                expectedOptionLink: oldFilterMetas[SqidEncoder.Encode(1)][SqidEncoder.Encode(1)],
+                change: filterOptionMetaChanges[2]);
+            AssertFilterOptionDeleted(
+                expectedOptionLink: oldFilterMetas[SqidEncoder.Encode(2)][SqidEncoder.Encode(6)],
+                change: filterOptionMetaChanges[3]);
             AssertFilterOptionChanged(
                 expectedOldOptionLink: oldFilterMetas[SqidEncoder.Encode(1)][SqidEncoder.Encode(3)],
                 expectedNewOptionLink: newFilterMetas[SqidEncoder.Encode(1)][SqidEncoder.Encode(3)],
-                change: filterOptionMetaChanges[1]);
-            AssertFilterOptionDeleted(
-                expectedOptionLink: oldFilterMetas[SqidEncoder.Encode(2)][SqidEncoder.Encode(5)],
-                change: filterOptionMetaChanges[2]);
-            AssertFilterOptionDeleted(
-                expectedOptionLink: oldFilterMetas[SqidEncoder.Encode(1)][SqidEncoder.Encode(1)],
-                change: filterOptionMetaChanges[3]);
+                change: filterOptionMetaChanges[4]);           
             AssertFilterOptionChanged(
                 expectedOldOptionLink: oldFilterMetas[SqidEncoder.Encode(2)][SqidEncoder.Encode(7)],
                 expectedNewOptionLink: newFilterMetas[SqidEncoder.Encode(2)][SqidEncoder.Encode(7)],
-                change: filterOptionMetaChanges[4]);
-            AssertFilterOptionDeleted(
-                expectedOptionLink: oldFilterMetas[SqidEncoder.Encode(2)][SqidEncoder.Encode(6)],
-                change: filterOptionMetaChanges[5]);
+                change: filterOptionMetaChanges[5]);            
             AssertFilterOptionChanged(
                 expectedOldOptionLink: oldFilterMetas[SqidEncoder.Encode(2)][SqidEncoder.Encode(8)],
                 expectedNewOptionLink: newFilterMetas[SqidEncoder.Encode(2)][SqidEncoder.Encode(8)],
@@ -2323,15 +2323,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                     m => m.OptionLinks.ToDictionary(l => l.PublicId));
 
             // The changes should be inserted into each database table ordered alphabetically by 'Label'.
-            // They should also be ordered such that all additions come last.
+            // They should also be ordered such that all deletions come first, updates next, and additions last.
 
             // Therefore, the expected order of Location Option changes are (as per their Public IDs):
             // Sqid index 2 in Location with Level EnglishDevolvedArea deleted
-            // Sqid index 3 in Location with Level EnglishDevolvedArea changed
             // Sqid index 5 in Location with Level Country deleted
             // Sqid index 1 in Location with Level EnglishDevolvedArea deleted
-            // Sqid index 7 in Location with Level Country changed
             // Sqid index 6 in Location with Level Country deleted
+            // Sqid index 3 in Location with Level EnglishDevolvedArea changed
+            // Sqid index 7 in Location with Level Country changed
             // Sqid index 8 in Location with Level Country changed
             // Sqid index 4 in Location with Level EnglishDevolvedArea changed
             // Sqid index 10 in Location with Level EnglishDevolvedArea added
@@ -2342,23 +2342,23 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
             AssertLocationOptionDeleted(
                 expectedOptionLink: oldLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(2)],
                 change: locationOptionMetaChanges[0]);
+            AssertLocationOptionDeleted(
+                expectedOptionLink: oldLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(5)],
+                change: locationOptionMetaChanges[1]);
+            AssertLocationOptionDeleted(
+                expectedOptionLink: oldLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(1)],
+                change: locationOptionMetaChanges[2]);
+            AssertLocationOptionDeleted(
+                expectedOptionLink: oldLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(6)],
+                change: locationOptionMetaChanges[3]);
             AssertLocationOptionChanged(
                 expectedOldOptionLink: oldLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(3)],
                 expectedNewOptionLink: newLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(3)],
-                change: locationOptionMetaChanges[1]);
-            AssertLocationOptionDeleted(
-                expectedOptionLink: oldLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(5)],
-                change: locationOptionMetaChanges[2]);
-            AssertLocationOptionDeleted(
-                expectedOptionLink: oldLocationMetas[GeographicLevel.EnglishDevolvedArea][SqidEncoder.Encode(1)],
-                change: locationOptionMetaChanges[3]);
+                change: locationOptionMetaChanges[4]);     
             AssertLocationOptionChanged(
                 expectedOldOptionLink: oldLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(7)],
                 expectedNewOptionLink: newLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(7)],
-                change: locationOptionMetaChanges[4]);
-            AssertLocationOptionDeleted(
-                expectedOptionLink: oldLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(6)],
-                change: locationOptionMetaChanges[5]);
+                change: locationOptionMetaChanges[5]);            
             AssertLocationOptionChanged(
                 expectedOldOptionLink: oldLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(8)],
                 expectedNewOptionLink: newLocationMetas[GeographicLevel.Country][SqidEncoder.Encode(8)],
@@ -2897,7 +2897,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
         }
 
         [Fact]
-        public async Task FiltersAddedAndDeletedAndChanged_ChangesInsertedIntoDatabaseInCorrectOrder()
+        public async Task IndicatorsAddedAndDeletedAndChanged_ChangesInsertedIntoDatabaseInCorrectOrder()
         {
             var oldIndicatorMeta = DataFixture.DefaultIndicatorMeta()
                 .ForIndex(0, s =>
@@ -2946,29 +2946,29 @@ public abstract class ProcessCompletionOfNextDataSetVersionImportFunctionTests(
                 .ToDictionary(m => m.PublicId);
 
             // The changes should be inserted into each database table ordered alphabetically by 'Label'.
-            // They should also be ordered such that all additions come last.
+            // They should also be ordered such that all deletions come first, updates next, and additions last.
 
             // Therefore, the expected order of Indicator changes are (as per their Public IDs):
             // Sqid index 2 deleted
+            // Sqid index 1 deleted
             // Sqid index 4 changed
             // Sqid index 3 changed
-            // Sqid index 1 deleted
             // Sqid index 6 added
             // Sqid index 5 added
 
             AssertIndicatorDeleted(
                 expectedIndicatorMeta: oldIndicatorMetas[SqidEncoder.Encode(2)],
                 change: indicatorMetaChanges[0]);
+            AssertIndicatorDeleted(
+                expectedIndicatorMeta: oldIndicatorMetas[SqidEncoder.Encode(1)],
+                change: indicatorMetaChanges[1]);
             AssertIndicatorChanged(
                 expectedOldIndicatorMeta: oldIndicatorMetas[SqidEncoder.Encode(4)],
                 expectedNewIndicatorMeta: newIndicatorMetas[SqidEncoder.Encode(4)],
-                change: indicatorMetaChanges[1]);
+                change: indicatorMetaChanges[2]);
             AssertIndicatorChanged(
                 expectedOldIndicatorMeta: oldIndicatorMetas[SqidEncoder.Encode(3)],
                 expectedNewIndicatorMeta: newIndicatorMetas[SqidEncoder.Encode(3)],
-                change: indicatorMetaChanges[2]);
-            AssertIndicatorDeleted(
-                expectedIndicatorMeta: oldIndicatorMetas[SqidEncoder.Encode(1)],
                 change: indicatorMetaChanges[3]);
             AssertIndicatorAdded(
                 expectedIndicatorMeta: newIndicatorMetas[SqidEncoder.Encode(6)],

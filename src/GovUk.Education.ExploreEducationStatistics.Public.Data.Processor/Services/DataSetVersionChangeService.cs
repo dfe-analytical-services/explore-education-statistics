@@ -58,8 +58,10 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         var oldMetas = await GetFilterMetas(previousVersionId, cancellationToken);
         var newMetas = await GetFilterMetas(nextVersionId, cancellationToken);
 
-        var metaDeletionsAndChanges = new List<FilterMetaChange>();
-        var optionMetaDeletionsAndChanges = new List<FilterOptionMetaChange>();
+        var metaDeletions = new List<FilterMetaChange>();
+        var optionMetaDeletions = new List<FilterOptionMetaChange>();
+        var metaUpdates = new List<FilterMetaChange>();
+        var optionMetaUpdates = new List<FilterOptionMetaChange>();
         var metaAdditions = new List<FilterMetaChange>();
         var optionMetaAdditions = new List<FilterOptionMetaChange>();
 
@@ -67,16 +69,17 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         {
             if (newMetas.TryGetValue(filterPublicId, out var newFilterTuple))
             {
-                // Filter changed
+                // Filter updated
                 if (!IsFilterEqual(newFilterTuple.FilterMeta, oldFilterTuple.FilterMeta))
                 {
-                    metaDeletionsAndChanges.Add(new FilterMetaChange
-                        {
-                            DataSetVersionId = nextVersionId,
-                            PreviousState = oldFilterTuple.FilterMeta,
-                            PreviousStateId = oldFilterTuple.FilterMeta.Id,
-                            CurrentStateId = newFilterTuple.FilterMeta.Id
-                        });
+                    metaUpdates.Add(new FilterMetaChange
+                    {
+                        DataSetVersionId = nextVersionId,
+                        PreviousState = oldFilterTuple.FilterMeta,
+                        PreviousStateId = oldFilterTuple.FilterMeta.Id,
+                        CurrentState = newFilterTuple.FilterMeta,
+                        CurrentStateId = newFilterTuple.FilterMeta.Id
+                    });
                 }
 
                 foreach (var (optionPublicId, oldOptionLink) in oldFilterTuple.OptionLinks)
@@ -84,59 +87,43 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     if (!newFilterTuple.OptionLinks.TryGetValue(optionPublicId, out var newOptionLink))
                     {
                         // Filter option deleted
-                        optionMetaDeletionsAndChanges.Add(new FilterOptionMetaChange
-                            {
-                                DataSetVersionId = nextVersionId,
-                                PreviousState = FilterOptionMetaChange.State.Create(oldOptionLink)
-                            });
+                        optionMetaDeletions.Add(new FilterOptionMetaChange
+                        {
+                            DataSetVersionId = nextVersionId,
+                            PreviousState = FilterOptionMetaChange.State.Create(oldOptionLink)
+                        });
                     }
-                    // Filter option changed
+                    // Filter option updated
                     else if (!IsFilterOptionEqual(newOptionLink.Option, oldOptionLink.Option))
                     {
-                        optionMetaDeletionsAndChanges.Add(new FilterOptionMetaChange
-                            {
-                                DataSetVersionId = nextVersionId,
-                                PreviousState = FilterOptionMetaChange.State.Create(oldOptionLink),
-                                CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
-                            });
+                        optionMetaUpdates.Add(new FilterOptionMetaChange
+                        {
+                            DataSetVersionId = nextVersionId,
+                            PreviousState = FilterOptionMetaChange.State.Create(oldOptionLink),
+                            CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
+                        });
+
+                        // Improving performance by removing from the new meta to avoid having to loop
+                        // over it again when finding the additions
+                        newFilterTuple.OptionLinks.Remove(optionPublicId);
                     }
                 }
             }
             else
             {
                 // Filter deleted
-                metaDeletionsAndChanges.Add(new FilterMetaChange
-                    {
-                        DataSetVersionId = nextVersionId,
-                        PreviousState = oldFilterTuple.FilterMeta,
-                        PreviousStateId = oldFilterTuple.FilterMeta.Id,
-                    });
+                metaDeletions.Add(new FilterMetaChange
+                {
+                    DataSetVersionId = nextVersionId,
+                    PreviousState = oldFilterTuple.FilterMeta,
+                    PreviousStateId = oldFilterTuple.FilterMeta.Id,
+                });
             }
         }
 
         foreach (var (filterPublicId, newFilterTuple) in newMetas)
         {
-            if (!oldMetas.TryGetValue(filterPublicId, out var oldFilterTuple))
-            {
-                // Filter added
-                metaAdditions.Add(new FilterMetaChange
-                    {
-                        DataSetVersionId = nextVersionId,
-                        CurrentState = newFilterTuple.FilterMeta,
-                        CurrentStateId = newFilterTuple.FilterMeta.Id
-                    });
-
-                foreach (var (_, newOptionLink) in newFilterTuple.OptionLinks)
-                {
-                    // Filter option added
-                    optionMetaAdditions.Add(new FilterOptionMetaChange
-                        {
-                            DataSetVersionId = nextVersionId,
-                            CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
-                        });
-                }
-            }
-            else
+            if (oldMetas.TryGetValue(filterPublicId, out var oldFilterTuple))
             {
                 foreach (var (optionPublicId, newOptionLink) in newFilterTuple.OptionLinks)
                 {
@@ -144,26 +131,53 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     {
                         // Filter option added
                         optionMetaAdditions.Add(new FilterOptionMetaChange
-                            {
-                                DataSetVersionId = nextVersionId,
-                                CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
-                            });
+                        {
+                            DataSetVersionId = nextVersionId,
+                            CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
+                        });
                     }
+                }
+            }
+            else
+            {
+                // Filter added
+                metaAdditions.Add(new FilterMetaChange
+                {
+                    DataSetVersionId = nextVersionId,
+                    CurrentState = newFilterTuple.FilterMeta,
+                    CurrentStateId = newFilterTuple.FilterMeta.Id
+                });
+
+                foreach (var (_, newOptionLink) in newFilterTuple.OptionLinks)
+                {
+                    // Filter option added
+                    optionMetaAdditions.Add(new FilterOptionMetaChange
+                    {
+                        DataSetVersionId = nextVersionId,
+                        CurrentState = FilterOptionMetaChange.State.Create(newOptionLink)
+                    });
                 }
             }
         }
 
-        metaDeletionsAndChanges = [.. metaDeletionsAndChanges.NaturalOrderBy(c => c.PreviousState!.Label)];
+        // The meta changes are inserted into the DB in the following order:
+        // - Deletions
+        // - Updates
+        // - Additions
+        publicDataDbContext.FilterMetaChanges.AddRange(
+            [
+                .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Label),
+                .. metaUpdates.NaturalOrderBy(c => c.PreviousState!.Label),
+                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label)
+            ]);
 
-        optionMetaDeletionsAndChanges = [.. optionMetaDeletionsAndChanges.NaturalOrderBy(c => c.PreviousState!.Option.Label)];
+        publicDataDbContext.FilterOptionMetaChanges.AddRange(
+            [
+                .. optionMetaDeletions.NaturalOrderBy(c => c.PreviousState!.Option.Label),
+                .. optionMetaUpdates.NaturalOrderBy(c => c.PreviousState!.Option.Label),
+                .. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label)
+            ]);
 
-        // Additions are inserted into the DB last
-        metaAdditions = [.. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label)];
-
-        optionMetaAdditions = [.. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label)];
-
-        publicDataDbContext.FilterMetaChanges.AddRange([.. metaDeletionsAndChanges, .. metaAdditions]);
-        publicDataDbContext.FilterOptionMetaChanges.AddRange([.. optionMetaDeletionsAndChanges, .. optionMetaAdditions]);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -188,7 +202,8 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         var newMetas = await GetLocationMetas(nextVersionId, cancellationToken);
 
         var metaDeletions = new List<LocationMetaChange>();
-        var optionMetaDeletionsAndChanges = new List<LocationOptionMetaChange>();
+        var optionMetaDeletions = new List<LocationOptionMetaChange>();
+        var optionMetaUpdates = new List<LocationOptionMetaChange>();
         var metaAdditions = new List<LocationMetaChange>();
         var optionMetaAdditions = new List<LocationOptionMetaChange>();
 
@@ -201,21 +216,25 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     if (!newLocationTuple.OptionLinks.TryGetValue(optionPublicId, out var newOptionLink))
                     {
                         // Location option deleted
-                        optionMetaDeletionsAndChanges.Add(new LocationOptionMetaChange
+                        optionMetaDeletions.Add(new LocationOptionMetaChange
                         {
                             DataSetVersionId = nextVersionId,
                             PreviousState = LocationOptionMetaChange.State.Create(oldOptionLink)
                         });
                     }
-                    // Location option changed
+                    // Location option updated
                     else if (!IsLocationOptionEqual(newOptionLink.Option, oldOptionLink.Option))
                     {
-                        optionMetaDeletionsAndChanges.Add(new LocationOptionMetaChange
+                        optionMetaUpdates.Add(new LocationOptionMetaChange
                         {
                             DataSetVersionId = nextVersionId,
                             PreviousState = LocationOptionMetaChange.State.Create(oldOptionLink),
                             CurrentState = LocationOptionMetaChange.State.Create(newOptionLink)
                         });
+
+                        // Improving performance by removing from the new meta to avoid having to loop
+                        // over it again when finding the additions
+                        newLocationTuple.OptionLinks.Remove(optionPublicId);
                     }
                 }
             }
@@ -233,7 +252,22 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
 
         foreach (var (locationLevel, newLocationTuple) in newMetas)
         {
-            if (!oldMetas.TryGetValue(locationLevel, out var oldLocationTuple))
+            if (oldMetas.TryGetValue(locationLevel, out var oldLocationTuple))
+            {
+                foreach (var (optionPublicId, newOptionLink) in newLocationTuple.OptionLinks)
+                {
+                    if (!oldLocationTuple.OptionLinks.ContainsKey(optionPublicId))
+                    {
+                        // Location option added
+                        optionMetaAdditions.Add(new LocationOptionMetaChange
+                        {
+                            DataSetVersionId = nextVersionId,
+                            CurrentState = LocationOptionMetaChange.State.Create(newOptionLink)
+                        });
+                    }
+                }
+            }
+            else
             {
                 // Location added
                 metaAdditions.Add(new LocationMetaChange
@@ -253,40 +287,34 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
                     });
                 }
             }
-            else
-            {
-                foreach (var (optionPublicId, newOptionLink) in newLocationTuple.OptionLinks)
-                {
-                    if (!oldLocationTuple.OptionLinks.ContainsKey(optionPublicId))
-                    {
-                        // Location option added
-                        optionMetaAdditions.Add(new LocationOptionMetaChange
-                        {
-                            DataSetVersionId = nextVersionId,
-                            CurrentState = LocationOptionMetaChange.State.Create(newOptionLink)
-                        });
-                    }
-                }
-            }
         }
 
-        metaDeletions = [.. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Level.GetEnumLabel())];
+        // The meta changes are inserted into the DB in the following order:
+        // - Deletions
+        // - Updates
+        // - Additions
+        publicDataDbContext.LocationMetaChanges.AddRange(
+            [
+                .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Level.GetEnumLabel()),
+                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Level.GetEnumLabel())
+            ]);
 
-        optionMetaDeletionsAndChanges = [.. optionMetaDeletionsAndChanges.NaturalOrderBy(c => c.PreviousState!.Option.Label)];
+        publicDataDbContext.LocationOptionMetaChanges.AddRange(
+            [
+                .. optionMetaDeletions.NaturalOrderBy(c => c.PreviousState!.Option.Label),
+                .. optionMetaUpdates.NaturalOrderBy(c => c.PreviousState!.Option.Label),
+                .. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label)
+            ]);
 
-        // Additions are inserted into the DB last
-        metaAdditions = [.. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Level.GetEnumLabel())];
-
-        optionMetaAdditions = [.. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label)];
-
-        publicDataDbContext.LocationMetaChanges.AddRange([.. metaDeletions, .. metaAdditions]);
-        publicDataDbContext.LocationOptionMetaChanges.AddRange([.. optionMetaDeletionsAndChanges, .. optionMetaAdditions]);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
     private static bool IsLocationOptionEqual(LocationOptionMeta locationOptionMeta1, LocationOptionMeta locationOptionMeta2)
     {
-        return locationOptionMeta1.Label == locationOptionMeta2.Label;
+        // We need to check if the label, and any codes have changed.
+        // However, the LocationOptionMeta table is constrained so that every row is unique and we only create new options
+        // when something has changed. This means we can get away with just checking that the ids are equal.
+        return locationOptionMeta1.Id == locationOptionMeta2.Id;
     }
 
     private async Task CreateGeographicLevelChange(
@@ -320,21 +348,23 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         var oldMetas = await GetIndicatorMetas(previousVersionId, cancellationToken);
         var newMetas = await GetIndicatorMetas(nextVersionId, cancellationToken);
 
-        var metaDeletionsAndChanges = new List<IndicatorMetaChange>();
+        var metaDeletions = new List<IndicatorMetaChange>();
+        var metaUpdates = new List<IndicatorMetaChange>();
         var metaAdditions = new List<IndicatorMetaChange>();
 
         foreach (var (indicatorPublicId, oldIndicator) in oldMetas)
         {
             if (newMetas.TryGetValue(indicatorPublicId, out var newIndicator))
             {
-                // Indicator changed
+                // Indicator updated
                 if (!IsIndicatorEqual(newIndicator, oldIndicator))
                 {
-                    metaDeletionsAndChanges.Add(new IndicatorMetaChange
+                    metaUpdates.Add(new IndicatorMetaChange
                     {
                         DataSetVersionId = nextVersionId,
                         PreviousState = oldIndicator,
                         PreviousStateId = oldIndicator.Id,
+                        CurrentState = newIndicator,
                         CurrentStateId = newIndicator.Id
                     });
                 }
@@ -342,7 +372,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             else
             {
                 // Indicator deleted
-                metaDeletionsAndChanges.Add(new IndicatorMetaChange
+                metaDeletions.Add(new IndicatorMetaChange
                 {
                     DataSetVersionId = nextVersionId,
                     PreviousState = oldIndicator,
@@ -365,12 +395,17 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             }
         }
 
-        metaDeletionsAndChanges = [.. metaDeletionsAndChanges.NaturalOrderBy(c => c.PreviousState!.Label)];
+        // The meta changes are inserted into the DB in the following order:
+        // - Deletions
+        // - Updates
+        // - Additions
+        publicDataDbContext.IndicatorMetaChanges.AddRange(
+            [
+                .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Label),
+                .. metaUpdates.NaturalOrderBy(c => c.PreviousState!.Label),
+                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label)
+            ]);
 
-        // Additions are inserted into the DB last
-        metaAdditions = [.. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label)];
-
-        publicDataDbContext.IndicatorMetaChanges.AddRange([.. metaDeletionsAndChanges, .. metaAdditions]);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -485,6 +520,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
     {
         return await publicDataDbContext
             .TimePeriodMetas
+            .AsNoTracking()
             .Where(tpm => tpm.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
     }
