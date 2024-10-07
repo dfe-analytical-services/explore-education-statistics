@@ -64,7 +64,7 @@ public class CreateNextDataSetVersionMappingsFunction(
         CancellationToken cancellationToken)
     {
         const string orchestratorName =
-            nameof(ProcessNextDataSetVersionMappingsFunction.ProcessNextDataSetVersionMappings);
+            nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration.ProcessNextDataSetVersionMappings);
 
         var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 
