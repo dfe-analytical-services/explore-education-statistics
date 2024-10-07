@@ -10,7 +10,7 @@ import useToggle from '@common/hooks/useToggle';
 import tableBuilderQueries from '@common/modules/find-statistics/queries/tableBuilderQueries';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import { useQuery } from '@tanstack/react-query';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 export interface EditableKeyStatDataBlockProps {
   isEditing?: boolean;
@@ -33,6 +33,7 @@ export default function EditableKeyStatDataBlock({
   onRemove,
   onSubmit,
 }: EditableKeyStatDataBlockProps) {
+  const [keyStatisticId, setKeyStatisticId] = useState("");
   const [showForm, toggleShowForm] = useToggle(false);
 
   const {
@@ -46,9 +47,10 @@ export default function EditableKeyStatDataBlock({
   const handleSubmit = useCallback(
     async (values: KeyStatDataBlockFormValues) => {
       await onSubmit(values);
+      setKeyStatisticId("");
       toggleShowForm.off();
     },
-    [onSubmit, toggleShowForm],
+    [onSubmit, toggleShowForm, setKeyStatisticId],
   );
 
   if (isLoading) {
@@ -76,7 +78,7 @@ export default function EditableKeyStatDataBlock({
     return (
       <EditableKeyStatDataBlockForm
         keyStat={keyStat}
-        keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
+        keyStatisticGuidanceTitles={keyStatisticGuidanceTitles?.filter((keyStatTitle) => keyStatTitle === keyStatisticId)}
         title={title}
         statistic={statistic}
         isReordering={isReordering}
