@@ -240,7 +240,7 @@ User verifies the relevant fields on the active preview token page
 
     ${current_time_tomorrow}=    get current local datetime    %-I:%M %p    1
     user checks page contains
-    ...     The token expires: tomorrow at ${current_time_tomorrow} (local time)
+    ...     The token expires: tomorrow at ${time_end} (local time)
 
     user checks page contains button    Copy preview token
     user checks page contains button    Revoke preview token
