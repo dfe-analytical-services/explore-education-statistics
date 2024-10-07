@@ -106,7 +106,7 @@ user opens browser and logs in via Identity Provider
 
 user checks for Analyst access on the Dashboard
     user waits until page contains title    Dashboard
-    user waits until h3 is visible    %{TEST_THEME_NAME} / %{TEST_TOPIC_NAME}
+    user waits until h3 is visible    %{TEST_THEME_NAME}
     user waits until page contains link    ${PUBLICATION_NAME}
     user checks page contains    Logged in as Pending
     user checks page does not contain link    Platform administration

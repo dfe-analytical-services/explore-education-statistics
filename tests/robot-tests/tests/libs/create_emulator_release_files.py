@@ -36,7 +36,7 @@ class ReleaseFilesGenerator(object):
         self.metadata_files = []
 
         if not os.path.exists(seed_data_csv_filepath):
-            logger.warn("Unable to locate seed data csv file for generating local storage file uploads - skipping")
+            logger.warning("Unable to locate seed data csv file for generating local storage file uploads - skipping")
             return
 
         with open(seed_data_csv_filepath, "r") as seed_data_csv_file:
@@ -88,7 +88,7 @@ class ReleaseFilesGenerator(object):
                 with open(seed_data_filepath, "r") as seed_file:
                     data = seed_file.read()
             else:
-                logger.warn(
+                logger.warning(
                     f"Unable to locate unzipped seed data file at location {seed_data_filepath} - "
                     f"creating dummy file contents instead"
                 )
