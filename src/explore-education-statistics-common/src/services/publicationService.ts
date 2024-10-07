@@ -26,11 +26,9 @@ export interface Publication {
     title: string;
   }[];
   releaseSeries: ReleaseSeriesItem[];
-  topic: {
-    theme: {
-      id: string;
-      title: string;
-    };
+  theme: {
+    id: string;
+    title: string;
   };
   contact: Contact;
   methodologies: MethodologySummary[];
@@ -207,18 +205,12 @@ export interface PublicationSupersededBy {
   title: string;
   slug: string;
 }
-export interface Topic {
-  id: string;
-  title: string;
-  summary: string;
-  publications: PublicationTreeSummary[];
-}
 
 export interface Theme {
   id: string;
   title: string;
   summary: string;
-  topics: Topic[];
+  publications: PublicationTreeSummary[];
 }
 
 export interface PublicationTreeOptions {

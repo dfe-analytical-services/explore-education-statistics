@@ -1247,7 +1247,7 @@ const DocumentationGlossary = () => {
               <p>
                 Alternatively, see if you can break up long sections like these
                 into 2 different sections by grouping the content into
-                like-minded themes and topics.
+                like-minded themes.
               </p>
               <h3 id="paper-b">Paper B</h3>
               <p>In national curriculum tests.</p>

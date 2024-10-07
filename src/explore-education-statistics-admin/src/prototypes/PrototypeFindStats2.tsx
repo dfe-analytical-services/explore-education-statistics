@@ -1,5 +1,4 @@
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
-import classNames from 'classnames';
 import RelatedInformation from '@common/components/RelatedInformation';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import Link from '@admin/components/Link';
@@ -21,7 +20,6 @@ const PrototypeFindStats = () => {
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTheme, setSelectedTheme] = useState('all-themes');
-  const [selectedTopic, setSelectedTopic] = useState('');
   const [selectedReleaseType, setSelectedReleaseType] =
     useState('all-release-types');
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -37,12 +35,6 @@ const PrototypeFindStats = () => {
 
   const getSelectedTheme = (themeId: string) => {
     return themes.find(theme => theme.id === themeId);
-  };
-
-  const getSelectedTopic = (themeId: string, topicId: string) => {
-    return themes
-      .find(theme => theme.id === themeId)
-      ?.topics.find(topic => topic.id === topicId);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,18 +55,14 @@ const PrototypeFindStats = () => {
 
   const filteredPublications = useMemo(() => {
     const themeTitle = getSelectedTheme(selectedTheme)?.title;
-    const topicTitle = getSelectedTopic(selectedTheme, selectedTopic)?.title;
-    const filteredByThemeAndTopic =
+    const filteredByTheme =
       selectedTheme === 'all-themes'
         ? publications
         : publications.filter(publication => {
-            return !selectedTopic || selectedTopic.startsWith('all-topics')
-              ? publication.theme === themeTitle
-              : publication.theme === themeTitle &&
-                  publication.topic === topicTitle;
+            return publication.theme === themeTitle;
           });
 
-    const filtered = filteredByThemeAndTopic.filter(publication => {
+    const filtered = filteredByTheme.filter(publication => {
       return selectedReleaseType && selectedReleaseType !== 'all-release-types'
         ? publication.type ===
             releaseTypes[selectedReleaseType as keyof typeof releaseTypes]
@@ -97,13 +85,7 @@ const PrototypeFindStats = () => {
     const ordered = orderBy(searched, orderValue, direction);
 
     return spliceIntoChunks(ordered, 10);
-  }, [
-    selectedReleaseType,
-    selectedSortOrder,
-    searchQuery,
-    selectedTheme,
-    selectedTopic,
-  ]);
+  }, [selectedReleaseType, selectedSortOrder, searchQuery, selectedTheme]);
 
   return (
     <div className={styles.prototypePublicPage}>
@@ -198,7 +180,6 @@ const PrototypeFindStats = () => {
             <PrototypeFilters
               selectedReleaseType={selectedReleaseType}
               selectedTheme={selectedTheme}
-              selectedTopic={selectedTopic}
               showFilters={showFilters}
               themes={themes}
               totalResults={totalResults}
@@ -209,10 +190,6 @@ const PrototypeFindStats = () => {
               }}
               onSelectTheme={theme => {
                 setSelectedTheme(theme);
-                setCurrentPage(0);
-              }}
-              onSelectTopic={topic => {
-                setSelectedTopic(topic);
                 setCurrentPage(0);
               }}
             />
@@ -248,7 +225,6 @@ const PrototypeFindStats = () => {
                       onClick={() => {
                         setSelectedTheme('all-themes');
                         setSelectedReleaseType('all-release-types');
-                        setSelectedTopic('');
                         setSearchQuery('');
                         setSearchInput('');
                         setCurrentPage(0);
@@ -283,7 +259,6 @@ const PrototypeFindStats = () => {
                         variant="secondary"
                         onClick={() => {
                           setSelectedTheme('all-themes');
-                          setSelectedTopic('');
                           setCurrentPage(0);
                         }}
                       >
@@ -292,28 +267,6 @@ const PrototypeFindStats = () => {
                           Clear theme{' '}
                         </span>
                         {getSelectedTheme(selectedTheme)?.title}
-                      </Button>
-                    </span>
-                  )}
-                  {selectedTopic && !selectedTopic.startsWith('all-topics') && (
-                    <span
-                      className={classNames(
-                        styles.prototypeFilterTag,
-                        styles.prototypeFilterTopic,
-                      )}
-                    >
-                      <Button
-                        variant="secondary"
-                        onClick={() => {
-                          setSelectedTopic(`all-topics-${selectedTheme}`);
-                          setCurrentPage(0);
-                        }}
-                      >
-                        ✕{' '}
-                        <span className="govuk-visually-hidden">
-                          Clear topic{' '}
-                        </span>
-                        {getSelectedTopic(selectedTheme, selectedTopic)?.title}
                       </Button>
                     </span>
                   )}

@@ -2,8 +2,8 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PublicationForm from '@admin/pages/publication/components/PublicationForm';
-import { dashboardRoute, ThemeTopicParams } from '@admin/routes/routes';
-import topicService from '@admin/services/topicService';
+import { dashboardRoute, ThemeParams } from '@admin/routes/routes';
+import themeService from '@admin/services/themeService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import appendQuery from '@common/utils/url/appendQuery';
@@ -13,19 +13,19 @@ import { RouteComponentProps } from 'react-router';
 export default function PublicationCreatePage({
   history,
   match,
-}: RouteComponentProps<{ topicId: string }>) {
-  const { topicId } = match.params;
+}: RouteComponentProps<{ themeId: string }>) {
+  const { themeId } = match.params;
 
-  const { value: topic, isLoading } = useAsyncHandledRetry(
-    () => topicService.getTopic(topicId),
-    [topicId],
+  const { value: theme, isLoading } = useAsyncHandledRetry(
+    () => themeService.getTheme(themeId),
+    [themeId],
   );
 
   if (isLoading) {
     return <LoadingSpinner loading={isLoading} />;
   }
 
-  if (!topic) {
+  if (!theme) {
     return null;
   }
 
@@ -33,7 +33,7 @@ export default function PublicationCreatePage({
     <Page breadcrumbs={[{ name: 'Create new publication' }]}>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <PageTitle caption={topic.title} title="Create new publication" />
+          <PageTitle caption={theme.title} title="Create new publication" />
         </div>
       </div>
 
@@ -41,16 +41,14 @@ export default function PublicationCreatePage({
         cancelButton={
           <Link
             unvisited
-            to={appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-              themeId: topic.themeId,
-              topicId,
+            to={appendQuery<ThemeParams>(dashboardRoute.path, {
+              themeId: theme.id,
             })}
           >
             Cancel
           </Link>
         }
-        themeId={topic.themeId}
-        topicId={topic.id}
+        themeId={theme.id}
         onSubmit={() => history.push(dashboardRoute.path)}
       />
     </Page>

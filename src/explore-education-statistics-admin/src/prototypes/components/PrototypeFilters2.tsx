@@ -15,27 +15,23 @@ import { FormSelect } from '@common/components/form';
 interface Props {
   selectedReleaseType: string;
   selectedTheme: string;
-  selectedTopic: string;
   showFilters: boolean;
   themes: Theme[];
   totalResults?: number;
   onCloseFilters: () => void;
   onSelectReleaseType: (type: string) => void;
   onSelectTheme: (theme: string) => void;
-  onSelectTopic: (topic: string) => void;
 }
 
 const PrototypeFilters = ({
   selectedReleaseType,
   selectedTheme,
-  selectedTopic,
   showFilters,
   themes,
   totalResults,
   onCloseFilters,
   onSelectReleaseType,
   onSelectTheme,
-  onSelectTopic,
 }: Props) => {
   const themeFilters = useMemo(() => {
     return [{ label: 'All themes', value: 'all-themes' }].concat(
@@ -47,10 +43,6 @@ const PrototypeFilters = ({
       }),
     );
   }, [themes]);
-
-  const getSelectedTheme = (themeId: string) => {
-    return themes.find(theme => theme.id === themeId);
-  };
 
   const [showHelpTypesModal, toggleHelpTypesModal] = useToggle(false);
 
@@ -83,47 +75,20 @@ const PrototypeFilters = ({
         value={selectedTheme}
         onChange={e => {
           onSelectTheme(e.target.value);
-          onSelectTopic(`all-topics-${e.target.value}`);
         }}
         options={themeFilters}
       />
 
       {selectedTheme !== 'all-themes' && (
-        <>
-          <FormRadioGroup
-            className="govuk-!-margin-top-5"
-            id="topics"
-            legend={`${getSelectedTheme(selectedTheme)?.title} topics `}
-            legendSize="s"
-            small
-            name="topic"
-            hint={getSelectedTheme(selectedTheme)?.summary}
-            value={selectedTopic}
-            onChange={e => {
-              onSelectTopic(e.target.value);
+        <div className="govuk-!-margin-top-2">
+          <ButtonText
+            onClick={() => {
+              onSelectTheme('all-themes');
             }}
-            options={[
-              {
-                label: `All topics`,
-                value: `all-topics-${selectedTheme}`,
-              },
-            ].concat(
-              getSelectedTheme(selectedTheme)?.topics.map(top => ({
-                label: top.title,
-                value: top.id,
-              })) ?? [],
-            )}
-          />
-          <div className="govuk-!-margin-top-2">
-            <ButtonText
-              onClick={() => {
-                onSelectTheme('all-themes');
-              }}
-            >
-              Clear theme and topic
-            </ButtonText>
-          </div>
-        </>
+          >
+            Clear theme
+          </ButtonText>
+        </div>
       )}
 
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Other filters</h2>

@@ -1,6 +1,6 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import styles from '@admin/pages/admin-dashboard/components/TopicPublications.module.scss';
-import { publicationCreateRoute, ThemeTopicParams } from '@admin/routes/routes';
+import styles from '@admin/pages/admin-dashboard/components/ThemePublications.module.scss';
+import { publicationCreateRoute, ThemeParams } from '@admin/routes/routes';
 import Link from '@admin/components/Link';
 import {
   publicationReleasesRoute,
@@ -9,7 +9,6 @@ import {
 import permissionService from '@admin/services/permissionService';
 import publicationService from '@admin/services/publicationService';
 import { Theme } from '@admin/services/themeService';
-import { Topic } from '@admin/services/topicService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import orderBy from 'lodash/orderBy';
@@ -18,14 +17,13 @@ import { generatePath } from 'react-router';
 
 interface Props {
   theme: Theme;
-  topic: Topic;
 }
 
-const TopicPublications = ({ theme, topic }: Props) => {
+const ThemePublications = ({ theme }: Props) => {
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const [publications, canCreatePublication] = await Promise.all([
-      publicationService.listPublications(topic.id),
-      permissionService.canCreatePublicationForTopic(topic.id),
+      publicationService.listPublications(theme.id),
+      permissionService.canCreatePublicationForTheme(theme.id),
     ]);
     return { publications, canCreatePublication };
   });
@@ -33,9 +31,9 @@ const TopicPublications = ({ theme, topic }: Props) => {
   const { publications, canCreatePublication } = value ?? {};
 
   return (
-    <div className={styles.publication} data-testid="topic-publications">
-      <div data-testid={`topic-publications-${theme.title}-${topic.title}`}>
-        <h3>{`${theme.title} / ${topic.title}`}</h3>
+    <div className={styles.publication} data-testid="theme-publications">
+      <div data-testid={`theme-publications-${theme.title}`}>
+        <h3>{theme.title}</h3>
         <LoadingSpinner
           hideText
           inline
@@ -67,9 +65,8 @@ const TopicPublications = ({ theme, topic }: Props) => {
       </div>
       {canCreatePublication && (
         <ButtonLink
-          to={generatePath<ThemeTopicParams>(publicationCreateRoute.path, {
+          to={generatePath<ThemeParams>(publicationCreateRoute.path, {
             themeId: theme.id,
-            topicId: topic.id,
           })}
         >
           Create new publication
@@ -79,4 +76,4 @@ const TopicPublications = ({ theme, topic }: Props) => {
   );
 };
 
-export default TopicPublications;
+export default ThemePublications;

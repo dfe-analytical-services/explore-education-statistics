@@ -138,11 +138,9 @@ const prototypeReleaseContent: ReleaseContent = {
       releaseSeries: [],
       slug: 'publication-slug',
       title: 'Initial Teacher Training Census',
-      topic: {
-        theme: {
-          id: 'test-theme',
-          title: 'Test theme',
-        },
+      theme: {
+        id: 'test-theme',
+        title: 'Test theme',
       },
     },
     relatedInformation: [

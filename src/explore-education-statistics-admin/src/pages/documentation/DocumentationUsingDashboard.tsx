@@ -124,12 +124,11 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4>
                     If you have access to a long list of publications - use the
-                    ‘Select theme’ and ‘Select topic’ dropdowns to find a
-                    publication.
+                    ‘Select theme’ dropdown to find a publication.
                   </h4>
                   <img
                     src={imagePublicationSelectTheme}
-                    alt="Select theme and topic to show relevant publications"
+                    alt="Select theme to show relevant publications"
                     className="govuk-!-width-three-quarters"
                   />
                 </li>
@@ -222,11 +221,11 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                   <h4>
                     If you have access to a long list of publications, to find
                     the publication you want to view or edit use the ‘Select
-                    theme’ and ‘Select topic’ dropdowns.
+                    theme’ dropdown.
                   </h4>
                   <img
                     src={imagePublicationSelectTheme}
-                    alt="Select theme and topic to show relevant publications"
+                    alt="Select theme to show relevant publications"
                     className="govuk-!-width-three-quarters"
                   />
                 </li>
@@ -307,13 +306,12 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4>
                     If you have access to a long list of publications - use the
-                    ‘Select theme’ and ‘Select topic’ dropdowns to first find
-                    the publication and then the related release you want to
-                    view and edit.
+                    ‘Select theme’ dropdown to first find the publication and
+                    then the related release you want to view and edit.
                   </h4>
                   <img
                     src={imagePublicationSelectTheme}
-                    alt="Select theme and topic to show relevant publications"
+                    alt="Select theme to show relevant publications"
                     className="govuk-!-width-three-quarters"
                   />
                 </li>

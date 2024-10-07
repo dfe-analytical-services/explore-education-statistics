@@ -131,7 +131,7 @@ describe('ReleaseContentPage', () => {
       slug: 'publication-1',
       releases: [],
       releaseSeries: [],
-      topic: { theme: { id: 'theme-1', title: 'Theme 1' } },
+      theme: { id: 'theme-1', title: 'Theme 1' },
       contact: {
         contactName: 'John Smith',
         contactTelNo: '0777777777',

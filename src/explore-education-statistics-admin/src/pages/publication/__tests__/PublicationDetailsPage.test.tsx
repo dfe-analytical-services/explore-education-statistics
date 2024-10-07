@@ -29,40 +29,12 @@ describe('PublicationDetailsPage', () => {
       slug: 'theme-1-slug',
       summary: '',
       title: 'Theme 1',
-      topics: [
-        {
-          id: 'theme-1-topic-1',
-          slug: 'theme-1-topic-1-slug',
-          themeId: 'theme-1',
-          title: 'Theme 1 Topic 1',
-        },
-        {
-          id: 'theme-1-topic-2',
-          slug: 'theme-1-topic-2-slug',
-          themeId: 'theme-1',
-          title: 'Theme 1 Topic 2',
-        },
-      ],
     },
     {
       id: 'theme-2',
       slug: 'theme-2-slug',
       summary: '',
       title: 'Theme 2',
-      topics: [
-        {
-          id: 'theme-2-topic-1',
-          slug: 'theme-2-topic-1-slug',
-          themeId: 'theme-2',
-          title: 'Theme 2 Topic 1',
-        },
-        {
-          id: 'theme-2-topic-2',
-          slug: 'theme-2-topic-2-slug',
-          themeId: 'theme-2',
-          title: 'Theme 2 Topic 2',
-        },
-      ],
     },
   ];
 
@@ -109,10 +81,6 @@ describe('PublicationDetailsPage', () => {
       id: 'theme-id-1',
       title: 'theme-title-1',
     },
-    topic: {
-      id: 'topic-id-1',
-      title: 'topic-title-1',
-    },
   };
 
   beforeEach(() => {
@@ -137,7 +105,6 @@ describe('PublicationDetailsPage', () => {
       'Publication 1',
     );
     expect(screen.getByTestId('Theme')).toHaveTextContent('Theme 1');
-    expect(screen.getByTestId('Topic')).toHaveTextContent('Theme 1 Topic 2');
     expect(screen.getByTestId('Superseding publication')).toHaveTextContent(
       'This publication is not archived',
     );
@@ -194,15 +161,6 @@ describe('PublicationDetailsPage', () => {
       expect(themes[1]).toHaveTextContent('Theme 2');
       expect(themes[1]).toHaveValue('theme-2');
 
-      const topicSelect = screen.getByLabelText('Select topic');
-      expect(topicSelect).toHaveValue('theme-1-topic-2');
-      const topics = within(topicSelect).getAllByRole('option');
-      expect(topics).toHaveLength(2);
-      expect(topics[0]).toHaveTextContent('Theme 1 Topic 1');
-      expect(topics[0]).toHaveValue('theme-1-topic-1');
-      expect(topics[1]).toHaveTextContent('Theme 1 Topic 2');
-      expect(topics[1]).toHaveValue('theme-1-topic-2');
-
       const supersedingPublicationSelect = screen.getByLabelText(
         'Superseding publication',
       );
@@ -225,46 +183,6 @@ describe('PublicationDetailsPage', () => {
       expect(
         screen.getByRole('button', { name: 'Cancel' }),
       ).toBeInTheDocument();
-    });
-
-    test('updates the topics dropdown when change the theme', async () => {
-      const { user } = renderPage(testPublication);
-
-      await waitFor(() => {
-        expect(screen.getByText('Publication details')).toBeInTheDocument();
-      });
-
-      await user.click(
-        screen.getByRole('button', { name: 'Edit publication details' }),
-      );
-
-      await waitFor(() => {
-        expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
-      });
-
-      const topics = within(screen.getByLabelText('Select topic')).getAllByRole(
-        'option',
-      );
-      expect(topics).toHaveLength(2);
-
-      expect(topics[0]).toHaveTextContent('Theme 1 Topic 1');
-      expect(topics[0]).toHaveValue('theme-1-topic-1');
-      expect(topics[1]).toHaveTextContent('Theme 1 Topic 2');
-      expect(topics[1]).toHaveValue('theme-1-topic-2');
-
-      await user.selectOptions(screen.getByLabelText('Select theme'), [
-        'theme-2',
-      ]);
-
-      const updatedTopics = within(
-        screen.getByLabelText('Select topic'),
-      ).getAllByRole('option');
-      expect(updatedTopics).toHaveLength(2);
-
-      expect(updatedTopics[0]).toHaveTextContent('Theme 2 Topic 1');
-      expect(updatedTopics[0]).toHaveValue('theme-2-topic-1');
-      expect(updatedTopics[1]).toHaveTextContent('Theme 2 Topic 2');
-      expect(updatedTopics[1]).toHaveValue('theme-2-topic-2');
     });
 
     test('clicking the cancel button switches back to readOnly view', async () => {
@@ -296,7 +214,6 @@ describe('PublicationDetailsPage', () => {
         screen.queryByLabelText('Publication title'),
       ).not.toBeInTheDocument();
       expect(screen.queryByLabelText('Theme')).not.toBeInTheDocument();
-      expect(screen.queryByLabelText('Topic')).not.toBeInTheDocument();
       expect(
         screen.queryByLabelText('Superseding publication'),
       ).not.toBeInTheDocument();
@@ -569,10 +486,6 @@ describe('PublicationDetailsPage', () => {
         'theme-2',
       ]);
 
-      await user.selectOptions(screen.getByLabelText('Select topic'), [
-        'theme-2-topic-2',
-      ]);
-
       await user.selectOptions(
         screen.getByLabelText('Superseding publication'),
         ['publication-2'],
@@ -598,7 +511,6 @@ describe('PublicationDetailsPage', () => {
           title: 'Publication 1 updated',
           summary: 'Publication 1 summary',
           themeId: 'theme-2',
-          topicId: 'theme-2-topic-2',
         });
       });
     });

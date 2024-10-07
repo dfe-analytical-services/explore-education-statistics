@@ -44,7 +44,7 @@ const PrototypeManageUsers = () => {
           {showBau && (
             <ul className="govuk-!-margin-bottom-6">
               <li>
-                <a href="#">manage themes and topics</a>
+                <a href="#">manage themes</a>
               </li>
             </ul>
           )}
@@ -84,18 +84,6 @@ const PrototypeManageUsers = () => {
                     className="govuk-select govuk-!-width-full"
                   >
                     <option value="">Pupils and schools</option>
-                  </select>
-                </div>
-                <div className="govuk-!-width-one-third">
-                  <label htmlFor="topic" className="govuk-label">
-                    Select topic
-                  </label>
-                  <select
-                    name="topic"
-                    id="topic"
-                    className="govuk-select govuk-select govuk-!-width-full"
-                  >
-                    <option value="">Pupil absence</option>
                   </select>
                 </div>
               </div>

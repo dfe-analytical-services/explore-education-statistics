@@ -14,27 +14,23 @@ import ModalContent from '@admin/prototypes/components/PrototypeModalContent';
 interface Props {
   selectedReleaseType: string;
   selectedTheme: string;
-  selectedTopic: string;
   showFilters: boolean;
   themes: Theme[];
   totalResults?: number;
   onCloseFilters: () => void;
   onSelectReleaseType: (type: string) => void;
   onSelectTheme: (theme: string) => void;
-  onSelectTopic: (topic: string) => void;
 }
 
 const PrototypeFilters = ({
   selectedReleaseType,
   selectedTheme,
-  selectedTopic,
   showFilters,
   themes,
   totalResults,
   onCloseFilters,
   onSelectReleaseType,
   onSelectTheme,
-  onSelectTopic,
 }: Props) => {
   const themeFilters = useMemo(() => {
     return [{ label: 'All themes', value: 'all-themes' }].concat(
@@ -42,35 +38,10 @@ const PrototypeFilters = ({
         return {
           label: theme.title,
           value: theme.id,
-          conditional: (
-            <FormRadioGroup
-              id="topics"
-              legend="Choose topic"
-              legendSize="s"
-              small
-              name="topic"
-              hint="Select a topic to filter results for this theme"
-              value={selectedTopic}
-              onChange={e => {
-                onSelectTopic(e.target.value);
-              }}
-              options={[
-                {
-                  label: `All topics`,
-                  value: `all-topics-${theme.id}`,
-                },
-              ].concat(
-                theme.topics.map(top => ({
-                  label: top.title,
-                  value: top.id,
-                })),
-              )}
-            />
-          ),
         };
       }),
     );
-  }, [selectedTopic, onSelectTopic, themes]);
+  }, [themes]);
 
   const [showHelpTypesModal, toggleHelpTypesModal] = useToggle(false);
 
@@ -105,7 +76,6 @@ const PrototypeFilters = ({
         small
         onChange={e => {
           onSelectTheme(e.target.value);
-          onSelectTopic(`all-topics-${e.target.value}`);
         }}
         options={themeFilters}
       />

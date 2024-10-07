@@ -51,11 +51,9 @@ export const testPublication: Publication = {
         'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
     },
   ],
-  topic: {
-    theme: {
-      id: 'test-theme',
-      title: 'Pupils and schools',
-    },
+  theme: {
+    id: 'test-theme',
+    title: 'Pupils and schools',
   },
   contact: {
     teamName: 'School absence and exclusions team',

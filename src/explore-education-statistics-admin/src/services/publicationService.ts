@@ -57,7 +57,6 @@ export interface Publication {
   summary: string;
   slug: string;
   theme: IdTitlePair;
-  topic: IdTitlePair;
   supersededById?: string;
   isSuperseded?: boolean;
   permissions?: PublicationPermissions;
@@ -68,7 +67,6 @@ export interface PublicationSaveRequest {
   summary: string;
   supersededById?: string;
   themeId: string;
-  topicId: string;
 }
 
 export interface PublicationCreateRequest {
@@ -77,7 +75,6 @@ export interface PublicationCreateRequest {
   contact: ContactSave;
   supersededById?: string;
   themeId: string;
-  topicId: string;
 }
 
 export interface ReleaseSeriesLegacyLinkAddRequest {
@@ -105,9 +102,9 @@ export interface ReleaseSeriesTableEntry extends ReleaseSeriesItem {
 }
 
 const publicationService = {
-  listPublications(topicId?: string): Promise<Publication[]> {
+  listPublications(themeId?: string): Promise<Publication[]> {
     return client.get('/publications', {
-      params: { topicId },
+      params: { themeId },
     });
   },
   getPublicationSummaries(): Promise<PublicationSummary[]> {
