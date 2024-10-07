@@ -1490,15 +1490,10 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
     private async Task<(Guid instanceId, DataSetVersion initialVersion, DataSetVersion nextVersion)>
         CreateNextDataSetVersionAndDataFiles(DataSetVersionImportStage importStage)
     {
-        var (initialDataSetVersion, _) = await CreateDataSet(
-            importStage: DataSetVersionImportStage.Completing,
-            status: DataSetVersionStatus.Published);
-
-        var (nextDataSetVersion, instanceId) = await CreateDataSetVersionAndImport(
-            dataSetId: initialDataSetVersion.DataSetId,
-            importStage: importStage,
-            versionMajor: 1,
-            versionMinor: 1);
+        var (initialDataSetVersion, nextDataSetVersion, instanceId) =
+            await CreateDataSetInitialAndNextVersion(
+                nextVersionImportStage: importStage,
+                nextVersionStatus: DataSetVersionStatus.Processing);
 
         SetupCsvDataFilesForDataSetVersion(ProcessorTestData.AbsenceSchool, nextDataSetVersion);
         return (instanceId, initialDataSetVersion, nextDataSetVersion);

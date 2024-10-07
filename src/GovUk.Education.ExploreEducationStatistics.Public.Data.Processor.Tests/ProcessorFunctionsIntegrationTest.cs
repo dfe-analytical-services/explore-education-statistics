@@ -40,7 +40,8 @@ public abstract class ProcessorFunctionsIntegrationTest(
         return Task.CompletedTask;
     }
 
-    protected void SetupCsvDataFilesForDataSetVersion(ProcessorTestData processorTestData,
+    protected void SetupCsvDataFilesForDataSetVersion(
+        ProcessorTestData processorTestData,
         DataSetVersion dataSetVersion)
     {
         var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
@@ -58,25 +59,76 @@ public abstract class ProcessorFunctionsIntegrationTest(
             destFileName: dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion));
     }
 
-    protected async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSet(
-        DataSetVersionImportStage importStage,
-        DataSetVersionStatus? status = null,
-        Guid? releaseFileId = null)
+    protected async Task<(DataSetVersion initialVersion, DataSetVersion nextVersion, Guid instanceId)>
+        CreateDataSetInitialAndNextVersion(
+            DataSetVersionStatus nextVersionStatus,
+            DataSetVersionImportStage nextVersionImportStage,
+            DataSetVersionMeta? initialVersionMeta = null,
+            DataSetVersionMeta? nextVersionMeta = null)
     {
-        DataSet dataSet = DataFixture.DefaultDataSet();
+        var (initialVersion, _) = await CreateDataSetInitialVersion(
+            dataSetStatus: DataSetStatus.Published,
+            dataSetVersionStatus: DataSetVersionStatus.Published,
+            importStage: DataSetVersionImportStage.Completing,
+            meta: initialVersionMeta);
+
+        var (nextVersion, instanceId) = await CreateDataSetNextVersion(
+            initialVersion: initialVersion,
+            status: nextVersionStatus,
+            importStage: nextVersionImportStage,
+            meta: nextVersionMeta);
+
+        return (initialVersion, nextVersion, instanceId);
+    }
+
+    protected async Task<(DataSetVersion dataSetVersion, Guid instanceId)>
+        CreateDataSetInitialVersion(
+            DataSetVersionImportStage importStage,
+            DataSetStatus dataSetStatus = DataSetStatus.Draft,
+            DataSetVersionStatus dataSetVersionStatus = DataSetVersionStatus.Processing,
+            Guid? releaseFileId = null,
+            DataSetVersionMeta? meta = null)
+    {
+        DataSet dataSet = DataFixture
+            .DefaultDataSet()
+            .WithStatus(dataSetStatus);
 
         await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-        return await CreateDataSetVersionAndImport(dataSet.Id, importStage, status, releaseFileId);
+        return await CreateDataSetVersion(
+            dataSetId: dataSet.Id,
+            importStage: importStage,
+            status: dataSetVersionStatus,
+            releaseFileId: releaseFileId,
+            meta: meta);
     }
 
-    protected async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersionAndImport(
+    protected async Task<(DataSetVersion nextVersion, Guid instanceId)>
+        CreateDataSetNextVersion(
+            DataSetVersion initialVersion,
+            DataSetVersionStatus status,
+            DataSetVersionImportStage importStage,
+            DataSetVersionMeta? meta = null)
+    {
+        var defaultNextVersion = initialVersion.DefaultNextVersion();
+
+        return await CreateDataSetVersion(
+            dataSetId: initialVersion.DataSetId,
+            status: status,
+            importStage: importStage,
+            versionMajor: defaultNextVersion.Major,
+            versionMinor: defaultNextVersion.Minor,
+            meta: meta);
+    }
+
+    private async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersion(
         Guid dataSetId,
         DataSetVersionImportStage importStage,
-        DataSetVersionStatus? status = null,
+        DataSetVersionStatus status = DataSetVersionStatus.Processing,
         Guid? releaseFileId = null,
         int versionMajor = 1,
-        int versionMinor = 0)
+        int versionMinor = 0,
+        DataSetVersionMeta? meta = null)
     {
         await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
@@ -88,10 +140,10 @@ public abstract class ProcessorFunctionsIntegrationTest(
             .DefaultDataSetVersionImport()
             .WithStage(importStage);
 
-        DataSetVersion dataSetVersion = DataFixture
+        var dataSetVersionGenerator = DataFixture
             .DefaultDataSetVersion()
             .WithDataSet(dataSet)
-            .WithStatus(status ?? DataSetVersionStatus.Processing)
+            .WithStatus(status)
             .WithImports(() => [dataSetVersionImport])
             .WithVersionNumber(major: versionMajor, minor: versionMinor)
             .FinishWith(dsv =>
@@ -110,6 +162,38 @@ public abstract class ProcessorFunctionsIntegrationTest(
                     dsv.DataSet.LatestDraftVersion = dsv;
                 }
             });
+
+        if (meta?.FilterMetas is not null)
+        {
+            dataSetVersionGenerator = dataSetVersionGenerator
+                .WithFilterMetas(() => meta.FilterMetas);
+        }
+
+        if (meta?.LocationMetas is not null)
+        {
+            dataSetVersionGenerator = dataSetVersionGenerator
+                .WithLocationMetas(() => meta.LocationMetas);
+        }
+
+        if (meta?.GeographicLevelMeta is not null)
+        {
+            dataSetVersionGenerator = dataSetVersionGenerator
+                .WithGeographicLevelMeta(() => meta.GeographicLevelMeta);
+        }
+
+        if (meta?.IndicatorMetas is not null)
+        {
+            dataSetVersionGenerator = dataSetVersionGenerator
+                .WithIndicatorMetas(() => meta.IndicatorMetas);
+        }
+
+        if (meta?.TimePeriodMetas is not null)
+        {
+            dataSetVersionGenerator = dataSetVersionGenerator
+                .WithTimePeriodMetas(() => meta.TimePeriodMetas);
+        }
+
+        var dataSetVersion = dataSetVersionGenerator.Generate();
 
         await AddTestData<PublicDataDbContext>(context =>
         {

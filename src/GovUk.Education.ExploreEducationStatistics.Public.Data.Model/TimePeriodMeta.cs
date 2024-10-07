@@ -39,4 +39,19 @@ public class TimePeriodMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
                 .IsUnique();
         }
     }
+
+    private sealed class CodePeriodEqualityComparer : IEqualityComparer<TimePeriodMeta>
+    {
+        public bool Equals(TimePeriodMeta? x, TimePeriodMeta? y)
+        {
+            return x?.Code == y?.Code && x?.Period == y?.Period;
+        }
+
+        public int GetHashCode(TimePeriodMeta obj)
+        {
+            return HashCode.Combine((int)obj.Code, obj.Period);
+        }
+    }
+
+    public static IEqualityComparer<TimePeriodMeta> CodePeriodComparer { get; } = new CodePeriodEqualityComparer();
 }

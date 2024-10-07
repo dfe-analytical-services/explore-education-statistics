@@ -24,7 +24,7 @@ public static class LocationMappingPlanGeneratorExtensions
             .Select(meta => meta.Level)
             .Distinct()
             .ToList();
-        
+
         levels.ForEach(level =>
         {
             var levelGenerator = fixture
@@ -32,7 +32,7 @@ public static class LocationMappingPlanGeneratorExtensions
 
             var sourceLocationsForLevel = sourceLocations?
                 .SingleOrDefault(meta => meta.Level == level);
-            
+
             sourceLocationsForLevel?.Options.ForEach(option =>
             {
                 levelGenerator.AddMapping(
@@ -43,10 +43,10 @@ public static class LocationMappingPlanGeneratorExtensions
                             .WithLabel(option.Label)
                             .WithCodes(option.ToRow())));
             });
-            
+
             var targetLocationsForLevel = targetLocations?
                 .SingleOrDefault(meta => meta.Level == level);
-            
+
             targetLocationsForLevel?.Options.ForEach(option =>
             {
                 levelGenerator.AddCandidate(
@@ -56,7 +56,7 @@ public static class LocationMappingPlanGeneratorExtensions
                         .WithLabel(option.Label)
                         .WithCodes(option.ToRow()));
             });
-                
+
             locationMappingPlanGenerator.AddLevel(level, levelGenerator);
         });
 
@@ -132,7 +132,7 @@ public static class LocationMappingPlanGeneratorExtensions
             urn: urn,
             laEstab: laEstab,
             ukprn: ukprn));
-    
+
     public static Generator<MappableLocationOption> WithCodes(
         this Generator<MappableLocationOption> generator,
         LocationOptionMetaRow metaRow)
