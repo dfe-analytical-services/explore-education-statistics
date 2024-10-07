@@ -17,53 +17,23 @@ public class EnumerableExtensionsTests
         public void OrdersSingleCharacters()
         {
             TestRecord[] testRecords = [
-                    new() {
-                        FirstString = "1",
-                        SecondString = "d"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "1"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "b"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "c"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "a"
-                    },
+                    new() { Value = "d" },
+                    new() { Value = "1" },
+                    new() { Value = "b" },
+                    new() { Value = "c" },
+                    new() { Value = "a" },
                 ];
 
             TestRecord[] expected = [
-                    new() {
-                        FirstString = "1",
-                        SecondString = "1"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "a"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "b"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "c"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "d"
-                    },
+                    new() { Value = "1" },
+                    new() { Value = "a" },
+                    new() { Value = "b" },
+                    new() { Value = "c" },
+                    new() { Value = "d" },
                 ];
 
             var orderedRecords = testRecords
-                .NaturalOrderBy(r => r.SecondString);
+                .NaturalOrderBy(r => r.Value);
 
             Assert.Equal(expected, orderedRecords);
         }
@@ -72,125 +42,46 @@ public class EnumerableExtensionsTests
         public void OrdersMultipleCharacters()
         {
             TestRecord[] testRecords = [
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z24"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z2"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abcde"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z15"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abd"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z1"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z3"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abc"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z20"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z5"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abcd"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z11"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z22"
-                    },
+                    new() { Value = "z24" },
+                    new() { Value = "z2" },
+                    new() { Value = "abcde" },
+                    new() { Value = "z15" },
+                    new() { Value = "abd" },
+                    new() { Value = "z1" },
+                    new() { Value = "z3" },
+                    new() { Value = "abc" },
+                    new() { Value = "z20" },
+                    new() { Value = "z5" },
+                    new() { Value = "abcd" },
+                    new() { Value = "z11" },
+                    new() { Value = "z22" },
                 ];
 
             TestRecord[] expected = [
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abc"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abcd"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abcde"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abd"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z1"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z2"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z3"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z5"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z11"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z15"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z20"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z22"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z24"
-                    },
+                    new() { Value = "abc" },
+                    new() { Value = "abcd" },
+                    new() { Value = "abcde" },
+                    new() { Value = "abd" },
+                    new() { Value = "z1" },
+                    new() { Value = "z2" },
+                    new() { Value = "z3" },
+                    new() { Value = "z5" },
+                    new() { Value = "z11" },
+                    new() { Value = "z15" },
+                    new() { Value = "z20" },
+                    new() { Value = "z22" },
+                    new() { Value = "z24" },
                 ];
 
             var orderedRecords = testRecords
-                .NaturalOrderBy(r => r.SecondString);
+                .NaturalOrderBy(r => r.Value);
 
             Assert.Equal(expected, orderedRecords);
         }
 
         private record TestRecord
         {
-            public required string FirstString { get; init; }
-            public required string SecondString { get; init; }
+            public required string Value { get; init; }
         }
     }
 
@@ -199,235 +90,97 @@ public class EnumerableExtensionsTests
         [Fact]
         public void OrdersSingleCharacters()
         {
-            TestRecord[] testRecords = [
-                    new() {
-                        FirstString = "1",
-                        SecondString = "d"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "1"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "b"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "c"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "a"
-                    },
-                ];
-
-            TestRecord[] expected = [
-                    new() {
-                        FirstString = "1",
-                        SecondString = "1"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "a"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "b"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "c"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "d"
-                    },
-                ];
-
+            TestRecord[] testRecords =
+            [
+                new() { FirstString = "1", SecondString = "d" }, 
+                new() { FirstString = "1", SecondString = "1" },
+                new() { FirstString = "1", SecondString = "b" }, 
+                new() { FirstString = "1", SecondString = "c" },
+                new() { FirstString = "1", SecondString = "a" },
+            ];
+            
+            TestRecord[] expected =
+            [
+                new() { FirstString = "1", SecondString = "1" },
+                new() { FirstString = "1", SecondString = "a" },
+                new() { FirstString = "1", SecondString = "b" }, 
+                new() { FirstString = "1", SecondString = "c" },
+                new() { FirstString = "1", SecondString = "d" },
+            ];
+            
             var orderedRecords = testRecords
                 .NaturalOrderBy(r => r.FirstString)
                 .NaturalThenBy(r => r.SecondString);
-
+            
             Assert.Equal(expected, orderedRecords);
         }
 
         [Fact]
         public void OrdersMultipleCharacters()
         {
-            TestRecord[] testRecords = [
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z24"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z2"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abcde"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z15"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abd"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z1"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z3"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abc"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z20"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z5"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abcd"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z11"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z22"
-                    },
-                ];
-
-            TestRecord[] expected = [
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abc"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abcd"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abcde"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "abd"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z1"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z2"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z3"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z5"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z11"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z15"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z20"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z22"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "z24"
-                    },
-                ];
-
+            TestRecord[] testRecords =
+            [
+                new() { FirstString = "1", SecondString = "z24" }, 
+                new() { FirstString = "1", SecondString = "z2" },
+                new() { FirstString = "1", SecondString = "abcde" }, 
+                new() { FirstString = "1", SecondString = "z15" },
+                new() { FirstString = "1", SecondString = "abd" }, 
+                new() { FirstString = "1", SecondString = "z1" },
+                new() { FirstString = "1", SecondString = "z3" }, 
+                new() { FirstString = "1", SecondString = "abc" },
+                new() { FirstString = "1", SecondString = "z20" }, 
+                new() { FirstString = "1", SecondString = "z5" },
+                new() { FirstString = "1", SecondString = "abcd" },
+                new() { FirstString = "1", SecondString = "z11" },
+                new() { FirstString = "1", SecondString = "z22" },
+            ];
+            
+            TestRecord[] expected =
+            [
+                new() { FirstString = "1", SecondString = "abc" }, 
+                new() { FirstString = "1", SecondString = "abcd" },
+                new() { FirstString = "1", SecondString = "abcde" }, 
+                new() { FirstString = "1", SecondString = "abd" },
+                new() { FirstString = "1", SecondString = "z1" }, 
+                new() { FirstString = "1", SecondString = "z2" },
+                new() { FirstString = "1", SecondString = "z3" }, 
+                new() { FirstString = "1", SecondString = "z5" },
+                new() { FirstString = "1", SecondString = "z11" }, 
+                new() { FirstString = "1", SecondString = "z15" },
+                new() { FirstString = "1", SecondString = "z20" }, 
+                new() { FirstString = "1", SecondString = "z22" },
+                new() { FirstString = "1", SecondString = "z24" },
+            ];
+            
             var orderedRecords = testRecords
                 .NaturalOrderBy(r => r.FirstString)
                 .NaturalThenBy(r => r.SecondString);
-
+            
             Assert.Equal(expected, orderedRecords);
         }
 
         [Fact]
         public void PreservesOrderingOfOrderBy()
         {
-            TestRecord[] testRecords = [
-                    new() {
-                        FirstString = "2",
-                        SecondString = "a"
-                    },
-                    new() {
-                        FirstString = "2",
-                        SecondString = "b"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "b"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "a"
-                    },
-                    new() {
-                        FirstString = "3",
-                        SecondString = "b"
-                    },
-                    new() {
-                        FirstString = "3",
-                        SecondString = "a"
-                    },
-                ];
-
-            TestRecord[] expected = [
-                    new() {
-                        FirstString = "1",
-                        SecondString = "a"
-                    },
-                    new() {
-                        FirstString = "1",
-                        SecondString = "b"
-                    },
-                    new() {
-                        FirstString = "2",
-                        SecondString = "a"
-                    },
-                    new() {
-                        FirstString = "2",
-                        SecondString = "b"
-                    },
-                    new() {
-                        FirstString = "3",
-                        SecondString = "a"
-                    },
-                    new() {
-                        FirstString = "3",
-                        SecondString = "b"
-                    },
-                ];
+            TestRecord[] testRecords =
+            [
+                new() { FirstString = "2", SecondString = "a" }, 
+                new() { FirstString = "2", SecondString = "b" },
+                new() { FirstString = "1", SecondString = "b" }, 
+                new() { FirstString = "1", SecondString = "a" },
+                new() { FirstString = "3", SecondString = "b" }, 
+                new() { FirstString = "3", SecondString = "a" },
+            ];
+            
+            TestRecord[] expected =
+            [
+                new() { FirstString = "1", SecondString = "a" }, 
+                new() { FirstString = "1", SecondString = "b" },
+                new() { FirstString = "2", SecondString = "a" }, 
+                new() { FirstString = "2", SecondString = "b" },
+                new() { FirstString = "3", SecondString = "a" }, 
+                new() { FirstString = "3", SecondString = "b" },
+            ];
 
             var orderedRecords = testRecords
                 .NaturalOrderBy(r => r.FirstString)
@@ -455,7 +208,7 @@ public class EnumerableExtensionsTests
 
         var result = source.ToDictionaryIndexed(value => value, (value, index) => (Value: value, Index: index));
 
-        var expected = new Dictionary<string, ( string S, int Index )>
+        var expected = new Dictionary<string, (string S, int Index)>
         {
             {"a", ("a", 0)},
             {"b", ("b", 1)},
@@ -504,7 +257,7 @@ public class EnumerableExtensionsTests
     public async Task ForEachAsync_SuccessfulEitherList()
     {
         Either<Unit, List<int>> results =
-            await new List<int> {1, 2}
+            await new List<int> { 1, 2 }
                 .ForEachAsync(async value =>
                     await GetSuccessfulEither(value));
 
@@ -520,7 +273,7 @@ public class EnumerableExtensionsTests
     public async Task ForEachAsync_FailingEither()
     {
         Either<Unit, List<int>> results =
-            await new List<int> {1, -1, 2}
+            await new List<int> { 1, -1, 2 }
                 .ForEachAsync(async value =>
                 {
                     if (value == -1)
@@ -537,22 +290,22 @@ public class EnumerableExtensionsTests
     [Fact]
     public void SelectNullSafe_NotNull()
     {
-        var list = new List<int> {1, 2, 3};
+        var list = new List<int> { 1, 2, 3 };
         var results = list.SelectNullSafe(value => value * 2).ToList();
-        Assert.Equal(new List<int> {2, 4, 6}, results);
+        Assert.Equal(new List<int> { 2, 4, 6 }, results);
     }
 
     [Fact]
     public void SelectNullSafe_Null()
     {
-        var results = ((List<int>?) null).SelectNullSafe(value => value * 2).ToList();
+        var results = ((List<int>?)null).SelectNullSafe(value => value * 2).ToList();
         Assert.Equal(new List<int>(), results);
     }
 
     [Fact]
     public void IsNullOrEmpty_Null()
     {
-        Assert.True(((List<string>?) null).IsNullOrEmpty());
+        Assert.True(((List<string>?)null).IsNullOrEmpty());
     }
 
     [Fact]
@@ -564,21 +317,21 @@ public class EnumerableExtensionsTests
     [Fact]
     public void IsNullOrEmpty_NeitherNullNorEmpty()
     {
-        var list = new List<string> {"foo", "bar"};
+        var list = new List<string> { "foo", "bar" };
         Assert.False(list.IsNullOrEmpty());
     }
 
     [Fact]
     public void JoinToString()
     {
-        var list = new List<string> {"foo", "bar", "baz"};
+        var list = new List<string> { "foo", "bar", "baz" };
 
         Assert.Equal("foo-bar-baz", list.JoinToString('-'));
         Assert.Equal("foo - bar - baz", list.JoinToString(" - "));
         Assert.Equal("foo, bar, baz", list.JoinToString(", "));
     }
-    
-    
+
+
     [Fact]
     public void Generate_Tuple2()
     {
@@ -586,19 +339,19 @@ public class EnumerableExtensionsTests
         Assert.Equal("test1", item1);
         Assert.Equal("test2", item2);
     }
-    
+
     [Fact]
     public void Generate_Tuple2_LengthTooShort()
     {
         Assert.Throws<ArgumentException>(() => new[] { "test1" }.ToTuple2());
     }
-    
+
     [Fact]
     public void Generate_Tuple2_LengthTooLong()
     {
         Assert.Throws<ArgumentException>(() => new[] { "test1", "test2", "test3" }.ToTuple2());
     }
-    
+
     [Fact]
     public void Generate_Tuple3()
     {
@@ -607,13 +360,13 @@ public class EnumerableExtensionsTests
         Assert.Equal("test2", item2);
         Assert.Equal("test3", item3);
     }
-    
+
     [Fact]
     public void Generate_Tuple3_LengthTooShort()
     {
         Assert.Throws<ArgumentException>(() => new[] { "test1", "test2" }.ToTuple3());
     }
-    
+
     [Fact]
     public void Generate_Tuple3_LengthTooLong()
     {
