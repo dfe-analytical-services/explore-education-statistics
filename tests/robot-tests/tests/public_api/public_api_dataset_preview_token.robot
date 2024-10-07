@@ -1,6 +1,5 @@
 *** Settings ***
 Library             ../libs/admin_api.py
-Library             ../libs/debug.py
 Resource            ../libs/admin-common.robot
 Resource            ../libs/admin/manage-content-common.robot
 Resource            ../libs/public-api-common.robot
@@ -12,25 +11,16 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-
-
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - Public API - Generate and Preview API token %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    UI tests - Public API - preview token %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Academic year Q1
 ${ACADEMIC_YEAR}=       3000
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
-
-
-
+${PREVIEW_TOKEN_NAME}=  Test token
 
 *** Test Cases ***
 Create publication and release
-
-    ${timezone}=    get browser timezone
-    ${offset}=    get browser utc offset
-    Log To Console    Browser timezone "${timezone}" with UTC offset ${offset}
-
     user selects dashboard theme and topic if possible
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
@@ -80,7 +70,7 @@ Create 1st API dataset
 
 User waits until the 1st API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
+    wait until keyword succeeds    10x    5s    Verify status of API Datasets    Ready
 
 Create 2nd API dataset
     user clicks link    Back to API data sets
@@ -94,25 +84,22 @@ Create 2nd API dataset
 
 User waits until the 2nd API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
+    wait until keyword succeeds    10x    5s    Verify status of API Datasets    Ready
 
 Verify the contents inside the 'Draft API datasets' table
     user clicks link    Back to API data sets
     user waits until h3 is visible    Draft API data sets
-
 
     user checks table column heading contains    1    1    Draft version    xpath://table[@data-testid='draft-api-data-sets']
     user checks table column heading contains    1    2    Name             xpath://table[@data-testid='draft-api-data-sets']
     user checks table column heading contains    1    3    Status           xpath://table[@data-testid='draft-api-data-sets']
     user checks table column heading contains    1    4    Actions          xpath://table[@data-testid='draft-api-data-sets']
 
-
     user checks table cell contains    1    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
     user checks table cell contains    1    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
 
     user checks table cell contains    2    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
     user checks table cell contains    2    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
-
 
 Click on 'View Details' link(First API dataset)
     user clicks link in table cell    1    4    View details    xpath://table[@data-testid='draft-api-data-sets']
@@ -126,7 +113,6 @@ User checks row data contents inside the 'Draft API datasets' summary table
     user checks contents inside the cell value    ${SUBJECT_NAME_1}                          xpath://div[@data-testid="Data set file"]//dd[@data-testid="Data set file-value"]
     user checks contents inside the cell value    National                                   xpath://div[@data-testid="Geographic levels"]//dd[@data-testid="Geographic levels-value"]
     user checks contents inside the cell value    2012/13                                    xpath://div[@data-testid="Time periods"]//dd[@data-testid="Time periods-value"]
-
 
     user checks contents inside the cell value    Lower quartile annualised earnings         xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[1]
     user checks contents inside the cell value    Median annualised earnings                 xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[2]
@@ -147,72 +133,70 @@ User checks row data contents inside the 'Draft API datasets' summary table
     user checks contents inside the cell value      Number of years after achievement of learning aim    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[6]
     user checks contents inside the cell value      Provision                                 xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[7]
 
-
     user checks contents inside the cell value      Preview API data set                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[1]/a
     user checks contents inside the cell value      View preview token log                    xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[2]/a
     user checks contents inside the cell value      Remove draft version                      xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[3]/button
 
-
-User clicks on 'Preview API dataset' link
+User clicks on 'Preview API data set' link
     user clicks link containing text    Preview API data set
 
-User clicks on 'Generate Token'
-    user clicks button     Generate token
+User clicks on 'Generate preview token'
+    user clicks button     Generate preview token
 
-User creates API token through 'Generate API token' modal window
-    ${modal}=    user waits until modal is visible    Generate API token
-    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    API Token
+User creates preview token through 'Generate preview token' modal window
+    ${modal}=    user waits until modal is visible    Generate preview token
+    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    ${PREVIEW_TOKEN_NAME}
     user clicks checkbox by selector        css:input[id="apiDataSetTokenCreateForm-agreeTerms"]
     user clicks button    Continue
 
     user waits until page finishes loading
-    user waits until modal is not visible    Generate API token    %{WAIT_LONG}
+    user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
     user waits until page contains    API data set preview token
     user waits until h2 is visible    ${SUBJECT_NAME_1}
 
-User revokes created API token
-    user clicks button    Revoke this token
-    ${modal}=    user waits until modal is visible    Revoke this token
+User revokes preview token
+    user clicks button    Revoke preview token
+    ${modal}=    user waits until modal is visible    Revoke preview token
     user clicks button    Confirm
     user waits until page finishes loading
-    user waits until modal is not visible    Revoke this token    %{WAIT_LONG}
+    user waits until modal is not visible    Revoke preview token    %{WAIT_LONG}
     user waits until page contains    Generate API data set preview token
 
-User again clicks on 'Generate Token'
-    user clicks button     Generate token
+User again clicks on 'Generate preview token'
+    user clicks button     Generate preview token
 
-User creates API token through 'Generate API token' modal window
-    ${modal}=    user waits until modal is visible    Generate API token
-    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    API Token
+User creates another preview token through 'Generate preview token' modal window
+    ${modal}=    user waits until modal is visible    Generate preview token
+    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    ${PREVIEW_TOKEN_NAME}
     user clicks checkbox by selector        css:input[id="apiDataSetTokenCreateForm-agreeTerms"]
     user clicks button    Continue
 
     user waits until page finishes loading
-    user waits until modal is not visible    Generate API token    %{WAIT_LONG}
+    user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
     user waits until page contains    API data set preview token
     user waits until h2 is visible    ${SUBJECT_NAME_1}
 
-User cancels to revoke created API token
-    user clicks button    Revoke this token
-    ${modal}=    user waits until modal is visible    Revoke this token
+User cancels revoking preview token
+    user clicks button    Revoke preview token
+    ${modal}=    user waits until modal is visible    Revoke preview token
     user clicks button    Cancel
     user waits until page finishes loading
-    user waits until modal is not visible    Revoke this token    %{WAIT_LONG}
+    user waits until modal is not visible    Revoke preview token    %{WAIT_LONG}
     user waits until page contains    API data set preview token
     user waits until h2 is visible    ${SUBJECT_NAME_1}
 
-User cancels to create API token
+User cancels creating preview token
     user clicks link    Back to API data set details
     user clicks link containing text    Preview API data set
-    user clicks button     Generate token
+    user clicks button     Generate preview token
 
-    ${modal}=    user waits until modal is visible    Generate API token
-    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    API Token
+    ${modal}=    user waits until modal is visible    Generate preview token
+    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    ${PREVIEW_TOKEN_NAME}
     user clicks checkbox by selector        css:input[id="apiDataSetTokenCreateForm-agreeTerms"]
     user clicks button    Cancel
 
     user waits until page finishes loading
-    user waits until modal is not visible    Generate API token    %{WAIT_LONG}
+    user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
     user waits until page contains    Generate API data set preview token
     user waits until h2 is visible    ${SUBJECT_NAME_1}
 
@@ -233,37 +217,36 @@ Verify the 'Active tokens' and 'Expired tokens' on preview token log page
     user checks table cell contains    2    4    Expired
 
     user clicks button in table cell    1    6    Revoke
-    ${modal}=    user waits until modal is visible    Revoke this token
+    ${modal}=    user waits until modal is visible    Revoke preview token
     user clicks button    Confirm    ${modal}
     user waits until page finishes loading
     user checks table cell contains    1    4    Expired
-    
-User verifies the relevant fields on the 'View Log Details' page for the Active API token.
-    user clicks link    Generate preview token
-    user clicks button    Generate token
 
-    ${modal}=    user waits until modal is visible    Generate API token
-    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    API Token
+User verifies the relevant fields on the active preview token page
+    user clicks link    Generate preview token
+    user clicks button    Generate preview token
+
+    ${modal}=    user waits until modal is visible    Generate preview token
+    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    ${PREVIEW_TOKEN_NAME}
     user clicks checkbox by selector        css:input[id="apiDataSetTokenCreateForm-agreeTerms"]
     user clicks button    Continue
 
     user waits until page finishes loading
-    user waits until modal is not visible    Generate API token    %{WAIT_LONG}
+    user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
     user waits until page contains    API data set preview token
+
     user waits until h2 is visible    ${SUBJECT_NAME_1}
+    user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
 
-    ${current_time_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    1    Europe/London
+    ${current_time_tomorrow}=    get current local datetime    %I:%M %p    1
 
-    ${time_end}=    format uk to local datetime    ${current_time_tomorrow}    %-I:%M %p
-
-    user checks page contains    
-    ...     Token expiry time: tomorrow at ${time_end}
+    user checks page contains
+    ...     The token expires: tomorrow at ${current_time_tomorrow} (local time)
 
     user checks page contains button    Copy preview token
-    user checks page contains button    Revoke this token
-    user checks page contains link    View API data set token log
+    user checks page contains button    Revoke preview token
+    user checks page contains link    View preview token log
     user checks page contains    API data set endpoints quick start
-
 
 Add headline text block to Content page
     user clicks link    Back to API data set details
@@ -281,7 +264,7 @@ Verify newly published release is on Find Statistics page
 User navigates to data catalogue page
     user navigates to data catalogue page on public frontend
 
-Search with 1st API dataset
+Search with 1st API data set
     user clicks element    id:searchForm-search
     user presses keys    ${PUBLICATION_NAME}
     user clicks radio    API data sets only
@@ -291,13 +274,13 @@ Search with 1st API dataset
     user checks page contains link    ${SUBJECT_NAME_1}
     user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_1}
 
-User clicks on API dataset link
+User clicks on API data set link
     user clicks link by index    ${SUBJECT_NAME_1}
     user waits until page finishes loading
-    
+
     user waits until h1 is visible    ${SUBJECT_NAME_1}
 
-User checks relevant headings exist on API dataset details page
+User checks relevant headings exist on API data set details page
     user waits until h2 is visible    Data set details
     user waits until h2 is visible    Data set preview
     user waits until h2 is visible    Variables in this data set
@@ -306,37 +289,36 @@ User checks relevant headings exist on API dataset details page
     user waits until h2 is visible    API data set version history
 
 User verifies the row headings and contents in 'Data set details' section
-    user checks row headings within the api dataset section    Theme
-    user checks row headings within the api dataset section    Publication
-    user checks row headings within the api dataset section    Release
-    user checks row headings within the api dataset section    Release type
-    user checks row headings within the api dataset section   Geographic levels
-    user checks row headings within the api dataset section   Indicators
-    user checks row headings within the api dataset section    Filters
-    user checks row headings within the api dataset section    Time period
+    user checks row headings within the api data set section    Theme
+    user checks row headings within the api data set section    Publication
+    user checks row headings within the api data set section    Release
+    user checks row headings within the api data set section    Release type
+    user checks row headings within the api data set section   Geographic levels
+    user checks row headings within the api data set section   Indicators
+    user checks row headings within the api data set section    Filters
+    user checks row headings within the api data set section    Time period
 
-    user checks row headings within the api dataset section   Notifications
+    user checks row headings within the api data set section   Notifications
 
     user checks contents inside the cell value          Test theme                                                  css: #dataSetDetails [data-testid="Theme-value"]
-    user checks contents inside the cell value          ${PUBLICATION_NAME}                                         css:#dataSetDetails [data-testid="Publication-value"] 
+    user checks contents inside the cell value          ${PUBLICATION_NAME}                                         css:#dataSetDetails [data-testid="Publication-value"]
     user checks contents inside the cell value          Academic year Q1 3000/01                                    css:#dataSetDetails [data-testid="Release-value"]
     User checks contents inside the release type        Accredited official statistics                              css:#dataSetDetails [data-testid="Release type-value"] > button
     user checks contents inside the cell value          National                                                    css:#dataSetDetails [data-testid="Geographic levels-value"]
 
-
     user checks contents inside the cell value           Lower quartile annualised earnings                         css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(1)
     user checks contents inside the cell value           Median annualised earnings                                 css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(2)
     user checks contents inside the cell value           Number of learners with earnings                           css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(3)
-    
+
     user clicks button                                   Show 1 more indicator                                      css:#dataSetDetails [data-testid="Indicators-value"]
-    
+
     user checks contents inside the cell value           Upper quartile annualised earnings                         css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(4)
 
     user checks contents inside the cell value    	     Cheese                                                     css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(1)
     user checks contents inside the cell value    	     Colour                                                     css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(2)
     user checks contents inside the cell value    	     Ethnicity group                                            css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(3)
 
-    user clicks button                                   Show 4 more filters                                        css:#dataSetDetails [data-testid="Filters-value"] 
+    user clicks button                                   Show 4 more filters                                        css:#dataSetDetails [data-testid="Filters-value"]
 
     user checks contents inside the cell value    	     Gender                                                     css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(4)
     user checks contents inside the cell value    	     Level of learning                                          css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(5)
@@ -355,8 +337,6 @@ User verifies the headings and contents in 'API version history' section
     user checks table cell contains              1    1    1.0 (current)                xpath://section[@id="apiVersionHistory"]
     user checks table cell contains              1    2    Academic year Q1 3000/01     xpath://section[@id="apiVersionHistory"]
     user checks table cell contains              1    3    Published                    xpath://section[@id="apiVersionHistory"]
-
-
 
 *** Keywords ***
 User checks contents inside the release type

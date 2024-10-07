@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import { useConfig } from '@admin/contexts/ConfigContext';
+import {useConfig} from '@admin/contexts/ConfigContext';
 import {
   releaseApiDataSetDetailsRoute,
   releaseApiDataSetPreviewRoute,
@@ -10,31 +10,31 @@ import {
 import previewTokenQueries from '@admin/queries/previewTokenQueries';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import previewTokenService from '@admin/services/previewTokenService';
-import { useLastLocation } from '@admin/contexts/LastLocationContext';
+import {useLastLocation} from '@admin/contexts/LastLocationContext';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Button from '@common/components/Button';
 import CopyTextButton from '@common/components/CopyTextButton';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
 import ApiDataSetQuickStart from '@common/modules/data-catalogue/components/ApiDataSetQuickStart';
-import { useQuery } from '@tanstack/react-query';
-import { generatePath, useHistory, useParams } from 'react-router-dom';
+import {useQuery} from '@tanstack/react-query';
+import {generatePath, useHistory, useParams} from 'react-router-dom';
 import React from 'react';
 
 export default function ReleaseApiDataSetPreviewTokenPage() {
   const history = useHistory();
   const lastLocation = useLastLocation();
 
-  const { publicApiUrl, publicApiDocsUrl } = useConfig();
+  const {publicApiUrl, publicApiDocsUrl} = useConfig();
 
-  const { dataSetId, previewTokenId, releaseId, publicationId } =
+  const {dataSetId, previewTokenId, releaseId, publicationId} =
     useParams<ReleaseDataSetPreviewTokenRouteParams>();
 
-  const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
+  const {data: dataSet, isLoading: isLoadingDataSet} = useQuery(
     apiDataSetQueries.get(dataSetId),
   );
 
-  const { data: previewToken, isLoading: isLoadingPreviewTokenId } = useQuery({
+  const {data: previewToken, isLoading: isLoadingPreviewTokenId} = useQuery({
     ...previewTokenQueries.get(previewTokenId),
   });
 
@@ -105,6 +105,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                       {previewToken.expiry}
                     </FormattedDate>
                   </strong>
+                  {' '}(local time)
                 </p>
                 <h3>Using this token</h3>
                 <h4>Step 1</h4>

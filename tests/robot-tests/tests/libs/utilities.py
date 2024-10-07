@@ -289,6 +289,10 @@ def format_uk_to_local_datetime(uk_local_datetime: str, strf: str) -> str:
 
 def get_current_datetime(strf: str, offset_days: int = 0, timezone: str = "UTC") -> str:
     return format_datetime(datetime.datetime.now(pytz.timezone(timezone)) + datetime.timedelta(days=offset_days), strf)
+    
+    
+def get_current_local_datetime(strf: str, offset_days: int = 0) -> str:
+    return get_current_datetime(strf, offset_days, _get_browser_timezone())    
 
 
 def format_datetime(datetime: datetime, strf: str) -> str:
@@ -445,3 +449,6 @@ def get_child_element_with_retry(parent_locator: object, child_locator: str, max
             logger.warn(f"Child element not found, after ({max_retries}) retries")
             time.sleep(retry_delay)
     raise AssertionError(f"Failed to find child element after {max_retries} retries.")
+
+def _get_browser_timezone():
+    return sl().driver.execute_script('return Intl.DateTimeFormat().resolvedOptions().timeZone;')
