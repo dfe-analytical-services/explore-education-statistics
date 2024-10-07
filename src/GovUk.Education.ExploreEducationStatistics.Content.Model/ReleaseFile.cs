@@ -17,7 +17,7 @@ public class ReleaseFile
 
     public Guid FileId { get; set; }
 
-    public string? Name { get; set; }
+    public string? Name { get; set; } // otherwise referred to as "title" to avoid confusion with filename
 
     public string? Summary { get; set; }
 
