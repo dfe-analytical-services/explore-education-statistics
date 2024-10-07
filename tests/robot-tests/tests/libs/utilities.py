@@ -3,20 +3,20 @@ import datetime
 import json
 import os
 import re
-import time
 from typing import Union
-from urllib.parse import urlparse, urlunparse
 
+import time
 import pytz
 import utilities_init
 import visual
 from robot.libraries.BuiltIn import BuiltIn
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.common.exceptions import NoSuchElementException
 from SeleniumLibrary.utils import is_noney
 from tests.libs.logger import get_logger
 from tests.libs.selenium_elements import element_finder, sl, waiting
+from urllib.parse import urlparse, urlunparse
 
 logger = get_logger(__name__)
 
@@ -99,13 +99,8 @@ def retry_or_fail_with_delay(func, retries=5, delay=1.0, *args, **kwargs):
 
 
 def user_waits_until_parent_contains_element(
-    parent_locator: object,
-    child_locator: str,
-    timeout: int = None,
-    error: str = None,
-    count: int = None,
-    retries: int = 5,
-    delay: float = 1.0,
+    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None,
+    retries: int = 5, delay: float = 1.0
 ):
     try:
         child_locator = _normalise_child_locator(child_locator)
@@ -293,7 +288,7 @@ def get_current_datetime(strf: str, offset_days: int = 0, timezone: str = "UTC")
 
 
 def get_current_london_datetime(strf: str, offset_days: int = 0) -> str:
-    return get_current_datetime(strf, offset_days, "Europe/London")
+    return get_current_datetime(strf, offset_days, 'Europe/London')
 
 
 def get_current_local_datetime(strf: str, offset_days: int = 0) -> str:
@@ -453,8 +448,7 @@ def remove_auth_from_url(publicUrl: str):
         netloc += f":{parsed_url.port}"
 
     modified_url_without_auth = urlunparse(
-        (parsed_url.scheme, netloc, parsed_url.path, parsed_url.params, parsed_url.query, parsed_url.fragment)
-    )
+        (parsed_url.scheme, netloc, parsed_url.path, parsed_url.params, parsed_url.query, parsed_url.fragment))
     return modified_url_without_auth
 
 
@@ -469,6 +463,5 @@ def get_child_element_with_retry(parent_locator: object, child_locator: str, max
             time.sleep(retry_delay)
     raise AssertionError(f"Failed to find child element after {max_retries} retries.")
 
-
 def _get_browser_timezone():
-    return sl().driver.execute_script("return Intl.DateTimeFormat().resolvedOptions().timeZone;")
+    return sl().driver.execute_script('return Intl.DateTimeFormat().resolvedOptions().timeZone;')
