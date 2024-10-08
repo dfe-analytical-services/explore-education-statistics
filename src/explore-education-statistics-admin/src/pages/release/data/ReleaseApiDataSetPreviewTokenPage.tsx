@@ -120,7 +120,8 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                   <strong>
                     <FormattedDate formatRelativeToNow>
                       {previewToken.expiry}
-                    </FormattedDate>
+                    </FormattedDate>{' '}
+                    (local time)
                   </strong>
                 </p>
 
