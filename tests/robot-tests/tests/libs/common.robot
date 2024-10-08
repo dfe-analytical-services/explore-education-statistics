@@ -2,9 +2,10 @@
 Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=record test failure
 Library     OperatingSystem
 Library     Collections
+Library     dates_and_times.py
+Library     fail_fast.py
 Library     file_operations.py
 Library     utilities.py
-Library     fail_fast.py
 Library     visual.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
@@ -20,7 +21,6 @@ ${DOWNLOADS_DIR}=                       ${EXECDIR}${/}test-results${/}downloads$
 ${timeout}=                             %{TIMEOUT}
 ${implicit_wait}=                       %{IMPLICIT_WAIT}
 ${prompt_to_continue_on_failure}=       0
-${DATE_FORMAT_MEDIUM}=                  %-d %B %Y
 
 
 *** Keywords ***
@@ -454,7 +454,7 @@ user checks element should not contain
 user checks input field contains
     [Arguments]    ${element}    ${text}
     page should contain textfield    ${element}
-    textfield should contain     ${element}    ${text}
+    textfield should contain    ${element}    ${text}
 
 user checks page contains
     [Arguments]    ${text}
@@ -489,7 +489,7 @@ user clicks link by index
     [Arguments]    ${text}    ${index}=1    ${parent}=css:body
     ${xpath}=    set variable    (//a[text()='${text}'])[${index}]
     ${button}=    get webelement    ${xpath}
-    user clicks element   ${button}    ${parent}
+    user clicks element    ${button}    ${parent}
 
 user clicks link by visible text
     [Arguments]    ${text}    ${parent}=css:body
@@ -508,7 +508,7 @@ user clicks button by index
     [Arguments]    ${text}    ${index}=1    ${parent}=css:body
     ${xpath}=    set variable    (//button[text()='${text}'])[${index}]
     ${button}=    get webelement    ${xpath}
-    user clicks element   ${button}    ${parent}
+    user clicks element    ${button}    ${parent}
 
 user waits until button is clickable
     [Arguments]    ${button_text}
@@ -707,9 +707,9 @@ user checks url equals
 user checks url without auth equals
     [Arguments]    ${expected}
     ${current_url}=    get location
-    ${remove_auth_current_url}=    remove auth from url      ${current_url}
+    ${remove_auth_current_url}=    remove auth from url    ${current_url}
     set variable    ${remove_auth_current_url}
-    should contain    ${remove_auth_current_url}   ${expected}
+    should contain    ${remove_auth_current_url}    ${expected}
 
 user checks page contains link
     [Arguments]
@@ -832,7 +832,7 @@ user clicks checkbox
 
 user clicks checkbox by selector
     [Arguments]    ${locator}
-    user scrolls to element     ${locator}
+    user scrolls to element    ${locator}
     user clicks element    ${locator}
 
 user checks checkbox is checked
@@ -1019,35 +1019,29 @@ user waits for caches to expire
     sleep    %{WAIT_CACHE_EXPIRY}
 
 user wait for option to be available and select it
-    [Arguments]  ${dropdown_locator}  ${option_text}  ${timeout}=%{TIMEOUT}
-    wait until keyword succeeds  ${timeout}  1s  check option exist in dropdown  ${dropdown_locator}  ${option_text}
-    select from list by label  ${dropdown_locator}  ${option_text}
+    [Arguments]    ${dropdown_locator}    ${option_text}    ${timeout}=%{TIMEOUT}
+    wait until keyword succeeds    ${timeout}    1s    check option exist in dropdown    ${dropdown_locator}
+    ...    ${option_text}
+    select from list by label    ${dropdown_locator}    ${option_text}
 
 check option exist in dropdown
-    [Arguments]  ${dropdown_locator}  ${option_text}
-     ${options}=  get webelements    ${dropdown_locator} > option
-     ${all_texts}=  Create List
+    [Arguments]    ${dropdown_locator}    ${option_text}
+    ${options}=    get webelements    ${dropdown_locator} > option
+    ${all_texts}=    Create List
 
-     FOR    ${option}    IN    @{options}
-        ${text}=  get text  ${option}
-        Append To List  ${all_texts}  ${text}
-     END
-     # Adding logging to help catch intermittent test failures
-     Log to console  \n\tAll Texts: ${all_texts}
-     ${matched}=  Run Keyword And Return Status  Should Contain  ${all_texts}  ${option_text}
+    FOR    ${option}    IN    @{options}
+        ${text}=    get text    ${option}
+        Append To List    ${all_texts}    ${text}
+    END
+    # Adding logging to help catch intermittent test failures
+    Log to console    \n\tAll Texts: ${all_texts}
+    ${matched}=    Run Keyword And Return Status    Should Contain    ${all_texts}    ${option_text}
 
-     IF  ${matched}
+    IF    ${matched}
         # Adding logging to help catch intermittent test failures
-        Log to console  \n\tOption '${option_text}' found in the dropdown.
-     ELSE
-         # Adding logging to help catch intermittent test failures
-        Log to console  \n\tOption '${option_text}' not found in the dropdown.
-     END
-     Return From Keyword  ${matched}
-
-
-    
-    
-
-
-
+        Log to console    \n\tOption '${option_text}' found in the dropdown.
+    ELSE
+        # Adding logging to help catch intermittent test failures
+        Log to console    \n\tOption '${option_text}' not found in the dropdown.
+    END
+    Return From Keyword    ${matched}

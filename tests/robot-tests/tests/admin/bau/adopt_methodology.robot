@@ -63,7 +63,7 @@ Adopt a published Methodology
     # List of adoptable methodologies shows latest published version, not latest version -
     # that's why this is approved and not the draft amendment
     user checks element should contain    ${selected_methodology_details}    Approved
-    ${methodology_published_date}=    get current datetime    %-d %B %Y
+    ${methodology_published_date}=    get london date
     user checks element should contain    ${selected_methodology_details}    ${methodology_published_date}
     user clicks button    Save
     user waits until h2 is visible    Manage methodologies
@@ -83,10 +83,10 @@ Set methodology to published alongside release
 Schedule release to be published tomorrow
     user navigates to draft release page from dashboard    ${ADOPTING_PUBLICATION_NAME}    ${RELEASE_NAME}
 
-    ${day}=    get current datetime    %-d    1
-    ${month}=    get current datetime    %-m    1
-    ${month_word}=    get current datetime    %B    1
-    ${year}=    get current datetime    %Y    1
+    ${day}=    get london day of month    offset_days=1
+    ${month}=    get london month date    offset_days=1
+    ${month_word}=    get london month word    offset_days=1
+    ${year}=    get london year    offset_days=1
 
     user clicks link    Sign off
     user clicks button    Edit release status
