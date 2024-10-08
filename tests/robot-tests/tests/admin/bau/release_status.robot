@@ -415,13 +415,6 @@ Publish the release immediately
 
 
 *** Keywords ***
-user edits release status
-    user clicks link    Sign off
-    user waits until h2 is visible    Sign off    %{WAIT_SMALL}
-
-    user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
-
 user checks checklist warnings contains
     [Arguments]    ${text}
     user waits until page contains testid    releaseChecklist-warnings
