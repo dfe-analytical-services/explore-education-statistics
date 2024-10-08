@@ -29,7 +29,8 @@ Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Calendar year 2000
 
-    user uploads subject and waits until complete    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    UI test subject    upload-file-test.csv
+    ...    upload-file-test.meta.csv
 
 Add metadata guidance
     user clicks link    Data guidance
@@ -141,11 +142,9 @@ Validate prerelease has not started
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1    Europe/London
-    ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2    Europe/London
+    ${time_start}=    get current london datetime    %-d %B %Y at 00:00    1
+    ${time_end}=    get current london datetime    %-d %B %Y    2
 
-    ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
-    ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
     user checks page contains
     ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
 
@@ -248,11 +247,9 @@ Validate prerelease has not started for Analyst user
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1
-    ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2
+    ${time_start}=    get current london datetime    %-d %B %Y at 00:00    1
+    ${time_end}=    get current london datetime    %-d %B %Y    2
 
-    ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
-    ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
     user checks page contains
     ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
 
