@@ -50,20 +50,20 @@ Add data guidance to subjects
 Save data guidance
     user clicks button    Save guidance
 
-Create 1st API dataset
+Create 1st API data set
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
 
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_NAME_1}
+    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_1}
     user clicks button    Confirm new API data set
 
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set
 
-User waits until the 1st API dataset status changes to 'Ready'
+User waits until the 1st API data set status changes to 'Ready'
     user waits until h3 is visible    Draft version details
     user waits until draft API data set status contains    Ready
 
@@ -101,7 +101,7 @@ Add data guidance to second release
 Save data guidance
     user clicks button    Save guidance
 
-Create a different version of an API dataset(Major version)
+Create major version update for an API data set
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
@@ -113,7 +113,7 @@ Create a different version of an API dataset(Major version)
     ...    xpath://table[@data-testid="live-api-data-sets"]
 
     ${modal}=    user waits until modal is visible    Create a new API data set version
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_NAME_2}
+    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_2}
     user clicks button    Confirm new data set version
 
     user waits until page finishes loading
@@ -267,7 +267,7 @@ User navigates to 'changelog and guidance notes' page and update relevant detail
 User clicks on 'View preview token log' link inside the 'Draft version details' section
     user clicks link by index    View changelog and guidance notes    2
 
-Validate the contents in the 'API dataset changelog' page.
+Validate the contents in the 'API data set changelog' page.
     user waits until page contains    API data set changelog
 
     user waits until page contains    public guidance notes
@@ -288,7 +288,7 @@ Verify newly published release is on Find Statistics page
 User navigates to data catalogue page
     user navigates to data catalogue page on public frontend
 
-Search with 2nd API dataset
+Search with 2nd API data set
     user clicks element    id:searchForm-search
     user presses keys    ${PUBLICATION_NAME}
     user clicks radio    API data sets only
@@ -302,13 +302,13 @@ Search with 2nd API dataset
 
     user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_2}
 
-User clicks on 2nd API dataset link
+User clicks on 2nd API data set link
     user clicks link by index    ${SUBJECT_NAME_2}
     user waits until page finishes loading
 
     user waits until h1 is visible    ${SUBJECT_NAME_2}
 
-User checks relevant headings exist on API dataset details page
+User checks relevant headings exist on API data set details page
     user waits until h2 is visible    Data set details
     user waits until h2 is visible    Data set preview
     user waits until h2 is visible    Variables in this data set
@@ -317,14 +317,14 @@ User checks relevant headings exist on API dataset details page
     user waits until h2 is visible    API data set version history
 
 User verifies the headings and contents in 'API version history' section
-    user checks table column heading contains    1    1    Version    css:section[id="apiVersionHistory"]
-    user checks table column heading contains    1    2    Release    css:section[id="apiVersionHistory"]
-    user checks table column heading contains    1    3    Status    css:section[id="apiVersionHistory"]
+    user checks table column heading contains    1    1    Version    id:apiVersionHistory
+    user checks table column heading contains    1    2    Release    id:apiVersionHistory
+    user checks table column heading contains    1    3    Status    id:apiVersionHistory
 
-    user checks table cell contains    1    1    1.1 (current)    xpath://section[@id="apiVersionHistory"]
-    user checks table cell contains    1    2    Academic year 3010/11    xpath://section[@id="apiVersionHistory"]
-    user checks table cell contains    1    3    Published    xpath://section[@id="apiVersionHistory"]
+    user checks table cell contains    1    1    1.1 (current)    id:apiVersionHistory
+    user checks table cell contains    1    2    Academic year 3010/11    id:apiVersionHistory
+    user checks table cell contains    1    3    Published    id:apiVersionHistory
 
-    user checks table cell contains    2    1    1.0    xpath://section[@id="apiVersionHistory"]
-    user checks table cell contains    2    2    Financial year 3000-01    xpath://section[@id="apiVersionHistory"]
-    user checks table cell contains    2    3    Published    xpath://section[@id="apiVersionHistory"]
+    user checks table cell contains    2    1    1.0    id:apiVersionHistory
+    user checks table cell contains    2    2    Financial year 3000-01    id:apiVersionHistory
+    user checks table cell contains    2    3    Published    id:apiVersionHistory
