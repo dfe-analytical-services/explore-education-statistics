@@ -1,6 +1,5 @@
 import datetime
 import os
-
 import pytz
 from tests.libs.selenium_elements import sl
 
