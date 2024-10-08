@@ -475,7 +475,7 @@ user checks element should not contain
 user checks input field contains
     [Arguments]    ${element}    ${text}
     page should contain textfield    ${element}
-    textfield should contain     ${element}    ${text}
+    textfield should contain    ${element}    ${text}
 
 user checks page contains
     [Arguments]    ${text}
@@ -510,7 +510,7 @@ user clicks link by index
     [Arguments]    ${text}    ${index}=1    ${parent}=css:body
     ${xpath}=    set variable    (//a[text()='${text}'])[${index}]
     ${button}=    get webelement    ${xpath}
-    user clicks element   ${button}    ${parent}
+    user clicks element    ${button}    ${parent}
 
 user clicks link by visible text
     [Arguments]    ${text}    ${parent}=css:body
@@ -529,7 +529,7 @@ user clicks button by index
     [Arguments]    ${text}    ${index}=1    ${parent}=css:body
     ${xpath}=    set variable    (//button[text()='${text}'])[${index}]
     ${button}=    get webelement    ${xpath}
-    user clicks element   ${button}    ${parent}
+    user clicks element    ${button}    ${parent}
 
 user waits until button is clickable
     [Arguments]    ${button_text}
@@ -643,10 +643,10 @@ user checks textarea contains
 user checks summary list contains
     [Arguments]    ${term}    ${description}    ${parent}=css:body    ${wait}=${timeout}
     user waits until parent contains element    ${parent}
-    ...    xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
+    ...    xpath:.//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
     ...    %{WAIT_MEDIUM}
     ${element}=    get child element    ${parent}
-    ...    xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
+    ...    xpath:.//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
     user waits until element is visible    ${element}    %{WAIT_LONG}
 
 user checks select contains x options
@@ -728,9 +728,9 @@ user checks url equals
 user checks url without auth equals
     [Arguments]    ${expected}
     ${current_url}=    get location
-    ${remove_auth_current_url}=    remove auth from url      ${current_url}
+    ${remove_auth_current_url}=    remove auth from url    ${current_url}
     set variable    ${remove_auth_current_url}
-    should contain    ${remove_auth_current_url}   ${expected}
+    should contain    ${remove_auth_current_url}    ${expected}
 
 user checks page contains link
     [Arguments]
@@ -851,11 +851,6 @@ user clicks checkbox
     user scrolls to element    xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
     user clicks element    xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
 
-user clicks checkbox by selector
-    [Arguments]    ${locator}
-    user scrolls to element     ${locator}
-    user clicks element    ${locator}
-
 user checks checkbox is checked
     [Arguments]    ${label}
     user checks checkbox input is checked
@@ -885,13 +880,17 @@ user checks list has x items
     [Arguments]    ${locator}    ${count}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
-    user waits until parent contains element    ${list}    css:li    count=${count}
+    # Use xpath to more precisely get child items underneath parent list.
+    # CSS selector should not be used here as it is not precise enough with parent.
+    user waits until parent contains element    ${list}    xpath:./li    count=${count}
 
 user gets list item element
     [Arguments]    ${locator}    ${item_num}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
-    ${item}=    get child element    ${list}    css:li:nth-child(${item_num})
+    # Use xpath to more precisely get child items underneath parent list.
+    # CSS selector should not be used here as it is not precise enough with parent.
+    ${item}=    get child element    ${list}    xpath:./li[${item_num}]
     [Return]    ${item}
 
 user checks list item contains
@@ -1040,35 +1039,29 @@ user waits for caches to expire
     sleep    %{WAIT_CACHE_EXPIRY}
 
 user wait for option to be available and select it
-    [Arguments]  ${dropdown_locator}  ${option_text}  ${timeout}=%{TIMEOUT}
-    wait until keyword succeeds  ${timeout}  1s  check option exist in dropdown  ${dropdown_locator}  ${option_text}
-    select from list by label  ${dropdown_locator}  ${option_text}
+    [Arguments]    ${dropdown_locator}    ${option_text}    ${timeout}=%{TIMEOUT}
+    wait until keyword succeeds    ${timeout}    1s    check option exist in dropdown    ${dropdown_locator}
+    ...    ${option_text}
+    select from list by label    ${dropdown_locator}    ${option_text}
 
 check option exist in dropdown
-    [Arguments]  ${dropdown_locator}  ${option_text}
-     ${options}=  get webelements    ${dropdown_locator} > option
-     ${all_texts}=  Create List
+    [Arguments]    ${dropdown_locator}    ${option_text}
+    ${options}=    get webelements    ${dropdown_locator} > option
+    ${all_texts}=    Create List
 
-     FOR    ${option}    IN    @{options}
-        ${text}=  get text  ${option}
-        Append To List  ${all_texts}  ${text}
-     END
-     # Adding logging to help catch intermittent test failures
-     Log to console  \n\tAll Texts: ${all_texts}
-     ${matched}=  Run Keyword And Return Status  Should Contain  ${all_texts}  ${option_text}
+    FOR    ${option}    IN    @{options}
+        ${text}=    get text    ${option}
+        Append To List    ${all_texts}    ${text}
+    END
+    # Adding logging to help catch intermittent test failures
+    Log to console    \n\tAll Texts: ${all_texts}
+    ${matched}=    Run Keyword And Return Status    Should Contain    ${all_texts}    ${option_text}
 
-     IF  ${matched}
+    IF    ${matched}
         # Adding logging to help catch intermittent test failures
-        Log to console  \n\tOption '${option_text}' found in the dropdown.
-     ELSE
-         # Adding logging to help catch intermittent test failures
-        Log to console  \n\tOption '${option_text}' not found in the dropdown.
-     END
-     Return From Keyword  ${matched}
-
-
-
-
-
-
-
+        Log to console    \n\tOption '${option_text}' found in the dropdown.
+    ELSE
+        # Adding logging to help catch intermittent test failures
+        Log to console    \n\tOption '${option_text}' not found in the dropdown.
+    END
+    Return From Keyword    ${matched}
