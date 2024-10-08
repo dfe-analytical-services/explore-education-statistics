@@ -238,14 +238,9 @@ User verifies the relevant fields on the active preview token page
     user waits until h2 is visible    ${SUBJECT_NAME_1}
     user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
 
-    ${current_time_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    1    Europe/London
-
-    ${time_with_leading_zero}=    format uk to local datetime    ${current_time_tomorrow}    %I:%M %p
-
-    ${time_end}=    format time without leading zero     ${time_with_leading_zero}
-
+    ${current_time_tomorrow}=    get current local datetime    %-I:%M %p    1
     user checks page contains
-    ...     The token expires: tomorrow at ${time_end}
+    ...     The token expires: tomorrow at ${current_time_tomorrow} (local time)
 
     user checks page contains button    Copy preview token
     user checks page contains button    Revoke preview token
