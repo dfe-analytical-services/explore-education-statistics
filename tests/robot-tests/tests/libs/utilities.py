@@ -7,7 +7,6 @@ import time
 from typing import Union
 from urllib.parse import urlparse, urlunparse
 
-import pytz
 import utilities_init
 import visual
 from robot.libraries.BuiltIn import BuiltIn
@@ -280,25 +279,6 @@ def set_cookie_from_json(cookie_json):
     sl().driver.add_cookie(cookie_dict)
 
 
-def get_current_datetime(strf: str, offset_days: int = 0, timezone: str = "UTC") -> str:
-    return format_datetime(datetime.datetime.now(pytz.timezone(timezone)) + datetime.timedelta(days=offset_days), strf)
-
-
-def get_current_london_datetime(strf: str, offset_days: int = 0) -> str:
-    return get_current_datetime(strf, offset_days, "Europe/London")
-
-
-def get_current_local_datetime(strf: str, offset_days: int = 0) -> str:
-    return get_current_datetime(strf, offset_days, _get_browser_timezone())
-
-
-def format_datetime(datetime: datetime, strf: str) -> str:
-    if os.name == "nt":
-        strf = strf.replace("%-", "%#")
-
-    return datetime.strftime(strf)
-
-
 def user_should_be_at_top_of_page():
     (x, y) = sl().get_window_position()
     if y != 0:
@@ -438,7 +418,3 @@ def get_child_element_with_retry(parent_locator: object, child_locator: str, max
             logger.warn(f"Child element not found, after ({max_retries}) retries")
             time.sleep(retry_delay)
     raise AssertionError(f"Failed to find child element after {max_retries} retries.")
-
-
-def _get_browser_timezone():
-    return sl().driver.execute_script("return Intl.DateTimeFormat().resolvedOptions().timeZone;")

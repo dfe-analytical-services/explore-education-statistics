@@ -103,8 +103,8 @@ Check publication owner can edit release status to "Ready for higher review"
 Validates Release status table is correct
     user waits until page contains element    css:table
     user checks element count is x    xpath://table/tbody/tr    1
-    ${datetime}    get current datetime    %-d %B %Y
-    table cell should contain    css:table    2    1    ${datetime}    # Date
+    ${date}    get london date
+    table cell should contain    css:table    2    1    ${date}    # Date
     table cell should contain    css:table    2    2    HigherLevelReview    # Status
     table cell should contain    css:table    2    3    ready for higher review (publication owner)    # Internal note
     table cell should contain    css:table    2    4    1    # Release version
@@ -116,10 +116,10 @@ Check publication owner can edit release status to "In draft"
 Validates Release status table is correct again
     user waits until page contains element    css:table
     user checks element count is x    xpath://table/tbody/tr    2
-    ${datetime}    get current datetime    %-d %B %Y
+    ${date}    get london date
 
     # New In draft row
-    table cell should contain    css:table    2    1    ${datetime}    # Date
+    table cell should contain    css:table    2    1    ${date}    # Date
     table cell should contain    css:table    2    2    Draft    # Status
     # Internal note
     table cell should contain    css:table    2    3    Moving back to Draft state (publication owner)
@@ -127,7 +127,7 @@ Validates Release status table is correct again
     table cell should contain    css:table    2    5    ees-test.analyst1@education.gov.uk    # By user
 
     # Higher review row
-    table cell should contain    css:table    3    1    ${datetime}    # Date
+    table cell should contain    css:table    3    1    ${date}    # Date
     table cell should contain    css:table    3    2    HigherLevelReview    # Status
     table cell should contain    css:table    3    3    ready for higher review (publication owner)    # Internal note
     table cell should contain    css:table    3    4    1    # Release version
@@ -224,7 +224,7 @@ Add a Footnote as a release approver
 Check release approver can create a release note
     user clicks link    Content
     user adds a release note    Test release note one
-    ${date}    get current datetime    %-d %B %Y
+    ${date}    get london date
     user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
