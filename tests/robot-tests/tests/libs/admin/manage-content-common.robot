@@ -468,12 +468,12 @@ user adds image to accordion section text block with retry
     ...    ${FILES_DIR}${filename}
 
     user scrolls up    300
-    wait until keyword succeeds     ${timeout}    1 sec    user clicks button    Change image text alternative
+    wait until keyword succeeds     ${timeout}    %{WAIT_SMALL} sec    user clicks button    Change image text alternative
     user enters text into element    label:Text alternative    ${alt_text}
     user clicks element    css:button.ck-button-save
     sleep    5
     user scrolls up    100
-    wait until keyword succeeds     ${timeout}    1 sec    user clicks element    xpath://div[@title="Insert paragraph after block"]
+    wait until keyword succeeds     ${timeout}    %{WAIT_SMALL} sec    user clicks element    xpath://div[@title="Insert paragraph after block"]
 
     # wait for the API to save the image and for the src attribute to be updated before continuing
     user waits until parent contains element    ${block}
