@@ -221,7 +221,8 @@ def validate_environment_variables():
 # back slashes.
 def includes_data_changing_tests(arguments: argparse.Namespace):
     return (
-        arguments.tests == "tests/"
+        arguments.tests == "tests"
+        or arguments.tests == "tests/"
         or arguments.tests == f"tests{os.sep}"
         or f"{os.sep}admin" in arguments.tests
         or "/admin" in arguments.tests
