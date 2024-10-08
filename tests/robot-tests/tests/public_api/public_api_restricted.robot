@@ -72,7 +72,7 @@ Create 1st API dataset
 
 User waits until the 1st API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
+    user waits until draft API data set status contains    Ready
 
 Create 2nd API dataset
     user clicks link    Back to API data sets
@@ -86,7 +86,7 @@ Create 2nd API dataset
 
 User waits until the 2nd API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
+    user waits until draft API data set status contains    Ready
 
 Verify the contents inside the 'Draft API datasets' table
     user clicks link    Back to API data sets
@@ -107,59 +107,47 @@ Verify the contents inside the 'Draft API datasets' table
 Click on 'View Details' link
     user clicks link in table cell    1    4    View details    xpath://table[@data-testid='draft-api-data-sets']
     user waits until h3 is visible    Draft version details
-    user checks table headings for Draft version details table
 
 User checks row data contents inside the 'Draft API datasets' summary table
-    user checks contents inside the cell value    v1.0
-    ...    xpath://dl[@data-testid="draft-version-summary"]/div/dd[@data-testid='Version-value']/strong
-    user checks contents inside the cell value    Ready
-    ...    xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
-    user checks contents inside the cell value    Financial year 3000-01
-    ...    xpath:(//div[@data-testid="Release"]//dd[@data-testid="Release-value"]//a)[1]
-    user checks contents inside the cell value    ${SUBJECT_NAME_1}
-    ...    xpath://div[@data-testid="Data set file"]//dd[@data-testid="Data set file-value"]
-    user checks contents inside the cell value    National
-    ...    xpath://div[@data-testid="Geographic levels"]//dd[@data-testid="Geographic levels-value"]
-    user checks contents inside the cell value    2012/13
-    ...    xpath://div[@data-testid="Time periods"]//dd[@data-testid="Time periods-value"]
+    user checks summary list contains    Version    v1.0
+    user checks summary list contains    Status    Ready
+    user checks summary list contains    Release    ${RELEASE_NAME}
+    user checks summary list contains    Data set file    ${SUBJECT_NAME_1}
+    user checks summary list contains    Geographic levels    National
+    user checks summary list contains    Time periods    2012/13
+    user checks list contains exact items in order    id:draft-version-summary-indicators
+    ...    Lower quartile annualised earnings
+    ...    Median annualised earnings
+    ...    Number of learners with earnings
 
-    user checks contents inside the cell value    Lower quartile annualised earnings
-    ...    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[1]
-    user checks contents inside the cell value    Median annualised earnings
-    ...    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[2]
-    user checks contents inside the cell value    Number of learners with earnings
-    ...    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[3]
+    user clicks button    Show 1 more indicator    testid:Indicators
 
-    user clicks button    Show 1 more indicator
-    ...    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]
+    user checks list contains exact items in order    id:draft-version-summary-indicators
+    ...    Lower quartile annualised earnings
+    ...    Median annualised earnings
+    ...    Number of learners with earnings
+    ...    Upper quartile annualised earnings
 
-    user checks contents inside the cell value    Upper quartile annualised earnings
-    ...    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[4]
+    user checks list contains exact items in order    id:draft-version-summary-filters
+    ...    Cheese
+    ...    Colour
+    ...    Ethnicity group
 
-    user checks contents inside the cell value    Cheese
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[1]
-    user checks contents inside the cell value    Colour
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[2]
-    user checks contents inside the cell value    Ethnicity group
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[3]
+    user clicks button    Show 4 more filters    testid:Filters
 
-    user clicks button    Show 4 more filters    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]
+    user checks list contains exact items in order    id:draft-version-summary-filters
+    ...    Cheese
+    ...    Colour
+    ...    Ethnicity group
+    ...    Gender
+    ...    Level of learning
+    ...    Number of years after achievement of learning aim
+    ...    Provision
 
-    user checks contents inside the cell value    Gender
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[4]
-    user checks contents inside the cell value    Level of learning
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[5]
-    user checks contents inside the cell value    Number of years after achievement of learning aim
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[6]
-    user checks contents inside the cell value    Provision
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[7]
-
-    user checks contents inside the cell value    Preview API data set
-    ...    xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[1]/a
-    user checks contents inside the cell value    View preview token log
-    ...    xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[2]/a
-    user checks contents inside the cell value    Remove draft version
-    ...    xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[3]/button
+    user checks list contains exact items in order    testid:Actions
+    ...    Preview API data set
+    ...    View preview token log
+    ...    Remove draft version
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
@@ -201,7 +189,7 @@ Create a new API dataset version through the first amendment using the invalid s
 
 User waits until the 2nd invalid API dataset status changes to 'Failed'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    20x    %{WAIT_SMALL}s    Verify status of API Datasets    Failed
+    user waits until draft API data set status contains    Failed    retries=20x
 
 Verify the contents inside the 'Draft API datasets' table after the invalid import fails
     user clicks link    Back to API data sets

@@ -66,7 +66,7 @@ Create the initial API data set version
 
 User waits until the initial API data set version's status changes to "Ready"
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API data sets    Ready
+    user waits until draft API data set status contains    Ready
 
 Add headline text block to Content page
     user clicks link    Back to API data sets

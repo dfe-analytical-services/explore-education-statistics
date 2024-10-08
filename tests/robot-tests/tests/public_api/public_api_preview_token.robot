@@ -14,10 +14,8 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${PUBLICATION_NAME}=        UI tests - Public API - preview token %{RUN_IDENTIFIER}
-${RELEASE_NAME}=            Academic year Q1
-${ACADEMIC_YEAR}=           3000
-${SUBJECT_NAME_1}=          UI test subject 1
-${SUBJECT_NAME_2}=          UI test subject 2
+${RELEASE_NAME}=            Academic year Q1 3000/01
+${SUBJECT_NAME_1}=          ${PUBLICATION_NAME} - Subject 1
 ${PREVIEW_TOKEN_NAME}=      Test token
 
 
@@ -28,7 +26,7 @@ Create publication and release
     user waits until h1 is visible    Create new publication
     user creates publication    ${PUBLICATION_NAME}
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user creates release from publication page    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${ACADEMIC_YEAR}
+    user creates release from publication page    ${PUBLICATION_NAME}    Academic year Q1    3000
 
 Verify release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
@@ -37,8 +35,6 @@ Verify release summary
 Upload data files
     user uploads subject and waits until complete    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv
     ...    ${PUBLIC_API_FILES_DIR}
-    user uploads subject and waits until complete    ${SUBJECT_NAME_2}    tiny-two-filters.csv
-    ...    tiny-two-filters.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to subjects
     user clicks link    Data and files
@@ -51,117 +47,85 @@ Add data guidance to subjects
     user waits until page contains accordion section    ${SUBJECT_NAME_1}
 
     user enters text into data guidance data file content editor    ${SUBJECT_NAME_1}
-    ...    ${SUBJECT_NAME_1} Main guidance content
-
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME_2}
-    ...    ${SUBJECT_NAME_2} Main guidance content
+    ...    ${SUBJECT_NAME_1} guidance content
 
 Save data guidance
     user clicks button    Save guidance
 
-Create 1st API dataset
+Create API data set
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
 
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_NAME_1}
+    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_1}
     user clicks button    Confirm new API data set
 
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
-User waits until the 1st API dataset status changes to 'Ready'
+User waits until the API data set status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
+    user waits until draft API data set status contains    Ready
 
-Create 2nd API dataset
-    user clicks link    Back to API data sets
-    user clicks button    Create API data set
-    ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_NAME_2}
-    user clicks button    Confirm new API data set
-
-    user waits until page finishes loading
-    user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
-
-User waits until the 2nd API dataset status changes to 'Ready'
-    user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
-
-Verify the contents inside the 'Draft API datasets' table
+Verify the contents inside 'Draft API data sets' table
     user clicks link    Back to API data sets
     user waits until h3 is visible    Draft API data sets
 
-    user checks table column heading contains    1    1    Draft version
-    ...    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table column heading contains    1    2    Name    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table column heading contains    1    3    Status    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table column heading contains    1    4    Actions    xpath://table[@data-testid='draft-api-data-sets']
+    user checks table column heading contains    1    1    Draft version    testid:draft-api-data-sets
+    user checks table column heading contains    1    2    Name    testid:draft-api-data-sets
+    user checks table column heading contains    1    3    Status    testid:draft-api-data-sets
+    user checks table column heading contains    1    4    Actions    testid:draft-api-data-sets
 
-    user checks table cell contains    1    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table cell contains    1    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
+    user checks table body has x rows    1    testid:draft-api-data-sets
+    user checks table cell contains    1    1    v1.0    testid:draft-api-data-sets
+    user checks table cell contains    1    3    Ready    testid:draft-api-data-sets
 
-    user checks table cell contains    2    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table cell contains    2    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
-
-Click on 'View Details' link(First API dataset)
-    user clicks link in table cell    1    4    View details    xpath://table[@data-testid='draft-api-data-sets']
+Click on 'View Details' link for API data set
+    user clicks link in table cell    1    4    View details    testid:draft-api-data-sets
     user waits until h3 is visible    Draft version details
-    user checks table headings for Draft version details table
 
-User checks row data contents inside the 'Draft API datasets' summary table
-    user checks contents inside the cell value    v1.0
-    ...    xpath://dl[@data-testid="draft-version-summary"]/div/dd[@data-testid='Version-value']/strong
-    user checks contents inside the cell value    Ready
-    ...    xpath:(//div[@data-testid="Status"]//dd[@data-testid="Status-value"]//strong)[2]
-    user checks contents inside the cell value    Academic year Q1 3000/01
-    ...    xpath:(//div[@data-testid="Release"]//dd[@data-testid="Release-value"]//a)[1]
-    user checks contents inside the cell value    ${SUBJECT_NAME_1}
-    ...    xpath://div[@data-testid="Data set file"]//dd[@data-testid="Data set file-value"]
-    user checks contents inside the cell value    National
-    ...    xpath://div[@data-testid="Geographic levels"]//dd[@data-testid="Geographic levels-value"]
-    user checks contents inside the cell value    2012/13
-    ...    xpath://div[@data-testid="Time periods"]//dd[@data-testid="Time periods-value"]
+User verifies the 'Draft API data set' summary list
+    user checks summary list contains    Version    v1.0
+    user checks summary list contains    Status    Ready
+    user checks summary list contains    Release    ${RELEASE_NAME}
+    user checks summary list contains    Data set file    ${SUBJECT_NAME_1}
+    user checks summary list contains    Geographic levels    National
+    user checks summary list contains    Time periods    2012/13
+    user checks list contains exact items in order    id:draft-version-summary-indicators
+    ...    Lower quartile annualised earnings
+    ...    Median annualised earnings
+    ...    Number of learners with earnings
 
-    user checks contents inside the cell value    Lower quartile annualised earnings
-    ...    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[1]
-    user checks contents inside the cell value    Median annualised earnings
-    ...    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[2]
-    user checks contents inside the cell value    Number of learners with earnings
-    ...    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[3]
+    user clicks button    Show 1 more indicator    testid:Indicators
 
-    user clicks button    Show 1 more indicator
-    ...    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]
+    user checks list contains exact items in order    id:draft-version-summary-indicators
+    ...    Lower quartile annualised earnings
+    ...    Median annualised earnings
+    ...    Number of learners with earnings
+    ...    Upper quartile annualised earnings
 
-    user checks contents inside the cell value    Upper quartile annualised earnings
-    ...    xpath://div[@data-testid="Indicators"]//dd[@data-testid="Indicators-value"]/ul/li[4]
+    user checks list contains exact items in order    id:draft-version-summary-filters
+    ...    Cheese
+    ...    Colour
+    ...    Ethnicity group
 
-    user checks contents inside the cell value    Cheese
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[1]
-    user checks contents inside the cell value    Colour
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[2]
-    user checks contents inside the cell value    Ethnicity group
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[3]
+    user clicks button    Show 4 more filters    testid:Filters
 
-    user clicks button    Show 4 more filters    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]
+    user checks list contains exact items in order    id:draft-version-summary-filters
+    ...    Cheese
+    ...    Colour
+    ...    Ethnicity group
+    ...    Gender
+    ...    Level of learning
+    ...    Number of years after achievement of learning aim
+    ...    Provision
 
-    user checks contents inside the cell value    Gender
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[4]
-    user checks contents inside the cell value    Level of learning
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[5]
-    user checks contents inside the cell value    Number of years after achievement of learning aim
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[6]
-    user checks contents inside the cell value    Provision
-    ...    xpath://div[@data-testid="Filters"]//dd[@data-testid="Filters-value"]/ul/li[7]
-
-    user checks contents inside the cell value    Preview API data set
-    ...    xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[1]/a
-    user checks contents inside the cell value    View preview token log
-    ...    xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[2]/a
-    user checks contents inside the cell value    Remove draft version
-    ...    xpath://div[@data-testid="Actions"]//dd[@data-testid="Actions-value"]/ul/li[3]/button
+    user checks list contains exact items in order    testid:Actions
+    ...    Preview API data set
+    ...    View preview token log
+    ...    Remove draft version
 
 User clicks on 'Preview API data set' link
     user clicks link containing text    Preview API data set
@@ -171,8 +135,8 @@ User clicks on 'Generate preview token'
 
 User creates preview token through 'Generate preview token' modal window
     ${modal}=    user waits until modal is visible    Generate preview token
-    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    ${PREVIEW_TOKEN_NAME}
-    user clicks checkbox by selector    css:input[id="apiDataSetTokenCreateForm-agreeTerms"]
+    user enters text into element    name:label    ${PREVIEW_TOKEN_NAME}
+    user clicks element    name:agreeTerms
     user clicks button    Continue
 
     user waits until page finishes loading
@@ -193,8 +157,8 @@ User again clicks on 'Generate preview token'
 
 User creates another preview token through 'Generate preview token' modal window
     ${modal}=    user waits until modal is visible    Generate preview token
-    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    ${PREVIEW_TOKEN_NAME}
-    user clicks checkbox by selector    css:input[id="apiDataSetTokenCreateForm-agreeTerms"]
+    user enters text into element    name:label    ${PREVIEW_TOKEN_NAME}
+    user clicks element    name:agreeTerms
     user clicks button    Continue
 
     user waits until page finishes loading
@@ -217,8 +181,8 @@ User cancels creating preview token
     user clicks button    Generate preview token
 
     ${modal}=    user waits until modal is visible    Generate preview token
-    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    ${PREVIEW_TOKEN_NAME}
-    user clicks checkbox by selector    css:input[id="apiDataSetTokenCreateForm-agreeTerms"]
+    user enters text into element    name:label    ${PREVIEW_TOKEN_NAME}
+    user clicks element    name:agreeTerms
     user clicks button    Cancel
 
     user waits until page finishes loading
@@ -253,8 +217,8 @@ User verifies the relevant fields on the active preview token page
     user clicks button    Generate preview token
 
     ${modal}=    user waits until modal is visible    Generate preview token
-    user enters text into element    css:input[id="apiDataSetTokenCreateForm-label"]    ${PREVIEW_TOKEN_NAME}
-    user clicks checkbox by selector    css:input[id="apiDataSetTokenCreateForm-agreeTerms"]
+    user enters text into element    name:label    ${PREVIEW_TOKEN_NAME}
+    user clicks element    name:agreeTerms
     user clicks button    Continue
 
     user waits until page finishes loading
@@ -279,7 +243,7 @@ Add headline text block to Content page
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
 
-Approve first release
+Approve release
     user clicks link    Sign off
     user approves release for immediate publication
 
@@ -289,7 +253,7 @@ Verify newly published release is on Find Statistics page
 User navigates to data catalogue page
     user navigates to data catalogue page on public frontend
 
-Search with 1st API data set
+Search for API data set
     user clicks element    id:searchForm-search
     user presses keys    ${PUBLICATION_NAME}
     user clicks radio    API data sets only
@@ -313,79 +277,55 @@ User checks relevant headings exist on API data set details page
     user waits until h2 is visible    API data set quick start
     user waits until h2 is visible    API data set version history
 
-User verifies the row headings and contents in 'Data set details' section
-    user checks row headings within the api data set section    Theme
-    user checks row headings within the api data set section    Publication
-    user checks row headings within the api data set section    Release
-    user checks row headings within the api data set section    Release type
-    user checks row headings within the api data set section    Geographic levels
-    user checks row headings within the api data set section    Indicators
-    user checks row headings within the api data set section    Filters
-    user checks row headings within the api data set section    Time period
+User verifies 'Data set details' section
+    user checks summary list contains    Theme    Test theme    id:dataSetDetails
+    user checks summary list contains    Publication    ${PUBLICATION_NAME}    id:dataSetDetails
+    user checks summary list contains    Release    ${RELEASE_NAME}    id:dataSetDetails
+    user checks summary list contains    Release type    Accredited official statistics    id:dataSetDetails
+    user checks summary list contains    Geographic levels    National    id:dataSetDetails
 
-    user checks row headings within the api data set section    Notifications
+    user checks list contains exact items in order    id:indicators
+    ...    Lower quartile annualised earnings
+    ...    Median annualised earnings
+    ...    Number of learners with earnings
+    ...    parent=id:dataSetDetails
 
-    user checks contents inside the cell value    Test theme    css: #dataSetDetails [data-testid="Theme-value"]
-    user checks contents inside the cell value    ${PUBLICATION_NAME}
-    ...    css:#dataSetDetails [data-testid="Publication-value"]
-    user checks contents inside the cell value    Academic year Q1 3000/01
-    ...    css:#dataSetDetails [data-testid="Release-value"]
-    User checks contents inside the release type    Accredited official statistics
-    ...    css:#dataSetDetails [data-testid="Release type-value"] > button
-    user checks contents inside the cell value    National
-    ...    css:#dataSetDetails [data-testid="Geographic levels-value"]
+    user clicks button    Show 1 more indicator    css:#dataSetDetails [data-testid="Indicators"]
 
-    user checks contents inside the cell value    Lower quartile annualised earnings
-    ...    css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(1)
-    user checks contents inside the cell value    Median annualised earnings
-    ...    css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(2)
-    user checks contents inside the cell value    Number of learners with earnings
-    ...    css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(3)
+    user checks list contains exact items in order    id:indicators
+    ...    Lower quartile annualised earnings
+    ...    Median annualised earnings
+    ...    Number of learners with earnings
+    ...    Upper quartile annualised earnings
+    ...    parent=id:dataSetDetails
 
-    user clicks button    Show 1 more indicator    css:#dataSetDetails [data-testid="Indicators-value"]
+    user checks list contains exact items in order    id:filters
+    ...    Cheese
+    ...    Colour
+    ...    Ethnicity group
+    ...    parent=id:dataSetDetails
 
-    user checks contents inside the cell value    Upper quartile annualised earnings
-    ...    css:#dataSetDetails [data-testid="Indicators-value"] > ul > :nth-of-type(4)
+    user clicks button    Show 4 more filters    css:#dataSetDetails [data-testid="Filters"]
 
-    user checks contents inside the cell value    Cheese
-    ...    css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(1)
-    user checks contents inside the cell value    Colour
-    ...    css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(2)
-    user checks contents inside the cell value    Ethnicity group
-    ...    css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(3)
+    user checks list contains exact items in order    id:filters
+    ...    Cheese
+    ...    Colour
+    ...    Ethnicity group
+    ...    Gender
+    ...    Level of learning
+    ...    Number of years after achievement of learning aim
+    ...    Provision
+    ...    parent=id:dataSetDetails
 
-    user clicks button    Show 4 more filters    css:#dataSetDetails [data-testid="Filters-value"]
+    user checks summary list contains    Time period    2012/13    id:dataSetDetails
+    user checks summary list contains    Notifications    Get email updates about this API data set
+    ...    id:dataSetDetails
 
-    user checks contents inside the cell value    Gender
-    ...    css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(4)
-    user checks contents inside the cell value    Level of learning
-    ...    css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(5)
-    user checks contents inside the cell value    Number of years after achievement of learning aim
-    ...    css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(6)
-    user checks contents inside the cell value    Provision
-    ...    css:#dataSetDetails [data-testid="Filters-value"] > ul > :nth-of-type(7)
+User verifies 'API version history' section
+    user checks table column heading contains    1    1    Version    id:apiVersionHistory
+    user checks table column heading contains    1    2    Release    id:apiVersionHistory
+    user checks table column heading contains    1    3    Status    id:apiVersionHistory
 
-    user checks contents inside the cell value    2012/13    css:#dataSetDetails [data-testid="Time period-value"]
-    user checks contents inside the cell value    Get email updates about this API data set
-    ...    css:#dataSetDetails [data-testid="Notifications-value"] > a
-
-User verifies the headings and contents in 'API version history' section
-    user checks table column heading contains    1    1    Version    css:section[id="apiVersionHistory"]
-
-    user checks table column heading contains    1    2    Release    css:section[id="apiVersionHistory"]
-    user checks table column heading contains    1    3    Status    css:section[id="apiVersionHistory"]
-
-    user checks table cell contains    1    1    1.0 (current)    xpath://section[@id="apiVersionHistory"]
-    user checks table cell contains    1    2    Academic year Q1 3000/01    xpath://section[@id="apiVersionHistory"]
-    user checks table cell contains    1    3    Published    xpath://section[@id="apiVersionHistory"]
-
-
-*** Keywords ***
-User checks contents inside the release type
-    [Arguments]    ${expected_text}    ${locator}
-    ${full_text}=    get text    ${locator}
-
-    # Split and remove the part after '?' and strip whitespace
-    ${button_text}=    set variable    ${full_text.split('?')[0].strip()}
-
-    should be equal as strings    ${button_text}    ${expected_text}
+    user checks table cell contains    1    1    1.0 (current)    id:apiVersionHistory
+    user checks table cell contains    1    2    ${RELEASE_NAME}    id:apiVersionHistory
+    user checks table cell contains    1    3    Published    id:apiVersionHistory

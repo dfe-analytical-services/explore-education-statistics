@@ -909,11 +909,6 @@ user clicks checkbox
     user scrolls to element    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
     user clicks element    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
 
-user clicks checkbox by selector
-    [Arguments]    ${locator}
-    user scrolls to element    ${locator}
-    user clicks element    ${locator}
-
 user checks checkbox is checked
     [Arguments]    ${label}    ${exact_match}=${True}
     ${text_matcher}=    get xpath text matcher    ${label}    ${exact_match}
@@ -946,13 +941,19 @@ user checks list has x items
     [Arguments]    ${locator}    ${count}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
-    user waits until parent contains element    ${list}    css:li    count=${count}
+    # Use xpath to more precisely get the direct child items underneath the
+    # parent list and ignore any nested lists and their children.
+    # CSS selector shouldn't be used here as child selector `>` doesn't seem to work.
+    user waits until parent contains element    ${list}    xpath:./li    count=${count}
 
 user gets list item element
     [Arguments]    ${locator}    ${item_num}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
-    ${item}=    get child element    ${list}    css:li:nth-child(${item_num})
+    # Use xpath to more precisely get the direct child items underneath the
+    # parent list and ignore any nested lists and their children.
+    # CSS selector shouldn't be used here as child selector `>` doesn't seem to work.
+    ${item}=    get child element    ${list}    xpath:./li[${item_num}]
     [Return]    ${item}
 
 user checks list item contains
