@@ -1,5 +1,6 @@
 import datetime
 import os
+
 import pytz
 from tests.libs.selenium_elements import sl
 
@@ -17,19 +18,19 @@ def get_local_browser_date_and_time(offset_days: int = 0, format_string: str = "
 
 
 def get_london_day_of_month(offset_days: int = 0) -> str:
-    return get_london_date_and_time(offset_days, "%-d")
+    return _get_date_and_time(offset_days, "%-d", "Europe/London")
 
 
 def get_london_month_date(offset_days: int = 0) -> str:
-    return get_london_date_and_time(offset_days, "%-m")
+    return _get_date_and_time(offset_days, "%-m", "Europe/London")
 
 
 def get_london_month_word(offset_days: int = 0) -> str:
-    return get_london_date_and_time(offset_days, "%B")
+    return _get_date_and_time(offset_days, "%B", "Europe/London")
 
 
 def get_london_year(offset_days: int = 0) -> str:
-    return get_london_date_and_time(offset_days, "%Y")
+    return _get_date_and_time(offset_days, "%Y", "Europe/London")
 
 
 def _get_browser_timezone():
