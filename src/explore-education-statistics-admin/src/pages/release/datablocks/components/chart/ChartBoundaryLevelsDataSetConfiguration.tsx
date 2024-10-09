@@ -111,8 +111,8 @@ export default function ChartBoundaryLevelsDataSetConfiguration({
               })),
             ]}
             onChange={({ target }) => {
+              // works but dodgy type?
               const { value } = target;
-              console.log({ value });
               setSelectValue(
                 Number.isNaN(Number(value)) ? undefined : Number(value),
               );
