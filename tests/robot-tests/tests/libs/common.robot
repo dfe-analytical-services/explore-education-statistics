@@ -251,7 +251,7 @@ user checks accordion is in position
 user waits until accordion section contains text
     [Arguments]    ${section_text}    ${text}    ${wait}=${timeout}
     ${section}=    user gets accordion section content element    ${section_text}
-    user waits until parent contains element    ${section}    xpath:.//*[text()="${text}"]    timeout=${wait}
+    user waits until parent contains element    ${section}    xpath:.//*[contains(., "${text}")]    timeout=${wait}
 
 user gets accordion header button element
     [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]
@@ -344,7 +344,7 @@ user checks page does not contain testid
 
 user checks testid element contains
     [Arguments]    ${id}    ${text}
-    user waits until element contains    css:[data-testid="${id}"]    ${text}
+    user waits until element contains    testid:${id}    ${text}
 
 user gets testid element
     [Arguments]    ${id}    ${wait}=${timeout}    ${parent}=css:body
@@ -361,6 +361,8 @@ user checks element contains child element
     ...    ${element}
     ...    ${child_element}
     user waits until parent contains element    ${element}    ${child_element}
+    ${child}=    get child element    ${element}    ${child_element}
+    RETURN    ${child}
 
 user checks element does not contain child element
     [Arguments]
@@ -493,7 +495,7 @@ user clicks link by index
 
 user clicks link by visible text
     [Arguments]    ${text}    ${parent}=css:body
-    user clicks element    xpath:.//a[text()="${text}"]    ${parent}
+    user clicks element    xpath:.//a[contains(., "${text}")]    ${parent}
 
 user clicks link containing text
     [Arguments]    ${text}    ${parent}=css:body
@@ -523,34 +525,36 @@ user clicks button containing text
 
 user waits until page contains button
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page contains element    xpath://button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
+    user waits until page contains element    xpath://button[contains(., "${text}") or .//*[contains(., "${text}")]]
+    ...    ${wait}
 
 user checks page contains button
     [Arguments]    ${text}
-    user checks page contains element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
+    user checks page contains element    xpath://button[contains(., "${text}") or .//*[contains(., "${text}")]]
 
 user checks page does not contain button
     [Arguments]    ${text}
-    user checks page does not contain element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
+    user checks page does not contain element    xpath://button[contains(., "${text}") or .//*[contains(., "${text}")]]
 
 user waits until page does not contain button
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page does not contain element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
-    ...    ${wait}
+    user waits until page does not contain element
+    ...    xpath://button[contains(., "${text}") or .//*[contains(., "${text}")]]    ${wait}
 
 user waits until button is enabled
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is enabled    xpath://button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
+    user waits until element is enabled    xpath://button[contains(., "${text}") or .//*[contains(., "${text}")]]
+    ...    ${wait}
 
 user waits until parent contains button
     [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
     user waits until parent contains element    ${parent}
-    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
+    ...    xpath:.//button[contains(., "${text}") or .//*[contains(., "${text}")]]    ${wait}
 
 user waits until parent does not contain button
     [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
     user waits until parent does not contain element    ${parent}
-    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
+    ...    xpath:.//button[contains(., "${text}") or .//*[contains(., "${text}")]]    ${wait}
 
 user waits until parent does not contain
     [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
@@ -560,49 +564,51 @@ user waits until parent does not contain
 user gets button element
     [Arguments]    ${text}    ${parent}=css:body
     user waits until parent contains button    ${parent}    ${text}
-    ${button}=    get child element    ${parent}    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]
+    ${button}=    get child element    ${parent}
+    ...    xpath:.//button[contains(., "${text}") or .//*[contains(., "${text}")]]
     [Return]    ${button}
 
 user checks page contains tag
     [Arguments]    ${text}
-    user checks page contains element    xpath://*[contains(@class, "govuk-tag")][text()="${text}"]
+    user checks page contains element    xpath://*[contains(@class, "govuk-tag")][contains(., "${text}")]
 
 user waits until h1 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is visible    xpath://h1[text()="${text}"]    ${wait}
+    user waits until element is visible    xpath://h1[contains(., "${text}")]    ${wait}
 
 user waits until h1 is not visible
     [Arguments]    ${text}    ${wait}=%{WAIT_SMALL}
-    user waits until element is not visible    xpath://h1[text()="${text}"]    ${wait}
+    user waits until element is not visible    xpath://h1[contains(., "${text}")]    ${wait}
 
 user waits until h2 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is visible    xpath://h2[text()="${text}"]    ${wait}
+    user waits until element is visible    xpath://h2[contains(., "${text}")]    ${wait}
 
 user waits until h2 is not visible
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is not visible    xpath://h2[text()="${text}"]    ${wait}
+    user waits until element is not visible    xpath://h2[contains(., "${text}")]    ${wait}
 
 user waits until h3 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is visible    xpath://h3[text()="${text}"]    ${wait}
+    user waits until element is visible    xpath://h3[contains(., "${text}")]    ${wait}
 
 user waits until h3 is not visible
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is not visible    xpath://h3[text()="${text}"]    ${wait}
+    user waits until element is not visible    xpath://h3[contains(., "${text}")]    ${wait}
 
 user waits until legend is visible
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is visible    xpath://legend[text()="${text}"]    ${wait}
+    user waits until element is visible    xpath://legend[contains(., "${text}")]    ${wait}
 
 user waits until page contains title
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page contains element    xpath://h1[@data-testid="page-title" and text()="${text}"]    ${wait}
+    user waits until page contains element    xpath://h1[@data-testid="page-title" and contains(., "${text}")]
+    ...    ${wait}
 
 user waits until page contains title caption
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page contains element    xpath://span[@data-testid="page-title-caption" and text()="${text}"]
-    ...    ${wait}
+    user waits until page contains element
+    ...    xpath://span[@data-testid="page-title-caption" and contains(., "${text}")]    ${wait}
 
 user selects newly opened window
     switch window    locator=NEW
