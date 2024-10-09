@@ -33,7 +33,7 @@ export default function EditableKeyStatDataBlock({
   onRemove,
   onSubmit,
 }: EditableKeyStatDataBlockProps) {
-  const [keyStatisticId, setKeyStatisticId] = useState("");
+  const [keyStatisticId, setKeyStatisticId] = useState('');
   const [showForm, toggleShowForm] = useToggle(false);
 
   const {
@@ -47,7 +47,7 @@ export default function EditableKeyStatDataBlock({
   const handleSubmit = useCallback(
     async (values: KeyStatDataBlockFormValues) => {
       await onSubmit(values);
-      setKeyStatisticId("");
+      setKeyStatisticId('');
       toggleShowForm.off();
     },
     [onSubmit, toggleShowForm, setKeyStatisticId],
@@ -78,7 +78,9 @@ export default function EditableKeyStatDataBlock({
     return (
       <EditableKeyStatDataBlockForm
         keyStat={keyStat}
-        keyStatisticGuidanceTitles={keyStatisticGuidanceTitles?.filter((keyStatTitle) => keyStatTitle === keyStatisticId)}
+        keyStatisticGuidanceTitles={keyStatisticGuidanceTitles?.filter(
+          keyStatTitle => keyStatTitle === keyStatisticId,
+        )}
         title={title}
         statistic={statistic}
         isReordering={isReordering}

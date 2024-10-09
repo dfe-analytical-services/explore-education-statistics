@@ -25,13 +25,13 @@ export default function EditableKeyStatText({
   onRemove,
   onSubmit,
 }: EditableKeyStatTextProps) {
-  const [keyStatisticId, setKeyStatisticId] = useState("");
+  const [keyStatisticId, setKeyStatisticId] = useState('');
   const [showForm, toggleShowForm] = useToggle(false);
 
   const handleSubmit = useCallback(
     async (values: KeyStatTextFormValues) => {
       await onSubmit(values);
-      setKeyStatisticId("");
+      setKeyStatisticId('');
       toggleShowForm.off();
     },
     [onSubmit, setKeyStatisticId, toggleShowForm],
@@ -41,7 +41,9 @@ export default function EditableKeyStatText({
     return (
       <EditableKeyStatTextForm
         keyStat={keyStat}
-        keyStatisticGuidanceTitles={keyStatisticGuidanceTitles?.filter((keyStatTitle) => keyStatTitle === keyStatisticId)}
+        keyStatisticGuidanceTitles={keyStatisticGuidanceTitles?.filter(
+          keyStatTitle => keyStatTitle === keyStatisticId,
+        )}
         isReordering={isReordering}
         testId={testId}
         onSubmit={handleSubmit}
