@@ -31,8 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ThemeService : IThemeService
     {
-        private readonly ContentDbContext _contentContext;
-        private readonly StatisticsDbContext _statisticsContext;
+        private readonly ContentDbContext _contentDbContext;
+        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
@@ -47,8 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public ThemeService(
             IOptions<AppOptions> appOptions,
-            ContentDbContext contentContext,
-            StatisticsDbContext statisticsContext,
+            ContentDbContext contentDbContext,
+            StatisticsDbContext statisticsDbContext,
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
@@ -60,8 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPublishingService publishingService,
             IBlobCacheService cacheService)
         {
-            _contentContext = contentContext;
-            _statisticsContext = statisticsContext;
+            _contentDbContext = contentDbContext;
+            _statisticsDbContext = statisticsDbContext;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
@@ -81,12 +81,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(
                     async _ =>
                     {
-                        if (await _contentContext.Themes.AnyAsync(theme => theme.Slug == created.Slug))
+                        if (await _contentDbContext.Themes.AnyAsync(theme => theme.Slug == created.Slug))
                         {
                             return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
                         }
 
-                        var saved = await _contentContext.Themes.AddAsync(
+                        var saved = await _contentDbContext.Themes.AddAsync(
                             new Theme
                             {
                                 Slug = created.Slug,
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             }
                         );
 
-                        await _contentContext.SaveChangesAsync();
+                        await _contentDbContext.SaveChangesAsync();
 
                         await _publishingService.TaxonomyChanged();
 
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(
                     async theme =>
                     {
-                        if (await _contentContext.Themes.AnyAsync(t => t.Slug == updated.Slug && t.Id != id))
+                        if (await _contentDbContext.Themes.AnyAsync(t => t.Slug == updated.Slug && t.Id != id))
                         {
                             return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
                         }
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         theme.Slug = updated.Slug;
                         theme.Summary = updated.Summary;
 
-                        await _contentContext.SaveChangesAsync();
+                        await _contentDbContext.SaveChangesAsync();
 
                         await _publishingService.TaxonomyChanged();
 
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     async _ => await _userService
                         .CheckCanManageAllTaxonomy()
                         .OnSuccess(
-                            async () => await _contentContext.Themes
+                            async () => await _contentDbContext.Themes
                                 .ToListAsync()
                         )
                         .OrElse(GetUserThemes)
@@ -167,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _userService.CheckCanManageAllTaxonomy()
                 .OnSuccess(() => _persistenceHelper.CheckEntityExists<Theme>(themeId, q => q.Include(t => t.Publications)))
                 .OnSuccessDo(CheckCanDeleteTheme)
-                .OnSuccessVoid(async theme =>
+                .OnSuccessDo(async theme =>
                 {
                     var publicationIdsToDelete = theme.Publications
                         .Select(p => p.Id)
@@ -176,9 +176,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await DeleteMethodologiesForPublications(publicationIdsToDelete)
                        .OnSuccess(() => DeleteReleasesForPublications(publicationIdsToDelete))
                        .OnSuccess(() => DeletePublications(publicationIdsToDelete));
-
-                    _contentContext.Themes.Remove(theme);
-                    await _contentContext.SaveChangesAsync(cancellationToken);
+                })
+                .OnSuccessVoid(async theme =>
+                {
+                    _contentDbContext.Themes.Remove(theme);
+                    await _contentDbContext.SaveChangesAsync(cancellationToken);
 
                     await _publishingService.TaxonomyChanged(cancellationToken);
                 });
@@ -187,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublications(
             IEnumerable<Guid> publicationIds)
         {
-            var methodologyIdsToDelete = await _contentContext
+            var methodologyIdsToDelete = await _contentDbContext
                 .PublicationMethodologies
                 .AsQueryable()
                 .Where(pm => pm.Owner && publicationIds.Contains(pm.PublicationId))
@@ -202,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> DeleteReleasesForPublications(IEnumerable<Guid> publicationIds)
         {
-            var publications = await _contentContext
+            var publications = await _contentDbContext
                 .Publications
                 .Where(publication => publicationIds.Contains(publication.Id))
                 .ToListAsync();
@@ -213,11 +215,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 publication.LatestPublishedReleaseVersionId = null;
             });
 
-            await _contentContext.SaveChangesAsync();
+            await _contentDbContext.SaveChangesAsync();
 
             // Some Content Db Releases may be soft-deleted and therefore not visible.
             // Ignore the query filter to make sure they are found
-            var releaseVersionIdsToDelete = await _contentContext
+            var releaseVersionIdsToDelete = await _contentDbContext
                 .ReleaseVersions
                 .IgnoreQueryFilters()
                 .Where(rv => publicationIds.Contains(rv.PublicationId))
@@ -242,19 +244,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> DeletePublications(IEnumerable<Guid> publicationIds)
         {
-            var publications = await _contentContext
+            var publications = await _contentDbContext
                 .Publications
                 .Where(publication => publicationIds.Contains(publication.Id))
                 .ToListAsync();
 
-            _contentContext.Publications.RemoveRange(publications);
-            await _contentContext.SaveChangesAsync();
+            _contentDbContext.Publications.RemoveRange(publications);
+            await _contentDbContext.SaveChangesAsync();
             return Unit.Instance;
         }
 
         private async Task<Either<ActionResult, Unit>> DeleteContentAndStatsRelease(Guid releaseVersionId)
         {
-            var contentReleaseVersion = await _contentContext
+            var contentReleaseVersion = await _contentDbContext
                 .ReleaseVersions
                 .IgnoreQueryFilters()
                 .SingleAsync(rv => rv.Id == releaseVersionId);
@@ -275,14 +277,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await RemoveReleaseDependencies(releaseVersionId);
             await DeleteStatsDbRelease(releaseVersionId);
 
-            _contentContext.ReleaseVersions.Remove(contentReleaseVersion);
-            await _contentContext.SaveChangesAsync();
+            _contentDbContext.ReleaseVersions.Remove(contentReleaseVersion);
+            await _contentDbContext.SaveChangesAsync();
             return Unit.Instance;
         }
 
         private async Task DeleteStatsDbRelease(Guid releaseVersionId)
         {
-            var statsRelease = await _statisticsContext
+            var statsRelease = await _statisticsDbContext
                 .ReleaseVersion
                 .AsQueryable()
                 .SingleOrDefaultAsync(rv => rv.Id == releaseVersionId);
@@ -291,8 +293,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseVersionId: statsRelease.Id,
                     softDeleteOrphanedSubjects: false);
-                _statisticsContext.ReleaseVersion.Remove(statsRelease);
-                await _statisticsContext.SaveChangesAsync();
+                _statisticsDbContext.ReleaseVersion.Remove(statsRelease);
+                await _statisticsDbContext.SaveChangesAsync();
             }
         }
 
@@ -303,13 +305,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task RemoveReleaseDependencies(Guid releaseVersionId)
         {
-            var keyStats = _contentContext
+            var keyStats = _contentDbContext
                 .KeyStatistics
                 .Where(ks => ks.ReleaseVersionId == releaseVersionId);
 
-            _contentContext.KeyStatistics.RemoveRange(keyStats);
+            _contentDbContext.KeyStatistics.RemoveRange(keyStats);
 
-            var dataBlockVersions = await _contentContext
+            var dataBlockVersions = await _contentDbContext
                 .DataBlockVersions
                 .Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
                 .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId)
@@ -327,22 +329,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 dataBlockParent.LatestPublishedVersionId = null;
             });
 
-            await _contentContext.SaveChangesAsync();
+            await _contentDbContext.SaveChangesAsync();
 
             // Then remove the now-unreferenced DataBlockVersions.
-            _contentContext.DataBlockVersions.RemoveRange(dataBlockVersions);
-            await _contentContext.SaveChangesAsync();
+            _contentDbContext.DataBlockVersions.RemoveRange(dataBlockVersions);
+            await _contentDbContext.SaveChangesAsync();
 
             // And finally, delete the DataBlockParents if they are now orphaned.
             var orphanedDataBlockParents = dataBlockParents
                 .Where(dataBlockParent =>
-                    !_contentContext
+                    !_contentDbContext
                         .DataBlockVersions
                         .Any(dataBlockVersion => dataBlockVersion.DataBlockParentId == dataBlockParent.Id))
                 .ToList();
 
-            _contentContext.DataBlockParents.RemoveRange(orphanedDataBlockParents);
-            await _contentContext.SaveChangesAsync();
+            _contentDbContext.DataBlockParents.RemoveRange(orphanedDataBlockParents);
+            await _contentDbContext.SaveChangesAsync();
         }
 
         public async Task<Either<ActionResult, Unit>> DeleteUITestThemes(CancellationToken cancellationToken = default)
@@ -350,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return !_themeDeletionAllowed
                 ? (Either<ActionResult, Unit>)new ForbidResult()
                 : await _userService.CheckCanManageAllTaxonomy()
-                    .OnSuccess(_ => _contentContext.Themes
+                    .OnSuccess(_ => _contentDbContext.Themes
                         .Where(theme => theme.Title.Contains("UI test")))
                     .OnSuccessVoid(async themes =>
                     {
@@ -359,7 +361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             await DeleteTheme(theme.Id, cancellationToken);
                         }
 
-                        await _contentContext.SaveChangesAsync(cancellationToken);
+                        await _contentDbContext.SaveChangesAsync(cancellationToken);
                         await _publishingService.TaxonomyChanged(cancellationToken);
                     });
         }
@@ -387,14 +389,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var userId = _userService.GetUserId();
 
-            return await _contentContext
+            return await _contentDbContext
                 .UserReleaseRoles
                 .AsQueryable()
                 .Where(userReleaseRole =>
                     userReleaseRole.UserId == userId &&
                     userReleaseRole.Role != ReleaseRole.PrereleaseViewer)
                 .Select(userReleaseRole => userReleaseRole.ReleaseVersion.Publication)
-                .Concat(_contentContext
+                .Concat(_contentDbContext
                     .UserPublicationRoles
                     .AsQueryable()
                     .Where(userPublicationRole =>

@@ -1,23 +1,22 @@
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public class AllMethodologiesThemeViewModel : IComparable<AllMethodologiesPublicationViewModel>
+public class AllMethodologiesThemeViewModel : IComparable<AllMethodologiesThemeViewModel>
 {
     public Guid Id { get; set; }
 
     public string Title { get; set; } = string.Empty;
 
-    public List<AllMethodologiesPublicationViewModel> Publications { get; set; } = new();
+    public List<AllMethodologiesPublicationViewModel> Publications { get; set; } = [];
 
     public void RemovePublicationNodesWithoutMethodologiesAndSort()
     {
         Publications = Publications
             .Where(publication => publication.Methodologies.Any())
             .ToList();
-
         Publications.Sort();
     }
 
-    public int CompareTo(AllMethodologiesPublicationViewModel? other)
+    public int CompareTo(AllMethodologiesThemeViewModel? other)
     {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;

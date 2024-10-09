@@ -374,9 +374,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Null(contentPublication.ExternalMethodology);
                 Assert.Equal("test-publication", contentPublication.Slug);
                 Assert.Equal("Publication", contentPublication.Title);
-                Assert.Equal("Theme", contentPublication.Theme.Title);
+                Assert.Equal("Theme", contentPublication.ThemeTitle);
                 Assert.NotNull(contentPublication);
-                Assert.NotNull(contentPublication.Theme);
 
                 var contentPublicationReleaseSeries = contentPublication.ReleaseSeries;
                 Assert.Equal(3, contentPublicationReleaseSeries.Count);

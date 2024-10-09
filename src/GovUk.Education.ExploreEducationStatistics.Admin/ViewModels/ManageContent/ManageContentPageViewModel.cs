@@ -84,18 +84,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; set; }
 
-            public ThemeViewModel Theme { get; set; }
+            public string ThemeTitle { get; set; }
 
             public Contact Contact { get; set; }
 
             public List<IdTitleViewModel> Methodologies { get; set; }
 
             public ExternalMethodology ExternalMethodology { get; set; }
-        }
-
-        public class ThemeViewModel
-        {
-            public string Title { get; set; }
         }
     }
 

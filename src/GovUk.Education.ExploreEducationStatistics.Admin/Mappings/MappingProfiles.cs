@@ -128,10 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         Title = rv.Publication.Title,
                         Slug = rv.Publication.Slug,
                         Contact = rv.Publication.Contact,
-                        Theme = new ManageContentPageViewModel.ThemeViewModel
-                        {
-                            Title = rv.Publication.Theme.Title
-                        },
+                        ThemeTitle = rv.Publication.Theme.Title,
                         Releases = rv.Publication.ReleaseVersions
                             .FindAll(otherReleaseVersion => rv.Id != otherReleaseVersion.Id &&
                                                      IsLatestVersionOfRelease(rv.Publication.ReleaseVersions, otherReleaseVersion.Id))
