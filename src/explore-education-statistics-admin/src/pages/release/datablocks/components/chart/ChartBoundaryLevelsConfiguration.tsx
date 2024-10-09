@@ -15,7 +15,7 @@ import ChartBoundaryLevelsDataSetConfiguration from './ChartBoundaryLevelsDataSe
 const formId = 'chartBoundaryLevelsConfigurationForm';
 
 export interface ChartBoundaryLevelsFormValues {
-  boundaryLevel?: number;
+  boundaryLevel: number;
   dataSetConfigs: MapDataSetConfig[];
 }
 
