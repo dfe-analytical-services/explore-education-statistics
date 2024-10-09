@@ -281,8 +281,7 @@ const ChartBuilder = ({
       boundaryLevel,
       dataSetConfigs,
     }: ChartBoundaryLevelsFormValues) => {
-      actions.updateChartOptions({ boundaryLevel } as ChartOptions);
-      actions.updateChartMapConfiguration(dataSetConfigs);
+      actions.updateChartBoundaryLevels({ boundaryLevel, dataSetConfigs });
 
       setDataLoading(true);
 
@@ -376,12 +375,7 @@ const ChartBuilder = ({
                       dataSetConfigs={chartProps?.map?.dataSetConfigs ?? []}
                       meta={meta}
                       onChange={handleDefaultBoundaryLevelChange}
-                      onSubmit={({ boundaryLevel, dataSetConfigs }) => {
-                        actions.updateChartOptions({
-                          boundaryLevel,
-                        } as ChartOptions);
-                        actions.updateChartMapConfiguration(dataSetConfigs);
-                      }}
+                      onSubmit={actions.updateChartBoundaryLevels}
                     />
                   </TabsSection>
                 )}
