@@ -33,7 +33,8 @@ Create new release
 
 Upload another subject (for deletion later)
     user waits until page contains element    id:dataFileUploadForm-subjectTitle
-    user uploads subject and waits until complete    ${SECOND_SUBJECT}    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    ${SECOND_SUBJECT}    upload-file-test.csv
+    ...    upload-file-test.meta.csv
 
 Add data guidance to subject
     user clicks link    Data guidance
@@ -292,7 +293,7 @@ Add release note to release amendment
     user clicks button    Add note
     user enters text into element    id:create-release-note-form-reason    Test release note one
     user clicks button    Save note
-    ${date}    get current datetime    %-d %B %Y
+    ${date}    get london date
     user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
@@ -303,8 +304,8 @@ Go to "Sign off" page
 Validate Release status table row is correct
     user waits until page contains element    css:table
     user checks element count is x    xpath://table/tbody/tr    1
-    ${datetime}    get current datetime    %-d %B %Y
-    table cell should contain    css:table    2    1    ${datetime}    # Date
+    ${date}    get london date
+    table cell should contain    css:table    2    1    ${date}    # Date
     table cell should contain    css:table    2    2    Approved    # Status
     table cell should contain    css:table    2    3    Approved by UI tests    # Internal note
     table cell should contain    css:table    2    4    1    # Release version
@@ -425,7 +426,7 @@ Update Seven filters footnote
 Add release note for new release amendment
     user clicks link    Content
     user adds a release note    Test release note two
-    ${date}    get current datetime    %-d %B %Y
+    ${date}    get london date
     user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note two
 

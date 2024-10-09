@@ -152,10 +152,10 @@ Add public prerelease access list
 
 Approve release for scheduled publication
     ${days_until_release}=    set variable    0
-    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
-    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
-    ${publish_date_month_word}=    get current datetime    %B    ${days_until_release}
-    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+    ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
+    ${publish_date_month}=    get london month date    offset_days=${days_until_release}
+    ${publish_date_month_word}=    get london month word    offset_days=${days_until_release}
+    ${publish_date_year}=    get london year    offset_days=${days_until_release}
 
     user approves release for scheduled publication
     ...    ${publish_date_day}
@@ -170,9 +170,9 @@ Approve release for scheduled publication
 Publish the scheduled release
     user waits for scheduled release to be published immediately
 
-    ${publish_date_day}=    get current datetime    %-d
-    ${publish_date_month_word}=    get current datetime    %B
-    ${publish_date_year}=    get current datetime    %Y
+    ${publish_date_day}=    get london day of month
+    ${publish_date_month_word}=    get london month word
+    ${publish_date_year}=    get london year
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
     ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 

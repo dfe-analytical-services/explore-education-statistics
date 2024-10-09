@@ -3,20 +3,6 @@ import { InvalidContentError } from '@admin/components/editable/utils/getInvalid
 import { render, screen } from '@testing-library/react';
 
 describe('InvalidContentDetails', () => {
-  test('renders clickHereLink errors', () => {
-    const testErrors: InvalidContentError[] = [
-      {
-        type: 'clickHereLinkText',
-      },
-      {
-        type: 'clickHereLinkText',
-      },
-    ];
-    render(<InvalidContentDetails errors={testErrors} />);
-
-    expect(screen.getByRole('button', { name: /2 "click here" links/ }));
-  });
-
   test('renders repeatedLinkText errors', () => {
     const testErrors: InvalidContentError[] = [
       {
@@ -40,21 +26,21 @@ describe('InvalidContentDetails', () => {
     expect(screen.getByText('Repeated link text: url-1, url-2'));
   });
 
-  test('renders oneWordLinkText errors', () => {
+  test('renders badLinkText errors', () => {
     const testErrors: InvalidContentError[] = [
       {
-        type: 'oneWordLinkText',
-        message: 'word',
+        type: 'badLinkText',
+        message: 'learn more',
       },
     ];
     render(<InvalidContentDetails errors={testErrors} />);
 
     expect(
       screen.getByRole('button', {
-        name: /1 link with one word link text/,
+        name: /1 bad link text/,
       }),
     );
-    expect(screen.getByText('word'));
+    expect(screen.getByText('learn more'));
   });
 
   test('renders urlLinkText errors', () => {

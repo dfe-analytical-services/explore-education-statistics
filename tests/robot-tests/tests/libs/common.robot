@@ -1,10 +1,11 @@
 *** Settings ***
-Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=do this on failure
+Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=record test failure
 Library     OperatingSystem
 Library     Collections
+Library     dates_and_times.py
+Library     fail_fast.py
 Library     file_operations.py
 Library     utilities.py
-Library     fail_fast.py
 Library     visual.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
@@ -20,31 +21,9 @@ ${DOWNLOADS_DIR}=                       ${EXECDIR}${/}test-results${/}downloads$
 ${timeout}=                             %{TIMEOUT}
 ${implicit_wait}=                       %{IMPLICIT_WAIT}
 ${prompt_to_continue_on_failure}=       0
-${FAIL_TEST_SUITES_FAST}=               %{FAIL_TEST_SUITES_FAST}
-${DATE_FORMAT_MEDIUM}=                  %-d %B %Y
 
 
 *** Keywords ***
-do this on failure
-    # See if the currently executing Test Suite is failing fast and if not, take a screenshot and HTML grab of the
-    # failing page.
-    ${currently_failing_fast}=    current test suite failing fast
-
-    IF    "${currently_failing_fast}" == "${FALSE}"
-        capture screenshots and html
-
-        # Additionally, mark the current Test Suite as failing if the "FAIL_TEST_SUITES_FAST" option is enabled, and
-        # this will cause subsequent tests within this same Test Suite to fail immediately (by virtue of their "Test
-        # Setup" steps checking to see if their owning Test Suite is currently failing fast).
-        IF    ${FAIL_TEST_SUITES_FAST} == 1
-            record failing test suite
-        END
-    END
-
-    IF    ${prompt_to_continue_on_failure} == 1
-        prompt to continue
-    END
-
 user opens the browser
     [Arguments]    ${alias}=main
     IF    "${browser}" == "chrome"
@@ -84,7 +63,7 @@ user opens ie
 user opens chrome headlessly
     [Arguments]    ${alias}=headless_chrome
     ${c_opts}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-    Call Method    ${c_opts}    add_argument    headless
+    Call Method    ${c_opts}    add_argument    headless\=old
     Call Method    ${c_opts}    add_argument    start-maximized
     Call Method    ${c_opts}    add_argument    disable-extensions
     Call Method    ${c_opts}    add_argument    disable-infobars
@@ -475,7 +454,7 @@ user checks element should not contain
 user checks input field contains
     [Arguments]    ${element}    ${text}
     page should contain textfield    ${element}
-    textfield should contain     ${element}    ${text}
+    textfield should contain    ${element}    ${text}
 
 user checks page contains
     [Arguments]    ${text}
@@ -510,7 +489,7 @@ user clicks link by index
     [Arguments]    ${text}    ${index}=1    ${parent}=css:body
     ${xpath}=    set variable    (//a[text()='${text}'])[${index}]
     ${button}=    get webelement    ${xpath}
-    user clicks element   ${button}    ${parent}
+    user clicks element    ${button}    ${parent}
 
 user clicks link by visible text
     [Arguments]    ${text}    ${parent}=css:body
@@ -529,7 +508,7 @@ user clicks button by index
     [Arguments]    ${text}    ${index}=1    ${parent}=css:body
     ${xpath}=    set variable    (//button[text()='${text}'])[${index}]
     ${button}=    get webelement    ${xpath}
-    user clicks element   ${button}    ${parent}
+    user clicks element    ${button}    ${parent}
 
 user waits until button is clickable
     [Arguments]    ${button_text}
@@ -728,9 +707,9 @@ user checks url equals
 user checks url without auth equals
     [Arguments]    ${expected}
     ${current_url}=    get location
-    ${remove_auth_current_url}=    remove auth from url      ${current_url}
+    ${remove_auth_current_url}=    remove auth from url    ${current_url}
     set variable    ${remove_auth_current_url}
-    should contain    ${remove_auth_current_url}   ${expected}
+    should contain    ${remove_auth_current_url}    ${expected}
 
 user checks page contains link
     [Arguments]
@@ -853,7 +832,7 @@ user clicks checkbox
 
 user clicks checkbox by selector
     [Arguments]    ${locator}
-    user scrolls to element     ${locator}
+    user scrolls to element    ${locator}
     user clicks element    ${locator}
 
 user checks checkbox is checked
@@ -1040,35 +1019,29 @@ user waits for caches to expire
     sleep    %{WAIT_CACHE_EXPIRY}
 
 user wait for option to be available and select it
-    [Arguments]  ${dropdown_locator}  ${option_text}  ${timeout}=%{TIMEOUT}
-    wait until keyword succeeds  ${timeout}  1s  check option exist in dropdown  ${dropdown_locator}  ${option_text}
-    select from list by label  ${dropdown_locator}  ${option_text}
+    [Arguments]    ${dropdown_locator}    ${option_text}    ${timeout}=%{TIMEOUT}
+    wait until keyword succeeds    ${timeout}    1s    check option exist in dropdown    ${dropdown_locator}
+    ...    ${option_text}
+    select from list by label    ${dropdown_locator}    ${option_text}
 
 check option exist in dropdown
-    [Arguments]  ${dropdown_locator}  ${option_text}
-     ${options}=  get webelements    ${dropdown_locator} > option
-     ${all_texts}=  Create List
+    [Arguments]    ${dropdown_locator}    ${option_text}
+    ${options}=    get webelements    ${dropdown_locator} > option
+    ${all_texts}=    Create List
 
-     FOR    ${option}    IN    @{options}
-        ${text}=  get text  ${option}
-        Append To List  ${all_texts}  ${text}
-     END
-     # Adding logging to help catch intermittent test failures
-     Log to console  \n\tAll Texts: ${all_texts}
-     ${matched}=  Run Keyword And Return Status  Should Contain  ${all_texts}  ${option_text}
+    FOR    ${option}    IN    @{options}
+        ${text}=    get text    ${option}
+        Append To List    ${all_texts}    ${text}
+    END
+    # Adding logging to help catch intermittent test failures
+    Log to console    \n\tAll Texts: ${all_texts}
+    ${matched}=    Run Keyword And Return Status    Should Contain    ${all_texts}    ${option_text}
 
-     IF  ${matched}
+    IF    ${matched}
         # Adding logging to help catch intermittent test failures
-        Log to console  \n\tOption '${option_text}' found in the dropdown.
-     ELSE
-         # Adding logging to help catch intermittent test failures
-        Log to console  \n\tOption '${option_text}' not found in the dropdown.
-     END
-     Return From Keyword  ${matched}
-
-
-    
-    
-
-
-
+        Log to console    \n\tOption '${option_text}' found in the dropdown.
+    ELSE
+        # Adding logging to help catch intermittent test failures
+        Log to console    \n\tOption '${option_text}' not found in the dropdown.
+    END
+    Return From Keyword    ${matched}

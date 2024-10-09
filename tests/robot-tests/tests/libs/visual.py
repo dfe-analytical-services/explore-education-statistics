@@ -46,7 +46,7 @@ def highlight_element(element: WebElement):
 
 def capture_screenshot():
     screenshot_location = sl().capture_page_screenshot()
-    logger.warn(
+    logger.info(
         f"Captured current screenshot at URL '{sl().get_location()}' Screenshot saved to file://{screenshot_location}"
     )
 
@@ -54,7 +54,7 @@ def capture_screenshot():
 @with_maximised_browser
 def capture_large_screenshot():
     screenshot_location = sl().capture_page_screenshot()
-    logger.warn(
+    logger.info(
         f"Captured enlarged screenshot at URL '{sl().get_location()}' Screenshot saved to file://{screenshot_location}"
     )
 

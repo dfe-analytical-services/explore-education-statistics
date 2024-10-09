@@ -407,7 +407,7 @@ user adds note to methodology
     user clicks button    Add note
     user enters text into element    label:New methodology note    ${note}
     user clicks button    Save note
-    ${date}=    get current datetime    %-d %B %Y
+    ${date}=    get london date
     user waits until element contains    css:#methodologyNotes time    ${date}
     user waits until element contains    css:#methodologyNotes p    ${note}
 
@@ -569,11 +569,11 @@ user uploads subject and waits until complete
     ...    ${META_FILE}
     ...    ${FOLDER}=${FILES_DIR}
     user uploads subject
-        ...    ${SUBJECT_NAME}
-        ...    ${SUBJECT_FILE}
-        ...    ${META_FILE}
-        ...    Complete
-        ...    ${FOLDER}
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    Complete
+    ...    ${FOLDER}
 
 user uploads subject and waits until importing
     [Arguments]
@@ -582,12 +582,12 @@ user uploads subject and waits until importing
     ...    ${META_FILE}
     ...    ${FOLDER}=${FILES_DIR}
     user uploads subject
-        ...    ${SUBJECT_NAME}
-        ...    ${SUBJECT_FILE}
-        ...    ${META_FILE}
-        ...    Importing
-        ...    ${FOLDER}
-    
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    Importing
+    ...    ${FOLDER}
+
 user uploads subject
     [Arguments]
     ...    ${SUBJECT_NAME}
@@ -603,14 +603,14 @@ user uploads subject
     user clicks button    Upload data files
     user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
     user waits until page contains accordion section    ${SUBJECT_NAME}    %{WAIT_SMALL}
-    user scrolls to accordion section     ${SUBJECT_NAME}
+    user scrolls to accordion section    ${SUBJECT_NAME}
     user opens accordion section    ${SUBJECT_NAME}
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
-    
+
     IF    "${IMPORT_STATUS}" != "Importing"
         user waits until page finishes loading
     END
-    
+
     user checks headed table body row contains    Status    ${IMPORT_STATUS}    ${section}    %{WAIT_DATA_FILE_IMPORT}
 
 user waits until data upload is completed
@@ -941,7 +941,8 @@ user updates free text key stat
     user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="guidanceTitle"]
     ...    ${guidance_title}
 
-    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//textarea[@name="guidanceText"]    ${guidance_text}
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//textarea[@name="guidanceText"]
+    ...    ${guidance_text}
 
     user clicks button    Save
     user waits until page does not contain button    Save
