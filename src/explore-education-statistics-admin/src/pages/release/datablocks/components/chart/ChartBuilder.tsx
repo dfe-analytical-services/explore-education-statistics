@@ -5,7 +5,9 @@ import ChartConfiguration from '@admin/pages/release/datablocks/components/chart
 import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration';
 import ChartDefinitionSelector from '@admin/pages/release/datablocks/components/chart/ChartDefinitionSelector';
 import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
-import ChartBoundaryLevelsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsConfiguration';
+import ChartBoundaryLevelsConfiguration, {
+  ChartBoundaryLevelsFormValues,
+} from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsConfiguration';
 import ChartDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingsConfiguration';
 import { ChartBuilderFormsContextProvider } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import {
@@ -274,14 +276,17 @@ const ChartBuilder = ({
     200,
   );
 
-  const handleBoundaryLevelChange = useCallback(
-    async (values: ChartOptions) => {
-      actions.updateChartOptions(values);
+  const handleDefaultBoundaryLevelChange = useCallback(
+    async ({
+      boundaryLevel,
+      dataSetConfigs,
+    }: ChartBoundaryLevelsFormValues) => {
+      actions.updateChartBoundaryLevels({ boundaryLevel, dataSetConfigs });
 
       setDataLoading(true);
 
       await onTableQueryUpdate({
-        boundaryLevel: parseNumber(values.boundaryLevel),
+        boundaryLevel: parseNumber(boundaryLevel),
       });
 
       setDataLoading(false);
@@ -355,7 +360,6 @@ const ChartBuilder = ({
                   />
                 </TabsSection>
               )}
-
               {forms.boundaryLevels &&
                 definition?.type === 'map' &&
                 options &&
@@ -366,11 +370,12 @@ const ChartBuilder = ({
                     id={forms.boundaryLevels.id}
                   >
                     <ChartBoundaryLevelsConfiguration
+                      boundaryLevel={options.boundaryLevel}
                       buttons={deleteButton}
+                      dataSetConfigs={chartProps?.map?.dataSetConfigs ?? []}
                       meta={meta}
-                      options={options}
-                      onChange={handleBoundaryLevelChange}
-                      onSubmit={actions.updateChartOptions}
+                      onChange={handleDefaultBoundaryLevelChange}
+                      onSubmit={actions.updateChartBoundaryLevels}
                     />
                   </TabsSection>
                 )}
@@ -385,13 +390,9 @@ const ChartBuilder = ({
                     id={forms.dataGroupings.id}
                   >
                     <ChartDataGroupingsConfiguration
-                      axisMajor={axes.major}
                       buttons={deleteButton}
-                      data={data}
                       map={map}
-                      legend={legend}
                       meta={meta}
-                      options={options}
                       onChange={handleMapConfigurationChange}
                       onSubmit={values => {
                         actions.updateChartMapConfiguration(values);
@@ -406,7 +407,6 @@ const ChartBuilder = ({
                     />
                   </TabsSection>
                 )}
-
               {forms.legend && axes.major && legend && (
                 <TabsSection
                   title="Legend"
