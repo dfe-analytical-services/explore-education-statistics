@@ -28,7 +28,8 @@ Verify release summary
     ...    Accredited official statistics
 
 Upload subject
-    user uploads subject and waits until complete    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    UI test subject    upload-file-test.csv
+    ...    upload-file-test.meta.csv
 
 Check release isn't publically visible
     user clicks link    Sign off
@@ -103,10 +104,10 @@ Go to "Sign off" page
     user waits until page contains button    Edit release status    %{WAIT_SMALL}
 
 Approve release and wait for it to be Scheduled
-    ${day}=    get current datetime    %-d    2
-    ${month}=    get current datetime    %-m    2
-    ${month_word}=    get current datetime    %B    2
-    ${year}=    get current datetime    %Y    2
+    ${day}=    get london day of month    offset_days=2
+    ${month}=    get london month date    offset_days=2
+    ${month_word}=    get london month word    offset_days=2
+    ${year}=    get london year    offset_days=2
 
     user clicks button    Edit release status
     user clicks radio    Approved for publication

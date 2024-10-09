@@ -10,8 +10,8 @@ export default function InvalidContentDetails({
 }: {
   errors: InvalidContentError[];
 }) {
-  const clickHereLinkTextErrors = errors.filter(
-    error => error.type === 'clickHereLinkText',
+  const badLinkTextErrors = errors.filter(
+    error => error.type === 'badLinkText',
   );
   const repeatedLinkTextErrors = errors.filter(
     error => error.type === 'repeatedLinkText',
@@ -19,9 +19,6 @@ export default function InvalidContentDetails({
   const filteredRepeatedLinkTextErrors = uniqBy(
     repeatedLinkTextErrors,
     'message',
-  );
-  const oneWordLinkTextErrors = errors.filter(
-    error => error.type === 'oneWordLinkText',
   );
   const urlLinkTextErrors = errors.filter(
     error => error.type === 'urlLinkText',
@@ -43,8 +40,11 @@ export default function InvalidContentDetails({
     <>
       <p>The following accessibility problems have been found:</p>
       <ul>
-        {!!clickHereLinkTextErrors.length && (
+        {!!badLinkTextErrors.length && (
           <ErrorItem
+            detailsList={badLinkTextErrors.map((error, index) => (
+              <li key={`error-${index.toString()}`}>{error.message}</li>
+            ))}
             modalContent={
               <>
                 <p>
@@ -53,15 +53,17 @@ export default function InvalidContentDetails({
                   descriptive and understandable on their own.
                 </p>
                 <p>
-                  Avoid using "click here" as link text as it does not describe
-                  where the link is to.
+                  Avoid using phrases such as "click here" as it does not
+                  describe where the link is to. Similarly, you should try to
+                  avoid short, or single word links because this limits how
+                  descriptive and user friendly it can be, and can also create
+                  problems for users with limited dexterity to click on a small
+                  area.
                 </p>
               </>
             }
-            modalTitle='"Click here" links'
-            text={`${clickHereLinkTextErrors.length} "click here" ${
-              clickHereLinkTextErrors.length === 1 ? 'link' : 'links'
-            }`}
+            modalTitle="Bad link text"
+            text={`${badLinkTextErrors.length} bad link text`}
           />
         )}
 
@@ -93,38 +95,6 @@ export default function InvalidContentDetails({
             }
             modalTitle="Repeated link text"
             text={`${repeatedLinkTextErrors.length} links have the same text with different URLs`}
-          />
-        )}
-
-        {!!oneWordLinkTextErrors.length && (
-          <ErrorItem
-            detailsList={oneWordLinkTextErrors.map((error, index) => (
-              <li key={`error-${index.toString()}`}>{error.message}</li>
-            ))}
-            modalContent={
-              <>
-                <p>
-                  Links are often viewed out of context and used to help
-                  navigate pages like headers, it is important that they are
-                  descriptive and understandable on their own.
-                </p>
-                <p>Avoid one word links because:</p>
-                <ul>
-                  <li>
-                    they can create problems for users with limited dexterity to
-                    click on a small area
-                  </li>
-                  <li>
-                    having a single word limits how descriptive and user
-                    friendly it can be
-                  </li>
-                </ul>
-              </>
-            }
-            modalTitle="One word link text"
-            text={`${oneWordLinkTextErrors.length} ${
-              oneWordLinkTextErrors.length === 1 ? 'link' : 'links'
-            } with one word link text`}
           />
         )}
 
