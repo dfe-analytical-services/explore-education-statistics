@@ -2,6 +2,7 @@
 Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=record test failure
 Library     OperatingSystem
 Library     Collections
+Library     browsers.py
 Library     dates_and_times.py
 Library     fail_fast.py
 Library     file_operations.py
@@ -40,7 +41,7 @@ user opens the browser
 user opens chrome
     [Arguments]    ${alias}=chrome
     IF    ${headless} == 1
-        user opens chrome headlessly    ${alias}
+        create chrome headless    alias=${alias}
     END
     IF    ${headless} == 0
         user opens chrome visually    ${alias}
@@ -60,26 +61,6 @@ user opens ie
     open browser    about:blank    ie    alias=${alias}
     maximize browser window
 
-user opens chrome headlessly
-    [Arguments]    ${alias}=headless_chrome
-    ${c_opts}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-    Call Method    ${c_opts}    add_argument    headless\=old
-    Call Method    ${c_opts}    add_argument    start-maximized
-    Call Method    ${c_opts}    add_argument    disable-extensions
-    Call Method    ${c_opts}    add_argument    disable-infobars
-    Call Method    ${c_opts}    add_argument    disable-gpu
-    Call Method    ${c_opts}    add_argument    window-size\=1920,1080
-    Call Method    ${c_opts}    add_argument    no-first-run
-    Call Method    ${c_opts}    add_argument    no-default-browser-check
-    Call Method    ${c_opts}    add_argument    ignore-certificate-errors
-    Call Method    ${c_opts}    add_argument    log-level\=3
-    Call Method    ${c_opts}    add_argument    disable-logging
-
-    ${prefs}=    Create Dictionary    download.default_directory=${DOWNLOADS_DIR}
-    Call Method    ${c_opts}    add_experimental_option    prefs    ${prefs}
-    Create Webdriver    Chrome    ${alias}    options=${c_opts}
-
-    ${all_opts}=    Call Method    ${c_opts}    to_capabilities
 
 user opens chrome visually
     [Arguments]    ${alias}=chrome
