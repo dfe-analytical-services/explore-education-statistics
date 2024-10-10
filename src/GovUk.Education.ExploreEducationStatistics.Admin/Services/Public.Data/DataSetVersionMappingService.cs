@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -30,7 +31,8 @@ public class DataSetVersionMappingService(
     IPostgreSqlRepository postgreSqlRepository,
     IUserService userService,
     PublicDataDbContext publicDataDbContext,
-    ContentDbContext contentDbContext)
+    ContentDbContext contentDbContext,
+    IDataSetVersionDiffService dataSetVersionDiffService)
     : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes =
@@ -134,10 +136,6 @@ public class DataSetVersionMappingService(
 
     private async Task UpdateMappingsCompleteAndVersion(Guid nextDataSetVersionId, CancellationToken cancellationToken)
     {
-        var hasDeletedLocationLevels = await HasDeletedLocationLevels(
-            nextDataSetVersionId: nextDataSetVersionId,
-            cancellationToken: cancellationToken);
-
         var locationMappingTypes = await GetLocationOptionMappingTypes(
             nextDataSetVersionId: nextDataSetVersionId,
             cancellationToken: cancellationToken);
@@ -154,7 +152,6 @@ public class DataSetVersionMappingService(
 
         await UpdateVersionNumber(
             nextDataSetVersionId: nextDataSetVersionId,
-            hasDeletedLocationLevels: hasDeletedLocationLevels,
             locationMappingTypes: locationMappingTypes,
             filterAndOptionMappingTypes: filterAndOptionMappingTypes,
             cancellationToken: cancellationToken);
@@ -162,7 +159,6 @@ public class DataSetVersionMappingService(
 
     private async Task UpdateVersionNumber(
         Guid nextDataSetVersionId,
-        bool hasDeletedLocationLevels,
         List<MappingType> locationMappingTypes,
         List<FilterAndOptionMappingTypes> filterAndOptionMappingTypes,
         CancellationToken cancellationToken)
@@ -183,7 +179,8 @@ public class DataSetVersionMappingService(
             .Select(nextVersion => nextVersion.TargetDataSetVersion)
             .SingleAsync(cancellationToken);
 
-        var isMajorVersionUpdate = hasDeletedLocationLevels || hasUnmappedOptions;
+        var isMajorVersionUpdate =
+            await dataSetVersionDiffService.IsMajorVersionUpdate(nextDataSetVersionId, cancellationToken);
 
         if (isMajorVersionUpdate)
         {
@@ -239,28 +236,6 @@ public class DataSetVersionMappingService(
                     .SetProperty(mapping => mapping.LocationMappingsComplete, locationMappingsComplete)
                     .SetProperty(mapping => mapping.FilterMappingsComplete, filterMappingsComplete),
                 cancellationToken: cancellationToken);
-    }
-
-    private async Task<bool> HasDeletedLocationLevels(
-        Guid nextDataSetVersionId,
-        CancellationToken cancellationToken)
-    {
-        var targetDataSetVersionIdParam = new NpgsqlParameter("targetDataSetVersionId", nextDataSetVersionId);
-
-        var deletedLevelCount = await publicDataDbContext.Database
-            .SqlQueryRaw<int>(
-                $$$"""
-                   SELECT DISTINCT COUNT(Level.key) "Value"
-                   FROM "{{{nameof(PublicDataDbContext.DataSetVersionMappings)}}}" Mapping,
-                        jsonb_each(Mapping."{{{nameof(DataSetVersionMapping.LocationMappingPlan)}}}"
-                                       -> '{{{nameof(LocationMappingPlan.Levels)}}}') Level
-                   WHERE "{{{nameof(DataSetVersionMapping.TargetDataSetVersionId)}}}" = @targetDataSetVersionId
-                     AND Level.value -> '{{{nameof(LocationLevelMappings.Candidates)}}}' = '{{}}'::jsonb
-                   """,
-                parameters: [targetDataSetVersionIdParam])
-            .FirstAsync(cancellationToken);
-
-        return deletedLevelCount > 0;
     }
 
     private async Task<List<MappingType>> GetLocationOptionMappingTypes(

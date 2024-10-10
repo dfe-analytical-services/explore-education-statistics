@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ValidationMessages =
@@ -18,6 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 
 internal class DataSetVersionMappingService(
     IDataSetMetaService dataSetMetaService,
+    IDataSetVersionDiffService dataSetVersionDiffService,
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext)
     : IDataSetVersionMappingService
@@ -72,7 +74,10 @@ internal class DataSetVersionMappingService(
                 SourceDataSetVersionId = liveVersion.Id,
                 TargetDataSetVersionId = nextDataSetVersionId,
                 LocationMappingPlan = locationMappings,
-                FilterMappingPlan = filterMappings
+                FilterMappingPlan = filterMappings,
+                HasDeletedIndicators = hasDeletedIndicators,
+                HasDeletedGeographicLevels = hasDeletedGeographicLevels,
+                HasDeletedTimePeriods = hasDeletedTimePeriods
             });
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
