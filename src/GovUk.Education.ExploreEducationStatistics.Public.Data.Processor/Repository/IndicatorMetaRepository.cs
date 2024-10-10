@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repositor
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using InterpolatedSql.Dapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 
@@ -19,19 +20,32 @@ public class IndicatorMetaRepository(
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken = default)
     {
+        var sourceDataSetVersionId = await GetSourceDataSetVersionId(dataSetVersion, cancellationToken);
+
+        var existingMetaIdsByColumn = sourceDataSetVersionId is not null
+            ? await publicDataDbContext.IndicatorMetas
+                .Where(meta => meta.DataSetVersionId == sourceDataSetVersionId)
+                .ToDictionaryAsync(
+                    meta => meta.Column,
+                    meta => meta.PublicId,
+                    cancellationToken
+                )
+            : [];
+
         var currentId = await publicDataDbContext.NextSequenceValue(
             PublicDataDbContext.IndicatorMetasIdSequence,
             cancellationToken);
 
-        var metas = (await duckDbConnection.SqlBuilder(
-                    $"""
-                     SELECT *
-                     FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
-                     WHERE "col_type" = {MetaFileRow.ColumnType.Indicator.ToString()}
-                     AND "col_name" IN ({allowedColumns})
-                     """)
-                .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken)
-            )
+        var metaRows = await duckDbConnection.SqlBuilder(
+                $"""
+                 SELECT *
+                 FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
+                 WHERE "col_type" = {MetaFileRow.ColumnType.Indicator.ToString()}
+                 AND "col_name" IN ({allowedColumns})
+                 """)
+            .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken);
+
+        var metas = metaRows
             .OrderBy(row => row.Label)
             .Select(row =>
             {
@@ -41,7 +55,7 @@ public class IndicatorMetaRepository(
                 {
                     Id = id,
                     DataSetVersionId = dataSetVersion.Id,
-                    PublicId = SqidEncoder.Encode(id),
+                    PublicId = existingMetaIdsByColumn.GetValueOrDefault(row.ColName, SqidEncoder.Encode(id)),
                     Column = row.ColName,
                     Label = row.Label,
                     Unit = row.ParsedIndicatorUnit,
@@ -58,5 +72,15 @@ public class IndicatorMetaRepository(
             PublicDataDbContext.IndicatorMetasIdSequence,
             currentId - 1,
             cancellationToken);
+    }
+
+    private async Task<Guid?> GetSourceDataSetVersionId(
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken)
+    {
+        return await publicDataDbContext.DataSetVersionMappings
+            .Where(mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id)
+            .Select(mapping => mapping.SourceDataSetVersionId)
+            .SingleOrDefaultAsync(cancellationToken);
     }
 }
