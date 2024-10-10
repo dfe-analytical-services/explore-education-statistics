@@ -700,6 +700,30 @@ cd src/GovUk.Education.ExploreEducationStatistics.Public.Data.Api
 dotnet ef migrations add EES1234_MigrationNameHere --context PublicDataDbContext --project ../GovUk.Education.ExploreEducationStatistics.Public.Data.Model -v
 ```
 
+### Running backend tests
+
+The backend c# projects have a number of unit and integration tests. From the project root, run:
+
+```sh
+cd src
+dotnet clean
+dotnet test
+```
+
+Note that the `clean` is necessary due to an issue with [AspectInjector](https://github.com/pamidur/aspect-injector)
+whereby compilation of code over already-compiled code will add AOP execution code on top of existing AOP execution
+code, leading to AOP code being invoked multiple times rather than just once. This would result in test failures, as we 
+assert that AOP code is executed only once.
+
+#### Configuring Linux for running unit and integration tests
+
+Due to the resource requirements of the integration tests, Linux users need to ensure that the system running the tests
+is capable of doing so. The `max_user_watches` setting must be set to a high enough limit, for example by running:
+
+```sh
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+```
+
 ### Resetting Azurite
 
 During development you might want to reset your Azurite instance to clear out all data from 
