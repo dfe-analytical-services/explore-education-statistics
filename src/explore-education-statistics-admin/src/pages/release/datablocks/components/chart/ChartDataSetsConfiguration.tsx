@@ -14,7 +14,6 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import FormProvider from '@common/components/form/FormProvider';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import Form from '@common/components/form/Form';
-
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';

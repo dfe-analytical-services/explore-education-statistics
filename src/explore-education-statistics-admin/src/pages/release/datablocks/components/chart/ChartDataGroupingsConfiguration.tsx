@@ -146,7 +146,11 @@ const ChartDataGroupingsConfiguration = ({
       </table>
 
       {editDataSetConfig && (
-        <Modal open={!!editDataSetConfig} title="Edit groupings">
+        <Modal
+          open
+          title="Edit groupings"
+          onExit={() => setEditDataSetConfig(undefined)}
+        >
           <ChartDataGroupingForm
             dataSetConfig={editDataSetConfig.dataSetConfig}
             dataSetConfigs={initialValues.dataSetConfigs}
