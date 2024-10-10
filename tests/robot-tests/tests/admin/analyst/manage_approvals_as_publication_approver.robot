@@ -67,7 +67,7 @@ Validate if Your approvals tab is correct
 
 Check that release link takes user to the correct release
     ${RELEASE_ROW}=    get webelement    testid:release-${RELEASE_NAME}
-    user clicks link by visible text    Review this page    ${RELEASE_ROW}
+    user clicks link containing text    Review this page    ${RELEASE_ROW}
 
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
     user waits until page contains title caption    Edit release for Academic year 2026/27
@@ -80,7 +80,7 @@ Check that Your approvals tab methodology link takes user to the correct methodo
     user waits until h2 is visible    Your approvals
 
     ${METHODOLOGY_ROW}=    get webelement    testid:methodology-${PUBLICATION_NAME} - ${PUBLICATION_NAME}
-    user clicks link by visible text    Review this page    ${METHODOLOGY_ROW}
+    user clicks link containing text    Review this page    ${METHODOLOGY_ROW}
 
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until page contains title caption    Edit methodology
