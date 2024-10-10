@@ -1,5 +1,4 @@
 import base64
-import datetime
 import json
 import os
 import re
@@ -8,7 +7,6 @@ from typing import Union
 from urllib.parse import urlparse, urlunparse
 
 import utilities_init
-import visual
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -96,7 +94,7 @@ def retry_or_fail_with_delay(func, retries=5, delay=1.0, *args, **kwargs):
 
 
 def user_waits_until_parent_contains_element(
-    parent_locator: object,
+    parent_locator_or_element: object,
     child_locator: str,
     timeout: int = None,
     error: str = None,
@@ -105,13 +103,13 @@ def user_waits_until_parent_contains_element(
     delay: float = 1.0,
 ):
     try:
-        default_timeout = BuiltIn().get_variable_value('${TIMEOUT}')
+        default_timeout = BuiltIn().get_variable_value("${TIMEOUT}")
         timeout_per_retry = timeout / retries if timeout is not None else int(default_timeout) / retries
 
         child_locator = _normalise_child_locator(child_locator)
 
         def parent_contains_matching_element() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout_per_retry, error)
+            parent_el = _get_parent_webelement_from_locator(parent_locator_or_element, timeout_per_retry, error)
             return element_finder().find(child_locator, required=False, parent=parent_el) is not None
 
         if is_noney(count):
@@ -120,7 +118,7 @@ def user_waits_until_parent_contains_element(
                 retries,
                 delay,
                 parent_contains_matching_element,
-                "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
+                "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator_or_element, child_locator),
                 timeout_per_retry,
                 error,
             )
@@ -128,7 +126,7 @@ def user_waits_until_parent_contains_element(
         count = int(count)
 
         def parent_contains_matching_elements() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout_per_retry, error)
+            parent_el = _get_parent_webelement_from_locator(parent_locator_or_element, timeout_per_retry, error)
             return len(sl().find_elements(child_locator, parent=parent_el)) == count
 
         retry_or_fail_with_delay(
@@ -136,14 +134,15 @@ def user_waits_until_parent_contains_element(
             retries,
             delay,
             parent_contains_matching_elements,
-            "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (parent_locator, count, child_locator),
+            "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>."
+            % (parent_locator_or_element, count, child_locator),
             timeout_per_retry,
             error,
         )
     except Exception as err:
         logger.warn(
             f"Error whilst executing utilities.py user_waits_until_parent_contains_element() "
-            f"with parent {parent_locator} and child locator {child_locator} - {err}"
+            f"with parent {parent_locator_or_element} and child locator {child_locator} - {err}"
         )
         raise_assertion_error(err)
 
@@ -283,11 +282,6 @@ def user_should_be_at_top_of_page():
     (x, y) = sl().get_window_position()
     if y != 0:
         raise_assertion_error(f"Windows position Y is {y} not 0! User should be at the top of the page!")
-
-
-def capture_large_screenshot_and_prompt_to_continue():
-    visual.capture_large_screenshot()
-    prompt_to_continue()
 
 
 def user_gets_row_number_with_heading(heading: str, table_locator: str = "css:table"):

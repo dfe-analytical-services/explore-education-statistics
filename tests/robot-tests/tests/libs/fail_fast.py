@@ -6,19 +6,20 @@ should continue to run or if they should fail immediately and therefore fail the
 """
 
 import datetime
-import os.path
 import os
+import os.path
 import threading
 
-from robot.libraries.BuiltIn import BuiltIn
+import tests.libs.visual as visual
 from robot.api import SkipExecution
+from robot.libraries.BuiltIn import BuiltIn
 from tests.libs.logger import get_logger
 from tests.libs.selenium_elements import sl
-import tests.libs.visual as visual
 
 failing_suites_filename = ".failing_suites"
 
 logger = get_logger(__name__)
+
 
 def record_test_failure():
     if not current_test_suite_failing_fast():
@@ -26,8 +27,8 @@ def record_test_failure():
         visual.capture_screenshot()
         visual.capture_large_screenshot()
         _capture_html()
-        
-    if BuiltIn().get_variable_value("${prompt_to_continue_on_failure}") == '1':
+
+    if BuiltIn().get_variable_value("${prompt_to_continue_on_failure}") == "1":
         _prompt_to_continue()
 
 
@@ -47,13 +48,13 @@ file_lock = threading.Lock()
 def record_failing_test_suite():
     if current_test_suite_failing_fast():
         return
-        
+
     test_suite = _get_current_test_suite()
-    
+
     logger.info(
         f"Recording test suite '{test_suite}' as failing - subsequent tests will automatically fail in this suite"
     )
-    
+
     with file_lock:
         try:
             with open(failing_suites_filename, "a") as file_write:
@@ -64,7 +65,7 @@ def record_failing_test_suite():
 
 def fail_test_fast_if_required():
     if current_test_suite_failing_fast():
-        raise SkipExecution(f"Test suite {_get_current_test_suite()} is already failing.  Skipping this test.")
+        raise SkipExecution("")
 
 
 def get_failing_test_suites() -> []:
@@ -82,7 +83,7 @@ def get_failing_test_suites() -> []:
 def _capture_html():
     html = sl().get_source()
     current_time_millis = round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
-    output_dir = BuiltIn().get_variable_value('${OUTPUT DIR}')
+    output_dir = BuiltIn().get_variable_value("${OUTPUT DIR}")
     html_file = open(f"{output_dir}{os.sep}captured-html-{current_time_millis}.html", "w", encoding="utf-8")
     html_file.write(html)
     html_file.close()
@@ -93,8 +94,8 @@ def _prompt_to_continue():
     logger.warn("Continue? (Y/n)")
     choice = input()
     if choice.lower().startswith("n"):
-        raise_assertion_error("Tests stopped!")
-        
+        _raise_assertion_error("Tests stopped!")
+
 
 def _raise_assertion_error(err_msg):
     sl().failure_occurred()

@@ -20,14 +20,14 @@ from zipfile import ZipFile
 
 import admin_api as admin_api
 import args_and_variables as args_and_variables
+import reports
+import test_runners
 import tests.libs.selenium_elements as selenium_elements
 from scripts.get_webdriver import get_webdriver
 from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
-from tests.libs.fail_fast import failing_suites_filename, get_failing_test_suites
+from tests.libs.fail_fast import failing_suites_filename
 from tests.libs.logger import get_logger
 from tests.libs.slack import SlackService
-import reports
-import test_runners
 
 pabot_suite_names_filename = ".pabotsuitenames"
 main_results_folder = "test-results"
@@ -87,23 +87,24 @@ def _setup_main_results_folder_for_first_run(args: argparse.Namespace):
     if args.rerun_failed_suites:
         previous_report_file_path = f"{main_results_folder}{os.sep}output.xml"
         if not os.path.exists(previous_report_file_path):
-            logger.error(f'No previous report file found at {previous_report_file_path} - unable to rerun failed suites')
+            logger.error(
+                f"No previous report file found at {previous_report_file_path} - unable to rerun failed suites"
+            )
             sys.exit(1)
         logger.info(f"Clearing old run folders prior to rerunning failed tests")
         for old_run_folders in glob.glob(rf"{main_results_folder}{os.sep}run-*"):
             shutil.rmtree(old_run_folders)
-        test_run_1_folder = f'{main_results_folder}{os.sep}run-0'    
-        logger.info(f"Copying previous test results into new \"{test_run_1_folder}\" folder")
-        shutil.copytree(main_results_folder, test_run_1_folder)    
+        test_run_1_folder = f"{main_results_folder}{os.sep}run-0"
+        logger.info(f'Copying previous test results into new "{test_run_1_folder}" folder')
+        shutil.copytree(main_results_folder, test_run_1_folder)
     else:
         # Remove any existing test results if running from scratch.
         if Path(main_results_folder).exists():
             shutil.rmtree(main_results_folder)
-            os.mkdir(main_results_folder)        
+            os.mkdir(main_results_folder)
 
 
 def run():
-
     args = args_and_variables.initialise()
 
     _setup_main_results_folder_for_first_run(args)
@@ -120,7 +121,7 @@ def run():
     _install_chromedriver(args.chromedriver_version)
 
     run_identifier_initial_value = _create_run_identifier()
-    
+
     max_run_attempts = args.rerun_attempts + 1
     test_run_index = 0
 
@@ -136,7 +137,7 @@ def run():
                     selenium_elements.clear_instances()
 
                 rerunning_failed_suites = args.rerun_failed_suites or test_run_index > 0
-                
+
                 # Perform any cleanup before the test run.
                 _clear_files_before_next_test_run_attempt(rerunning_failed_suites)
 
@@ -159,17 +160,21 @@ def run():
                 # any failed tests from the previous run.
                 if rerunning_failed_suites:
                     previous_report_file = f"{main_results_folder}{os.sep}run-{test_run_index}{os.sep}output.xml"
-                    logger.info(f"Using previous test run's results file \"{previous_report_file}\" to determine which failing suites to run")
+                    logger.info(
+                        f'Using previous test run\'s results file "{previous_report_file}" to determine which failing suites to run'
+                    )
                 else:
                     previous_report_file = None
 
                 # Run the tests.
-                logger.info(f"Performing test run {test_run_index + 1} in test run folder \"{test_run_results_folder}\" with unique identifier {run_identifier}")
+                logger.info(
+                    f'Performing test run {test_run_index + 1} in test run folder "{test_run_results_folder}" with unique identifier {run_identifier}'
+                )
                 test_runners.execute_tests(args, test_run_results_folder, previous_report_file)
-                
+
                 if test_run_index > 0:
                     reports.create_report_from_output_xml(test_run_results_folder)
-                
+
             finally:
                 # Tear down any data created by this test run unless we've disabled teardown.
                 if args_and_variables.includes_data_changing_tests(args) and not args.disable_teardown:
@@ -178,19 +183,20 @@ def run():
 
                 test_run_index += 1
 
-            # If all tests passed, return early.
-            if not get_failing_test_suites():
-                break
+            failing_suites = reports.get_failing_test_suite_sources(f"{test_run_results_folder}{os.sep}output.xml")
 
-        failing_suites = get_failing_test_suites()
+            # If all tests passed, return early.
+            if len(failing_suites) == 0:
+                break
 
         # Merge together all reports from all test runs.
         number_of_test_runs = test_run_index
         first_run_folder_number = 0 if args.rerun_failed_suites else 1
+
         reports.merge_robot_reports(first_run_folder_number, number_of_test_runs)
 
         # Log the results of the merge test runs.
-        reports.log_report_results(number_of_test_runs, failing_suites)
+        reports.log_report_results(number_of_test_runs, rerunning_failed_suites, failing_suites)
 
         if args.enable_slack_notifications:
             slack_service = SlackService()

@@ -1,7 +1,8 @@
-import os
-import reports
 import argparse
+import os
+
 import pabot.pabot as pabot
+import reports
 import robot
 from tests.libs.logger import get_logger
 
@@ -19,9 +20,9 @@ def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) 
     ]
 
     robot_args += _create_include_and_exclude_args(arguments)
-    
+
     robot_args += ["-v", f"timeout:{os.getenv('TIMEOUT')}", "-v", f"implicit_wait:{os.getenv('IMPLICIT_WAIT')}"]
-    
+
     if arguments.fail_fast:
         robot_args += ["--exitonfailure"]
     if arguments.print_keywords:
@@ -30,7 +31,7 @@ def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) 
         # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
         robot_args += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
         robot_args += ["--removekeywords", "name:common.user goes to url"]  # To hide basic auth credentials
-    
+
     if arguments.visual:
         robot_args += ["-v", "headless:0"]
     else:
@@ -72,7 +73,6 @@ def _create_include_and_exclude_args(arguments: argparse.Namespace) -> []:
 
 
 def execute_tests(arguments: argparse.Namespace, test_run_folder: str, path_to_previous_report_file: str):
-    
     robot_args = create_robot_arguments(arguments, test_run_folder)
 
     if arguments.interp == "robot":
@@ -80,23 +80,25 @@ def execute_tests(arguments: argparse.Namespace, test_run_folder: str, path_to_p
             robot_args += ["--rerunfailedsuites", path_to_previous_report_file]
 
         robot_args += [arguments.tests]
-        
-        logger.info(f'Performing test run with Robot')
+
+        logger.info(f"Performing test run with Robot")
         robot.run_cli(robot_args, exit=False)
 
     elif arguments.interp == "pabot":
-
-        robot_args = ['--processes', arguments.processes] + robot_args
+        robot_args = ["--processes", arguments.processes] + robot_args
 
         if path_to_previous_report_file is not None:
-        
-            path_to_filtered_report_file = '_filtered.xml'.join(path_to_previous_report_file.rsplit('.xml', 1))
-            reports.filter_out_passing_suites_from_report_file(path_to_previous_report_file, path_to_filtered_report_file)
-            
-            logger.info(f'Generated filtered report file containing only failing suites at {path_to_filtered_report_file}')
-            robot_args = ['--suitesfrom', path_to_filtered_report_file] + robot_args
+            path_to_filtered_report_file = "_filtered.xml".join(path_to_previous_report_file.rsplit(".xml", 1))
+            reports.filter_out_passing_suites_from_report_file(
+                path_to_previous_report_file, path_to_filtered_report_file
+            )
+
+            logger.info(
+                f"Generated filtered report file containing only failing suites at {path_to_filtered_report_file}"
+            )
+            robot_args = ["--suitesfrom", path_to_filtered_report_file] + robot_args
 
         robot_args += [arguments.tests]
 
-        logger.info(f'Performing test run with Pabot ({arguments.processes} processes)')
+        logger.info(f"Performing test run with Pabot ({arguments.processes} processes)")
         pabot.main_program(robot_args)
