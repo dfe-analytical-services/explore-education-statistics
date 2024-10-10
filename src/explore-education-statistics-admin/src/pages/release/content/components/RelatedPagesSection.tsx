@@ -1,3 +1,4 @@
+import styles from '@admin/components/editable/EditableAccordionSection.module.scss';
 import EditableLink from '@admin/components/editable/EditableLink';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import releaseContentRelatedInformationService from '@admin/services/releaseContentRelatedInformationService';
@@ -12,6 +13,9 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { BasicLink } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import React, { useState } from 'react';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
+import DraggableItem from '@admin/components/DraggableItem';
+import classNames from 'classnames';
 
 type FormValues = Omit<BasicLink, 'id'>;
 
@@ -40,6 +44,10 @@ export default function RelatedPagesSection({ release }: Props) {
     toggleFormOpen.off();
   };
 
+  const [reorderingMode, setReorderingMode] = useState<boolean>(false);
+
+  // https://github.com/hello-pangea/dnd?tab=readme-ov-file
+
   return (
     <>
       {(editingMode === 'edit' || links.length > 0) && (
@@ -48,15 +56,39 @@ export default function RelatedPagesSection({ release }: Props) {
             Related pages
           </h3>
           <nav role="navigation" aria-labelledby="related-content">
-            <ul className="govuk-list">
-              {links.map(({ id, description, url }) => (
-                <li key={id}>
-                  <EditableLink removeOnClick={() => removeLink(id)} to={url}>
-                    {description}
-                  </EditableLink>
-                </li>
-              ))}
-            </ul>
+            <DragDropContext dragHandleUsageInstructions="test" onDragEnd={(a) => console.log(a)}>
+              <Droppable droppableId="droppable-1">
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey' }}
+                    // eslint-disable-next-line react/jsx-props-no-spreading
+                    {...provided.droppableProps}
+                  >
+                    <ul className="govuk-list">
+                      {links.map(({ id, description, url }, index) => (
+                        <DraggableItem
+                          className={classNames({
+                            [styles.draggableItem]: editingMode === 'edit',
+                          })}
+                          id={id}
+                          index={index}
+                          isDisabled={editingMode !== 'edit'}
+                          isReordering={true}
+                        >
+                          <li>
+                            <EditableLink removeOnClick={() => removeLink(id)} to={url}>
+                              {description}
+                            </EditableLink>
+                          </li>
+                        </DraggableItem>
+                      ))}
+                    </ul>
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </nav>
         </>
       )}
