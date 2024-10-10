@@ -451,7 +451,7 @@ Verify that the Dates data block accordion is unchanged
     user checks chart title contains    ${section}    Dates table title
     user checks infographic chart contains alt    ${section}    Sample alt text
 
-    user clicks link by visible text    Table    ${section}
+    user clicks link containing text    Table    ${section}
     user waits until parent contains element    ${section}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Dates table title"]
     user waits until parent contains element    ${section}    xpath:.//*[.="Source: Dates source"]

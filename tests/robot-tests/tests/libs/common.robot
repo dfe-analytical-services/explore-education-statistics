@@ -12,15 +12,15 @@ Resource    ./table_tool.robot
 
 
 *** Variables ***
-${browser}=                             chrome
-${headless}=                            1
-${FILES_DIR}=                           ${EXECDIR}${/}tests${/}files${/}
-${PUBLIC_API_FILES_DIR}=                ${EXECDIR}${/}tests${/}files${/}public-api-data-files${/}
-${UNZIPPED_FILES_DIR}=                  ${EXECDIR}${/}tests${/}files${/}.unzipped-seed-data-files${/}
-${DOWNLOADS_DIR}=                       ${EXECDIR}${/}test-results${/}downloads${/}
-${timeout}=                             %{TIMEOUT}
-${implicit_wait}=                       %{IMPLICIT_WAIT}
-${prompt_to_continue_on_failure}=       0
+${browser}                          chrome
+${headless}                         1
+${FILES_DIR}                        ${EXECDIR}${/}tests${/}files${/}
+${PUBLIC_API_FILES_DIR}             ${EXECDIR}${/}tests${/}files${/}public-api-data-files${/}
+${UNZIPPED_FILES_DIR}               ${EXECDIR}${/}tests${/}files${/}.unzipped-seed-data-files${/}
+${DOWNLOADS_DIR}                    ${EXECDIR}${/}test-results${/}downloads${/}
+${timeout}                          %{TIMEOUT}
+${implicit_wait}                    %{IMPLICIT_WAIT}
+${prompt_to_continue_on_failure}    0
 
 
 *** Keywords ***
@@ -220,50 +220,59 @@ user waits until element contains testid
     user waits until parent contains element    ${element}    css:[data-testid="${testid}"]    timeout=${wait}
 
 user waits until page contains accordion section
-    [Arguments]    ${section_title}    ${wait}=${timeout}
+    [Arguments]    ${section_title}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${section_title}    ${exact_match}
     user waits until page contains element
-    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[text()="${section_title}"]]    ${wait}
+    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[${text_matcher}]]    ${wait}
 
 user waits until page does not contain accordion section
-    [Arguments]    ${section_title}    ${wait}=${timeout}
+    [Arguments]    ${section_title}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${section_title}    ${exact_match}
     user waits until page does not contain element
-    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[text()="${section_title}"]]    ${wait}
+    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[${text_matcher}]]    ${wait}
 
 user verifies accordion is open
-    [Arguments]    ${section_text}
+    [Arguments]    ${section_text}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
     user waits until page contains element
-    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[text()="${section_text}"] and @aria-expanded="true"]
+    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[${text_matcher}] and @aria-expanded="true"]
 
 user verifies accordion is closed
-    [Arguments]    ${section_text}
+    [Arguments]    ${section_text}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
     user waits until page contains element
-    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[text()="${section_text}"] and @aria-expanded="false"]
+    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[${text_matcher}] and @aria-expanded="false"]
 
 user checks there are x accordion sections
     [Arguments]    ${count}    ${parent}=css:body
     user waits until parent contains element    ${parent}    css:[data-testid="accordionSection"]    count=${count}
 
 user checks accordion is in position
-    [Arguments]    ${section_text}    ${position}    ${parent}=css:[data-testid="accordion"]
+    [Arguments]    ${section_text}    ${position}    ${parent}=css:[data-testid="accordion"]    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
     user waits until parent contains element    ${parent}
-    ...    xpath:(.//*[@data-testid="accordionSection"])[${position}]//span[starts-with(text(), "${section_text}")]
+    ...    xpath:(.//*[@data-testid="accordionSection"])[${position}]//span[${text_matcher}]
 
 user waits until accordion section contains text
-    [Arguments]    ${section_text}    ${text}    ${wait}=${timeout}
+    [Arguments]    ${section_text}    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
     ${section}=    user gets accordion section content element    ${section_text}
-    user waits until parent contains element    ${section}    xpath:.//*[text()="${text}"]    timeout=${wait}
+    user waits until parent contains element    ${section}    xpath:.//*[${text_matcher}]    timeout=${wait}
 
 user gets accordion header button element
-    [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]
-    ${button}=    get child element    ${parent}    xpath:.//button[@aria-expanded and contains(., "${heading_text}")]
+    [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${heading_text}    ${exact_match}
+    ${button}=    get child element    ${parent}    xpath:.//button[@aria-expanded and ${text_matcher}]
     [Return]    ${button}
 
 user opens accordion section
     [Arguments]
     ...    ${heading_text}
     ...    ${parent}=css:[data-testid="accordion"]
+    ...    ${exact_match}=${FALSE}
 
     ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
+    ...    exact_match=${exact_match}
     ${accordion}=    user opens accordion section with accordion header    ${header_button}    ${parent}
     [Return]    ${accordion}
 
@@ -290,22 +299,25 @@ user opens accordion section with accordion header
     [Return]    ${accordion}
 
 user closes accordion section
-    [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]
+    [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]    ${exact_match}=${FALSE}
     ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
-    user closes accordion section with accordion header    ${header_button}    ${parent}
+    ...    exact_match=${exact_match}
+    user closes accordion section with accordion header    ${header_button}    ${parent}    exact_match=${exact_match}
 
 user closes accordion section with id
     [Arguments]
     ...    ${id}
     ...    ${parent}=css:[data-testid="accordion"]
+    ...    ${exact_match}=${FALSE}
 
     ${header_button}=    get child element    ${parent}    id:${id}-heading
-    user closes accordion section with accordion header    ${header_button}    ${parent}
+    user closes accordion section with accordion header    ${header_button}    ${parent}    exact_match=${exact_match}
 
 user closes accordion section with accordion header
     [Arguments]
     ...    ${header_button}
     ...    ${parent}=css:[data-testid="accordion"]
+    ...    ${exact_match}=${FALSE}
 
     ${is_expanded}=    get element attribute    ${header_button}    aria-expanded
     IF    '${is_expanded}' != 'false'
@@ -314,8 +326,9 @@ user closes accordion section with accordion header
     user checks element attribute value should be    ${header_button}    aria-expanded    false
 
 user gets accordion section content element
-    [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]
+    [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]    ${exact_match}=${FALSE}
     ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
+    ...    exact_match=${exact_match}
     ${content_id}=    get element attribute    ${header_button}    aria-controls
     ${content}=    get child element    ${parent}    css:[id="${content_id}"]
     [Return]    ${content}
@@ -327,9 +340,11 @@ user gets accordion section content element from heading element
     [Return]    ${content}
 
 user scrolls to accordion section
-    [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]
+    [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]    ${exact_match}=${FALSE}
     ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
+    ...    exact_match=${exact_match}
     ${content}=    user gets accordion section content element    ${heading_text}    ${parent}
+    ...    exact_match=${exact_match}
     user scrolls to element    ${header_button}
     # Workaround to get lazy loaded data blocks to render
     user scrolls down    1
@@ -344,7 +359,7 @@ user checks page does not contain testid
 
 user checks testid element contains
     [Arguments]    ${id}    ${text}
-    user waits until element contains    css:[data-testid="${id}"]    ${text}
+    user waits until element contains    testid:${id}    ${text}
 
 user gets testid element
     [Arguments]    ${id}    ${wait}=${timeout}    ${parent}=css:body
@@ -361,6 +376,8 @@ user checks element contains child element
     ...    ${element}
     ...    ${child_element}
     user waits until parent contains element    ${element}    ${child_element}
+    ${child}=    get child element    ${element}    ${child_element}
+    RETURN    ${child}
 
 user checks element does not contain child element
     [Arguments]
@@ -369,8 +386,9 @@ user checks element does not contain child element
     user waits until parent does not contain element    ${element}    ${child_element}
 
 user checks element contains
-    [Arguments]    ${element}    ${text}
-    user waits until parent contains element    ${element}    xpath://*[contains(.,"${text}")]
+    [Arguments]    ${element}    ${text}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until parent contains element    ${element}    xpath://*[${text_matcher}]
 
 user checks element contains button
     [Arguments]
@@ -491,22 +509,20 @@ user clicks link by index
     ${button}=    get webelement    ${xpath}
     user clicks element    ${button}    ${parent}
 
-user clicks link by visible text
-    [Arguments]    ${text}    ${parent}=css:body
-    user clicks element    xpath:.//a[text()="${text}"]    ${parent}
-
 user clicks link containing text
-    [Arguments]    ${text}    ${parent}=css:body
-    user clicks element    xpath:.//a[contains(text(), "${text}")]    ${parent}
+    [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user clicks element    xpath:.//a[${text_matcher}]    ${parent}
 
 user clicks button
-    [Arguments]    ${text}    ${parent}=css:body
-    ${button}=    user gets button element    ${text}    ${parent}
+    [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${FALSE}
+    ${button}=    user gets button element    ${text}    ${parent}    exact_match=${exact_match}
     user clicks element    ${button}
 
 user clicks button by index
-    [Arguments]    ${text}    ${index}=1    ${parent}=css:body
-    ${xpath}=    set variable    (//button[text()='${text}'])[${index}]
+    [Arguments]    ${text}    ${index}=1    ${parent}=css:body    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    ${xpath}=    set variable    (//button[${text_matcher}])[${index}]
     ${button}=    get webelement    ${xpath}
     user clicks element    ${button}    ${parent}
 
@@ -518,91 +534,124 @@ user waits until button is clickable
     element should be enabled    xpath=//button[text()="${button_text}"]
 
 user clicks button containing text
-    [Arguments]    ${text}    ${parent}=css:body
-    user clicks element    xpath://button[contains(text(), "${text}")]    ${parent}
+    [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user clicks element    xpath://button[${text_matcher}]    ${parent}
 
 user waits until page contains button
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page contains element    xpath://button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until page contains element    xpath://button[${text_matcher}]
+    ...    ${wait}
 
 user checks page contains button
-    [Arguments]    ${text}
-    user checks page contains element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
+    [Arguments]    ${text}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user checks page contains element    xpath://button[${text_matcher}]
 
 user checks page does not contain button
-    [Arguments]    ${text}
-    user checks page does not contain element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
+    [Arguments]    ${text}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user checks page does not contain element    xpath://button[${text_matcher}]
 
 user waits until page does not contain button
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page does not contain element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
-    ...    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until page does not contain element
+    ...    xpath://button[${text_matcher}]    ${wait}
 
 user waits until button is enabled
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is enabled    xpath://button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until element is enabled    xpath://button[${text_matcher}]
+    ...    ${wait}
 
 user waits until parent contains button
-    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
+    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
     user waits until parent contains element    ${parent}
-    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
+    ...    xpath://button[${text_matcher}]    ${wait}
 
 user waits until parent does not contain button
-    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
+    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
     user waits until parent does not contain element    ${parent}
-    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
+    ...    xpath://button[${text_matcher}]    ${wait}
 
 user waits until parent does not contain
-    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
+    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
     user waits until parent does not contain element    ${parent}
-    ...    .//*[contains(text(),"${text}")]    ${wait}
+    ...    //button[${text_matcher}]    ${wait}
 
 user gets button element
-    [Arguments]    ${text}    ${parent}=css:body
+    [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
     user waits until parent contains button    ${parent}    ${text}
-    ${button}=    get child element    ${parent}    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]
+    ${button}=    get child element    ${parent}    xpath://button[${text_matcher}]
     [Return]    ${button}
 
+get xpath text matcher
+    [Arguments]    ${text}    ${exact_match}=${FALSE}
+    IF    "${exact_match}" == "${TRUE}"
+        ${expression}=    Set Variable    text()="${text}"
+    ELSE
+        ${expression}=    Set Variable    contains(., "${text}")
+    END
+    RETURN    ${expression}
+
 user checks page contains tag
-    [Arguments]    ${text}
-    user checks page contains element    xpath://*[contains(@class, "govuk-tag")][text()="${text}"]
+    [Arguments]    ${text}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user checks page contains element    xpath://*[contains(@class, "govuk-tag")][${text_matcher}]
 
 user waits until h1 is visible
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is visible    xpath://h1[text()="${text}"]    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until element is visible    xpath://h1[${text_matcher}]    ${wait}
 
 user waits until h1 is not visible
-    [Arguments]    ${text}    ${wait}=%{WAIT_SMALL}
-    user waits until element is not visible    xpath://h1[text()="${text}"]    ${wait}
+    [Arguments]    ${text}    ${wait}=%{WAIT_SMALL}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until element is not visible    xpath://h1[${text_matcher}]    ${wait}
 
 user waits until h2 is visible
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is visible    xpath://h2[text()="${text}"]    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until element is visible    xpath://h2[${text_matcher}]    ${wait}
 
 user waits until h2 is not visible
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is not visible    xpath://h2[text()="${text}"]    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until element is not visible    xpath://h2[${text_matcher}]    ${wait}
 
 user waits until h3 is visible
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is visible    xpath://h3[text()="${text}"]    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until element is visible    xpath://h3[${text_matcher}]    ${wait}
 
 user waits until h3 is not visible
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is not visible    xpath://h3[text()="${text}"]    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until element is not visible    xpath://h3[${text_matcher}]    ${wait}
 
 user waits until legend is visible
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is visible    xpath://legend[text()="${text}"]    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until element is visible    xpath://legend[${text_matcher}]    ${wait}
 
 user waits until page contains title
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page contains element    xpath://h1[@data-testid="page-title" and text()="${text}"]    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until page contains element    xpath://h1[@data-testid="page-title" and ${text_matcher}]
+    ...    ${wait}
 
 user waits until page contains title caption
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page contains element    xpath://span[@data-testid="page-title-caption" and text()="${text}"]
-    ...    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until page contains element
+    ...    xpath://span[@data-testid="page-title-caption" and ${text_matcher}]    ${wait}
 
 user selects newly opened window
     switch window    locator=NEW
@@ -715,23 +764,28 @@ user checks page contains link
     [Arguments]
     ...    ${text}
     ...    ${parent}=css:body
+    ...    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
     user waits until parent contains element    ${parent}
-    ...    xpath:.//a[contains(text(), "${text}")]
+    ...    xpath:.//a[${text_matcher}]
 
 user checks page contains link with text and url
     [Arguments]
     ...    ${text}
     ...    ${href}
     ...    ${parent}=css:body
+    ...    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
     user waits until parent contains element    ${parent}
-    ...    xpath:.//a[@href="${href}" and contains(text(), "${text}")]
+    ...    xpath:.//a[@href="${href}" and ${text_matcher}]
 
 user opens details dropdown
-    [Arguments]    ${text}    ${parent}=css:body
+    [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
     user waits until parent contains element    ${parent}
-    ...    xpath:.//details/summary[contains(., "${text}") and @aria-expanded]    %{WAIT_SMALL}
-    ${details}=    get child element    ${parent}    xpath:.//details[summary[contains(., "${text}")]]
-    ${summary}=    get child element    ${parent}    xpath:.//details/summary[contains(., "${text}")]
+    ...    xpath:.//details/summary[${text_matcher} and @aria-expanded]    %{WAIT_SMALL}
+    ${details}=    get child element    ${parent}    xpath:.//details[summary[${text_matcher}]]
+    ${summary}=    get child element    ${parent}    xpath:.//details/summary[${text_matcher}]
     user waits until element is visible    ${summary}    %{WAIT_SMALL}
     ${is_expanded}=    get element attribute    ${summary}    aria-expanded
     IF    '${is_expanded}' != 'true'
@@ -741,10 +795,11 @@ user opens details dropdown
     [Return]    ${details}
 
 user closes details dropdown
-    [Arguments]    ${text}    ${parent}=css:body
+    [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
     user waits until parent contains element    ${parent}
     ...    xpath:.//details/summary[contains(., "${text}") and @aria-expanded]
-    ${summary}=    get child element    ${parent}    xpath:.//details/summary[contains(., "${text}")]
+    ${summary}=    get child element    ${parent}    xpath:.//details/summary[${text_matcher}]
     user waits until element is visible    ${summary}
     ${is_expanded}=    get element attribute    ${summary}    aria-expanded
     IF    '${is_expanded}' != 'false'
@@ -753,25 +808,29 @@ user closes details dropdown
     user checks element attribute value should be    ${summary}    aria-expanded    false
 
 user gets details content element
-    [Arguments]    ${text}    ${parent}=css:body    ${wait}=${timeout}
-    user waits until parent contains element    ${parent}    xpath:.//details/summary[contains(., "${text}")]
+    [Arguments]    ${text}    ${parent}=css:body    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until parent contains element    ${parent}    xpath:.//details/summary[${text_matcher}]
     ...    timeout=${wait}
-    ${summary}=    get child element    ${parent}    xpath:.//details/summary[contains(., "${text}")]
+    ${summary}=    get child element    ${parent}    xpath:.//details/summary[${text_matcher}]
     ${content_id}=    get element attribute    ${summary}    aria-controls
     ${content}=    get child element    ${parent}    id:${content_id}
     [Return]    ${content}
 
 user waits until page contains details dropdown
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page contains element    xpath:.//details/summary[contains(., "${text}")]    ${wait}
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until page contains element    xpath:.//details/summary[${text_matcher}]    ${wait}
 
 user checks page for details dropdown
-    [Arguments]    ${text}
-    user checks page contains element    xpath:.//details/summary[contains(., "${text}")]
+    [Arguments]    ${text}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user checks page contains element    xpath:.//details/summary[${text_matcher}]
 
 user scrolls to details dropdown
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user scrolls to element    xpath:.//details/summary[contains(., "${text}")]
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user scrolls to element    xpath:.//details/summary[${text_matcher}]
 
 user checks publication bullet contains link
     [Arguments]    ${publication}    ${link}
@@ -821,14 +880,16 @@ user checks radio is checked
     user checks page contains element    xpath://label[text()="${label}"]/../input[@type="radio" and @checked]
 
 user checks radio in position has label
-    [Arguments]    ${position}    ${label}
+    [Arguments]    ${position}    ${label}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${label}    ${exact_match}
     user checks page contains element
-    ...    xpath://*[contains(@data-testid, "Radio item for ")][${position}]//label[contains(text(), "${label}")]
+    ...    xpath://*[contains(@data-testid, "Radio item for ")][${position}]//label[${text_matcher}]
 
 user clicks checkbox
-    [Arguments]    ${label}
-    user scrolls to element    xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
-    user clicks element    xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
+    [Arguments]    ${label}    ${exact_match}=${TRUE}
+    ${text_matcher}=    get xpath text matcher    ${label}    ${exact_match}
+    user scrolls to element    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
+    user clicks element    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
 
 user clicks checkbox by selector
     [Arguments]    ${locator}
@@ -836,14 +897,16 @@ user clicks checkbox by selector
     user clicks element    ${locator}
 
 user checks checkbox is checked
-    [Arguments]    ${label}
+    [Arguments]    ${label}    ${exact_match}=${TRUE}
+    ${text_matcher}=    get xpath text matcher    ${label}    ${exact_match}
     user checks checkbox input is checked
-    ...    xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
+    ...    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
 
 user checks checkbox is not checked
-    [Arguments]    ${label}
+    [Arguments]    ${label}    ${exact_match}=${TRUE}
+    ${text_matcher}=    get xpath text matcher    ${label}    ${exact_match}
     user checks checkbox input is not checked
-    ...    xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
+    ...    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
 
 user checks checkbox input is checked
     [Arguments]    ${selector}
@@ -856,9 +919,10 @@ user checks checkbox input is not checked
     checkbox should not be selected    ${selector}
 
 user checks checkbox in position has label
-    [Arguments]    ${position}    ${label}
+    [Arguments]    ${position}    ${label}    ${exact_match}=${TRUE}
+    ${text_matcher}=    get xpath text matcher    ${label}    ${exact_match}
     user checks page contains element
-    ...    xpath://*[contains(@data-testid,"Checkbox item for ")][${position}]//label[contains(text(), "${label}")]
+    ...    xpath://*[contains(@data-testid,"Checkbox item for ")][${position}]//label[${text_matcher}]
 
 user checks list has x items
     [Arguments]    ${locator}    ${count}    ${parent}=css:body
@@ -968,7 +1032,7 @@ user gets data block from parent
 user gets data block table from parent
     [Arguments]    ${data_block_name}    ${parent}
     ${data_block}=    user gets data block from parent    ${data_block_name}    ${parent}
-    user clicks link by visible text    Table    ${data_block}
+    user clicks link containing text    Table    ${data_block}
     ${data_block_id}=    get element attribute    ${data_block}    id
     ${data_block_table}=    get child element    ${data_block}    id:${data_block_id}-tables
     [Return]    ${data_block_table}
@@ -976,7 +1040,7 @@ user gets data block table from parent
 user gets data block chart from parent
     [Arguments]    ${data_block_name}    ${parent}
     ${data_block}=    user gets data block from parent    ${data_block_name}    ${parent}
-    user clicks link by visible text    Chart    ${data_block}
+    user clicks link containing text    Chart    ${data_block}
     ${data_block_id}=    get element attribute    ${data_block}    id
     ${data_block_chart}=    get child element    ${data_block}    id:${data_block_id}-chart
     [Return]    ${data_block_chart}

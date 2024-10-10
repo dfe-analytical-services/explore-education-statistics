@@ -119,7 +119,7 @@ user navigates to release page from dashboard
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${RELEASE_TABLE_TESTID}
     user scrolls to element    ${ROW}
 
-    user clicks link by visible text    ${LINK_TEXT}    ${ROW}
+    user clicks link containing text    ${LINK_TEXT}    ${ROW}
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
 
 user navigates to draft release page from dashboard
