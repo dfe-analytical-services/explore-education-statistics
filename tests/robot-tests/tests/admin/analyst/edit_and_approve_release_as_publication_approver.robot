@@ -134,10 +134,10 @@ Put release back into draft
 
 Approve release for scheduled release
     ${days_until_release}=    set variable    2
-    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
-    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
-    ${publish_date_month_word}=    get current datetime    %B    ${days_until_release}
-    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+    ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
+    ${publish_date_month}=    get london month date    offset_days=${days_until_release}
+    ${publish_date_month_word}=    get london month word    offset_days=${days_until_release}
+    ${publish_date_year}=    get london year    offset_days=${days_until_release}
 
     user approves release for scheduled publication
     ...    ${publish_date_day}
