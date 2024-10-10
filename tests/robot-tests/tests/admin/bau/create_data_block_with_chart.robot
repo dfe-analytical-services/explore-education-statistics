@@ -13,7 +13,6 @@ Force Tags          Admin    Local    AltersData    Dev
 
 
 *** Variables ***
-${TOPIC_NAME}=              %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=        UI tests - create data block with chart %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}=          UI test data block
 ${CONTENT_SECTION_NAME}=    Test data block section
@@ -29,7 +28,8 @@ Create test publication and release via API
 Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Academic year 2025/26
-    user uploads subject and waits until complete    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    UI test subject    upload-file-test.csv
+    ...    upload-file-test.meta.csv
 
 Navigate to 'Footnotes' page
     user waits until page finishes loading
@@ -206,7 +206,6 @@ Validate data block is in list
     user checks table column heading contains    1    3    In content    testid:dataBlocks
     user checks table column heading contains    1    4    Created date    testid:dataBlocks
     user checks table column heading contains    1    5    Actions    testid:dataBlocks
-
 
     user checks table body has x rows    1    testid:dataBlocks
     user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
@@ -551,7 +550,6 @@ Save chart and validate marked as 'Has chart' in data blocks list
     user waits until table is visible
     user checks table column heading contains    1    1    Name    testid:dataBlocks
     user checks table column heading contains    1    2    Has chart    testid:dataBlocks
-
 
     user checks table body has x rows    1
     user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks

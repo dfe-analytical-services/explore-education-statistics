@@ -91,7 +91,7 @@ const AdminDashboardPage = () => {
           {isBauUser && (
             <ul className="govuk-!-margin-bottom-6">
               <li>
-                <Link to="/themes">manage themes and topics</Link>
+                <Link to="/themes">manage themes</Link>
               </li>
             </ul>
           )}

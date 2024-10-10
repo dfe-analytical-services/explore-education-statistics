@@ -47,7 +47,7 @@ test('Verify that user is able to create a release via admin', async ({
   await adminPage.clickSignIn();
   await azPage.doSignIn();
   await page.waitForLoadState('load');
-  await adminPage.selectTestThemeAndTestTopic();
+  await adminPage.selectTestTheme();
   await adminPage.createNewPublicationButton.click();
 
   publicationName = uiTestString('publish publication');

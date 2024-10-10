@@ -137,7 +137,7 @@ describe('Filters', () => {
     const handleChange = jest.fn();
     const { user } = render(
       <Filters
-        publications={testThemes[1].topics[0].publications}
+        publications={testThemes[1].publications}
         themeId="theme-2"
         themes={testThemes}
         onChange={handleChange}
@@ -213,7 +213,7 @@ describe('Filters', () => {
     render(
       <Filters
         publicationId="publication-2"
-        publications={testThemes[1].topics[0].publications}
+        publications={testThemes[1].publications}
         themes={testThemes}
         themeId="theme-2"
         onChange={noop}

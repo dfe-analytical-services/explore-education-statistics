@@ -58,8 +58,7 @@ const PublicationForm = ({
       return (
         themes
           .find(theme => theme.id === selectedThemeId)
-          ?.topics.flatMap(topic => topic.publications)
-          .filter(publication =>
+          ?.publications.filter(publication =>
             showSupersededPublications
               ? publication
               : !publication.isSuperseded,
@@ -68,7 +67,7 @@ const PublicationForm = ({
     }
     if (searchTerm) {
       return themes
-        .flatMap(theme => theme.topics.flatMap(topic => topic.publications))
+        .flatMap(theme => theme.publications)
         .filter(publication =>
           showSupersededPublications
             ? publication.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -84,16 +83,13 @@ const PublicationForm = ({
 
   const getThemeForPublication = (publicationId: string) => {
     return themes.find(theme =>
-      theme.topics
-        .flatMap(topic => topic.publications)
-        .find(pub => pub.id === publicationId),
+      theme.publications.find(publication => publication.id === publicationId),
     )?.title;
   };
 
   const getSelectedPublication = (publicationId: string) =>
     themes
-      .flatMap(theme => theme.topics)
-      .flatMap(topic => topic.publications)
+      .flatMap(theme => theme.publications)
       .find(publication => publication.id === publicationId);
 
   const stepHeading = (

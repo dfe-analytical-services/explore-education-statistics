@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 import spinner from '../utils/spinner';
 import adminApi from '../utils/adminApi';
 
-const { TOPIC_ID } = process.env;
+const { THEME_ID } = process.env;
 
 const publicationService = {
   createPublication: async (): Promise<string> => {
@@ -11,7 +11,7 @@ const publicationService = {
     console.time('createPublication');
     const res = await adminApi.post('/api/publications', {
       title: `importer-testing-${v4()}`,
-      topicId: TOPIC_ID,
+      themeId: THEME_ID,
       contact: {
         teamName: 'testing',
         teamEmail: 'johndoe@gmail.com',

@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<ThemeViewModel>>> GetThemes();
 
-        Task<Either<ActionResult, Unit>> DeleteTheme(Guid themeId);
+        Task<Either<ActionResult, Unit>> DeleteTheme(Guid themeId, CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, Unit>> DeleteUITestThemes(CancellationToken cancellationToken = default);
     }

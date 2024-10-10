@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Moq;
-using Xunit;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
@@ -41,13 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 new ThemeViewModel
                 {
                     Title = "Theme A",
-                    Topics = new List<TopicViewModel>
-                    {
-                        new TopicViewModel
-                        {
-                            Title = "Topic A"
-                        }
-                    }
                 }
             };
 

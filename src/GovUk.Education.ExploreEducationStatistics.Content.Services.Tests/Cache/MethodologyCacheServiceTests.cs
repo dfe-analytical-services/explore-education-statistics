@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -10,8 +7,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using static Newtonsoft.Json.JsonConvert;
@@ -20,41 +19,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cach
 
 public class MethodologyCacheServiceTests : CacheServiceTestFixture
 {
-    private readonly List<AllMethodologiesThemeViewModel> _methodologyTree = ListOf(
+    private readonly List<AllMethodologiesThemeViewModel> _methodologyTree = [
         new AllMethodologiesThemeViewModel
         {
             Title = "Theme 1",
-            Topics = ListOf(new AllMethodologiesTopicViewModel
-            {
-                Title = "Theme 1 Topic 1",
-                Publications = ListOf(new AllMethodologiesPublicationViewModel
+            Publications =
+            [
+                new()
                 {
                     Id = Guid.NewGuid(),
-                    Title = "Theme 1 Topic 1 Publication 1",
-                    Methodologies = ListOf(new MethodologyVersionSummaryViewModel
-                    {
-                        Title = "Theme 1 Topic 1 Publication 1 Methodology 1",
-                    })
-                })
-            })
+                    Title = "Theme 1 Publication 1",
+                    Methodologies =
+                    [
+                        new()
+                        {
+                            Title = "Theme 1 Publication 1 Methodology 1",
+                        }
+                    ]
+                }
+            ]
         },
         new AllMethodologiesThemeViewModel
         {
             Title = "Theme 2",
-            Topics = ListOf(new AllMethodologiesTopicViewModel
-            {
-                Title = "Theme 2 Topic 1",
-                Publications = ListOf(new AllMethodologiesPublicationViewModel
+            Publications =
+            [
+                new()
                 {
                     Id = Guid.NewGuid(),
-                    Title = "Theme 2 Topic 1 Publication 1",
-                    Methodologies = ListOf(new MethodologyVersionSummaryViewModel
-                    {
-                        Title = "Theme 2 Topic 1 Publication 1 Methodology 1",
-                    })
-                })
-            })
-        });
+                    Title = "Theme 2 Publication 1",
+                    Methodologies =
+                    [
+                        new()
+                        {
+                            Title = "Theme 2 Publication 1 Methodology 1",
+                        }
+                    ]
+                }
+            ]
+        }];
 
     [Fact]
     public async Task GetSummariesTree_NoCachedTreeExists()
@@ -101,7 +104,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetSummariesByPublication_NoCachedTreeExists()
     {
-        var publicationId = _methodologyTree[1].Topics[0].Publications[0].Id;
+        var publicationId = _methodologyTree[1].Publications[0].Id;
 
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
@@ -124,7 +127,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
         VerifyAllMocks(methodologyService, PublicBlobCacheService);
 
         var expectedMethodologiesByPublication =
-            _methodologyTree[1].Topics[0].Publications[0].Methodologies;
+            _methodologyTree[1].Publications[0].Methodologies;
 
         result.AssertRight(expectedMethodologiesByPublication);
     }
@@ -156,7 +159,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetSummariesByPublication_CachedTreeExists()
     {
-        var publicationId = _methodologyTree[1].Topics[0].Publications[0].Id;
+        var publicationId = _methodologyTree[1].Publications[0].Id;
 
         PublicBlobCacheService
             .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
@@ -169,7 +172,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
         VerifyAllMocks(PublicBlobCacheService);
 
         var expectedMethodologiesByPublication =
-            _methodologyTree[1].Topics[0].Publications[0].Methodologies;
+            _methodologyTree[1].Publications[0].Methodologies;
 
         result.AssertRight(expectedMethodologiesByPublication);
     }
@@ -189,7 +192,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         VerifyAllMocks(PublicBlobCacheService);
 
-        result.AssertRight(new List<MethodologyVersionSummaryViewModel>());
+        result.AssertRight([]);
     }
 
     [Fact]
@@ -199,31 +202,23 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
         {
             Id = Guid.NewGuid(),
             Title = "Publication title",
-            Topics = new List<AllMethodologiesTopicViewModel>
-            {
+            Publications =
+            [
                 new()
                 {
                     Id = Guid.NewGuid(),
-                    Title = "Topic title",
-                    Publications = new List<AllMethodologiesPublicationViewModel>
+                    Title = "Publication title",
+                    Methodologies = new List<MethodologyVersionSummaryViewModel>
                     {
                         new()
                         {
                             Id = Guid.NewGuid(),
-                            Title = "Publication title",
-                            Methodologies = new List<MethodologyVersionSummaryViewModel>
-                            {
-                                new()
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Slug = "methodology-slug",
-                                    Title = "Methodology title",
-                                }
-                            }
+                            Slug = "methodology-slug",
+                            Title = "Methodology title",
                         }
                     }
                 }
-            }
+            ]
         };
 
         var converted = DeserializeObject<AllMethodologiesThemeViewModel>(SerializeObject(viewModel));

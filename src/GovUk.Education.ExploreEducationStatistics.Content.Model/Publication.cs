@@ -23,10 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public ExternalMethodology? ExternalMethodology { get; set; }
 
-        public Guid TopicId { get; set; }
-
-        public Topic Topic { get; set; } = null!;
-
         public Guid ThemeId { get; set; }
 
         public Theme Theme { get; set; } = null!;

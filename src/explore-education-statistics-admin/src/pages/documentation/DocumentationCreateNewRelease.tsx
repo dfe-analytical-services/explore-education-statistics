@@ -91,8 +91,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 <li>
                   <h4 className="govuk-heading-s">
                     If you have access to a long list of publications, use the
-                    ‘Select theme’ and ‘Select topic’ dropdowns to find a
-                    publication.
+                    ‘Select theme’ dropdown to find a publication.
                   </h4>
                   <img
                     src={imageSelectTheme}

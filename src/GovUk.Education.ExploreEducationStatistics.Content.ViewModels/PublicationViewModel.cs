@@ -20,7 +20,7 @@ public record PublicationViewModel
 
     public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; init; } = new();
 
-    public TopicViewModel Topic { get; init; } = null!;
+    public ThemeViewModel Theme { get; init; } = null!;
 
     public ContactViewModel Contact { get; init; } = null!;
 
@@ -43,7 +43,7 @@ public record PublicationViewModel
         SupersededBy = publication.SupersededBy;
         Releases = publication.Releases;
         ReleaseSeries = publication.ReleaseSeries;
-        Topic = publication.Topic;
+        Theme = publication.Theme;
         Contact = publication.Contact;
         ExternalMethodology = publication.ExternalMethodology;
         Methodologies = methodologySummaries;

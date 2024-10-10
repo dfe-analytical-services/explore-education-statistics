@@ -1,21 +1,26 @@
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -27,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public async Task GetThemes_CanViewAllTopics()
+        public async Task GetThemes_CanViewAllThemes()
         {
             var contextId = Guid.NewGuid().ToString();
 
@@ -51,87 +56,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         await using var context = DbUtils.InMemoryApplicationDbContext(contextId);
 
-                        var service = SetupThemeService(userService: userService.Object, context: context);
+                        var service = SetupThemeService(userService: userService.Object, contentContext: context);
                         var result = await service.GetThemes();
 
                         Assert.Single(result.Right);
                         Assert.Equal("Test theme", result.Right[0].Title);
-
-                        return result;
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task GetThemes_CanViewLinkedTopics()
-        {
-            var userId = Guid.NewGuid();
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = DbUtils.InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(
-                    new UserReleaseRole
-                    {
-                        ReleaseVersion = new ReleaseVersion
-                        {
-                            Publication = new Publication
-                            {
-                                Topic = new Topic
-                                {
-                                    Title = "Another topic",
-                                    Theme = new Theme
-                                    {
-                                        Title = "Another theme"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    new UserReleaseRole
-                    {
-                        UserId = userId,
-                        ReleaseVersion = new ReleaseVersion
-                        {
-                            Publication = new Publication
-                            {
-                                Topic = new Topic
-                                {
-                                    Title = "Expected topic",
-                                    Theme = new Theme
-                                    {
-                                        Title = "Expected theme"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                );
-
-                await context.SaveChangesAsync();
-            }
-
-            await PolicyCheckBuilder()
-                .SetupCheck(SecurityPolicies.RegisteredUser)
-                .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
-                .AssertSuccess(
-                    async userService =>
-                    {
-                        await using var context = DbUtils.InMemoryApplicationDbContext(contextId);
-
-                        userService
-                            .Setup(s => s.GetUserId())
-                            .Returns(userId);
-
-                        var service = SetupThemeService(userService: userService.Object, context: context);
-                        var result = await service.GetThemes();
-
-                        Assert.Single(result.Right);
-                        Assert.Equal("Expected theme", result.Right[0].Title);
-
-                        Assert.Single(result.Right[0].Topics);
-                        Assert.Equal("Expected topic", result.Right[0].Topics[0].Title);
 
                         return result;
                     }
@@ -247,21 +176,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private ThemeService SetupThemeService(
-            ContentDbContext context = null,
+            ContentDbContext contentContext = null,
+            StatisticsDbContext statisticsContext = null,
             IMapper mapper = null,
             PersistenceHelper<ContentDbContext> persistenceHelper = null,
             IUserService userService = null,
-            ITopicService topicService = null,
+            IBlobCacheService cacheService = null,
+            IMethodologyService methodologyService = null,
+            IReleaseSubjectRepository releaseSubjectRepository = null,
+            IReleaseFileService releaseFileService = null,
+            IReleaseDataFileService releaseDataFileService = null,
+            IReleasePublishingStatusRepository releasePublishingStatusRepository = null,
             IPublishingService publishingService = null)
         {
             return new ThemeService(
                 DefaultAppOptions(),
-                context ?? new Mock<ContentDbContext>().Object,
+                contentContext ?? new Mock<ContentDbContext>().Object,
+                statisticsContext ?? new Mock<StatisticsDbContext>().Object,
                 mapper ?? AdminMapper(),
                 persistenceHelper ?? MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object,
                 userService ?? AlwaysTrueUserService().Object,
-                topicService ?? new Mock<ITopicService>().Object,
-                publishingService ?? new Mock<IPublishingService>().Object
+                methodologyService ?? Mock.Of<IMethodologyService>(Strict),
+                releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
+                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
+                releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),
+                releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(),
+                publishingService ?? new Mock<IPublishingService>().Object,
+                cacheService ?? Mock.Of<IBlobCacheService>(Strict)
             );
         }
     }

@@ -8,5 +8,5 @@ public record PublicationTreeThemeViewModel
 
     public string Summary { get; init; } = string.Empty;
 
-    public List<PublicationTreeTopicViewModel> Topics { get; init; } = new();
+    public List<PublicationTreePublicationViewModel> Publications { get; init; } = [];
 }

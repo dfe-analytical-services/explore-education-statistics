@@ -13,8 +13,6 @@ public record PublicationCreateRequest
 
     [Required] public Guid ThemeId { get; set; }
 
-    [Required] public Guid TopicId { get; set; }
-
     [Required] public ContactSaveRequest Contact { get; set; } = null!;
 
     private string _slug = string.Empty;

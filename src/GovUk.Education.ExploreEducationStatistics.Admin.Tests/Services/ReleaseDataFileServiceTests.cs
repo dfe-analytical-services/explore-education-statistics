@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -25,6 +21,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -1790,15 +1790,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Topic
+                    Theme = new Theme
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Test topic",
-                        Theme = new Theme
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Test theme"
-                        }
+                        Title = "Test theme"
                     }
                 }
             };
@@ -1935,15 +1930,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Topic
+                    Theme = new Theme
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Test topic",
-                        Theme = new Theme
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Test theme"
-                        }
+                        Title = "Test theme"
                     }
                 }
             };
@@ -2156,15 +2146,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Topic
+                    Theme = new Theme
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Test topic",
-                        Theme = new Theme
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Test theme"
-                        }
+                        Title = "Test theme"
                     }
                 },
             };
@@ -2315,15 +2300,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Topic
+                    Theme = new Theme
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Test topic",
-                        Theme = new Theme
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Test theme"
-                        }
+                        Title = "Test theme"
                     }
                 }
             };
@@ -2467,15 +2447,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Topic
+                    Theme = new Theme
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Test topic",
-                        Theme = new Theme
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Test theme"
-                        }
+                        Title = "Test theme"
                     }
                 }
             };
@@ -2620,15 +2595,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Topic
+                    Theme = new Theme
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Test topic",
-                        Theme = new Theme
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Test theme"
-                        }
+                        Title = "Test theme"
                     }
                 }
             };
@@ -2821,15 +2791,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Topic
+                    Theme = new Theme
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Test topic",
-                        Theme = new Theme
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Test theme"
-                        }
+                        Title = "Test theme"
                     }
                 }
             };
@@ -2989,15 +2954,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication
                 {
                     Title = "Test publication",
-                    Topic = new Topic
+                    Theme = new Theme
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Test topic",
-                        Theme = new Theme
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Test theme"
-                        }
+                        Title = "Test theme"
                     }
                 }
             };

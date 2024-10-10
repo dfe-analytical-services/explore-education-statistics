@@ -1,4 +1,4 @@
-import FormFieldThemeTopicSelect from '@admin/components/form/FormFieldThemeTopicSelect';
+import FormFieldThemeSelect from '@admin/components/form/FormFieldThemeSelect';
 import publicationService from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
@@ -25,7 +25,6 @@ interface FormValues {
   supersededById?: string;
   title: string;
   themeId: string;
-  topicId: string;
 }
 
 interface Props {
@@ -81,7 +80,6 @@ export default function PublicationDetailsForm({
       supersededById: Yup.string(),
       title: Yup.string().required('Enter a title'),
       themeId: Yup.string().required('Choose a theme'),
-      topicId: Yup.string().required('Choose a topic'),
     });
   }, []);
 
@@ -97,7 +95,6 @@ export default function PublicationDetailsForm({
             title: '',
             summary: '',
             themeId: '',
-            topicId: '',
           }),
         }}
         validationSchema={validationSchema}
@@ -124,14 +121,13 @@ export default function PublicationDetailsForm({
                     />
                   )}
 
-                  {canUpdatePublication && themes && initialValues?.topicId && (
-                    <FormFieldThemeTopicSelect<FormValues>
+                  {canUpdatePublication && themes && (
+                    <FormFieldThemeSelect<FormValues>
                       id={id}
                       inline={false}
-                      legend="Choose a topic for this publication"
+                      legend="Choose a theme for this publication"
                       legendHidden
-                      name="topicId"
-                      themeInputName="themeId"
+                      name="themeId"
                       themes={themes}
                     />
                   )}

@@ -275,11 +275,9 @@ export const testPublicationRelease: Release = {
     title: '',
     releases: [],
     releaseSeries: [],
-    topic: {
-      theme: {
-        title: '',
-        id: '',
-      },
+    theme: {
+      title: '',
+      id: '',
     },
     contact: {
       teamName: 'The team name',

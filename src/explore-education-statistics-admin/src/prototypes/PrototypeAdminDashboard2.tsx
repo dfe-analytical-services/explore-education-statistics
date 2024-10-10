@@ -58,7 +58,7 @@ const PrototypeManageUsers = () => {
           {showBau && (
             <ul className="govuk-!-margin-bottom-6">
               <li>
-                <a href="#">manage themes and topics</a>
+                <a href="#">manage themes</a>
               </li>
             </ul>
           )}

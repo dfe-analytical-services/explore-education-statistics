@@ -8,7 +8,6 @@ interface Props {
   type?: string;
   link?: string;
   theme?: string;
-  topic?: string;
 }
 
 const PrototypeSearchResult = ({
@@ -19,7 +18,6 @@ const PrototypeSearchResult = ({
   type,
   link,
   theme,
-  topic,
 }: Props) => {
   return (
     <>
@@ -36,11 +34,7 @@ const PrototypeSearchResult = ({
           <br />
           Published: {published}
         </div>
-        <div className="govuk-grid-column-one-half">
-          Theme: {theme}
-          <br />
-          Topic: {topic}
-        </div>
+        <div className="govuk-grid-column-one-half">Theme: {theme}</div>
       </div>
       <hr />
     </>

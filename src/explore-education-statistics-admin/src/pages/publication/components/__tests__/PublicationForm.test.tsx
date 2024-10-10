@@ -13,7 +13,7 @@ const publicationService = _publicationService as jest.Mocked<
 describe('PublicationForm', () => {
   test('shows validation error when there is no title', async () => {
     const { user } = render(
-      <PublicationForm themeId="theme-id" topicId="topic-id" onSubmit={noop} />,
+      <PublicationForm themeId="theme-id" onSubmit={noop} />,
     );
 
     await waitFor(() => {
@@ -33,7 +33,7 @@ describe('PublicationForm', () => {
 
   test('shows validation error when there is no summary', async () => {
     const { user } = render(
-      <PublicationForm themeId="theme-id" topicId="topic-id" onSubmit={noop} />,
+      <PublicationForm themeId="theme-id" onSubmit={noop} />,
     );
 
     await waitFor(() => {
@@ -53,7 +53,7 @@ describe('PublicationForm', () => {
 
   test('shows validation errors when there are no contact details', async () => {
     const { user } = render(
-      <PublicationForm themeId="theme-id" topicId="topic-id" onSubmit={noop} />,
+      <PublicationForm themeId="theme-id" onSubmit={noop} />,
     );
 
     await waitFor(() => {
@@ -89,11 +89,7 @@ describe('PublicationForm', () => {
     'show validation error when contact tel no "%s" contains non-numeric or non-whitespace characters',
     async telNo => {
       const { user } = render(
-        <PublicationForm
-          themeId="theme-id"
-          topicId="topic-id"
-          onSubmit={noop}
-        />,
+        <PublicationForm themeId="theme-id" onSubmit={noop} />,
       );
 
       await waitFor(() => {
@@ -132,11 +128,7 @@ describe('PublicationForm', () => {
     'show validation error when contact tel no "%s" is DfE enquiries number',
     async telNo => {
       const { user } = render(
-        <PublicationForm
-          themeId="theme-id"
-          topicId="topic-id"
-          onSubmit={noop}
-        />,
+        <PublicationForm themeId="theme-id" onSubmit={noop} />,
       );
 
       await waitFor(() => {
@@ -170,11 +162,7 @@ describe('PublicationForm', () => {
     'show validation error when contact tel no "%s" is less than 8 characters',
     async telNo => {
       const { user } = render(
-        <PublicationForm
-          themeId="theme-id"
-          topicId="topic-id"
-          onSubmit={noop}
-        />,
+        <PublicationForm themeId="theme-id" onSubmit={noop} />,
       );
 
       await waitFor(() => {
@@ -203,7 +191,7 @@ describe('PublicationForm', () => {
 
   test('show validation error when contact email is not valid', async () => {
     const { user } = render(
-      <PublicationForm themeId="theme-id" topicId="topic-id" onSubmit={noop} />,
+      <PublicationForm themeId="theme-id" onSubmit={noop} />,
     );
 
     await waitFor(() => {
@@ -229,11 +217,7 @@ describe('PublicationForm', () => {
     const handleSubmit = jest.fn();
 
     const { user } = render(
-      <PublicationForm
-        themeId="theme-id"
-        topicId="topic-id"
-        onSubmit={handleSubmit}
-      />,
+      <PublicationForm themeId="theme-id" onSubmit={handleSubmit} />,
     );
 
     await waitFor(() => {
@@ -255,11 +239,7 @@ describe('PublicationForm', () => {
     const handleSubmit = jest.fn();
 
     const { user } = render(
-      <PublicationForm
-        themeId="theme-id"
-        topicId="topic-id"
-        onSubmit={handleSubmit}
-      />,
+      <PublicationForm themeId="theme-id" onSubmit={handleSubmit} />,
     );
 
     await waitFor(() => {
@@ -293,7 +273,6 @@ describe('PublicationForm', () => {
         title: 'Test title',
         summary: 'Test summary',
         themeId: 'theme-id',
-        topicId: 'topic-id',
         contact: {
           teamName: 'Test team',
           teamEmail: 'team@test.com',
@@ -308,11 +287,7 @@ describe('PublicationForm', () => {
     const handleSubmit = jest.fn();
 
     const { user } = render(
-      <PublicationForm
-        themeId="theme-id"
-        topicId="topic-id"
-        onSubmit={handleSubmit}
-      />,
+      <PublicationForm themeId="theme-id" onSubmit={handleSubmit} />,
     );
 
     await waitFor(() => {
@@ -342,7 +317,6 @@ describe('PublicationForm', () => {
         title: 'Test title',
         summary: 'Test summary',
         themeId: 'theme-id',
-        topicId: 'topic-id',
         contact: {
           teamName: 'Test team',
           teamEmail: 'team@test.com',

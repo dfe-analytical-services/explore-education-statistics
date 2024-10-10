@@ -184,7 +184,7 @@ It is essential that the test suites can run in parallel. This might not be the 
 
 For this reason, you **MUST** ensure that if a test suite changes test data, that you create test new data to be used specifically with that suite. Be careful if scavenging test data from other test suites! Ideally, every test suite will use test data that is only used by those particular tests.
 
-A common error is for a test suite to intermittently fail when run with other test suites, as it was previous only run by itself. Your tests must pass even if other publications and releases exist within the same topic, when multiple test suites are run at once.
+A common error is for a test suite to intermittently fail when run with other test suites, as it was previous only run by itself. Your tests must pass even if other publications and releases exist within the same theme, when multiple test suites are run at once.
 
 ## Test data:
 

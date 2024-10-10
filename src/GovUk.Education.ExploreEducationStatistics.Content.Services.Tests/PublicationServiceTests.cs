@@ -147,10 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
                     .WithLegacyLinks(_legacyLinks)
-                    .WithTopic(_dataFixture
-                        .DefaultTopic()
-                        .WithTheme(_dataFixture
-                            .DefaultTheme()));
+                    .WithTheme(_dataFixture.DefaultTheme());
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -215,10 +212,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Null(releaseSeriesItem3.ReleaseSlug);
                     Assert.Equal(_legacyLinks[0].LegacyLinkUrl, releaseSeriesItem3.LegacyLinkUrl);
 
-                    Assert.Equal(publication.Topic.Theme.Id, publicationViewModel.Topic.Theme.Id);
-                    Assert.Equal(publication.Topic.Theme.Slug, publicationViewModel.Topic.Theme.Slug);
-                    Assert.Equal(publication.Topic.Theme.Title, publicationViewModel.Topic.Theme.Title);
-                    Assert.Equal(publication.Topic.Theme.Summary, publicationViewModel.Topic.Theme.Summary);
+                    Assert.Equal(publication.Theme.Id, publicationViewModel.Theme.Id);
+                    Assert.Equal(publication.Theme.Slug, publicationViewModel.Theme.Slug);
+                    Assert.Equal(publication.Theme.Title, publicationViewModel.Theme.Title);
+                    Assert.Equal(publication.Theme.Summary, publicationViewModel.Theme.Summary);
 
                     Assert.Equal(_contact.TeamName, publicationViewModel.Contact.TeamName);
                     Assert.Equal(_contact.TeamEmail, publicationViewModel.Contact.TeamEmail);
@@ -247,10 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
-                    .WithTopic(_dataFixture
-                        .DefaultTopic()
-                        .WithTheme(_dataFixture
-                            .DefaultTheme()));
+                    .WithTheme(_dataFixture.DefaultTheme());
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -293,10 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
-                    .WithTopic(_dataFixture
-                        .DefaultTopic()
-                        .WithTheme(_dataFixture
-                            .DefaultTheme()));
+                    .WithTheme(_dataFixture.DefaultTheme());
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -329,10 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
-                    .WithTopic(_dataFixture
-                        .DefaultTopic()
-                        .WithTheme(_dataFixture
-                            .DefaultTheme()));
+                    .WithTheme(_dataFixture.DefaultTheme());
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -376,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
 
             [Fact]
-            public async Task MultipleThemesTopics()
+            public async Task MultipleThemesPublications()
             {
                 var (publication1, publication2, publication3) = _dataFixture
                     .DefaultPublication()
@@ -388,17 +376,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var (theme1, theme2) = _dataFixture
                     .DefaultTheme()
-                    .ForIndex(0,
-                        themeSetter => themeSetter.SetTopics(_dataFixture
-                            .DefaultTopic()
-                            .ForIndex(0, s => s.SetPublications(ListOf(publication1)))
-                            .ForIndex(1, s => s.SetPublications(ListOf(publication2)))
-                            .Generate(2)))
-                    .ForIndex(1,
-                        themeSetter => themeSetter.SetTopics(_dataFixture
-                            .DefaultTopic()
-                            .ForIndex(0, s => s.SetPublications(ListOf(publication3)))
-                            .Generate(1)))
+                    .ForIndex(0, themeSetter => themeSetter.SetPublications([publication1, publication2]))
+                    .ForIndex(1, themeSetter => themeSetter.SetPublications([publication3]))
                     .GenerateTuple2();
 
                 var contextId = Guid.NewGuid().ToString();
@@ -413,74 +392,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     var service = SetupPublicationService(context);
 
                     var publicationTree = await service.GetPublicationTree();
-
                     Assert.Equal(2, publicationTree.Count);
                     Assert.Equal(theme1.Title, publicationTree[0].Title);
                     Assert.Equal(theme1.Summary, publicationTree[0].Summary);
-
                     Assert.Equal(theme2.Title, publicationTree[1].Title);
                     Assert.Equal(theme2.Summary, publicationTree[1].Summary);
 
-                    Assert.Equal(2, publicationTree[0].Topics.Count);
-                    Assert.Equal(theme1.Topics[0].Title, publicationTree[0].Topics[0].Title);
-                    Assert.Equal(theme1.Topics[1].Title, publicationTree[0].Topics[1].Title);
+                    var themeAPublications = publicationTree[0].Publications;
+                    Assert.Equal(2, themeAPublications.Count);
+                    Assert.Equal(theme1.Publications[0].Title, themeAPublications[0].Title);
+                    Assert.Equal(theme1.Publications[1].Title, themeAPublications[1].Title);
+                    Assert.Equal(publication1.Slug, themeAPublications[0].Slug);
+                    Assert.Equal(publication1.Title, themeAPublications[0].Title);
+                    Assert.Equal(publication2.Slug, themeAPublications[1].Slug);
+                    Assert.Equal(publication2.Title, themeAPublications[1].Title);
+                    Assert.False(themeAPublications[0].LatestReleaseHasData);
+                    Assert.False(themeAPublications[0].AnyLiveReleaseHasData);
+                    Assert.False(themeAPublications[1].LatestReleaseHasData);
+                    Assert.False(themeAPublications[1].AnyLiveReleaseHasData);
 
-                    Assert.Single(publicationTree[1].Topics);
-                    Assert.Equal(theme2.Topics[0].Title, publicationTree[1].Topics[0].Title);
-
-                    var topicAPublications = publicationTree[0].Topics[0].Publications;
-
-                    Assert.Single(topicAPublications);
-                    Assert.Equal(publication1.Slug, topicAPublications[0].Slug);
-                    Assert.Equal(publication1.Title, topicAPublications[0].Title);
-                    Assert.False(topicAPublications[0].LatestReleaseHasData);
-                    Assert.False(topicAPublications[0].AnyLiveReleaseHasData);
-
-                    var topicBPublications = publicationTree[0].Topics[1].Publications;
-
-                    Assert.Single(topicBPublications);
-                    Assert.Equal(publication2.Slug, topicBPublications[0].Slug);
-                    Assert.Equal(publication2.Title, topicBPublications[0].Title);
-                    Assert.False(topicBPublications[0].LatestReleaseHasData);
-                    Assert.False(topicBPublications[0].AnyLiveReleaseHasData);
-
-                    var topicCPublications = publicationTree[1].Topics[0].Publications;
-
-                    Assert.Single(topicCPublications);
-                    Assert.Equal(publication3.Slug, topicCPublications[0].Slug);
-                    Assert.Equal(publication3.Title, topicCPublications[0].Title);
-                    Assert.False(topicCPublications[0].LatestReleaseHasData);
-                    Assert.False(topicCPublications[0].AnyLiveReleaseHasData);
+                    var themeBPublication = Assert.Single(publicationTree[1].Publications);
+                    Assert.Equal(theme2.Publications[0].Title, themeBPublication.Title);
+                    Assert.Equal(publication3.Slug, themeBPublication.Slug);
+                    Assert.Equal(publication3.Title, themeBPublication.Title);
+                    Assert.False(themeBPublication.LatestReleaseHasData);
+                    Assert.False(themeBPublication.AnyLiveReleaseHasData);
                 }
             }
 
             [Fact]
-            public async Task ThemesWithNoTopicsOrPublications_Excluded()
+            public async Task ThemesWithNoPublications_Excluded()
             {
-                var (theme1, theme2, theme3) = _dataFixture
+                var (theme1, theme2) = _dataFixture
                     .DefaultTheme()
-                    // Index 0 has no topics,
-                    // Index 1 has a topic with a publication,
-                    // Index 2 has a topic with no publications
-                    .ForIndex(1, s => s.SetTopics(_dataFixture
-                        .DefaultTopic()
-                        .WithPublications(_dataFixture
-                            .DefaultPublication()
+                    // Index 0 has no publications,
+                    // Index 1 one publication
+                    .ForIndex(1, s => s.SetPublications(_dataFixture
+                        .DefaultPublication()
                             .WithReleases(_dataFixture
                                 .DefaultRelease(publishedVersions: 1)
                                 .Generate(1))
-                            .Generate(1))
                         .Generate(1)))
-                    .ForIndex(2, s => s.SetTopics(_dataFixture
-                        .DefaultTopic()
-                        .Generate(1)))
-                    .Generate(3)
-                    .ToTuple3();
+                    .Generate(2)
+                    .ToTuple2();
 
                 var contextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryContentDbContext(contextId))
                 {
-                    context.Themes.AddRange(theme1, theme2, theme3);
+                    context.Themes.AddRange(theme1, theme2);
                     await context.SaveChangesAsync();
                 }
 
@@ -493,13 +452,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Single(publicationTree);
                     Assert.Equal(theme2.Title, publicationTree[0].Title);
 
-                    Assert.Single(publicationTree[0].Topics);
-                    Assert.Equal(theme2.Topics[0].Title, publicationTree[0].Topics[0].Title);
-
-                    var publications = publicationTree[0].Topics[0].Publications;
+                    var publications = publicationTree[0].Publications;
 
                     Assert.Single(publications);
-                    Assert.Equal(theme2.Topics[0].Publications[0].Title, publications[0].Title);
+                    Assert.Equal(theme2.Publications[0].Title, publications[0].Title);
                 }
             }
 
@@ -512,42 +468,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Index 1 has a publication with a published and unpublished release
                     // Index 2 has a publication with no releases
                     // Index 3 has a publication with an unpublished release
-                    .ForIndex(0, s => s.SetTopics(_dataFixture
-                        .DefaultTopic()
-                        .WithPublications(_dataFixture
-                            .DefaultPublication()
+                    .ForIndex(0, s => s.SetPublications(_dataFixture
+                        .DefaultPublication()
                             .WithReleases(_dataFixture
                                 .DefaultRelease(publishedVersions: 1)
                                 .Generate(1))
-                            .Generate(1))
                         .Generate(1)))
-                    .ForIndex(1, s => s.SetTopics(_dataFixture
-                        .DefaultTopic()
-                        .WithPublications(_dataFixture
-                            .DefaultPublication()
+                    .ForIndex(1, s => s.SetPublications(_dataFixture
+                        .DefaultPublication()
                             .WithReleases(ListOf<Release>(
-                                _dataFixture
-                                    .DefaultRelease(publishedVersions: 1),
-                                _dataFixture
-                                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                                _dataFixture.DefaultRelease(publishedVersions: 1),
+                                _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
                             ))
-                            .Generate(1))
                         .Generate(1)))
-                    .ForIndex(2, s => s.SetTopics(_dataFixture
-                        .DefaultTopic()
-                        .WithPublications(_dataFixture
-                            .DefaultPublication()
-                            .Generate(1))
-                        .Generate(1)))
-                    .ForIndex(3, s => s.SetTopics(_dataFixture
-                        .DefaultTopic()
-                        .WithPublications(_dataFixture
-                            .DefaultPublication()
+                    .ForIndex(2, s => s.SetPublications(_dataFixture
+                        .DefaultPublication()
+                            .Generate(1)))
+                    .ForIndex(3, s => s.SetPublications(_dataFixture
+                        .DefaultPublication()
                             .WithReleases(_dataFixture
                                 .DefaultRelease(publishedVersions: 0, draftVersion: true)
                                 .Generate(1))
-                            .Generate(1))
-                        .Generate(1)))
+                            .Generate(1)))
                     .GenerateList(4);
 
                 var contextId = Guid.NewGuid().ToString();
@@ -569,38 +511,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(themes[0].Title, publicationTree[0].Title);
                     Assert.Equal(themes[1].Title, publicationTree[1].Title);
 
-                    Assert.Single(publicationTree[0].Topics);
-                    Assert.Equal(themes[0].Topics[0].Title, publicationTree[0].Topics[0].Title);
+                    Assert.Single(publicationTree[0].Publications);
+                    Assert.Equal(themes[0].Publications[0].Title, publicationTree[0].Publications[0].Title);
 
-                    Assert.Single(publicationTree[0].Topics[0].Publications);
-                    Assert.Equal(themes[0].Topics[0].Publications[0].Title,
-                        publicationTree[0].Topics[0].Publications[0].Title);
+                    Assert.Single(publicationTree[0].Publications);
+                    Assert.Equal(themes[0].Publications[0].Title, publicationTree[0].Publications[0].Title);
 
-                    Assert.Single(publicationTree[1].Topics);
-                    Assert.Equal(themes[1].Topics[0].Title, publicationTree[1].Topics[0].Title);
+                    Assert.Single(publicationTree[1].Publications);
+                    Assert.Equal(themes[1].Publications[0].Title, publicationTree[1].Publications[0].Title);
 
-                    Assert.Single(publicationTree[1].Topics[0].Publications);
-                    Assert.Equal(themes[1].Topics[0].Publications[0].Title,
-                        publicationTree[1].Topics[0].Publications[0].Title);
+                    Assert.Single(publicationTree[1].Publications);
+                    Assert.Equal(themes[1].Publications[0].Title, publicationTree[1].Publications[0].Title);
                 }
             }
 
             [Fact]
             public async Task PublicationsWithNoReleases_Excluded()
             {
-                Theme theme = _dataFixture
+                var theme = _dataFixture
                     .DefaultTheme()
-                    .WithTopics(_dataFixture
-                        .DefaultTopic()
-                        .WithPublications(_dataFixture
-                            .DefaultPublication()
-                            // Index 0 has a published release
-                            // Index 1 has no releases
-                            .ForIndex(0, s => s.SetReleases(_dataFixture
-                                .DefaultRelease(publishedVersions: 1)
-                                .Generate(1)))
-                            .Generate(2))
-                        .Generate(1));
+                    .WithPublications(_dataFixture
+                        .DefaultPublication()
+                        // Index 0 has a published release
+                        // Index 1 has no releases
+                        .ForIndex(0, s => s.SetReleases(_dataFixture
+                            .DefaultRelease(publishedVersions: 1)
+                            .Generate(1)))
+                        .Generate(2))
+                    .Generate();
 
                 var contextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryContentDbContext(contextId))
@@ -615,60 +553,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                     var publicationTree = await service.GetPublicationTree();
 
-                    var publications = publicationTree[0].Topics[0].Publications;
+                    var publications = publicationTree[0].Publications;
 
                     Assert.Single(publications);
-                    Assert.Equal(theme.Topics[0].Publications[0].Title, publications[0].Title);
-                }
-            }
-
-            [Fact]
-            public async Task TopicsWithNoVisiblePublications_Excluded()
-            {
-                Theme theme = _dataFixture
-                    .DefaultTheme()
-                    .WithTopics(_dataFixture
-                        .DefaultTopic()
-                        // Index 0 has a publication with published release
-                        // Index 1 has a publication with an unpublished release
-                        .ForIndex(0, s => s.SetPublications(_dataFixture
-                            .DefaultPublication()
-                            .WithReleases(_dataFixture
-                                .DefaultRelease(publishedVersions: 1)
-                                .Generate(1))
-                            .Generate(1)))
-                        .ForIndex(1, s => s.SetPublications(_dataFixture
-                            .DefaultPublication()
-                            .WithReleases(_dataFixture
-                                .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                                .Generate(1))
-                            .Generate(1)))
-                        .Generate(2));
-
-                var contextId = Guid.NewGuid().ToString();
-                await using (var context = InMemoryContentDbContext(contextId))
-                {
-                    context.Themes.Add(theme);
-                    await context.SaveChangesAsync();
-                }
-
-                await using (var context = InMemoryContentDbContext(contextId))
-                {
-                    var service = SetupPublicationService(context);
-
-                    var publicationTree = await service.GetPublicationTree();
-
-                    // Expect only the first topic to be included
-
-                    Assert.Single(publicationTree);
-                    Assert.Equal(theme.Title, publicationTree[0].Title);
-
-                    Assert.Single(publicationTree[0].Topics);
-                    Assert.Equal(theme.Topics[0].Title, publicationTree[0].Topics[0].Title);
-
-                    Assert.Single(publicationTree[0].Topics[0].Publications);
-                    Assert.Equal(theme.Topics[0].Publications[0].Title,
-                        publicationTree[0].Topics[0].Publications[0].Title);
+                    Assert.Equal(theme.Publications[0].Title, publications[0].Title);
                 }
             }
 
@@ -681,12 +569,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .DefaultRelease(publishedVersions: 1)
                         .Generate(2));
 
-                Theme theme = _dataFixture
+                var theme = _dataFixture
                     .DefaultTheme()
-                    .WithTopics(_dataFixture
-                        .DefaultTopic()
-                        .WithPublications(ListOf(publication))
-                        .Generate(1));
+                    .WithPublications(ListOf(publication))
+                    .Generate();
 
                 var releaseFiles = new List<ReleaseFile>
                 {
@@ -728,12 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Single(publicationTree);
                     Assert.Equal(theme.Title, publicationTree[0].Title);
 
-                    Assert.Single(publicationTree[0].Topics);
-                    Assert.Equal(theme.Topics[0].Title, publicationTree[0].Topics[0].Title);
-
-                    var publications = publicationTree[0].Topics[0].Publications;
-
-                    var resultPublication = Assert.Single(publications);
+                    var resultPublication = Assert.Single(publicationTree[0].Publications);
                     Assert.Equal(publication.Title, resultPublication.Title);
                     Assert.Equal(publication.Id, resultPublication.Id);
                     Assert.True(resultPublication.LatestReleaseHasData);
@@ -750,12 +631,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .DefaultRelease(publishedVersions: 1)
                         .Generate(2));
 
-                Theme theme = _dataFixture
+                var theme = _dataFixture
                     .DefaultTheme()
-                    .WithTopics(_dataFixture
-                        .DefaultTopic()
-                        .WithPublications(ListOf(publication))
-                        .Generate(1));
+                    .WithPublications(ListOf(publication))
+                    .Generate();
 
                 var releaseFiles = new List<ReleaseFile>
                 {
@@ -797,12 +676,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Single(publicationTree);
                     Assert.Equal(theme.Title, publicationTree[0].Title);
 
-                    Assert.Single(publicationTree[0].Topics);
-                    Assert.Equal(theme.Topics[0].Title, publicationTree[0].Topics[0].Title);
-
-                    var publications = publicationTree[0].Topics[0].Publications;
-
-                    var resultPublication = Assert.Single(publications);
+                    var resultPublication = Assert.Single(publicationTree[0].Publications);
                     Assert.Equal(publication.Title, resultPublication.Title);
                     Assert.Equal(publication.Id, resultPublication.Id);
                     Assert.False(resultPublication.LatestReleaseHasData);
@@ -819,12 +693,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true),
                         _dataFixture.DefaultRelease(publishedVersions: 1)));
 
-                Theme theme = _dataFixture
+                var theme = _dataFixture
                     .DefaultTheme()
-                    .WithTopics(_dataFixture
-                        .DefaultTopic()
-                        .WithPublications(ListOf(publication))
-                        .Generate(1));
+                    .WithPublications(ListOf(publication))
+                    .Generate();
 
                 var releaseFiles = new List<ReleaseFile>
                 {
@@ -866,10 +738,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Single(publicationTree);
                     Assert.Equal(theme.Id, publicationTree[0].Id);
 
-                    var topic = Assert.Single(publicationTree[0].Topics);
-                    Assert.Equal(theme.Topics[0].Id, topic.Id);
-
-                    var resultPublication = Assert.Single(topic.Publications);
+                    var resultPublication = Assert.Single(publicationTree[0].Publications);
                     Assert.Equal(publication.Id, resultPublication.Id);
                     Assert.False(resultPublication.LatestReleaseHasData);
                     Assert.False(resultPublication.AnyLiveReleaseHasData);
@@ -894,14 +763,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     .ForIndex(1, s => s.SetSupersededBy(supersedingPublication))
                     .GenerateTuple2();
 
-                Theme theme = _dataFixture
+                var theme = _dataFixture
                     .DefaultTheme()
-                    .WithTopics(_dataFixture
-                        .DefaultTopic()
-                        // Publications are in random order
-                        // to check that ordering is done by title
-                        .WithPublications(ListOf(publication2, publication1))
-                        .Generate(1));
+                    // Publications are in random order
+                    // to check that ordering is done by title
+                    .WithPublications([publication2, publication1])
+                    .Generate();
 
                 var contextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryContentDbContext(contextId))
@@ -919,10 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Single(publicationTree);
                     Assert.Equal(theme.Title, publicationTree[0].Title);
 
-                    Assert.Single(publicationTree[0].Topics);
-                    Assert.Equal(theme.Topics[0].Title, publicationTree[0].Topics[0].Title);
-
-                    var publications = publicationTree[0].Topics[0].Publications;
+                    var publications = publicationTree[0].Publications;
                     Assert.Equal(2, publications.Count);
 
                     Assert.Equal(publication1.Title, publications[0].Title);
@@ -981,37 +845,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 };
 
                 var themes = new List<Theme>
-            {
-                new()
                 {
-                    Title = "Theme 1 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
-                            {
-                                publicationA,
-                                publicationB
-                            }
-                        }
+                        Title = "Theme 1 title",
+                        Publications =
+                        [
+                            publicationA,
+                            publicationB
+                        ]
                     },
-                },
-                new()
-                {
-                    Title = "Theme 2 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
-                            {
-                                publicationC
-                            }
-                        }
-                    },
-                }
-            };
+                        Title = "Theme 2 title",
+                        Publications =
+                        [
+                            publicationC
+                        ]
+                    }
+                };
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1079,23 +931,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 };
 
                 var themes = new List<Theme>
-            {
-                new()
                 {
-                    Title = "Theme 1 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
-                            {
-                                publicationA,
-                                publicationB
-                            }
-                        }
+                        Title = "Theme 1 title",
+                        Publications =
+                        [
+                            publicationA,
+                            publicationB
+                        ]
                     }
-                }
-            };
+                };
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1172,26 +1018,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 };
 
                 var themes = new List<Theme>
-            {
-                new()
                 {
-                    Title = "Theme 1 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
-                            {
-                                publicationA,
-                                publicationB,
-                                publicationC,
-                                publicationD,
-                                publicationE
-                            }
-                        }
+                        Title = "Theme 1 title",
+                        Publications =
+                        [
+                            publicationA,
+                            publicationB,
+                            publicationC,
+                            publicationD,
+                            publicationE
+                        ]
                     }
-                }
-            };
+                };
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1237,45 +1077,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 };
 
                 var themes = new List<Theme>
-            {
-                new()
                 {
-                    Title = "Theme 1 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
-                            {
-                                publicationA,
-                                publicationB
-                            }
-                        }
+                        Title = "Theme 1 title",
+                        Publications =
+                        [
+                            publicationA,
+                            publicationB
+                        ],
                     },
-                },
-                new()
-                {
-                    Title = "Theme 2 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
+                        Title = "Theme 2 title",
+                        Publications =
+                        [
+                            new()
                             {
-                                new()
+                                Title = "Publication C",
+                                LatestPublishedReleaseVersion = new ReleaseVersion
                                 {
-                                    Title = "Publication C",
-                                    LatestPublishedReleaseVersion = new ReleaseVersion
-                                    {
-                                        Type = AdHocStatistics,
-                                        Published = new DateTime(2022, 1, 1)
-                                    }
+                                    Type = AdHocStatistics,
+                                    Published = new DateTime(2022, 1, 1)
                                 }
                             }
-                        }
-                    },
-                }
-            };
+                        ],
+                    }
+                };
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1347,25 +1175,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 };
 
                 var themes = new List<Theme>
-            {
-                new()
                 {
-                    Title = "Theme 1 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
-                            {
-                                publicationA,
-                                publicationB,
-                                publicationC,
-                                publicationD
-                            }
-                        }
-                    },
-                }
-            };
+                        Title = "Theme 1 title",
+                        Publications =
+                        [
+                            publicationA,
+                            publicationB,
+                            publicationC,
+                            publicationD
+                        ]
+                    }
+                };
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1427,37 +1249,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 };
 
                 var themes = new List<Theme>
-            {
-                new()
                 {
-                    Title = "Theme 1 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
-                            {
-                                publicationA,
-                                publicationB
-                            }
-                        }
+                        Title = "Theme 1 title",
+                        Publications =
+                        [
+                            publicationA,
+                            publicationB
+                        ],
                     },
-                },
-                new()
-                {
-                    Title = "Theme 2 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
-                            {
-                                publicationC
-                            }
-                        }
-                    },
-                }
-            };
+                        Title = "Theme 2 title",
+                        Publications =
+                        [
+                            publicationC
+                        ],
+                    }
+                };
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1506,12 +1316,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Published = DateTime.UtcNow
                 };
 
-                var topic = new Topic
+                var theme = new Theme
                 {
-                    Theme = new Theme
-                    {
-                        Title = "Theme title"
-                    }
+                    Title = "Theme title"
                 };
 
                 var publications = new List<Publication>
@@ -1522,7 +1329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication B",
                     LatestPublishedReleaseVersionId = releaseVersionB.Id,
                     LatestPublishedReleaseVersion = releaseVersionB,
-                    Topic = topic
+                    Theme = theme
                 },
                 new()
                 {
@@ -1530,7 +1337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication C",
                     LatestPublishedReleaseVersionId = releasedVersionC.Id,
                     LatestPublishedReleaseVersion = releasedVersionC,
-                    Topic = topic
+                    Theme = theme
                 },
                 new()
                 {
@@ -1538,7 +1345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication A",
                     LatestPublishedReleaseVersionId = releaseVersionA.Id,
                     LatestPublishedReleaseVersion = releaseVersionA,
-                    Topic = topic
+                    Theme = theme
                 },
             };
 
@@ -1602,12 +1409,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Published = DateTime.UtcNow
                 };
 
-                var topic = new Topic
+                var theme = new Theme
                 {
-                    Theme = new Theme
-                    {
-                        Title = "Theme title"
-                    }
+                    Title = "Theme title"
                 };
 
                 var publications = new List<Publication>
@@ -1618,7 +1422,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication B",
                     LatestPublishedReleaseVersionId = releaseVersionB.Id,
                     LatestPublishedReleaseVersion = releaseVersionB,
-                    Topic = topic
+                    Theme = theme
                 },
                 new()
                 {
@@ -1626,7 +1430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication C",
                     LatestPublishedReleaseVersionId = releaseVersionC.Id,
                     LatestPublishedReleaseVersion = releaseVersionC,
-                    Topic = topic
+                    Theme = theme
                 },
                 new()
                 {
@@ -1634,7 +1438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication A",
                     LatestPublishedReleaseVersionId = releaseVersionA.Id,
                     LatestPublishedReleaseVersion = releaseVersionA,
-                    Topic = topic
+                    Theme = theme
                 },
             };
 
@@ -1739,26 +1543,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 };
 
                 var themes = new List<Theme>
-            {
-                new()
                 {
-                    Title = "Theme 1 title",
-                    Topics =
-                    [
-                        new()
-                        {
-                            Publications =
-                            [
-                                publicationB,
-                                publicationC,
-                                publicationA,
-                                publicationD,
-                                publicationE
-                            ]
-                        }
-                    ]
-                }
-            };
+                    new()
+                    {
+                        Title = "Theme 1 title",
+                        Publications =
+                        [
+                            publicationB,
+                            publicationC,
+                            publicationA,
+                            publicationD,
+                            publicationE
+                        ]
+                    }
+                };
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1840,24 +1638,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 };
 
                 var themes = new List<Theme>
-            {
-                new()
                 {
-                    Title = "Theme 1 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
-                            {
-                                publicationB,
-                                publicationC,
-                                publicationA
-                            }
-                        }
+                        Title = "Theme 1 title",
+                        Publications =
+                        [
+                            publicationB,
+                            publicationC,
+                            publicationA
+                        ]
                     }
-                }
-            };
+                };
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1925,24 +1717,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 };
 
                 var themes = new List<Theme>
-            {
-                new()
                 {
-                    Title = "Theme 1 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
-                            {
-                                publicationB,
-                                publicationC,
-                                publicationA
-                            }
-                        }
+                        Title = "Theme 1 title",
+                        Publications =
+                        [
+                            publicationB,
+                            publicationC,
+                            publicationA
+                        ]
                     }
-                }
-            };
+                };
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -2010,24 +1796,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 };
 
                 var themes = new List<Theme>
-            {
-                new()
                 {
-                    Title = "Theme 1 title",
-                    Topics = new List<Topic>
+                    new()
                     {
-                        new()
-                        {
-                            Publications = new List<Publication>
-                            {
-                                publicationB,
-                                publicationC,
-                                publicationA
-                            }
-                        }
+                        Title = "Theme 1 title",
+                        Publications =
+                        [
+                            publicationB,
+                            publicationC,
+                            publicationA
+                        ]
                     }
-                }
-            };
+                };
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))

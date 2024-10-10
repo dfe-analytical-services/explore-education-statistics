@@ -13,7 +13,6 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${TOPIC_NAME}=                              %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=                        UI tests - prerelease %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}=                          UI test table
 ${DATABLOCK_FEATURED_NAME}=                 UI test featured table name
@@ -513,7 +512,7 @@ Validate methodology as Analyst user
 Unschedule release
     [Documentation]    EES-2826
     # EES-2826 Cancel scheduled publishing because ReleaseStatus row in table storage isn't removed
-    # by test topic teardown. Unscheduling prevents an error when the scheduled publishing begins.
+    # by test theme teardown. Unscheduling prevents an error when the scheduled publishing begins.
     user changes to bau1
     user navigates to admin frontend    ${RELEASE_URL}/status
     user puts release into draft    expected_next_release_date=January 2001

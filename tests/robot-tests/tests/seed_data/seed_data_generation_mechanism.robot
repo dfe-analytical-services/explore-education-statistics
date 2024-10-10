@@ -4,7 +4,7 @@
 # keywords in regular test runs prevents them from becoming stale over time in between them being used to
 # seed / reseed environments.
 #
-# Because these tests set up data under the standard Test Topic set up for each unique test run, they will be
+# Because these tests set up data under the standard Test Theme set up for each unique test run, they will be
 # torn down again afterwards.
 #
 

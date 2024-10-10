@@ -1,211 +1,81 @@
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.ViewModels
 {
     public class AllMethodologiesThemeViewModelTests
     {
         [Fact]
-        public void RemoveTopicNodesWithoutMethodologiesAndSort_RemovesTopicsWithoutMethodologies()
+        public void RemovePublicationNodesWithoutMethodologiesAndSort_RemovesPublicationsWithoutMethodologies()
         {
             var model = new AllMethodologiesThemeViewModel
             {
-                Title = "ThemeWithTopics",
-                Topics = AsList(
-                    new AllMethodologiesTopicViewModel
+                Title = "ThemeWithPublications",
+                Publications = [
+                    new AllMethodologiesPublicationViewModel
                     {
-                        Title = "TopicWithoutPublications",
-                        Publications = new List<AllMethodologiesPublicationViewModel>()
+                        Title = "PublicationWithoutMethodology",
+                        Methodologies = []
                     },
-                    new AllMethodologiesTopicViewModel
+                    new AllMethodologiesPublicationViewModel
                     {
-                        Title = "TopicWithPublicationsButNoMethodologies",
-                        Publications = AsList(
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "PublicationWithNoMethodologies",
-                                Methodologies = new List<MethodologyVersionSummaryViewModel>()
-                            }
-                        )
-                    },
-                    new AllMethodologiesTopicViewModel
-                    {
-                        Title = "TopicWithPublications",
-                        Publications = AsList(
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "PublicationWithMethodologies",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel()
-                                )
-                            },
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "PublicationWithoutMethodologies",
-                                Methodologies = new List<MethodologyVersionSummaryViewModel>()
-                            }
-                        )
+                        Title = "PublicationWithMethodology",
+                        Methodologies = [new()]
                     }
-                )
+                ]
             };
 
-            model.RemoveTopicNodesWithoutMethodologiesAndSort();
+            model.RemovePublicationNodesWithoutMethodologiesAndSort();
 
-            Assert.Single(model.Topics);
-            Assert.Equal("TopicWithPublications", model.Topics[0].Title);
-            Assert.Single(model.Topics[0].Publications);
-            Assert.Equal("PublicationWithMethodologies", model.Topics[0].Publications[0].Title);
+            Assert.Single(model.Publications);
+            Assert.Equal("PublicationWithMethodology", model.Publications[0].Title);
         }
 
         [Fact]
-        public void RemoveTopicNodesWithoutMethodologiesAndSort_SortsTopicsAndPublicationsByTitle()
+        public void RemovePublicationNodesWithoutMethodologiesAndSort_SortsPublicationsByTitle()
         {
             var model = new AllMethodologiesThemeViewModel
             {
-                Title = "ThemeWithTopics",
-                Topics = AsList(
-                    new AllMethodologiesTopicViewModel
+                Title = "ThemeWithPublications",
+                Publications = [
+                    new AllMethodologiesPublicationViewModel
                     {
-                        Title = "Topic C",
-                        Publications = AsList(
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "Topic C Publication C",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel()
-                                )
-                            },
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "Topic C Publication A",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel()
-                                )
-                            },
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "Topic C Publication B",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel()
-                                )
-                            }
-                        )
+                        Title = "Publication C",
+                        Methodologies = [new()]
                     },
-                    new AllMethodologiesTopicViewModel
+                    new AllMethodologiesPublicationViewModel
                     {
-                        Title = "Topic A",
-                        Publications = AsList(
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "Topic A Publication C",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel()
-                                )
-                            },
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "Topic A Publication A",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel()
-                                )
-                            },
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "Topic A Publication B",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel()
-                                )
-                            }
-                        )
+                        Title = "Publication A",
+                        Methodologies = [new()]
                     },
-                    new AllMethodologiesTopicViewModel
+                    new AllMethodologiesPublicationViewModel
                     {
-                        Title = "Topic B",
-                        Publications = AsList(
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "Topic B Publication C",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel()
-                                )
-                            },
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "Topic B Publication A",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel()
-                                )
-                            },
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Title = "Topic B Publication B",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel()
-                                )
-                            }
-                        )
+                        Title = "Publication B",
+                        Methodologies = [new()]
                     }
-                )
+                ]
             };
 
-            model.RemoveTopicNodesWithoutMethodologiesAndSort();
+            model.RemovePublicationNodesWithoutMethodologiesAndSort();
 
-            Assert.Equal(3, model.Topics.Count);
-
-            Assert.Equal("Topic A", model.Topics[0].Title);
-            Assert.Equal("Topic B", model.Topics[1].Title);
-            Assert.Equal("Topic C", model.Topics[2].Title);
-
-            Assert.Equal(3, model.Topics[0].Publications.Count);
-            Assert.Equal("Topic A Publication A", model.Topics[0].Publications[0].Title);
-            Assert.Equal("Topic A Publication B", model.Topics[0].Publications[1].Title);
-            Assert.Equal("Topic A Publication C", model.Topics[0].Publications[2].Title);
-
-            Assert.Equal(3, model.Topics[1].Publications.Count);
-            Assert.Equal("Topic B Publication A", model.Topics[1].Publications[0].Title);
-            Assert.Equal("Topic B Publication B", model.Topics[1].Publications[1].Title);
-            Assert.Equal("Topic B Publication C", model.Topics[1].Publications[2].Title);
-
-            Assert.Equal(3, model.Topics[2].Publications.Count);
-            Assert.Equal("Topic C Publication A", model.Topics[2].Publications[0].Title);
-            Assert.Equal("Topic C Publication B", model.Topics[2].Publications[1].Title);
-            Assert.Equal("Topic C Publication C", model.Topics[2].Publications[2].Title);
+            Assert.Equal(3, model.Publications.Count);
+            Assert.Equal("Publication A", model.Publications[0].Title);
+            Assert.Equal("Publication B", model.Publications[1].Title);
+            Assert.Equal("Publication C", model.Publications[2].Title);
         }
 
         [Fact]
-        public void RemoveTopicNodesWithoutMethodologiesAndSort_HandlesEmptyTopics()
+        public void RemovePublicationNodesWithoutMethodologiesAndSort_HandlesEmptyPublications()
         {
             var model = new AllMethodologiesThemeViewModel
             {
-                Title = "ThemeWithoutTopics",
-                Topics = new List<AllMethodologiesTopicViewModel>()
+                Title = "ThemeWithoutPublications",
+                Publications = []
             };
 
-            model.RemoveTopicNodesWithoutMethodologiesAndSort();
+            model.RemovePublicationNodesWithoutMethodologiesAndSort();
 
-            Assert.Empty(model.Topics);
-        }
-
-        [Fact]
-        public void RemoveTopicNodesWithoutMethodologiesAndSort_HandlesEmptyPublications()
-        {
-            var model = new AllMethodologiesThemeViewModel
-            {
-                Title = "ThemeWithTopics",
-                Topics = AsList(
-                    new AllMethodologiesTopicViewModel
-                    {
-                        Title = "TopicWithoutPublications",
-                        Publications = new List<AllMethodologiesPublicationViewModel>()
-                    }
-                )
-            };
-
-            model.RemoveTopicNodesWithoutMethodologiesAndSort();
-
-            Assert.Empty(model.Topics);
+            Assert.Empty(model.Publications);
         }
     }
 }

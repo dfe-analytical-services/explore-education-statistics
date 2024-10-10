@@ -3,27 +3,21 @@ import { Locator, Page } from '@playwright/test';
 export default class AdminPage {
   readonly page: Page;
   readonly signInButton: Locator;
-  readonly manageThemesTopicLink: Locator;
+  readonly manageThemesLink: Locator;
   readonly createNewPublicationButton: Locator;
   readonly themeDropdown: Locator;
-  readonly topicDropdown: Locator;
   readonly publicationLink: (text: string) => Locator;
 
   constructor(page: Page) {
     this.page = page;
     // Locators
     this.signInButton = page.locator('button[id="signin-button"]');
-    this.manageThemesTopicLink = page.locator(
-      '//a[text()="manage themes and topics" ]',
-    );
+    this.manageThemesLink = page.locator('//a[text()="manage themes" ]');
     this.createNewPublicationButton = page.locator(
       '//a[contains(text(),"Create new publication")]',
     );
     this.themeDropdown = page.locator(
-      'select[id="publicationsReleases-themeTopic-themeId"]',
-    );
-    this.topicDropdown = page.locator(
-      'select[id="publicationsReleases-themeTopic-topicId"]',
+      'select[id="publicationsReleases-theme-themeId"]',
     );
     this.publicationLink = (text: string) =>
       page.locator(`//a[text()="${text}"]`);
@@ -33,7 +27,7 @@ export default class AdminPage {
     this.signInButton.click();
   }
 
-  async selectTestThemeAndTestTopic() {
+  async selectTestTheme() {
     await this.themeDropdown.selectOption({ label: 'Test theme' });
   }
 

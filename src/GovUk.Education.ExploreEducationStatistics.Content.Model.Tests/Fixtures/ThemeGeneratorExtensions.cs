@@ -1,7 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
@@ -20,6 +20,36 @@ public static class ThemeGeneratorExtensions
             .SetDefault(t => t.Summary)
             .SetDefault(t => t.Title);
 
+    public static Generator<Theme> WithPublications(
+        this Generator<Theme> generator,
+        IEnumerable<Publication> publications)
+        => generator.ForInstance(s => s.SetPublications(publications));
+
+    public static Generator<Theme> WithPublications(
+        this Generator<Theme> generator,
+        Func<SetterContext, IEnumerable<Publication>> publications)
+        => generator.ForInstance(s => s.SetPublications(publications.Invoke));
+
+    public static InstanceSetters<Theme> SetPublications(
+        this InstanceSetters<Theme> setters,
+        IEnumerable<Publication> publications)
+        => setters.SetPublications(_ => publications);
+
+    public static InstanceSetters<Theme> SetPublications(
+        this InstanceSetters<Theme> setters,
+        Func<SetterContext, IEnumerable<Publication>> publications)
+        => setters.Set(
+            t => t.Publications,
+            (_, theme, context) =>
+            {
+                var list = publications.Invoke(context).ToList();
+
+                list.ForEach(publication => publication.Theme = theme);
+
+                return list;
+            }
+        );
+
     public static Generator<Theme> WithSlug(
         this Generator<Theme> generator,
         string slug)
@@ -34,36 +64,6 @@ public static class ThemeGeneratorExtensions
         this Generator<Theme> generator,
         string title)
         => generator.ForInstance(s => s.SetTitle(title));
-
-    public static Generator<Theme> WithTopics(
-        this Generator<Theme> generator,
-        IEnumerable<Topic> topics)
-        => generator.ForInstance(s => s.SetTopics(topics));
-
-    public static Generator<Theme> WithTopics(
-        this Generator<Theme> generator,
-        Func<SetterContext, IEnumerable<Topic>> topics)
-        => generator.ForInstance(s => s.SetTopics(topics.Invoke));
-
-    public static InstanceSetters<Theme> SetTopics(
-        this InstanceSetters<Theme> setters,
-        IEnumerable<Topic> topics)
-        => setters.SetTopics(_ => topics);
-
-    private static InstanceSetters<Theme> SetTopics(
-        this InstanceSetters<Theme> setters,
-        Func<SetterContext, IEnumerable<Topic>> topics)
-        => setters.Set(
-            t => t.Topics,
-            (_, theme, context) =>
-            {
-                var list = topics.Invoke(context).ToList();
-
-                list.ForEach(topic => topic.Theme = theme);
-
-                return list;
-            }
-        );
 
     public static InstanceSetters<Theme> SetSlug(
         this InstanceSetters<Theme> setters,

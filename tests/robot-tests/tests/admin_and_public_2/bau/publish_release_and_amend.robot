@@ -20,7 +20,7 @@ ${DATABLOCK_NAME}=      Dates data block name
 
 
 *** Test Cases ***
-Create new publication for "UI tests topic" topic
+Create new publication for "UI tests theme" theme
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user creates test release via api    ${PUBLICATION_ID}    FY    3000
 

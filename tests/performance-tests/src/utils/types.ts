@@ -58,18 +58,6 @@ export type OverallStage =
   | 'Started'
   | 'Superseded';
 
-export interface Topic {
-  id: string;
-  title: string;
-  themeId: string;
-}
-
-export interface ThemeAndTopics {
-  id: string;
-  title: string;
-  topics: Topic[];
-}
-
 export interface Release {
   id: string;
   year: number;
@@ -79,6 +67,7 @@ export interface Release {
 export interface Publication {
   id: string;
   title: string;
+  themeId: string;
 }
 
 export default {};

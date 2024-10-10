@@ -6,7 +6,7 @@ import ThemesPage from '@admin/pages/ThemesPage';
 import CreateThemePage from '@admin/pages/CreateThemePage';
 import uiTestString from '@util/uiTestString';
 
-test.describe('Verify the end to end functionality of themes and topics', () => {
+test.describe('Verify the end to end functionality of themes', () => {
   let adminPage: AdminPage;
   let themesPage: ThemesPage;
   let createThemePage: CreateThemePage;
@@ -24,7 +24,7 @@ test.describe('Verify the end to end functionality of themes and topics', () => 
   });
 
   test('Verify that themes are being created and displayed in the themes home screen', async () => {
-    await adminPage.manageThemesTopicLink.click();
+    await adminPage.manageThemesLink.click();
     await themesPage.createThemeLink.click();
 
     const uiThemeTitle = uiTestString('Test theme');

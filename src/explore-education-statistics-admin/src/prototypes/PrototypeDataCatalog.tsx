@@ -80,12 +80,12 @@ const PrototypeDataCatalogue = () => {
   /* eslint-disable-next-line */
   const filteredPublications = useMemo(() => {
     const themeTitle = getSelectedTheme(selectedTheme)?.title;
-    const filteredByThemeAndTopic =
+    const filteredByTheme =
       selectedTheme === 'all-themes'
         ? publications
         : publications.filter(publication => publication.theme === themeTitle);
 
-    const filtered = filteredByThemeAndTopic.filter(publication => {
+    const filtered = filteredByTheme.filter(publication => {
       return selectedReleaseType && selectedReleaseType !== 'all-release-types'
         ? publication.type ===
             releaseTypes[selectedReleaseType as keyof typeof releaseTypes]
