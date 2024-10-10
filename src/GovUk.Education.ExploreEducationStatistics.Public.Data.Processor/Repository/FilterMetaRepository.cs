@@ -32,7 +32,6 @@ public class FilterMetaRepository(
             duckDbConnection,
             dataSetVersion,
             allowedColumns,
-            publicIdMappings: [],
             cancellationToken);
 
         return await metas
@@ -56,11 +55,14 @@ public class FilterMetaRepository(
     {
         var publicIdMappings = await CreatePublicIdMappings(dataSetVersion, cancellationToken);
 
+        var currentMetaId = await publicDataDbContext.NextSequenceValue(
+            PublicDataDbContext.FilterMetasIdSequence,
+            cancellationToken);
+
         var metas = await GetFilterMetas(
             duckDbConnection,
             dataSetVersion,
             allowedColumns,
-            publicIdMappings.Filters,
             cancellationToken);
 
         publicDataDbContext.FilterMetas.AddRange(metas);
@@ -68,6 +70,9 @@ public class FilterMetaRepository(
 
         foreach (var meta in metas)
         {
+            meta.Id = currentMetaId++;
+            meta.PublicId = publicIdMappings.Filters.GetValueOrDefault(meta.Column, SqidEncoder.Encode(meta.Id));
+
             var options = await GetFilterOptionMeta(
                 duckDbConnection,
                 dataSetVersion,
@@ -88,7 +93,7 @@ public class FilterMetaRepository(
                 .InsertWhenNotMatched()
                 .MergeAsync(cancellationToken);
 
-            var currentId = await publicDataDbContext.NextSequenceValue(
+            var currentLinkId = await publicDataDbContext.NextSequenceValue(
                 PublicDataDbContext.FilterOptionMetaLinkSequence,
                 cancellationToken);
 
@@ -121,7 +126,7 @@ public class FilterMetaRepository(
                             publicIdMappings: publicIdMappings,
                             filter: meta,
                             option: option,
-                            defaultPublicIdFn: () => SqidEncoder.Encode(currentId++)),
+                            defaultPublicIdFn: () => SqidEncoder.Encode(currentLinkId++)),
                         MetaId = meta.Id,
                         OptionId = option.Id
                     })
@@ -146,15 +151,26 @@ public class FilterMetaRepository(
 
             // Avoid trying to set to 0 (which only
             // happens synthetically during tests).
-            if (currentId > 1)
+            if (currentLinkId > 1)
             {
                 // Increase the sequence only by the amount that we used to generate new PublicIds.
                 await publicDataDbContext.SetSequenceValue(
                     PublicDataDbContext.FilterOptionMetaLinkSequence,
-                    currentId - 1,
+                    currentLinkId - 1,
                     cancellationToken
                 );
             }
+        }
+
+        // Avoid trying to set to 0 (which only
+        // happens synthetically during tests).
+        if (currentMetaId > 1)
+        {
+            await publicDataDbContext.SetSequenceValue(
+                PublicDataDbContext.FilterMetasIdSequence,
+                currentMetaId - 1,
+                cancellationToken
+            );
         }
     }
 
@@ -162,13 +178,8 @@ public class FilterMetaRepository(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        Dictionary<string, string> publicIdMappings,
         CancellationToken cancellationToken)
     {
-        var currentId = await publicDataDbContext.NextSequenceValue(
-            PublicDataDbContext.FilterMetasIdSequence,
-            cancellationToken);
-
         var metaRows = await duckDbConnection.SqlBuilder(
                 $"""
                  SELECT *
@@ -178,36 +189,17 @@ public class FilterMetaRepository(
                  """)
             .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken);
 
-        var metas = metaRows
+        return metaRows
             .OrderBy(row => row.Label)
-            .Select(row =>
+            .Select(row => new FilterMeta
             {
-                var id = currentId++;
-
-                return new FilterMeta
-                {
-                    Id = id,
-                    PublicId = publicIdMappings.GetValueOrDefault(row.ColName, SqidEncoder.Encode(id)),
-                    Column = row.ColName,
-                    DataSetVersionId = dataSetVersion.Id,
-                    Label = row.Label,
-                    Hint = row.FilterHint ?? string.Empty
-                };
+                PublicId = string.Empty,
+                Column = row.ColName,
+                DataSetVersionId = dataSetVersion.Id,
+                Label = row.Label,
+                Hint = row.FilterHint ?? string.Empty
             })
             .ToList();
-
-        // Avoid trying to set to 0 (which only
-        // happens synthetically during tests).
-        if (currentId > 1)
-        {
-            await publicDataDbContext.SetSequenceValue(
-                PublicDataDbContext.FilterMetasIdSequence,
-                currentId - 1,
-                cancellationToken
-            );
-        }
-
-        return metas;
     }
 
     private async Task<List<FilterOptionMeta>> GetFilterOptionMeta(
