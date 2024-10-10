@@ -30,7 +30,7 @@
   {
     "publication_summary": "Apprenticeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships",
-    "published": "12 Sep 2024",
+    "published": "10 Oct 2024",
     "release_type": "Accredited official statistics",
     "theme": "Further education"
   },
@@ -490,6 +490,13 @@
     "theme": "Higher education"
   },
   {
+    "publication_summary": "Phonics screening check attainment statistics of pupils in England by pupil characteristics, school characteristics, region and local authority.",
+    "publication_title": "Phonics screening check attainment",
+    "published": "10 Oct 2024",
+    "release_type": "Accredited official statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
     "publication_summary": "Local authority (LA) spending plans for education, children's services and social care.",
     "publication_title": "Planned LA and school expenditure",
     "published": "26 Sep 2024",
@@ -527,7 +534,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "26 Sep 2024",
+    "published": "10 Oct 2024",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
