@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Asp.Versioning;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -24,8 +25,8 @@ public class DataSetVersionsController(
     /// List a data set’s versions. Only provides summary information of each version.
     /// </remarks>
     [HttpGet]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The paginated list of data set versions", type: typeof(DataSetVersionPaginatedListViewModel))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [SwaggerResponse(200, "The paginated list of data set versions.", type: typeof(DataSetVersionPaginatedListViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListDataSetVersions(
@@ -49,8 +50,8 @@ public class DataSetVersionsController(
     /// Get a data set version's summary details.
     /// </remarks>
     [HttpGet("{dataSetVersion}")]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The requested data set version", type: typeof(DataSetVersionViewModel))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [SwaggerResponse(200, "The requested data set version.", type: typeof(DataSetVersionViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionViewModel>> GetDataSetVersion(
@@ -73,8 +74,8 @@ public class DataSetVersionsController(
     /// Lists the changes made by a data set version relative to the version prior to it.
     /// </remarks>
     [HttpGet("{dataSetVersion}/changes")]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The changes for this data set version", type: typeof(DataSetVersionChangesViewModel))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [SwaggerResponse(200, "The changes for the data set version.", type: typeof(DataSetVersionChangesViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionChangesViewModel>> GetDataSetVersionChanges(

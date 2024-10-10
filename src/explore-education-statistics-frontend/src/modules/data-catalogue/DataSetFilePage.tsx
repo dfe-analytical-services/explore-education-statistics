@@ -216,7 +216,7 @@ export default function DataSetFilePage({
               }}
             />
 
-            <div className="govuk-grid-column-two-thirds">
+            <div className="govuk-grid-column-three-quarters">
               <DataSetFileDetails
                 dataSetFile={dataSetFile}
                 hasApiDataSet={!!apiDataSet}
@@ -259,8 +259,9 @@ export default function DataSetFilePage({
 
                   {apiDataSetVersionChanges && (
                     <DataSetFileApiChangelog
-                      version={apiDataSetVersion.version}
                       changes={apiDataSetVersionChanges}
+                      guidanceNotes={apiDataSetVersion.notes}
+                      version={apiDataSetVersion.version}
                     />
                   )}
                 </>

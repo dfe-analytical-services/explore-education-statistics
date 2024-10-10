@@ -335,7 +335,7 @@ describe('getInvalidContent', () => {
     ]);
   });
 
-  test('returns an error when the link text is just one word', () => {
+  test('returns an error when the link text is an inaccessible word or phrase', () => {
     const testContent: JsonElement[] = [
       {
         name: 'paragraph',
@@ -366,39 +366,7 @@ describe('getInvalidContent', () => {
               linkHref: 'https://bbc.co.uk',
               linkOpenInNewTab: true,
             },
-            data: 'link',
-          },
-          {
-            data: ' words',
-          },
-        ],
-      },
-    ];
-
-    const result = getInvalidContent(testContent);
-
-    expect(result).toEqual([
-      {
-        type: 'oneWordLinkText',
-        message: 'link',
-      },
-    ]);
-  });
-
-  test('returns an error when the link text is "click here"', () => {
-    const testContent: JsonElement[] = [
-      {
-        name: 'paragraph',
-        children: [
-          {
-            data: 'words ',
-          },
-          {
-            attributes: {
-              linkHref: 'https://gov.uk',
-              linkOpenInNewTab: true,
-            },
-            data: 'link to something',
+            data: 'learn more',
           },
           {
             data: ' words',
@@ -416,7 +384,7 @@ describe('getInvalidContent', () => {
               linkHref: 'https://bbc.co.uk',
               linkOpenInNewTab: true,
             },
-            data: 'click here',
+            data: ' learn more ',
           },
           {
             data: ' words',
@@ -429,7 +397,12 @@ describe('getInvalidContent', () => {
 
     expect(result).toEqual([
       {
-        type: 'clickHereLinkText',
+        type: 'badLinkText',
+        message: 'learn more',
+      },
+      {
+        type: 'badLinkText',
+        message: ' learn more ',
       },
     ]);
   });

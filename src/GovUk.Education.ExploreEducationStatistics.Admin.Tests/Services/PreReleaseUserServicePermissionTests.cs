@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -9,8 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -102,30 +102,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private PreReleaseUserService SetupPreReleaseUserService(
             ContentDbContext? context = null,
             UsersAndRolesDbContext? usersAndRolesDbContext = null,
-            IConfiguration? configuration = null,
             IEmailService? emailService = null,
+            IOptions<AppOptions>? appOptions = null,
+            IOptions<NotifyOptions>? notifyOptions = null,
             IPreReleaseService? preReleaseService = null,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IUserService? userService = null,
             IUserRepository? userRepository = null,
             IUserInviteRepository? userInviteRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-            IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-            IHttpContextAccessor? httpContextAccessor = null)
+            IUserReleaseInviteRepository? userReleaseInviteRepository = null)
         {
             return new(
                 context ?? Mock.Of<ContentDbContext>(),
                 usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
-                configuration ?? Mock.Of<IConfiguration>(Strict),
                 emailService ?? Mock.Of<IEmailService>(Strict),
+                appOptions ?? Mock.Of<IOptions<AppOptions>>(Strict),
+                notifyOptions ?? Mock.Of<IOptions<NotifyOptions>>(Strict),
                 preReleaseService ?? Mock.Of<IPreReleaseService>(Strict),
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 userService ?? Mock.Of<IUserService>(Strict),
                 userRepository ?? Mock.Of<IUserRepository>(Strict),
                 userInviteRepository ?? Mock.Of<IUserInviteRepository>(Strict),
                 userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
-                userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict),
-                httpContextAccessor ?? Mock.Of<IHttpContextAccessor>(Strict)
+                userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict)
             );
         }
     }

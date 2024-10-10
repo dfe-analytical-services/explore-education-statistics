@@ -64,8 +64,8 @@ public class DataSetVersionChangeService(
             GetFilterChanges(dataSetVersion.FilterMetaChanges);
         var filterOptionChanges =
             GetFilterOptionChanges(dataSetVersion.FilterOptionMetaChanges);
-        var geographicLevelOptionChange =
-            GetGeographicLevelOptionChange(dataSetVersion.GeographicLevelMetaChange);
+        var geographicLevelChanges =
+            GetGeographicLevelChanges(dataSetVersion.GeographicLevelMetaChange);
         var indicatorChanges =
             GetIndicatorChanges(dataSetVersion.IndicatorMetaChanges);
         var locationGroupChanges =
@@ -81,7 +81,7 @@ public class DataSetVersionChangeService(
             {
                 Filters = filterChanges?.GetValueOrDefault(ChangeType.Major),
                 FilterOptions = filterOptionChanges?.GetValueOrDefault(ChangeType.Major),
-                GeographicLevels = geographicLevelOptionChange?.GetValueOrDefault(ChangeType.Major),
+                GeographicLevels = geographicLevelChanges?.GetValueOrDefault(ChangeType.Major),
                 Indicators = indicatorChanges?.GetValueOrDefault(ChangeType.Major),
                 LocationGroups = locationGroupChanges?.GetValueOrDefault(ChangeType.Major),
                 LocationOptions = locationOptionChanges?.GetValueOrDefault(ChangeType.Major),
@@ -91,7 +91,7 @@ public class DataSetVersionChangeService(
             {
                 Filters = filterChanges?.GetValueOrDefault(ChangeType.Minor),
                 FilterOptions = filterOptionChanges?.GetValueOrDefault(ChangeType.Minor),
-                GeographicLevels = geographicLevelOptionChange?.GetValueOrDefault(ChangeType.Minor),
+                GeographicLevels = geographicLevelChanges?.GetValueOrDefault(ChangeType.Minor),
                 Indicators = indicatorChanges?.GetValueOrDefault(ChangeType.Minor),
                 LocationGroups = locationGroupChanges?.GetValueOrDefault(ChangeType.Minor),
                 LocationOptions = locationOptionChanges?.GetValueOrDefault(ChangeType.Minor),
@@ -174,7 +174,7 @@ public class DataSetVersionChangeService(
             : null;
     }
 
-    private static Dictionary<ChangeType, List<GeographicLevelOptionChangeViewModel>>? GetGeographicLevelOptionChange(
+    private static Dictionary<ChangeType, List<GeographicLevelChangeViewModel>>? GetGeographicLevelChanges(
         GeographicLevelMetaChange? change)
     {
         if (change is null)
@@ -190,17 +190,17 @@ public class DataSetVersionChangeService(
             return null;
         }
 
-        List<GeographicLevelOptionChangeViewModel> changes =
+        List<GeographicLevelChangeViewModel> changes =
         [
             ..currentLevels
                 .Where(level => !previousLevels.Contains(level))
-                .Select(level => new GeographicLevelOptionChangeViewModel
+                .Select(level => new GeographicLevelChangeViewModel
                 {
                     CurrentState = GeographicLevelViewModel.Create(level),
                 }),
             ..previousLevels
                 .Where(level => !currentLevels.Contains(level))
-                .Select(level => new GeographicLevelOptionChangeViewModel
+                .Select(level => new GeographicLevelChangeViewModel
                 {
                     PreviousState = GeographicLevelViewModel.Create(level),
                 }),

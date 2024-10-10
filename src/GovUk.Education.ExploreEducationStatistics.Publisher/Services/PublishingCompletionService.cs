@@ -29,7 +29,10 @@ public class PublishingCompletionService(
     {
         var releaseStatuses = await releasePublishingKeys
             .ToAsyncEnumerable()
-            .SelectAwait(async key => await releasePublishingStatusService.Get(key))
+            .SelectAwait(async key =>
+            {
+                return await releasePublishingStatusService.Get(key);
+            })
             .ToListAsync();
 
         var prePublishingStagesComplete = releaseStatuses
@@ -43,9 +46,8 @@ public class PublishingCompletionService(
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(status =>
-                releasePublishingStatusService.UpdatePublishingStage(status.AsTableRowKey(),
-                    ReleasePublishingStatusPublishingStage.Started));
+            .ForEachAwaitAsync(status => releasePublishingStatusService.UpdatePublishingStage(status.AsTableRowKey(),
+                ReleasePublishingStatusPublishingStage.Started));
 
         var releaseVersionIdsToUpdate = prePublishingStagesComplete
             .Select(status => status.ReleaseVersionId)
@@ -117,8 +119,9 @@ public class PublishingCompletionService(
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async status => await releasePublishingStatusService
-                .UpdatePublishingStage(status.AsTableRowKey(), ReleasePublishingStatusPublishingStage.Complete));
+            .ForEachAwaitAsync(async status =>
+                await releasePublishingStatusService
+                    .UpdatePublishingStage(status.AsTableRowKey(), ReleasePublishingStatusPublishingStage.Complete));
     }
 
     private async Task UpdateLatestPublishedRelease(Guid publicationId)

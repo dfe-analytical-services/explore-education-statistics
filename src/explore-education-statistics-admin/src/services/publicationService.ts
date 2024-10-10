@@ -67,6 +67,7 @@ export interface PublicationSaveRequest {
   title: string;
   summary: string;
   supersededById?: string;
+  themeId: string;
   topicId: string;
 }
 
@@ -75,6 +76,7 @@ export interface PublicationCreateRequest {
   summary: string;
   contact: ContactSave;
   supersededById?: string;
+  themeId: string;
   topicId: string;
 }
 

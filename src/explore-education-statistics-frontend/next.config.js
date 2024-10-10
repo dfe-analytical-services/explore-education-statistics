@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign */
+const withBundleAnalyzer = require('@next/bundle-analyzer');
 const path = require('path');
 
 /**
@@ -96,4 +97,6 @@ const nextConfig = {
       : [],
 };
 
-module.exports = nextConfig;
+module.exports = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})(nextConfig);

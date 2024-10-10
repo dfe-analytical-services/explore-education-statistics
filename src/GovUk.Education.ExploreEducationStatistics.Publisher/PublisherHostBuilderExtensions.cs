@@ -21,8 +21,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
@@ -81,15 +81,15 @@ public static class PublisherHostBuilderExtensions
                             providerOptions => providerOptions.EnableCustomRetryOnFailure()))
                     .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                         new FileStorageService(
-                            provider.GetRequiredService<IOptions<AppSettingsOptions>>().Value.PublisherStorageConnectionString))
+                            provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
                     .AddScoped<IPublishingService, PublishingService>()
                     .AddScoped<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
                         new PublicBlobStorageService(
-                            provider.GetRequiredService<IOptions<AppSettingsOptions>>().Value.PublicStorageConnectionString,
+                            provider.GetRequiredService<IOptions<AppOptions>>().Value.PublicStorageConnectionString,
                             provider.GetRequiredService<ILogger<IBlobStorageService>>()))
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                         new PrivateBlobStorageService(
-                            provider.GetRequiredService<IOptions<AppSettingsOptions>>().Value.PrivateStorageConnectionString,
+                            provider.GetRequiredService<IOptions<AppOptions>>().Value.PrivateStorageConnectionString,
                             provider.GetRequiredService<ILogger<IBlobStorageService>>()))
                     .AddScoped<IContentService, ContentService>(provider =>
                         new ContentService(
@@ -105,9 +105,9 @@ public static class PublisherHostBuilderExtensions
                             methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
                             publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()))
                     .AddScoped<IReleaseService, ReleaseService>()
-                    .AddScoped<IPublisherTableStorageService, PublisherTableStorageService>(provider =>
+                    .AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(provider =>
                         new PublisherTableStorageService(
-                            provider.GetRequiredService<IOptions<AppSettingsOptions>>().Value.PublisherStorageConnectionString))
+                            provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
                     .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()
                     .AddScoped<IMethodologyRepository, MethodologyRepository>()
                     .AddScoped<IMethodologyService, MethodologyService>()
@@ -124,10 +124,10 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
                     .AddSingleton<INotifierClient, NotifierClient>(provider => new NotifierClient(
-                        provider.GetRequiredService<IOptions<AppSettingsOptions>>().Value.NotifierStorageConnectionString))
+                        provider.GetRequiredService<IOptions<AppOptions>>().Value.NotifierStorageConnectionString))
                     .AddSingleton<IPublisherClient, PublisherClient>(provider => new PublisherClient(
-                        provider.GetRequiredService<IOptions<AppSettingsOptions>>().Value.PublisherStorageConnectionString))
-                    .Configure<AppSettingsOptions>(configuration.GetSection(AppSettingsOptions.Section));
+                        provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString))
+                    .Configure<AppOptions>(configuration.GetSection(AppOptions.Section));
 
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
                 if (publicDataDbExists)

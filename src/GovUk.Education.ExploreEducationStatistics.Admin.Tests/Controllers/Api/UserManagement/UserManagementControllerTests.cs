@@ -13,7 +13,7 @@ public class UserManagementControllerTests(TestApplicationFactory testApp) : Int
     public class DeleteUserTests(TestApplicationFactory testApp) : UserManagementControllerTests(testApp)
     {
         [Theory]
-        [InlineData("BAU User", true)]
+        [InlineData("BAU User", false)]
         [InlineData("Analyst", false)]
         [InlineData("Prerelease User", false)]
         public async Task PermissionCheck(

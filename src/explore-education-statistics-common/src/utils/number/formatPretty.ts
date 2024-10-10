@@ -20,7 +20,7 @@ export default function formatPretty(
   decimalPlaces?: number,
 ): string {
   switch (unit) {
-    case 'numberstring':
+    case 'string':
       return String(value);
     case '£': {
       const formattedNumber = formatNumber(value, decimalPlaces);

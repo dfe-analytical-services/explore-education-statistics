@@ -5,9 +5,9 @@ import React, { ReactNode } from 'react';
 interface Props {
   className?: string;
   id: string;
+  inline?: boolean;
   label?: string | ReactNode;
   labelHidden?: boolean;
-  widthLimited?: boolean;
   testId?: string;
   url: string;
 }
@@ -15,17 +15,17 @@ interface Props {
 export default function UrlContainer({
   className,
   id,
+  inline = true,
   label = 'URL',
   labelHidden,
-  widthLimited,
   testId = id,
   url,
 }: Props) {
   return (
     <div
-      className={classNames(className, {
-        'dfe-flex dfe-align-items--center': !labelHidden,
-        'dfe-flex-grow--1': !widthLimited,
+      className={classNames(className, 'dfe-flex dfe-flex-wrap', {
+        'dfe-flex-direction--column': !inline,
+        'dfe-align-items--center': inline,
       })}
     >
       <label
@@ -33,18 +33,19 @@ export default function UrlContainer({
         className={classNames({
           'govuk-visually-hidden': labelHidden,
           'govuk-!-margin-right-2': !labelHidden,
+          'govuk-!-display-block govuk-!-margin-bottom-1': !inline,
         })}
       >
         {label}
       </label>
       <input
-        type="text"
-        value={url}
-        id={id}
         className={styles.url}
         data-testid={testId}
-        onFocus={e => e.target.select()}
+        id={id}
         readOnly
+        type="text"
+        value={url}
+        onFocus={e => e.target.select()}
       />
     </div>
   );

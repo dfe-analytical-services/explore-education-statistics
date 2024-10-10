@@ -1,6 +1,5 @@
 #nullable enable
 using FluentValidation;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
@@ -19,7 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Settings;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -126,6 +125,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Security;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -263,8 +263,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             //
             // TODO EES-4869 - review if we want to keep these features of Identity Framework or not.
             services
-                .AddIdentityCore<ApplicationUser>()
-                .AddRoles<IdentityRole>()
+             .AddIdentityCore<ApplicationUser>(options => {
+                 options.Stores.MaxLengthForKeys = 128;
+             })
+             .AddRoles<IdentityRole>()
                 .AddUserManager<UserManager<ApplicationUser>>()
                 .AddRoleManager<RoleManager<IdentityRole>>()
                 .AddUserStore<UserStore<ApplicationUser, IdentityRole, UsersAndRolesDbContext>>()
@@ -354,18 +356,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Configuration options
              */
 
+            services.Configure<AppOptions>(
+                configuration.GetRequiredSection(AppOptions.Section));
+            services.Configure<AppInsightsOptions>(
+                configuration.GetSection(AppInsightsOptions.Section));
+            services.Configure<NotifyOptions>(
+                configuration.GetSection(NotifyOptions.Section));
+            services.Configure<PublicAppOptions>(
+                configuration.GetRequiredSection(PublicAppOptions.Section));
             services.Configure<PublicDataProcessorOptions>(
                 configuration.GetRequiredSection(PublicDataProcessorOptions.Section));
             services.Configure<PublicDataApiOptions>(
                 configuration.GetRequiredSection(PublicDataApiOptions.Section));
-            services.Configure<PreReleaseOptions>(configuration);
-            services.Configure<LocationsOptions>(configuration.GetRequiredSection(LocationsOptions.Locations));
+            services.Configure<PreReleaseAccessOptions>(
+                configuration.GetRequiredSection(PreReleaseAccessOptions.Section));
+            services.Configure<LocationsOptions>(
+                configuration.GetRequiredSection(LocationsOptions.Section));
             services.Configure<ReleaseApprovalOptions>(
-                configuration.GetRequiredSection(ReleaseApprovalOptions.ReleaseApproval));
-            services.Configure<TableBuilderOptions>(configuration.GetRequiredSection(TableBuilderOptions.TableBuilder));
+                configuration.GetRequiredSection(ReleaseApprovalOptions.Section));
+            services.Configure<TableBuilderOptions>(
+                configuration.GetRequiredSection(TableBuilderOptions.Section));
+            services.Configure<OpenIdConnectSpaClientOptions>(
+                configuration.GetSection(OpenIdConnectSpaClientOptions.Section));
+
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-            services.Configure<OpenIdConnectSpaClientOptions>(configuration.GetSection(
-                OpenIdConnectSpaClientOptions.OpenIdConnectSpaClient));
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 
@@ -499,14 +513,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddTransient<INotificationClient>(s =>
             {
-                var notifyApiKey = configuration.GetValue<string>("NotifyApiKey");
+                var notifyOptions = s.GetRequiredService<IOptions<NotifyOptions>>();
+
+                var notifyApiKey = notifyOptions.Value.ApiKey;
 
                 if (!hostEnvironment.IsDevelopment() && !hostEnvironment.IsIntegrationTest())
                 {
                     return new NotificationClient(notifyApiKey);
                 }
 
-                if (notifyApiKey != null && notifyApiKey != "change-me")
+                if (!notifyApiKey.IsNullOrEmpty())
                 {
                     return new NotificationClient(notifyApiKey);
                 }
@@ -594,7 +610,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Swagger
              */
 
-            if (configuration.GetValue<bool>("enableSwagger"))
+            if (configuration.GetValue<bool>("App:EnableSwagger"))
                 services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1",
@@ -670,7 +686,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             app.UseResponseCompression();
 
-            if (configuration.GetValue<bool>("enableSwagger"))
+            if (configuration.GetValue<bool>("App:EnableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>

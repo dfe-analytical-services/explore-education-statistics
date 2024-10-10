@@ -1,0 +1,9 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.manageUserLink {
+  margin-right: govuk-spacing(2);
+}
+
+.deleteUserButton {
+  color: govuk-colour('red');
+}

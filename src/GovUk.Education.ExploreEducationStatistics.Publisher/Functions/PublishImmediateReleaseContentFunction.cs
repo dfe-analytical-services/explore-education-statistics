@@ -33,9 +33,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             try
             {
-                await UpdateContentStage(message.ReleasePublishingKey, ReleasePublishingStatusContentStage.Started);
+                await releasePublishingStatusService.UpdateContentStage(
+                    message.ReleasePublishingKey,
+                    ReleasePublishingStatusContentStage.Started);
+
                 await contentService.UpdateContent(message.ReleasePublishingKey.ReleaseVersionId);
-                await UpdateContentStage(message.ReleasePublishingKey, ReleasePublishingStatusContentStage.Complete);
+
+                await releasePublishingStatusService.UpdateContentStage(
+                    message.ReleasePublishingKey,
+                    ReleasePublishingStatusContentStage.Complete);
+
                 await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(new[]
                 {
                     message.ReleasePublishingKey
@@ -45,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 logger.LogError(e, "Exception occured while executing {FunctionName}", context.FunctionDefinition.Name);
 
-                await UpdateContentStage(
+                await releasePublishingStatusService.UpdateContentStage(
                     message.ReleasePublishingKey,
                     ReleasePublishingStatusContentStage.Failed,
                     new ReleasePublishingStatusLogMessage(
@@ -53,17 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             }
 
             logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
-        }
-
-        private async Task UpdateContentStage(
-            ReleasePublishingKey releasePublishingKey,
-            ReleasePublishingStatusContentStage state,
-            ReleasePublishingStatusLogMessage? logMessage = null)
-        {
-            await releasePublishingStatusService.UpdateContentStage(
-                releasePublishingKey,
-                state,
-                logMessage);
         }
     }
 }

@@ -29,14 +29,14 @@ public record IndicatorViewModel
     public required string Label { get; init; }
 
     /// <summary>
-    /// A numeric unit for an indicator.
+    /// The type of unit that should be used when formatting the indicator.
     /// </summary>
     /// <example>%</example>
     [JsonConverter(typeof(EnumToEnumLabelJsonConverter<IndicatorUnit>))]
     public required IndicatorUnit? Unit { get; init; }
 
     /// <summary>
-    /// The optimal number of decimal places that the indicator should use when displayed.
+    /// The recommended number of decimal places to use when formatting the indicator.
     /// </summary>
     /// <example>2</example>
     public int? DecimalPlaces { get; init; }

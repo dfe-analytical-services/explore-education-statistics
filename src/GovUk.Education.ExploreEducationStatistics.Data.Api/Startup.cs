@@ -47,6 +47,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
@@ -133,8 +134,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             // Services
             //
 
-            services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
-            services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
+            services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Section));
+            services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.Section));
 
             services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
                 new PublicBlobStorageService(Configuration.GetValue<string>("PublicStorage"),

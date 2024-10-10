@@ -11,12 +11,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
@@ -34,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly bool _themeDeletionAllowed;
 
         public ThemeService(
-            IConfiguration configuration,
+            IOptions<AppOptions> appOptions,
             ContentDbContext context,
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
@@ -48,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _topicService = topicService;
             _publishingService = publishingService;
-            _themeDeletionAllowed = configuration.GetValue<bool>("enableThemeDeletion");
+            _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
         }
 
         public async Task<Either<ActionResult, ThemeViewModel>> CreateTheme(ThemeSaveViewModel created)

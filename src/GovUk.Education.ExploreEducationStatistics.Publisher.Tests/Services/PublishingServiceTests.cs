@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -389,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             IPublicBlobStorageService? publicBlobStorageService = null,
             IMethodologyService? methodologyService = null,
             IReleaseService? releaseService = null,
-            IOptions<AppSettingsOptions>? appSettingsOptions = null,
+            IOptions<AppOptions>? appOptions = null,
             ILogger<PublishingService>? logger = null)
         {
             return new PublishingService(
@@ -397,14 +398,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(MockBehavior.Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(MockBehavior.Strict),
                 releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict),
-                appSettingsOptions ?? DefaultAppSettingsOptions(),
+                appOptions ?? DefaultAppOptions(),
                 logger ?? Mock.Of<ILogger<PublishingService>>()
             );
         }
 
-        private static IOptions<AppSettingsOptions> DefaultAppSettingsOptions()
+        private static IOptions<AppOptions> DefaultAppOptions()
         {
-            return Options.Create(new AppSettingsOptions
+            return new AppOptions
             {
                 PrivateStorageConnectionString = string.Empty,
                 PublicStorageConnectionString = PublicStorageConnectionString,
@@ -412,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublisherStorageConnectionString = string.Empty,
                 PublishReleaseContentCronSchedule = string.Empty,
                 PublishReleasesCronSchedule = string.Empty
-            });
+            }.ToOptionsWrapper();
         }
     }
 }

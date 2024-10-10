@@ -76,7 +76,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                 inline
                 loading={formState.isSubmitting}
                 size="sm"
-                text="Creating new API data set preview token"
+                text="Creating new preview token"
               />
             </ButtonGroup>
           </Form>

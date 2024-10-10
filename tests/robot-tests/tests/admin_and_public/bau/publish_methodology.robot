@@ -151,8 +151,8 @@ Verify that the methodology 'Published' tag and datetime is shown
 
     ${ROW}=    user gets table row    ${PUBLICATION_NAME}
     user checks element contains    ${ROW}    Published
-    ${DATE}=    get current datetime    %-d %B %Y
-    user checks element contains    ${ROW}    ${DATE}
+    ${date}=    get london date
+    user checks element contains    ${ROW}    ${date}
 
 Verify that the methodology is visible on the public methodologies page with the expected URL
     user navigates to public methodologies page
@@ -198,7 +198,7 @@ Verify that the methodology displays a link to the publication
     ...    css:[aria-labelledby="related-information"]
 
 Verify that the methodology content is correct
-    ${date}=    get current datetime    %-d %B %Y
+    ${date}=    get london date
     user checks summary list contains    Published    ${date}
 
     user checks accordion is in position    Methodology content section 1    1    id:content
@@ -363,7 +363,7 @@ Verify that the amended methodology displays a link to the publication
     ...    css:[aria-labelledby="related-information"]
 
 Verify that the amended methodology content is correct
-    ${date}=    get current datetime    %-d %B %Y
+    ${date}=    get london date
     user checks summary list contains    Published    ${date}
     user checks summary list contains    Last updated    ${date}
 
@@ -400,7 +400,7 @@ Verify that the amended methodology content is correct
     user checks element contains    ${annexe_section_1}    Annexe 1
 
 Verify the list of notes
-    ${date}=    get current datetime    %-d %B %Y
+    ${date}=    get london date
     user opens details dropdown    See all notes (2)
     user waits until page contains element    css:[data-testid="notes"] li    limit=2
     user checks methodology note    1    ${date}    Latest note

@@ -1,16 +1,18 @@
 import Button from '@common/components/Button';
 import styles from '@common/components/CopyTextButton.module.scss';
+import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import UrlContainer from '@common/components/UrlContainer';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 
 export interface CopyTextButtonProps {
   buttonText?: string | ReactNode;
   className?: string;
-  confirmMessage?: string;
-  inlineButton?: boolean;
-  label?: string;
+  confirmText?: string;
+  id: string;
+  inline?: boolean;
+  label: string;
   labelHidden?: boolean;
   text: string;
 }
@@ -18,74 +20,56 @@ export interface CopyTextButtonProps {
 export default function CopyTextButton({
   buttonText = 'Copy',
   className,
-  confirmMessage = 'Text copied to the clipboard.',
-  inlineButton = true,
+  confirmText = 'Copied',
+  id,
+  inline = true,
   label,
-  labelHidden = true,
+  labelHidden,
   text,
 }: CopyTextButtonProps) {
   const [copied, toggleCopied] = useToggle(false);
 
-  return (
-    <div className={className}>
-      <div
-        className={classNames(styles.container, {
-          'dfe-flex dfe-align-items-start': inlineButton,
-        })}
-      >
-        <UrlContainer
-          id="copy-link-url"
-          className={styles.urlContainer}
-          label={label}
-          labelHidden={labelHidden}
-          url={text}
-          widthLimited={false}
-        />
-        <div
-          className={classNames({
-            'dfe-flex dfe-align-items--center govuk-!-margin-top-2':
-              !inlineButton,
-          })}
-        >
-          <Button
-            className={classNames('govuk-!-margin-bottom-0', {
-              'govuk-!-margin-right-2': !inlineButton,
-            })}
-            onClick={async () => {
-              await navigator.clipboard.writeText(text);
-              toggleCopied.on();
-            }}
-          >
-            {buttonText}
-          </Button>
-          {!inlineButton && (
-            <Message copied={copied} confirmMessage={confirmMessage} />
-          )}
-        </div>
-      </div>
-      {inlineButton && (
-        <Message
-          className={styles.message}
-          copied={copied}
-          confirmMessage={confirmMessage}
-        />
-      )}
-    </div>
-  );
-}
+  useEffect(() => {
+    const resetTimeout = setTimeout(toggleCopied.off, 5000);
 
-function Message({
-  className,
-  copied,
-  confirmMessage,
-}: {
-  className?: string;
-  copied: boolean;
-  confirmMessage?: string;
-}) {
+    return () => {
+      if (copied) {
+        clearTimeout(resetTimeout);
+      }
+    };
+  }, [copied, toggleCopied]);
+
   return (
-    <div aria-live="polite" className={className}>
-      {copied && confirmMessage}
+    <div
+      className={classNames(className, styles.container, {
+        'dfe-flex dfe-align-items--start': inline,
+      })}
+    >
+      <UrlContainer
+        className={classNames(styles.urlContainer, {
+          'dfe-flex-grow--1': inline,
+          'govuk-!-margin-bottom-2': !inline,
+        })}
+        id={id}
+        inline={inline}
+        label={label}
+        labelHidden={labelHidden}
+        url={text}
+      />
+
+      <Button
+        className={classNames(styles.button, {
+          'govuk-!-margin-right-2': !inline,
+        })}
+        onClick={async () => {
+          await navigator.clipboard.writeText(text);
+          toggleCopied.on();
+        }}
+      >
+        {copied ? confirmText : buttonText}
+      </Button>
+
+      <ScreenReaderMessage message={copied ? confirmText : ''} />
     </div>
   );
 }

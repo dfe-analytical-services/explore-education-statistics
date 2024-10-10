@@ -289,35 +289,44 @@ internal class DataSetQueryService(
         ColumnMappings columnMappings,
         QueryState queryState)
     {
-        if (request.Sorts is null)
-        {
-            return [new Sort(Field: DataTable.Cols.TimePeriodId, Direction: SortDirection.Desc)];
-        }
-
-        var invalidSorts = new HashSet<DataSetQuerySort>();
         var sorts = new List<Sort>();
 
-        foreach (var sort in request.Sorts)
+        if (request.Sorts is not null)
         {
-            if (TryGetSortColumn(sort, columnMappings, out var column))
+            var invalidSorts = new HashSet<DataSetQuerySort>();
+
+            foreach (var sort in request.Sorts)
             {
-                sorts.Add(new Sort(Field: column, Direction: sort.ParsedDirection()));
-                continue;
+                if (TryGetSortColumn(sort, columnMappings, out var column))
+                {
+                    sorts.Add(new Sort(Field: column, Direction: sort.ParsedDirection()));
+                    continue;
+                }
+
+                invalidSorts.Add(sort);
             }
 
-            invalidSorts.Add(sort);
+            if (invalidSorts.Count != 0)
+            {
+                queryState.Errors.Add(new ErrorViewModel
+                {
+                    Message = ValidationMessages.SortFieldsNotFound.Message,
+                    Code = ValidationMessages.SortFieldsNotFound.Code,
+                    Path = "sorts",
+                    Detail = new NotFoundItemsErrorDetail<DataSetQuerySort>(invalidSorts)
+                });
+            }
         }
 
-        if (invalidSorts.Count != 0)
+        if (sorts.Count == 0)
         {
-            queryState.Errors.Add(new ErrorViewModel
-            {
-                Message = ValidationMessages.SortFieldsNotFound.Message,
-                Code = ValidationMessages.SortFieldsNotFound.Code,
-                Path = "sorts",
-                Detail = new NotFoundItemsErrorDetail<DataSetQuerySort>(invalidSorts)
-            });
+            // Default to sorting by time period in descending order if no sorts.
+            sorts.Add(new Sort(Field: DataTable.Ref().TimePeriodId, Direction: SortDirection.Desc));
         }
+
+        // Need to append ID sort to ensure there is always a tie-break to ensure results are
+        // returned in a deterministic order (otherwise ordering can vary when queries are re-ran).
+        sorts.Add(new Sort(Field: DataTable.Ref().Id, Direction: SortDirection.Asc));
 
         return sorts;
     }

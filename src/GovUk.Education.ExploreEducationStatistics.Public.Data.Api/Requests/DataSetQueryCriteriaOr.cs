@@ -22,7 +22,10 @@ public record DataSetQueryCriteriaOr : IDataSetQueryCriteria
     ///     },
     ///     {
     ///         "locations": {
-    ///             "eq": "LA|code|E08000019"
+    ///             "eq": {
+    ///                 "level": "LA",
+    ///                 "code": "E08000019"
+    ///             }
     ///         }
     ///     }
     /// ]

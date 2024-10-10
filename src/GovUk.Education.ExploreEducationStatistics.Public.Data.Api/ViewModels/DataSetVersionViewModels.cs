@@ -49,7 +49,7 @@ public class DataSetVersionViewModel
     /// <summary>
     /// When the version was withdrawn.
     /// </summary>
-    /// <example>null</example>
+    /// <example>2024-06-01T12:00:00+00:00</example>
     public DateTimeOffset? Withdrawn { get; init; }
 
     /// <summary>
@@ -82,7 +82,7 @@ public class DataSetVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
-    /// <example>["NAT", "REG", "LA"]</example>
+    /// <example>["National", "Regional", "Local authority"]</example>
     [JsonConverter(typeof(ReadOnlyListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
@@ -95,7 +95,7 @@ public class DataSetVersionViewModel
     /// <summary>
     /// The indicators available in the data set.
     /// </summary>
-    /// <example>["Authorised absence rate" "Overall absence rate"]</example>
+    /// <example>["Authorised absence rate", "Overall absence rate"]</example>
     public required IReadOnlyList<string> Indicators { get; init; }
 }
 

@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.Spatial;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations.MigrationConstants;
 
 #nullable disable

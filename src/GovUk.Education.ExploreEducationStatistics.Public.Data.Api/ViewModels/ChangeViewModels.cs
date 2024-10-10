@@ -55,7 +55,7 @@ public record FilterOptionChangeViewModel : ChangeViewModel<FilterOptionViewMode
 /// <summary>
 /// A change to a geographic level option in a data set.
 /// </summary>
-public record GeographicLevelOptionChangeViewModel : ChangeViewModel<GeographicLevelViewModel>
+public record GeographicLevelChangeViewModel : ChangeViewModel<GeographicLevelViewModel>
 {
     public override bool IsMajor() => CurrentState is null && PreviousState is not null;
 }

@@ -11,6 +11,11 @@ public interface IDataSetService
         Guid dataSetId,
         CancellationToken cancellationToken = default);
 
+    Task<Either<ActionResult, FileStreamResult>> DownloadDataSet(
+        Guid dataSetId,
+        string? dataSetVersion,
+        CancellationToken cancellationToken = default);
+
     Task<Either<ActionResult, DataSetPaginatedListViewModel>> ListDataSets(
         int page,
         int pageSize, 

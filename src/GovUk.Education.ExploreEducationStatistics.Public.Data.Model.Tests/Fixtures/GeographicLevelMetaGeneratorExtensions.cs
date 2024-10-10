@@ -34,7 +34,7 @@ public static class GeographicLevelMetaGeneratorExtensions
         DataSetVersion dataSetVersion)
         => setters
             .Set(m => m.DataSetVersion, dataSetVersion)
-            .Set(m => m.DataSetVersionId, dataSetVersion.Id);
+            .Set(m => m.DataSetVersionId, (_, m) => m.DataSetVersion.Id);
 
     public static InstanceSetters<GeographicLevelMeta> SetLevels(
         this InstanceSetters<GeographicLevelMeta> setters,

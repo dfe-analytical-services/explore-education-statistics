@@ -79,8 +79,8 @@ describe('formatPretty', () => {
     expect(formatPretty(15.1234, '%', 2)).toBe('15.12%');
     expect(formatPretty(150000000.1234, '', 4)).toBe('150,000,000.1234');
 
-    expect(formatPretty(150000000.1234, 'numberstring')).toBe('150000000.1234');
-    expect(formatPretty('ABCD123456789', 'numberstring')).toBe('ABCD123456789');
+    expect(formatPretty(150000000.1234, 'string')).toBe('150000000.1234');
+    expect(formatPretty('ABCD123456789', 'string')).toBe('ABCD123456789');
   });
 
   test('returns NaN string if number value is not a number', () => {

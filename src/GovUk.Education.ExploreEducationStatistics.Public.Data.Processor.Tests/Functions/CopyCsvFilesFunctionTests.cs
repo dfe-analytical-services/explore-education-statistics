@@ -47,7 +47,7 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
                 context.ReleaseFiles.AddRange(releaseDataFile, releaseMetaFile);
             });
 
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage(),
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage(),
                 releaseFileId: releaseDataFile.Id);
 
             var blobStorageService = GetRequiredService<IPrivateBlobStorageService>();

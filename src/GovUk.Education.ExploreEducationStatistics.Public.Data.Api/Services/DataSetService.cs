@@ -9,14 +9,17 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 internal class DataSetService(
     PublicDataDbContext publicDataDbContext,
+    IDataSetVersionPathResolver dataSetVersionPathResolver,
     IUserService userService)
     : IDataSetService
 {
@@ -30,6 +33,31 @@ internal class DataSetService(
             .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSet)
             .OnSuccess(MapDataSet);
+    }
+
+    public async Task<Either<ActionResult, FileStreamResult>> DownloadDataSet(
+        Guid dataSetId,
+        string? dataSetVersion,
+        CancellationToken cancellationToken = default)
+    {
+        return await FindVersion(
+                dataSetId: dataSetId,
+                dataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken)
+            .OnSuccessDo(userService.CheckCanViewDataSetVersion)
+            .OnSuccess(DownloadDataSetVersionToStream);
+    }
+
+    private FileStreamResult DownloadDataSetVersionToStream(DataSetVersion dataSetVersion)
+    {
+        var csvDataPath = dataSetVersionPathResolver.CsvDataPath(dataSetVersion);
+
+        var fileStream = new FileStream(csvDataPath, FileMode.Open, FileAccess.Read, FileShare.Read); 
+
+        return new FileStreamResult(fileStream, MediaTypeNames.Text.Csv)
+        {
+            FileDownloadName = $"{dataSetVersion.DataSetId}_v{dataSetVersion.PublicVersion}.csv"
+        };
     }
 
     public async Task<Either<ActionResult, DataSetPaginatedListViewModel>> ListDataSets(

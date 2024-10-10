@@ -69,8 +69,8 @@ Create Methodology with some content and images
     user adds content to accordion section text block    Methodology annex section 2    2
     ...    Adding Methodology annex 2 text block 2    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user scrolls up    100
-    user adds image to accordion section text block with retry   Methodology annex section 2    2    test-infographic.png
-    ...    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    user adds image to accordion section text block with retry    Methodology annex section 2    2
+    ...    test-infographic.png    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Verify the editable content is as expected
     user checks accordion section contains x blocks    Methodology content section 1    1
@@ -106,7 +106,7 @@ Approve the Methodology
     user approves methodology for publication    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} - first methodology version
 
 Verify the summary for the original Methodology is as expected
-    ${expected_published_date}=    get current datetime    %-d %B %Y
+    ${expected_published_date}=    get london date
     user navigates to methodologies on publication page
     ...    ${PUBLICATION_NAME}
 
@@ -213,7 +213,7 @@ Visit the approved Amendment and check that its summary is as expected
     user clicks element    xpath://*[text()="View"]    ${ROW}
     user waits until h2 is visible    Methodology summary
 
-    ${date}=    get current datetime    %-d %B %Y
+    ${date}=    get london date
     user verifies methodology summary details
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}

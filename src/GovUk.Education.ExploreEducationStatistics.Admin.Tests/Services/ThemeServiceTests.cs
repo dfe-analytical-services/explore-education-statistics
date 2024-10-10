@@ -14,10 +14,10 @@ using Moq;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
@@ -600,11 +600,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPublishingService? publishingService = null,
             bool enableThemeDeletion = true)
         {
-            var configuration =
-                CreateMockConfiguration(TupleOf("enableThemeDeletion", enableThemeDeletion.ToString()));
-
             return new ThemeService(
-                configuration.Object,
+                new AppOptions { EnableThemeDeletion = enableThemeDeletion }.ToOptionsWrapper(),
                 context,
                 mapper ?? AdminMapper(),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),

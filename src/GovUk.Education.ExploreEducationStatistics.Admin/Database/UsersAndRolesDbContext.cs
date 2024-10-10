@@ -47,6 +47,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Database
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserInvite>()
+                .HasOne(c => c.CreatedBy)
+                .WithMany()
+                .HasForeignKey("CreatedById")
+                .OnDelete(DeleteBehavior.SetNull);
+
+                modelBuilder.Entity<UserInvite>()
                 .Property(invite => invite.Created)
                 .HasConversion(
                     v => v,

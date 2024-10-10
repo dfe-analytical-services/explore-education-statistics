@@ -1,14 +1,14 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
@@ -260,24 +260,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             result.AssertRight();
         }
 
-        private static Mock<IConfiguration> ConfigurationMock()
+        private static IOptions<AppOptions> DefaultAppOptions()
         {
-            return CreateMockConfiguration(
-                TupleOf("NotifyInviteWithRolesTemplateId", "invite-with-roles-template-id"),
-                TupleOf("NotifyPublicationRoleTemplateId", "publication-role-template-id"),
-                TupleOf("NotifyReleaseRoleTemplateId", "release-role-template-id"),
-                TupleOf("NotifyReleaseHigherReviewersTemplateId", "notify-release-higher-reviewers-template-id"),
-                TupleOf("NotifyMethodologyHigherReviewersTemplateId", "notify-methodology-higher-reviewers-template-id"),
-                TupleOf("AdminUri", "admin-uri"));
+            return new AppOptions { Url = "https://admin-uri" }.ToOptionsWrapper();
+        }
+
+        private static IOptions<NotifyOptions> DefaultNotifyOptions()
+        {
+            return new NotifyOptions
+            {
+                InviteWithRolesTemplateId = "invite-with-roles-template-id",
+                PublicationRoleTemplateId = "publication-role-template-id",
+                ReleaseRoleTemplateId = "release-role-template-id",
+                ReleaseHigherReviewersTemplateId = "notify-release-higher-reviewers-template-id",
+                MethodologyHigherReviewersTemplateId = "notify-methodology-higher-reviewers-template-id"
+            }.ToOptionsWrapper();
         }
 
         private static EmailTemplateService SetupEmailTemplateService(
             IEmailService? emailService = null,
-            IConfiguration? configuration = null)
+            IOptions<AppOptions>? appOptions = null,
+            IOptions<NotifyOptions>? notifyOptions = null)
         {
             return new(
                 emailService ?? Mock.Of<IEmailService>(Strict),
-                configuration ?? ConfigurationMock().Object);
+                appOptions ?? DefaultAppOptions(),
+                notifyOptions ?? DefaultNotifyOptions());
         }
     }
 }

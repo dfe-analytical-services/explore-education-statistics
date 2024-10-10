@@ -44,7 +44,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                         AssertEmailTemplateValues(
                             personalisation,
                             DataSetTitle,
-                            $"{GetAppSettingsOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-subscription/")
+                            $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-subscription/")
                     ),
                     null,
                     null,
@@ -262,7 +262,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                         AssertEmailTemplateValues(
                             personalisation,
                             DataSetTitle,
-                            $"{GetAppSettingsOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/")
+                            $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/")
                     ),
                     null,
                     null,
@@ -565,9 +565,9 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                         AssertEmailTemplateValues(
                             personalisation,
                             DataSetTitle,
-                            $"{GetAppSettingsOptions().PublicAppUrl}/data-catalogue/data-set/{_dataSetFileId}",
+                            $"{GetAppOptions().PublicAppUrl}/data-catalogue/data-set/{_dataSetFileId}",
                             Version,
-                            $"{GetAppSettingsOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/")
+                            $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/")
                     ),
                     null,
                     null,

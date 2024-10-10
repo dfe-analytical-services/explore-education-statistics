@@ -18,7 +18,7 @@ public abstract class HandleProcessingFailureFunctionTests(ProcessorFunctionsInt
             // The stage which the failure occured in - This should not be altered by the handler
             const DataSetVersionImportStage failedStage = DataSetVersionImportStage.CopyingCsvFiles;
 
-            var (_, instanceId) = await CreateDataSet(failedStage);
+            var (_, instanceId) = await CreateDataSetInitialVersion(failedStage);
 
             var function = GetRequiredService<HandleProcessingFailureFunction>();
             await function.HandleProcessingFailure(instanceId, CancellationToken.None);

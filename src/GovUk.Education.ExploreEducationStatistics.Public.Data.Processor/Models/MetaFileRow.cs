@@ -13,11 +13,11 @@ public record MetaFileRow
 
     public string? IndicatorGrouping { get; init; }
 
-    private string? _indicatorUnit { get; init; }
+    public string? IndicatorUnit { get; init; }
 
-    public IndicatorUnit? IndicatorUnit =>
-        _indicatorUnit is not null
-            ? EnumUtil.GetFromEnumValue<IndicatorUnit>(_indicatorUnit)
+    public IndicatorUnit? ParsedIndicatorUnit =>
+        IndicatorUnit is not null
+            ? EnumUtil.GetFromEnumValue<IndicatorUnit>(IndicatorUnit)
             : null;
 
     public byte? IndicatorDp { get; init; }

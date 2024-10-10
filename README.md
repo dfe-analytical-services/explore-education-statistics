@@ -204,6 +204,7 @@ The service can be started against a set of non-existent database. If no pre-exi
    CREATE LOGIN [adminapp] WITH PASSWORD = 'Your_Password123';
    CREATE LOGIN [importer] WITH PASSWORD = 'Your_Password123';
    CREATE LOGIN [publisher] WITH PASSWORD = 'Your_Password123';
+   CREATE LOGIN [notifier] WITH PASSWORD = 'Your_Password123';
    CREATE LOGIN [content] WITH PASSWORD = 'Your_Password123';
    CREATE LOGIN [data] WITH PASSWORD = 'Your_Password123';
    CREATE LOGIN [public_data_processor] WITH PASSWORD = 'Your_Password123';

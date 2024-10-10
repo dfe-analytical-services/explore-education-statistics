@@ -1,6 +1,6 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import styles from '@admin/pages/admin-dashboard/components/TopicPublications.module.scss';
-import { publicationCreateRoute, TopicParams } from '@admin/routes/routes';
+import { publicationCreateRoute, ThemeTopicParams } from '@admin/routes/routes';
 import Link from '@admin/components/Link';
 import {
   publicationReleasesRoute,
@@ -8,6 +8,7 @@ import {
 } from '@admin/routes/publicationRoutes';
 import permissionService from '@admin/services/permissionService';
 import publicationService from '@admin/services/publicationService';
+import { Theme } from '@admin/services/themeService';
 import { Topic } from '@admin/services/topicService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
@@ -16,11 +17,11 @@ import React from 'react';
 import { generatePath } from 'react-router';
 
 interface Props {
-  themeTitle: string;
+  theme: Theme;
   topic: Topic;
 }
 
-const TopicPublications = ({ topic, themeTitle }: Props) => {
+const TopicPublications = ({ theme, topic }: Props) => {
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const [publications, canCreatePublication] = await Promise.all([
       publicationService.listPublications(topic.id),
@@ -33,8 +34,8 @@ const TopicPublications = ({ topic, themeTitle }: Props) => {
 
   return (
     <div className={styles.publication} data-testid="topic-publications">
-      <div data-testid={`topic-publications-${themeTitle}-${topic.title}`}>
-        <h3>{`${themeTitle} / ${topic.title}`}</h3>
+      <div data-testid={`topic-publications-${theme.title}-${topic.title}`}>
+        <h3>{`${theme.title} / ${topic.title}`}</h3>
         <LoadingSpinner
           hideText
           inline
@@ -66,7 +67,8 @@ const TopicPublications = ({ topic, themeTitle }: Props) => {
       </div>
       {canCreatePublication && (
         <ButtonLink
-          to={generatePath<TopicParams>(publicationCreateRoute.path, {
+          to={generatePath<ThemeTopicParams>(publicationCreateRoute.path, {
+            themeId: theme.id,
             topicId: topic.id,
           })}
         >

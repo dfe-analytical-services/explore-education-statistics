@@ -34,7 +34,7 @@ public static class IndicatorGeneratorExtensions
             .SetDefault(i => i.Label)
             .SetDefault(i => i.Name)
             .Set(i => i.Name, (_, i) => i.Name.SnakeCase())
-            .Set(i => i.Unit, IndicatorUnit.Number)
+            .Set(i => i.Unit, IndicatorUnit.None)
             .Set(i => i.DecimalPlaces, 0);
 
     public static InstanceSetters<Indicator> SetLabel(

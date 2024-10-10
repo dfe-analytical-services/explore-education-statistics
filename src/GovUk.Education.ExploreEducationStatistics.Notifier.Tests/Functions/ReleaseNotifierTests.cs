@@ -1,27 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.TableStorageTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
 public class ReleaseNotifierTests
 {
-    private static readonly AppSettingsOptions AppSettingsOptions = new()
+    private static readonly AppOptions AppOptions = new()
     {
-        BaseUrl = "https://notifier.func/api",
+        Url = "https://notifier.func/api",
         PublicAppUrl = "https://public.app"
     };
 
@@ -38,40 +38,15 @@ public class ReleaseNotifierTests
     [Fact]
     public async Task NotifySubscribers()
     {
+        var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
+
         var publication1Id = Guid.NewGuid();
-
-        // generate Azure Storage Table and return results
-        var cloudTable = MockCloudTable();
-
-        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
-        {
-            new(Guid.NewGuid().ToString(), "test@test.com", "Publication 1", "publication-1", null)
-        });
-        cloudTable.Setup(mock =>
-                mock.ExecuteQuerySegmentedAsync(
-                    It.Is<TableQuery<SubscriptionEntity>>(
-                        tq =>
-                            tq.FilterString == $"PartitionKey eq '{publication1Id}'"),
-                    It.IsAny<TableContinuationToken>()))
-            .ReturnsAsync(tableQuerySegmentPubSubs);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publication1Id))
+            .ReturnsAsync([ "test@test.com" ]);
 
         var supersededPubId = Guid.NewGuid();
-        var tableQuerySegmentSupersededPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
-        {
-            new(supersededPubId.ToString(), "superseded@test.com", "Superseded publication",
-                "superseded-publication", null)
-        });
-        cloudTable.Setup(mock =>
-            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntity>>(tq =>
-                    tq.FilterString == $"PartitionKey eq '{supersededPubId}'"),
-                It.IsAny<TableContinuationToken>()))
-            .ReturnsAsync(tableQuerySegmentSupersededPubSubs);
-
-        // other mocks
-        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
-        publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(NotifierTableStorage.PublicationSubscriptionsTable))
-            .ReturnsAsync(cloudTable.Object);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
+            .ReturnsAsync([ "superseded@test.com" ]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -89,48 +64,59 @@ public class ReleaseNotifierTests
             mock.SendEmail("superseded@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
-        var function = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
-            tokenService: tokenService.Object,
-            emailService: emailService.Object);
-
-        var releaseNotificationMessage = new ReleaseNotificationMessage
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
         {
-            PublicationId = publication1Id,
-            PublicationName = "Publication 1",
-            PublicationSlug = "publication-1",
-            ReleaseName = "2000",
-            ReleaseSlug = "2000",
-            Amendment = false,
-            UpdateNote = string.Empty,
-            SupersededPublications = new List<IdTitleViewModel>
+            context.Publications.Add(new Publication
             {
-                new()
-                {
-                    Id = supersededPubId,
-                    Title = "Superseded publication",
-                },
-            },
-        };
+                Id = supersededPubId,
+                Title = "Superseded publication",
+                Slug = "superseded-publication",
+                SupersededById = publication1Id,
+            });
+            await context.SaveChangesAsync();
+        }
 
-        await function.NotifySubscribers(
-            releaseNotificationMessage,
-            new TestFunctionContext());
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            var function = BuildFunction(
+                contentDbContext: context,
+                subscriptionRepository: subscriptionRepository.Object,
+                tokenService: tokenService.Object,
+                emailService: emailService.Object);
+
+            var releaseNotificationMessage = new ReleaseNotificationMessage
+            {
+                PublicationId = publication1Id,
+                PublicationName = "Publication 1",
+                PublicationSlug = "publication-1",
+                ReleaseName = "2000",
+                ReleaseSlug = "2000",
+                Amendment = false,
+                UpdateNote = string.Empty,
+            };
+
+            await function.NotifySubscribers(
+                releaseNotificationMessage,
+                new TestFunctionContext());
+        }
 
         emailService.Verify(mock =>
             mock.SendEmail("test@test.com", "release-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
-                        publication1Id.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", null, null)
+                        "Publication 1", "publication-1",
+                        "2000", "2000", null,
+                        "publication-1", null)
                 )), Times.Once);
 
         emailService.Verify(mock =>
             mock.SendEmail("superseded@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
-                        supersededPubId.ToString(), "Publication 1", "publication-1",
+                        "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-publication",
                         "Superseded publication")
                 )), Times.Once);
     }
@@ -138,30 +124,11 @@ public class ReleaseNotifierTests
     [Fact]
     public async Task NotifySubscribers_MultipleSubs()
     {
-        var publication1Id = Guid.NewGuid();
+        var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
 
-        // generate Azure Storage Table and return results
-        var cloudTable = MockCloudTable();
-
-        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
-        {
-            new(Guid.NewGuid().ToString(), "test1@test.com", "Publication 1", "publication-1", null),
-            new(Guid.NewGuid().ToString(), "test2@test.com", "Publication 1", "publication-1", null),
-            new(Guid.NewGuid().ToString(), "test3@test.com", "Publication 1", "publication-1", null),
-        });
-        cloudTable.Setup(mock =>
-                mock.ExecuteQuerySegmentedAsync(
-                    It.Is<TableQuery<SubscriptionEntity>>(
-                        tq =>
-                            tq.FilterString == $"PartitionKey eq '{publication1Id}'"),
-                    It.IsAny<TableContinuationToken>()))
-            .ReturnsAsync(tableQuerySegmentPubSubs);
-
-        // other mocks
-        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
-        publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(NotifierTableStorage.PublicationSubscriptionsTable))
-            .ReturnsAsync(cloudTable.Object);
+        var publicationId = Guid.NewGuid();
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
+            .ReturnsAsync([ "test1@test.com", "test2@test.com", "test3@test.com" ]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -185,21 +152,23 @@ public class ReleaseNotifierTests
             mock.SendEmail("test3@test.com", "release-published-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
+        await using var context = ContentDbUtils.InMemoryContentDbContext(Guid.NewGuid().ToString());
+
         var function = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
+            contentDbContext: context,
+            subscriptionRepository: subscriptionRepository.Object,
             tokenService: tokenService.Object,
             emailService: emailService.Object);
 
         var releaseNotificationMessage = new ReleaseNotificationMessage
         {
-            PublicationId = publication1Id,
+            PublicationId = publicationId,
             PublicationName = "Publication 1",
             PublicationSlug = "publication-1",
             ReleaseName = "2000",
             ReleaseSlug = "2000",
             Amendment = false,
             UpdateNote = string.Empty,
-            SupersededPublications = new List<IdTitleViewModel>(),
         };
 
         await function.NotifySubscribers(
@@ -210,63 +179,40 @@ public class ReleaseNotifierTests
             mock.SendEmail("test1@test.com", "release-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
-                        publication1Id.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", null, null)
+                        "Publication 1", "publication-1",
+                        "2000", "2000", null,
+                        "publication-1", null)
                 )), Times.Once);
         emailService.Verify(mock =>
             mock.SendEmail("test2@test.com", "release-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
-                        publication1Id.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", null, null)
+                        "Publication 1", "publication-1",
+                        "2000", "2000", null,
+                        "publication-1", null)
                 )), Times.Once);
         emailService.Verify(mock =>
             mock.SendEmail("test3@test.com", "release-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-3",
-                        publication1Id.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", null, null)
+                        "Publication 1", "publication-1",
+                        "2000", "2000", null,
+                        "publication-1", null)
                 )), Times.Once);
     }
 
     [Fact]
     public async Task NotifySubscribers_MultipleSupersededPublicationSubs()
     {
-        var publication1Id = Guid.NewGuid();
+        var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
 
-        // generate Azure Storage Table and return results
-        var cloudTable = MockCloudTable();
-
-        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>());
-        cloudTable.Setup(mock =>
-                mock.ExecuteQuerySegmentedAsync(
-                    It.Is<TableQuery<SubscriptionEntity>>(
-                        tq =>
-                            tq.FilterString == $"PartitionKey eq '{publication1Id}'"),
-                    It.IsAny<TableContinuationToken>()))
-            .ReturnsAsync(tableQuerySegmentPubSubs);
+        var publicationId = Guid.NewGuid();
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
+            .ReturnsAsync([]);
 
         var supersededPubId = Guid.NewGuid();
-        var tableQuerySegmentSupersededPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
-        {
-            new(supersededPubId.ToString(), "superseded1@test.com", "Superseded publication",
-                "superseded-publication", null),
-            new(supersededPubId.ToString(), "superseded2@test.com", "Superseded publication",
-                "superseded-publication", null),
-            new(supersededPubId.ToString(), "superseded3@test.com", "Superseded publication",
-                "superseded-publication", null),
-        });
-        cloudTable.Setup(mock =>
-            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntity>>(tq =>
-                    tq.FilterString == $"PartitionKey eq '{supersededPubId}'"),
-                It.IsAny<TableContinuationToken>()))
-            .ReturnsAsync(tableQuerySegmentSupersededPubSubs);
-
-        // other mocks
-        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
-        publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(NotifierTableStorage.PublicationSubscriptionsTable))
-            .ReturnsAsync(cloudTable.Object);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
+            .ReturnsAsync([ "superseded1@test.com", "superseded2@test.com", "superseded3@test.com" ]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -290,56 +236,68 @@ public class ReleaseNotifierTests
             mock.SendEmail("superseded3@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
-        var function = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
-            tokenService: tokenService.Object,
-            emailService: emailService.Object);
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            context.Publications.Add(new Publication
+            {
+                Id = supersededPubId,
+                Title = "Superseded publication",
+                Slug = "superseded-publication",
+                SupersededById = publicationId,
+            });
+            await context.SaveChangesAsync();
+        }
 
         var releaseNotificationMessage = new ReleaseNotificationMessage
         {
-            PublicationId = publication1Id,
+            PublicationId = publicationId,
             PublicationName = "Publication 1",
             PublicationSlug = "publication-1",
             ReleaseName = "2000",
             ReleaseSlug = "2000",
             Amendment = false,
             UpdateNote = string.Empty,
-            SupersededPublications = new List<IdTitleViewModel>
-            {
-                new()
-                {
-                    Id = supersededPubId,
-                    Title = "Superseded publication",
-                },
-            },
         };
 
-        await function.NotifySubscribers(
-            releaseNotificationMessage,
-            new TestFunctionContext());
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            var function = BuildFunction(
+                contentDbContext: context,
+                subscriptionRepository: subscriptionRepository.Object,
+                tokenService: tokenService.Object,
+                emailService: emailService.Object);
+
+            await function.NotifySubscribers(
+                releaseNotificationMessage,
+                new TestFunctionContext());
+        }
 
         emailService.Verify(mock =>
             mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
-                        supersededPubId.ToString(), "Publication 1", "publication-1",
+                        "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-publication",
                         "Superseded publication")
                 )), Times.Once);
         emailService.Verify(mock =>
             mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
-                        supersededPubId.ToString(), "Publication 1", "publication-1",
+                        "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-publication",
                         "Superseded publication")
                 )), Times.Once);
         emailService.Verify(mock =>
             mock.SendEmail("superseded3@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-3",
-                        supersededPubId.ToString(), "Publication 1", "publication-1",
+                        "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-publication",
                         "Superseded publication")
                 )), Times.Once);
     }
@@ -347,49 +305,19 @@ public class ReleaseNotifierTests
     [Fact]
     public async Task NotifySubscribers_MultipleSupersededPublications()
     {
-        var publication1Id = Guid.NewGuid();
+        var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
 
-        // generate Azure Storage Table and return results
-        var cloudTable = MockCloudTable();
-
-        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>());
-        cloudTable.Setup(mock =>
-                mock.ExecuteQuerySegmentedAsync(
-                    It.Is<TableQuery<SubscriptionEntity>>(
-                        tq =>
-                            tq.FilterString == $"PartitionKey eq '{publication1Id}'"),
-                    It.IsAny<TableContinuationToken>()))
-            .ReturnsAsync(tableQuerySegmentPubSubs);
+        var publicationId = Guid.NewGuid();
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
+            .ReturnsAsync([]);
 
         var supersededPub1Id = Guid.NewGuid();
-        var tableQuerySegmentSupersededPub1Subs = CreateTableQuerySegment(new List<SubscriptionEntity>
-        {
-            new(supersededPub1Id.ToString(), "superseded1@test.com", "Superseded 1 publication",
-                "superseded-1-publication", null),
-        });
-        cloudTable.Setup(mock =>
-            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntity>>(tq =>
-                    tq.FilterString == $"PartitionKey eq '{supersededPub1Id}'"),
-                It.IsAny<TableContinuationToken>()))
-            .ReturnsAsync(tableQuerySegmentSupersededPub1Subs);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPub1Id))
+            .ReturnsAsync([ "superseded1@test.com" ]);
 
         var supersededPub2Id = Guid.NewGuid();
-        var tableQuerySegmentSupersededPub2Subs = CreateTableQuerySegment(new List<SubscriptionEntity>
-        {
-            new(supersededPub1Id.ToString(), "superseded2@test.com", "Superseded21 publication",
-                "superseded-2-publication", null),
-        });
-        cloudTable.Setup(mock =>
-            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntity>>(tq =>
-                    tq.FilterString == $"PartitionKey eq '{supersededPub2Id}'"),
-                It.IsAny<TableContinuationToken>()))
-            .ReturnsAsync(tableQuerySegmentSupersededPub2Subs);
-
-        // other mocks
-        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
-        publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(NotifierTableStorage.PublicationSubscriptionsTable))
-            .ReturnsAsync(cloudTable.Object);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPub2Id))
+            .ReturnsAsync([ "superseded2@test.com" ]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -407,94 +335,83 @@ public class ReleaseNotifierTests
             mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
-        var function = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
-            tokenService: tokenService.Object,
-            emailService: emailService.Object);
-
-        var releaseNotificationMessage = new ReleaseNotificationMessage
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
         {
-            PublicationId = publication1Id,
-            PublicationName = "Publication 1",
-            PublicationSlug = "publication-1",
-            ReleaseName = "2000",
-            ReleaseSlug = "2000",
-            Amendment = false,
-            UpdateNote = string.Empty,
-            SupersededPublications = new List<IdTitleViewModel>
-            {
-                new()
+            context.Publications.AddRange(
+                new Publication
                 {
                     Id = supersededPub1Id,
                     Title = "Superseded 1 publication",
+                    Slug = "superseded-1-publication",
+                    SupersededById = publicationId,
                 },
-                new()
+                new Publication
                 {
                     Id = supersededPub2Id,
                     Title = "Superseded 2 publication",
-                }
-            },
-        };
+                    Slug = "superseded-2-publication",
+                    SupersededById = publicationId,
+                });
+            await context.SaveChangesAsync();
+        }
 
-        await function.NotifySubscribers(
-            releaseNotificationMessage,
-            new TestFunctionContext());
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            var function = BuildFunction(
+                contentDbContext: context,
+                subscriptionRepository: subscriptionRepository.Object,
+                tokenService: tokenService.Object,
+                emailService: emailService.Object);
+
+            var releaseNotificationMessage = new ReleaseNotificationMessage
+            {
+                PublicationId = publicationId,
+                PublicationName = "Publication 1",
+                PublicationSlug = "publication-1",
+                ReleaseName = "2000",
+                ReleaseSlug = "2000",
+                Amendment = false,
+                UpdateNote = string.Empty,
+            };
+
+            await function.NotifySubscribers(
+                releaseNotificationMessage,
+                new TestFunctionContext());
+        }
 
         emailService.Verify(mock =>
             mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
-                        supersededPub1Id.ToString(), "Publication 1", "publication-1",
+                        "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-1-publication",
                         "Superseded 1 publication")
                 )), Times.Once);
         emailService.Verify(mock =>
             mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
-                        supersededPub2Id.ToString(), "Publication 1", "publication-1",
+                        "Publication 1", "publication-1",
                         "2000", "2000", null,
+                        "superseded-2-publication",
                         "Superseded 2 publication")
                 )), Times.Once);
     }
 
     [Fact]
-    public async Task NotifySubscribers_Amendment()
+    public async Task NotifySubscribers_Amendment() // If an amendment we use a different email template
     {
-        var publication1Id = Guid.NewGuid();
+        var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
 
-        // generate Azure Storage Table and return results
-        var cloudTable = MockCloudTable();
-
-        var tableQuerySegmentPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
-        {
-            new(Guid.NewGuid().ToString(), "test@test.com", "Publication 1", "publication-1", null)
-        });
-        cloudTable.Setup(mock =>
-                mock.ExecuteQuerySegmentedAsync(
-                    It.Is<TableQuery<SubscriptionEntity>>(
-                        tq =>
-                            tq.FilterString == $"PartitionKey eq '{publication1Id}'"),
-                    It.IsAny<TableContinuationToken>()))
-            .ReturnsAsync(tableQuerySegmentPubSubs);
+        var publicationId = Guid.NewGuid();
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
+            .ReturnsAsync([ "test@test.com" ]);
 
         var supersededPubId = Guid.NewGuid();
-        var tableQuerySegmentSupersededPubSubs = CreateTableQuerySegment(new List<SubscriptionEntity>
-        {
-            new(supersededPubId.ToString(), "superseded@test.com", "Superseded publication",
-                "superseded-publication", null)
-        });
-        cloudTable.Setup(mock =>
-            mock.ExecuteQuerySegmentedAsync(It.Is<TableQuery<SubscriptionEntity>>(tq =>
-                    tq.FilterString == $"PartitionKey eq '{supersededPubId}'"),
-                It.IsAny<TableContinuationToken>()))
-            .ReturnsAsync(tableQuerySegmentSupersededPubSubs);
-
-        // other mocks
-        var publicationSubscriptionRepository = new Mock<IPublicationSubscriptionRepository>(MockBehavior.Strict);
-        publicationSubscriptionRepository.Setup(mock =>
-                mock.GetTable(NotifierTableStorage.PublicationSubscriptionsTable))
-            .ReturnsAsync(cloudTable.Object);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
+            .ReturnsAsync([ "superseded@test.com" ]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
         tokenService.Setup(mock =>
@@ -513,40 +430,50 @@ public class ReleaseNotifierTests
                 "release-amendment-published-superseded-subscribers-id",
                 It.IsAny<Dictionary<string, dynamic>>()));
 
-        var function = BuildFunction(
-            publicationSubscriptionRepository: publicationSubscriptionRepository.Object,
-            tokenService: tokenService.Object,
-            emailService: emailService.Object);
-
-        var releaseNotificationMessage = new ReleaseNotificationMessage
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
         {
-            PublicationId = publication1Id,
-            PublicationName = "Publication 1",
-            PublicationSlug = "publication-1",
-            ReleaseName = "2000",
-            ReleaseSlug = "2000",
-            Amendment = true,
-            UpdateNote = "Update note",
-            SupersededPublications = new List<IdTitleViewModel>
+            context.Publications.Add(new Publication
             {
-                new()
-                {
-                    Id = supersededPubId,
-                    Title = "Superseded publication",
-                },
-            },
-        };
+                Id = supersededPubId,
+                Title = "Superseded publication",
+                Slug = "superseded-publication",
+                SupersededById = publicationId,
+            });
+            await context.SaveChangesAsync();
+        }
 
-        await function.NotifySubscribers(
-            releaseNotificationMessage,
-            new TestFunctionContext());
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            var function = BuildFunction(
+                contentDbContext: context,
+                subscriptionRepository: subscriptionRepository.Object,
+                tokenService: tokenService.Object,
+                emailService: emailService.Object);
+
+            var releaseNotificationMessage = new ReleaseNotificationMessage
+            {
+                PublicationId = publicationId,
+                PublicationName = "Publication 1",
+                PublicationSlug = "publication-1",
+                ReleaseName = "2000",
+                ReleaseSlug = "2000",
+                Amendment = true,
+                UpdateNote = "Update note",
+            };
+
+            await function.NotifySubscribers(
+                releaseNotificationMessage,
+                new TestFunctionContext());
+        }
 
         emailService.Verify(mock =>
             mock.SendEmail("test@test.com", "release-amendment-published-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-1",
-                        publication1Id.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", "Update note", null)
+                        "Publication 1", "publication-1",
+                        "2000", "2000", "Update note",
+                        "publication-1", null)
                 )), Times.Once);
 
         emailService.Verify(mock =>
@@ -554,23 +481,25 @@ public class ReleaseNotifierTests
                 "release-amendment-published-superseded-subscribers-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "unsubscribe-token-2",
-                        supersededPubId.ToString(), "Publication 1", "publication-1",
+                        "Publication 1", "publication-1",
                         "2000", "2000", "Update note",
+                        "superseded-publication",
                         "Superseded publication")
                 )), Times.Once);
     }
 
     private static bool AssertEmailTemplateValues(Dictionary<string, dynamic> values,
         string unsubToken,
-        string pubId, string pubName, string pubSlug,
+        string pubName, string pubSlug,
         string releaseName, string releaseSlug, string? updateNote,
+        string unsubPubSlug,
         string? supersededPublicationTitle = null)
     {
         Assert.Equal(pubName, values["publication_name"]);
         Assert.Equal(releaseName, values["release_name"]);
-        Assert.Equal($"{AppSettingsOptions.PublicAppUrl}/find-statistics/{pubSlug}/{releaseSlug}",
+        Assert.Equal($"{AppOptions.PublicAppUrl}/find-statistics/{pubSlug}/{releaseSlug}",
             values["release_link"]);
-        Assert.Equal($"{AppSettingsOptions.PublicAppUrl}/subscriptions/{pubSlug}/confirm-unsubscription/{unsubToken}", values["unsubscribe_link"]);
+        Assert.Equal($"{AppOptions.PublicAppUrl}/subscriptions/{unsubPubSlug}/confirm-unsubscription/{unsubToken}", values["unsubscribe_link"]);
 
         if (updateNote != null)
         {
@@ -594,20 +523,22 @@ public class ReleaseNotifierTests
     }
 
     private static ReleaseNotifier BuildFunction(
+        ContentDbContext? contentDbContext = null,
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
-        IPublicationSubscriptionRepository? publicationSubscriptionRepository = null)
+        ISubscriptionRepository? subscriptionRepository = null)
     {
         return new ReleaseNotifier(
+            contentDbContext ?? Mock.Of<ContentDbContext>(),
             Mock.Of<ILogger<ReleaseNotifier>>(),
-            Options.Create(AppSettingsOptions),
-            Options.Create(new GovUkNotifyOptions
+            AppOptions.ToOptionsWrapper(),
+            new GovUkNotifyOptions
             {
                 ApiKey = "",
                 EmailTemplates = EmailTemplateOptions
-            }),
+            }.ToOptionsWrapper(),
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
-            publicationSubscriptionRepository ?? Mock.Of<IPublicationSubscriptionRepository>(MockBehavior.Strict));
+            subscriptionRepository ?? Mock.Of<ISubscriptionRepository>(MockBehavior.Strict));
     }
 }

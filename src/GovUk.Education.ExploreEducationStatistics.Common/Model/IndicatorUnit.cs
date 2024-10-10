@@ -1,25 +1,32 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+
+public enum IndicatorUnit
 {
-    public enum IndicatorUnit
-    {
-        [EnumLabelValue("", "")]
-        Number,
+    [EnumLabelValue("", "")]
+    None,
 
-        [EnumLabelValue("%", "%")]
-        Percent,
+    [EnumLabelValue("%", "%")]
+    Percent,
 
-        [EnumLabelValue("£", "£")]
-        Pound,
+    [EnumLabelValue("£", "£")]
+    Pound,
 
-        [EnumLabelValue("£m", "£m")]
-        MillionPounds,
+    [EnumLabelValue("£m", "£m")]
+    MillionPounds,
 
-        [EnumLabelValue("pp", "pp")]
-        PercentagePoint,
+    [EnumLabelValue("pp", "pp")]
+    PercentagePoint,
 
-        [EnumLabelValue("numberstring", "numberstring")]
-        NumberString,
-    }
+    // We named this `numberstring` in EES-5478, but this is
+    // likely to be confusing for end users who can see this unit
+    // (e.g. in the public API).
+    // It's really just saying 'this is a string without any numeric
+    // formatting' so `string` is a more appropriate name.
+    // To compromise, we'll display `string` to end users and persist
+    // as `numberstring` internally (which analysts will publish with).
+    [EnumLabelValue("string", "numberstring")]
+    String,
 }

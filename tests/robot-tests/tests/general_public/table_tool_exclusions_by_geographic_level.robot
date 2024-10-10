@@ -161,7 +161,7 @@ User validates permanent link works correctly
     ...    'Exclusions by geographic level' from '${EXCLUSIONS_PUBLICATION_TITLE}'
 
 User validates permalink contains correct date
-    ${date}=    get current datetime    %-d %B %Y
+    ${date}=    get london date
     user checks page contains element    xpath://*[@data-testid="created-date"]//strong//time[text()="${date}"]
 
 User validates permalink table headers

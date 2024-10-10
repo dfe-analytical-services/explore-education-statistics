@@ -34,7 +34,7 @@ public record ChangeSetViewModel
     /// <summary>
     /// A list of any geographic level changes made to the data set.
     /// </summary>
-    public IReadOnlyList<GeographicLevelOptionChangeViewModel>? GeographicLevels { get; init; }
+    public IReadOnlyList<GeographicLevelChangeViewModel>? GeographicLevels { get; init; }
 
     /// <summary>
     /// A list of any indicator changes made to the data set.

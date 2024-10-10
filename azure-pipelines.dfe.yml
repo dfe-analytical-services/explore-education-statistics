@@ -5,6 +5,7 @@ parameters:
     default:
       - master
       - dev
+      - test
 
 variables:
   BuildConfiguration: 'Release'
@@ -18,12 +19,14 @@ trigger:
     include:
       - master
       - dev
+      - test
   paths:
     exclude:
       - infrastructure/
 pr:
   - master
   - dev
+  - test
 
 jobs:
   - job: 'Backend'

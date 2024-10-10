@@ -15,11 +15,12 @@ import {
 interface Props<TFormValues extends FieldValues>
   extends OmitStrict<FormThemeTopicSelectProps, 'error' | 'topicId'> {
   name: Path<TFormValues>;
+  themeInputName: Path<TFormValues>;
 }
 
 export default function FormFieldThemeTopicSelect<
   TFormValues extends FieldValues,
->({ name, onChange, ...props }: Props<TFormValues>) {
+>({ themeInputName, name, onChange, ...props }: Props<TFormValues>) {
   const {
     formState: { errors },
     setValue,
@@ -38,6 +39,10 @@ export default function FormFieldThemeTopicSelect<
         }
 
         setValue(name, topicId as PathValue<TFormValues, Path<TFormValues>>);
+        setValue(
+          themeInputName,
+          themeId as PathValue<TFormValues, Path<TFormValues>>,
+        );
       }}
     />
   );

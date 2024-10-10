@@ -14,10 +14,10 @@ export interface OidcConfig {
 
 export interface Config {
   readonly appInsightsKey: string;
-  readonly publicAppUrl: string;
-  readonly permittedEmbedUrlDomains: string[];
   readonly oidc: OidcConfig;
-  readonly publicApiBaseUrl: string;
+  readonly permittedEmbedUrlDomains: string[];
+  readonly publicAppUrl: string;
+  readonly publicApiUrl: string;
   readonly publicApiDocsUrl: string;
 }
 

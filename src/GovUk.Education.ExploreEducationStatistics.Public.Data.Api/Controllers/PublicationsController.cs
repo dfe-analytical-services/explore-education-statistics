@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Asp.Versioning;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -22,8 +23,8 @@ public class PublicationsController(IPublicationService publicationService, IDat
     /// Lists details about publications with data available for querying.
     /// </remarks>
     [HttpGet]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The paginated list of publications", type: typeof(PublicationPaginatedListViewModel))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [SwaggerResponse(200, "The paginated list of publications.", type: typeof(PublicationPaginatedListViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     public async Task<ActionResult<PublicationPaginatedListViewModel>> ListPublications(
         [FromQuery] PublicationListRequest request,
@@ -45,8 +46,8 @@ public class PublicationsController(IPublicationService publicationService, IDat
     /// Get a specific publication's summary details.
     /// </remarks>
     [HttpGet("{publicationId:guid}")]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The requested publication summary", type: typeof(PublicationSummaryViewModel))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [SwaggerResponse(200, "The requested publication summary.", type: typeof(PublicationSummaryViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     // add other responses
     public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication(
@@ -67,8 +68,8 @@ public class PublicationsController(IPublicationService publicationService, IDat
     /// Lists summary details of all the data sets related to a publication.
     /// </remarks>
     [HttpGet("{publicationId:guid}/data-sets")]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The paginated list of data sets", type: typeof(DataSetPaginatedListViewModel))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [SwaggerResponse(200, "The paginated list of data sets.", type: typeof(DataSetPaginatedListViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     public async Task<ActionResult<DataSetPaginatedListViewModel>> ListPublicationDataSets(
         [FromQuery] DataSetListRequest request,

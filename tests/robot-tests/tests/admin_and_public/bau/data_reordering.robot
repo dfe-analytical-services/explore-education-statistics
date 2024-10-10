@@ -27,7 +27,7 @@ Upload subject to release
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
 
-    user uploads subject
+    user uploads subject and waits until complete
     ...    ${SUBJECT_NAME}
     ...    grouped-filters-and-indicators.csv
     ...    grouped-filters-and-indicators.meta.csv

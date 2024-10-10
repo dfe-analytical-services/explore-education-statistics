@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -16,11 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     public class StageReleaseContentFunction(
         ILogger<StageReleaseContentFunction> logger,
-        IOptions<AppSettingsOptions> appSettingsOptions,
+        IOptions<AppOptions> appOptions,
         IContentService contentService,
         IReleasePublishingStatusService releasePublishingStatusService)
     {
-        private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+        private readonly AppOptions _appOptions = appOptions.Value;
 
         /// <summary>
         /// Azure function which generates the content for a Release into a staging directory.
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await UpdateContentStage(message, Started);
             try
             {
-                var publishStagedReleasesCronExpression = _appSettingsOptions.PublishReleaseContentCronSchedule;
+                var publishStagedReleasesCronExpression = _appOptions.PublishReleaseContentCronSchedule;
                 var nextScheduledPublishingTime = CrontabSchedule.Parse(publishStagedReleasesCronExpression,
                     new CrontabSchedule.ParseOptions
                     {
@@ -69,7 +69,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await message.ReleasePublishingKeys
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async key =>
-                    await releasePublishingStatusService.UpdateContentStage(key, stage, logMessage));
+                {
+                    await releasePublishingStatusService.UpdateContentStage(key, stage, logMessage);
+                });
         }
     }
 }

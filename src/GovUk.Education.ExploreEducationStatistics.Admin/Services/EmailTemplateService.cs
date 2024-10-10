@@ -2,33 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class EmailTemplateService : IEmailTemplateService
+    public class EmailTemplateService(
+        IEmailService emailService,
+        IOptions<AppOptions> appOptions,
+        IOptions<NotifyOptions> notifyOptions)
+        : IEmailTemplateService
     {
-        private readonly IEmailService _emailService;
-        private readonly IConfiguration _configuration;
-
-        public EmailTemplateService(IEmailService emailService, IConfiguration configuration)
-        {
-            _emailService = emailService;
-            _configuration = configuration;
-        }
-
         public Either<ActionResult, Unit> SendInviteEmail(
             string email,
             List<UserReleaseInvite> userReleaseInvites,
             List<UserPublicationInvite> userPublicationInvites)
         {
-            var uri = _configuration.GetValue<string>("AdminUri");
-            var template = _configuration.GetValue<string>("NotifyInviteWithRolesTemplateId");
+            var url = appOptions.Value.Url;
+            var template = notifyOptions.Value.InviteWithRolesTemplateId;
 
             var releaseRoleList = userReleaseInvites
                 .OrderBy(invite => invite.ReleaseVersion.Publication.Title)
@@ -46,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var emailValues = new Dictionary<string, dynamic>
             {
-                { "url", $"https://{uri}" },
+                { "url", url },
                 {
                     "release role list",
                     releaseRoleList.IsNullOrEmpty()
@@ -61,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 },
             };
 
-            return _emailService.SendEmail(email, template, emailValues);
+            return emailService.SendEmail(email, template, emailValues);
         }
 
         public Either<ActionResult, Unit> SendPublicationRoleEmail(
@@ -69,17 +65,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Publication publication,
             PublicationRole role)
         {
-            var uri = _configuration.GetValue<string>("AdminUri");
-            var template = _configuration.GetValue<string>("NotifyPublicationRoleTemplateId");
+            var url = appOptions.Value.Url;
+            var template = notifyOptions.Value.PublicationRoleTemplateId;
 
             var emailValues = new Dictionary<string, dynamic>
             {
-                {"url", $"https://{uri}"},
+                {"url", url},
                 {"role", role.ToString()},
                 {"publication", publication.Title}
             };
 
-            return _emailService.SendEmail(email, template, emailValues);
+            return emailService.SendEmail(email, template, emailValues);
         }
 
         public Either<ActionResult, Unit> SendReleaseRoleEmail(
@@ -87,41 +83,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ReleaseVersion releaseVersion,
             ReleaseRole role)
         {
-            var uri = _configuration.GetValue<string>("AdminUri");
-            var template = _configuration.GetValue<string>("NotifyReleaseRoleTemplateId");
+            var url = appOptions.Value.Url;
+            var template = notifyOptions.Value.ReleaseRoleTemplateId;
 
             var link = role == ReleaseRole.PrereleaseViewer ? "prerelease " : "summary";
             var emailValues = new Dictionary<string, dynamic>
             {
                 {
                     "url",
-                    $"https://{uri}/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/{link}"
+                    $"{url}/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/{link}"
                 },
                 { "role", role.ToString() },
                 { "publication", releaseVersion.Publication.Title },
                 { "release", releaseVersion.Title }
             };
 
-            return _emailService.SendEmail(email, template, emailValues);
+            return emailService.SendEmail(email, template, emailValues);
         }
 
         public Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email,
             ReleaseVersion releaseVersion)
         {
-            var uri = _configuration.GetValue<string>("AdminUri");
-            var template = _configuration.GetValue<string>("NotifyReleaseHigherReviewersTemplateId");
+            var url = appOptions.Value.Url;
+            var template = notifyOptions.Value.ReleaseHigherReviewersTemplateId;
 
             var emailValues = new Dictionary<string, dynamic>
             {
                 {
                     "url",
-                    $"https://{uri}/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/summary"
+                    $"{url}/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/summary"
                 },
                 { "publication", releaseVersion.Publication.Title },
                 { "release", releaseVersion.Title },
             };
 
-            return _emailService.SendEmail(email, template, emailValues);
+            return emailService.SendEmail(email, template, emailValues);
         }
 
         public Either<ActionResult, Unit> SendMethodologyHigherReviewEmail(
@@ -129,16 +125,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid methodologyVersionId,
             string methodologyTitle)
         {
-            var uri = _configuration.GetValue<string>("AdminUri");
-            var template = _configuration.GetValue<string>("NotifyMethodologyHigherReviewersTemplateId");
+            var url = appOptions.Value.Url;
+            var template = notifyOptions.Value.MethodologyHigherReviewersTemplateId;
 
             var emailValues = new Dictionary<string, dynamic>
             {
-                {"url", $"https://{uri}/methodology/{methodologyVersionId}/summary"},
+                {"url", $"{url}/methodology/{methodologyVersionId}/summary"},
                 {"methodology", methodologyTitle},
             };
 
-            return _emailService.SendEmail(email, template, emailValues);
+            return emailService.SendEmail(email, template, emailValues);
         }
     }
 }

@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
@@ -365,12 +366,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             return string.Empty;
         }
-    }
-
-    public class TableBuilderOptions
-    {
-        public const string TableBuilder = "TableBuilder";
-
-        public int MaxTableCellsAllowed { get; set; }
     }
 }

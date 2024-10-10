@@ -597,6 +597,7 @@ describe('PublicationDetailsPage', () => {
           supersededById: 'publication-2',
           title: 'Publication 1 updated',
           summary: 'Publication 1 summary',
+          themeId: 'theme-2',
           topicId: 'theme-2-topic-2',
         });
       });

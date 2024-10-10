@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -948,11 +949,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
             bool enableThemeDeletion = true)
         {
-            var configuration =
-                CreateMockConfiguration(TupleOf("enableThemeDeletion", enableThemeDeletion.ToString()));
-
             return new TopicService(
-                configuration.Object,
+                new AppOptions { EnableThemeDeletion = enableThemeDeletion }.ToOptionsWrapper(),
                 contentContext,
                 statisticsContext ?? Mock.Of<StatisticsDbContext>(Strict),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentContext),

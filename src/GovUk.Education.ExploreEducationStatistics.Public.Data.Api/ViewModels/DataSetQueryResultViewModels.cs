@@ -37,6 +37,13 @@ public record DataSetQueryResultViewModel
     /// This is a dictionary where the key is the location's geographic
     /// level and the value is the location's ID.
     /// </summary>
+    /// <example>
+    /// {
+    ///     "NAT": "04bTr",
+    ///     "REG": "4veOu",
+    ///     "LA": "owqlK"
+    /// }
+    /// </example>
     public required Dictionary<string, string> Locations { get; init; }
 
     /// <summary>
@@ -45,6 +52,13 @@ public record DataSetQueryResultViewModel
     /// This is a dictionary where the key is the filter ID and
     /// the value is the specific filter option ID.
     /// </summary>
+    /// <example>
+    /// {
+    ///     "ups2K": "n0WqP",
+    ///     "j51wV": "AnZsi",
+    ///     "hAkBQ": "dvB4z"
+    /// }
+    /// </example>
     public required Dictionary<string, string> Filters { get; init; }
 
     /// <summary>
@@ -53,5 +67,12 @@ public record DataSetQueryResultViewModel
     /// This is a dictionary where the key is the indicator ID
     /// and the value is the data value.
     /// </summary>
+    /// <example>
+    /// {
+    ///     "wLcft": "23593018",
+    ///     "4S8Ou": "50.342",
+    ///     "9kVFg": "25369172"
+    /// }
+    /// </example>
     public required Dictionary<string, string> Values { get; init; }
 }

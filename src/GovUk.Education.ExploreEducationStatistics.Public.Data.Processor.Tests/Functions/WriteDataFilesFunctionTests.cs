@@ -39,7 +39,7 @@ public abstract class WriteDataFilesFunctionTests(
         [MemberData(nameof(Data))]
         public async Task Success(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             await WriteData(testData, dataSetVersion, instanceId);
 

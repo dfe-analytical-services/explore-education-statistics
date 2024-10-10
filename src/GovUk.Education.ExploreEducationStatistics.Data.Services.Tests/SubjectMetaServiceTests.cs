@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -206,20 +207,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     LocalAuthority = _nottingham
                 });
 
-            var options = Options.Create(new LocationsOptions
+            var options = new LocationsOptions
             {
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
                 {
                     {
                         GeographicLevel.LocalAuthority,
-                        new List<string>
-                        {
+                        [
                             "Country",
                             "Region"
-                        }
+                        ]
                     }
                 }
-            });
+            }.ToOptionsWrapper();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -757,7 +757,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             new Indicator
                             {
                                 Id = Guid.NewGuid(),
-                                Unit = IndicatorUnit.Number,
+                                Unit = IndicatorUnit.None,
                                 Label = "Indicator 2"
                             })
                     },
@@ -887,7 +887,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                                 new IndicatorMetaViewModel
                                 {
                                     Label = "Indicator 2",
-                                    Unit = IndicatorUnit.Number,
+                                    Unit = IndicatorUnit.None,
                                     Value = indicatorGroups[0].Indicators[0].Id
                                 }),
                             Order = 1
@@ -2609,7 +2609,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private static IOptions<LocationsOptions> DefaultLocationOptions()
         {
-            return Options.Create(new LocationsOptions());
+            return new LocationsOptions().ToOptionsWrapper();
         }
 
         private static List<FilterGroup> CreateFilterGroups(Filter filter,

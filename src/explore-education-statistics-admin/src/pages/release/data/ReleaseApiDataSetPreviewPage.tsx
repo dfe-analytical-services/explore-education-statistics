@@ -96,13 +96,13 @@ export default function ReleaseApiDataSetPreviewPage() {
             </p>
             <Modal
               open={modalOpen}
-              title="Generate API token"
+              title="Generate preview token"
               triggerButton={
                 <Button
                   className="govuk-!-margin-top-5"
                   onClick={toggleModalOpen.on}
                 >
-                  Generate token
+                  Generate preview token
                 </Button>
               }
             >

@@ -18,7 +18,7 @@ public class HealthCheckFunctions(
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IOptions<AppSettingsOptions> appSettingsOptions)
+    IOptions<AppOptions> appOptions)
 {
     [Function(nameof(HealthCheck))]
     [Produces("application/json")]
@@ -90,7 +90,7 @@ public class HealthCheckFunctions(
 
         try
         {
-            var connectionString = appSettingsOptions.Value.PrivateStorageConnectionString;
+            var connectionString = appOptions.Value.PrivateStorageConnectionString;
             var blobClient = new BlobServiceClient(connectionString);
             var response = await blobClient.GetAccountInfoAsync();
             return response.HasValue

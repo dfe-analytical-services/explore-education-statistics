@@ -14,7 +14,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - public api resolve mapping statuses %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    UI tests - Public API - resolve mapping statuses %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
@@ -33,7 +33,7 @@ Verify release summary
     user verifies release summary    Financial year    3000-01    Accredited official statistics
 
 Upload datafile
-    user uploads subject    ${SUBJECT_NAME_1}    absence_school.csv    absence_school.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_1}    absence_school.csv    absence_school.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to subjects
     user clicks link    Data and files
@@ -66,7 +66,7 @@ Create 1st API dataset
 
 User waits until the 1st API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    5s    Verify status of API Datasets    Ready
+    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
 
 Add headline text block to Content page
     user clicks link    Back to API data sets
@@ -83,7 +83,7 @@ Create a second draft release via api
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3010
 
 Upload subject to second release
-   user uploads subject    ${SUBJECT_NAME_2}    absence_school_major_manual.csv    absence_school_major_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
+   user uploads subject and waits until complete    ${SUBJECT_NAME_2}    absence_school_major_manual.csv    absence_school_major_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to second release
     user clicks link    Data and files
@@ -148,7 +148,7 @@ Validate the row headings and its contents in the 'Regions' section
 
     user checks table column heading contains    1    3    Type
     user checks table column heading contains   1    4    Actions
-    
+
     user checks table cell contains    1    1    Yorkshire and The Humber
     user checks table cell contains    1    2    Unmapped
     user checks table cell contains    1    3    N/A
@@ -241,7 +241,7 @@ Confirm finalization of this API data set version
 User navigates to 'changelog and guidance notes' page and update relevant details in it
     user clicks link by index    View changelog and guidance notes    1
     user waits until page contains     API data set changelog
-    
+
     user enters text into element    css:textarea[id="guidanceNotesForm-notes"]    public guidance notes
     user clicks button    Save public guidance notes
 

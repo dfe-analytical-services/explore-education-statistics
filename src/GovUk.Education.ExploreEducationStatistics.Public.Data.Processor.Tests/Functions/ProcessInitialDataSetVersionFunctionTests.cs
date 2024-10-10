@@ -135,7 +135,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
         [Fact]
         public async Task Success()
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
             Directory.CreateDirectory(dataSetVersionPathResolver.DirectoryPath(dataSetVersion));
@@ -157,7 +157,7 @@ public abstract class ProcessInitialDataSetVersionFunctionTests(
         [Fact]
         public async Task DuckDbFileIsDeleted()
         {
-            var (dataSetVersion, instanceId) = await CreateDataSet(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
 
             // Create empty data set version files for all file paths
             var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();

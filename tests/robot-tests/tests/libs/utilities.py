@@ -3,20 +3,19 @@ import datetime
 import json
 import os
 import re
-from typing import Union
-
 import time
-import pytz
+from typing import Union
+from urllib.parse import urlparse, urlunparse
+
 import utilities_init
 import visual
 from robot.libraries.BuiltIn import BuiltIn
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.common.exceptions import NoSuchElementException
 from SeleniumLibrary.utils import is_noney
 from tests.libs.logger import get_logger
 from tests.libs.selenium_elements import element_finder, sl, waiting
-from urllib.parse import urlparse, urlunparse
 
 logger = get_logger(__name__)
 
@@ -30,7 +29,6 @@ if not utilities_init.initialised:
 
         return parent_locator
 
-
     def _find_by_label(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
         parent_locator = _normalize_parent_locator(parent_locator)
 
@@ -42,12 +40,10 @@ if not utilities_init.initialised:
         for_id = labels[0].get_attribute("for")
         return get_child_elements(parent_locator, f"id:{for_id}")
 
-
     def _find_by_testid(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
         parent_locator = _normalize_parent_locator(parent_locator)
 
         return get_child_elements(parent_locator, f'css:[data-testid="{criteria}"]')
-
 
     # Register locator strategies
 
@@ -66,8 +62,6 @@ def enable_basic_auth_headers():
         token = base64.b64encode(f"{public_auth_user}:{public_auth_password}".encode())
 
         try:
-            # Must refetch sl() on rerun or sl().driver is None!
-            # sl() = BuiltIn().get_library_instance("SeleniumLibrary")
             assert sl().driver is not None, "sl().driver is None"
             sl().driver.execute_cdp_cmd("Network.enable", {})
 
@@ -95,21 +89,29 @@ def retry_or_fail_with_delay(func, retries=5, delay=1.0, *args, **kwargs):
             return func(*args, **kwargs)
         except Exception as e:
             last_exception = e
-            logger.warn(f"Attempt {attempt + 1}/{retries} failed with error: {e}. Retrying in {delay} seconds...")
+            logger.info(f"Attempt {attempt + 1}/{retries} failed with error: {e}. Retrying in {delay} seconds...")
             time.sleep(delay)
     # Raise the last exception if all retries failed
     raise last_exception
 
 
 def user_waits_until_parent_contains_element(
-    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None,
-    retries: int = 5, delay: float = 1.0
+    parent_locator: object,
+    child_locator: str,
+    timeout: int = None,
+    error: str = None,
+    count: int = None,
+    retries: int = 5,
+    delay: float = 1.0,
 ):
     try:
+        default_timeout = BuiltIn().get_variable_value('${TIMEOUT}')
+        timeout_per_retry = timeout / retries if timeout is not None else int(default_timeout) / retries
+
         child_locator = _normalise_child_locator(child_locator)
 
         def parent_contains_matching_element() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
+            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout_per_retry, error)
             return element_finder().find(child_locator, required=False, parent=parent_el) is not None
 
         if is_noney(count):
@@ -119,14 +121,14 @@ def user_waits_until_parent_contains_element(
                 delay,
                 parent_contains_matching_element,
                 "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
-                timeout,
+                timeout_per_retry,
                 error,
             )
 
         count = int(count)
 
         def parent_contains_matching_elements() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
+            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout_per_retry, error)
             return len(sl().find_elements(child_locator, parent=parent_el)) == count
 
         retry_or_fail_with_delay(
@@ -135,7 +137,7 @@ def user_waits_until_parent_contains_element(
             delay,
             parent_contains_matching_elements,
             "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (parent_locator, count, child_locator),
-            timeout,
+            timeout_per_retry,
             error,
         )
     except Exception as err:
@@ -277,66 +279,15 @@ def set_cookie_from_json(cookie_json):
     sl().driver.add_cookie(cookie_dict)
 
 
-def format_uk_to_local_datetime(uk_local_datetime: str, strf: str) -> str:
-    if os.name == "nt":
-        strf = strf.replace("%-", "%#")
-
-    tz = pytz.timezone("Europe/London")
-
-    return tz.localize(datetime.datetime.fromisoformat(uk_local_datetime)).strftime(strf)
-
-
-def get_current_datetime(strf: str, offset_days: int = 0, timezone: str = "UTC") -> str:
-    return format_datetime(datetime.datetime.now(pytz.timezone(timezone)) + datetime.timedelta(days=offset_days), strf)
-
-
-def format_datetime(datetime: datetime, strf: str) -> str:
-    if os.name == "nt":
-        strf = strf.replace("%-", "%#")
-
-    return datetime.strftime(strf)
-
-
-def format_time_without_leading_zero(time_str: str) -> str:
-    parts = time_str.split()
-    hour, minute = parts[0].split(':')
-
-    # Remove leading zero in hour
-    hour = str(int(hour))
-    return f"{hour}:{minute} {parts[1]}"
-
-
 def user_should_be_at_top_of_page():
     (x, y) = sl().get_window_position()
     if y != 0:
         raise_assertion_error(f"Windows position Y is {y} not 0! User should be at the top of the page!")
 
 
-def prompt_to_continue():
-    logger.warn("Continue? (Y/n)")
-    choice = input()
-    if choice.lower().startswith("n"):
-        raise_assertion_error("Tests stopped!")
-
-
 def capture_large_screenshot_and_prompt_to_continue():
     visual.capture_large_screenshot()
     prompt_to_continue()
-
-
-def capture_screenshots_and_html():
-    visual.capture_screenshot()
-    visual.capture_large_screenshot()
-    capture_html()
-
-
-def capture_html():
-    html = sl().get_source()
-    current_time_millis = round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
-    html_file = open(f"test-results/captured-html-{current_time_millis}.html", "w", encoding="utf-8")
-    html_file.write(html)
-    html_file.close()
-    logger.warn(f"Captured HTML of {sl().get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
 
 
 def user_gets_row_number_with_heading(heading: str, table_locator: str = "css:table"):
@@ -452,7 +403,8 @@ def remove_auth_from_url(publicUrl: str):
         netloc += f":{parsed_url.port}"
 
     modified_url_without_auth = urlunparse(
-        (parsed_url.scheme, netloc, parsed_url.path, parsed_url.params, parsed_url.query, parsed_url.fragment))
+        (parsed_url.scheme, netloc, parsed_url.path, parsed_url.params, parsed_url.query, parsed_url.fragment)
+    )
     return modified_url_without_auth
 
 

@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -22,12 +17,17 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
-using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
@@ -132,6 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Contact = contact.Entity,
                         Title = publication.Title,
                         Summary = publication.Summary,
+                        ThemeId = publication.ThemeId,
                         TopicId = publication.TopicId,
                         Slug = publication.Slug,
                     });
@@ -165,6 +166,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (publication.SupersededById != updatedPublication.SupersededById)
                     {
                         return await _userService.CheckCanUpdatePublication();
+                    }
+
+                    return Unit.Instance;
+                })
+                .OnSuccessDo(async publication =>
+                {
+                    if (publication.ThemeId != updatedPublication.ThemeId)
+                    {
+                        return await ValidateSelectedTheme(updatedPublication.ThemeId);
                     }
 
                     return Unit.Instance;
@@ -232,6 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     publication.Title = updatedPublication.Title;
                     publication.Summary = updatedPublication.Summary;
+                    publication.ThemeId = updatedPublication.ThemeId;
                     publication.TopicId = updatedPublication.TopicId;
                     publication.Updated = DateTime.UtcNow;
                     publication.SupersededById = updatedPublication.SupersededById;
@@ -278,6 +289,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await supersededPublications
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(p => _publicationCacheService.UpdatePublication(p.Slug));
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateSelectedTheme(Guid themeId)
+        {
+            var theme = await _context.Themes.FindAsync(themeId);
+
+            if (theme is null)
+            {
+                return ValidationActionResult(ThemeDoesNotExist);
+            }
+
+            return Unit.Instance;
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateSelectedTopic(
@@ -480,15 +503,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             }
 
                             result.Add(new ReleaseSeriesTableEntryViewModel
-                                {
-                                    Id = seriesItem.Id,
-                                    IsLegacyLink = false,
-                                    Description = latestVersion.Title,
-                                    ReleaseId = latestVersion.ReleaseId,
-                                    ReleaseSlug = latestVersion.Slug,
-                                    IsLatest = latestVersion.Id == publication.LatestPublishedReleaseVersionId,
-                                    IsPublished = latestVersion.Live,
-                                });
+                            {
+                                Id = seriesItem.Id,
+                                IsLegacyLink = false,
+                                Description = latestVersion.Title,
+                                ReleaseId = latestVersion.ReleaseId,
+                                ReleaseSlug = latestVersion.Slug,
+                                IsLatest = latestVersion.Id == publication.LatestPublishedReleaseVersionId,
+                                IsPublished = latestVersion.Live,
+                            });
                         }
                     }
 

@@ -38,6 +38,7 @@ const errorMappings = [
 interface Props {
   cancelButton?: ReactNode;
   id?: string;
+  themeId: string;
   topicId: string;
   onSubmit: () => void | Promise<void>;
 }
@@ -45,6 +46,7 @@ interface Props {
 export default function PublicationForm({
   cancelButton,
   id = 'publicationForm',
+  themeId,
   topicId,
   onSubmit,
 }: Props) {
@@ -99,6 +101,7 @@ export default function PublicationForm({
     await publicationService.createPublication({
       summary,
       title,
+      themeId,
       topicId,
       contact,
     });

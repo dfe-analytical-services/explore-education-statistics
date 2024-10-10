@@ -90,7 +90,7 @@ stages:
                 - template: pipeline-variables-from-bicep-outputs-template.yml
                   parameters:
                     serviceConnection: ${{parameters.serviceConnection}}
-                
+
                 # We handle the non-infrastructure appsetting and connection string configuration here rather than directly
                 # in the Bicep files so that we can implement slot swapping.
                 # Configuration changes are firstly deployed to the staging slot and combined with a fresh code deploy prior
@@ -110,7 +110,7 @@ stages:
                         --resource-group $(resourceGroupName) \
                         --slot staging \
                         --settings \
-                          "AppSettings__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
+                          "App__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
                           "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
                           "DataFiles__BasePath=$(dataProcessorPublicApiDataFileShareMountPath)"
                       
@@ -129,7 +129,7 @@ stages:
                         --slot staging \
                         --settings \
                           "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
-                
+
                 # TODO EES-5128 - add Private Endpoint to Data Processor Function App into the VMSS VNet to allow DevOps to
                 # deploy the Data Processor Function App without having to temporarily make it publicly accessible.
                 - task: AzureCLI@2
@@ -149,7 +149,7 @@ stages:
                         --set \
                           publicNetworkAccess=Enabled \
                           siteConfig.publicNetworkAccess=Enabled
-                
+
                 # TODO EES-5128 - we will try several attempts to deploy the Function App in order to allow the staging
                 # slot the time to fully restart after appsettings and network visibility settings have been updated prior to
                 # attempting the deploy. Deploying prematurely results in a 500 from the deployment endpoint until the
@@ -172,7 +172,7 @@ stages:
                         --name $(dataProcessorFunctionAppName) \
                         --resource-group $(resourceGroupName) \
                         --slot staging
-                
+
                 # TODO EES-5128 - add Private Endpoint to Data Processor Function App into the VMSS VNet to allow DevOps to
                 # deploy the Data Processor Function App without having to temporarily make it publicly accessible.
                 - task: AzureCLI@2
@@ -208,7 +208,7 @@ stages:
                         --resource-group $(resourceGroupName) \
                         --slot staging \
                         --target-slot production
-              
+
               # - template: assign-app-role-to-service-principal-template.yml
               #   parameters:
               #     serviceConnection: ${{parameters.serviceConnection}}

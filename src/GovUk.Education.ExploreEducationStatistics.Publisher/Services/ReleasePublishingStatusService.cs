@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Data.Tables;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
@@ -19,19 +21,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _context;
         private readonly ILogger<ReleasePublishingStatusService> _logger;
-        private readonly IPublisherTableStorageService _tableStorageService;
+        private readonly IPublisherTableStorageService _publisherTableStorageService;
 
         public ReleasePublishingStatusService(
             ContentDbContext context,
             ILogger<ReleasePublishingStatusService> logger,
-            IPublisherTableStorageService tableStorageService)
+            IPublisherTableStorageService publisherTableStorageService)
         {
             _context = context;
             _logger = logger;
-            _tableStorageService = tableStorageService;
+            _publisherTableStorageService = publisherTableStorageService;
         }
 
-        public async Task<ReleasePublishingKey> Create(
+        public async Task Create(
             ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state,
             bool immediate,
@@ -42,123 +44,135 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(rv => rv.Publication)
                 .FirstAsync(rv => rv.Id == releasePublishingKey.ReleaseVersionId);
 
-            var releaseStatus = new ReleasePublishingStatus(publicationSlug: releaseVersion.Publication.Slug,
-                publish: immediate ? null : releaseVersion.PublishScheduled,
+            var releaseStatus = new ReleasePublishingStatus(
                 releaseVersionId: releaseVersion.Id,
                 releaseStatusId: releasePublishingKey.ReleaseStatusId,
+                publicationSlug: releaseVersion.Publication.Slug,
+                publish: immediate ? null : releaseVersion.PublishScheduled,
                 releaseSlug: releaseVersion.Slug,
                 state,
                 immediate: immediate,
                 logMessages);
 
-            var tableResult = await GetTable().ExecuteAsync(TableOperation.Insert(releaseStatus));
-            return (tableResult.Result as ReleasePublishingStatus).AsTableRowKey();
+            await _publisherTableStorageService.CreateEntity(
+                PublisherReleaseStatusTableName,
+                releaseStatus);
         }
 
         public async Task<ReleasePublishingStatus> Get(ReleasePublishingKey releasePublishingKey)
         {
-            var tableResult = await GetTable().ExecuteAsync(
-                TableOperation.Retrieve<ReleasePublishingStatus>(
-                    partitionKey: releasePublishingKey.ReleaseVersionId.ToString(),
-                    rowkey: releasePublishingKey.ReleaseStatusId.ToString(),
-                    [
-                        nameof(ReleasePublishingStatus.Created),
-                        nameof(ReleasePublishingStatus.PublicationSlug),
-                        nameof(ReleasePublishingStatus.Publish),
-                        nameof(ReleasePublishingStatus.ReleaseSlug),
-                        nameof(ReleasePublishingStatus.ContentStage),
-                        nameof(ReleasePublishingStatus.FilesStage),
-                        nameof(ReleasePublishingStatus.PublishingStage),
-                        nameof(ReleasePublishingStatus.OverallStage),
-                        nameof(ReleasePublishingStatus.Immediate),
-                        nameof(ReleasePublishingStatus.Messages)
-                    ]));
+            var result = await _publisherTableStorageService.GetEntityIfExists<ReleasePublishingStatus>(
+                tableName: PublisherReleaseStatusTableName,
+                partitionKey: releasePublishingKey.ReleaseVersionId.ToString(),
+                rowKey: releasePublishingKey.ReleaseStatusId.ToString());
 
-            return tableResult.Result as ReleasePublishingStatus;
+            if (result == null)
+            {
+                throw new Exception($"""
+                                    Failed to fetch entity from PublisherReleaseStatusTable.
+                                    ReleaseVersionId/PartitionKey: {releasePublishingKey.ReleaseVersionId}
+                                    ReleaseStatusId/RowKey: {releasePublishingKey.ReleaseStatusId}
+                                    """);
+            }
+
+            return result;
         }
 
-        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayWithStages(
+        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueToday(
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null)
         {
-            var query = QueryPublishLessThanEndOfTodayWithStages(content, files, publishing, overall);
-            var tableResult = await ExecuteQuery(query);
-            return tableResult.Select(status => status.AsTableRowKey()).ToList();
+            var filter = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
+                status.Publish < DateTime.Today.AddDays(1));
+
+            filter = UpdateFilterForStages(filter, content, files, publishing, overall);
+
+            var asyncPageable = await _publisherTableStorageService
+                .QueryEntities<ReleasePublishingStatus>(
+                    PublisherReleaseStatusTableName,
+                    filter);
+
+            var tableResults = await asyncPageable.ToListAsync();
+
+            return tableResults
+                .Select(status => status.AsTableRowKey())
+                .ToList();
         }
 
-        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFutureWithStages(
+        public async Task<IReadOnlyList<ReleasePublishingKey>> GetWherePublishingDueTodayOrInFuture(
             IReadOnlyList<Guid> releaseVersionIds,
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null)
         {
-            var query = QueryPublishTodayOrInFutureWithStages(content, files, publishing, overall);
-            var tableResult = await ExecuteQuery(query);
-            return tableResult.Where(status => releaseVersionIds.Contains(status.ReleaseVersionId))
+            var filter = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
+                status.Publish >= DateTime.Today);
+
+            filter = UpdateFilterForStages(filter, content, files, publishing, overall);
+
+            var asyncPageable = await _publisherTableStorageService
+                .QueryEntities<ReleasePublishingStatus>(
+                    PublisherReleaseStatusTableName,
+                    filter);
+
+            var tableResults = await asyncPageable.ToListAsync();
+
+            return tableResults
+                .Where(status => releaseVersionIds.Contains(status.ReleaseVersionId))
                 .Select(status => status.AsTableRowKey())
                 .ToList();
         }
 
-
-        public async Task<IReadOnlyList<ReleasePublishingStatus>> GetAllByOverallStage(
+        public async Task<List<ReleasePublishingStatus>> GetAllByOverallStage(
             Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages)
         {
-            var filter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                QueryComparisons.Equal,
-                releaseVersionId.ToString());
+            var filter = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
+                status.PartitionKey == releaseVersionId.ToString());
 
-            if (overallStages.Any())
+            var stageFilter = "";
+            foreach (var stage in overallStages)
             {
-                var allStageFilters = overallStages.ToList().Aggregate("",
-                    (acc, stage) =>
-                    {
-                        var stageFilter = TableQuery.GenerateFilterCondition(
-                            nameof(ReleasePublishingStatus.OverallStage),
-                            QueryComparisons.Equal,
-                            stage.ToString()
-                        );
+                var stageStr = Enum.GetName(stage);
+                var stageFilterCondition = TableClient.CreateQueryFilter<ReleasePublishingStatus>(status =>
+                    status.OverallStage == stageStr);
 
-                        if (acc == "")
-                        {
-                            return stageFilter;
-                        }
-
-                        return TableQuery.CombineFilters(acc, TableOperators.Or, stageFilter);
-                    });
-
-                filter = TableQuery.CombineFilters(filter, TableOperators.And, allStageFilters);
+                stageFilter = stageFilter == ""
+                    ? stageFilterCondition
+                    : DataTableStorageUtils.CombineQueryFiltersOr(stageFilter, stageFilterCondition);
             }
 
-            var query = new TableQuery<ReleasePublishingStatus>().Where(filter);
-            return await ExecuteQuery(query);
+            filter = stageFilter == ""
+                ? filter
+                : DataTableStorageUtils.CombineQueryFiltersAnd(filter, stageFilter);
+
+            var results = await _publisherTableStorageService
+                .QueryEntities<ReleasePublishingStatus>(
+                    PublisherReleaseStatusTableName,
+                    filter);
+
+            return await results.ToListAsync();
         }
 
         public async Task<ReleasePublishingStatus?> GetLatest(Guid releaseVersionId)
         {
-            var query = new TableQuery<ReleasePublishingStatus>()
-                .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                    QueryComparisons.Equal,
-                    releaseVersionId.ToString()));
+            var asyncPages = await _publisherTableStorageService
+                .QueryEntities<ReleasePublishingStatus>(
+                    PublisherReleaseStatusTableName,
+                    status => status.PartitionKey == releaseVersionId.ToString());
+            var statusList = await asyncPages.ToListAsync();
 
-            var result = await ExecuteQuery(query);
-            return result.OrderByDescending(status => status.Created).FirstOrDefault();
-        }
-
-        private async Task<IReadOnlyList<ReleasePublishingStatus>> ExecuteQuery(
-            TableQuery<ReleasePublishingStatus> query)
-        {
-            return await _tableStorageService.ExecuteQuery(PublisherReleaseStatusTableName, query);
+            return statusList.OrderByDescending(status => status.Created).FirstOrDefault();
         }
 
         public async Task UpdateState(
             ReleasePublishingKey releasePublishingKey,
             ReleasePublishingStatusState state)
         {
-            await UpdateRowAsync(releasePublishingKey,
+            await UpdateWithRetries(releasePublishingKey,
                 row =>
                 {
                     row.State = state;
@@ -171,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releasePublishingKey,
+            await UpdateWithRetries(releasePublishingKey,
                 row =>
                 {
                     row.State.Content = stage;
@@ -185,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releasePublishingKey,
+            await UpdateWithRetries(releasePublishingKey,
                 row =>
                 {
                     row.State.Files = stage;
@@ -199,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releasePublishingKey,
+            await UpdateWithRetries(releasePublishingKey,
                 row =>
                 {
                     row.State.Publishing = stage;
@@ -208,44 +222,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 });
         }
 
-        private async Task UpdateRowAsync(
+        private async Task UpdateWithRetries(
             ReleasePublishingKey releasePublishingKey,
             Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction,
-            int retry = 0)
+            int numRetries = 5)
         {
-            var table = GetTable();
             var releasePublishingStatus = await Get(releasePublishingKey);
+
+            var updatedStatus = updateFunction.Invoke(releasePublishingStatus);
 
             try
             {
-                await table.ExecuteAsync(TableOperation.Replace(updateFunction.Invoke(releasePublishingStatus)));
+                await _publisherTableStorageService.UpdateEntity(
+                    PublisherReleaseStatusTableName,
+                    updatedStatus
+                );
             }
-            catch (StorageException e)
+            catch (RequestFailedException e)
             {
-                if (e.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
-                {
-                    _logger.LogDebug("Precondition failure as expected. ETag does not match");
-                    if (retry++ < 5)
-                    {
-                        await UpdateRowAsync(releasePublishingKey,
-                            updateFunction,
-                            retry);
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                else
+                if (e.Status != (int)HttpStatusCode.PreconditionFailed)
                 {
                     throw;
                 }
+                
+                // If the ETag of the status fetched doesn't match the one found in the table,
+                // something else has updated the entity, so we should refetch the entity and try the update again.
+                _logger.LogDebug("Precondition failure. ETag does not match");
+                if (numRetries > 0)
+                {
+                    numRetries--;
+                    await UpdateWithRetries(releasePublishingKey,
+                        updateFunction,
+                        numRetries);
+                }
+                else
+                {
+                    throw new Exception("Did not complete Storage table entity update despite retries");
+                }
             }
-        }
-
-        private CloudTable GetTable()
-        {
-            return _tableStorageService.GetTable(PublisherReleaseStatusTableName);
         }
     }
 }

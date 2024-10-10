@@ -87,6 +87,18 @@ public class FilterOptionMetaChange : Change<FilterOptionMetaChange.State>
         public required int OptionId { get; set; }
 
         public required string PublicId { get; set; }
+
+        public static State Create(FilterOptionMetaLink link)
+        {
+            return new State
+            {
+                Meta = link.Meta,
+                MetaId = link.MetaId,
+                Option = link.Option,
+                OptionId = link.OptionId,
+                PublicId = link.PublicId
+            };
+        }
     }
 }
 
@@ -161,6 +173,18 @@ public class LocationOptionMetaChange : Change<LocationOptionMetaChange.State>
         public required int OptionId { get; set; }
 
         public required string PublicId { get; set; }
+
+        public static State Create(LocationOptionMetaLink link)
+        {
+            return new State
+            {
+                Meta = link.Meta,
+                MetaId = link.MetaId,
+                Option = link.Option,
+                OptionId = link.OptionId,
+                PublicId = link.PublicId
+            };
+        }
     }
 }
 

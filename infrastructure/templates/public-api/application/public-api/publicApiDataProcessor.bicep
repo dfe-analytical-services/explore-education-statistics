@@ -103,7 +103,7 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       unhealthyMetricName: '${metricsNamePrefix}Unhealthy'
     }
     appSettings: {
-      AppSettings__MetaInsertBatchSize: 1000
+      App__MetaInsertBatchSize: 1000
     }
     azureFileShares: [{
       storageName: resourceNames.publicApi.publicApiFileshare

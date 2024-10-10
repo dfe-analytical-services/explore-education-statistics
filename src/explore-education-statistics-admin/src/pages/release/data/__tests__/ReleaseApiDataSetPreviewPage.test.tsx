@@ -72,7 +72,7 @@ describe('ReleaseApiDataSetPreviewPage', () => {
       screen.getByRole('heading', { name: 'Data set title' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Generate token' }),
+      screen.getByRole('button', { name: 'Generate preview token' }),
     ).toBeInTheDocument();
   });
 
@@ -87,7 +87,9 @@ describe('ReleaseApiDataSetPreviewPage', () => {
       await screen.findByText('Generate API data set preview token'),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Generate token' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Generate preview token' }),
+    );
 
     expect(await screen.findByText('Token name')).toBeInTheDocument();
 

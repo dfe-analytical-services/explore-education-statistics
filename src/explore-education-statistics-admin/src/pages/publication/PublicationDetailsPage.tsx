@@ -57,6 +57,7 @@ const PublicationDetailsPage = () => {
             supersededById,
             title,
             summary,
+            themeId: theme.id,
             topicId: topic.id,
           }}
           publicationId={id}
