@@ -22,7 +22,7 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
-import RelatedAside from '@common/components/RelatedAside';
+import RelatedContent from '@common/components/RelatedContent';
 import ScrollableContainer from '@common/components/ScrollableContainer';
 import Tag from '@common/components/Tag';
 import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
@@ -207,7 +207,7 @@ const PrototypeReleaseContent = ({
         </div>
 
         <div className="govuk-grid-column-one-third">
-          <RelatedAside>
+          <RelatedContent>
             <h2 className="govuk-heading-m" id="quick-links">
               Quick links
             </h2>
@@ -358,7 +358,7 @@ const PrototypeReleaseContent = ({
               </>
             )}
             <RelatedPagesSection release={release} />
-          </RelatedAside>
+          </RelatedContent>
         </div>
       </div>
 

@@ -24,7 +24,7 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
-import RelatedAside from '@common/components/RelatedAside';
+import RelatedContent from '@common/components/RelatedContent';
 import ScrollableContainer from '@common/components/ScrollableContainer';
 import Tag from '@common/components/Tag';
 import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
@@ -245,7 +245,7 @@ const ReleaseContent = ({
         </div>
 
         <div className="govuk-grid-column-one-third">
-          <RelatedAside>
+          <RelatedContent>
             <h2 className="govuk-heading-m" id="quick-links">
               Quick links
             </h2>
@@ -335,9 +335,9 @@ const ReleaseContent = ({
 
             {!!releaseSeries.length && (
               <>
-                <h3 className="govuk-heading-s" id="past-releases">
+                <h2 className="govuk-heading-s" id="past-releases">
                   Releases in this series
-                </h3>
+                </h2>
 
                 <Details
                   className="govuk-!-margin-bottom-4"
@@ -376,12 +376,12 @@ const ReleaseContent = ({
 
             {allMethodologies.length > 0 && (
               <>
-                <h3
+                <h2
                   className="govuk-heading-s govuk-!-padding-top-0"
                   id="methodologies"
                 >
                   Methodologies
-                </h3>
+                </h2>
                 <ul className="govuk-list" data-testid="methodologies-list">
                   {allMethodologies.map(methodology => (
                     <li key={methodology.key}>
@@ -396,7 +396,7 @@ const ReleaseContent = ({
               </>
             )}
             <RelatedPagesSection release={release} />
-          </RelatedAside>
+          </RelatedContent>
         </div>
       </div>
 
