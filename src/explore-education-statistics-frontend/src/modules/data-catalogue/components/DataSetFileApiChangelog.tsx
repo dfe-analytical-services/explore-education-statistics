@@ -6,13 +6,13 @@ import React from 'react';
 
 interface Props {
   changes: ApiDataSetVersionChanges;
-  publicGuidanceNotes?: string;
+  guidanceNotes: string;
   version: string;
 }
 
 export default function DataSetFileApiChangelog({
   changes,
-  publicGuidanceNotes,
+  guidanceNotes,
   version,
 }: Props) {
   const { majorChanges, minorChanges } = changes;
@@ -26,8 +26,8 @@ export default function DataSetFileApiChangelog({
       heading={pageSections.apiChangelog}
       id="apiChangelog"
     >
-      {publicGuidanceNotes && (
-        <p data-testid="public-guidance-notes">{publicGuidanceNotes}</p>
+      {guidanceNotes.length && (
+        <p data-testid="public-guidance-notes">{guidanceNotes}</p>
       )}
       <ApiDataSetChangelog
         majorChanges={changes.majorChanges}

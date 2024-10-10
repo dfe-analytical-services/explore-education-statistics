@@ -21,7 +21,7 @@ describe('DataSetFileApiChangelog', () => {
             ],
           },
         }}
-        publicGuidanceNotes={'Guidance notes.\nMultiline content.'}
+        guidanceNotes={'Guidance notes.\nMultiline content.'}
         version="2.0"
       />,
     );
@@ -64,6 +64,7 @@ describe('DataSetFileApiChangelog', () => {
           },
           minorChanges: {},
         }}
+        guidanceNotes=""
         version="2.0"
       />,
     );
@@ -90,6 +91,7 @@ describe('DataSetFileApiChangelog', () => {
             ],
           },
         }}
+        guidanceNotes=""
         version="2.0"
       />,
     );
@@ -116,6 +118,7 @@ describe('DataSetFileApiChangelog', () => {
             ],
           },
         }}
+        guidanceNotes=""
         version="2.0"
       />,
     );
@@ -130,6 +133,7 @@ describe('DataSetFileApiChangelog', () => {
           majorChanges: {},
           minorChanges: {},
         }}
+        guidanceNotes=""
         version="2.0"
       />,
     );

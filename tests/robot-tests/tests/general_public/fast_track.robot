@@ -20,7 +20,7 @@ Click fast track link for 'Pupil absence rates' data block
     user scrolls to accordion section    Pupil absence rates    id:content
     user scrolls to element    testid:Data block - Generic data block - National
     user waits until h3 is visible    Explore and edit this data online
-    user clicks link by visible text    Explore data    testid:Data block - Generic data block - National
+    user clicks link containing text    Explore data    testid:Data block - Generic data block - National
 
 Validate Publication selected step option
     user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}

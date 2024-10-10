@@ -33,7 +33,7 @@ export interface ApiDataSetVersion {
   status: ApiDataSetStatus;
   published: string;
   withdrawn?: Date;
-  notes?: string;
+  notes: string;
   totalResults: number;
   file: ApiDataSetVersionFile;
   release: ApiDataSetVersionRelease;

@@ -509,11 +509,6 @@ user clicks link by index
     ${button}=    get webelement    ${xpath}
     user clicks element    ${button}    ${parent}
 
-user clicks link by visible text
-    [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${FALSE}
-    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
-    user clicks element    xpath:.//a[${text_matcher}]    ${parent}
-
 user clicks link containing text
     [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${FALSE}
     ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
@@ -1037,7 +1032,7 @@ user gets data block from parent
 user gets data block table from parent
     [Arguments]    ${data_block_name}    ${parent}
     ${data_block}=    user gets data block from parent    ${data_block_name}    ${parent}
-    user clicks link by visible text    Table    ${data_block}
+    user clicks link containing text    Table    ${data_block}
     ${data_block_id}=    get element attribute    ${data_block}    id
     ${data_block_table}=    get child element    ${data_block}    id:${data_block_id}-tables
     [Return]    ${data_block_table}
@@ -1045,7 +1040,7 @@ user gets data block table from parent
 user gets data block chart from parent
     [Arguments]    ${data_block_name}    ${parent}
     ${data_block}=    user gets data block from parent    ${data_block_name}    ${parent}
-    user clicks link by visible text    Chart    ${data_block}
+    user clicks link containing text    Chart    ${data_block}
     ${data_block_id}=    get element attribute    ${data_block}    id
     ${data_block_chart}=    get child element    ${data_block}    id:${data_block_id}-chart
     [Return]    ${data_block_chart}

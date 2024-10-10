@@ -232,7 +232,7 @@ Verify data block is updated correctly
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
 
     user checks chart title contains    ${datablock}    Updated dates table title
-    user clicks link by visible text    Table    ${datablock}
+    user clicks link containing text    Table    ${datablock}
     user waits until parent contains element    ${datablock}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
     user waits until parent contains element    ${datablock}    xpath:.//*[.="Source: Updated dates source"]
@@ -407,7 +407,7 @@ Verify Dates data block accordion section
     user checks chart title contains    ${section}    Updated dates table title
     user checks infographic chart contains alt    ${section}    Sample alt text
 
-    user clicks link by visible text    Table    ${section}
+    user clicks link containing text    Table    ${section}
     user waits until parent contains element    ${section}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
     user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]
@@ -434,7 +434,7 @@ Verify Dates data block table has footnotes
 Verify Dates data block Fast Track page
     ${release_url}=    user gets url
 
-    user clicks link by visible text    Explore data    testid:Data block - Dates data block name-table-tab
+    user clicks link containing text    Explore data    testid:Data block - Dates data block name-table-tab
 
     user waits until page contains title    Create your own tables
     user waits until page contains    This is the latest data
@@ -882,7 +882,7 @@ Verify amendment Dates data block accordion section
     user checks chart title contains    ${section}    Amended sample title
     user checks infographic chart contains alt    ${section}    Amended sample alt text
 
-    user clicks link by visible text    Table    ${section}
+    user clicks link containing text    Table    ${section}
     user waits until parent contains element    ${section}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Amended dates table title"]
     user waits until parent contains element    ${section}    xpath:.//*[.="Source: Amended dates source"]
@@ -915,7 +915,7 @@ Verify amendment Dates data block table has footnotes
 Verify amendment Dates data block Fast Track page
     ${release_url}=    user gets url
 
-    user clicks link by visible text    Explore data    testid:Data block - Dates data block name-table-tab
+    user clicks link containing text    Explore data    testid:Data block - Dates data block name-table-tab
 
     user waits until page contains title    Create your own tables
     user waits until page contains    This is the latest data
