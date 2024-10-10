@@ -2,7 +2,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
-import RelatedAside from '@common/components/RelatedAside';
+import RelatedContent from '@common/components/RelatedContent';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ScrollableContainer from '@common/components/ScrollableContainer';
@@ -207,7 +207,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         </div>
 
         <div className="govuk-grid-column-one-third">
-          <RelatedAside>
+          <RelatedContent testId="useful-information">
             <h2 className="govuk-heading-m" id="quick-links">
               Quick links
             </h2>
@@ -320,9 +320,9 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             </ul>
             {!!releaseSeries.length && (
               <>
-                <h3 className="govuk-heading-s" id="past-releases">
+                <h2 className="govuk-heading-s" id="past-releases">
                   Releases in this series
-                </h3>
+                </h2>
 
                 <Details
                   className="govuk-!-margin-bottom-4"
@@ -371,12 +371,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             {(release.publication.methodologies.length > 0 ||
               release.publication.externalMethodology) && (
               <>
-                <h3
+                <h2
                   className="govuk-heading-s govuk-!-padding-top-0"
                   id="methodologies"
                 >
                   Methodologies
-                </h3>
+                </h2>
                 <ul className="govuk-list">
                   {release.publication.methodologies.map(methodology => (
                     <li key={methodology.id}>
@@ -401,22 +401,20 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             )}
             {release.relatedInformation.length > 0 && (
               <>
-                <h3 className="govuk-heading-s" id="related-pages">
+                <h2 className="govuk-heading-s" id="related-pages">
                   Related pages
-                </h3>
-                <nav role="navigation" aria-labelledby="related-pages">
-                  <ul className="govuk-list">
-                    {release.relatedInformation &&
-                      release.relatedInformation.map(link => (
-                        <li key={link.id}>
-                          <a href={link.url}>{link.description}</a>
-                        </li>
-                      ))}
-                  </ul>
-                </nav>
+                </h2>
+                <ul className="govuk-list">
+                  {release.relatedInformation &&
+                    release.relatedInformation.map(link => (
+                      <li key={link.id}>
+                        <a href={link.url}>{link.description}</a>
+                      </li>
+                    ))}
+                </ul>
               </>
             )}
-          </RelatedAside>
+          </RelatedContent>
         </div>
       </div>
       <hr />

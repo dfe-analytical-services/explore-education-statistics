@@ -190,7 +190,7 @@ describe('PublicationReleasePage', () => {
   test(`renders other releases including legacy links`, async () => {
     render(<PublicationReleasePage release={testRelease} />);
 
-    const usefulInfo = within(screen.getByRole('complementary'));
+    const usefulInfo = within(screen.getByTestId('useful-information'));
 
     expect(
       usefulInfo.getByRole('heading', { name: 'Releases in this series' }),
@@ -393,7 +393,7 @@ describe('PublicationReleasePage', () => {
 
   test('renders link to a methodology', () => {
     render(<PublicationReleasePage release={testRelease} />);
-    const usefulInfo = screen.getByRole('complementary');
+    const usefulInfo = screen.getByTestId('useful-information');
 
     expect(
       within(usefulInfo).getByRole('heading', { name: 'Methodologies' }),
@@ -424,7 +424,7 @@ describe('PublicationReleasePage', () => {
     render(
       <PublicationReleasePage release={testReleaseWithExternalMethodology} />,
     );
-    const usefulInfo = screen.getByRole('complementary');
+    const usefulInfo = screen.getByTestId('useful-information');
 
     expect(
       within(usefulInfo).getByRole('heading', { name: 'Methodologies' }),
@@ -453,7 +453,7 @@ describe('PublicationReleasePage', () => {
         release={testReleaseWithInternalAndExternalMethodologies}
       />,
     );
-    const usefulInfo = screen.getByRole('complementary');
+    const usefulInfo = screen.getByTestId('useful-information');
 
     expect(
       within(usefulInfo).getByRole('heading', { name: 'Methodologies' }),
