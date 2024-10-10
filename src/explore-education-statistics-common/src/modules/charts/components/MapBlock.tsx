@@ -120,6 +120,7 @@ export default function MapBlock({
   width,
   height,
   axes,
+  title,
 }: MapBlockProps) {
   const axisMajor = useMemo<AxisConfiguration>(
     () => ({
@@ -221,6 +222,7 @@ export default function MapBlock({
         id={id}
         selectedDataSetKey={selectedDataSetKey}
         selectedLocation={selectedFeature?.id?.toString()}
+        title={title}
         onChangeDataSet={setSelectedDataSetKey}
         onChangeLocation={value => {
           const feature = features?.features.find(feat => feat.id === value);
