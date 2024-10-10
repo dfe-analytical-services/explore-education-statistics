@@ -31,7 +31,7 @@ export default function ApiDataSetChangelog({
             this version.
           </p>
 
-          <p>Note that the following are considered breaking changes:</p>
+          <p>The following are examples of breaking changes:</p>
           <ul>
             <li>options were deleted</li>
             <li>ids were changed</li>
