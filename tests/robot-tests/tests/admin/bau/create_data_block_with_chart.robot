@@ -29,7 +29,8 @@ Create test publication and release via API
 Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Academic year 2025/26
-    user uploads subject and waits until complete    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    UI test subject    upload-file-test.csv
+    ...    upload-file-test.meta.csv
 
 Navigate to 'Footnotes' page
     user waits until page finishes loading
@@ -206,7 +207,6 @@ Validate data block is in list
     user checks table column heading contains    1    3    In content    testid:dataBlocks
     user checks table column heading contains    1    4    Created date    testid:dataBlocks
     user checks table column heading contains    1    5    Actions    testid:dataBlocks
-
 
     user checks table body has x rows    1    testid:dataBlocks
     user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
@@ -488,7 +488,7 @@ Add reference line
     user clicks button    Add new line
     user chooses select option    id:chartAxisConfiguration-major-referenceLines-position    2005
     user enters text into element    id:chartAxisConfiguration-major-referenceLines-label    Reference line 1
-    user clicks button    Add
+    user clicks button    Add    exact_match=${TRUE}
 
 Validate basic line chart preview
     user waits until element contains line chart    id:chartBuilderPreview
@@ -551,7 +551,6 @@ Save chart and validate marked as 'Has chart' in data blocks list
     user waits until table is visible
     user checks table column heading contains    1    1    Name    testid:dataBlocks
     user checks table column heading contains    1    2    Has chart    testid:dataBlocks
-
 
     user checks table body has x rows    1
     user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks

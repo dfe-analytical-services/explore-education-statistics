@@ -305,6 +305,7 @@ Search with 2nd API dataset
     user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_2}
 
 User clicks on 2nd API dataset link
+    capture large screenshot
     user clicks link by index    ${SUBJECT_NAME_2}
     user waits until page finishes loading
 
