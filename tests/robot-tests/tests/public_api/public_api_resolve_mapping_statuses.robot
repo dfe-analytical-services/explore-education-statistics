@@ -12,7 +12,6 @@ Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
 
-
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - Public API - resolve mapping statuses %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
@@ -20,10 +19,9 @@ ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
 
 
-
 *** Test Cases ***
 Create publication and release
-   ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user creates test release via api    ${PUBLICATION_ID}    FY    3000
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
@@ -33,7 +31,8 @@ Verify release summary
     user verifies release summary    Financial year    3000-01    Accredited official statistics
 
 Upload datafile
-    user uploads subject and waits until complete    ${SUBJECT_NAME_1}    absence_school.csv    absence_school.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_1}    absence_school.csv    absence_school.meta.csv
+    ...    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to subjects
     user clicks link    Data and files
@@ -58,7 +57,7 @@ Create 1st API dataset
 
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId   ${SUBJECT_NAME_1}
+    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_NAME_1}
     user clicks button    Confirm new API data set
 
     user waits until page finishes loading
@@ -83,7 +82,8 @@ Create a second draft release via api
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3010
 
 Upload subject to second release
-   user uploads subject and waits until complete    ${SUBJECT_NAME_2}    absence_school_major_manual.csv    absence_school_major_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_2}    absence_school_major_manual.csv
+    ...    absence_school_major_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to second release
     user clicks link    Data and files
@@ -109,10 +109,11 @@ Create a different version of an API dataset(Major version)
     user waits until h3 is visible    Current live API data sets
 
     user checks table column heading contains    1    1    Version    xpath://table[@data-testid="live-api-data-sets"]
-    user clicks button in table cell    1    3    Create new version    xpath://table[@data-testid="live-api-data-sets"]
+    user clicks button in table cell    1    3    Create new version
+    ...    xpath://table[@data-testid="live-api-data-sets"]
 
     ${modal}=    user waits until modal is visible    Create a new API data set version
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId   ${SUBJECT_NAME_2}
+    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_NAME_2}
     user clicks button    Confirm new data set version
 
     user waits until page finishes loading
@@ -120,23 +121,32 @@ Create a different version of an API dataset(Major version)
 
 Validate the summary contents inside the 'draft version details' table
     user waits until h3 is visible    Draft version details
-    user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(1) > dt + dd     v2.0    %{WAIT_LONG}
-    user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd     Action required    %{WAIT_LONG}
+    user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(1) > dt + dd
+    ...    v2.0    %{WAIT_LONG}
+    user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
+    ...    Action required    %{WAIT_LONG}
     ${mapping_status}=    get text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
     should be equal as strings    ${mapping_status}    Action required
 
 Validate the version task statuses inside the 'Draft version task' section
     user waits until h3 is visible    Draft version tasks
-    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) a    Map locations    %{WAIT_LONG}
-    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(2) a    Map filters    %{WAIT_LONG}
+    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) a    Map locations
+    ...    %{WAIT_LONG}
+    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(2) a    Map filters
+    ...    %{WAIT_LONG}
 
-    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) div[id="map-locations-task-status"]    Incomplete    %{WAIT_LONG}
-    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(2) div[id="map-filters-task-status"]    Incomplete    %{WAIT_LONG}
+    user waits until element contains
+    ...    css:div[data-testid="draft-version-tasks"] li:nth-child(1) div[id="map-locations-task-status"]    Incomplete
+    ...    %{WAIT_LONG}
+    user waits until element contains
+    ...    css:div[data-testid="draft-version-tasks"] li:nth-child(2) div[id="map-filters-task-status"]    Incomplete
+    ...    %{WAIT_LONG}
 
 User clicks on Map locations link
     user clicks link    Map locations
-    user waits until h3 is visible        Locations not found in new data set
-    user waits until element contains     xpath://table[@data-testid='mappable-table-region']/caption//strong[1]    1 unmapped location     %{WAIT_LONG}
+    user waits until h3 is visible    Locations not found in new data set
+    user waits until element contains    xpath://table[@data-testid='mappable-table-region']/caption//strong[1]
+    ...    1 unmapped location    %{WAIT_LONG}
 
 Validate the 'unmapped location' notification banner
     user waits until h2 is visible    Action required
@@ -147,31 +157,31 @@ Validate the row headings and its contents in the 'Regions' section
     user checks table column heading contains    1    2    New data set
 
     user checks table column heading contains    1    3    Type
-    user checks table column heading contains   1    4    Actions
+    user checks table column heading contains    1    4    Actions
 
     user checks table cell contains    1    1    Yorkshire and The Humber
     user checks table cell contains    1    2    Unmapped
     user checks table cell contains    1    3    N/A
 
 User edits location mapping
-    user clicks button in table cell     1    4    Edit
+    user clicks button in table cell    1    4    Edit
 
     ${modal}=    user waits until modal is visible    Map existing location
-    user clicks radio        Yorkshire
+    user clicks radio    Yorkshire
     user clicks button    Update location mapping
     user waits until modal is not visible    Map existing location
 
 Verify mapping changes
-    user waits until element contains    xpath://table[@data-testid='mappable-table-region']/caption//strong[1]    1 mapped location     %{WAIT_LONG}
+    user waits until element contains    xpath://table[@data-testid='mappable-table-region']/caption//strong[1]
+    ...    1 mapped location    %{WAIT_LONG}
 
 Validate the row headings and its contents in the 'Regions' section(after mapping)
-
     user waits until h3 is visible    Locations not found in new data set
     user checks table column heading contains    1    1    Current data set
     user checks table column heading contains    1    2    New data set
 
     user checks table column heading contains    1    3    Type
-    user checks table column heading contains   1    4    Actions
+    user checks table column heading contains    1    4    Actions
 
     user checks table cell contains    1    1    Yorkshire and The Humber
     user checks table cell contains    1    2    Yorkshire
@@ -182,15 +192,20 @@ Validate the row headings and its contents in the 'Regions' section(after mappin
 Validate the version status of location task
     user waits until h3 is visible    Draft version tasks
 
-    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) a    Map locations    %{WAIT_LONG}
-    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(2) a    Map filters    %{WAIT_LONG}
+    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) a    Map locations
+    ...    %{WAIT_LONG}
+    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(2) a    Map filters
+    ...    %{WAIT_LONG}
 
-    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) div[id="map-locations-task-status"]    Complete    %{WAIT_LONG}
+    user waits until element contains
+    ...    css:div[data-testid="draft-version-tasks"] li:nth-child(1) div[id="map-locations-task-status"]    Complete
+    ...    %{WAIT_LONG}
 
 User clicks on Map filters link
     user clicks link    Map filters
-    user waits until h3 is visible        Filter options not found in new data set
-    user waits until element contains     xpath://table[@data-testid='mappable-table-school_type']/caption//strong[1]    1 unmapped filter option     %{WAIT_LONG}
+    user waits until h3 is visible    Filter options not found in new data set
+    user waits until element contains    xpath://table[@data-testid='mappable-table-school_type']/caption//strong[1]
+    ...    1 unmapped filter option    %{WAIT_LONG}
 
 Validate the 'unmapped filter option' notification banner
     user waits until h2 is visible    Action required
@@ -201,22 +216,23 @@ Validate the row headings and its contents in the 'filter options' section
     user checks table column heading contains    1    2    New data set
 
     user checks table column heading contains    1    3    Type
-    user checks table column heading contains   1    4    Actions
+    user checks table column heading contains    1    4    Actions
 
     user checks table cell contains    1    1    Total
     user checks table cell contains    1    2    Unmapped
     user checks table cell contains    1    3    N/A
 
 User edits filter mapping
-    user clicks button in table cell     1    4    Edit
+    user clicks button in table cell    1    4    Edit
 
     ${modal}=    user waits until modal is visible    Map existing filter option
-    user clicks radio        State-funded primary and secondary
+    user clicks radio    State-funded primary and secondary
     user clicks button    Update filter option mapping
     user waits until modal is not visible    Map existing location
 
 Verify mapping changes
-    user waits until element contains    xpath://table[@data-testid='mappable-table-school_type']/caption//strong[1]    1 mapped filter option     %{WAIT_LONG}
+    user waits until element contains    xpath://table[@data-testid='mappable-table-school_type']/caption//strong[1]
+    ...    1 mapped filter option    %{WAIT_LONG}
 
 Validate the row headings and its contents in the 'filters options' section(after mapping)
     user waits until h3 is visible    Filter options not found in new data set
@@ -224,7 +240,7 @@ Validate the row headings and its contents in the 'filters options' section(afte
     user checks table column heading contains    1    2    New data set
 
     user checks table column heading contains    1    3    Type
-    user checks table column heading contains   1    4    Actions
+    user checks table column heading contains    1    4    Actions
 
     user checks table cell contains    1    1    Total
     user checks table cell contains    1    2    State-funded primary and secondary
@@ -240,21 +256,22 @@ Confirm finalization of this API data set version
 
 User navigates to 'changelog and guidance notes' page and update relevant details in it
     user clicks link by index    View changelog and guidance notes    1
-    user waits until page contains     API data set changelog
+    user waits until page contains    API data set changelog
 
-    user enters text into element    css:textarea[id="guidanceNotesForm-notes"]    public guidance notes
+    user enters text into element    css:textarea[id="guidanceNotesForm-notes"]
+    ...    Content for the public guidance notes
     user clicks button    Save public guidance notes
 
-    user waits until page contains    public guidance notes
+    user waits until page contains    Content for the public guidance notes
     user clicks link    Back to API data set details
 
 User clicks on 'View preview token log' link inside the 'Draft version details' section
     user clicks link by index    View changelog and guidance notes    2
 
 Validate the contents in the 'API dataset changelog' page.
-    user waits until page contains     API data set changelog
+    user waits until page contains    API data set changelog
 
-    user waits until page contains    public guidance notes
+    user waits until page contains    Content for the public guidance notes
     user clicks link    Back to API data set details
 
 Add headline text block to Content page
@@ -280,13 +297,15 @@ Search with 2nd API dataset
     user waits until page finishes loading
     user clicks radio    Newest
 
-    ${API_DATASET_STATUS_VALUE}=  set variable  li[data-testid="data-set-file-summary-UI test subject 2"]:nth-of-type(1) [data-testid="Status-value"] strong:nth-of-type(1)
-    user checks contents inside the cell value     This is the latest data     css:${API_DATASET_STATUS_VALUE}
+    ${API_DATASET_STATUS_VALUE}=    set variable
+    ...    li[data-testid="data-set-file-summary-UI test subject 2"]:nth-of-type(1) [data-testid="Status-value"] strong:nth-of-type(1)
+    user checks contents inside the cell value    This is the latest data    css:${API_DATASET_STATUS_VALUE}
     user checks page contains link    ${SUBJECT_NAME_2}
 
     user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_2}
 
 User clicks on 2nd API dataset link
+    capture large screenshot
     user clicks link by index    ${SUBJECT_NAME_2}
     user waits until page finishes loading
 
@@ -299,16 +318,20 @@ User checks relevant headings exist on API dataset details page
     user waits until h2 is visible    Using this data
     user waits until h2 is visible    API data set quick start
     user waits until h2 is visible    API data set version history
+    user waits until h2 is visible    API data set changelog
 
-User verifies the headings and contents in 'API version history' section
-    user checks table column heading contains    1    1    Version    css:section[id="apiVersionHistory"]
-    user checks table column heading contains    1    2    Release    css:section[id="apiVersionHistory"]
-    user checks table column heading contains    1    3    Status     css:section[id="apiVersionHistory"]
+User verifies the public data guidance in the 'API data set changelog' section
+    user waits until element contains    testid:public-guidance-notes    Content for the public guidance notes
 
-    user checks table cell contains              1    1    1.1 (current)                xpath://section[@id="apiVersionHistory"]
-    user checks table cell contains              1    2    Academic year 3010/11        xpath://section[@id="apiVersionHistory"]
-    user checks table cell contains              1    3    Published                    xpath://section[@id="apiVersionHistory"]
-
-    user checks table cell contains              2    1    1.0                          xpath://section[@id="apiVersionHistory"]
-    user checks table cell contains              2    2    Financial year 3000-01       xpath://section[@id="apiVersionHistory"]
-    user checks table cell contains              2    3    Published                    xpath://section[@id="apiVersionHistory"]
+## EES-5560 - commented out any further testing until EES-5559 is resolved.
+## User verifies the major changes in the 'API data set changelog' section
+##    user waits until h3 is visible    Major changes for version 1.1
+##    ${major_changes_section}=    get child element    id:apiChangelog    testid:major-changes
+##    user checks element contains    ${major_changes_section}    This version introduces major breaking changes
+##    ${deleted_indicators_section}=    user checks element contains child element    ${major_changes_section}
+##    ...    testid:deleted-indicators
+##    user checks element contains    ${deleted_indicators_section}    Enrolments
+##    user checks element contains    ${deleted_indicators_section}    Number of authorised sessions
+##    user checks element contains    ${deleted_indicators_section}    Number of possible sessions
+##    user checks element contains    ${deleted_indicators_section}    Number of unauthorised sessions
+##    user checks element contains    ${deleted_indicators_section}    Percentage of unauthorised sessions
