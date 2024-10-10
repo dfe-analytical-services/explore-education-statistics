@@ -218,16 +218,41 @@ public record ProcessorTestData
                 [
                     new FilterOptionMeta
                     {
+                        Id = 1,
                         Label = "Primary sponsor led academy",
                     },
                     new FilterOptionMeta
                     {
+                        Id = 2,
                         Label = "Secondary free school",
                     },
                     new FilterOptionMeta
                     {
+                        Id = 3,
                         Label = "Secondary sponsor led academy",
                     },
+                ],
+                OptionLinks =
+                [
+                    new FilterOptionMetaLink
+                    {
+                        MetaId = 1,
+                        OptionId = 1,
+                        PublicId = SqidEncoder.Encode(1),
+                    },
+                    new FilterOptionMetaLink
+                    {
+                        MetaId = 1,
+                        OptionId = 2,
+                        PublicId = SqidEncoder.Encode(2),
+                    },
+                    new FilterOptionMetaLink
+                    {
+
+                        MetaId = 1,
+                        OptionId = 3,
+                        PublicId = SqidEncoder.Encode(3),
+                    }
                 ],
             },
             new FilterMeta
@@ -242,20 +267,52 @@ public record ProcessorTestData
                 [
                     new FilterOptionMeta
                     {
+                        Id = 4,
                         Label = "Year 10",
                     },
                     new FilterOptionMeta
                     {
+                        Id = 5,
                         Label = "Year 4",
                     },
                     new FilterOptionMeta
                     {
+                        Id = 6,
                         Label = "Year 6",
                     },
                     new FilterOptionMeta
                     {
+                        Id = 7,
                         Label = "Year 8",
                     },
+                ],
+                OptionLinks =
+                [
+                    new FilterOptionMetaLink
+                    {
+                        MetaId = 2,
+                        OptionId = 4,
+                        PublicId = SqidEncoder.Encode(4),
+                    },
+                    new FilterOptionMetaLink
+                    {
+                        MetaId = 2,
+                        OptionId = 5,
+                        PublicId = SqidEncoder.Encode(5),
+                    },
+                    new FilterOptionMetaLink
+                    {
+
+                        MetaId = 2,
+                        OptionId = 6,
+                        PublicId = SqidEncoder.Encode(6),
+                    },
+                    new FilterOptionMetaLink
+                    {
+                        MetaId = 2,
+                        OptionId = 7,
+                        PublicId = SqidEncoder.Encode(7),
+                    }
                 ],
             },
             new FilterMeta
@@ -270,18 +327,42 @@ public record ProcessorTestData
                 [
                     new FilterOptionMeta
                     {
+                        Id = 8,
                         Label = "State-funded primary",
                     },
                     new FilterOptionMeta
                     {
+                        Id = 9,
                         Label = "State-funded secondary",
                     },
                     new FilterOptionMeta
                     {
+                        Id = 10,
                         Label = "Total",
                         IsAggregate = true
                     },
                 ],
+                OptionLinks =
+                [
+                    new FilterOptionMetaLink
+                    {
+                        MetaId = 3,
+                        OptionId = 8,
+                        PublicId = SqidEncoder.Encode(8),
+                    },
+                    new FilterOptionMetaLink
+                    {
+                        MetaId = 3,
+                        OptionId = 9,
+                        PublicId = SqidEncoder.Encode(9),
+                    },
+                    new FilterOptionMetaLink
+                    {
+                        MetaId = 3,
+                        OptionId = 10,
+                        PublicId = SqidEncoder.Encode(10),
+                    }
+                ]
             },
         ],
         ExpectedIndicators =

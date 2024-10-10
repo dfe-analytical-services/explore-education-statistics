@@ -2,7 +2,7 @@
 
 .button {
   background: $govuk-brand-colour;
-  border: 0;
+  border: 2px solid transparent;
   color: govuk-colour('white');
   cursor: pointer;
   height: 40px;
