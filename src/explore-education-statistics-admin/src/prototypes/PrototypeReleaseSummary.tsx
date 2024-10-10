@@ -1,7 +1,7 @@
 import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import React from 'react';
-import RelatedAside from '@common/components/RelatedAside';
+import RelatedContent from '@common/components/RelatedContent';
 import Button from '@common/components/Button';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -33,7 +33,7 @@ const PrototypeReleaseSummary = () => {
             />
           </div>
           <div className="govuk-grid-column-one-third">
-            <RelatedAside>
+            <RelatedContent>
               <h2 className="govuk-heading-m">Help and guidance</h2>
               <ul className="govuk-list">
                 <li>
@@ -42,7 +42,7 @@ const PrototypeReleaseSummary = () => {
                   </a>
                 </li>
               </ul>
-            </RelatedAside>
+            </RelatedContent>
           </div>
         </div>
 
