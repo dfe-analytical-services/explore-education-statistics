@@ -58,7 +58,7 @@ public abstract class CreateDataSetFunctionTests(
             StartOrchestrationOptions? startOrchestrationOptions = null;
             durableTaskClientMock.Setup(client =>
                     client.ScheduleNewOrchestrationInstanceAsync(
-                        nameof(ProcessInitialDataSetVersionFunction.ProcessInitialDataSetVersion),
+                        nameof(ProcessInitialDataSetVersionOrchestration.ProcessInitialDataSetVersion),
                         It.IsAny<ProcessDataSetVersionContext>(),
                         It.IsAny<StartOrchestrationOptions>(),
                         It.IsAny<CancellationToken>()))
@@ -163,8 +163,8 @@ public abstract class CreateDataSetFunctionTests(
             DataSet dataSet = DataFixture.DefaultDataSet();
 
             DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion()
-                 .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                     .WithReleaseFileId(releaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
+                    .WithReleaseFileId(releaseFile.Id))
                 .WithDataSet(dataSet);
 
             await AddTestData<ContentDbContext>(context =>

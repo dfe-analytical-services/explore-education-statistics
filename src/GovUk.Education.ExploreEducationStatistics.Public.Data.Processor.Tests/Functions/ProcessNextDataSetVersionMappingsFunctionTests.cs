@@ -9,13 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
-using Microsoft.DurableTask;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
@@ -23,90 +18,6 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
     ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
-    public class ProcessNextDataSetVersionMappingsTests(
-        ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessNextDataSetVersionMappingsFunctionTests(fixture)
-    {
-        [Fact]
-        public async Task Success()
-        {
-            var mockOrchestrationContext = DefaultMockOrchestrationContext();
-            var activitySequence = new MockSequence();
-
-            string[] expectedActivitySequence =
-            [
-                ActivityNames.CopyCsvFiles,
-                ActivityNames.CreateMappings,
-                ActivityNames.ApplyAutoMappings,
-                ActivityNames.CompleteNextDataSetVersionMappingProcessing,
-            ];
-
-            foreach (var activityName in expectedActivitySequence)
-            {
-                mockOrchestrationContext
-                    .InSequence(activitySequence)
-                    .Setup(context => context.CallActivityAsync(activityName,
-                        mockOrchestrationContext.Object.InstanceId,
-                        null))
-                    .Returns(Task.CompletedTask);
-            }
-
-            await ProcessNextDataSetVersion(mockOrchestrationContext.Object);
-
-            VerifyAllMocks(mockOrchestrationContext);
-        }
-
-        [Fact]
-        public async Task ActivityFunctionThrowsException_CallsHandleFailureActivity()
-        {
-            var mockOrchestrationContext = DefaultMockOrchestrationContext();
-
-            var activitySequence = new MockSequence();
-
-            mockOrchestrationContext
-                .InSequence(activitySequence)
-                .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.CopyCsvFiles,
-                        mockOrchestrationContext.Object.InstanceId,
-                        null))
-                .Throws<Exception>();
-
-            mockOrchestrationContext
-                .InSequence(activitySequence)
-                .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.HandleProcessingFailure,
-                        mockOrchestrationContext.Object.InstanceId,
-                        null))
-                .Returns(Task.CompletedTask);
-
-            await ProcessNextDataSetVersion(mockOrchestrationContext.Object);
-
-            VerifyAllMocks(mockOrchestrationContext);
-        }
-
-        private async Task ProcessNextDataSetVersion(TaskOrchestrationContext orchestrationContext)
-        {
-            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunction>();
-            await function.ProcessNextDataSetVersionMappings(
-                orchestrationContext,
-                new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() });
-        }
-
-        private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(Guid? instanceId = null)
-        {
-            var mock = new Mock<TaskOrchestrationContext>(MockBehavior.Strict);
-
-            mock.Setup(context => context.CreateReplaySafeLogger(
-                    nameof(ProcessNextDataSetVersionMappingsFunction.ProcessNextDataSetVersionMappings)))
-                .Returns(NullLogger.Instance);
-
-            mock.SetupGet(context => context.InstanceId)
-                .Returns(instanceId?.ToString() ?? Guid.NewGuid().ToString());
-
-            return mock;
-        }
-    }
-
     public abstract class CreateMappingsTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessNextDataSetVersionMappingsFunctionTests(fixture)
@@ -115,7 +26,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
         protected async Task CreateMappings(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunction>();
+            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunctions>();
             await function.CreateMappings(instanceId, CancellationToken.None);
         }
     }
@@ -629,7 +540,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
         protected async Task ApplyAutoMappings(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunction>();
+            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunctions>();
             await function.ApplyAutoMappings(instanceId, CancellationToken.None);
         }
     }
@@ -1790,7 +1701,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
         private async Task CompleteProcessing(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunction>();
+            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunctions>();
             await function.CompleteNextDataSetVersionMappingProcessing(instanceId, CancellationToken.None);
         }
     }

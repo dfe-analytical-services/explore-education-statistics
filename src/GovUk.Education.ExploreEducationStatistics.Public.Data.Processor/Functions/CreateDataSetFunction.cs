@@ -59,7 +59,8 @@ public class CreateDataSetFunction(
         Guid instanceId,
         CancellationToken cancellationToken)
     {
-        const string orchestratorName = nameof(ProcessInitialDataSetVersionFunction.ProcessInitialDataSetVersion);
+        const string orchestratorName =
+            nameof(ProcessInitialDataSetVersionOrchestration.ProcessInitialDataSetVersion);
 
         var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 
