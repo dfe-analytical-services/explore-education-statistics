@@ -12,6 +12,8 @@ import noop from 'lodash/noop';
 import React, { ReactElement } from 'react';
 
 describe('ChartBoundaryLevelsConfiguration', () => {
+  const testTable = testFullTable;
+
   const testDefaultChartOptions: ChartOptions = {
     alt: '',
     height: 600,
@@ -35,7 +37,6 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       },
     ],
   };
-
   const testFormState: ChartBuilderForms = {
     options: {
       isValid: true,
@@ -66,7 +67,19 @@ describe('ChartBoundaryLevelsConfiguration', () => {
   test('renders correctly without initial values', () => {
     render(
       <ChartBoundaryLevelsConfiguration
+        data={testTable.results}
         meta={testMeta}
+        axisMajor={{
+          dataSets: [],
+          groupBy: 'locations',
+          referenceLines: [],
+          type: 'major',
+          visible: true,
+        }}
+        legend={{
+          position: 'top',
+          items: [],
+        }}
         options={testDefaultChartOptions}
         onChange={noop}
         onSubmit={noop}
@@ -92,7 +105,19 @@ describe('ChartBoundaryLevelsConfiguration', () => {
   test('renders correctly with initial values', () => {
     render(
       <ChartBoundaryLevelsConfiguration
+        data={testTable.results}
         meta={testMeta}
+        axisMajor={{
+          dataSets: [],
+          groupBy: 'locations',
+          referenceLines: [],
+          type: 'major',
+          visible: true,
+        }}
+        legend={{
+          position: 'top',
+          items: [],
+        }}
         options={{
           ...testDefaultChartOptions,
           boundaryLevel: 2,
@@ -110,7 +135,19 @@ describe('ChartBoundaryLevelsConfiguration', () => {
 
     const { user } = render(
       <ChartBoundaryLevelsConfiguration
+        data={testTable.results}
         meta={testMeta}
+        axisMajor={{
+          dataSets: [],
+          groupBy: 'locations',
+          referenceLines: [],
+          type: 'major',
+          visible: true,
+        }}
+        legend={{
+          position: 'top',
+          items: [],
+        }}
         options={testDefaultChartOptions}
         onChange={handleChange}
         onSubmit={noop}
@@ -128,7 +165,19 @@ describe('ChartBoundaryLevelsConfiguration', () => {
   test('submitting fails with validation errors if no boundary level set', async () => {
     const { user } = render(
       <ChartBoundaryLevelsConfiguration
+        data={testTable.results}
         meta={testMeta}
+        axisMajor={{
+          dataSets: [],
+          groupBy: 'locations',
+          referenceLines: [],
+          type: 'major',
+          visible: true,
+        }}
+        legend={{
+          position: 'top',
+          items: [],
+        }}
         options={testDefaultChartOptions}
         onChange={noop}
         onSubmit={noop}
@@ -156,7 +205,19 @@ describe('ChartBoundaryLevelsConfiguration', () => {
 
     const { user } = render(
       <ChartBoundaryLevelsConfiguration
+        data={testTable.results}
         meta={testMeta}
+        axisMajor={{
+          dataSets: [],
+          groupBy: 'locations',
+          referenceLines: [],
+          type: 'major',
+          visible: true,
+        }}
+        legend={{
+          position: 'top',
+          items: [],
+        }}
         options={testDefaultChartOptions}
         onChange={noop}
         onSubmit={handleSubmit}
@@ -184,7 +245,19 @@ describe('ChartBoundaryLevelsConfiguration', () => {
 
     const { user } = render(
       <ChartBoundaryLevelsConfiguration
+        data={testTable.results}
         meta={testMeta}
+        axisMajor={{
+          dataSets: [],
+          groupBy: 'locations',
+          referenceLines: [],
+          type: 'major',
+          visible: true,
+        }}
+        legend={{
+          position: 'top',
+          items: [],
+        }}
         options={{
           ...testDefaultChartOptions,
           boundaryLevel: 3,
