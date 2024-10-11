@@ -681,11 +681,19 @@ user checks textarea contains
 user checks summary list contains
     [Arguments]    ${term}    ${description}    ${parent}=css:body    ${wait}=${timeout}
     user waits until parent contains element    ${parent}
-    ...    xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
+    ...    xpath:.//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
     ...    %{WAIT_MEDIUM}
     ${element}=    get child element    ${parent}
-    ...    xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
+    ...    xpath:.//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
     user waits until element is visible    ${element}    %{WAIT_LONG}
+
+user checks summary list does not contain
+    [Arguments]    ${term}    ${description}    ${parent}=css:body    ${wait}=${timeout}
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//dt[contains(text(), "${term}")]
+    ...    %{WAIT_MEDIUM}
+    user waits until parent does not contain element    ${parent}
+    ...    xpath:.//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
 
 user checks select contains x options
     [Arguments]    ${locator}    ${num}

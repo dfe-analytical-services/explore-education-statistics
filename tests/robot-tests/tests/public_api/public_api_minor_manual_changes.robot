@@ -10,13 +10,15 @@ Force Tags          Admin    Local    Dev    AltersData
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
+Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - Public API - resolve mapping statuses %{RUN_IDENTIFIER}
-${RELEASE_NAME}=        Financial year 3000-01
-${SUBJECT_NAME_1}=      UI test subject 1
-${SUBJECT_NAME_2}=      UI test subject 2
+${PUBLICATION_NAME}=    UI tests - Public API - minor manual changes %{RUN_IDENTIFIER}
+${RELEASE_1_NAME}=      Financial year 3000-01
+${RELEASE_2_NAME}=      Academic year 3010/11
+${SUBJECT_1_NAME}=      UI tests - Public API - minor manual changes - subject 1 - %{RUN_IDENTIFIER}
+${SUBJECT_2_NAME}=      UI tests - Public API - minor manual changes - subject 2 - %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***
@@ -24,14 +26,14 @@ Create publication and release
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user creates test release via api    ${PUBLICATION_ID}    FY    3000
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME}
+    ...    ${RELEASE_1_NAME}
 
 Verify release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    Financial year    3000-01    Accredited official statistics
 
 Upload datafile
-    user uploads subject and waits until complete    ${SUBJECT_NAME_1}    absence_school.csv    absence_school.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_1_NAME}    absence_school.csv    absence_school.meta.csv
     ...    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to subjects
@@ -42,10 +44,10 @@ Add data guidance to subjects
     user waits until h2 is visible    Public data guidance
 
     user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    ${SUBJECT_NAME_1}
+    user waits until page contains accordion section    ${SUBJECT_1_NAME}
 
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME_1}
-    ...    ${SUBJECT_NAME_1} Main guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_1_NAME}
+    ...    ${SUBJECT_1_NAME} Main guidance content
 
     user clicks button    Save guidance
 
@@ -56,7 +58,7 @@ Create 1st API dataset
 
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_NAME_1}
+    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_1_NAME}
     user clicks button    Confirm new API data set
 
     user waits until page finishes loading
@@ -80,8 +82,12 @@ Create a second draft release via api
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3010
 
+# In this new subject, the "School type" filter option "Total" is being updated to "State-funded primary and secondary",
+# and is no longer marked as an aggregate option. The location option "Yorkshire and the Humber" is being renamed to
+# "Yorkshire".
+
 Upload subject to second release
-    user uploads subject and waits until complete    ${SUBJECT_NAME_2}    absence_school_minor_manual.csv
+    user uploads subject and waits until complete    ${SUBJECT_2_NAME}    absence_school_minor_manual.csv
     ...    absence_school_minor_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to second release
@@ -92,14 +98,14 @@ Add data guidance to second release
     user waits until h2 is visible    Public data guidance
 
     user waits until page contains element    id:dataGuidance-dataFiles
-    user waits until page contains accordion section    ${SUBJECT_NAME_2}
+    user waits until page contains accordion section    ${SUBJECT_2_NAME}
 
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME_2}
-    ...    ${SUBJECT_NAME_2} Main guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_2_NAME}
+    ...    ${SUBJECT_2_NAME} Main guidance content
 
     user clicks button    Save guidance
 
-Create a different version of an API dataset(Major version)
+Create a different version of an API dataset with minor changes
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
@@ -111,34 +117,48 @@ Create a different version of an API dataset(Major version)
     ...    xpath://table[@data-testid="live-api-data-sets"]
 
     ${modal}=    user waits until modal is visible    Create a new API data set version
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_NAME_2}
+    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_2_NAME}
     user clicks button    Confirm new data set version
 
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set version
 
+Validate the summary contents inside the 'Latest live version details' table
+    user waits until h3 is visible    Draft version details
+    user checks summary list contains    Version    v1.0    parent=id:live-version-summary
+    user checks summary list contains    Status    Published    parent=id:live-version-summary
+    user checks summary list contains    Release    ${RELEASE_1_NAME}    parent=id:live-version-summary
+    user checks summary list contains    Data set file    ${SUBJECT_1_NAME}    parent=id:live-version-summary
+    user checks summary list contains    Geographic levels    Local authority, National, Regional, School
+    ...    parent=id:live-version-summary
+    user checks summary list contains    Time periods    2020/21 to 2022/23    parent=id:live-version-summary
+    user checks summary list contains    Indicators    Enrolments    parent=id:live-version-summary
+    user checks summary list contains    Indicators    more indicators    parent=id:live-version-summary
+    user checks summary list contains    Filters    Academy type    parent=id:live-version-summary
+    user checks summary list contains    Actions    View live data set (opens in new tab)
+    ...    parent=id:live-version-summary
+
 Validate the summary contents inside the 'draft version details' table
     user waits until h3 is visible    Draft version details
-    user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(1) > dt + dd
-    ...    v2.0    %{WAIT_LONG}
-    user waits until element contains    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
-    ...    Action required    %{WAIT_LONG}
-    ${mapping_status}=    get text    css:dl[data-testid="draft-version-summary"] > div:nth-of-type(2) > dt + dd
-    should be equal as strings    ${mapping_status}    Action required
+    user checks summary list contains    Version    v2.0    parent=id:draft-version-summary    wait=%{WAIT_LONG}
+    user checks summary list contains    Status    Action required    parent=id:draft-version-summary
+    ...    wait=%{WAIT_LONG}
+    user checks summary list contains    Release    ${RELEASE_2_NAME}    parent=id:draft-version-summary
+    user checks summary list contains    Data set file    ${SUBJECT_2_NAME}    parent=id:draft-version-summary
+    user checks summary list contains    Geographic levels    Local authority, National, Regional, School
+    ...    parent=id:draft-version-summary
+    user checks summary list contains    Time periods    2020/21 to 2022/23    parent=id:draft-version-summary
+    user checks summary list contains    Indicators    Enrolments    parent=id:draft-version-summary
+    user checks summary list contains    Indicators    more indicators    parent=id:draft-version-summary
+    user checks summary list contains    Filters    Academy type    parent=id:draft-version-summary
+    user checks summary list contains    Actions    Remove draft version    parent=id:draft-version-summary
 
 Validate the version task statuses inside the 'Draft version task' section
     user waits until h3 is visible    Draft version tasks
-    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) a    Map locations
-    ...    %{WAIT_LONG}
-    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(2) a    Map filters
-    ...    %{WAIT_LONG}
-
-    user waits until element contains
-    ...    css:div[data-testid="draft-version-tasks"] li:nth-child(1) div[id="map-locations-task-status"]    Incomplete
-    ...    %{WAIT_LONG}
-    user waits until element contains
-    ...    css:div[data-testid="draft-version-tasks"] li:nth-child(2) div[id="map-filters-task-status"]    Incomplete
-    ...    %{WAIT_LONG}
+    user waits until parent contains element    testid:map-locations-task    link:Map locations
+    user waits until parent contains element    id:map-locations-task-status    text:Incomplete
+    user waits until parent contains element    testid:map-filters-task    link:Map filters
+    user waits until parent contains element    id:map-filters-task-status    text:Incomplete
 
 User clicks on Map locations link
     user clicks link    Map locations
@@ -295,18 +315,16 @@ Search with 2nd API dataset
     user waits until page finishes loading
     user clicks radio    Newest
 
-    ${API_DATASET_STATUS_VALUE}=    set variable
-    ...    li[data-testid="data-set-file-summary-UI test subject 2"]:nth-of-type(1) [data-testid="Status-value"] strong:nth-of-type(1)
-    user checks contents inside the cell value    This is the latest data    css:${API_DATASET_STATUS_VALUE}
-    user checks page contains link    ${SUBJECT_NAME_2}
-
-    user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_2}
+    user checks summary list contains    Status    This is the latest data
+    ...    parent=testid:data-set-file-summary-${SUBJECT_2_NAME}
+    user checks summary list contains    Status    Available by API
+    ...    parent=testid:data-set-file-summary-${SUBJECT_2_NAME}
+    user checks page contains link    ${SUBJECT_2_NAME}
 
 User clicks on 2nd API dataset link
-    user clicks link by index    ${SUBJECT_NAME_2}
+    user clicks link    ${SUBJECT_2_NAME}
     user waits until page finishes loading
-
-    user waits until h1 is visible    ${SUBJECT_NAME_2}
+    user waits until h1 is visible    ${SUBJECT_2_NAME}
 
 User checks relevant headings exist on API dataset details page
     user waits until h2 is visible    Data set details
@@ -336,6 +354,9 @@ User verifies minor changes in the 'API data set changelog' section
     ${updated_yorkshire_and_humber}=    user checks changed facet contains option    ${updated_regional_options}
     ...    Yorkshire and The Humber
     user checks changed option contains description    ${updated_yorkshire_and_humber}    label changed to: Yorkshire
+
+User verifies no major changes are present
+    user checks page does not contain element    testid:major-changes
 
 
 *** Keywords ***

@@ -43,10 +43,16 @@ if not utilities_init.initialised:
 
         return get_child_elements(parent_locator, f'css:[data-testid="{criteria}"]')
 
+    def _find_by_text(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
+        parent_locator = _normalize_parent_locator(parent_locator)
+
+        return get_child_elements(parent_locator, f'xpath:.//*[contains(., "{criteria}")]')
+
     # Register locator strategies
 
     element_finder().register("label", _find_by_label, persist=True)
     element_finder().register("testid", _find_by_testid, persist=True)
+    element_finder().register("text", _find_by_text, persist=True)
 
     utilities_init.initialised = True
 
