@@ -636,6 +636,16 @@ user waits until h3 is not visible
     ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
     user waits until element is not visible    xpath://h3[${text_matcher}]    ${wait}
 
+user waits until h4 is visible
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until element is visible    xpath://h4[${text_matcher}]    ${wait}
+
+user waits until h4 is not visible
+    [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
+    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
+    user waits until element is not visible    xpath://h4[${text_matcher}]    ${wait}
+
 user waits until legend is visible
     [Arguments]    ${text}    ${wait}=${timeout}    ${exact_match}=${FALSE}
     ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}

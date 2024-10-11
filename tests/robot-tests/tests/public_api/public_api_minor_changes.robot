@@ -47,7 +47,6 @@ Add data guidance to subjects
     user enters text into data guidance data file content editor    ${SUBJECT_NAME_1}
     ...    ${SUBJECT_NAME_1} Main guidance content
 
-Save data guidance
     user clicks button    Save guidance
 
 Create 1st API dataset
@@ -82,8 +81,8 @@ Create a second draft release via api
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3010
 
 Upload subject to second release
-    user uploads subject and waits until complete    ${SUBJECT_NAME_2}    absence_school_major_manual.csv
-    ...    absence_school_major_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_2}    absence_school_minor_manual.csv
+    ...    absence_school_minor_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to second release
     user clicks link    Data and files
@@ -98,7 +97,6 @@ Add data guidance to second release
     user enters text into data guidance data file content editor    ${SUBJECT_NAME_2}
     ...    ${SUBJECT_NAME_2} Main guidance content
 
-Save data guidance
     user clicks button    Save guidance
 
 Create a different version of an API dataset(Major version)
@@ -171,7 +169,7 @@ User edits location mapping
     user clicks button    Update location mapping
     user waits until modal is not visible    Map existing location
 
-Verify mapping changes
+Verify location mapping changes
     user waits until element contains    xpath://table[@data-testid='mappable-table-region']/caption//strong[1]
     ...    1 mapped location    %{WAIT_LONG}
 
@@ -230,7 +228,7 @@ User edits filter mapping
     user clicks button    Update filter option mapping
     user waits until modal is not visible    Map existing location
 
-Verify mapping changes
+Verify filter mapping changes
     user waits until element contains    xpath://table[@data-testid='mappable-table-school_type']/caption//strong[1]
     ...    1 mapped filter option    %{WAIT_LONG}
 
@@ -274,7 +272,7 @@ Validate the contents in the 'API dataset changelog' page.
     user waits until page contains    Content for the public guidance notes
     user clicks link    Back to API data set details
 
-Add headline text block to Content page
+Add headline text block to Content page for the second release
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
@@ -305,7 +303,6 @@ Search with 2nd API dataset
     user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_2}
 
 User clicks on 2nd API dataset link
-    capture large screenshot
     user clicks link by index    ${SUBJECT_NAME_2}
     user waits until page finishes loading
 
@@ -323,15 +320,51 @@ User checks relevant headings exist on API dataset details page
 User verifies the public data guidance in the 'API data set changelog' section
     user waits until element contains    testid:public-guidance-notes    Content for the public guidance notes
 
-## EES-5560 - commented out any further testing until EES-5559 is resolved.
-## User verifies the major changes in the 'API data set changelog' section
-##    user waits until h3 is visible    Major changes for version 1.1
-##    ${major_changes_section}=    get child element    id:apiChangelog    testid:major-changes
-##    user checks element contains    ${major_changes_section}    This version introduces major breaking changes
-##    ${deleted_indicators_section}=    user checks element contains child element    ${major_changes_section}
-##    ...    testid:deleted-indicators
-##    user checks element contains    ${deleted_indicators_section}    Enrolments
-##    user checks element contains    ${deleted_indicators_section}    Number of authorised sessions
-##    user checks element contains    ${deleted_indicators_section}    Number of possible sessions
-##    user checks element contains    ${deleted_indicators_section}    Number of unauthorised sessions
-##    user checks element contains    ${deleted_indicators_section}    Percentage of unauthorised sessions
+User verifies minor changes in the 'API data set changelog' section
+    user waits until h3 is visible    Minor changes for version 1.1
+    ${minor_changes_section}=    get child element    id:apiChangelog    testid:minor-changes
+
+    ${school_types_filter}=    user checks changelog section contains updated filter    ${minor_changes_section}
+    ...    School type
+    ${updated_school_types_total}=    user checks changed facet contains option    ${school_types_filter}    Total
+    user checks changed option contains description    ${updated_school_types_total}
+    ...    label changed to: State-funded primary and secondary
+    user checks changed option contains description    ${updated_school_types_total}    no longer an aggregate
+
+    ${updated_regional_options}=    user checks changelog section contains updated location level
+    ...    ${minor_changes_section}    Regional
+    ${updated_yorkshire_and_humber}=    user checks changed facet contains option    ${updated_regional_options}
+    ...    Yorkshire and The Humber
+    user checks changed option contains description    ${updated_yorkshire_and_humber}    label changed to: Yorkshire
+
+
+*** Keywords ***
+user checks changelog section contains updated filter
+    [Arguments]
+    ...    ${changes_section}
+    ...    ${filter_label}
+    ${filter}=    user checks element contains child element    ${changes_section}
+    ...    xpath://div[starts-with(@data-testid, "updated-filterOptions")][h4[contains(., "Updated ${filter_label} filter options")]]
+    RETURN    ${filter}
+
+user checks changelog section contains updated location level
+    [Arguments]
+    ...    ${changes_section}
+    ...    ${level_label}
+    ${location_level}=    user checks element contains child element    ${changes_section}
+    ...    xpath://div[starts-with(@data-testid, "updated-locationOptions")][h4[contains(., "Updated ${level_label} location options")]]
+    RETURN    ${location_level}
+
+user checks changed facet contains option
+    [Arguments]
+    ...    ${changed_facet}
+    ...    ${option_label}
+    ${option}=    user checks element contains child element    ${changed_facet}
+    ...    xpath://li[@data-testid="updated-item" and contains(., "${option_label}")]
+    RETURN    ${option}
+
+user checks changed option contains description
+    [Arguments]
+    ...    ${changed_option}
+    ...    ${description}
+    user checks element contains    ${changed_option}    ${description}
