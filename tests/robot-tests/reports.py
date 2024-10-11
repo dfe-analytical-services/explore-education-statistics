@@ -131,6 +131,12 @@ def _get_passing_suite_ids_from_report(report: BeautifulSoup) -> []:
 
 
 def _get_failing_leaf_suite_ids_from_report(report: BeautifulSoup) -> []:
+    """Get the ids of failing suites from output.xml, filtering out ids from parent levels in the suite hierarchy.
+
+    Given an example suite folder structure of "Top-level folder:Sub-folder:Leaf suite", the report contains stats
+    for each level, with ids like "s1", "s1-1" and "s1-1-1". This code returns only the leaf ids, so "s1-1-1" in this
+    example.
+    """
     suite_results = report.find("statistics").find("suite").find_all("stat")
     failing_suite_results = [suite_result for suite_result in suite_results if int(suite_result.get("fail")) > 0]
     suite_ids = [failing_suite.get("id") for failing_suite in failing_suite_results]
