@@ -2,23 +2,36 @@ import CollapsibleList from '@common/components/CollapsibleList';
 import ContentHtml from '@common/components/ContentHtml';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Footnote } from '@common/services/types/footnotes';
-import React from 'react';
+import React, { createElement } from 'react';
 
 interface Props {
   footnotes: Footnote[];
   headingHiddenText?: string;
+  headingTag?: 'h2' | 'h3';
   id: string;
 }
 
-const FigureFootnotes = ({ footnotes, headingHiddenText, id }: Props) => {
+const FigureFootnotes = ({
+  footnotes,
+  headingHiddenText,
+  headingTag = 'h3',
+  id,
+}: Props) => {
   return footnotes.length > 0 ? (
     <>
-      <h3 className="govuk-heading-m">
-        Footnotes
-        {headingHiddenText && (
-          <VisuallyHidden>{` ${headingHiddenText}`}</VisuallyHidden>
-        )}
-      </h3>
+      {createElement(
+        headingTag,
+        {
+          className: `govuk-heading-m`,
+        },
+        <>
+          Footnotes
+          {headingHiddenText && (
+            <VisuallyHidden>{` ${headingHiddenText}`}</VisuallyHidden>
+          )}
+        </>,
+      )}
+
       <CollapsibleList
         listStyle="number"
         collapseAfter={2}
