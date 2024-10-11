@@ -10,10 +10,7 @@ import ChartBoundaryLevelsConfiguration, {
 } from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsConfiguration';
 import ChartDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingsConfiguration';
 import { ChartBuilderFormsContextProvider } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
-import {
-  ChartOptions,
-  useChartBuilderReducer,
-} from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
+import { useChartBuilderReducer } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
@@ -360,19 +357,25 @@ const ChartBuilder = ({
                   />
                 </TabsSection>
               )}
+
               {forms.boundaryLevels &&
+                axes.major &&
+                forms.dataGroupings &&
                 definition?.type === 'map' &&
                 options &&
-                meta.boundaryLevels.length && (
+                legend && (
                   <TabsSection
                     title="Boundary levels"
                     headingTitle="Boundary levels"
                     id={forms.boundaryLevels.id}
                   >
                     <ChartBoundaryLevelsConfiguration
-                      boundaryLevel={options.boundaryLevel}
                       buttons={deleteButton}
-                      dataSetConfigs={chartProps?.map?.dataSetConfigs ?? []}
+                      axisMajor={axes.major}
+                      data={data}
+                      legend={legend}
+                      options={options}
+                      map={map}
                       meta={meta}
                       onChange={handleDefaultBoundaryLevelChange}
                       onSubmit={actions.updateChartBoundaryLevels}
@@ -391,6 +394,10 @@ const ChartBuilder = ({
                   >
                     <ChartDataGroupingsConfiguration
                       buttons={deleteButton}
+                      axisMajor={axes.major}
+                      data={data}
+                      legend={legend}
+                      options={options}
                       map={map}
                       meta={meta}
                       onChange={handleMapConfigurationChange}

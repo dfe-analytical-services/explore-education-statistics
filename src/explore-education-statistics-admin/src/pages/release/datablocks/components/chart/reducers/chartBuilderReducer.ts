@@ -18,6 +18,7 @@ import { isEqual } from 'lodash';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
 import { Reducer } from 'use-immer';
+import { ChartBoundaryLevelsFormValues } from '../ChartBoundaryLevelsConfiguration';
 
 export interface ChartOptions extends ChartDefinitionOptions {
   file?: File;
@@ -52,10 +53,7 @@ export type ChartBuilderActions =
     }
   | {
       type: 'UPDATE_CHART_MAP_BOUNDARY_LEVELS';
-      payload: {
-        boundaryLevel: ChartOptions['boundaryLevel'];
-        dataSetConfigs: MapDataSetConfig[];
-      };
+      payload: ChartBoundaryLevelsFormValues;
     }
   | {
       type: 'UPDATE_CHART_MAP_CONFIGURATION';
@@ -243,10 +241,12 @@ export const chartBuilderReducer: Reducer<
       const dataSetConfigs = action.payload.dataSetConfigs.map(
         // add existing dataGrouping to new MapDataSetConfigs
         ({ dataSet, boundaryLevel }) => {
-          const { dataGrouping } = existingDataSetConfigs.find(
-            ({ dataSet: existingDataSet }) => isEqual(existingDataSet, dataSet),
-          )!;
+          const { dataGrouping } =
+            existingDataSetConfigs.find(({ dataSet: existingDataSet }) =>
+              isEqual(existingDataSet, dataSet),
+            )! ?? {};
 
+          if (boundaryLevel) console.log({ boundaryLevel });
           return { dataSet, boundaryLevel, dataGrouping };
         },
       );
@@ -358,10 +358,7 @@ export function useChartBuilderReducer(
   );
 
   const updateChartBoundaryLevels = useCallback(
-    (payload: {
-      boundaryLevel: ChartOptions['boundaryLevel'];
-      dataSetConfigs: MapDataSetConfig[];
-    }) => {
+    (payload: ChartBoundaryLevelsFormValues) => {
       dispatch({
         type: 'UPDATE_CHART_MAP_BOUNDARY_LEVELS',
         payload,
