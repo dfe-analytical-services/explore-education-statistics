@@ -45,7 +45,7 @@ internal class DataSetVersionMappingService(
 
         var liveVersion = nextVersion.DataSet.LatestLiveVersion!;
 
-        var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMetaForMappings(
+        var nextVersionMeta = await dataSetMetaService.ReadDataSetVersionMappingMeta(
             dataSetVersionId: nextDataSetVersionId,
             cancellationToken);
 
@@ -63,6 +63,21 @@ internal class DataSetVersionMappingService(
             sourceFilterMeta,
             nextVersionMeta.Filters);
 
+        var hasDeletedIndicators = await HasDeletedIndicators(
+            liveVersion.Id,
+            nextVersionMeta.Indicators,
+            cancellationToken);
+
+        var hasDeletedGeographicLevels = await HasDeletedGeographicLevels(
+            liveVersion.Id,
+            nextVersionMeta.GeographicLevel,
+            cancellationToken);
+
+        var hasDeletedTimePeriods = await HasDeletedTimePeriods(
+            liveVersion.Id,
+            nextVersionMeta.TimePeriods,
+            cancellationToken);
+
         nextVersion.MetaSummary = nextVersionMeta.MetaSummary;
 
         publicDataDbContext
@@ -72,7 +87,10 @@ internal class DataSetVersionMappingService(
                 SourceDataSetVersionId = liveVersion.Id,
                 TargetDataSetVersionId = nextDataSetVersionId,
                 LocationMappingPlan = locationMappings,
-                FilterMappingPlan = filterMappings
+                FilterMappingPlan = filterMappings,
+                HasDeletedIndicators = hasDeletedIndicators,
+                HasDeletedGeographicLevels = hasDeletedGeographicLevels,
+                HasDeletedTimePeriods = hasDeletedTimePeriods
             });
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
@@ -466,8 +484,7 @@ internal class DataSetVersionMappingService(
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
     {
-        return await publicDataDbContext
-            .LocationMetas
+        return await publicDataDbContext.LocationMetas
             .AsNoTracking()
             .Include(meta => meta.OptionLinks)
             .ThenInclude(link => link.Option)
@@ -477,13 +494,54 @@ internal class DataSetVersionMappingService(
 
     private async Task<List<FilterMeta>> GetFilterMeta(Guid dataSetVersionId, CancellationToken cancellationToken)
     {
-        return await publicDataDbContext
-            .FilterMetas
+        return await publicDataDbContext.FilterMetas
             .AsNoTracking()
             .Include(meta => meta.OptionLinks)
             .ThenInclude(link => link.Option)
             .Where(meta => meta.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
+    }
+
+    private async Task<bool> HasDeletedIndicators(
+        Guid dataSetVersionId,
+        IEnumerable<IndicatorMeta> newIndicatorMetas,
+        CancellationToken cancellationToken)
+    {
+        return (await publicDataDbContext.IndicatorMetas
+            .AsNoTracking()
+            .Where(meta => meta.DataSetVersionId == dataSetVersionId)
+            .Select(meta => meta.Column)
+            .ToListAsync(cancellationToken))
+            .Except(newIndicatorMetas.Select(meta => meta.Column))
+            .Any();
+    }
+
+    private async Task<bool> HasDeletedGeographicLevels(
+        Guid dataSetVersionId,
+        GeographicLevelMeta newGeographicLevelMeta,
+        CancellationToken cancellationToken)
+    {
+        var oldGeographicLevelMeta = await publicDataDbContext.GeographicLevelMetas
+            .AsNoTracking()
+            .SingleAsync(meta => meta.DataSetVersionId == dataSetVersionId, cancellationToken);
+
+        return oldGeographicLevelMeta.Levels
+            .Except(newGeographicLevelMeta.Levels)
+            .Any();
+    }
+
+    private async Task<bool> HasDeletedTimePeriods(
+        Guid dataSetVersionId,
+        IEnumerable<TimePeriodMeta> newTimePeriodMetas,
+        CancellationToken cancellationToken)
+    {
+        return (await publicDataDbContext.TimePeriodMetas
+            .AsNoTracking()
+            .Where(meta => meta.DataSetVersionId == dataSetVersionId)
+            .Select(m => $"{m.Period}|{m.Code}")
+            .ToListAsync(cancellationToken))
+            .Except(newTimePeriodMetas.Select(m => $"{m.Period}|{m.Code}"))
+            .Any();
     }
 
     private static BadRequestObjectResult CreateDataSetVersionIdError(

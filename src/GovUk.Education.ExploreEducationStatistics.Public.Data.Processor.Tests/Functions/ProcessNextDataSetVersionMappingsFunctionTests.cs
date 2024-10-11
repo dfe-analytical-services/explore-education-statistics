@@ -197,6 +197,191 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 },
                 metaSummary.TimePeriodRange);
         }
+
+        [Fact]
+        public async Task Success_HasDeletedIndicators_True()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                IndicatorMetas = DataFixture.DefaultIndicatorMeta().GenerateList(2),
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels)
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.True(mapping.HasDeletedIndicators);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedIndicators_SameIndicators_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                IndicatorMetas = ProcessorTestData.AbsenceSchool.ExpectedIndicators,
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels)
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedIndicators);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedIndicators_NewIndicators_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                IndicatorMetas = ProcessorTestData.AbsenceSchool.ExpectedIndicators[..2],
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels)
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedIndicators);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedGeographicLevels_True()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(
+                    [
+                        GeographicLevel.Country,
+                        GeographicLevel.Region,
+                        GeographicLevel.LocalAuthority,
+                        // Replaced by school in next version
+                        GeographicLevel.Institution
+                    ])
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.True(mapping.HasDeletedGeographicLevels);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedGeographicLevels_SameGeographicLevels_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels)
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedGeographicLevels);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedGeographicLevels_NewGeographicLevels_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels[..2])
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedGeographicLevels);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedTimePeriods_True()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels),
+                TimePeriodMetas = DataFixture.DefaultTimePeriodMeta()
+                    .GenerateList(2)
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.True(mapping.HasDeletedTimePeriods);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedTimePeriods_SameTimePeriods_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels),
+                TimePeriodMetas = ProcessorTestData.AbsenceSchool.ExpectedTimePeriods
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedTimePeriods);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedTimePeriods_NewTimePeriods_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels),
+                TimePeriodMetas = ProcessorTestData.AbsenceSchool.ExpectedTimePeriods[..2]
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedTimePeriods);
+        }
     }
 
     public class CreateMappingsLocationsTests(
@@ -1329,10 +1514,13 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
     }
 
     private async Task<(Guid instanceId, DataSetVersion initialVersion, DataSetVersion nextVersion)>
-        CreateNextDataSetVersionAndDataFiles(DataSetVersionImportStage importStage)
+        CreateNextDataSetVersionAndDataFiles(
+            DataSetVersionImportStage importStage,
+            DataSetVersionMeta? initialVersionMeta = null)
     {
         var (initialDataSetVersion, nextDataSetVersion, instanceId) =
             await CreateDataSetInitialAndNextVersion(
+                initialVersionMeta: initialVersionMeta ?? GetDefaultInitialDataSetVersionMeta(),
                 nextVersionImportStage: importStage,
                 nextVersionStatus: DataSetVersionStatus.Processing);
 
@@ -1363,6 +1551,15 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             .DataSetVersionMappings
             .Include(mapping => mapping.TargetDataSetVersion)
             .SingleAsync(mapping => mapping.TargetDataSetVersionId == nextVersion.Id);
+    }
+
+    private DataSetVersionMeta GetDefaultInitialDataSetVersionMeta()
+    {
+        return new DataSetVersionMeta
+        {
+            GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels)
+        };
     }
 
     private async Task AssertCorrectDataSetVersionNumbers(DataSetVersionMapping mapping, string expectedVersion)
