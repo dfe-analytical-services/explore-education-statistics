@@ -25,14 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         [ProducesResponseType(404)]
         public async Task<ActionResult<List<UserViewModel>>> GetPreReleaseUserList()
         {
-            var users = await _userManagementService.ListPreReleaseUsersAsync();
-
-            if (users.Any())
-            {
-                return Ok(users);
-            }
-
-            return NotFound();
+            return await _userManagementService.ListPreReleaseUsersAsync();
         }
     }
 }
