@@ -34,35 +34,11 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task Success()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithLocationMappingPlan(DataFixture
                     .DefaultLocationMappingPlan()
@@ -107,10 +83,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                 targetKey: "target-location-1-key",
                                 candidate: DataFixture.DefaultMappableLocationOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             var client = BuildApp().CreateClient();
 
@@ -122,7 +95,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             // Test that the mappings from the Controller are identical to the mappings saved in the database
             retrievedMappings.AssertDeepEqualTo(
-                mappings.LocationMappingPlan,
+                mapping.LocationMappingPlan,
                 ignoreCollectionOrders: true);
         }
 
@@ -163,40 +136,17 @@ public abstract class DataSetVersionMappingControllerTests(
     }
 
     public class ApplyBatchLocationMappingUpdatesTests(
-        TestApplicationFactory testApp) : DataSetVersionMappingControllerTests(testApp)
+        TestApplicationFactory testApp)
+        : DataSetVersionMappingControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithLocationMappingPlan(DataFixture
                     .DefaultLocationMappingPlan()
@@ -240,19 +190,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                 targetKey: "target-location-1-key",
                                 candidate: DataFixture.DefaultMappableLocationOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile(FileType.Data))
-                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -277,16 +215,16 @@ public abstract class DataSetVersionMappingControllerTests(
 
             var viewModel = response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
-            var originalLocalAuthorityMappingToUpdate = mappings
+            var originalLocalAuthorityMappingToUpdate = mapping
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "source-location-1-key");
 
-            var originalLocalAuthorityMappingNotUpdated = mappings
+            var originalLocalAuthorityMappingNotUpdated = mapping
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "source-location-2-key");
 
-            var originalCountryMappingNotUpdated = mappings
+            var originalCountryMappingNotUpdated = mapping
                 .GetLocationOptionMapping(GeographicLevel.Country, "source-location-1-key");
 
-            var originalCountryMappingToUpdate = mappings
+            var originalCountryMappingToUpdate = mapping
                 .GetLocationOptionMapping(GeographicLevel.Country, "source-location-3-key");
 
             var expectedUpdateResponse = new BatchLocationMappingUpdatesResponseViewModel
@@ -320,7 +258,7 @@ public abstract class DataSetVersionMappingControllerTests(
             // that were updated.
             viewModel.AssertDeepEqualTo(expectedUpdateResponse, ignoreCollectionOrders: true);
 
-            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
@@ -344,7 +282,7 @@ public abstract class DataSetVersionMappingControllerTests(
                             },
                             { "source-location-2-key", originalLocalAuthorityMappingNotUpdated }
                         },
-                        Candidates = mappings
+                        Candidates = mapping
                             .LocationMappingPlan
                             .Levels[GeographicLevel.LocalAuthority]
                             .Candidates
@@ -367,7 +305,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                 }
                             }
                         },
-                        Candidates = mappings
+                        Candidates = mapping
                             .LocationMappingPlan
                             .Levels[GeographicLevel.Country]
                             .Candidates
@@ -377,18 +315,18 @@ public abstract class DataSetVersionMappingControllerTests(
 
             // Test that the updated mappings retrieved from the database reflect the updates
             // that were requested.
-            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+            updatedMapping.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedFullMappings,
                 ignoreCollectionOrders: true);
 
             // Assert that the batch saves still show the location mappings as incomplete, as there
             // are still mappings with type "AutoNone" in the plan.
-            Assert.False(updatedMappings.LocationMappingsComplete);
+            Assert.False(updatedMapping.LocationMappingsComplete);
 
             // Assert that this update constitutes a major version update, as some locations options
             // are 'ManualNone', indicating that some of the source location options may have been
             // removed thus creating a breaking change.
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
+            Assert.Equal("2.0.0", updatedMapping.TargetDataSetVersion.SemVersion().ToString());
         }
 
         [Theory]
@@ -406,35 +344,11 @@ public abstract class DataSetVersionMappingControllerTests(
             bool expectedMappingsComplete,
             string expectedVersion)
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithLocationMappingPlan(DataFixture
                     .DefaultLocationMappingPlan()
@@ -470,19 +384,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                 targetKey: "target-location-1-key",
                                 candidate: DataFixture.DefaultMappableLocationOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -503,54 +405,24 @@ public abstract class DataSetVersionMappingControllerTests(
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
-            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
-            Assert.Equal(expectedMappingsComplete, updatedMappings.LocationMappingsComplete);
+            Assert.Equal(expectedMappingsComplete, updatedMapping.LocationMappingsComplete);
 
-            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(expectedVersion, updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, expectedVersion);
         }
 
         [Fact]
         public async Task Success_DeletedLevel_MajorUpdate()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithLocationMappingPlan(DataFixture
                     .DefaultLocationMappingPlan()
@@ -567,7 +439,6 @@ public abstract class DataSetVersionMappingControllerTests(
                             .AddCandidate(
                                 targetKey: "target-location-1-key",
                                 candidate: DataFixture.DefaultMappableLocationOption()))
-                    // Country level has been deleted and has no candidates.
                     .AddLevel(
                         level: GeographicLevel.Country,
                         mappings: DataFixture
@@ -579,19 +450,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                     .WithSource(DataFixture.DefaultMappableLocationOption())
                                     .WithAutoNone())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -610,56 +469,26 @@ public abstract class DataSetVersionMappingControllerTests(
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
-            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // This update completes the mapping but as there's a
             // location level deletion, it's a major version update.
-            Assert.True(updatedMappings.LocationMappingsComplete);
+            Assert.True(updatedMapping.LocationMappingsComplete);
 
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal("2.0.0", updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
 
         [Fact]
         public async Task Success_AddedLevel_MinorUpdate()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithLocationMappingPlan(DataFixture
                     .DefaultLocationMappingPlan()
@@ -686,19 +515,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                 candidate: DataFixture
                                     .DefaultMappableLocationOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -717,56 +534,26 @@ public abstract class DataSetVersionMappingControllerTests(
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
 
-            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // This update completes the mapping as a location level was added
             // and isn't considered as needing to be mapped - minor version update.
-            Assert.True(updatedMappings.LocationMappingsComplete);
+            Assert.True(updatedMapping.LocationMappingsComplete);
 
-            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal("1.1.0", updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
         }
 
         [Fact]
         public async Task SourceKeyDoesNotExist_Returns400_AndRollsBackTransaction()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithLocationMappingPlan(DataFixture
                     .DefaultLocationMappingPlan()
@@ -801,19 +588,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                 targetKey: "target-country-location-1-key",
                                 candidate: DataFixture.DefaultMappableLocationOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile(FileType.Data))
-                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -867,42 +642,18 @@ public abstract class DataSetVersionMappingControllerTests(
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
             retrievedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
-                mappings.LocationMappingPlan.Levels,
+                mapping.LocationMappingPlan.Levels,
                 ignoreCollectionOrders: true);
         }
 
         [Fact]
         public async Task CandidateKeyDoesNotExist_Returns400()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithLocationMappingPlan(DataFixture
                     .DefaultLocationMappingPlan()
@@ -941,10 +692,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                 targetKey: "target-country-location-1-key",
                                 candidate: DataFixture.DefaultMappableLocationOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             List<LocationMappingUpdateRequest> updates =
             [
@@ -1006,7 +754,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
             retrievedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
-                mappings.LocationMappingPlan.Levels,
+                mapping.LocationMappingPlan.Levels,
                 ignoreCollectionOrders: true);
         }
 
@@ -1148,35 +896,11 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task Success()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithFilterMappingPlan(DataFixture
                     .DefaultFilterMappingPlan()
@@ -1204,7 +928,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
-                context.DataSetVersionMappings.Add(mappings);
+                context.DataSetVersionMappings.Add(mapping);
             });
 
             var response = await GetFilterMappings(
@@ -1214,7 +938,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             // Test that the mappings from the Controller are identical to the mappings saved in the database
             retrievedMappings.AssertDeepEqualTo(
-                mappings.FilterMappingPlan,
+                mapping.FilterMappingPlan,
                 ignoreCollectionOrders: true);
         }
 
@@ -1256,35 +980,11 @@ public abstract class DataSetVersionMappingControllerTests(
         [Fact]
         public async Task Success()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithFilterMappingPlan(DataFixture
                     .DefaultFilterMappingPlan()
@@ -1312,19 +1012,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         .AddOptionCandidate("filter-2-option-1-key", DataFixture
                             .DefaultMappableFilterOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile(FileType.Data))
-                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             List<FilterOptionMappingUpdateRequest> updates =
             [
@@ -1357,7 +1045,7 @@ public abstract class DataSetVersionMappingControllerTests(
                     {
                         FilterKey = "filter-1-key",
                         SourceKey = "filter-1-option-1-key",
-                        Mapping = mappings.GetFilterOptionMapping(
+                        Mapping = mapping.GetFilterOptionMapping(
                                 filterKey: "filter-1-key",
                                 filterOptionKey: "filter-1-option-1-key") with
                             {
@@ -1369,7 +1057,7 @@ public abstract class DataSetVersionMappingControllerTests(
                     {
                         FilterKey = "filter-2-key",
                         SourceKey = "filter-2-option-1-key",
-                        Mapping = mappings.GetFilterOptionMapping(
+                        Mapping = mapping.GetFilterOptionMapping(
                                 filterKey: "filter-2-key",
                                 filterOptionKey: "filter-2-option-1-key") with
                             {
@@ -1384,22 +1072,22 @@ public abstract class DataSetVersionMappingControllerTests(
             // that were updated.
             viewModel.AssertDeepEqualTo(expectedUpdateResponse, ignoreCollectionOrders: true);
 
-            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
-                .Include(mapping => mapping.TargetDataSetVersion)
+                .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             var expectedFullMappings = new Dictionary<string, FilterMapping>
             {
                 {
                     "filter-1-key",
-                    mappings.GetFilterMapping("filter-1-key") with
+                    mapping.GetFilterMapping("filter-1-key") with
                     {
                         OptionMappings = new Dictionary<string, FilterOptionMapping>
                         {
                             {
                                 "filter-1-option-1-key",
-                                mappings.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
+                                mapping.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
                                 {
                                     Type = MappingType.ManualMapped,
                                     CandidateKey = "filter-1-option-1-key"
@@ -1407,20 +1095,20 @@ public abstract class DataSetVersionMappingControllerTests(
                             },
                             {
                                 "filter-1-option-2-key",
-                                mappings.GetFilterOptionMapping("filter-1-key", "filter-1-option-2-key")
+                                mapping.GetFilterOptionMapping("filter-1-key", "filter-1-option-2-key")
                             }
                         }
                     }
                 },
                 {
                     "filter-2-key",
-                    mappings.GetFilterMapping("filter-2-key") with
+                    mapping.GetFilterMapping("filter-2-key") with
                     {
                         OptionMappings = new Dictionary<string, FilterOptionMapping>
                         {
                             {
                                 "filter-2-option-1-key",
-                                mappings.GetFilterOptionMapping("filter-2-key", "filter-2-option-1-key") with
+                                mapping.GetFilterOptionMapping("filter-2-key", "filter-2-option-1-key") with
                                 {
                                     Type = MappingType.ManualNone,
                                     CandidateKey = null
@@ -1433,19 +1121,19 @@ public abstract class DataSetVersionMappingControllerTests(
 
             // Test that the updated mappings retrieved from the database reflect the updates
             // that were requested.
-            updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+            updatedMapping.FilterMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedFullMappings,
                 ignoreCollectionOrders: true);
 
             // Assert that the batch saves show the filter mappings as complete, as there
             // are no remaining mappings with type "None" or "AutoNone" in the plan.
-            Assert.True(updatedMappings.FilterMappingsComplete);
+            Assert.True(updatedMapping.FilterMappingsComplete);
 
             // Assert that this update constitutes a major version update, as some filter options
-            // belonging to mapped filters have a mapping type of "ManualNone", indicating that 
+            // belonging to mapped filters have a mapping type of "ManualNone", indicating that
             // some of the source filter options are no longer available in the target data set
-            // version, thus creating a breaking change. 
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
+            // version, thus creating a breaking change.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
 
         [Theory]
@@ -1462,35 +1150,11 @@ public abstract class DataSetVersionMappingControllerTests(
             MappingType unchangedMappingType,
             bool expectedMappingsComplete)
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithFilterMappingPlan(DataFixture
                     .DefaultFilterMappingPlan()
@@ -1511,7 +1175,7 @@ public abstract class DataSetVersionMappingControllerTests(
                                 MappingType.ManualMapped or MappingType.AutoMapped => "filter-2-option-1-key",
                                 _ => null
                             })))
-                    // Add an unmappable filter and filter options. Because we don't currently allow the 
+                    // Add an unmappable filter and filter options. Because we don't currently allow the
                     // users to update mappings for filters, this should not count against the calculation
                     // of the FilterMappingsComplete flag.
                     .AddFilterMapping("filter-3-key", DataFixture
@@ -1529,19 +1193,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         .AddOptionCandidate("filter-2-option-1-key", DataFixture
                             .DefaultMappableFilterOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile(FileType.Data))
-                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
                 ? "filter-1-option-1-key"
@@ -1564,13 +1216,13 @@ public abstract class DataSetVersionMappingControllerTests(
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Assert that the batch save calculates the LocationMappingsComplete flag as expected given the
             // combination of the requested mapping update and the existing mapping that is untouched. 
-            Assert.Equal(expectedMappingsComplete, updatedMappings.FilterMappingsComplete);
+            Assert.Equal(expectedMappingsComplete, updatedMapping.FilterMappingsComplete);
         }
 
         [Theory]
@@ -1587,35 +1239,11 @@ public abstract class DataSetVersionMappingControllerTests(
             MappingType unchangedMappingType,
             string expectedVersion)
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithFilterMappingPlan(DataFixture
                     .DefaultFilterMappingPlan()
@@ -1645,19 +1273,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         .AddOptionCandidate("filter-2-option-1-key", DataFixture
                             .DefaultMappableFilterOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile(FileType.Data))
-                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
                 ? "filter-1-option-1-key"
@@ -1680,19 +1296,12 @@ public abstract class DataSetVersionMappingControllerTests(
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
-            // Assert that the batch save calculates the next version number as expected. 
-            Assert.Equal(expectedVersion, updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(expectedVersion, updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, expectedVersion);
         }
 
         [Theory]
@@ -1700,35 +1309,11 @@ public abstract class DataSetVersionMappingControllerTests(
         [InlineData(MappingType.ManualNone)]
         public async Task Success_VersionUpdates_UnmappableFilter(MappingType updatedMappingType)
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithFilterMappingPlan(DataFixture
                     .DefaultFilterMappingPlan()
@@ -1757,19 +1342,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         .AddOptionCandidate("filter-2-option-1-key", DataFixture
                             .DefaultMappableFilterOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextDataSetVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile(FileType.Data))
-                .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             var mappingCandidateKey = updatedMappingType == MappingType.ManualMapped
                 ? "filter-1-option-1-key"
@@ -1792,49 +1365,25 @@ public abstract class DataSetVersionMappingControllerTests(
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
 
-            var updatedMappings = await TestApp.GetDbContext<PublicDataDbContext>()
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
                 .DataSetVersionMappings
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             // Assert that the batch save calculates the next version number as a major change,
             // as filter options that were in the source data set version no longer appear in the
-            // next version. 
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
+            // next version.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
 
         [Fact]
         public async Task SourceKeyDoesNotExist_Returns400_AndRollsBackTransaction()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithFilterMappingPlan(DataFixture
                     .DefaultFilterMappingPlan()
@@ -1856,10 +1405,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         .AddOptionCandidate("filter-1-option-3-key", DataFixture
                             .DefaultMappableFilterOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             List<FilterOptionMappingUpdateRequest> updates =
             [
@@ -1901,42 +1447,18 @@ public abstract class DataSetVersionMappingControllerTests(
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
             retrievedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
-                mappings.FilterMappingPlan.Mappings,
+                mapping.FilterMappingPlan.Mappings,
                 ignoreCollectionOrders: true);
         }
 
         [Fact]
         public async Task CandidateKeyDoesNotExist_Returns400()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithFilterMappingPlan(DataFixture
                     .DefaultFilterMappingPlan()
@@ -1966,10 +1488,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         .AddOptionCandidate("filter-2-option-1-key", DataFixture
                             .DefaultMappableFilterOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             List<FilterOptionMappingUpdateRequest> updates =
             [
@@ -2031,42 +1550,18 @@ public abstract class DataSetVersionMappingControllerTests(
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
             retrievedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
-                mappings.FilterMappingPlan.Mappings,
+                mapping.FilterMappingPlan.Mappings,
                 ignoreCollectionOrders: true);
         }
 
         [Fact]
         public async Task OwningFilterNotMapped_Returns400()
         {
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished();
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-            DataSetVersion currentDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 0)
-                .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-            DataSetVersion nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 1, minor: 1)
-                .WithStatusDraft()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
                 .WithTargetDataSetVersionId(nextDataSetVersion.Id)
                 .WithFilterMappingPlan(DataFixture
                     .DefaultFilterMappingPlan()
@@ -2084,10 +1579,7 @@ public abstract class DataSetVersionMappingControllerTests(
                         .AddOptionCandidate("filter-1-option-1-key", DataFixture
                             .DefaultMappableFilterOption())));
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             List<FilterOptionMappingUpdateRequest> updates =
             [
@@ -2122,7 +1614,7 @@ public abstract class DataSetVersionMappingControllerTests(
 
             // Test that the mappings are not updated due to the failures of some of the update requests.
             retrievedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
-                mappings.FilterMappingPlan.Mappings,
+                mapping.FilterMappingPlan.Mappings,
                 ignoreCollectionOrders: true);
         }
 
@@ -2262,6 +1754,57 @@ public abstract class DataSetVersionMappingControllerTests(
             return await client.PatchAsync(uri,
                 new JsonNetContent(new BatchFilterOptionMappingUpdatesRequest { Updates = updates }));
         }
+    }
+
+    private async Task AssertCorrectDataSetVersionNumbers(DataSetVersionMapping mapping, string expectedVersion)
+    {
+        Assert.Equal(expectedVersion, mapping.TargetDataSetVersion.SemVersion().ToString());
+
+        var updatedReleaseFile = await TestApp.GetDbContext<ContentDbContext>()
+            .ReleaseFiles
+            .SingleAsync(rf => rf.PublicApiDataSetId == mapping.TargetDataSetVersion.DataSetId);
+
+        Assert.Equal(expectedVersion, updatedReleaseFile.PublicApiDataSetVersion?.ToString());
+    }
+
+    private async Task<(DataSetVersion initialVersion, DataSetVersion nextVersion)> CreateInitialAndNextDataSetVersion()
+    {
+        DataSet dataSet = DataFixture
+            .DefaultDataSet()
+            .WithStatusPublished();
+
+        await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+        DataSetVersion initialDataSetVersion = DataFixture
+            .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+            .WithVersionNumber(major: 1, minor: 0)
+            .WithStatusPublished()
+            .WithDataSet(dataSet)
+            .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+        DataSetVersion nextDataSetVersion = DataFixture
+            .DefaultDataSetVersion()
+            .WithVersionNumber(major: 1, minor: 1)
+            .WithStatusDraft()
+            .WithDataSet(dataSet)
+            .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+        await TestApp.AddTestData<PublicDataDbContext>(context =>
+        {
+            context.DataSetVersions.AddRange(initialDataSetVersion, nextDataSetVersion);
+            context.DataSets.Update(dataSet);
+        });
+
+        ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+            .WithId(nextDataSetVersion.Release.ReleaseFileId)
+            .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+            .WithFile(DataFixture.DefaultFile(FileType.Data))
+            .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
+            .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
+
+        await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
+        return (initialDataSetVersion, nextDataSetVersion);
     }
 
     private WebApplicationFactory<TestStartup> BuildApp(ClaimsPrincipal? user = null)
