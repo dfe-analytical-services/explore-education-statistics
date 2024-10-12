@@ -148,7 +148,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             await CreateMappings(instanceId);
 
-            var updatedDataSetVersion = GetDataSetVersion(nextVersion);
+            var updatedDataSetVersion = await GetDataSetVersion(nextVersion);
 
             // Assert that the MetaSummary has been generated correctly from the CSV.
             var metaSummary = updatedDataSetVersion.MetaSummary;
@@ -242,11 +242,11 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             await CreateMappings(instanceId);
 
-            var mappings = GetDataSetVersionMapping(nextVersion);
+            var mapping = await GetDataSetVersionMapping(nextVersion);
 
-            Assert.Equal(initialVersion.Id, mappings.SourceDataSetVersionId);
-            Assert.Equal(nextVersion.Id, mappings.TargetDataSetVersionId);
-            Assert.False(mappings.LocationMappingsComplete);
+            Assert.Equal(initialVersion.Id, mapping.SourceDataSetVersionId);
+            Assert.Equal(nextVersion.Id, mapping.TargetDataSetVersionId);
+            Assert.False(mapping.LocationMappingsComplete);
 
             var expectedLocationMappingsFromSource = initialLocationMeta
                 .ToDictionary(
@@ -280,12 +280,12 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                     .ExpectedGeographicLevels
                     .Concat([GeographicLevel.Provider])
                     .Order(),
-                mappings.LocationMappingPlan
+                mapping.LocationMappingPlan
                     .Levels
                     .Select(level => level.Key)
                     .Order());
 
-            mappings.LocationMappingPlan.Levels.ForEach(level =>
+            mapping.LocationMappingPlan.Levels.ForEach(level =>
             {
                 var matchingLevelFromSource = expectedLocationMappingsFromSource.GetValueOrDefault(level.Key);
 
@@ -310,10 +310,10 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             await CreateMappings(instanceId);
 
-            var mappings = GetDataSetVersionMapping(nextVersion);
+            var mapping = await GetDataSetVersionMapping(nextVersion);
 
-            Assert.Equal(initialVersion.Id, mappings.SourceDataSetVersionId);
-            Assert.Equal(nextVersion.Id, mappings.TargetDataSetVersionId);
+            Assert.Equal(initialVersion.Id, mapping.SourceDataSetVersionId);
+            Assert.Equal(nextVersion.Id, mapping.TargetDataSetVersionId);
 
             var expectedLocationLevels = ProcessorTestData
                 .AbsenceSchool
@@ -338,7 +338,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                                     })
                         });
 
-            mappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+            mapping.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedLocationLevels,
                 ignoreCollectionOrders: true);
         }
@@ -367,11 +367,11 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             await CreateMappings(instanceId);
 
-            var mappings = GetDataSetVersionMapping(nextVersion);
+            var mapping = await GetDataSetVersionMapping(nextVersion);
 
-            Assert.Equal(initialVersion.Id, mappings.SourceDataSetVersionId);
-            Assert.Equal(nextVersion.Id, mappings.TargetDataSetVersionId);
-            Assert.False(mappings.FilterMappingsComplete);
+            Assert.Equal(initialVersion.Id, mapping.SourceDataSetVersionId);
+            Assert.Equal(nextVersion.Id, mapping.TargetDataSetVersionId);
+            Assert.False(mapping.FilterMappingsComplete);
 
             var expectedFilterMappings = initialFilterMeta
                 .ToDictionary(
@@ -395,7 +395,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                                         })
                         });
 
-            mappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+            mapping.FilterMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedFilterMappings,
                 ignoreCollectionOrders: true);
         }
@@ -408,10 +408,10 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             await CreateMappings(instanceId);
 
-            var mappings = GetDataSetVersionMapping(nextVersion);
+            var mapping = await GetDataSetVersionMapping(nextVersion);
 
-            Assert.Equal(initialVersion.Id, mappings.SourceDataSetVersionId);
-            Assert.Equal(nextVersion.Id, mappings.TargetDataSetVersionId);
+            Assert.Equal(initialVersion.Id, mapping.SourceDataSetVersionId);
+            Assert.Equal(nextVersion.Id, mapping.TargetDataSetVersionId);
 
             var expectedFilterTargets = ProcessorTestData
                 .AbsenceSchool
@@ -430,7 +430,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                                         new MappableFilterOption { Label = optionMeta.Label })
                         });
 
-            mappings.FilterMappingPlan.Candidates.AssertDeepEqualTo(
+            mapping.FilterMappingPlan.Candidates.AssertDeepEqualTo(
                 expectedFilterTargets,
                 ignoreCollectionOrders: true);
         }
@@ -468,15 +468,6 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                     FilterMappingPlan = new FilterMappingPlan()
                 }));
 
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
-
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
-
             await ApplyAutoMappings(instanceId);
 
             var savedImport = await GetDbContext<PublicDataDbContext>()
@@ -499,7 +490,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
                 .WithTargetDataSetVersionId(nextVersion.Id)
@@ -528,32 +519,23 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                                 targetKey: "la-location-1-key",
                                 candidate: DataFixture.DefaultMappableLocationOption())));
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
-
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
-            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
 
-            var laMapping1 = mappings
+            var laMapping1 = mapping
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "la-location-1-key");
 
-            var laMapping2 = mappings
+            var laMapping2 = mapping
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "la-location-2-key");
 
             Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
             {
                 {
                     GeographicLevel.LocalAuthority,
-                    mappings.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
+                    mapping.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
                     {
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
@@ -576,20 +558,14 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 },
             };
 
-            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+            updatedMapping.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedLevelMappings,
                 ignoreCollectionOrders: true);
 
-            Assert.False(updatedMappings.LocationMappingsComplete);
+            Assert.False(updatedMapping.LocationMappingsComplete);
 
             // Some options have no auto-mapped candidate - major version update.
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
 
         [Fact]
@@ -598,7 +574,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
                 .WithTargetDataSetVersionId(nextVersion.Id)
@@ -631,32 +607,23 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                                 targetKey: "la-location-3-key",
                                 candidate: DataFixture.DefaultMappableLocationOption())));
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
-
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
-            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
 
-            var laMapping1 = mappings
+            var laMapping1 = mapping
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "la-location-1-key");
 
-            var laMapping2 = mappings
+            var laMapping2 = mapping
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "la-location-2-key");
 
             Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
             {
                 {
                     GeographicLevel.LocalAuthority,
-                    mappings.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
+                    mapping.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
                     {
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
@@ -679,20 +646,14 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 },
             };
 
-            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+            updatedMapping.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedLevelMappings,
                 ignoreCollectionOrders: true);
 
-            Assert.False(updatedMappings.LocationMappingsComplete);
+            Assert.False(updatedMapping.LocationMappingsComplete);
 
             // Some options have no auto-mapped candidate - major version update.
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
 
         [Fact]
@@ -701,7 +662,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
                 .WithTargetDataSetVersionId(nextVersion.Id)
@@ -718,34 +679,25 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                                     .WithSource(DataFixture.DefaultMappableLocationOption())
                                     .WithManualNone())));
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
-
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
-            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
 
-            var rscMapping1 = mappings
+            var rscMapping = mapping
                 .GetLocationOptionMapping(GeographicLevel.RscRegion, "rsc-location-1-key");
 
             Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
             {
                 {
                     GeographicLevel.RscRegion,
-                    mappings.GetLocationLevelMappings(GeographicLevel.RscRegion) with
+                    mapping.GetLocationLevelMappings(GeographicLevel.RscRegion) with
                     {
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
                             {
-                                "rsc-location-1-key", rscMapping1 with
+                                "rsc-location-1-key", rscMapping with
                                 {
                                     Type = MappingType.AutoNone,
                                     CandidateKey = null
@@ -756,20 +708,14 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 },
             };
 
-            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+            updatedMapping.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedLevelMappings,
                 ignoreCollectionOrders: true);
 
-            Assert.True(updatedMappings.LocationMappingsComplete);
+            Assert.True(updatedMapping.LocationMappingsComplete);
 
             // Level has been deleted (cannot be mapped) - major version update.
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
 
         [Fact]
@@ -778,7 +724,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
                 .WithTargetDataSetVersionId(nextVersion.Id)
@@ -793,40 +739,25 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                                 candidate: DataFixture
                                     .DefaultMappableLocationOption())));
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
-
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
-            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
 
             Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
             {
-                { GeographicLevel.Country, mappings.GetLocationLevelMappings(GeographicLevel.Country) }
+                { GeographicLevel.Country, mapping.GetLocationLevelMappings(GeographicLevel.Country) }
             };
 
-            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+            updatedMapping.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedLevelMappings,
                 ignoreCollectionOrders: true);
 
-            Assert.True(updatedMappings.LocationMappingsComplete);
+            Assert.True(updatedMapping.LocationMappingsComplete);
 
             // Level has been added - minor version update.
-            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
         }
 
         [Fact]
@@ -835,7 +766,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
                 .WithTargetDataSetVersionId(nextVersion.Id)
@@ -855,29 +786,20 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                                 targetKey: "location-1-key",
                                 candidate: DataFixture.DefaultMappableLocationOption())));
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
-
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
-            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
 
-            var originalLocationMapping = mappings
+            var originalLocationMapping = mapping
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "location-1-key");
 
             Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
             {
                 {
                     GeographicLevel.LocalAuthority,
-                    mappings.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
+                    mapping.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
                     {
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
@@ -893,18 +815,12 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 }
             };
 
-            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(expectedLevelMappings);
+            updatedMapping.LocationMappingPlan.Levels.AssertDeepEqualTo(expectedLevelMappings);
 
-            Assert.True(updatedMappings.LocationMappingsComplete);
+            Assert.True(updatedMapping.LocationMappingsComplete);
 
             // All source options have auto-mapped candidates - minor version update.
-            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
         }
 
         [Fact]
@@ -913,7 +829,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
                 .WithTargetDataSetVersionId(nextVersion.Id)
@@ -947,29 +863,20 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                                 candidate: DataFixture
                                     .DefaultMappableLocationOption())));
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
-
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
-            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
 
-            var originalLaMapping = mappings
+            var originalLaMapping = mapping
                 .GetLocationOptionMapping(GeographicLevel.LocalAuthority, "la-location-1-key");
 
             Dictionary<GeographicLevel, LocationLevelMappings> expectedLevelMappings = new()
             {
                 {
                     GeographicLevel.LocalAuthority,
-                    mappings.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
+                    mapping.GetLocationLevelMappings(GeographicLevel.LocalAuthority) with
                     {
                         Mappings = new Dictionary<string, LocationOptionMapping>
                         {
@@ -983,23 +890,17 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         }
                     }
                 },
-                { GeographicLevel.RscRegion, mappings.GetLocationLevelMappings(GeographicLevel.RscRegion) }
+                { GeographicLevel.RscRegion, mapping.GetLocationLevelMappings(GeographicLevel.RscRegion) }
             };
 
-            updatedMappings.LocationMappingPlan.Levels.AssertDeepEqualTo(
+            updatedMapping.LocationMappingPlan.Levels.AssertDeepEqualTo(
                 expectedLevelMappings,
                 ignoreCollectionOrders: true);
 
-            Assert.True(updatedMappings.LocationMappingsComplete);
+            Assert.True(updatedMapping.LocationMappingsComplete);
 
             // All source options have auto-mapped candidates - minor version update.
-            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
         }
     }
 
@@ -1016,7 +917,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             // Create a mapping plan based on 2 data set versions with partially overlapping filters.
             // Both have "Filter 1" and both have "Filter 1 option 1", but then each also contains Filter 1
             // options that the other do not, and each also contains filters that the other does not.
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
                 .WithTargetDataSetVersionId(nextVersion.Id)
@@ -1044,25 +945,16 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         .AddOptionCandidate("filter-1-option-3-key", DataFixture
                             .DefaultMappableFilterOption())));
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
-
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
-            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
 
             Dictionary<string, FilterMapping> expectedFilterMappings = new()
             {
                 {
-                    "filter-1-key", mappings.GetFilterMapping("filter-1-key") with
+                    "filter-1-key", mapping.GetFilterMapping("filter-1-key") with
                     {
                         // The code managed to establish an automapping for this filter.
                         Type = MappingType.AutoMapped,
@@ -1071,7 +963,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         {
                             {
                                 "filter-1-option-1-key",
-                                mappings.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
+                                mapping.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
                                 {
                                     // The code managed to establish an automapping for this filter option.
                                     Type = MappingType.AutoMapped,
@@ -1080,7 +972,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             },
                             {
                                 "filter-1-option-2-key",
-                                mappings.GetFilterOptionMapping("filter-1-key", "filter-1-option-2-key") with
+                                mapping.GetFilterOptionMapping("filter-1-key", "filter-1-option-2-key") with
                                 {
                                     // The code managed to establish that no obvious automapping candidate exists for
                                     // this filter option.
@@ -1092,7 +984,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                     }
                 },
                 {
-                    "filter-2-key", mappings.GetFilterMapping("filter-2-key") with
+                    "filter-2-key", mapping.GetFilterMapping("filter-2-key") with
                     {
                         // The code managed to establish that no obvious automapping candidate exists for
                         // this filter.
@@ -1102,7 +994,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         {
                             {
                                 "filter-2-option-1-key",
-                                mappings.GetFilterOptionMapping("filter-2-key", "filter-2-option-1-key") with
+                                mapping.GetFilterOptionMapping("filter-2-key", "filter-2-option-1-key") with
                                 {
                                     // The code managed to establish that no obvious automapping candidate exists for
                                     // this filter option.
@@ -1115,21 +1007,15 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 }
             };
 
-            updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+            updatedMapping.FilterMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedFilterMappings,
                 ignoreCollectionOrders: true);
 
-            Assert.False(updatedMappings.FilterMappingsComplete);
+            Assert.False(updatedMapping.FilterMappingsComplete);
 
             // Some source filter options have no equivalent candidate to be mapped to, thus
             // resulting in a major version update.
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
 
         [Fact]
@@ -1140,7 +1026,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             // Create a mapping plan based on 2 data set versions with exactly the same filters
             // and filter options.
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
                 .WithTargetDataSetVersionId(nextVersion.Id)
@@ -1172,25 +1058,16 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         .AddOptionCandidate("filter-2-option-1-key", DataFixture
                             .DefaultMappableFilterOption())));
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
-
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
-            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
 
             Dictionary<string, FilterMapping> expectedFilterMappings = new()
             {
                 {
-                    "filter-1-key", mappings.GetFilterMapping("filter-1-key") with
+                    "filter-1-key", mapping.GetFilterMapping("filter-1-key") with
                     {
                         // The code managed to establish an automapping for this filter.
                         Type = MappingType.AutoMapped,
@@ -1199,7 +1076,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         {
                             {
                                 "filter-1-option-1-key",
-                                mappings.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
+                                mapping.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
                                 {
                                     // The code managed to establish an automapping for this filter option.
                                     Type = MappingType.AutoMapped,
@@ -1208,7 +1085,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                             },
                             {
                                 "filter-1-option-2-key",
-                                mappings.GetFilterOptionMapping("filter-1-key", "filter-1-option-2-key") with
+                                mapping.GetFilterOptionMapping("filter-1-key", "filter-1-option-2-key") with
                                 {
                                     // The code managed to establish an automapping for this filter option.
                                     Type = MappingType.AutoMapped,
@@ -1219,7 +1096,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                     }
                 },
                 {
-                    "filter-2-key", mappings.GetFilterMapping("filter-2-key") with
+                    "filter-2-key", mapping.GetFilterMapping("filter-2-key") with
                     {
                         // The code managed to establish an automapping for this filter.
                         Type = MappingType.AutoMapped,
@@ -1228,7 +1105,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         {
                             {
                                 "filter-2-option-1-key",
-                                mappings.GetFilterOptionMapping("filter-2-key", "filter-2-option-1-key") with
+                                mapping.GetFilterOptionMapping("filter-2-key", "filter-2-option-1-key") with
                                 {
                                     // The code managed to establish an automapping for this filter option.
                                     Type = MappingType.AutoMapped,
@@ -1240,19 +1117,13 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 }
             };
 
-            updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(expectedFilterMappings);
+            updatedMapping.FilterMappingPlan.Mappings.AssertDeepEqualTo(expectedFilterMappings);
 
-            Assert.True(updatedMappings.FilterMappingsComplete);
+            Assert.True(updatedMapping.FilterMappingsComplete);
 
             // All source filter options have equivalent candidates to be mapped to, thus
             // resulting in a minor version update.
-            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
         }
 
         [Fact]
@@ -1266,7 +1137,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             // Each source filter and filter option can be auto-mapped exactly to one in
             // the target version, leaving some candidates unused but essentially the mapping
             // is complete unless the user manually intervenes at this point.
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
                 .WithTargetDataSetVersionId(nextVersion.Id)
@@ -1289,25 +1160,16 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         .AddOptionCandidate("filter-2-option-1-key", DataFixture
                             .DefaultMappableFilterOption())));
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
-
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
-            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
 
             Dictionary<string, FilterMapping> expectedFilterMappings = new()
             {
                 {
-                    "filter-1-key", mappings.GetFilterMapping("filter-1-key") with
+                    "filter-1-key", mapping.GetFilterMapping("filter-1-key") with
                     {
                         Type = MappingType.AutoMapped,
                         CandidateKey = "filter-1-key",
@@ -1315,7 +1177,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         {
                             {
                                 "filter-1-option-1-key",
-                                mappings.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
+                                mapping.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
                                 {
                                     Type = MappingType.AutoMapped,
                                     CandidateKey = "filter-1-option-1-key"
@@ -1326,22 +1188,16 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 }
             };
 
-            updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+            updatedMapping.FilterMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedFilterMappings,
                 ignoreCollectionOrders: true);
 
-            Assert.True(updatedMappings.FilterMappingsComplete);
+            Assert.True(updatedMapping.FilterMappingsComplete);
 
             // All source filter options have equivalent candidates to be mapped to, thus
             // resulting in a minor version update. The inclusion of new filter options
             // not present in the original version does not matter.
-            Assert.Equal("1.1.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
         }
 
         // As there is currently no way in the UI for a user to resolve unmapped filters, filters
@@ -1358,7 +1214,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             // Each source filter and filter option can be auto-mapped exactly to one in
             // the target version, leaving some candidates unused but essentially the mapping
             // is complete unless the user manually intervenes at this point.
-            DataSetVersionMapping mappings = DataFixture
+            DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(originalVersion.Id)
                 .WithTargetDataSetVersionId(nextVersion.Id)
@@ -1381,25 +1237,16 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         .AddOptionCandidate("filter-1-option-1-key", DataFixture
                             .DefaultMappableFilterOption())));
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mappings));
-
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithId(nextVersion.Release.ReleaseFileId)
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
-                .WithFile(DataFixture.DefaultFile())
-                .WithPublicApiDataSetId(nextVersion.DataSetId)
-                .WithPublicApiDataSetVersion(nextVersion.SemVersion());
-
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
-            var updatedMappings = GetDataSetVersionMapping(nextVersion);
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
 
             Dictionary<string, FilterMapping> expectedFilterMappings = new()
             {
                 {
-                    "filter-1-key", mappings.GetFilterMapping("filter-1-key") with
+                    "filter-1-key", mapping.GetFilterMapping("filter-1-key") with
                     {
                         Type = MappingType.AutoMapped,
                         CandidateKey = "filter-1-key",
@@ -1407,7 +1254,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                         {
                             {
                                 "filter-1-option-1-key",
-                                mappings.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
+                                mapping.GetFilterOptionMapping("filter-1-key", "filter-1-option-1-key") with
                                 {
                                     Type = MappingType.AutoMapped,
                                     CandidateKey = "filter-1-option-1-key"
@@ -1417,14 +1264,14 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                     }
                 },
                 {
-                    "filter-2-key", mappings.GetFilterMapping("filter-2-key") with
+                    "filter-2-key", mapping.GetFilterMapping("filter-2-key") with
                     {
                         Type = MappingType.AutoNone,
                         OptionMappings = new Dictionary<string, FilterOptionMapping>
                         {
                             {
                                 "filter-2-option-1-key",
-                                mappings.GetFilterOptionMapping("filter-2-key", "filter-2-option-1-key") with
+                                mapping.GetFilterOptionMapping("filter-2-key", "filter-2-option-1-key") with
                                 {
                                     Type = MappingType.AutoNone
                                 }
@@ -1434,21 +1281,15 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 }
             };
 
-            updatedMappings.FilterMappingPlan.Mappings.AssertDeepEqualTo(
+            updatedMapping.FilterMappingPlan.Mappings.AssertDeepEqualTo(
                 expectedFilterMappings,
                 ignoreCollectionOrders: true);
 
-            Assert.True(updatedMappings.FilterMappingsComplete);
+            Assert.True(updatedMapping.FilterMappingsComplete);
 
             // Some source filter options have no equivalent candidate to be mapped to, thus
             // resulting in a major version update.
-            Assert.Equal("2.0.0", updatedMappings.TargetDataSetVersion.SemVersion());
-
-            var updatedReleaseFile = await GetDbContext<ContentDbContext>()
-                .ReleaseFiles
-                .SingleAsync(rf => rf.PublicApiDataSetId == updatedMappings.TargetDataSetVersion.DataSetId);
-
-            Assert.Equal(updatedMappings.TargetDataSetVersion.SemVersion(), updatedReleaseFile.PublicApiDataSetVersion);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
     }
 
@@ -1496,21 +1337,42 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 nextVersionStatus: DataSetVersionStatus.Processing);
 
         SetupCsvDataFilesForDataSetVersion(ProcessorTestData.AbsenceSchool, nextDataSetVersion);
+
+        ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
+            .WithId(nextDataSetVersion.Release.ReleaseFileId)
+            .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+            .WithFile(DataFixture.DefaultFile())
+            .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
+            .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
+
+        await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
         return (instanceId, initialDataSetVersion, nextDataSetVersion);
     }
 
-    private DataSetVersion GetDataSetVersion(DataSetVersion nextVersion)
+    private async Task<DataSetVersion> GetDataSetVersion(DataSetVersion nextVersion)
     {
-        return GetDbContext<PublicDataDbContext>()
+        return await GetDbContext<PublicDataDbContext>()
             .DataSetVersions
-            .Single(dsv => dsv.Id == nextVersion.Id);
+            .SingleAsync(dsv => dsv.Id == nextVersion.Id);
     }
 
-    private DataSetVersionMapping GetDataSetVersionMapping(DataSetVersion nextVersion)
+    private async Task<DataSetVersionMapping> GetDataSetVersionMapping(DataSetVersion nextVersion)
     {
-        return GetDbContext<PublicDataDbContext>()
+        return await GetDbContext<PublicDataDbContext>()
             .DataSetVersionMappings
             .Include(mapping => mapping.TargetDataSetVersion)
-            .Single(mapping => mapping.TargetDataSetVersionId == nextVersion.Id);
+            .SingleAsync(mapping => mapping.TargetDataSetVersionId == nextVersion.Id);
+    }
+
+    private async Task AssertCorrectDataSetVersionNumbers(DataSetVersionMapping mapping, string expectedVersion)
+    {
+        Assert.Equal(expectedVersion, mapping.TargetDataSetVersion.SemVersion().ToString());
+
+        var updatedReleaseFile = await GetDbContext<ContentDbContext>()
+            .ReleaseFiles
+            .SingleAsync(rf => rf.PublicApiDataSetId == mapping.TargetDataSetVersion.DataSetId);
+
+        Assert.Equal(expectedVersion, updatedReleaseFile.PublicApiDataSetVersion?.ToString());
     }
 }
