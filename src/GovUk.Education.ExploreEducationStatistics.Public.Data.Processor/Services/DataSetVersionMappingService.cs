@@ -101,17 +101,17 @@ internal class DataSetVersionMappingService(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default)
     {
-        var mappings = await publicDataDbContext
+        var mapping = await publicDataDbContext
             .DataSetVersionMappings
             .Include(mapping => mapping.TargetDataSetVersion)
             .SingleAsync(
                 mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
                 cancellationToken);
 
-        AutoMapLocations(mappings.LocationMappingPlan);
-        AutoMapFilters(mappings.FilterMappingPlan);
+        AutoMapLocations(mapping.LocationMappingPlan);
+        AutoMapFilters(mapping.FilterMappingPlan);
 
-        mappings.LocationMappingsComplete = !mappings.LocationMappingPlan
+        mapping.LocationMappingsComplete = !mapping.LocationMappingPlan
             .Levels
             // Ignore any levels where candidates or mappings are empty as this means the level
             // has been added or deleted from the data set and is not a mappable change.
@@ -121,41 +121,62 @@ internal class DataSetVersionMappingService(
 
         // Note that currently within the UI there is no way to resolve unmapped filters, and therefore we
         // omit checking the status of filters that have a mapping of AutoNone.
-        mappings.FilterMappingsComplete = !mappings.FilterMappingPlan
+        mapping.FilterMappingsComplete = !mapping.FilterMappingPlan
             .Mappings
             .Where(filterMapping => filterMapping.Value.Type != MappingType.AutoNone)
             .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
             .Any(optionMapping => IncompleteMappingTypes.Contains(optionMapping.Value.Type));
 
-        var hasMajorLocationChange =  mappings.LocationMappingPlan
-            .Levels
-            .Any(level => level.Value.Candidates.Count == 0
-                          || level.Value.Mappings
-                              .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type)));
-
-        var hasMajorFilterUpdate = mappings.FilterMappingPlan
-            .Mappings
-            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
-            .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type));
-
-        var isMajorVersionUpdate = hasMajorLocationChange || hasMajorFilterUpdate;
-
-        if (isMajorVersionUpdate)
+        if (IsMajorVersionUpdate(mapping))
         {
-            mappings.TargetDataSetVersion.VersionMajor += 1;
-            mappings.TargetDataSetVersion.VersionMinor = 0;
+            mapping.TargetDataSetVersion.VersionMajor += 1;
+            mapping.TargetDataSetVersion.VersionMinor = 0;
         }
 
-        publicDataDbContext.DataSetVersionMappings.Update(mappings);
+        publicDataDbContext.DataSetVersionMappings.Update(mapping);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
         var releaseFile = await contentDbContext.ReleaseFiles
-            .Where(rf => rf.Id == mappings.TargetDataSetVersion.Release.ReleaseFileId)
+            .Where(rf => rf.Id == mapping.TargetDataSetVersion.Release.ReleaseFileId)
             .SingleAsync(cancellationToken);
 
-        releaseFile.PublicApiDataSetVersion = mappings.TargetDataSetVersion.SemVersion();
+        releaseFile.PublicApiDataSetVersion = mapping.TargetDataSetVersion.SemVersion();
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private static bool IsMajorVersionUpdate(DataSetVersionMapping mapping)
+    {
+        if (mapping.HasDeletedIndicators
+            || mapping.HasDeletedGeographicLevels
+            || mapping.HasDeletedTimePeriods)
+        {
+            return true;
+        }
+
+        var hasDeletedLocationLevels = mapping.LocationMappingPlan
+            .Levels
+            .Any(level => level.Value.Candidates.Count == 0);
+
+        if (hasDeletedLocationLevels)
+        {
+            return true;
+        }
+
+        var hasUnmappedLocationOptions =  mapping.LocationMappingPlan
+            .Levels
+            .Any(level => level.Value.Mappings
+                .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type)));
+
+        if (hasUnmappedLocationOptions)
+        {
+            return true;
+        }
+
+        return mapping.FilterMappingPlan
+            .Mappings
+            .SelectMany(filterMapping => filterMapping.Value.OptionMappings)
+            .Any(optionMapping => NoMappingTypes.Contains(optionMapping.Value.Type));
     }
 
     public Task<Either<ActionResult, Tuple<DataSetVersion, DataSetVersionImport>>> GetManualMappingVersionAndImport(
