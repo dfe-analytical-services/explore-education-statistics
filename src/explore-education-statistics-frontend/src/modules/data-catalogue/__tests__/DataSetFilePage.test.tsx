@@ -308,7 +308,14 @@ describe('DataSetFilePage', () => {
       const testApiDataSetVersionChanges: ApiDataSetVersionChanges = {
         majorChanges: {
           filters: [
-            { previousState: { id: 'filter-1', label: 'Filter 1', hint: '' } },
+            {
+              previousState: {
+                id: 'filter-1',
+                column: 'filter_1',
+                label: 'Filter 1',
+                hint: '',
+              },
+            },
           ],
         },
         minorChanges: {},
@@ -376,7 +383,14 @@ describe('DataSetFilePage', () => {
       const testApiDataSetVersionChanges: ApiDataSetVersionChanges = {
         majorChanges: {
           filters: [
-            { previousState: { id: 'filter-1', label: 'Filter 1', hint: '' } },
+            {
+              previousState: {
+                id: 'filter-1',
+                column: 'filter_1',
+                label: 'Filter 1',
+                hint: '',
+              },
+            },
           ],
         },
         minorChanges: {},

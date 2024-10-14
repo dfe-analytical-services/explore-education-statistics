@@ -9,7 +9,14 @@ describe('ApiDataSetChangelog', () => {
         version="2.0"
         majorChanges={{
           filters: [
-            { previousState: { id: 'filter-1', label: 'Filter 1', hint: '' } },
+            {
+              previousState: {
+                id: 'filter-1',
+                column: 'filter_1',
+                label: 'Filter 1',
+                hint: '',
+              },
+            },
           ],
         }}
         minorChanges={{}}
@@ -33,7 +40,9 @@ describe('ApiDataSetChangelog', () => {
     ).getAllByRole('listitem');
 
     expect(deletedFilters).toHaveLength(1);
-    expect(deletedFilters[0]).toHaveTextContent('Filter 1 (id: filter-1)');
+    expect(deletedFilters[0]).toHaveTextContent(
+      'Filter 1 (id: filter-1, column: filter_1)',
+    );
 
     // No minor changes
     expect(screen.queryByTestId('minor-changes')).not.toBeInTheDocument();
@@ -46,7 +55,14 @@ describe('ApiDataSetChangelog', () => {
         majorChanges={{}}
         minorChanges={{
           filters: [
-            { currentState: { id: 'filter-2', label: 'Filter 2', hint: '' } },
+            {
+              currentState: {
+                id: 'filter-2',
+                column: 'filter_2',
+                label: 'Filter 2',
+                hint: '',
+              },
+            },
           ],
         }}
       />,
@@ -73,7 +89,9 @@ describe('ApiDataSetChangelog', () => {
 
     expect(addedFilters).toHaveLength(1);
 
-    expect(addedFilters[0]).toHaveTextContent('Filter 2 (id: filter-2)');
+    expect(addedFilters[0]).toHaveTextContent(
+      'Filter 2 (id: filter-2, column: filter_2)',
+    );
   });
 
   test('renders major and minor changes', () => {
@@ -82,12 +100,26 @@ describe('ApiDataSetChangelog', () => {
         version="2.0"
         majorChanges={{
           filters: [
-            { previousState: { id: 'filter-1', label: 'Filter 1', hint: '' } },
+            {
+              previousState: {
+                id: 'filter-1',
+                column: 'filter_1',
+                label: 'Filter 1',
+                hint: '',
+              },
+            },
           ],
         }}
         minorChanges={{
           filters: [
-            { currentState: { id: 'filter-2', label: 'Filter 2', hint: '' } },
+            {
+              currentState: {
+                id: 'filter-2',
+                column: 'filter_2',
+                label: 'Filter 2',
+                hint: '',
+              },
+            },
           ],
         }}
       />,
@@ -110,7 +142,9 @@ describe('ApiDataSetChangelog', () => {
     ).getAllByRole('listitem');
 
     expect(deletedFilters).toHaveLength(1);
-    expect(deletedFilters[0]).toHaveTextContent('Filter 1 (id: filter-1)');
+    expect(deletedFilters[0]).toHaveTextContent(
+      'Filter 1 (id: filter-1, column: filter_1)',
+    );
 
     const minorChanges = within(screen.getByTestId('minor-changes'));
 
@@ -129,6 +163,8 @@ describe('ApiDataSetChangelog', () => {
     ).getAllByRole('listitem');
 
     expect(addedFilters).toHaveLength(1);
-    expect(addedFilters[0]).toHaveTextContent('Filter 2 (id: filter-2)');
+    expect(addedFilters[0]).toHaveTextContent(
+      'Filter 2 (id: filter-2, column: filter_2)',
+    );
   });
 });

@@ -7,26 +7,66 @@ describe('ChangeSection', () => {
   test('renders filter changes only', () => {
     const testChanges: ChangeSet = {
       filters: [
-        { previousState: { id: 'filter-1', label: 'Filter 1', hint: '' } },
-        { previousState: { id: 'filter-2', label: 'Filter 2', hint: '' } },
         {
-          previousState: { id: 'filter-3', label: 'Filter 3', hint: '' },
-          currentState: { id: 'filter-3-updated', label: 'Filter 3', hint: '' },
+          previousState: {
+            id: 'filter-1',
+            column: 'filter_1',
+            label: 'Filter 1',
+            hint: '',
+          },
+        },
+        {
+          previousState: {
+            id: 'filter-2',
+            column: 'filter_2',
+            label: 'Filter 2',
+            hint: '',
+          },
+        },
+        {
+          previousState: {
+            id: 'filter-3',
+            column: 'filter_3',
+            label: 'Filter 3',
+            hint: '',
+          },
+          currentState: {
+            id: 'filter-3-updated',
+            column: 'filter_3_updated',
+            label: 'Filter 3',
+            hint: '',
+          },
         },
         {
           previousState: {
             id: 'filter-4',
+            column: 'filter_4',
             label: 'Filter 4',
             hint: 'Filter 4 hint',
           },
           currentState: {
             id: 'filter-4',
+            column: 'filter_4',
             label: 'Filter 4 updated',
             hint: 'Filter 4 hint updated',
           },
         },
-        { currentState: { id: 'filter-5', label: 'Filter 5', hint: '' } },
-        { currentState: { id: 'filter-6', label: 'Filter 6', hint: '' } },
+        {
+          currentState: {
+            id: 'filter-5',
+            column: 'filter_5',
+            label: 'Filter 5',
+            hint: '',
+          },
+        },
+        {
+          currentState: {
+            id: 'filter-6',
+            column: 'filter_6',
+            label: 'Filter 6',
+            hint: '',
+          },
+        },
       ],
     };
 
@@ -41,35 +81,69 @@ describe('ChangeSection', () => {
     );
 
     expect(deleted).toHaveLength(2);
-    expect(deleted[0]).toHaveTextContent('Filter 1 (id: filter-1)');
-    expect(deleted[1]).toHaveTextContent('Filter 2 (id: filter-2)');
+    expect(deleted[0]).toHaveTextContent(
+      'Filter 1 (id: filter-1, column: filter_1)',
+    );
+    expect(deleted[1]).toHaveTextContent(
+      'Filter 2 (id: filter-2, column: filter_2)',
+    );
 
     const updated = within(
       screen.getByTestId('updated-filters'),
     ).getAllByTestId('updated-item');
 
     expect(updated).toHaveLength(2);
-    expect(updated[0]).toHaveTextContent('Filter 3 (id: filter-3)');
-    expect(updated[0]).toHaveTextContent('id changed to: filter-3-updated');
+    expect(updated[0]).toHaveTextContent(
+      'Filter 3 (id: filter-3, column: filter_3)',
+    );
 
-    expect(updated[1]).toHaveTextContent('Filter 4 (id: filter-4)');
-    expect(updated[1]).toHaveTextContent('label changed to: Filter 4 updated');
-    expect(updated[1]).toHaveTextContent('hint changed to: Filter 4 hint');
+    const updated1Changes = within(updated[0]).getAllByRole('listitem');
+
+    expect(updated1Changes).toHaveLength(2);
+    expect(updated1Changes[0]).toHaveTextContent(
+      'id changed to: filter-3-updated',
+    );
+    expect(updated1Changes[1]).toHaveTextContent(
+      'column changed to: filter_3_updated',
+    );
+
+    expect(updated[1]).toHaveTextContent(
+      'Filter 4 (id: filter-4, column: filter_4)',
+    );
+
+    const updated2Changes = within(updated[1]).getAllByRole('listitem');
+
+    expect(updated2Changes).toHaveLength(2);
+    expect(updated2Changes[0]).toHaveTextContent(
+      'label changed to: Filter 4 updated',
+    );
+    expect(updated2Changes[1]).toHaveTextContent(
+      'hint changed to: Filter 4 hint',
+    );
 
     const added = within(screen.getByTestId('added-filters')).getAllByRole(
       'listitem',
     );
 
     expect(added).toHaveLength(2);
-    expect(added[0]).toHaveTextContent('Filter 5 (id: filter-5)');
-    expect(added[1]).toHaveTextContent('Filter 6 (id: filter-6)');
+    expect(added[0]).toHaveTextContent(
+      'Filter 5 (id: filter-5, column: filter_5)',
+    );
+    expect(added[1]).toHaveTextContent(
+      'Filter 6 (id: filter-6, column: filter_6)',
+    );
   });
 
   test('renders filter option changes only', () => {
     const testChanges: ChangeSet = {
       filterOptions: [
         {
-          filter: { id: 'filter-1', label: 'Filter 1', hint: '' },
+          filter: {
+            id: 'filter-1',
+            column: 'filter_1',
+            label: 'Filter 1',
+            hint: '',
+          },
           options: [
             { previousState: { id: 'filter-opt-1', label: 'Filter option 1' } },
             { previousState: { id: 'filter-opt-2', label: 'Filter option 2' } },
@@ -93,7 +167,12 @@ describe('ChangeSection', () => {
           ],
         },
         {
-          filter: { id: 'filter-2', label: 'Filter 2', hint: '' },
+          filter: {
+            id: 'filter-2',
+            column: 'filter_2',
+            label: 'Filter 2',
+            hint: '',
+          },
           options: [
             { previousState: { id: 'filter-opt-7', label: 'Filter option 7' } },
             {
@@ -138,16 +217,29 @@ describe('ChangeSection', () => {
     expect(updatedFilter1Options[0]).toHaveTextContent(
       'Filter option 3 (id: filter-opt-3)',
     );
-    expect(updatedFilter1Options[0]).toHaveTextContent(
+
+    const updatedFilter1Option1Changes = within(
+      updatedFilter1Options[0],
+    ).getAllByRole('listitem');
+
+    expect(updatedFilter1Option1Changes).toHaveLength(1);
+    expect(updatedFilter1Option1Changes[0]).toHaveTextContent(
       'id changed to: filter-opt-3-updated',
     );
+
     expect(updatedFilter1Options[1]).toHaveTextContent(
       'Filter option 4 (id: filter-opt-4)',
     );
-    expect(updatedFilter1Options[1]).toHaveTextContent(
+
+    const updatedFilter1Option2Changes = within(
+      updatedFilter1Options[1],
+    ).getAllByRole('listitem');
+
+    expect(updatedFilter1Option2Changes).toHaveLength(2);
+    expect(updatedFilter1Option2Changes[0]).toHaveTextContent(
       'label changed to: Filter option 4 updated',
     );
-    expect(updatedFilter1Options[1]).toHaveTextContent(
+    expect(updatedFilter1Option2Changes[1]).toHaveTextContent(
       'changed to an aggregate',
     );
 
@@ -180,6 +272,12 @@ describe('ChangeSection', () => {
     expect(updatedFilter2Options[0]).toHaveTextContent(
       'Filter option 8 (id: filter-opt-8)',
     );
+
+    const updatedFilter2Option1Changes = within(
+      updatedFilter2Options[0],
+    ).getAllByRole('listitem');
+
+    expect(updatedFilter2Option1Changes).toHaveLength(1);
     expect(updatedFilter2Options[0]).toHaveTextContent(
       'no longer an aggregate',
     );
@@ -234,11 +332,20 @@ describe('ChangeSection', () => {
 
     expect(updated).toHaveLength(2);
     expect(updated[0]).toHaveTextContent('Local authority (code: LA)');
-    expect(updated[0]).toHaveTextContent(
+
+    const updated1Changes = within(updated[0]).getAllByRole('listitem');
+
+    expect(updated1Changes).toHaveLength(1);
+    expect(updated1Changes[0]).toHaveTextContent(
       'changed to: Local authority district (code: LAD)',
     );
+
     expect(updated[1]).toHaveTextContent('Opportunity area (code: OA)');
-    expect(updated[1]).toHaveTextContent(
+
+    const updated2Changes = within(updated[1]).getAllByRole('listitem');
+
+    expect(updated2Changes).toHaveLength(1);
+    expect(updated2Changes[0]).toHaveTextContent(
       'changed to: Planning area (code: PA)',
     );
 
@@ -254,22 +361,59 @@ describe('ChangeSection', () => {
   test('renders indicators changes only', () => {
     const testChanges: ChangeSet = {
       indicators: [
-        { previousState: { id: 'indicator-1', label: 'Indicator 1' } },
-        { previousState: { id: 'indicator-2', label: 'Indicator 2' } },
         {
-          currentState: { id: 'indicator-4', label: 'Indicator 3' },
-          previousState: { id: 'indicator-3', label: 'Indicator 3' },
+          previousState: {
+            id: 'indicator-1',
+            column: 'indicator_1',
+            label: 'Indicator 1',
+          },
+        },
+        {
+          previousState: {
+            id: 'indicator-2',
+            column: 'indicator_2',
+            label: 'Indicator 2',
+          },
         },
         {
           currentState: {
-            id: 'indicator-5',
-            label: 'Indicator 5 updated',
+            id: 'indicator-3-updated',
+            column: 'indicator_3_updated',
+            label: 'Indicator 3',
+          },
+          previousState: {
+            id: 'indicator-3',
+            column: 'indicator_3',
+            label: 'Indicator 3',
+          },
+        },
+        {
+          currentState: {
+            id: 'indicator-4',
+            column: 'indicator_4',
+            label: 'Indicator 4 updated',
             unit: '%',
           },
-          previousState: { id: 'indicator-5', label: 'Indicator 5' },
+          previousState: {
+            id: 'indicator-4',
+            column: 'indicator_4',
+            label: 'Indicator 4',
+          },
         },
-        { currentState: { id: 'indicator-6', label: 'Indicator 6' } },
-        { currentState: { id: 'indicator-7', label: 'Indicator 7' } },
+        {
+          currentState: {
+            id: 'indicator-6',
+            column: 'indicator_6',
+            label: 'Indicator 6',
+          },
+        },
+        {
+          currentState: {
+            id: 'indicator-7',
+            column: 'indicator_7',
+            label: 'Indicator 7',
+          },
+        },
       ],
     };
 
@@ -292,14 +436,31 @@ describe('ChangeSection', () => {
     ).getAllByTestId('updated-item');
 
     expect(updated).toHaveLength(2);
-    expect(updated[0]).toHaveTextContent('Indicator 3 (id: indicator-3)');
-    expect(updated[0]).toHaveTextContent('id changed to: indicator-4');
-
-    expect(updated[1]).toHaveTextContent('Indicator 5 (id: indicator-5)');
-    expect(updated[1]).toHaveTextContent(
-      'label changed to: Indicator 5 updated',
+    expect(updated[0]).toHaveTextContent(
+      'Indicator 3 (id: indicator-3, column: indicator_3)',
     );
-    expect(updated[1]).toHaveTextContent('unit changed to: %');
+
+    const updated1Changes = within(updated[0]).getAllByRole('listitem');
+
+    expect(updated1Changes).toHaveLength(2);
+    expect(updated1Changes[0]).toHaveTextContent(
+      'id changed to: indicator-3-updated',
+    );
+    expect(updated1Changes[1]).toHaveTextContent(
+      'column changed to: indicator_3_updated',
+    );
+
+    expect(updated[1]).toHaveTextContent(
+      'Indicator 4 (id: indicator-4, column: indicator_4)',
+    );
+
+    const updated2Changes = within(updated[1]).getAllByRole('listitem');
+
+    expect(updated2Changes).toHaveLength(2);
+    expect(updated2Changes[0]).toHaveTextContent(
+      'label changed to: Indicator 4 updated',
+    );
+    expect(updated2Changes[1]).toHaveTextContent('unit changed to: %');
 
     const added = within(screen.getByTestId('added-indicators')).getAllByRole(
       'listitem',
@@ -352,12 +513,20 @@ describe('ChangeSection', () => {
     expect(updated).toHaveLength(2);
 
     expect(updated[0]).toHaveTextContent('Local authority (code: LA)');
-    expect(updated[0]).toHaveTextContent(
+
+    const updated1Changes = within(updated[0]).getAllByRole('listitem');
+
+    expect(updated1Changes).toHaveLength(1);
+    expect(updated1Changes[0]).toHaveTextContent(
       'changed to: Local authority district (code: LAD)',
     );
 
     expect(updated[1]).toHaveTextContent('Opportunity area (code: OA)');
-    expect(updated[1]).toHaveTextContent(
+
+    const updated2Changes = within(updated[1]).getAllByRole('listitem');
+
+    expect(updated2Changes).toHaveLength(1);
+    expect(updated2Changes[0]).toHaveTextContent(
       'changed to: Planning area (code: PA)',
     );
 
@@ -499,24 +668,36 @@ describe('ChangeSection', () => {
     expect(updatedRegionOptions[0]).toHaveTextContent(
       'Location 3 (id: location-3, code: location-3-code, old code: location-3-oldCode)',
     );
-    expect(updatedRegionOptions[0]).toHaveTextContent(
+
+    const updatedRegionOption1Changes = within(
+      updatedRegionOptions[0],
+    ).getAllByRole('listitem');
+
+    expect(updatedRegionOption1Changes).toHaveLength(3);
+    expect(updatedRegionOption1Changes[0]).toHaveTextContent(
       'id changed to: location-3-updated',
     );
-    expect(updatedRegionOptions[0]).toHaveTextContent(
+    expect(updatedRegionOption1Changes[1]).toHaveTextContent(
       'code changed to: location-3-code-updated',
     );
-    expect(updatedRegionOptions[0]).toHaveTextContent(
+    expect(updatedRegionOption1Changes[2]).toHaveTextContent(
       'old code changed to: location-3-oldCode-updated',
     );
 
     expect(updatedRegionOptions[1]).toHaveTextContent(
       'Location 4 (id: location-4, UKPRN: location-4-ukprn)',
     );
-    expect(updatedRegionOptions[1]).toHaveTextContent(
+
+    const updatedRegionOption2Changes = within(
+      updatedRegionOptions[1],
+    ).getAllByRole('listitem');
+
+    expect(updatedRegionOption2Changes).toHaveLength(2);
+    expect(updatedRegionOption2Changes[0]).toHaveTextContent(
       'label changed to: Location 4 updated',
     );
-    expect(updatedRegionOptions[1]).toHaveTextContent(
-      'UKPRN changed to: location-4-ukprn',
+    expect(updatedRegionOption2Changes[1]).toHaveTextContent(
+      'UKPRN changed to: location-4-ukprn-updated',
     );
 
     const addedRegionOptions = within(
@@ -555,16 +736,22 @@ describe('ChangeSection', () => {
     expect(updatedSchoolOptions[0]).toHaveTextContent(
       'Location 8 (id: location-8, URN: location-8-urn, LAESTAB: location-8-laEstab)',
     );
-    expect(updatedSchoolOptions[0]).toHaveTextContent(
-      'id changed to: location-8-updated',
-    );
-    expect(updatedSchoolOptions[0]).toHaveTextContent(
+
+    const updatedSchoolOption1Changes = within(
+      updatedSchoolOptions[0],
+    ).getAllByRole('listitem');
+
+    expect(updatedSchoolOption1Changes).toHaveLength(4);
+    expect(updatedSchoolOption1Changes[0]).toHaveTextContent(
       'label changed to: Location 8 updated',
     );
-    expect(updatedSchoolOptions[0]).toHaveTextContent(
+    expect(updatedSchoolOption1Changes[1]).toHaveTextContent(
+      'id changed to: location-8-updated',
+    );
+    expect(updatedSchoolOption1Changes[2]).toHaveTextContent(
       'URN changed to: location-8-urn-updated',
     );
-    expect(updatedSchoolOptions[0]).toHaveTextContent(
+    expect(updatedSchoolOption1Changes[3]).toHaveTextContent(
       'LAESTAB changed to: location-8-laEstab-updated',
     );
 
@@ -640,13 +827,28 @@ describe('ChangeSection', () => {
     const testChanges: ChangeSet = {
       filters: [
         {
-          previousState: { id: 'filter-1', label: 'Filter 1', hint: '' },
-          currentState: { id: 'filter-1', label: 'Filter 1 updated', hint: '' },
+          previousState: {
+            id: 'filter-1',
+            column: 'filter_1',
+            label: 'Filter 1',
+            hint: '',
+          },
+          currentState: {
+            id: 'filter-1',
+            column: 'filter_1_updated',
+            label: 'Filter 1 updated',
+            hint: '',
+          },
         },
       ],
       filterOptions: [
         {
-          filter: { id: 'filter-1', label: 'Filter 1', hint: '' },
+          filter: {
+            id: 'filter-1',
+            column: 'filter_1',
+            label: 'Filter 1',
+            hint: '',
+          },
           options: [
             { previousState: { id: 'filter-opt-1', label: 'Filter option 1' } },
           ],
@@ -657,8 +859,16 @@ describe('ChangeSection', () => {
       ],
       indicators: [
         {
-          currentState: { id: 'indicator-1', label: 'Indicator 1 updated' },
-          previousState: { id: 'indicator-1', label: 'Indicator 1' },
+          currentState: {
+            id: 'indicator-1',
+            column: 'indicator_1_updated',
+            label: 'Indicator 1 updated',
+          },
+          previousState: {
+            id: 'indicator-1',
+            column: 'indicator_1',
+            label: 'Indicator 1',
+          },
         },
       ],
       locationGroups: [
@@ -697,9 +907,19 @@ describe('ChangeSection', () => {
 
     expect(updatedFilters).toHaveLength(1);
 
-    expect(updatedFilters[0]).toHaveTextContent('Filter 1 (id: filter-1)');
     expect(updatedFilters[0]).toHaveTextContent(
+      'Filter 1 (id: filter-1, column: filter_1)',
+    );
+
+    const updatedFilterChanges = within(updatedFilters[0]).getAllByRole(
+      'listitem',
+    );
+    expect(updatedFilterChanges).toHaveLength(2);
+    expect(updatedFilterChanges[0]).toHaveTextContent(
       'label changed to: Filter 1 updated',
+    );
+    expect(updatedFilterChanges[1]).toHaveTextContent(
+      'column changed to: filter_1_updated',
     );
 
     expect(
@@ -738,10 +958,18 @@ describe('ChangeSection', () => {
 
     expect(updatedIndicators).toHaveLength(1);
     expect(updatedIndicators[0]).toHaveTextContent(
-      'Indicator 1 (id: indicator-1)',
+      'Indicator 1 (id: indicator-1, column: indicator_1)',
     );
-    expect(updatedIndicators[0]).toHaveTextContent(
+
+    const updatedIndicatorChanges = within(updatedIndicators[0]).getAllByRole(
+      'listitem',
+    );
+    expect(updatedIndicatorChanges).toHaveLength(2);
+    expect(updatedIndicatorChanges[0]).toHaveTextContent(
       'label changed to: Indicator 1 updated',
+    );
+    expect(updatedIndicatorChanges[1]).toHaveTextContent(
+      'column changed to: indicator_1_updated',
     );
 
     expect(
