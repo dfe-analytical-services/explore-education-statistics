@@ -218,8 +218,9 @@ Check subject order in data catalogue
     user navigates to data catalogue page on public frontend
 
     user wait for option to be available and select it    css:select[id="filters-form-theme"]    %{TEST_THEME_NAME}
-    user wait for option to be available and select it    css:select[id="filters-form-publication"]     ${PUBLICATION_NAME}
-     sleep    1  # wait a moment to wait for release filter options to get updated
+    user wait for option to be available and select it    css:select[id="filters-form-publication"]
+    ...    ${PUBLICATION_NAME}
+    sleep    1    # wait a moment to wait for release filter options to get updated
     user wait for option to be available and select it    css:select[id="filters-form-release"]    ${RELEASE_NAME}
 
     user waits until page contains    Download all 4 data sets (ZIP)
@@ -232,7 +233,7 @@ Check subject order in data catalogue
     ...    locator=xpath://*[@data-testid="data-set-file-list"]/li/h4
 
 Check subject order in data guidance
-    user navigates to public find statistics page
+    user checks publication is on find statistics page    ${PUBLICATION_NAME}
     user clicks link    ${PUBLICATION_NAME}
 
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
