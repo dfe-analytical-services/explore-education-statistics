@@ -11,10 +11,10 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}             UI tests - release status %{RUN_IDENTIFIER}
-${ADOPTED_PUBLICATION_NAME}     UI tests - release status publication with adoptable methodology %{RUN_IDENTIFIER}
-${PUBLICATION_NAME_DATAFILES}   ${PUBLICATION_NAME} -  datafiles-updated
-${SUBJECT_NAME}         	Dates test subject
+${PUBLICATION_NAME}                 UI tests - release status %{RUN_IDENTIFIER}
+${ADOPTED_PUBLICATION_NAME}         UI tests - release status publication with adoptable methodology %{RUN_IDENTIFIER}
+${PUBLICATION_NAME_DATAFILES}       ${PUBLICATION_NAME} -    datafiles-updated
+${SUBJECT_NAME}                     Dates test subject
 
 
 *** Test Cases ***
@@ -42,8 +42,6 @@ Validate checklist errors and warnings
     ...    Release must contain a key statistic or a non-empty headline text block
 
     user checks page does not contain testid    releaseChecklist-success
-
-
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
@@ -119,7 +117,6 @@ Add text block with content to Test section two
     user scrolls to accordion section    View related dashboard(s)    id:data-accordion
 
 Add content to text block in Related dashboards section
-
     user waits until page contains accordion section    View related dashboard(s)
     user opens accordion section    View related dashboard(s)    id:data-accordion
     user adds content to related dashboards text block    Related dashboards test text
@@ -269,7 +266,7 @@ Approve the adopted methodology amendment and verify the warning disappears
 Publish new release from adopted publication and make an amendment
     user navigates to publication page from dashboard    ${ADOPTED_PUBLICATION_NAME}
     user creates release from publication page    ${ADOPTED_PUBLICATION_NAME}    Academic year Q1    2200
-    user navigates to content page   ${ADOPTED_PUBLICATION_NAME}
+    user navigates to content page    ${ADOPTED_PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
     user clicks link    Sign off
@@ -281,12 +278,12 @@ Publish new release from adopted publication and make an amendment
 Verify the checklist errors and warnings for amendment
     user edits release status
     user checks checklist warnings contains
-     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
+    ...    2 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    No data files uploaded
     user checks checklist warnings contains link    A public pre-release access list has not been created
 
     user checks checklist errors contains link
-     ...    A public release note for this amendment is required, add this near the top of the content page
+    ...    A public release note for this amendment is required, add this near the top of the content page
     user checks page does not contain testid    releaseChecklist-success
 
 Navigate to contents page and add a release note
@@ -314,7 +311,7 @@ Upload data files
     user waits until page contains accordion section    Dates test subject
     user opens accordion section    Dates test subject
 
-    ${section}=    user gets accordion section content element    Dates test subject
+    ${section}    user gets accordion section content element    Dates test subject
     user clicks link    Replace data    ${section}
 
     user waits until h2 is visible    Data file details
@@ -352,7 +349,7 @@ Navigate to data upload and confirm data replacement
     user waits until page contains accordion section    Dates test subject
     user opens accordion section    Dates test subject
 
-    ${section}=    user gets accordion section content element    Dates test subject
+    ${section}    user gets accordion section content element    Dates test subject
     user clicks link    Replace data    ${section}
     user waits until page contains    Footnotes: OK
     user waits until page contains    Data blocks: OK
@@ -399,7 +396,7 @@ Add data guidance to subject
 
 Save data guidance (third release)
     user clicks button    Save guidance
-    user waits for caches to expire       #prevent intermittent failure in pipeline - data guidance to be saved  before navigating to content page
+    user waits for caches to expire    #prevent intermittent failure in pipeline - data guidance to be saved    before navigating to content page
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME_DATAFILES}
@@ -412,16 +409,7 @@ Publish the release immediately
     user approves release for immediate publication
 
 
-
-
 *** Keywords ***
-user edits release status
-    user clicks link    Sign off
-    user waits until h2 is visible    Sign off    %{WAIT_SMALL}
-
-    user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
-
 user checks checklist warnings contains
     [Arguments]    ${text}
     user waits until page contains testid    releaseChecklist-warnings
