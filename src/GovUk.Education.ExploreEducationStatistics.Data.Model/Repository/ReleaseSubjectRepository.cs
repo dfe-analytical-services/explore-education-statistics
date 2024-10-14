@@ -1,11 +1,11 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             {
                 // Use raw delete as EF can't correctly figure out how to cascade the delete, whilst the database can.
                 // N.B. This delete will be slow if there are a large number of observations but this is only
-                // executed by the tests when the topic is torn down so ensure files used are < 1000 rows.
+                // executed by the tests when the theme is torn down so ensure files used are < 1000 rows.
                 context.Subject.FromSqlInterpolated($"DELETE Subject WHERE Id = {subjectId}");
             }
         }

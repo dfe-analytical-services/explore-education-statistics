@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -12,6 +8,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using ExternalMethodologyViewModel =
     GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
@@ -28,10 +28,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     {
         [HttpGet("api/publications")]
         public async Task<ActionResult<List<PublicationViewModel>>> ListPublications(
-            [FromQuery] Guid? topicId)
+            [FromQuery] Guid? themeId)
         {
             return await publicationService
-                .ListPublications(topicId)
+                .ListPublications(themeId)
                 .HandleFailuresOrOk();
         }
 

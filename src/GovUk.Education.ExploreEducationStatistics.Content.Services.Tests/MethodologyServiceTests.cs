@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -11,11 +7,15 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
@@ -458,16 +458,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Title = "Publication title"
             };
 
-            var topic = new Topic
-            {
-                Title = "Topic title",
-                Publications = ListOf(publication)
-            };
-
             var theme = new Theme
             {
                 Title = "Theme title",
-                Topics = ListOf(topic)
+                Publications = [publication]
             };
 
             var methodologyVersion1Id = Guid.NewGuid();
@@ -533,13 +527,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(theme.Id, themes[0].Id);
                 Assert.Equal("Theme title", themes[0].Title);
 
-                var topics = themes[0].Topics;
-                Assert.Single(topics);
-
-                Assert.Equal(topic.Id, topics[0].Id);
-                Assert.Equal("Topic title", topics[0].Title);
-
-                var publications = topics[0].Publications;
+                var publications = themes[0].Publications;
                 Assert.Single(publications);
 
                 Assert.Equal(publication.Id, publications[0].Id);
@@ -559,39 +547,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetSummariesTree_ThemeWithoutTopicsIsNotIncluded()
-        {
-            var theme = new Theme
-            {
-                Title = "Theme title",
-                Slug = "theme-slug",
-                Summary = "Theme summary",
-                Topics = new List<Topic>()
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Themes.AddAsync(theme);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(contentDbContext,
-                    methodologyVersionRepository: methodologyVersionRepository.Object);
-
-                var result = await service.GetSummariesTree();
-                VerifyAllMocks(methodologyVersionRepository);
-
-                result.AssertRight(new List<AllMethodologiesThemeViewModel>());
-            }
-        }
-
-        [Fact]
         public async Task GetSummariesTree_ThemeWithoutPublicationsIsNotIncluded()
         {
             var theme = new Theme
@@ -599,14 +554,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Title = "Theme title",
                 Slug = "theme-slug",
                 Summary = "Theme summary",
-                Topics = ListOf(
-                    new Topic
-                    {
-                        Title = "Topic title",
-                        Slug = "topic-slug",
-                        Publications = new List<Publication>()
-                    }
-                )
+                Publications = []
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -648,18 +596,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Title = "Theme title",
                 Slug = "theme-slug",
                 Summary = "Theme summary",
-                Topics = ListOf(
-                    new Topic
-                    {
-                        Title = "Topic title",
-                        Slug = "topic-slug",
-                        Publications = ListOf(publication)
-                    }
-                )
+                Publications = ListOf(publication)
             };
 
             // This test sets up returning an empty list of the latest publicly accessible methodologies for a publication.
-            // The theme/topic/publication shouldn't be visible because it has no methodology leaf nodes.
+            // The theme/publication shouldn't be visible because it has no methodology leaf nodes.
             // This would be the case if:
             // * There are no approved methodologies yet.
             // * All of the approved methodologies depend on other releases which aren't published yet.
@@ -699,7 +640,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var methodologyVersionId = Guid.NewGuid();
             var methodologyUpdatedDate = DateTime.Parse(sitemapItemLastModifiedTime);
-            
+
             var methodology = new Methodology
             {
                 OwningPublicationSlug = "publication-title",
@@ -717,7 +658,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     }
                 ]
             };
-            
+
             var publication = new Publication
             {
                 Slug = "publication-title",
@@ -754,7 +695,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var methodologyVersionId = Guid.NewGuid();
             var methodologyUpdatedDate = DateTime.Parse(sitemapItemLastModifiedTime);
-            
+
             var methodology = new Methodology
             {
                 OwningPublicationSlug = "publication-title",

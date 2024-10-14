@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -10,6 +6,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 
@@ -46,8 +46,7 @@ public class MethodologyCacheService : IMethodologyCacheService
             .OnSuccess(methodologiesByTheme =>
             {
                 var matchingPublication = methodologiesByTheme
-                    .SelectMany(theme => theme.Topics)
-                    .SelectMany(topic => topic.Publications)
+                    .SelectMany(theme => theme.Publications)
                     .SingleOrDefault(publication => publication.Id == publicationId);
                 return matchingPublication?.Methodologies ?? new List<MethodologyVersionSummaryViewModel>();
             });
