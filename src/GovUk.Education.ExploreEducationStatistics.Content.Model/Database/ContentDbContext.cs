@@ -119,12 +119,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureMarkdownBlock(modelBuilder);
             ConfigureFeaturedTable(modelBuilder);
             ConfigurePermalink(modelBuilder);
+            ConfigureUpdate(modelBuilder);
             ConfigureUser(modelBuilder);
             ConfigureUserPublicationRole(modelBuilder);
             ConfigureUserReleaseRole(modelBuilder);
             ConfigureUserReleaseInvite(modelBuilder);
             ConfigureUserPublicationInvite(modelBuilder);
             ConfigureGlossaryEntry(modelBuilder);
+            ConfigureKeyStatistics(modelBuilder);
             ConfigureKeyStatisticsDataBlock(modelBuilder);
             ConfigureKeyStatisticsText(modelBuilder);
             ConfigureDataBlockParent(modelBuilder);
@@ -148,6 +150,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         private static void ConfigureDataImport(ModelBuilder modelBuilder)
@@ -244,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyVersion>()
                 .HasOne(m => m.CreatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         private static void ConfigureMethodologyStatus(ModelBuilder modelBuilder)
@@ -260,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyStatus>()
                 .HasOne(rs => rs.CreatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<MethodologyStatus>()
                 .Property(rs => rs.ApprovalStatus)
@@ -283,6 +290,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         private static void ConfigureMethodologyNote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<MethodologyNote>()
+                .Property(n => n.DisplayDate)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<MethodologyNote>()
                 .Property(n => n.Created)
                 .HasConversion(
                     v => v,
@@ -291,13 +304,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyNote>()
                 .HasOne(m => m.CreatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<MethodologyNote>()
-                .Property(n => n.DisplayDate)
-                .HasConversion(
-                    v => v,
-                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<MethodologyNote>()
                 .Property(n => n.Updated)
@@ -308,7 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyNote>()
                 .HasOne(m => m.UpdatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction)
+                .OnDelete(DeleteBehavior.SetNull)
                 .IsRequired(false);
         }
 
@@ -373,7 +380,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<ReleaseStatus>()
                 .HasOne(rs => rs.CreatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<ReleaseStatus>()
                 .Property(rs => rs.ApprovalStatus)
@@ -446,6 +453,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     .WithOne()
                     .HasForeignKey<File>(f => f.ReplacedById)
                     .IsRequired(false);
+                entity.HasOne(rs => rs.CreatedBy)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.SetNull);
                 entity.Property(f => f.Created)
                     .HasConversion(
                         v => v,
@@ -456,6 +466,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     .HasConversion( // You might want to use EF8 JSON support instead of this
                         v => JsonConvert.SerializeObject(v),
                         v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
+
+
             });
         }
 
@@ -516,7 +528,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<ReleaseVersion>()
                 .HasOne(rv => rv.CreatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<ReleaseVersion>()
                 .Property(rv => rv.Published)
@@ -615,6 +627,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<FeaturedTable>()
                 .HasOne(ft => ft.DataBlock)
                 .WithOne();
+
+            modelBuilder.Entity<FeaturedTable>()
+                .HasOne(rs => rs.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<FeaturedTable>()
+                .HasOne(rs => rs.UpdatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         private static void ConfigurePermalink(ModelBuilder modelBuilder)
@@ -630,6 +652,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Permalink>()
                 .HasIndex(data => data.SubjectId);
+        }
+
+        private static void ConfigureUpdate(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Update>()
+                .HasOne(r => r.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         private static void ConfigureRedirects(ModelBuilder modelBuilder)
@@ -657,7 +687,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<UserPublicationRole>()
                 .HasOne(r => r.CreatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<UserPublicationRole>()
+                .HasOne(r => r.DeletedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<UserPublicationRole>()
                 .Property(r => r.Role)
@@ -683,6 +718,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasQueryFilter(r =>
                     !r.SoftDeleted
                     && r.Deleted == null);
+
+            modelBuilder.Entity<UserReleaseRole>()
+                .HasOne(rs => rs.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<UserReleaseRole>()
+                .HasOne(rs => rs.DeletedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         private static void ConfigureUserReleaseInvite(ModelBuilder modelBuilder)
@@ -705,6 +750,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+            modelBuilder.Entity<UserReleaseInvite>()
+                .HasOne(rs => rs.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         private static void ConfigureUserPublicationInvite(ModelBuilder modelBuilder)
@@ -718,6 +768,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<UserPublicationInvite>()
+                .HasOne(rs => rs.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         private static void ConfigureGlossaryEntry(ModelBuilder modelBuilder)
@@ -731,7 +786,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<GlossaryEntry>()
                 .HasOne(rs => rs.CreatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
+        }
+
+        private static void ConfigureKeyStatistics(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<KeyStatistic>()
+                .HasOne(ks => ks.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<KeyStatistic>()
+                .HasOne(ks => ks.UpdatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         private static void ConfigureKeyStatisticsDataBlock(ModelBuilder modelBuilder)
@@ -746,6 +814,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 // associated data block is removed. That cascade delete _only_ removes the KeyStatisticsDataBlock
                 // entry, leaving a KeyStatistics table entry, which should never happen.
                 .OnDelete(DeleteBehavior.NoAction);
+        }
+
+        private static void ConfigureKeyStatisticsText(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<KeyStatisticText>()
+                .ToTable("KeyStatisticsText");
         }
 
         private static void ConfigureDataBlockParent(ModelBuilder modelBuilder)
@@ -798,12 +872,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<DataBlockVersion>()
                 .Navigation(dataBlockVersion => dataBlockVersion.ContentBlock)
                 .AutoInclude();
-        }
-
-        private static void ConfigureKeyStatisticsText(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<KeyStatisticText>()
-                .ToTable("KeyStatisticsText");
         }
     }
 

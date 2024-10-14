@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Database
             modelBuilder.Entity<UserInvite>()
                 .HasOne(c => c.CreatedBy)
                 .WithMany()
-                .HasForeignKey("CreatedById")
+                //.HasForeignKey("CreatedById") // @MarkFix can remove?
                 .OnDelete(DeleteBehavior.SetNull);
 
                 modelBuilder.Entity<UserInvite>()

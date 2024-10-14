@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -23,9 +24,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string YearTitle => TimePeriodLabelFormatter.FormatYear(Year, TimePeriodCoverage);
 
-        private string _releaseName;
+        private string? _releaseName;
 
-        public string ReleaseName
+        public string? ReleaseName
         {
             get => _releaseName;
             set
@@ -59,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid PublicationId { get; set; }
 
-        public Publication Publication { get; set; }
+        public Publication Publication { get; set; } = null!;
 
         public List<Update> Updates { get; set; } = new();
 
@@ -102,9 +103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime Created { get; set; }
 
-        public User CreatedBy { get; set; } = null!;
+        public User? CreatedBy { get; set; }
 
-        public Guid CreatedById { get; set; }
+        public Guid? CreatedById { get; set; }
 
         public int Version { get; set; }
 

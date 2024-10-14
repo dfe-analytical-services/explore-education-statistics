@@ -15,10 +15,8 @@ public class Update : ICreatedTimestamp<DateTime?>
     // TODO - Can this be non-nullable?
     public DateTime? Created { get; set; }
 
-    // TODO - Can this be non-nullable?
     public User? CreatedBy { get; set; }
 
-    // TODO - Can this be non-nullable?
     public Guid? CreatedById { get; set; }
 
     public DateTime On { get; set; }
