@@ -142,7 +142,7 @@ Add basic release content
     user navigates to content page    ${PUBLICATION_NAME}
 
     # FALSE to not add headline block, as we needed to add that to publish the original release
-    user adds basic release content    ${PUBLICATION_NAME}    ${FALSE}
+    user adds basic release content    ${PUBLICATION_NAME}    ${False}
 
 Add release note to amendment
     user clicks button    Add note

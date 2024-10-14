@@ -71,9 +71,9 @@ Check Fast Track Table
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${FAST_TRACKS_FOLDER}/${content_block.content_block_id}-table.html
 
     IF    ${content_block.has_chart_config}
-        log content block details    ${content_block}    Fast Track    ${TRUE}
+        log content block details    ${content_block}    Fast Track    ${True}
     ELSE
-        log content block details    ${content_block}    Fast Track    ${FALSE}
+        log content block details    ${content_block}    Fast Track    ${False}
     END
 
 Check Content Block Table
