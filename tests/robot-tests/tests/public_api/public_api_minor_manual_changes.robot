@@ -112,9 +112,9 @@ Create a different version of an API dataset with minor changes
 
     user waits until h3 is visible    Current live API data sets
 
-    user checks table column heading contains    1    1    Version    xpath://table[@data-testid="live-api-data-sets"]
+    user checks table column heading contains    1    1    Version    testid:live-api-data-sets
     user clicks button in table cell    1    3    Create new version
-    ...    xpath://table[@data-testid="live-api-data-sets"]
+    ...    testid:live-api-data-sets
 
     ${modal}=    user waits until modal is visible    Create a new API data set version
     user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_2_NAME}
@@ -125,33 +125,33 @@ Create a different version of an API dataset with minor changes
 
 Validate the summary contents inside the 'Latest live version details' table
     user waits until h3 is visible    Draft version details
-    user checks summary list contains    Version    v1.0    parent=id:live-version-summary
-    user checks summary list contains    Status    Published    parent=id:live-version-summary
-    user checks summary list contains    Release    ${RELEASE_1_NAME}    parent=id:live-version-summary
-    user checks summary list contains    Data set file    ${SUBJECT_1_NAME}    parent=id:live-version-summary
+    user checks summary list contains    Version    v1.0    id:live-version-summary
+    user checks summary list contains    Status    Published    id:live-version-summary
+    user checks summary list contains    Release    ${RELEASE_1_NAME}    id:live-version-summary
+    user checks summary list contains    Data set file    ${SUBJECT_1_NAME}    id:live-version-summary
     user checks summary list contains    Geographic levels    Local authority, National, Regional, School
-    ...    parent=id:live-version-summary
-    user checks summary list contains    Time periods    2020/21 to 2022/23    parent=id:live-version-summary
-    user checks summary list contains    Indicators    Enrolments    parent=id:live-version-summary
-    user checks summary list contains    Indicators    more indicators    parent=id:live-version-summary
-    user checks summary list contains    Filters    Academy type    parent=id:live-version-summary
+    ...    id:live-version-summary
+    user checks summary list contains    Time periods    2020/21 to 2022/23    id:live-version-summary
+    user checks summary list contains    Indicators    Enrolments    id:live-version-summary
+    user checks summary list contains    Indicators    more indicators    id:live-version-summary
+    user checks summary list contains    Filters    Academy type    id:live-version-summary
     user checks summary list contains    Actions    View live data set (opens in new tab)
-    ...    parent=id:live-version-summary
+    ...    id:live-version-summary
 
 Validate the summary contents inside the 'draft version details' table
     user waits until h3 is visible    Draft version details
-    user checks summary list contains    Version    v2.0    parent=id:draft-version-summary    wait=%{WAIT_LONG}
-    user checks summary list contains    Status    Action required    parent=id:draft-version-summary
+    user checks summary list contains    Version    v2.0    id:draft-version-summary    wait=%{WAIT_LONG}
+    user checks summary list contains    Status    Action required    id:draft-version-summary
     ...    wait=%{WAIT_LONG}
-    user checks summary list contains    Release    ${RELEASE_2_NAME}    parent=id:draft-version-summary
-    user checks summary list contains    Data set file    ${SUBJECT_2_NAME}    parent=id:draft-version-summary
+    user checks summary list contains    Release    ${RELEASE_2_NAME}    id:draft-version-summary
+    user checks summary list contains    Data set file    ${SUBJECT_2_NAME}    id:draft-version-summary
     user checks summary list contains    Geographic levels    Local authority, National, Regional, School
-    ...    parent=id:draft-version-summary
-    user checks summary list contains    Time periods    2020/21 to 2022/23    parent=id:draft-version-summary
-    user checks summary list contains    Indicators    Enrolments    parent=id:draft-version-summary
-    user checks summary list contains    Indicators    more indicators    parent=id:draft-version-summary
-    user checks summary list contains    Filters    Academy type    parent=id:draft-version-summary
-    user checks summary list contains    Actions    Remove draft version    parent=id:draft-version-summary
+    ...    id:draft-version-summary
+    user checks summary list contains    Time periods    2020/21 to 2022/23    id:draft-version-summary
+    user checks summary list contains    Indicators    Enrolments    id:draft-version-summary
+    user checks summary list contains    Indicators    more indicators    id:draft-version-summary
+    user checks summary list contains    Filters    Academy type    id:draft-version-summary
+    user checks summary list contains    Actions    Remove draft version    id:draft-version-summary
 
 Validate the version task statuses inside the 'Draft version task' section
     user waits until h3 is visible    Draft version tasks
@@ -209,15 +209,10 @@ Validate the row headings and its contents in the 'Regions' section(after mappin
 
 Validate the version status of location task
     user waits until h3 is visible    Draft version tasks
-
-    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(1) a    Map locations
-    ...    %{WAIT_LONG}
-    user waits until element contains    css:div[data-testid="draft-version-tasks"] li:nth-child(2) a    Map filters
-    ...    %{WAIT_LONG}
-
-    user waits until element contains
-    ...    css:div[data-testid="draft-version-tasks"] li:nth-child(1) div[id="map-locations-task-status"]    Complete
-    ...    %{WAIT_LONG}
+    user waits until parent contains element    testid:map-locations-task    link:Map locations
+    user waits until parent contains element    id:map-locations-task-status    text:Complete
+    user waits until parent contains element    testid:map-filters-task    link:Map filters
+    user waits until parent contains element    id:map-filters-task-status    text:Complete
 
 User clicks on Map filters link
     user clicks link    Map filters

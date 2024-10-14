@@ -505,7 +505,7 @@ Add text block with link to a featured table to accordion section
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${toolbar}=    get editor toolbar    ${block}
     ${insert}=    get child element    parent_locator=${toolbar}
-    ...    child_locator=xpath://button[@data-cke-tooltip-text="Insert"]
+    ...    child_locator=css:[data-cke-tooltip-text="Insert"]
     user clicks element    ${insert}
     ${button}=    user gets button element    Insert featured table link    ${toolbar}
     user clicks element    ${button}

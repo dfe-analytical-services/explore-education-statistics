@@ -123,35 +123,35 @@ Create a different version of an API dataset with major changes
 
 Validate the summary contents inside the 'Latest live version details' table
     user waits until h3 is visible    Draft version details
-    user checks summary list contains    Version    v1.0    parent=id:live-version-summary
-    user checks summary list contains    Status    Published    parent=id:live-version-summary
-    user checks summary list contains    Release    ${RELEASE_1_NAME}    parent=id:live-version-summary
-    user checks summary list contains    Data set file    ${SUBJECT_1_NAME}    parent=id:live-version-summary
+    user checks summary list contains    Version    v1.0    id:live-version-summary
+    user checks summary list contains    Status    Published    id:live-version-summary
+    user checks summary list contains    Release    ${RELEASE_1_NAME}    id:live-version-summary
+    user checks summary list contains    Data set file    ${SUBJECT_1_NAME}    id:live-version-summary
     user checks summary list contains    Geographic levels    Local authority, National, Regional, School
-    ...    parent=id:live-version-summary
-    user checks summary list contains    Time periods    2020/21 to 2022/23    parent=id:live-version-summary
-    user checks summary list contains    Indicators    Enrolments    parent=id:live-version-summary
-    user checks summary list contains    Indicators    more indicators    parent=id:live-version-summary
-    user checks summary list contains    Filters    Academy type    parent=id:live-version-summary
-    user checks summary list contains    Filters    School type    parent=id:live-version-summary
+    ...    id:live-version-summary
+    user checks summary list contains    Time periods    2020/21 to 2022/23    id:live-version-summary
+    user checks summary list contains    Indicators    Enrolments    id:live-version-summary
+    user checks summary list contains    Indicators    more indicators    id:live-version-summary
+    user checks summary list contains    Filters    Academy type    id:live-version-summary
+    user checks summary list contains    Filters    School type    id:live-version-summary
     user checks summary list contains    Actions    View live data set (opens in new tab)
-    ...    parent=id:live-version-summary
+    ...    id:live-version-summary
 
 Validate the summary contents inside the 'draft version details' table
     user waits until h3 is visible    Draft version details
-    user checks summary list contains    Version    v2.0    parent=id:draft-version-summary    wait=%{WAIT_LONG}
-    user checks summary list contains    Status    Action required    parent=id:draft-version-summary
+    user checks summary list contains    Version    v2.0    id:draft-version-summary    wait=%{WAIT_LONG}
+    user checks summary list contains    Status    Action required    id:draft-version-summary
     ...    wait=%{WAIT_LONG}
-    user checks summary list contains    Release    ${RELEASE_2_NAME}    parent=id:draft-version-summary
-    user checks summary list contains    Data set file    ${SUBJECT_2_NAME}    parent=id:draft-version-summary
+    user checks summary list contains    Release    ${RELEASE_2_NAME}    id:draft-version-summary
+    user checks summary list contains    Data set file    ${SUBJECT_2_NAME}    id:draft-version-summary
     user checks summary list contains    Geographic levels    Local authority, National, Regional, School
-    ...    parent=id:draft-version-summary
-    user checks summary list contains    Time periods    2020/21 to 2022/23    parent=id:draft-version-summary
-    user checks summary list contains    Indicators    Enrolments    parent=id:draft-version-summary
-    user checks summary list contains    Indicators    more indicators    parent=id:draft-version-summary
-    user checks summary list contains    Filters    Academy type    parent=id:draft-version-summary
-    user checks summary list does not contain    Filters    School type    parent=id:draft-version-summary
-    user checks summary list contains    Actions    Remove draft version    parent=id:draft-version-summary
+    ...    id:draft-version-summary
+    user checks summary list contains    Time periods    2020/21 to 2022/23    id:draft-version-summary
+    user checks summary list contains    Indicators    Enrolments    id:draft-version-summary
+    user checks summary list contains    Indicators    more indicators    id:draft-version-summary
+    user checks summary list contains    Filters    Academy type    id:draft-version-summary
+    user checks summary list does not contain    Filters    School type    id:draft-version-summary
+    user checks summary list contains    Actions    Remove draft version    id:draft-version-summary
 
 Validate that location and filter mappings are complete
     user waits until h3 is visible    Draft version tasks
@@ -248,6 +248,6 @@ user checks changelog section contains deleted filter
     ...    ${changes_section}
     ...    ${filter_label}
     ${deleted_filters}=    user checks element contains child element    ${changes_section}
-    ...    xpath://div[@data-testid="deleted-filters"]
+    ...    testid:deleted-filters
     user checks element contains child element    ${deleted_filters}
     ...    xpath://li[@data-testid="deleted-item" and contains(., "${filter_label}")]
