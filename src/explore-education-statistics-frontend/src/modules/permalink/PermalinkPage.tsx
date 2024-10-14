@@ -87,6 +87,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
           captionId={captionId}
           footnotes={footnotes}
           footnotesClassName="govuk-!-width-two-thirds"
+          footnotesHeadingTag="h2"
           footnotesId={footnotesId}
           source={`${publicationTitle}, ${dataSetTitle}`}
           tableJson={json}

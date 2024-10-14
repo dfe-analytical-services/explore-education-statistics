@@ -1,5 +1,6 @@
 import { FormGroup, FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import { MapDataSetCategory } from '@common/modules/charts/components/utils/createMapDataSetCategories';
 import { Dictionary } from '@common/types';
 import locationLevelsMap, {
@@ -15,6 +16,7 @@ interface Props {
   id: string;
   selectedDataSetKey: string;
   selectedLocation?: string;
+  title?: string;
   onChangeDataSet: (value: string) => void;
   onChangeLocation: (value: string) => void;
 }
@@ -25,6 +27,7 @@ export default function MapControls({
   id,
   selectedDataSetKey,
   selectedLocation,
+  title,
   onChangeDataSet,
   onChangeLocation,
 }: Props) {
@@ -92,7 +95,12 @@ export default function MapControls({
             name="selectedDataSet"
             id={`${id}-selectedDataSet`}
             className="govuk-!-width-full"
-            label="1. Select data to view"
+            label={
+              <>
+                1. Select data to view
+                {title && <VisuallyHidden>{` for ${title}`}</VisuallyHidden>}
+              </>
+            }
             value={selectedDataSetKey}
             onChange={e => onChangeDataSet(e.currentTarget.value)}
             options={dataSetOptions}
@@ -104,7 +112,12 @@ export default function MapControls({
           <FormSelect
             name="selectedLocation"
             id={`${id}-selectedLocation`}
-            label={`2. Select ${locationType.prefix} ${locationType.label}`}
+            label={
+              <>
+                {`2. Select ${locationType.prefix} ${locationType.label}`}
+                {title && <VisuallyHidden>{` for ${title}`}</VisuallyHidden>}
+              </>
+            }
             value={selectedLocation}
             options={locationOptions}
             optGroups={groupedLocationOptions}
