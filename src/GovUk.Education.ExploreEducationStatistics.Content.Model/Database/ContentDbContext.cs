@@ -251,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyVersion>()
                 .HasOne(m => m.CreatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction); // @MarkFix to avoid "is not a constraint" error when running migration
         }
 
         private static void ConfigureMethodologyStatus(ModelBuilder modelBuilder)
@@ -315,8 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyNote>()
                 .HasOne(m => m.UpdatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.SetNull)
-                .IsRequired(false);
+                .OnDelete(DeleteBehavior.NoAction); // @MarkFix to avoid "may cause cycles or multiple cascade paths" error on running migration
         }
 
         private static void ConfigurePublication(ModelBuilder modelBuilder)
@@ -636,7 +635,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<FeaturedTable>()
                 .HasOne(rs => rs.UpdatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction); // @MarkFix to avoid "may cause cycles or multiple cascade paths" error on running migration
         }
 
         private static void ConfigurePermalink(ModelBuilder modelBuilder)
@@ -687,12 +686,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<UserPublicationRole>()
                 .HasOne(r => r.CreatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction); // @MarkFix to avoid "may cause cycles or multiple cascade paths" error on running migration
 
             modelBuilder.Entity<UserPublicationRole>()
                 .HasOne(r => r.DeletedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction); // @MarkFix to avoid "may cause cycles or multiple cascade paths" error on running migration
 
             modelBuilder.Entity<UserPublicationRole>()
                 .Property(r => r.Role)
@@ -727,7 +726,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<UserReleaseRole>()
                 .HasOne(rs => rs.DeletedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction); // @MarkFix to avoid "may cause cycles or multiple cascade paths" error on running migration
         }
 
         private static void ConfigureUserReleaseInvite(ModelBuilder modelBuilder)
@@ -799,7 +798,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<KeyStatistic>()
                 .HasOne(ks => ks.UpdatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction); // @MarkFix to avoid "may cause cycles or multiple cascade paths" error on running migration
         }
 
         private static void ConfigureKeyStatisticsDataBlock(ModelBuilder modelBuilder)

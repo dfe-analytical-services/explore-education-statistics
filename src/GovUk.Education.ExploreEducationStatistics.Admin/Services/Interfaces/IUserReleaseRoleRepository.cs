@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<UserReleaseRole> Create(Guid userId,
             Guid releaseVersionId,
             ReleaseRole role,
-            Guid createdById);
+            Guid? createdById);
 
         Task<UserReleaseRole> CreateIfNotExists(Guid userId,
             Guid releaseVersionId,

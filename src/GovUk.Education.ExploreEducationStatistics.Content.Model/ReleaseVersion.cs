@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [NotMapped] public bool Amendment => Version > 0 && !Live;
 
-        public string Slug { get; set; }
+        public string? Slug { get; set; }
 
         public Guid PublicationId { get; set; }
 
@@ -83,9 +83,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<FeaturedTable> FeaturedTables { get; set; } = new();
 
-        public string PreReleaseAccessList { get; set; } = string.Empty;
+        public string? PreReleaseAccessList { get; set; } = string.Empty;
 
-        public string DataGuidance { get; set; } = string.Empty;
+        public string? DataGuidance { get; set; } = string.Empty;
 
         public bool NotifySubscribers { get; set; }
 
@@ -188,9 +188,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
-        private PartialDate _nextReleaseDate;
+        private PartialDate? _nextReleaseDate;
 
-        public PartialDate NextReleaseDate
+        public PartialDate? NextReleaseDate
         {
             get => _nextReleaseDate;
             set
