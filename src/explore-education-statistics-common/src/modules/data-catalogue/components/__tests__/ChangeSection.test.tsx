@@ -7,8 +7,12 @@ describe('ChangeSection', () => {
   test('renders filter changes only', () => {
     const testChanges: ChangeSet = {
       filters: [
-        { previousState: { id: 'filter-2', label: 'Filter 2', hint: '' } },
         { previousState: { id: 'filter-1', label: 'Filter 1', hint: '' } },
+        { previousState: { id: 'filter-2', label: 'Filter 2', hint: '' } },
+        {
+          previousState: { id: 'filter-3', label: 'Filter 3', hint: '' },
+          currentState: { id: 'filter-3-updated', label: 'Filter 3', hint: '' },
+        },
         {
           previousState: {
             id: 'filter-4',
@@ -21,12 +25,8 @@ describe('ChangeSection', () => {
             hint: 'Filter 4 hint updated',
           },
         },
-        {
-          previousState: { id: 'filter-3', label: 'Filter 3', hint: '' },
-          currentState: { id: 'filter-3-updated', label: 'Filter 3', hint: '' },
-        },
-        { currentState: { id: 'filter-6', label: 'Filter 6', hint: '' } },
         { currentState: { id: 'filter-5', label: 'Filter 5', hint: '' } },
+        { currentState: { id: 'filter-6', label: 'Filter 6', hint: '' } },
       ],
     };
 
@@ -71,8 +71,15 @@ describe('ChangeSection', () => {
         {
           filter: { id: 'filter-1', label: 'Filter 1', hint: '' },
           options: [
-            { previousState: { id: 'filter-opt-2', label: 'Filter option 2' } },
             { previousState: { id: 'filter-opt-1', label: 'Filter option 1' } },
+            { previousState: { id: 'filter-opt-2', label: 'Filter option 2' } },
+            {
+              previousState: { id: 'filter-opt-3', label: 'Filter option 3' },
+              currentState: {
+                id: 'filter-opt-3-updated',
+                label: 'Filter option 3',
+              },
+            },
             {
               previousState: { id: 'filter-opt-4', label: 'Filter option 4' },
               currentState: {
@@ -81,15 +88,8 @@ describe('ChangeSection', () => {
                 isAggregate: true,
               },
             },
-            {
-              previousState: { id: 'filter-opt-3', label: 'Filter option 3' },
-              currentState: {
-                id: 'filter-opt-3-updated',
-                label: 'Filter option 3',
-              },
-            },
-            { currentState: { id: 'filter-opt-6', label: 'Filter option 6' } },
             { currentState: { id: 'filter-opt-5', label: 'Filter option 5' } },
+            { currentState: { id: 'filter-opt-6', label: 'Filter option 6' } },
           ],
         },
         {
@@ -197,18 +197,18 @@ describe('ChangeSection', () => {
   test('renders geographic level changes only', () => {
     const testChanges: ChangeSet = {
       geographicLevels: [
-        { previousState: { code: 'WARD', label: 'Ward' } },
         { previousState: { code: 'NAT', label: 'National' } },
-        {
-          previousState: { code: 'OA', label: 'Opportunity area' },
-          currentState: { code: 'PA', label: 'Planning area' },
-        },
+        { previousState: { code: 'WARD', label: 'Ward' } },
         {
           previousState: { code: 'LA', label: 'Local authority' },
           currentState: { code: 'LAD', label: 'Local authority district' },
         },
-        { currentState: { code: 'REG', label: 'Regional' } },
+        {
+          previousState: { code: 'OA', label: 'Opportunity area' },
+          currentState: { code: 'PA', label: 'Planning area' },
+        },
         { currentState: { code: 'NAT', label: 'National' } },
+        { currentState: { code: 'REG', label: 'Regional' } },
       ],
     };
 
@@ -254,8 +254,8 @@ describe('ChangeSection', () => {
   test('renders indicators changes only', () => {
     const testChanges: ChangeSet = {
       indicators: [
-        { previousState: { id: 'indicator-2', label: 'Indicator 2' } },
         { previousState: { id: 'indicator-1', label: 'Indicator 1' } },
+        { previousState: { id: 'indicator-2', label: 'Indicator 2' } },
         {
           currentState: { id: 'indicator-4', label: 'Indicator 3' },
           previousState: { id: 'indicator-3', label: 'Indicator 3' },
@@ -268,8 +268,8 @@ describe('ChangeSection', () => {
           },
           previousState: { id: 'indicator-5', label: 'Indicator 5' },
         },
-        { currentState: { id: 'indicator-7', label: 'Indicator 7' } },
         { currentState: { id: 'indicator-6', label: 'Indicator 6' } },
+        { currentState: { id: 'indicator-7', label: 'Indicator 7' } },
       ],
     };
 
@@ -313,20 +313,20 @@ describe('ChangeSection', () => {
   test('renders location group changes only', () => {
     const testChanges: ChangeSet = {
       locationGroups: [
-        { previousState: { level: { code: 'WARD', label: 'Ward' } } },
         { previousState: { level: { code: 'INST', label: 'Institution' } } },
-        {
-          previousState: { level: { code: 'OA', label: 'Opportunity area' } },
-          currentState: { level: { code: 'PA', label: 'Planning area' } },
-        },
+        { previousState: { level: { code: 'WARD', label: 'Ward' } } },
         {
           previousState: { level: { code: 'LA', label: 'Local authority' } },
           currentState: {
             level: { code: 'LAD', label: 'Local authority district' },
           },
         },
-        { currentState: { level: { code: 'REG', label: 'Regional' } } },
+        {
+          previousState: { level: { code: 'OA', label: 'Opportunity area' } },
+          currentState: { level: { code: 'PA', label: 'Planning area' } },
+        },
         { currentState: { level: { code: 'NAT', label: 'National' } } },
+        { currentState: { level: { code: 'REG', label: 'Regional' } } },
       ],
     };
 
@@ -379,13 +379,6 @@ describe('ChangeSection', () => {
           options: [
             {
               previousState: {
-                id: 'location-2',
-                code: 'location-2-code',
-                label: 'Location 2',
-              },
-            },
-            {
-              previousState: {
                 id: 'location-1',
                 code: 'location-1-code',
                 label: 'Location 1',
@@ -393,14 +386,9 @@ describe('ChangeSection', () => {
             },
             {
               previousState: {
-                id: 'location-4',
-                label: 'Location 4',
-                ukprn: 'location-4-ukprn',
-              },
-              currentState: {
-                id: 'location-4',
-                label: 'Location 4 updated',
-                ukprn: 'location-4-ukprn-updated',
+                id: 'location-2',
+                code: 'location-2-code',
+                label: 'Location 2',
               },
             },
             {
@@ -415,6 +403,18 @@ describe('ChangeSection', () => {
                 label: 'Location 3',
                 code: 'location-3-code-updated',
                 oldCode: 'location-3-oldCode-updated',
+              },
+            },
+            {
+              previousState: {
+                id: 'location-4',
+                label: 'Location 4',
+                ukprn: 'location-4-ukprn',
+              },
+              currentState: {
+                id: 'location-4',
+                label: 'Location 4 updated',
+                ukprn: 'location-4-ukprn-updated',
               },
             },
             {
@@ -582,10 +582,10 @@ describe('ChangeSection', () => {
     const testChanges: ChangeSet = {
       timePeriods: [
         {
-          previousState: { code: 'AY', label: '2018/19', period: '2018/2019' },
+          previousState: { code: 'AY', label: '2017/18', period: '2017/2018' },
         },
         {
-          previousState: { code: 'AY', label: '2017/18', period: '2017/2018' },
+          previousState: { code: 'AY', label: '2018/19', period: '2018/2019' },
         },
         {
           previousState: { code: 'AY', label: '2019/20', period: '2019/2020' },
