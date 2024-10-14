@@ -197,6 +197,191 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
                 },
                 metaSummary.TimePeriodRange);
         }
+
+        [Fact]
+        public async Task Success_HasDeletedIndicators_True()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                IndicatorMetas = DataFixture.DefaultIndicatorMeta().GenerateList(2),
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels)
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.True(mapping.HasDeletedIndicators);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedIndicators_SameIndicators_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                IndicatorMetas = ProcessorTestData.AbsenceSchool.ExpectedIndicators,
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels)
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedIndicators);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedIndicators_NewIndicators_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                IndicatorMetas = ProcessorTestData.AbsenceSchool.ExpectedIndicators[..2],
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels)
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedIndicators);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedGeographicLevels_True()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(
+                    [
+                        GeographicLevel.Country,
+                        GeographicLevel.Region,
+                        GeographicLevel.LocalAuthority,
+                        // Replaced by school in next version
+                        GeographicLevel.Institution
+                    ])
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.True(mapping.HasDeletedGeographicLevels);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedGeographicLevels_SameGeographicLevels_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels)
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedGeographicLevels);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedGeographicLevels_NewGeographicLevels_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels[..2])
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedGeographicLevels);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedTimePeriods_True()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels),
+                TimePeriodMetas = DataFixture.DefaultTimePeriodMeta()
+                    .GenerateList(2)
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.True(mapping.HasDeletedTimePeriods);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedTimePeriods_SameTimePeriods_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels),
+                TimePeriodMetas = ProcessorTestData.AbsenceSchool.ExpectedTimePeriods
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedTimePeriods);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedTimePeriods_NewTimePeriods_False()
+        {
+            var initialVersionMeta = new DataSetVersionMeta
+            {
+                GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                    .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels),
+                TimePeriodMetas = ProcessorTestData.AbsenceSchool.ExpectedTimePeriods[..2]
+            };
+
+            var (instanceId, _, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage(), initialVersionMeta);
+
+            await CreateMappings(instanceId);
+
+            var mapping = await GetDataSetVersionMapping(nextVersion);
+
+            Assert.False(mapping.HasDeletedTimePeriods);
+        }
     }
 
     public class CreateMappingsLocationsTests(
@@ -477,6 +662,69 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
 
             Assert.Equal(Stage, savedImport.Stage);
             Assert.Equal(DataSetVersionStatus.Processing, savedImport.DataSetVersion.Status);
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedIndicators_MajorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithHasDeletedIndicators(true);
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedGeographicLevels_MajorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithHasDeletedGeographicLevels(true);
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Success_HasDeletedTimePeriods_MajorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithHasDeletedTimePeriods(true);
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
     }
 
@@ -902,6 +1150,120 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             // All source options have auto-mapped candidates - minor version update.
             await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
         }
+
+        [Fact]
+        public async Task Complete_HasDeletedIndicators_MajorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .DefaultLocationMappingPlan()
+                    .AddLevel(
+                        level: GeographicLevel.LocalAuthority,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddMapping(
+                                sourceKey: "location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithNoMapping())
+                            .AddCandidate(
+                                targetKey: "location-1-key",
+                                candidate: DataFixture.DefaultMappableLocationOption())))
+                // Has deleted indicators that cannot be mapped
+                .WithHasDeletedIndicators(true);
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            // Is an exact match but as there are deleted indicators so needs to be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Complete_HasDeletedGeographicLevels_MajorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .DefaultLocationMappingPlan()
+                    .AddLevel(
+                        level: GeographicLevel.LocalAuthority,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddMapping(
+                                sourceKey: "location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithNoMapping())
+                            .AddCandidate(
+                                targetKey: "location-1-key",
+                                candidate: DataFixture.DefaultMappableLocationOption())))
+                // Has deleted geographic levels that cannot be mapped
+                .WithHasDeletedGeographicLevels(true);
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            // Is an exact match but as there are deleted geographic levels so needs to be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Complete_HasDeletedTimePeriods_MajorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .DefaultLocationMappingPlan()
+                    .AddLevel(
+                        level: GeographicLevel.LocalAuthority,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddMapping(
+                                sourceKey: "location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithNoMapping())
+                            .AddCandidate(
+                                targetKey: "location-1-key",
+                                candidate: DataFixture.DefaultMappableLocationOption())))
+                // Has deleted time periods that cannot be mapped
+                .WithHasDeletedTimePeriods(true);
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            // Is an exact match but as there are deleted time periods so needs to be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
     }
 
     public class ApplyAutoMappingsFiltersTests(
@@ -909,7 +1271,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
         : ApplyAutoMappingsTests(fixture)
     {
         [Fact]
-        public async Task PartiallyComplete()
+        public async Task PartiallyComplete_MajorUpdate()
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
@@ -1019,7 +1381,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
         }
 
         [Fact]
-        public async Task Complete_ExactMatch()
+        public async Task Complete_ExactMatch_MinorUpdate()
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
@@ -1127,7 +1489,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
         }
 
         [Fact]
-        public async Task Complete_AllSourcesMapped_OtherUnmappedCandidatesExist()
+        public async Task Complete_AllSourcesMapped_NewCandidatesExist_MinorUpdate()
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
@@ -1204,7 +1566,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
         // and their child filter options with mapping type of AutoNone should not count towards
         // the calculation of the FilterMappingsComplete flag.
         [Fact]
-        public async Task Complete_SomeFiltersAutoNone()
+        public async Task Complete_SomeFiltersAutoNone_MajorUpdate()
         {
             var (instanceId, originalVersion, nextVersion) =
                 await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
@@ -1291,6 +1653,111 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             // resulting in a major version update.
             await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
+
+        [Fact]
+        public async Task Complete_HasDeletedIndicators_MajorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithFilterMappingPlan(DataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithNoMapping()
+                        .AddOptionMapping("filter-1-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterCandidate("filter-1-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", DataFixture
+                            .DefaultMappableFilterOption())))
+                // Has deleted indicators that cannot be mapped
+                .WithHasDeletedIndicators(true);
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            // Is an exact match but as there are deleted indicators so needs to be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Complete_HasDeletedGeographicLevels_MajorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithFilterMappingPlan(DataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithNoMapping()
+                        .AddOptionMapping("filter-1-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterCandidate("filter-1-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", DataFixture
+                            .DefaultMappableFilterOption())))
+                // Has deleted geographic levels that cannot be mapped
+                .WithHasDeletedGeographicLevels(true);
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            // Is an exact match but as there are deleted geographic levels so needs to be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Complete_HasDeletedTimePeriods_MajorUpdate()
+        {
+            var (instanceId, originalVersion, nextVersion) =
+                await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithFilterMappingPlan(DataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithNoMapping()
+                        .AddOptionMapping("filter-1-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterCandidate("filter-1-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", DataFixture
+                            .DefaultMappableFilterOption())))
+                // Has deleted time periods that cannot be mapped
+                .WithHasDeletedTimePeriods(true);
+
+            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            var updatedMapping = await GetDataSetVersionMapping(nextVersion);
+
+            // Is an exact match but as there are deleted time periods so needs to be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
     }
 
     public class CompleteNextDataSetVersionMappingsMappingProcessingTests(
@@ -1329,10 +1796,13 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
     }
 
     private async Task<(Guid instanceId, DataSetVersion initialVersion, DataSetVersion nextVersion)>
-        CreateNextDataSetVersionAndDataFiles(DataSetVersionImportStage importStage)
+        CreateNextDataSetVersionAndDataFiles(
+            DataSetVersionImportStage importStage,
+            DataSetVersionMeta? initialVersionMeta = null)
     {
         var (initialDataSetVersion, nextDataSetVersion, instanceId) =
             await CreateDataSetInitialAndNextVersion(
+                initialVersionMeta: initialVersionMeta ?? GetDefaultInitialDataSetVersionMeta(),
                 nextVersionImportStage: importStage,
                 nextVersionStatus: DataSetVersionStatus.Processing);
 
@@ -1363,6 +1833,15 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionTests(
             .DataSetVersionMappings
             .Include(mapping => mapping.TargetDataSetVersion)
             .SingleAsync(mapping => mapping.TargetDataSetVersionId == nextVersion.Id);
+    }
+
+    private DataSetVersionMeta GetDefaultInitialDataSetVersionMeta()
+    {
+        return new DataSetVersionMeta
+        {
+            GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta()
+                .WithLevels(ProcessorTestData.AbsenceSchool.ExpectedGeographicLevels)
+        };
     }
 
     private async Task AssertCorrectDataSetVersionNumbers(DataSetVersionMapping mapping, string expectedVersion)

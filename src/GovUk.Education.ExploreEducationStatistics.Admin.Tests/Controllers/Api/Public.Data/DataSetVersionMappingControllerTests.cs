@@ -416,7 +416,7 @@ public abstract class DataSetVersionMappingControllerTests(
         }
 
         [Fact]
-        public async Task Success_DeletedLevel_MajorUpdate()
+        public async Task Success_MappedLocation_HasDeletedLocationLevels_MajorUpdate()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
@@ -482,7 +482,7 @@ public abstract class DataSetVersionMappingControllerTests(
         }
 
         [Fact]
-        public async Task Success_AddedLevel_MinorUpdate()
+        public async Task Success_MappedLocation_HasDeletedIndicators_MajorUpdate()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
 
@@ -504,16 +504,9 @@ public abstract class DataSetVersionMappingControllerTests(
                                     .WithNoMapping())
                             .AddCandidate(
                                 targetKey: "target-location-1-key",
-                                candidate: DataFixture.DefaultMappableLocationOption()))
-                    // Country level has been added and only has candidates.
-                    .AddLevel(
-                        level: GeographicLevel.Country,
-                        mappings: DataFixture
-                            .DefaultLocationLevelMappings()
-                            .AddCandidate(
-                                targetKey: "source-location-1-key",
-                                candidate: DataFixture
-                                    .DefaultMappableLocationOption())));
+                                candidate: DataFixture.DefaultMappableLocationOption())))
+                // There are deleted indicators that cannot be mapped.
+                .WithHasDeletedIndicators(true);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
 
@@ -539,12 +532,129 @@ public abstract class DataSetVersionMappingControllerTests(
                 .Include(m => m.TargetDataSetVersion)
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
-            // This update completes the mapping as a location level was added
-            // and isn't considered as needing to be mapped - minor version update.
             Assert.True(updatedMapping.LocationMappingsComplete);
 
-            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
+            // This update completes the mapping and would normally be a minor version
+            // update, but the deleted indicators mean this is still a major version update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
+
+        [Fact]
+        public async Task Success_MappedLocation_HasDeletedGeographicLevels_MajorUpdate()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .DefaultLocationMappingPlan()
+                    .AddLevel(
+                        level: GeographicLevel.LocalAuthority,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddMapping(
+                                sourceKey: "source-location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithNoMapping())
+                            .AddCandidate(
+                                targetKey: "target-location-1-key",
+                                candidate: DataFixture.DefaultMappableLocationOption())))
+                // There are deleted geographic levels that cannot be mapped.
+                .WithHasDeletedGeographicLevels(true);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<LocationMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    Level = GeographicLevel.LocalAuthority,
+                    SourceKey = "source-location-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "target-location-1-key"
+                }
+            ];
+
+            var response = await ApplyBatchLocationMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates);
+
+            response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
+
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            Assert.True(updatedMapping.LocationMappingsComplete);
+
+            // This update completes the mapping and would normally be a minor version
+            // update, but the deleted geographic levels mean this is still a major version update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Success_MappedLocation_HasDeletedTimePeriods_MajorUpdate()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithLocationMappingPlan(DataFixture
+                    .DefaultLocationMappingPlan()
+                    .AddLevel(
+                        level: GeographicLevel.LocalAuthority,
+                        mappings: DataFixture
+                            .DefaultLocationLevelMappings()
+                            .AddMapping(
+                                sourceKey: "source-location-1-key",
+                                mapping: DataFixture
+                                    .DefaultLocationOptionMapping()
+                                    .WithSource(DataFixture.DefaultMappableLocationOption())
+                                    .WithNoMapping())
+                            .AddCandidate(
+                                targetKey: "target-location-1-key",
+                                candidate: DataFixture.DefaultMappableLocationOption())))
+                // There are deleted time periods that cannot be mapped.
+                .WithHasDeletedTimePeriods(true);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<LocationMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    Level = GeographicLevel.LocalAuthority,
+                    SourceKey = "source-location-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "target-location-1-key"
+                }
+            ];
+
+            var response = await ApplyBatchLocationMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates);
+
+            response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
+
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            Assert.True(updatedMapping.LocationMappingsComplete);
+
+            // This update completes the mapping and would normally be a minor version
+            // update, but the deleted time periods mean this is still a major version update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
 
         [Fact]
         public async Task SourceKeyDoesNotExist_Returns400_AndRollsBackTransaction()
@@ -1302,6 +1412,163 @@ public abstract class DataSetVersionMappingControllerTests(
                 .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
 
             await AssertCorrectDataSetVersionNumbers(updatedMapping, expectedVersion);
+        }
+
+        [Fact]
+        public async Task Success_VersionUpdate_HasDeletedIndicators_MajorUpdate()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(DataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterCandidate("filter-1-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", DataFixture
+                            .DefaultMappableFilterOption())))
+                // Has deleted indicators that cannot be mapped
+                .WithHasDeletedIndicators(true);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-1-key"
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates);
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Should be a minor version update, but has deleted indicators so must be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Success_VersionUpdate_HasDeletedGeographicLevels_MajorUpdate()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(DataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterCandidate("filter-1-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate("filter-1-option-1-key", DataFixture
+                            .DefaultMappableFilterOption())))
+                // Has deleted geographic levels that cannot be mapped
+                .WithHasDeletedGeographicLevels(true);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-1-key"
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates);
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Should be a minor version update, but has deleted geographic levels so must be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Success_VersionUpdate_HasDeletedTimePeriods_MajorUpdate()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion();
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(DataFixture
+                    .DefaultFilterMappingPlan()
+                    .AddFilterMapping("filter-1-key", DataFixture
+                        .DefaultFilterMapping()
+                        .WithAutoMapped("filter-1-key")
+                        .AddOptionMapping("filter-1-option-1-key", DataFixture
+                            .DefaultFilterOptionMapping()
+                            .WithNoMapping()))
+                    .AddFilterCandidate("filter-1-key", DataFixture
+                        .DefaultFilterMappingCandidate()
+                        .AddOptionCandidate(
+                            "filter-1-option-1-key",
+                            DataFixture.DefaultMappableFilterOption())))
+                // Has deleted time periods that cannot be mapped
+                .WithHasDeletedTimePeriods(true);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+
+            List<FilterOptionMappingUpdateRequest> updates =
+            [
+                new()
+                {
+                    FilterKey = "filter-1-key",
+                    SourceKey = "filter-1-option-1-key",
+                    Type = MappingType.ManualMapped,
+                    CandidateKey = "filter-1-option-1-key"
+                }
+            ];
+
+            var response = await ApplyBatchFilterOptionMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: updates);
+
+            response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
+
+            var updatedMapping = await TestApp.GetDbContext<PublicDataDbContext>()
+                .DataSetVersionMappings
+                .Include(m => m.TargetDataSetVersion)
+                .SingleAsync(m => m.TargetDataSetVersionId == nextDataSetVersion.Id);
+
+            // Should be a minor version update, but has deleted time periods so must be a major update.
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
         }
 
         [Theory]
