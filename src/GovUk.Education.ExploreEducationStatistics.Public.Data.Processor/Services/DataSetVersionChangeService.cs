@@ -363,7 +363,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
 
         foreach (var (indicatorPublicId, newIndicator) in newMetas)
         {
-            if (!oldMetas.TryGetValue(indicatorPublicId, out var oldIndicator))
+            if (!oldMetas.TryGetValue(indicatorPublicId, out _))
             {
                 // Indicator added
                 metaAdditions.Add(new IndicatorMetaChange
@@ -407,7 +407,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
 
         var timePeriodMetaDeletions = oldTimePeriodMetas
             .Except(newTimePeriodMetas, TimePeriodMeta.CodePeriodComparer)
-            .OrderBy(timePeriodMeta => timePeriodMeta.Period)
+            .NaturalOrderBy(timePeriodMeta => timePeriodMeta.Period)
             .ThenBy(timePeriodMeta => timePeriodMeta.Code)
             .Select(timePeriodMeta => new TimePeriodMetaChange
             {
@@ -419,7 +419,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
 
         var timePeriodMetaAdditions = newTimePeriodMetas
             .Except(oldTimePeriodMetas, TimePeriodMeta.CodePeriodComparer)
-            .OrderBy(timePeriodMeta => timePeriodMeta.Period)
+            .NaturalOrderBy(timePeriodMeta => timePeriodMeta.Period)
             .ThenBy(timePeriodMeta => timePeriodMeta.Code)
             .Select(timePeriodMeta => new TimePeriodMetaChange
             {
@@ -463,7 +463,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
             .SingleAsync(m => m.DataSetVersionId == dataSetVersionId, cancellationToken);
     }
 
-    private async Task<IReadOnlyDictionary<string, IndicatorMeta>> GetIndicatorMetas(
+    private async Task<Dictionary<string, IndicatorMeta>> GetIndicatorMetas(
         Guid dataSetVersionId,
         CancellationToken cancellationToken)
     {

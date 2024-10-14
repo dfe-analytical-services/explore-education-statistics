@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
@@ -194,12 +195,14 @@ public class DataSetVersionChangeService(
         [
             ..currentLevels
                 .Where(level => !previousLevels.Contains(level))
+                .OrderBy(level => level.GetEnumLabel())
                 .Select(level => new GeographicLevelChangeViewModel
                 {
                     CurrentState = GeographicLevelViewModel.Create(level),
                 }),
             ..previousLevels
                 .Where(level => !currentLevels.Contains(level))
+                .OrderBy(level => level.GetEnumLabel())
                 .Select(level => new GeographicLevelChangeViewModel
                 {
                     PreviousState = GeographicLevelViewModel.Create(level),

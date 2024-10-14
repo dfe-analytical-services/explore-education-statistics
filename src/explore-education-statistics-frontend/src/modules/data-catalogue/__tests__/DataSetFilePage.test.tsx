@@ -10,6 +10,7 @@ import DataSetFilePage from '@frontend/modules/data-catalogue/DataSetFilePage';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 
+jest.mock('@frontend/services/apiDataSetService');
 jest.mock('@common/services/downloadService');
 
 const downloadService = _downloadService as jest.Mocked<
@@ -308,7 +309,14 @@ describe('DataSetFilePage', () => {
       const testApiDataSetVersionChanges: ApiDataSetVersionChanges = {
         majorChanges: {
           filters: [
-            { previousState: { id: 'filter-1', label: 'Filter 1', hint: '' } },
+            {
+              previousState: {
+                id: 'filter-1',
+                column: 'filter_1',
+                label: 'Filter 1',
+                hint: '',
+              },
+            },
           ],
         },
         minorChanges: {},
@@ -376,7 +384,14 @@ describe('DataSetFilePage', () => {
       const testApiDataSetVersionChanges: ApiDataSetVersionChanges = {
         majorChanges: {
           filters: [
-            { previousState: { id: 'filter-1', label: 'Filter 1', hint: '' } },
+            {
+              previousState: {
+                id: 'filter-1',
+                column: 'filter_1',
+                label: 'Filter 1',
+                hint: '',
+              },
+            },
           ],
         },
         minorChanges: {},
