@@ -51,22 +51,22 @@ Add data guidance to subjects
 
     user clicks button    Save guidance
 
-Create 1st API dataset
+Create the initial API data set version
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
 
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_1_NAME}
+    user chooses select option    name:releaseFileId    ${SUBJECT_1_NAME}
     user clicks button    Confirm new API data set
 
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set
 
-User waits until the 1st API dataset status changes to 'Ready'
+User waits until the initial API data set version's status changes to "Ready"
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
+    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API data sets    Ready
 
 Add headline text block to Content page
     user clicks link    Back to API data sets
@@ -78,7 +78,7 @@ Approve first release
     user clicks link    Sign off
     user approves release for immediate publication
 
-Create a second draft release via api
+Create a second draft release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3010
 
@@ -105,7 +105,7 @@ Add data guidance to second release
 
     user clicks button    Save guidance
 
-Create a different version of an API dataset with minor changes
+Create a new version of the API data set with minor changes
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
@@ -117,7 +117,7 @@ Create a different version of an API dataset with minor changes
     ...    testid:live-api-data-sets
 
     ${modal}=    user waits until modal is visible    Create a new API data set version
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_2_NAME}
+    user chooses select option    name:releaseFileId    ${SUBJECT_2_NAME}
     user clicks button    Confirm new data set version
 
     user waits until page finishes loading
@@ -271,7 +271,7 @@ User navigates to 'changelog and guidance notes' page and update relevant detail
     user clicks link by index    View changelog and guidance notes    1
     user waits until page contains    API data set changelog
 
-    user enters text into element    css:textarea[id="guidanceNotesForm-notes"]
+    user enters text into element    name:notes
     ...    Content for the public guidance notes
     user clicks button    Save public guidance notes
 
@@ -281,7 +281,7 @@ User navigates to 'changelog and guidance notes' page and update relevant detail
 User clicks on 'View preview token log' link inside the 'Draft version details' section
     user clicks link by index    View changelog and guidance notes    2
 
-Validate the contents in the 'API dataset changelog' page.
+Validate the contents in the 'API data set changelog' page.
     user waits until page contains    API data set changelog
 
     user waits until page contains    Content for the public guidance notes
@@ -302,8 +302,8 @@ Verify newly published release is on Find Statistics page
 User navigates to data catalogue page
     user navigates to data catalogue page on public frontend
 
-Search with 2nd API dataset
-    user clicks element    id:searchForm-search
+Search for the new API data set version
+    user clicks element    name:search
     user presses keys    ${PUBLICATION_NAME}
     user clicks radio    API data sets only
 
@@ -311,17 +311,17 @@ Search with 2nd API dataset
     user clicks radio    Newest
 
     user checks summary list contains    Status    This is the latest data
-    ...    parent=testid:data-set-file-summary-${SUBJECT_2_NAME}
+    ...    testid:data-set-file-summary-${SUBJECT_2_NAME}
     user checks summary list contains    Status    Available by API
-    ...    parent=testid:data-set-file-summary-${SUBJECT_2_NAME}
+    ...    testid:data-set-file-summary-${SUBJECT_2_NAME}
     user checks page contains link    ${SUBJECT_2_NAME}
 
-User clicks on 2nd API dataset link
+User clicks on the new data set version link
     user clicks link    ${SUBJECT_2_NAME}
     user waits until page finishes loading
     user waits until h1 is visible    ${SUBJECT_2_NAME}
 
-User checks relevant headings exist on API dataset details page
+User checks relevant headings exist on the data set details page
     user waits until h2 is visible    Data set details
     user waits until h2 is visible    Data set preview
     user waits until h2 is visible    Variables in this data set
@@ -340,15 +340,15 @@ User verifies minor changes in the 'API data set changelog' section
     ${school_types_filter}=    user checks changelog section contains updated filter    ${minor_changes_section}
     ...    School type
     ${updated_school_types_total}=    user checks changed facet contains option    ${school_types_filter}    Total
-    user checks changed option contains description    ${updated_school_types_total}
+    user checks element contains    ${updated_school_types_total}
     ...    label changed to: State-funded primary and secondary
-    user checks changed option contains description    ${updated_school_types_total}    no longer an aggregate
+    user checks element contains    ${updated_school_types_total}    no longer an aggregate
 
     ${updated_regional_options}=    user checks changelog section contains updated location level
     ...    ${minor_changes_section}    Regional
     ${updated_yorkshire_and_humber}=    user checks changed facet contains option    ${updated_regional_options}
     ...    Yorkshire and The Humber
-    user checks changed option contains description    ${updated_yorkshire_and_humber}    label changed to: Yorkshire
+    user checks element contains    ${updated_yorkshire_and_humber}    label changed to: Yorkshire
 
 User verifies no major changes are present
     user checks page does not contain element    testid:major-changes
@@ -378,9 +378,3 @@ user checks changed facet contains option
     ${option}=    user checks element contains child element    ${changed_facet}
     ...    xpath://li[@data-testid="updated-item" and contains(., "${option_label}")]
     RETURN    ${option}
-
-user checks changed option contains description
-    [Arguments]
-    ...    ${changed_option}
-    ...    ${description}
-    user checks element contains    ${changed_option}    ${description}
