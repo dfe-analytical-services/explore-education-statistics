@@ -2065,15 +2065,7 @@ const DocumentationGlossary = () => {
               <h3 id="themes">Themes</h3>
               <p>
                 Categorical term for the high-level primary collection of
-                publications within the admin system. The parent of its related
-                admin system ‘topics’.
-              </p>
-              <p>
-                For example, ‘Pupils and schools’ is the parent theme of the
-                ‘Admission appeals’, ‘Exclusions’ and ‘Pupil absence’ topics.
-              </p>
-              <p>
-                See also<a href="#topics">topics</a>.
+                publications within the admin system.
               </p>
               <h3 id="the-service">the service</h3>
               <p>
@@ -2122,19 +2114,6 @@ const DocumentationGlossary = () => {
                 <li>not have a full stop at the end</li>
                 <li>not use acronyms unless they are well-known, like EU</li>
               </ul>
-              <h3 id="topics">Topics</h3>
-              <p>
-                Categorical term for the high-level secondary collection of
-                publications within the admin system. The child of a related
-                admin system ‘theme’.
-              </p>
-              <p>
-                For example, ‘Admission appeals’, ‘Exclusions’ and ‘Pupil
-                absence’ are the child topics of the ‘Pupils and schools’ theme.
-              </p>
-              <p>
-                See also <a href="#themes">themes</a>.
-              </p>
               <h3 id="town-council">town council</h3>
               <p>Lower case, even when part of a name: Swanage town council.</p>
               <h3 id="training-schools">training schools</h3>

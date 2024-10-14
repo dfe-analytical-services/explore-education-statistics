@@ -20,19 +20,12 @@ describe('TableToolWizard', () => {
       id: 'theme-1',
       title: 'Theme 1',
       summary: '',
-      topics: [
+      publications: [
         {
-          id: 'topic-1',
-          title: 'Topic 1',
-          summary: '',
-          publications: [
-            {
-              id: 'publication-1',
-              title: 'Publication 1',
-              slug: 'publication-1',
-              isSuperseded: false,
-            },
-          ],
+          id: 'publication-1',
+          title: 'Publication 1',
+          slug: 'publication-1',
+          isSuperseded: false,
         },
       ],
     },
@@ -42,30 +35,23 @@ describe('TableToolWizard', () => {
     id: 'theme-5',
     title: 'Theme 5',
     summary: '',
-    topics: [
+    publications: [
       {
-        id: 'topic-11',
-        title: 'Topic 11',
-        summary: '',
-        publications: [
-          {
-            id: 'publication-11',
-            title: 'Publication 11',
-            slug: 'publication-slug-11',
-            isSuperseded: true,
-            supersededBy: {
-              id: 'superseding-publication',
-              slug: 'superseding-publication-slug',
-              title: 'Superseding publication',
-            },
-          },
-          {
-            id: 'publication-12',
-            title: 'Publication 12',
-            slug: 'publication-slug-12',
-            isSuperseded: false,
-          },
-        ],
+        id: 'publication-11',
+        title: 'Publication 11',
+        slug: 'publication-slug-11',
+        isSuperseded: true,
+        supersededBy: {
+          id: 'superseding-publication',
+          slug: 'superseding-publication-slug',
+          title: 'Superseding publication',
+        },
+      },
+      {
+        id: 'publication-12',
+        title: 'Publication 12',
+        slug: 'publication-slug-12',
+        isSuperseded: false,
       },
     ],
   };
@@ -263,7 +249,7 @@ describe('TableToolWizard', () => {
             indicators: [],
           },
           selectedPublication: {
-            ...testThemeWithSupercededPublication.topics[0].publications[0],
+            ...testThemeWithSupercededPublication.publications[0],
             selectedRelease: {
               id: 'selected-release',
               latestData: false,

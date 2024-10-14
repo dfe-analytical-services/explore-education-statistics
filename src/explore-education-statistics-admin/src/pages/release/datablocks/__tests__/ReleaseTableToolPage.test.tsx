@@ -32,7 +32,6 @@ const testPublication: Publication = {
   summary: 'Pupil absence summary',
   slug: 'pupil-absence',
   theme: { id: 'theme-1', title: 'Test theme' },
-  topic: { id: 'topic-1', title: 'Test topic' },
 };
 
 const testRelease: Release = {

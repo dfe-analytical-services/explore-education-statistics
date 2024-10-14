@@ -456,7 +456,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           }
           renderDataCatalogueLink={
             <Link
-              to={`/data-catalogue?themeId=${release.publication.topic.theme.id}&publicationId=${release.publication.id}&releaseId=${release.id}`}
+              to={`/data-catalogue?themeId=${release.publication.theme.id}&publicationId=${release.publication.id}&releaseId=${release.id}`}
             >
               Data catalogue
             </Link>
