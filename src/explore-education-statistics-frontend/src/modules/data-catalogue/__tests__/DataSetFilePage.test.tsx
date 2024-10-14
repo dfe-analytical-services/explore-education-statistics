@@ -10,6 +10,7 @@ import DataSetFilePage from '@frontend/modules/data-catalogue/DataSetFilePage';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 
+jest.mock('@frontend/services/apiDataSetService');
 jest.mock('@common/services/downloadService');
 
 const downloadService = _downloadService as jest.Mocked<
