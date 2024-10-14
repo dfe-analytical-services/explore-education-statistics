@@ -4,7 +4,7 @@ import EditableKeyStatTextForm, {
 } from '@admin/pages/release/content/components/EditableKeyStatTextForm';
 import useToggle from '@common/hooks/useToggle';
 import { KeyStatisticText } from '@common/services/publicationService';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 
 export interface EditableKeyStatTextProps {
   isEditing?: boolean;
@@ -25,16 +25,14 @@ export default function EditableKeyStatText({
   onRemove,
   onSubmit,
 }: EditableKeyStatTextProps) {
-  const [keyStatisticId, setKeyStatisticId] = useState('');
   const [showForm, toggleShowForm] = useToggle(false);
 
   const handleSubmit = useCallback(
     async (values: KeyStatTextFormValues) => {
       await onSubmit(values);
-      setKeyStatisticId('');
       toggleShowForm.off();
     },
-    [onSubmit, setKeyStatisticId, toggleShowForm],
+    [onSubmit, toggleShowForm],
   );
 
   if (showForm) {
@@ -42,7 +40,7 @@ export default function EditableKeyStatText({
       <EditableKeyStatTextForm
         keyStat={keyStat}
         keyStatisticGuidanceTitles={keyStatisticGuidanceTitles?.filter(
-          keyStatTitle => keyStatTitle === keyStatisticId,
+          keyStatTitle => keyStatTitle === keyStat.title
         )}
         isReordering={isReordering}
         testId={testId}
