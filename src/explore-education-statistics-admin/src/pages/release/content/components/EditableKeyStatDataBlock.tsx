@@ -77,7 +77,7 @@ export default function EditableKeyStatDataBlock({
       <EditableKeyStatDataBlockForm
         keyStat={keyStat}
         keyStatisticGuidanceTitles={keyStatisticGuidanceTitles?.filter(
-          keyStatTitle => keyStatTitle === keyStat.guidanceTitle
+          keyStatTitle => keyStatTitle === keyStat.guidanceTitle,
         )}
         title={title}
         statistic={statistic}
