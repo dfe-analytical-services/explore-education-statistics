@@ -51,7 +51,7 @@ def _setup_python_path():
 
 def _unzip_data_files():
     if not os.path.exists(seed_data_files_filepath):
-        logger.warn(f"Unable to find seed data files bundle at {seed_data_files_filepath}")
+        logger.warning(f"Unable to find seed data files bundle at {seed_data_files_filepath}")
     else:
         with ZipFile(seed_data_files_filepath, "r") as zipfile:
             zipfile.extractall(unzipped_seed_data_folderpath)
@@ -152,9 +152,9 @@ def run():
                 run_identifier = f"{run_identifier_initial_value}-{test_run_index}"
                 os.environ["RUN_IDENTIFIER"] = run_identifier
 
-                # Create a Test Topic under which all of this test run's data will be created.
+                # Create a Test Theme under which all of this test run's data will be created.
                 if args_and_variables.includes_data_changing_tests(args):
-                    admin_api.create_test_topic(run_identifier)
+                    admin_api.create_test_theme(run_identifier)
 
                 # If re-running failed suites, get the appropriate report file from the previous "run-x" folder. This will contain details of
                 # any failed tests from the previous run.
@@ -179,7 +179,7 @@ def run():
                 # Tear down any data created by this test run unless we've disabled teardown.
                 if args_and_variables.includes_data_changing_tests(args) and not args.disable_teardown:
                     logger.info("Tearing down test data...")
-                    admin_api.delete_test_topic()
+                    admin_api.delete_test_theme()
 
                 test_run_index += 1
 

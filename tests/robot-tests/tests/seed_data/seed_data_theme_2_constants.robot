@@ -1,6 +1,5 @@
 *** Variables ***
 ${ROLE_PERMISSIONS_THEME_TITLE}                         Seed theme - role permissions
-${ROLE_PERMISSIONS_TOPIC_TITLE}                         Seed topic - role permissions
 ${PUBLICATION_TITLE_PREFIX}                             Seed publication -${SPACE}
 ${PUBLICATION_SLUG_PREFIX}                              seed-publication-
 ${ROLE_PERMISSIONS_PUBLICATION_OWNER_PUBLICATION}       ${PUBLICATION_TITLE_PREFIX}Publication Owner

@@ -12,7 +12,7 @@ from tests.libs.logger import get_logger
 
 logger = get_logger(__name__)
 
-test_theme_name = "Test theme"
+test_theme_name = "UI test theme"
 
 
 def send_admin_request(method, endpoint, body=None, fail_on_reauthenticate=False):
@@ -107,8 +107,18 @@ def get_test_themes():
     return send_admin_request("GET", "/api/themes")
 
 
-def create_test_theme():
-    return send_admin_request("POST", "/api/themes", {"title": test_theme_name, "summary": "Test theme summary"})
+def create_test_theme(run_id: str):
+    test_theme_id = get_test_theme_id()
+
+    if not test_theme_id:
+        test_theme_name = f"UI test theme {run_id}"
+        create_theme_resp = send_admin_request("POST", "/api/themes", {"title": test_theme_name, "summary": "Test theme summary"})
+        test_theme_id = create_theme_resp.json()["id"]
+
+    os.environ["TEST_THEME_NAME"] = test_theme_name
+    os.environ["TEST_THEME_ID"] = test_theme_id
+
+    return create_theme_resp
 
 
 def get_test_theme_id():
@@ -121,26 +131,9 @@ def get_test_theme_id():
     return None
 
 
-def create_test_topic(run_id: str):
-    test_theme_id = get_test_theme_id()
-
-    if not test_theme_id:
-        create_theme_resp = create_test_theme()
-        test_theme_id = create_theme_resp.json()["id"]
-
-    os.environ["TEST_THEME_NAME"] = test_theme_name
-    os.environ["TEST_THEME_ID"] = test_theme_id
-
-    topic_name = f"UI test topic {run_id}"
-    response = send_admin_request("POST", "/api/topics", {"title": topic_name, "themeId": os.getenv("TEST_THEME_ID")})
-
-    os.environ["TEST_TOPIC_NAME"] = topic_name
-    os.environ["TEST_TOPIC_ID"] = response.json()["id"]
-
-
-def delete_test_topic():
-    if os.getenv("TEST_TOPIC_ID") is not None:
-        send_admin_request("DELETE", f'/api/topics/{os.getenv("TEST_TOPIC_ID")}')
+def delete_test_theme():
+    if os.getenv("TEST_THEME_ID") is not None:
+        send_admin_request("DELETE", f'/api/themes/{os.getenv("TEST_THEME_ID")}')
 
 
 def setup_bau_authentication(clear_existing=False) -> dict:
@@ -183,7 +176,7 @@ def setup_auth_variables(user, email, password, identity_provider, clear_existin
             authenticated = True
         else:
             authenticated = False
-            logger.warn("Found invalid authentication information in local files! Attempting to reauthenticate.")
+            logger.warning("Found invalid authentication information in local files! Attempting to reauthenticate.")
 
     if not authenticated:
         logger.info(f"Logging in to obtain {user} authentication information...")

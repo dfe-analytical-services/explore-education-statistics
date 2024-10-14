@@ -14,7 +14,6 @@ user creates a fully populated higher review release
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     ...    ${RELEASE_TIME_PERIOD}=AY
     ...    ${RELEASE_YEAR}=2023
     ...    ${RELEASE_TYPE}=Academic year 2023/24
@@ -22,7 +21,6 @@ user creates a fully populated higher review release
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
     ...    ${RELEASE_TIME_PERIOD}
     ...    ${RELEASE_YEAR}
     ...    ${RELEASE_TYPE}
@@ -33,7 +31,6 @@ user creates a fully populated approved release
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     ...    ${RELEASE_TIME_PERIOD}=AY
     ...    ${RELEASE_YEAR}=2024
     ...    ${RELEASE_TYPE}=Academic year 2024/25
@@ -41,7 +38,6 @@ user creates a fully populated approved release
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
     ...    ${RELEASE_TIME_PERIOD}
     ...    ${RELEASE_YEAR}
     ...    ${RELEASE_TYPE}
@@ -59,7 +55,6 @@ user creates a fully populated published release
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     ...    ${RELEASE_TIME_PERIOD}=AY
     ...    ${RELEASE_YEAR}=2025
     ...    ${RELEASE_TYPE}=Academic year 2025/26
@@ -67,7 +62,6 @@ user creates a fully populated published release
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
     ...    ${RELEASE_TIME_PERIOD}
     ...    ${RELEASE_YEAR}
     ...    ${RELEASE_TYPE}
@@ -78,7 +72,6 @@ user creates a fully populated draft release
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     ...    ${RELEASE_TIME_PERIOD}=AY
     ...    ${RELEASE_YEAR}=2022
     ...    ${RELEASE_TYPE}=Academic year 2022/23
@@ -87,7 +80,6 @@ user creates a fully populated draft release
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_TYPE}
     ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
 
     # add data files
     user uploads subject and waits until complete    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv

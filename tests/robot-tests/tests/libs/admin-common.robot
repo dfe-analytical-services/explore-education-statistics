@@ -88,17 +88,14 @@ user logs out
         user waits until page contains    signed out of your account
     END
 
-user selects dashboard theme and topic if possible
+user selects dashboard theme if possible
     [Arguments]
     ...    ${theme_name}=%{TEST_THEME_NAME}
-    ...    ${topic_name}=%{TEST_TOPIC_NAME}
     user waits until page finishes loading
-    ${dropdowns_exist}=    user checks dashboard theme topic dropdowns exist
+    ${dropdowns_exist}=    user checks dashboard theme dropdown exists
     IF    ${dropdowns_exist}
-        user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme_name}
-        user waits until page contains element    id:publicationsReleases-themeTopic-topicId
-        user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic_name}
-        user waits until page contains    ${theme_name} / ${topic_name}
+        user chooses select option    id:publicationsReleases-theme-themeId    ${theme_name}
+        user waits until page contains    ${theme_name}
     END
 
 user navigates to release page from dashboard
@@ -108,12 +105,10 @@ user navigates to release page from dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
 
     user navigates to publication page from dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
 
     user waits until page finishes loading
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${RELEASE_TABLE_TESTID}
@@ -127,7 +122,6 @@ user navigates to draft release page from dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     ...    ${ACTION_LINK_TEXT}=Edit
     user navigates to release page from dashboard
     ...    publication-draft-releases
@@ -135,35 +129,30 @@ user navigates to draft release page from dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
 
 user navigates to scheduled release page from dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     user navigates to release page from dashboard
     ...    publication-scheduled-releases
     ...    View
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
 
 user navigates to published release page from dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     user navigates to release page from dashboard
     ...    publication-published-releases
     ...    View
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
 
 user creates publication
     [Arguments]    ${title}
@@ -201,11 +190,10 @@ user navigates to publication page from dashboard
     [Arguments]
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
-    ...    ${topic}=%{TEST_TOPIC_NAME}
 
     user navigates to admin dashboard if needed    %{ADMIN_URL}
     user waits until h1 is visible    Dashboard    %{WAIT_SMALL}
-    user selects dashboard theme and topic if possible    ${theme}    ${topic}
+    user selects dashboard theme if possible    ${theme}
     user scrolls to element    xpath://a[text()="${publication}"]
     user clicks link    ${publication}
     user waits until h1 is visible    ${publication}
@@ -216,9 +204,8 @@ user creates methodology for publication
     [Arguments]
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
-    ...    ${topic}=%{TEST_TOPIC_NAME}
 
-    user navigates to methodologies on publication page    ${publication}    ${theme}    ${topic}
+    user navigates to methodologies on publication page    ${publication}    ${theme}
 
     user clicks button    Create new methodology
     user verifies methodology summary details    ${publication}
@@ -227,8 +214,7 @@ user navigates to details on publication page
     [Arguments]
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
-    ...    ${topic}=%{TEST_TOPIC_NAME}
-    user navigates to publication page from dashboard    ${publication}    ${theme}    ${topic}
+    user navigates to publication page from dashboard    ${publication}    ${theme}
 
     user clicks link    Details
     user waits until h2 is visible    Publication details
@@ -237,8 +223,7 @@ user navigates to methodologies on publication page
     [Arguments]
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
-    ...    ${topic}=%{TEST_TOPIC_NAME}
-    user navigates to publication page from dashboard    ${publication}    ${theme}    ${topic}
+    user navigates to publication page from dashboard    ${publication}    ${theme}
 
     user clicks link    Methodologies
     user waits until h2 is visible    Manage methodologies    %{WAIT_SMALL}
@@ -249,11 +234,9 @@ user navigates to methodology
     ...    ${methodology_title}
     ...    ${action_button_text}=Edit
     ...    ${theme}=%{TEST_THEME_NAME}
-    ...    ${topic}=%{TEST_TOPIC_NAME}
     user navigates to methodologies on publication page
     ...    ${publication}
     ...    ${theme}
-    ...    ${topic}
     ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
     user clicks element    xpath://*[text()="${action_button_text}"]    ${ROW}
 
@@ -265,12 +248,10 @@ user edits methodology summary for publication
     ...    ${existing_methodology_title}
     ...    ${new_methodology_title}
     ...    ${theme}=%{TEST_THEME_NAME}
-    ...    ${topic}=%{TEST_TOPIC_NAME}
     user navigates to methodology    ${publication}
     ...    ${existing_methodology_title}
     ...    Edit
     ...    ${theme}
-    ...    ${topic}
 
     user clicks link    Edit summary
     user waits until h2 is visible    Edit methodology summary    %{WAIT_MEDIUM}
@@ -313,7 +294,6 @@ user approves methodology for publication
     ...    ${publication}
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
-    ...    ${topic}=%{TEST_TOPIC_NAME}
     ...    ${publishing_strategy}=Immediately
     ...    ${with_release}=
 
@@ -321,7 +301,6 @@ user approves methodology for publication
     ...    ${publication}
     ...    ${methodology_title}
     ...    ${theme}
-    ...    ${topic}
     ...    ${publishing_strategy}
     ...    ${with_release}
     ...    Edit
@@ -331,7 +310,6 @@ user approves methodology amendment for publication
     ...    ${publication}
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
-    ...    ${topic}=%{TEST_TOPIC_NAME}
     ...    ${publishing_strategy}=Immediately
     ...    ${with_release}=
 
@@ -339,7 +317,6 @@ user approves methodology amendment for publication
     ...    ${publication}
     ...    ${methodology_title}
     ...    ${theme}
-    ...    ${topic}
     ...    ${publishing_strategy}
     ...    ${with_release}
     ...    Edit
@@ -349,12 +326,11 @@ approve methodology for publication
     ...    ${publication}
     ...    ${methodology_title}
     ...    ${theme}
-    ...    ${topic}
     ...    ${publishing_strategy}
     ...    ${with_release}
     ...    ${action_button_text}
 
-    user navigates to methodologies on publication page    ${publication}    ${theme}    ${topic}
+    user navigates to methodologies on publication page    ${publication}    ${theme}
 
     ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
     user clicks element    xpath://*[text()="${action_button_text}"]    ${ROW}
@@ -375,8 +351,7 @@ user creates methodology amendment for publication
     ...    ${publication}
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
-    ...    ${topic}=%{TEST_TOPIC_NAME}
-    user navigates to methodologies on publication page    ${publication}    ${theme}    ${topic}
+    user navigates to methodologies on publication page    ${publication}    ${theme}
 
     ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
     user clicks element    xpath://*[text()="Amend"]    ${ROW}
@@ -391,8 +366,7 @@ user cancels methodology amendment for publication
     ...    ${publication}
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
-    ...    ${topic}=%{TEST_TOPIC_NAME}
-    user navigates to methodologies on publication page    ${publication}    ${theme}    ${topic}
+    user navigates to methodologies on publication page    ${publication}    ${theme}
 
     ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
     user clicks element    xpath://*[text()="Cancel amendment"]    ${ROW}
@@ -498,9 +472,8 @@ user creates amendment for release
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC}=%{TEST_TOPIC_NAME}
 
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME}    ${TOPIC}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME}
 
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
     user clicks element    xpath://*[text()="Amend"]    ${ROW}
@@ -559,7 +532,7 @@ user navigates to admin dashboard
         user waits until page contains title caption    Welcome ${USER}
     END
     user waits until page contains element
-    ...    css:[data-testid='topic-publications'],[data-testid='no-permission-to-access-releases']
+    ...    css:[data-testid='theme-publications'],[data-testid='no-permission-to-access-releases']
     ...    %{WAIT_SMALL}
 
 user uploads subject and waits until complete

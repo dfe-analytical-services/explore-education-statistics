@@ -12,12 +12,12 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=                            UI tests - publish methodology publication update %{RUN_IDENTIFIER}
-${PUBLIC_METHODOLOGY_URL_ENDING}=               /methodology/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
-${PUBLICATION_NAME_UPDATED}=                    ${PUBLICATION_NAME} updated
-${PUBLIC_PUBLICATION_URL_ENDING}=               /find-statistics/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
-${RELEASE_NAME}=                                Academic year Q1
-${ACADEMIC_YEAR}=                               /2046-47
+${PUBLICATION_NAME}=                    UI tests - publish methodology publication update %{RUN_IDENTIFIER}
+${PUBLIC_METHODOLOGY_URL_ENDING}=       /methodology/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
+${PUBLICATION_NAME_UPDATED}=            ${PUBLICATION_NAME} updated
+${PUBLIC_PUBLICATION_URL_ENDING}=       /find-statistics/ui-tests-publish-methodology-publication-update-%{RUN_IDENTIFIER}
+${RELEASE_NAME}=                        Academic year Q1
+${ACADEMIC_YEAR}=                       /2046-47
 
 
 *** Test Cases ***
@@ -64,13 +64,12 @@ Update publication details
     user clicks button    Update publication details
     ${modal}=    user waits until modal is visible    Confirm publication changes
     user checks input field contains    id:before-url    ${PUBLIC_PUBLICATION_URL_ENDING}
-    user checks input field contains    id:after-url     ${PUBLIC_PUBLICATION_URL_ENDING}-updated
+    user checks input field contains    id:after-url    ${PUBLIC_PUBLICATION_URL_ENDING}-updated
     user clicks button    Confirm    ${modal}
     user waits until modal is not visible    Confirm publication changes
     user checks summary list contains    Publication title    ${PUBLICATION_NAME_UPDATED}
     user checks summary list contains    Publication summary    ${PUBLICATION_NAME} summary
     user checks summary list contains    Theme    %{TEST_THEME_NAME}
-    user checks summary list contains    Topic    %{TEST_TOPIC_NAME}
     user checks summary list contains    Superseding publication    This publication is not archived
 
 Update publication contact
@@ -98,7 +97,7 @@ Update publication contact
 Check publication is updated on dashboard
     user navigates to admin dashboard if needed    %{ADMIN_URL}
     user waits until h1 is visible    Dashboard
-    user selects dashboard theme and topic if possible
+    user selects dashboard theme if possible
 
     user waits until page contains link    ${PUBLICATION_NAME_UPDATED}
 

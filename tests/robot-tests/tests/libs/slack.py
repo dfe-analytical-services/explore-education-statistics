@@ -119,7 +119,7 @@ class SlackService:
             os.remove(report_name)
             logger.info("Sent UI test report to #build")
 
-        assert response.status_code == 200, logger.warn(f"Response wasn't 200, it was {response}")
+        assert response.status_code == 200, logger.warning(f"Response wasn't 200, it was {response}")
 
         logger.info("Sent UI test statistics to #build")
 
@@ -130,6 +130,6 @@ class SlackService:
             text=":x: UI test pipeline failure", channel=self.slack_channel, blocks=attachments
         )
 
-        assert response.status_code == 200, logger.warn(f"Response wasn't 200, it was {response}")
+        assert response.status_code == 200, logger.warning(f"Response wasn't 200, it was {response}")
 
         logger.info("Sent UI exception details to #build")
