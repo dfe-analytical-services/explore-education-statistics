@@ -407,30 +407,3 @@ Add headline text block to Content page
 Publish the release immediately
     user clicks link    Sign off
     user approves release for immediate publication
-
-
-*** Keywords ***
-user checks checklist warnings contains
-    [Arguments]    ${text}
-    user waits until page contains testid    releaseChecklist-warnings
-    user waits until element contains    testid:releaseChecklist-warnings    ${text}
-
-user checks checklist warnings contains link
-    [Arguments]    ${text}
-    user waits until page contains testid    releaseChecklist-warnings
-    user waits until parent contains element    testid:releaseChecklist-warnings    link:${text}
-
-user checks checklist warnings does not contain link
-    [Arguments]    ${text}
-    user waits until page contains testid    releaseChecklist-warnings
-    user waits until parent does not contain element    testid:releaseChecklist-warnings    link:${text}
-
-user checks checklist errors contains
-    [Arguments]    ${text}
-    user waits until page contains testid    releaseChecklist-errors
-    user waits until element contains    testid:releaseChecklist-errors    ${text}
-
-user checks checklist errors contains link
-    [Arguments]    ${text}
-    user waits until page contains testid    releaseChecklist-errors
-    user waits until parent contains element    testid:releaseChecklist-errors    link:${text}

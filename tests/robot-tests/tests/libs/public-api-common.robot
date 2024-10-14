@@ -4,16 +4,6 @@ Library     admin-utilities.py
 
 
 *** Keywords ***
-user checks checklist errors contains
-    [Arguments]    ${text}
-    user waits until page contains testid    releaseChecklist-errors
-    user waits until element contains    testid:releaseChecklist-errors    ${text}
-
-user checks checklist errors contains link
-    [Arguments]    ${text}
-    user waits until page contains testid    releaseChecklist-errors
-    user waits until parent contains element    testid:releaseChecklist-errors    link:${text}
-
 user checks checklist errors contains either link
     [Arguments]    ${text1}    ${text2}
     user waits until page contains testid    releaseChecklist-errors

@@ -996,3 +996,28 @@ user creates legacy release
     user clicks button    Save legacy release
     user waits until page finishes loading
     user waits until page contains button    Create legacy release
+
+user checks checklist warnings contains
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-warnings
+    user waits until element contains    testid:releaseChecklist-warnings    ${text}
+
+user checks checklist warnings contains link
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-warnings
+    user waits until parent contains element    testid:releaseChecklist-warnings    link:${text}
+
+user checks checklist warnings does not contain link
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-warnings
+    user waits until parent does not contain element    testid:releaseChecklist-warnings    link:${text}
+
+user checks checklist errors contains
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-errors
+    user waits until element contains    testid:releaseChecklist-errors    ${text}
+
+user checks checklist errors contains link
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-errors
+    user waits until parent contains element    testid:releaseChecklist-errors    link:${text}
