@@ -49,7 +49,7 @@ jobs:
     displayName: Public UI tests
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --noinvite-pass "test" --pendinginvite-pass "test" --env "dev" --file "tests/general_public/" --processes 4 --rerun-attempts 3
+      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --noinvite-pass "test" --pendinginvite-pass "test" --env "dev" --file "tests/general_public" --processes 4 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
       SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)

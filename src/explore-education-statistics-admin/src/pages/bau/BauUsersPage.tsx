@@ -4,9 +4,21 @@ import userService from '@admin/services/userService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
+import styles from './BauUsersPage.module.scss';
 
 const BauUsersPage = () => {
   const { value, isLoading } = useAsyncRetry(() => userService.getUsers());
+
+  // const handleDeleteUser = async (userEmail: string) => { // EES-5573
+  //   await userService
+  //     .deleteUser(userEmail)
+  //     .then(() => {
+  //       window.location.reload();
+  //     })
+  //     .catch(error => {
+  //       logger.info(`Error encountered when deleting the user - ${error}`);
+  //     });
+  // };
 
   return (
     <Page
@@ -37,7 +49,19 @@ const BauUsersPage = () => {
                   <td>{user.email}</td>
                   <td>{user.role ?? 'No role'}</td>
                   <td>
-                    <Link to={`/administration/users/${user.id}`}>Manage</Link>
+                    <Link
+                      className={styles.manageUserLink}
+                      to={`/administration/users/${user.id}`}
+                    >
+                      Manage
+                    </Link>
+                    {/* EES-5573 */}
+                    {/* <ButtonText */}
+                    {/*  onClick={() => handleDeleteUser(user.email)} */}
+                    {/*  className={styles.deleteUserButton} */}
+                    {/* > */}
+                    {/*  Delete */}
+                    {/* </ButtonText> */}
                   </td>
                 </tr>
               ))}

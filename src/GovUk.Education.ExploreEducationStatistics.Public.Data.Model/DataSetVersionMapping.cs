@@ -28,6 +28,17 @@ public class DataSetVersionMapping : ICreatedUpdatedTimestamps<DateTimeOffset, D
 
     public bool FilterMappingsComplete { get; set; }
 
+    // Use boolean flags to describe meta types that have been deleted and cannot be
+    // changed via mapping currently. We can use this when calculating the version number.
+    // We've gone with this approach for simplicity and expedience, but we may need to
+    // migrate away from this approach later e.g. for indicator mappings.
+
+    public bool HasDeletedIndicators { get; set; }
+
+    public bool HasDeletedGeographicLevels { get; set; }
+
+    public bool HasDeletedTimePeriods { get; set; }
+
     public DateTimeOffset Created { get; set; }
 
     public DateTimeOffset? Updated { get; set; }
@@ -125,7 +136,7 @@ public enum MappingType
 /// </summary>
 public abstract record MappableElement
 {
-    public required string Label { get; init; }
+    public required string Label { get; set; }
 }
 
 public abstract record MappableElementWithOptions<TMappableOption>
@@ -146,7 +157,7 @@ public abstract record Mapping<TMappableElement>
 {
     public required TMappableElement Source { get; init; }
 
-    public required string PublicId { get; init; }
+    public required string PublicId { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]

@@ -44,20 +44,18 @@ export default function RelatedPagesSection({ release }: Props) {
     <>
       {(editingMode === 'edit' || links.length > 0) && (
         <>
-          <h3 className="govuk-heading-s" id="related-pages">
+          <h2 className="govuk-heading-s" id="related-pages">
             Related pages
-          </h3>
-          <nav role="navigation" aria-labelledby="related-content">
-            <ul className="govuk-list">
-              {links.map(({ id, description, url }) => (
-                <li key={id}>
-                  <EditableLink removeOnClick={() => removeLink(id)} to={url}>
-                    {description}
-                  </EditableLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          </h2>
+          <ul className="govuk-list">
+            {links.map(({ id, description, url }) => (
+              <li key={id}>
+                <EditableLink removeOnClick={() => removeLink(id)} to={url}>
+                  {description}
+                </EditableLink>
+              </li>
+            ))}
+          </ul>
         </>
       )}
       {editingMode === 'edit' && (

@@ -757,7 +757,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             new Indicator
                             {
                                 Id = Guid.NewGuid(),
-                                Unit = IndicatorUnit.Number,
+                                Unit = IndicatorUnit.None,
                                 Label = "Indicator 2"
                             })
                     },
@@ -887,7 +887,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                                 new IndicatorMetaViewModel
                                 {
                                     Label = "Indicator 2",
-                                    Unit = IndicatorUnit.Number,
+                                    Unit = IndicatorUnit.None,
                                     Value = indicatorGroups[0].Indicators[0].Id
                                 }),
                             Order = 1

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using NaturalSort.Extension;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
@@ -295,6 +296,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         public static bool ContainsAll<T>(this IEnumerable<T> source, IEnumerable<T> values)
         {
             return values.All(id => source.Contains(id));
+        }
+        
+        /// <summary>
+        /// Order some objects, according to a string key, in natural order for humans to read.
+        /// </summary>
+        public static IOrderedEnumerable<T> NaturalOrderBy<T>(
+            this IEnumerable<T> source,
+            Func<T, string> keySelector,
+            StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        {
+            return source.OrderBy(keySelector, comparison.WithNaturalSort());
+        }
+
+        /// <summary>
+        /// Subsequently order some objects, according to a string key, in natural order for humans to read.
+        /// </summary>
+        public static IOrderedEnumerable<T> NaturalThenBy<T>(
+            this IOrderedEnumerable<T> source,
+            Func<T, string> keySelector,
+            StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        {
+            return source.ThenBy(keySelector, comparison.WithNaturalSort());
         }
     }
 }

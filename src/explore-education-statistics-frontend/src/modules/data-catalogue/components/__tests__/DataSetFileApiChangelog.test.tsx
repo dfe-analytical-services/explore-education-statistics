@@ -2,25 +2,36 @@ import DataSetFileApiChangelog from '@frontend/modules/data-catalogue/components
 import { render, screen, within } from '@testing-library/react';
 
 describe('DataSetFileApiChangelog', () => {
-  test('renders correctly with major and minor changes', () => {
+  test('renders correctly with major and minor changes and public guidance notes', () => {
     render(
       <DataSetFileApiChangelog
         changes={{
           majorChanges: {
             filters: [
               {
-                previousState: { id: 'filter-1', label: 'Filter 1', hint: '' },
+                previousState: {
+                  id: 'filter-1',
+                  column: 'filter_1',
+                  label: 'Filter 1',
+                  hint: '',
+                },
               },
             ],
           },
           minorChanges: {
             filters: [
               {
-                currentState: { id: 'filter-2', label: 'Filter 2', hint: '' },
+                currentState: {
+                  id: 'filter-2',
+                  column: 'filter_2',
+                  label: 'Filter 2',
+                  hint: '',
+                },
               },
             ],
           },
         }}
+        guidanceNotes={'Guidance notes.\nMultiline content.'}
         version="2.0"
       />,
     );
@@ -29,6 +40,10 @@ describe('DataSetFileApiChangelog', () => {
       screen.getByRole('heading', { name: 'API data set changelog' }),
     ).toBeInTheDocument();
 
+    expect(screen.getByTestId('public-guidance-notes')).toHaveTextContent(
+      'Guidance notes. Multiline content.',
+    );
+
     expect(
       screen.getByRole('heading', { name: 'Major changes for version 2.0' }),
     ).toBeInTheDocument();
@@ -36,13 +51,13 @@ describe('DataSetFileApiChangelog', () => {
     const majorChanges = within(screen.getByTestId('major-changes'));
 
     expect(majorChanges.getByTestId('deleted-filters')).toHaveTextContent(
-      'Filter 1 (id: filter-1)',
+      'Filter 1 (id: filter-1, column: filter_1)',
     );
 
     const minorChanges = within(screen.getByTestId('minor-changes'));
 
     expect(minorChanges.getByTestId('added-filters')).toHaveTextContent(
-      'Filter 2 (id: filter-2)',
+      'Filter 2 (id: filter-2, column: filter_2)',
     );
   });
 
@@ -53,12 +68,18 @@ describe('DataSetFileApiChangelog', () => {
           majorChanges: {
             filters: [
               {
-                previousState: { id: 'filter-1', label: 'Filter 1', hint: '' },
+                previousState: {
+                  id: 'filter-1',
+                  column: 'filter_1',
+                  label: 'Filter 1',
+                  hint: '',
+                },
               },
             ],
           },
           minorChanges: {},
         }}
+        guidanceNotes=""
         version="2.0"
       />,
     );
@@ -66,7 +87,7 @@ describe('DataSetFileApiChangelog', () => {
     const majorChanges = within(screen.getByTestId('major-changes'));
 
     expect(majorChanges.getByTestId('deleted-filters')).toHaveTextContent(
-      'Filter 1 (id: filter-1)',
+      'Filter 1 (id: filter-1, column: filter_1)',
     );
 
     expect(screen.queryByTestId('minor-changes')).not.toBeInTheDocument();
@@ -80,11 +101,17 @@ describe('DataSetFileApiChangelog', () => {
           minorChanges: {
             filters: [
               {
-                currentState: { id: 'filter-2', label: 'Filter 2', hint: '' },
+                currentState: {
+                  id: 'filter-2',
+                  column: 'filter_2',
+                  label: 'Filter 2',
+                  hint: '',
+                },
               },
             ],
           },
         }}
+        guidanceNotes=""
         version="2.0"
       />,
     );
@@ -94,8 +121,34 @@ describe('DataSetFileApiChangelog', () => {
     const minorChanges = within(screen.getByTestId('minor-changes'));
 
     expect(minorChanges.getByTestId('added-filters')).toHaveTextContent(
-      'Filter 2 (id: filter-2)',
+      'Filter 2 (id: filter-2, column: filter_2)',
     );
+  });
+
+  test('renders correctly with no public data guidance', () => {
+    render(
+      <DataSetFileApiChangelog
+        changes={{
+          majorChanges: {},
+          minorChanges: {
+            filters: [
+              {
+                currentState: {
+                  id: 'filter-2',
+                  column: 'filter_2',
+                  label: 'Filter 2',
+                  hint: '',
+                },
+              },
+            ],
+          },
+        }}
+        guidanceNotes=""
+        version="2.0"
+      />,
+    );
+
+    expect(screen.queryByTestId('data-guidance-notes')).not.toBeInTheDocument();
   });
 
   test('does not render if empty changes', () => {
@@ -105,12 +158,17 @@ describe('DataSetFileApiChangelog', () => {
           majorChanges: {},
           minorChanges: {},
         }}
+        guidanceNotes=""
         version="2.0"
       />,
     );
 
     expect(
       screen.queryByRole('heading', { name: 'API data set changelog' }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByTestId('public-guidance-notes'),
     ).not.toBeInTheDocument();
 
     expect(

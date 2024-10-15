@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.OpenApi.Any;
@@ -40,7 +39,7 @@ public class GeographicLevelSchemaFilter : ISchemaFilter
                 - `SCH` - School
                 - `SPON` - Sponsor
                 - `WARD` - Ward
-                """.TrimIndent();
+                """;
 
             schema.Example = new OpenApiString("NAT");
 

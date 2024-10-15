@@ -24,7 +24,7 @@ export default function DataSetFileUsage({
   tableToolLink,
   onDownload,
 }: Props) {
-  const downloadLink = new URL(
+  const downloadUrl = new URL(
     `/data-catalogue/data-set/${dataSetFileId}/csv`,
     process.env.PUBLIC_URL,
   ).href;
@@ -71,8 +71,10 @@ export default function DataSetFileUsage({
       </p>
 
       <CopyTextButton
-        className="govuk-!-margin-top-5"
-        text={downloadLink}
+        className="govuk-!-margin-top-5 govuk-!-margin-bottom-5"
+        id="copy-download-url"
+        text={downloadUrl}
+        label="URL"
         labelHidden={false}
       />
 
@@ -85,13 +87,13 @@ export default function DataSetFileUsage({
           <CodeBlock language="python">
             {`import pandas as pd
 
-pd.read_csv("${downloadLink}")`}
+pd.read_csv("${downloadUrl}")`}
           </CodeBlock>
         </TabsSection>
         <TabsSection title="R">
           <h5 className="govuk-heading-s">R</h5>
 
-          <CodeBlock language="r">{`read.csv("${downloadLink}")`}</CodeBlock>
+          <CodeBlock language="r">{`read.csv("${downloadUrl}")`}</CodeBlock>
         </TabsSection>
       </Tabs>
     </DataSetFilePageSection>

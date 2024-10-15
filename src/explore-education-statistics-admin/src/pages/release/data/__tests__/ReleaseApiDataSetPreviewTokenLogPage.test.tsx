@@ -197,7 +197,9 @@ describe('ReleaseApiDataSetPreviewTokenLogPage', () => {
     );
 
     expect(
-      await screen.findByText('Are you sure you want to revoke this token?'),
+      await screen.findByText(
+        'Are you sure you want to revoke this preview token?',
+      ),
     ).toBeInTheDocument();
 
     expect(previewTokenService.revokePreviewToken).not.toHaveBeenCalled();

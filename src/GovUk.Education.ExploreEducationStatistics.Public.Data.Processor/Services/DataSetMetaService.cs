@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
@@ -27,7 +26,7 @@ public class DataSetMetaService(
     ITimePeriodsDuckDbRepository timePeriodsDuckDbRepository
 ) : IDataSetMetaService
 {
-    public async Task<DataSetVersionMappingMeta> ReadDataSetVersionMetaForMappings(
+    public async Task<DataSetVersionMappingMeta> ReadDataSetVersionMappingMeta(
         Guid dataSetVersionId,
         CancellationToken cancellationToken = default)
     {
@@ -58,6 +57,12 @@ public class DataSetMetaService(
             dataSetVersion,
             cancellationToken);
 
+        var indicatorMetas = await indicatorMetaRepository.ReadIndicatorMetas(
+            duckDbConnection,
+            dataSetVersion,
+            allowedColumns,
+            cancellationToken);
+
         var locationMetas = await locationMetaRepository.ReadLocationMetas(
             duckDbConnection,
             dataSetVersion,
@@ -75,7 +80,15 @@ public class DataSetMetaService(
             allowedColumns,
             geographicLevelMeta);
 
-        return new DataSetVersionMappingMeta(filterMetas, locationMetas, metaSummary);
+        return new DataSetVersionMappingMeta
+        {
+            Filters = filterMetas,
+            Locations = locationMetas,
+            MetaSummary = metaSummary,
+            Indicators = indicatorMetas,
+            GeographicLevel = geographicLevelMeta,
+            TimePeriods = timePeriodMetas
+        };
     }
 
     public async Task CreateDataSetVersionMeta(

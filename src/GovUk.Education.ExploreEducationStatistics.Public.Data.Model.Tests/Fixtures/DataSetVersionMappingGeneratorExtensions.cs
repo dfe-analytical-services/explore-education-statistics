@@ -40,6 +40,21 @@ public static class DataSetVersionMappingGeneratorExtensions
         FilterMappingPlan filterMappingPlan)
         => generator.ForInstance(s => s.SetFilterMappingPlan(filterMappingPlan));
 
+    public static Generator<DataSetVersionMapping> WithHasDeletedIndicators(
+        this Generator<DataSetVersionMapping> generator,
+        bool hasDeletedIndicators)
+        => generator.ForInstance(s => s.SetHasDeletedIndicators(hasDeletedIndicators));
+
+    public static Generator<DataSetVersionMapping> WithHasDeletedGeographicLevels(
+        this Generator<DataSetVersionMapping> generator,
+        bool hasDeletedGeographicLevels)
+        => generator.ForInstance(s => s.SetHasDeletedGeographicLevels(hasDeletedGeographicLevels));
+
+    public static Generator<DataSetVersionMapping> WithHasDeletedTimePeriods(
+        this Generator<DataSetVersionMapping> generator,
+        bool hasDeletedTimePeriods)
+        => generator.ForInstance(s => s.SetHasDeletedTimePeriods(hasDeletedTimePeriods));
+
     public static InstanceSetters<DataSetVersionMapping> SetDefaults(
         this InstanceSetters<DataSetVersionMapping> setters)
         => setters
@@ -76,12 +91,25 @@ public static class DataSetVersionMappingGeneratorExtensions
     public static InstanceSetters<DataSetVersionMapping> SetLocationMappingPlan(
         this InstanceSetters<DataSetVersionMapping> instanceSetter,
         LocationMappingPlan locationMappingPlan)
-        => instanceSetter
-            .Set(mapping => mapping.LocationMappingPlan, locationMappingPlan);
+        => instanceSetter.Set(mapping => mapping.LocationMappingPlan, locationMappingPlan);
 
     public static InstanceSetters<DataSetVersionMapping> SetFilterMappingPlan(
         this InstanceSetters<DataSetVersionMapping> instanceSetter,
         FilterMappingPlan filterMappingPlan)
-        => instanceSetter
-            .Set(mapping => mapping.FilterMappingPlan, filterMappingPlan);
+        => instanceSetter.Set(mapping => mapping.FilterMappingPlan, filterMappingPlan);
+
+    public static InstanceSetters<DataSetVersionMapping> SetHasDeletedIndicators(
+        this InstanceSetters<DataSetVersionMapping> instanceSetter,
+        bool hasDeletedIndicators)
+        => instanceSetter.Set(mapping => mapping.HasDeletedIndicators, hasDeletedIndicators);
+
+    public static InstanceSetters<DataSetVersionMapping> SetHasDeletedGeographicLevels(
+        this InstanceSetters<DataSetVersionMapping> instanceSetter,
+        bool hasDeletedGeographicLevels)
+        => instanceSetter.Set(mapping => mapping.HasDeletedGeographicLevels, hasDeletedGeographicLevels);
+
+    public static InstanceSetters<DataSetVersionMapping> SetHasDeletedTimePeriods(
+        this InstanceSetters<DataSetVersionMapping> instanceSetter,
+        bool hasDeletedTimePeriods)
+        => instanceSetter.Set(mapping => mapping.HasDeletedTimePeriods, hasDeletedTimePeriods);
 }

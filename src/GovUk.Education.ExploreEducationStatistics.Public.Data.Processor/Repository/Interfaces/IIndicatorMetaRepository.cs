@@ -5,6 +5,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public interface IIndicatorMetaRepository
 {
+    Task<IList<IndicatorMeta>> ReadIndicatorMetas(
+        IDuckDbConnection duckDbConnection,
+        DataSetVersion dataSetVersion,
+        IReadOnlySet<string> allowedColumns,
+        CancellationToken cancellationToken = default);
+
     Task CreateIndicatorMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,

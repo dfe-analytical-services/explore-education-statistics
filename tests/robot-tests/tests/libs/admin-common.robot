@@ -119,7 +119,7 @@ user navigates to release page from dashboard
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${RELEASE_TABLE_TESTID}
     user scrolls to element    ${ROW}
 
-    user clicks link by visible text    ${LINK_TEXT}    ${ROW}
+    user clicks link containing text    ${LINK_TEXT}    ${ROW}
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
 
 user navigates to draft release page from dashboard
@@ -407,7 +407,7 @@ user adds note to methodology
     user clicks button    Add note
     user enters text into element    label:New methodology note    ${note}
     user clicks button    Save note
-    ${date}=    get current datetime    %-d %B %Y
+    ${date}=    get london date
     user waits until element contains    css:#methodologyNotes time    ${date}
     user waits until element contains    css:#methodologyNotes p    ${note}
 
@@ -569,11 +569,11 @@ user uploads subject and waits until complete
     ...    ${META_FILE}
     ...    ${FOLDER}=${FILES_DIR}
     user uploads subject
-        ...    ${SUBJECT_NAME}
-        ...    ${SUBJECT_FILE}
-        ...    ${META_FILE}
-        ...    Complete
-        ...    ${FOLDER}
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    Complete
+    ...    ${FOLDER}
 
 user uploads subject and waits until importing
     [Arguments]
@@ -582,12 +582,12 @@ user uploads subject and waits until importing
     ...    ${META_FILE}
     ...    ${FOLDER}=${FILES_DIR}
     user uploads subject
-        ...    ${SUBJECT_NAME}
-        ...    ${SUBJECT_FILE}
-        ...    ${META_FILE}
-        ...    Importing
-        ...    ${FOLDER}
-    
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    Importing
+    ...    ${FOLDER}
+
 user uploads subject
     [Arguments]
     ...    ${SUBJECT_NAME}
@@ -603,14 +603,14 @@ user uploads subject
     user clicks button    Upload data files
     user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
     user waits until page contains accordion section    ${SUBJECT_NAME}    %{WAIT_SMALL}
-    user scrolls to accordion section     ${SUBJECT_NAME}
+    user scrolls to accordion section    ${SUBJECT_NAME}
     user opens accordion section    ${SUBJECT_NAME}
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
-    
+
     IF    "${IMPORT_STATUS}" != "Importing"
         user waits until page finishes loading
     END
-    
+
     user checks headed table body row contains    Status    ${IMPORT_STATUS}    ${section}    %{WAIT_DATA_FILE_IMPORT}
 
 user waits until data upload is completed
@@ -724,14 +724,14 @@ user changes methodology status to Approved
     user clicks element    id:methodologyStatusForm-status-Approved
     user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Approved by UI tests
     user clicks element    id:methodologyStatusForm-publishingStrategy-${publishing_strategy}
-    IF    ${is_publishing_strategy_with_release} is ${TRUE}
+    IF    ${is_publishing_strategy_with_release} is ${True}
         user waits until element is enabled    css:[name="withReleaseId"]
         user chooses select option    css:[name="withReleaseId"]    ${with_release}
     END
     user clicks button    Update status
     user waits until h2 is visible    Sign off
     user checks summary list contains    Status    Approved
-    IF    ${is_publishing_strategy_with_release} is ${TRUE}
+    IF    ${is_publishing_strategy_with_release} is ${True}
         user checks summary list contains    When to publish    With a specific release
         user checks summary list contains    Publish with release    ${with_release}
     ELSE
@@ -941,7 +941,8 @@ user updates free text key stat
     user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="guidanceTitle"]
     ...    ${guidance_title}
 
-    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//textarea[@name="guidanceText"]    ${guidance_text}
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//textarea[@name="guidanceText"]
+    ...    ${guidance_text}
 
     user clicks button    Save
     user waits until page does not contain button    Save

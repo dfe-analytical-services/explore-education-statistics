@@ -13,7 +13,8 @@ export default function IndicatorChangeLabel({
   if (previousState && currentState) {
     return (
       <>
-        {previousState.label} (id: <code>{previousState.id}</code>):
+        {previousState.label} (id: <code>{previousState.id}</code>, column:{' '}
+        <code>{previousState.column}</code>):
         <ul>
           {previousState.label !== currentState.label && (
             <li>label changed to: {currentState.label}</li>
@@ -21,6 +22,11 @@ export default function IndicatorChangeLabel({
           {previousState.id !== currentState.id && (
             <li>
               id changed to: <code>{currentState.id}</code>
+            </li>
+          )}
+          {previousState.column !== currentState.column && (
+            <li>
+              column changed to: <code>{currentState.column}</code>
             </li>
           )}
           {previousState.unit !== currentState.unit && (

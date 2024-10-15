@@ -1141,12 +1141,12 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             // Addition
             Assert.Null(minorChanges[0].PreviousState);
             Assert.NotNull(minorChanges[0].CurrentState);
-            Assert.Equal(GeographicLevel.Region, minorChanges[0].CurrentState!.Code);
+            Assert.Equal(GeographicLevel.LocalAuthority, minorChanges[0].CurrentState!.Code);
 
             // Addition
             Assert.Null(minorChanges[1].PreviousState);
             Assert.NotNull(minorChanges[1].CurrentState);
-            Assert.Equal(GeographicLevel.LocalAuthority, minorChanges[1].CurrentState!.Code);
+            Assert.Equal(GeographicLevel.Region, minorChanges[1].CurrentState!.Code);
         }
 
         [Fact]

@@ -3,6 +3,7 @@ import { GeographicLevelCode } from '@common/utils/locationLevelsMap';
 export interface Filter {
   id: string;
   hint: string;
+  column: string;
   label: string;
 }
 
@@ -20,6 +21,7 @@ export interface GeographicLevel {
 export interface IndicatorOption {
   id: string;
   label: string;
+  column: string;
   unit?: string;
 }
 

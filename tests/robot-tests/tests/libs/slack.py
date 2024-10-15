@@ -22,7 +22,7 @@ class SlackService:
 
         self.client = WebClient(token=self.slack_app_token)
 
-    def _build_test_results_attachments(self, env: str, suites_ran: str, suites_failed: [], run_index: int):
+    def _build_test_results_attachments(self, env: str, suites_ran: str, suites_failed: [], number_of_test_runs: int):
         with open(f"{PATH}{os.sep}output.xml", "rb") as report:
             contents = report.read()
 
@@ -31,11 +31,12 @@ class SlackService:
             tests = soup.find("total").find("stat")
             failed_tests = int(tests["fail"])
             passed_tests = int(tests["pass"])
+            skipped_tests = int(tests["skip"])
 
         except AttributeError as e:
             raise Exception("Error parsing the XML report") from e
 
-        total_tests_count = passed_tests + failed_tests
+        total_tests_count = passed_tests + failed_tests + skipped_tests
 
         blocks = [
             {
@@ -50,10 +51,11 @@ class SlackService:
                 "fields": [
                     {"type": "mrkdwn", "text": f"*Environment*\n{env}"},
                     {"type": "mrkdwn", "text": f"*Suite*\n{suites_ran.replace('tests/', '')}"},
-                    {"type": "mrkdwn", "text": f"*Total runs*\n{run_index + 1}"},
+                    {"type": "mrkdwn", "text": f"*Total runs*\n{number_of_test_runs}"},
                     {"type": "mrkdwn", "text": f"*Total test cases*\n{total_tests_count}"},
                     {"type": "mrkdwn", "text": f"*Passed test cases*\n{passed_tests}"},
                     {"type": "mrkdwn", "text": f"*Failed test cases*\n{failed_tests}"},
+                    {"type": "mrkdwn", "text": f"*Skipped test cases*\n{skipped_tests}"},
                 ],
             },
         ]
@@ -79,7 +81,7 @@ class SlackService:
 
         return blocks
 
-    def _build_exception_details_attachments(self, env: str, suites_ran: str, run_index: int, ex: Exception):
+    def _build_exception_details_attachments(self, env: str, suites_ran: str, number_of_test_runs: int, ex: Exception):
         ex_stripped = repr(ex).replace("\n", "")
         suites_ran_conditional = "N/A" if not suites_ran else suites_ran.replace("tests/", "")
 
@@ -90,15 +92,15 @@ class SlackService:
                 "fields": [
                     {"type": "mrkdwn", "text": f"*Environment*\n{env}"},
                     {"type": "mrkdwn", "text": f"*Suite*\n{suites_ran_conditional}"},
-                    {"type": "mrkdwn", "text": f"*Run number*\n{run_index + 1}"},
+                    {"type": "mrkdwn", "text": f"*Run number*\n{number_of_test_runs}"},
                 ],
             },
             {"type": "divider"},
             {"type": "section", "text": {"type": "mrkdwn", "text": f"*Error details*\n{ex_stripped}"}},
         ]
 
-    def send_test_report(self, env: str, suites_ran: str, suites_failed: [], run_index: int):
-        attachments = self._build_test_results_attachments(env, suites_ran, suites_failed, run_index)
+    def send_test_report(self, env: str, suites_ran: str, suites_failed: [], number_of_test_runs: int):
+        attachments = self._build_test_results_attachments(env, suites_ran, suites_failed, number_of_test_runs)
 
         response = self.client.chat_postMessage(channel=self.slack_channel, text="All results", blocks=attachments)
 
@@ -121,8 +123,8 @@ class SlackService:
 
         logger.info("Sent UI test statistics to #build")
 
-    def send_exception_details(self, env: str, suites_ran: str, run_index: int, ex: Exception):
-        attachments = self._build_exception_details_attachments(env, suites_ran, run_index, ex)
+    def send_exception_details(self, env: str, suites_ran: str, number_of_test_runs: int, ex: Exception):
+        attachments = self._build_exception_details_attachments(env, suites_ran, number_of_test_runs, ex)
 
         response = self.client.chat_postMessage(
             text=":x: UI test pipeline failure", channel=self.slack_channel, blocks=attachments

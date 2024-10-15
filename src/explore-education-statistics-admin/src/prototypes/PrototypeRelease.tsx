@@ -4,7 +4,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
-import RelatedAside from '@common/components/RelatedAside';
+import RelatedContent from '@common/components/RelatedContent';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import stylesKeyStat from '@common/modules/find-statistics/components/KeyStat.module.scss';
@@ -121,7 +121,7 @@ const PrototypeRelease = () => {
             <PageSearchForm inputLabel="Search this page" />
           </div>
           <div className="govuk-grid-column-one-third">
-            <RelatedAside>
+            <RelatedContent>
               <h2 className="govuk-heading-m">Related infomation</h2>
               <ul className="govuk-list">
                 <li>
@@ -158,7 +158,7 @@ const PrototypeRelease = () => {
                   <a href="#">Children's social care</a>
                 </li>
               </ul>
-            </RelatedAside>
+            </RelatedContent>
           </div>
         </div>
         <Tabs id="test">

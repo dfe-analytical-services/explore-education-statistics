@@ -29,7 +29,8 @@ Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Calendar year 2000
 
-    user uploads subject and waits until complete    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    UI test subject    upload-file-test.csv
+    ...    upload-file-test.meta.csv
 
 Add metadata guidance
     user clicks link    Data guidance
@@ -104,10 +105,10 @@ Go to "Sign off" page
     user waits until page contains button    Edit release status
 
 Approve release and wait for it to be Scheduled
-    ${day}=    get current datetime    %-d    2
-    ${month}=    get current datetime    %-m    2
-    ${month_word}=    get current datetime    %B    2
-    ${year}=    get current datetime    %Y    2
+    ${day}=    get london day of month    offset_days=2
+    ${month}=    get london month date    offset_days=2
+    ${month_word}=    get london month word    offset_days=2
+    ${year}=    get london year    offset_days=2
 
     user clicks button    Edit release status
     user clicks radio    Approved for publication
@@ -141,13 +142,11 @@ Validate prerelease has not started
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1    Europe/London
-    ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2    Europe/London
+    ${start_date}=    get london date    offset_days=1
+    ${end_date}=    get london date    offset_days=2
 
-    ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
-    ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
     user checks page contains
-    ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
+    ...    Pre-release access will be available from ${start_date} at 00:00 until it is published on ${end_date}.
 
 Go to prerelease access page
     user navigates to admin frontend    ${RELEASE_URL}/prerelease-access
@@ -248,20 +247,18 @@ Validate prerelease has not started for Analyst user
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1
-    ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2
+    ${start_date}=    get london date    offset_days=1
+    ${end_date}=    get london date    offset_days=2
 
-    ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
-    ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
     user checks page contains
-    ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
+    ...    Pre-release access will be available from ${start_date} at 00:00 until it is published on ${end_date}.
 
 Start prerelease
     user changes to bau1
-    ${day}=    get current datetime    %-d    1
-    ${month}=    get current datetime    %-m    1
-    ${month_word}=    get current datetime    %B    1
-    ${year}=    get current datetime    %Y    1
+    ${day}=    get london day of month    offset_days=1
+    ${month}=    get london month date    offset_days=1
+    ${month_word}=    get london month word    offset_days=1
+    ${year}=    get london year    offset_days=1
     user navigates to admin frontend    ${RELEASE_URL}/status
     user clicks button    Edit release status
     user enters text into element    id:releaseStatusForm-publishScheduled-day    ${day}

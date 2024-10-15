@@ -39,7 +39,9 @@ export default function EditableKeyStatText({
     return (
       <EditableKeyStatTextForm
         keyStat={keyStat}
-        keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
+        keyStatisticGuidanceTitles={keyStatisticGuidanceTitles?.filter(
+          keyStatTitle => keyStatTitle === keyStat.title,
+        )}
         isReordering={isReordering}
         testId={testId}
         onSubmit={handleSubmit}

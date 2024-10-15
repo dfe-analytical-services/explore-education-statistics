@@ -28,7 +28,7 @@ public record IndicatorMetaViewModel
 {
     public string Label { get; init; } = string.Empty;
 
-    [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
+    [JsonConverter(typeof(EnumToEnumLabelJsonConverter<IndicatorUnit>))]
     public IndicatorUnit Unit { get; init; }
 
     public Guid Value { get; init; }

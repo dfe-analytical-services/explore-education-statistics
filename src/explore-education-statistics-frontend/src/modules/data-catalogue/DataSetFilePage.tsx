@@ -259,8 +259,9 @@ export default function DataSetFilePage({
 
                   {apiDataSetVersionChanges && (
                     <DataSetFileApiChangelog
-                      version={apiDataSetVersion.version}
                       changes={apiDataSetVersionChanges}
+                      guidanceNotes={apiDataSetVersion.notes}
+                      version={apiDataSetVersion.version}
                     />
                   )}
                 </>

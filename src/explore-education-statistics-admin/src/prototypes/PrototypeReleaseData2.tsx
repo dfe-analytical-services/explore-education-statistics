@@ -5,7 +5,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
-import RelatedAside from '@common/components/RelatedAside';
+import RelatedContent from '@common/components/RelatedContent';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import stylesKeyStat from '@common/modules/find-statistics/components/KeyStat.module.scss';
@@ -132,7 +132,7 @@ const PrototypeReleaseData = () => {
             <PageSearchForm inputLabel="Search this page" />
           </div>
           <div className="govuk-grid-column-one-third">
-            <RelatedAside>
+            <RelatedContent>
               <h2 className="govuk-heading-m">Data downloads</h2>
               <ul className="govuk-list govuk-list--spaced">
                 <li>
@@ -173,7 +173,7 @@ const PrototypeReleaseData = () => {
                   <a href="#">16-18 destination measures</a>
                 </li>
               </ul>
-            </RelatedAside>
+            </RelatedContent>
           </div>
         </div>
         <h2 className="govuk-heading-l">Key statistics and data downloads</h2>

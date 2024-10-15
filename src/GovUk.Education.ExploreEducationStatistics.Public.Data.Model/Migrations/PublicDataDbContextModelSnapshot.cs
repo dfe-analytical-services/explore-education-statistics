@@ -181,6 +181,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<bool>("FilterMappingsComplete")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("HasDeletedGeographicLevels")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("HasDeletedIndicators")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("HasDeletedTimePeriods")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LocationMappingPlan")
                         .IsRequired()
                         .HasColumnType("jsonb");

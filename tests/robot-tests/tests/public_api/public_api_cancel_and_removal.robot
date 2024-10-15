@@ -14,7 +14,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - public api cancel and removal %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    UI tests - Public API - cancel and removal %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
@@ -79,7 +79,7 @@ User creates 2nd API dataset
 
 User waits until the 2nd API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    5s    Verify status of API Datasets    Ready
+    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
 
 Verify the contents inside the 'Draft API datasets' table
     user clicks link    Back to API data sets
@@ -117,7 +117,7 @@ Verify the contents inside the 'Draft API datasets' table
 
 Remove draft API dataset
     user clicks button in table cell    1    4    Remove draft    xpath://table[@data-testid='draft-api-data-sets']
-    
+
     ${modal}=    user waits until modal is visible     Remove this draft API data set version
     user clicks button     Remove this API data set version
 
@@ -135,7 +135,7 @@ User creates 1st API dataset again
 
 User waits until the 1st API dataset status changes to 'Ready'
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    5s    Verify status of API Datasets    Ready
+    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API Datasets    Ready
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}

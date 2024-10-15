@@ -9,15 +9,17 @@ internal static class ActivityNames
     public const string HandleProcessingFailure = nameof(HandleProcessingFailureFunction.HandleProcessingFailure);
 
     public const string CompleteInitialDataSetVersionProcessing =
-        nameof(ProcessInitialDataSetVersionFunction.CompleteInitialDataSetVersionProcessing);
+        nameof(CompleteInitialDataSetVersionProcessingFunction.CompleteInitialDataSetVersionProcessing);
 
-    public const string CreateMappings = nameof(ProcessNextDataSetVersionMappingsFunction.CreateMappings);
-    public const string ApplyAutoMappings = nameof(ProcessNextDataSetVersionMappingsFunction.ApplyAutoMappings);
+    public const string CreateMappings = nameof(ProcessNextDataSetVersionMappingsFunctions.CreateMappings);
+    public const string ApplyAutoMappings = nameof(ProcessNextDataSetVersionMappingsFunctions.ApplyAutoMappings);
     public const string CompleteNextDataSetVersionMappingProcessing =
-        nameof(ProcessNextDataSetVersionMappingsFunction.CompleteNextDataSetVersionMappingProcessing);
+        nameof(ProcessNextDataSetVersionMappingsFunctions.CompleteNextDataSetVersionMappingProcessing);
 
+    public const string CreateChanges =
+        nameof(ProcessCompletionOfNextDataSetVersionFunctions.CreateChanges);
     public const string UpdateFileStoragePath =
-        nameof(ProcessCompletionOfNextDataSetVersionFunction.UpdateFileStoragePath);
+        nameof(ProcessCompletionOfNextDataSetVersionFunctions.UpdateFileStoragePath);
     public const string CompleteNextDataSetVersionImportProcessing =
-        nameof(ProcessCompletionOfNextDataSetVersionFunction.CompleteNextDataSetVersionImportProcessing);
+        nameof(ProcessCompletionOfNextDataSetVersionFunctions.CompleteNextDataSetVersionImportProcessing);
 }

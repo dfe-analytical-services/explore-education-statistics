@@ -39,7 +39,7 @@ public class TimeIdentifierSchemaFilter : ISchemaFilter
                 - `TYQ1 - FYQ4` - tax year quarter 1 to 4
                 - `W1 - W52` - week 1 to 52
                 - `M1 - M12` - month 1 to 12
-                """.TrimIndent();
+                """;
 
             schema.Example = new OpenApiString("CY");
 

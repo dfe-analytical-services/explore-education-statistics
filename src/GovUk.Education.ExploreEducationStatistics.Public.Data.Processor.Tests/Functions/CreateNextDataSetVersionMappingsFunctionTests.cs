@@ -41,7 +41,8 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             StartOrchestrationOptions? startOrchestrationOptions = null;
             durableTaskClientMock.Setup(client =>
                     client.ScheduleNewOrchestrationInstanceAsync(
-                        nameof(ProcessNextDataSetVersionMappingsFunction.ProcessNextDataSetVersionMappings),
+                        nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration
+                            .ProcessNextDataSetVersionMappings),
                         It.IsAny<ProcessDataSetVersionContext>(),
                         It.IsAny<StartOrchestrationOptions>(),
                         It.IsAny<CancellationToken>()))

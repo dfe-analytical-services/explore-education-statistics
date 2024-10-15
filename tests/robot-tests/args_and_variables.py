@@ -27,7 +27,11 @@ def create_argument_parser() -> argparse.ArgumentParser:
         help="interpreter to use to run the tests",
     )
     parser.add_argument(
-        "--processes", dest="processes", help="how many processes should be used when using the pabot interpreter"
+        "--processes",
+        dest="processes",
+        type=int,
+        default=4,
+        help="how many processes should be used when using the pabot interpreter",
     )
     parser.add_argument(
         "-e",
@@ -183,7 +187,6 @@ def validate_environment_variables():
         "WAIT_LONG",
         "WAIT_SMALL",
         "WAIT_DATA_FILE_IMPORT",
-        "FAIL_TEST_SUITES_FAST",
         "IDENTITY_PROVIDER",
         "WAIT_CACHE_EXPIRY",
         "ADMIN_EMAIL",
@@ -213,7 +216,8 @@ def validate_environment_variables():
 # back slashes.
 def includes_data_changing_tests(arguments: argparse.Namespace):
     return (
-        arguments.tests == "tests/"
+        arguments.tests == "tests"
+        or arguments.tests == "tests/"
         or arguments.tests == f"tests{os.sep}"
         or f"{os.sep}admin" in arguments.tests
         or "/admin" in arguments.tests

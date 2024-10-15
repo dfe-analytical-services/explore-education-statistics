@@ -192,7 +192,6 @@ const PublicationForm = ({
 
                 <div className={styles.publicationsList}>
                   <FormFieldRadioGroup<FormValues>
-                    id="publications"
                     legend={
                       <>
                         Select a publication

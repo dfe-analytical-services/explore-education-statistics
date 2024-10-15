@@ -2,7 +2,7 @@ import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import React from 'react';
 import Tabs from '@common/components/Tabs';
-import RelatedAside from '@common/components/RelatedAside';
+import RelatedContent from '@common/components/RelatedContent';
 import TabsSection from '@common/components/TabsSection';
 import NavBar from './components/PrototypeNavBar';
 import CreateMeta from './components/PrototypeMetaCreate';
@@ -16,7 +16,7 @@ const PrototypeMetadata = () => {
           <PageTitle title="An example publication" caption="Edit release" />
         </div>
         <div className="govuk-grid-column-one-third">
-          <RelatedAside>
+          <RelatedContent>
             <h2 className="govuk-heading-m">Help and guidance</h2>
             <ul className="govuk-list">
               <li>
@@ -25,7 +25,7 @@ const PrototypeMetadata = () => {
                 </a>
               </li>
             </ul>
-          </RelatedAside>
+          </RelatedContent>
         </div>
       </div>
 
