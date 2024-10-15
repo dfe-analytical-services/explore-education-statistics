@@ -16,32 +16,18 @@ describe('PublicationForm', () => {
       id: 'theme-1',
       title: 'Theme 1',
       summary: '',
-      topics: [
+      publications: [
         {
-          id: 'topic-1',
-          title: 'Topic 1',
-          summary: '',
-          publications: [
-            {
-              id: 'publication-1',
-              title: 'Publication 1',
-              slug: 'publication-slug-1',
-              isSuperseded: false,
-            },
-          ],
+          id: 'publication-1',
+          title: 'Publication 1',
+          slug: 'publication-slug-1',
+          isSuperseded: false,
         },
         {
-          id: 'topic-2',
-          title: 'Topic 2',
-          summary: '',
-          publications: [
-            {
-              id: 'publication-2',
-              title: 'Publication 2 find me',
-              slug: 'publication-slug-2',
-              isSuperseded: false,
-            },
-          ],
+          id: 'publication-2',
+          title: 'Publication 2 find me',
+          slug: 'publication-slug-2',
+          isSuperseded: false,
         },
       ],
     },
@@ -49,19 +35,12 @@ describe('PublicationForm', () => {
       id: 'theme-2',
       title: 'Theme 2',
       summary: '',
-      topics: [
+      publications: [
         {
-          id: 'topic-3',
-          title: 'Topic 3',
-          summary: '',
-          publications: [
-            {
-              id: 'publication-3',
-              title: 'Publication 3',
-              slug: 'publication-slug-3',
-              isSuperseded: false,
-            },
-          ],
+          id: 'publication-3',
+          title: 'Publication 3',
+          slug: 'publication-slug-3',
+          isSuperseded: false,
         },
       ],
     },
@@ -69,58 +48,30 @@ describe('PublicationForm', () => {
       id: 'theme-3',
       title: 'Theme 3',
       summary: '',
-      topics: [
+      publications: [
         {
-          id: 'topic-4',
-          title: 'Topic 4',
-          summary: '',
-          publications: [
-            {
-              id: 'publication-4',
-              title: 'Publication 4 find me',
-              slug: 'publication-slug-4',
-              isSuperseded: false,
-            },
-          ],
+          id: 'publication-4',
+          title: 'Publication 4 find me',
+          slug: 'publication-slug-4',
+          isSuperseded: false,
         },
         {
-          id: 'topic-5',
-          title: 'Topic 5',
-          summary: '',
-          publications: [
-            {
-              id: 'publication-5',
-              title: 'Publication 5',
-              slug: 'publication-slug-5',
-              isSuperseded: false,
-            },
-          ],
+          id: 'publication-5',
+          title: 'Publication 5',
+          slug: 'publication-slug-5',
+          isSuperseded: false,
         },
         {
-          id: 'topic-6',
-          title: 'Topic 6',
-          summary: '',
-          publications: [
-            {
-              id: 'publication-6',
-              title: 'Publication 6',
-              slug: 'publication-slug-6',
-              isSuperseded: false,
-            },
-          ],
+          id: 'publication-6',
+          title: 'Publication 6',
+          slug: 'publication-slug-6',
+          isSuperseded: false,
         },
         {
-          id: 'topic-7',
-          title: 'Topic 7',
-          summary: '',
-          publications: [
-            {
-              id: 'publication-7',
-              title: 'Publication 7',
-              slug: 'publication-slug-7',
-              isSuperseded: false,
-            },
-          ],
+          id: 'publication-7',
+          title: 'Publication 7',
+          slug: 'publication-slug-7',
+          isSuperseded: false,
         },
       ],
     },
@@ -128,45 +79,24 @@ describe('PublicationForm', () => {
       id: 'theme-4',
       title: 'Theme 4',
       summary: '',
-      topics: [
+      publications: [
         {
-          id: 'topic-8',
-          title: 'Topic 8',
-          summary: '',
-          publications: [
-            {
-              id: 'publication-8',
-              title: 'Publication 8',
-              slug: 'publication-slug-8',
-              isSuperseded: false,
-            },
-          ],
+          id: 'publication-8',
+          title: 'Publication 8',
+          slug: 'publication-slug-8',
+          isSuperseded: false,
         },
         {
-          id: 'topic-9',
-          title: 'Topic 9',
-          summary: '',
-          publications: [
-            {
-              id: 'publication-9',
-              title: 'Publication 9',
-              slug: 'publication-slug-9',
-              isSuperseded: false,
-            },
-          ],
+          id: 'publication-9',
+          title: 'Publication 9',
+          slug: 'publication-slug-9',
+          isSuperseded: false,
         },
         {
-          id: 'topic-10',
-          title: 'Topic 10',
-          summary: '',
-          publications: [
-            {
-              id: 'publication-10',
-              title: 'Publication 10',
-              slug: 'publication-slug-10',
-              isSuperseded: false,
-            },
-          ],
+          id: 'publication-10',
+          title: 'Publication 10',
+          slug: 'publication-slug-10',
+          isSuperseded: false,
         },
       ],
     },
@@ -176,30 +106,23 @@ describe('PublicationForm', () => {
     id: 'theme-5',
     title: 'Theme 5',
     summary: '',
-    topics: [
+    publications: [
       {
-        id: 'topic-11',
-        title: 'Topic 11',
-        summary: '',
-        publications: [
-          {
-            id: 'publication-11',
-            title: 'Publication 11',
-            slug: 'publication-slug-11',
-            isSuperseded: true,
-            supersededBy: {
-              id: 'superseding-publication',
-              slug: 'superseding-publication-slug',
-              title: 'Superseding publication',
-            },
-          },
-          {
-            id: 'publication-12',
-            title: 'Publication 12',
-            slug: 'publication-slug-12',
-            isSuperseded: false,
-          },
-        ],
+        id: 'publication-11',
+        title: 'Publication 11',
+        slug: 'publication-slug-11',
+        isSuperseded: true,
+        supersededBy: {
+          id: 'superseding-publication',
+          slug: 'superseding-publication-slug',
+          title: 'Superseding publication',
+        },
+      },
+      {
+        id: 'publication-12',
+        title: 'Publication 12',
+        slug: 'publication-slug-12',
+        isSuperseded: false,
       },
     ],
   };

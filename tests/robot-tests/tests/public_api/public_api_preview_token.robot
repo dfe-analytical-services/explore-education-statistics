@@ -23,7 +23,7 @@ ${PREVIEW_TOKEN_NAME}=      Test token
 
 *** Test Cases ***
 Create publication and release
-    user selects dashboard theme and topic if possible
+    user selects dashboard theme if possible
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
     user creates publication    ${PUBLICATION_NAME}

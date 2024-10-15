@@ -67,29 +67,12 @@ def user_deletes_theme_via_api(theme_id: str):
     assert resp.status_code == 204, f"Could not delete theme! Responded with {resp.status_code} and {resp.text}"
 
 
-def user_creates_topic_via_api(title: str, theme_id: str) -> str:
-    assert title
-
-    resp = admin_client.post(f"/api/topics", {"title": title, "themeId": theme_id})
-
-    assert resp.status_code == 200, f"Could not create topic! Responded with {resp.status_code} and {resp.text}"
-
-    return resp.json()["id"]
-
-
-def user_creates_test_publication_via_api(publication_name: str, topic_id: str = None):
-    if topic_id is not None:
-        chosen_topic_id = topic_id
-    else:
-        assert os.getenv("TEST_TOPIC_ID") is not None
-        chosen_topic_id = os.getenv("TEST_TOPIC_ID")
-
+def user_creates_test_publication_via_api(publication_name: str):
     response = admin_client.post(
         "/api/publications",
         {
             "title": publication_name,
             "summary": f"{publication_name} summary",
-            "topicId": chosen_topic_id,
             "themeId": os.getenv("TEST_THEME_ID"),
             "contact": {
                 "contactName": "UI test contact name",

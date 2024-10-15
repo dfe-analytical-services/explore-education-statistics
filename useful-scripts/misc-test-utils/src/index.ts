@@ -6,7 +6,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const start = async () => {
   const choices = [
     'create new release & publication',
-    'delete theme & topic',
+    'delete theme',
     'create new publication',
     'create new release',
     'publish a new release',

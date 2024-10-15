@@ -20,7 +20,7 @@ ${DATABLOCK_NAME}=      Dates data block name
 
 *** Test Cases ***
 Create publication
-    user selects dashboard theme and topic if possible
+    user selects dashboard theme if possible
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
     user creates publication    ${PUBLICATION_NAME}

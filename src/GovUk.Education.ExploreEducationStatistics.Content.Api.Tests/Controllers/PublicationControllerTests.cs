@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -11,6 +7,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -78,16 +78,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 {
                     new()
                     {
-                        Topics = new List<PublicationTreeTopicViewModel>
-                        {
+                        Publications =
+                        [
                             new()
-                            {
-                                Publications = new List<PublicationTreePublicationViewModel>
-                                {
-                                    new()
-                                }
-                            }
-                        }
+                        ]
                     }
                 });
 
@@ -99,9 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var theme = Assert.Single(publicationTree);
 
-            var topic = Assert.Single(theme.Topics);
-
-            Assert.Single(topic.Publications);
+            Assert.Single(theme.Publications);
         }
 
         [Fact]

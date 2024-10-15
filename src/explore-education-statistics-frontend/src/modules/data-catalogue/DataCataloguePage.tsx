@@ -108,9 +108,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
   });
 
   const selectedTheme = themes.find(theme => theme.id === themeId);
-  const publications = themes
-    .find(theme => theme.id === themeId)
-    ?.topics.flatMap(topic => topic.publications);
+  const publications = themes.find(theme => theme.id === themeId)?.publications;
   const selectedPublication = publications?.find(
     publication => publication.id === publicationId,
   );
@@ -171,8 +169,8 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
 
       const publicationSlug = themes
         .find(theme => theme.id === publicationThemeId)
-        ?.topics.flatMap(topic => topic.publications)
-        ?.find(publication => publication.id === publicationId)?.slug;
+        ?.publications?.find(publication => publication.id === publicationId)
+        ?.slug;
 
       const newParams = await getUpdatedQueryParams({
         filterType: 'publicationId',
@@ -638,7 +636,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
   // Redirect old slug based links to new format.
   if (publicationSlug) {
     const selectedPublication = themes
-      .flatMap(option => option.topics)
       .flatMap(option => option.publications)
       .find(option => option.slug === publicationSlug);
 
@@ -713,8 +710,6 @@ function getThemeForPublication({
   themes: Theme[];
 }) {
   return themes.find(theme =>
-    theme.topics
-      .flatMap(topic => topic.publications)
-      .find(pub => pub.id === publicationId),
+    theme.publications.find(pub => pub.id === publicationId),
   );
 }

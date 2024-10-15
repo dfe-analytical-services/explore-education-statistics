@@ -14,8 +14,6 @@ public record PublicationSaveRequest
 
     [Required] public Guid ThemeId { get; set; }
 
-    [Required] public Guid TopicId { get; set; }
-
     private string _slug = Empty;
 
     public string Slug

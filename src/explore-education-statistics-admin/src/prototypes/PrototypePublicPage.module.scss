@@ -6,6 +6,7 @@
   :global(.govuk-header__navigation) {
     display: none !important;
   }
+
   :global(.govuk-width-container) {
     @include govuk-media-query($from: 1260px) {
       max-width: 1220px;
@@ -32,13 +33,16 @@
   :global(.dfe-width-container--wide) {
     max-width: 90vw;
   }
+
   :global(.govuk-header__navigation) {
     display: none !important;
   }
+
   :global(.govuk-header__logotype::after) {
     display: none;
   }
 }
+
 .prototypeCardContainer {
   display: flex;
   justify-content: space-between;
@@ -50,9 +54,11 @@
   display: grid;
   grid-column-gap: 2rem;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+
   @include govuk-media-query($from: tablet) {
     grid-template-columns: 1fr 1fr;
   }
+
   /*@include govuk-media-query($from: 1280px) {
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }*/
@@ -61,6 +67,7 @@
     @include govuk-media-query($from: desktop) {
       grid-template-columns: 1fr 1fr 1fr;
     }
+
     @include govuk-media-query($from: 1280px) {
       grid-template-columns: 1fr 1fr 1fr;
     }
@@ -70,6 +77,7 @@
     @include govuk-media-query($from: desktop) {
       grid-template-columns: 1fr 1fr;
     }
+
     @include govuk-media-query($from: 1280px) {
       grid-template-columns: 1fr 1fr;
     }
@@ -81,13 +89,16 @@
   grid-gap: 1rem;
   grid-template-columns: 1fr;
   margin-bottom: 1rem;
+
   @include govuk-media-query($from: tablet) {
     grid-template-columns: 1fr 1fr;
   }
+
   @include govuk-media-query($from: 1280px) {
     grid-template-columns: 1fr 1fr 1fr;
   }
 }
+
 .prototypeCard {
   //background: govuk-colour('light-grey');
   //@function: 1px solid $govuk-border-colour;
@@ -101,6 +112,7 @@
     padding: 1.6rem;
   }
 }
+
 .prototypeDashboardCard {
   background: govuk-colour('light-grey');
   display: flex;
@@ -119,6 +131,7 @@
     margin-bottom: 0;
   }
 }
+
 .prototypeCardChevron {
   //background: govuk-colour('light-grey');
   //@function: 1px solid $govuk-border-colour;
@@ -128,6 +141,7 @@
   position: relative;
   //padding: 1rem;
 }
+
 .prototypeCardChevronOneThird {
   //background: govuk-colour('light-grey');
   //@function: 1px solid $govuk-border-colour;
@@ -137,15 +151,18 @@
   position: relative;
   //padding: 1rem;
 }
+
 .prototypeCardChevronOneHalf {
   border-top: 1px solid $govuk-border-colour;
   flex: 0 1 48%;
   padding: 1rem 1.5rem 1rem 0;
   position: relative;
 }
+
 .prototypeCardNoBorder {
   border: 0;
 }
+
 .prototypeCardWithButton {
   display: flex;
   flex-direction: column;
@@ -194,6 +211,7 @@
   justify-content: space-between;
   margin-left: 15px;
 }
+
 .prototypeDownloadContainer {
   display: flex;
   justify-content: space-between;
@@ -209,6 +227,7 @@
     min-width: 150px;
   }
 }
+
 .prototypeDownloadAll {
   align-items: center;
   display: flex;
@@ -254,18 +273,6 @@
     box-shadow: none;
     margin: 0;
     padding: 0.5rem;
-  }
-}
-
-.prototypeFilterTopic {
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  margin-left: 0;
-  &::before {
-    content: '❱';
-    display: block;
-    padding-right: 0.4rem;
   }
 }
 
@@ -473,6 +480,7 @@
 
 .stickyWidthOneQuarter {
   width: 25%;
+
   @include govuk-media-query($until: tablet) {
     flex: 1 0 100%;
   }
@@ -481,6 +489,7 @@
 .stickyWidthOneThird {
   width: 33.333%;
   padding-right: 2rem;
+
   @include govuk-media-query($until: tablet) {
     flex: 1 0 100%;
   }
@@ -495,6 +504,7 @@
     margin-right: 1rem;
     position: sticky;
   }
+
   @include govuk-media-query($until: tablet) {
     margin-bottom: 3rem;
   }
@@ -528,6 +538,7 @@
 
 .releaseNav {
   flex: 1 0 100%;
+
   @include govuk-media-query($from: desktop) {
     flex: 1 0 25%;
   }
@@ -536,6 +547,7 @@
 .releaseMainContent {
   flex: 1 0 100%;
   margin-top: 0.5rem;
+
   @include govuk-media-query($from: desktop) {
     flex: 1 0 75%;
   }
@@ -645,6 +657,7 @@
 
 html {
   scroll-padding-top: 1rem;
+
   @include govuk-media-query($until: tablet) {
     scroll-padding-top: 2.5rem;
   }
@@ -654,6 +667,7 @@ html {
   @include govuk-media-query($from: tablet) {
     display: none;
   }
+
   @include govuk-media-query($until: tablet) {
     background: govuk-colour('light-grey');
     padding: 0.2rem;
@@ -826,9 +840,11 @@ html {
 
 .prototypeMobileContents {
   margin-top: 1rem;
+
   :global(.govuk-body-s) {
     font-size: 1rem !important;
   }
+
   li {
     margin-bottom: 1rem;
   }

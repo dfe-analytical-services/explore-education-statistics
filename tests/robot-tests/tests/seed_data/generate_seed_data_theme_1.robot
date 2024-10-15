@@ -31,31 +31,21 @@ ${RELEASE_2_NAME}       ${EXCLUSIONS_PUBLICATION_TITLE} ${EXCLUSIONS_PUBLICATION
 
 
 *** Test Cases ***
-Create test theme and topic
+Create test theme
     ${THEME_ID}=    user creates theme via api
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     ...    Including absence, application and offers, capacity exclusion and special educational needs (SEN) statistics
-    ${TOPIC_1_ID}=    user creates topic via api    ${PUPIL_ABSENCE_TOPIC_TITLE}    ${THEME_ID}
-    ${TOPIC_2_ID}=    user creates topic via api    ${EXCLUSIONS_TOPIC_TITLE}    ${THEME_ID}
-    ${TOPIC_3_ID}=    user creates topic via api    ${SCHOOL_AND_PUPIL_NUMBERS_TOPIC_TITLE}    ${THEME_ID}
-    ${TOPIC_4_ID}=    user creates topic via api    ${SCHOOL_APPLICATIONS_TOPIC_TITLE}    ${THEME_ID}
     user reloads page
     Set Suite Variable    ${THEME_ID}
-    Set Suite Variable    ${TOPIC_1_ID}
-    Set Suite Variable    ${TOPIC_2_ID}
-    Set Suite Variable    ${TOPIC_3_ID}
-    Set Suite Variable    ${TOPIC_4_ID}
 
 Create ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ${PUBLICATION_ID}=    user creates test publication via api
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    ...    ${TOPIC_1_ID}
     Set Suite Variable    ${PUBLICATION_ID}
 
     user navigates to publication page from dashboard
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
 Add legacy releases to ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks link    Legacy releases
@@ -84,7 +74,6 @@ Create ${RELEASE_1_NAME} release
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ...    ${PUPIL_ABSENCE_RELEASE_NAME}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
 Add data files to ${RELEASE_1_NAME}
     user uploads subject and waits until complete
@@ -357,7 +346,6 @@ Amend ${RELEASE_1_NAME}
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ...    ${PUPIL_ABSENCE_RELEASE_NAME}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
     # Add a release note to the amendment.
     user clicks link    Content
@@ -380,7 +368,6 @@ Create methodology ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     user creates methodology for publication
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
 Update summary for ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     user edits methodology summary for publication
@@ -388,7 +375,6 @@ Update summary for ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ...    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
     user clicks link    Manage content
 
@@ -501,7 +487,6 @@ Approve ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ...    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
 Backdate ${PUPIL_ABSENCE_METHODOLOGY_TITLE} published date
     ${methodology_id}=    get methodology id from url
@@ -520,14 +505,12 @@ Give Analyst1 Contributor access to ${RELEASE_1_NAME}
 Create ${EXCLUSIONS_PUBLICATION_TITLE}
     ${PUBLICATION_ID}=    user creates test publication via api
     ...    ${EXCLUSIONS_PUBLICATION_TITLE}
-    ...    ${TOPIC_2_ID}
 
     Set Suite Variable    ${PUBLICATION_ID}
 
     user navigates to publication page from dashboard
     ...    ${EXCLUSIONS_PUBLICATION_TITLE}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    ...    ${EXCLUSIONS_TOPIC_TITLE}
 
 Add legacy releases to ${EXCLUSIONS_PUBLICATION_TITLE}
     user clicks link    Legacy releases
@@ -560,7 +543,6 @@ Create ${RELEASE_2_NAME} release
     ...    ${EXCLUSIONS_PUBLICATION_TITLE}
     ...    ${EXCLUSIONS_PUBLICATION_RELEASE_NAME}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    ...    ${EXCLUSIONS_TOPIC_TITLE}
 
 Add data files to ${RELEASE_2_NAME}
     user uploads subject and waits until complete
@@ -822,7 +804,6 @@ Create methodology ${EXCLUSIONS_METHODOLOGY_TITLE}
     user creates methodology for publication
     ...    ${EXCLUSIONS_PUBLICATION_TITLE}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    ...    ${EXCLUSIONS_TOPIC_TITLE}
 
 Update summary for ${EXCLUSIONS_METHODOLOGY_TITLE}
     user edits methodology summary for publication
@@ -830,7 +811,6 @@ Update summary for ${EXCLUSIONS_METHODOLOGY_TITLE}
     ...    ${EXCLUSIONS_PUBLICATION_TITLE}
     ...    ${EXCLUSIONS_METHODOLOGY_TITLE}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    ...    ${EXCLUSIONS_TOPIC_TITLE}
 
     user clicks link    Manage content
 
@@ -896,7 +876,6 @@ Approve ${EXCLUSIONS_METHODOLOGY_TITLE}
     ...    ${EXCLUSIONS_PUBLICATION_TITLE}
     ...    ${EXCLUSIONS_METHODOLOGY_TITLE}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    ...    ${EXCLUSIONS_TOPIC_TITLE}
 
 Backdate ${EXCLUSIONS_METHODOLOGY_TITLE} published date
     ${methodology_id}=    get methodology id from url

@@ -14,16 +14,15 @@ ${PUBLICATION_NAME}         UI tests - create publication %{RUN_IDENTIFIER}
 
 ${CREATED_THEME_ID}         ${EMPTY}
 ${CREATED_THEME_NAME}       UI test theme - create publication %{RUN_IDENTIFIER}
-${CREATED_TOPIC_NAME}       UI test topic - create publication %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***
-Go to Create publication page for "UI tests topic" topic
-    user selects dashboard theme and topic if possible
+Go to Create publication page for "UI tests theme" theme
+    user selects dashboard theme if possible
     user waits until page contains link    Create new publication
     user checks page does not contain button    ${PUBLICATION_NAME}
     user clicks link    Create new publication
-    user waits until page contains title caption    %{TEST_TOPIC_NAME}
+    user waits until page contains title caption    %{TEST_THEME_NAME}
     user waits until h1 is visible    Create new publication
 
 Enters contact details
@@ -67,9 +66,8 @@ Verify new publication's contact
     user checks summary list contains    Contact name    UI Tests Contact Name
     user checks summary list contains    Contact telephone    123456789
 
-Create new test theme and topic
+Create new test theme
     ${theme_id}=    user creates theme via api    ${CREATED_THEME_NAME}
-    ${topic_id}=    user creates topic via api    ${CREATED_TOPIC_NAME}    ${theme_id}
     set suite variable    ${CREATED_THEME_ID}    ${theme_id}
 
 Update publication's details
@@ -81,7 +79,6 @@ Update publication's details
     user enters text into element    id:publicationDetailsForm-title    ${PUBLICATION_NAME}
     user enters text into element    id:publicationDetailsForm-summary    ${PUBLICATION_NAME} summary updated
     user chooses select option    id:publicationDetailsForm-themeId    ${CREATED_THEME_NAME}
-    user chooses select option    id:publicationDetailsForm-topicId    ${CREATED_TOPIC_NAME}
 
     user clicks button    Update publication details
 
@@ -93,7 +90,6 @@ Verify publication details have been updated
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
     user checks summary list contains    Publication summary    ${PUBLICATION_NAME} summary updated
     user checks summary list contains    Theme    ${CREATED_THEME_NAME}
-    user checks summary list contains    Topic    ${CREATED_TOPIC_NAME}
     user checks summary list contains    Superseding publication    This publication is not archived
 
 Update publication's contact
@@ -121,7 +117,6 @@ Verify contact details have been updated
 
 Add a methodology
     user creates methodology for publication    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}
-    ...    ${CREATED_TOPIC_NAME}
 
 Verify new methodology is attached to publication
     user checks summary list contains    Title    ${PUBLICATION_NAME}

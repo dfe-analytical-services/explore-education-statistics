@@ -26,16 +26,15 @@ Force Tags          SeedDataGeneration    Local    Dev    PreProd
 
 
 *** Test Cases ***
-Create test theme and topic
+Create test theme
     ${THEME_ID}=    user creates theme via api    ${ROLE_PERMISSIONS_THEME_TITLE}
-    ${TOPIC_ID}=    user creates topic via api    ${ROLE_PERMISSIONS_TOPIC_TITLE}    ${THEME_ID}
     user reloads page
-    Set Suite Variable    ${TOPIC_ID}
+    Set Suite Variable    ${THEME_ID}
 
 Create new publications and published releases - for Publication Owner
     ${PUBLICATION_ID}=    user creates test publication via api
     ...    ${ROLE_PERMISSIONS_PUBLICATION_OWNER_PUBLICATION}
-    ...    ${TOPIC_ID}
+    ...    ${THEME_ID}
 
     user creates releases in all states for publication
     ...    ${PUBLICATION_ID}
@@ -47,7 +46,7 @@ Create new publications and published releases - for Publication Owner
 Create new publications and published releases - for Publication Approver
     ${PUBLICATION_ID}=    user creates test publication via api
     ...    ${ROLE_PERMISSIONS_PUBLICATION_APPROVER_PUBLICATION}
-    ...    ${TOPIC_ID}
+    ...    ${THEME_ID}
 
     user creates releases in all states for publication
     ...    ${PUBLICATION_ID}
@@ -59,7 +58,7 @@ Create new publications and published releases - for Publication Approver
 Create new publications and published releases - for Release Viewer
     ${PUBLICATION_ID}=    user creates test publication via api
     ...    ${ROLE_PERMISSIONS_RELEASE_VIEWER_PUBLICATION}
-    ...    ${TOPIC_ID}
+    ...    ${THEME_ID}
 
     user creates releases in all states for publication
     ...    ${PUBLICATION_ID}
@@ -72,7 +71,7 @@ Create new publications and published releases - for Release Viewer
 Create new publications and published releases - for Release Contributor
     ${PUBLICATION_ID}=    user creates test publication via api
     ...    ${ROLE_PERMISSIONS_RELEASE_CONTRIBUTOR_PUBLICATION}
-    ...    ${TOPIC_ID}
+    ...    ${THEME_ID}
 
     user creates releases in all states for publication
     ...    ${PUBLICATION_ID}
@@ -85,7 +84,7 @@ Create new publications and published releases - for Release Contributor
 Create new publications and published releases - for Release Approver
     ${PUBLICATION_ID}=    user creates test publication via api
     ...    ${ROLE_PERMISSIONS_RELEASE_APPROVER_PUBLICATION}
-    ...    ${TOPIC_ID}
+    ...    ${THEME_ID}
 
     user creates releases in all states for publication
     ...    ${PUBLICATION_ID}
@@ -106,25 +105,21 @@ user creates releases in all states for publication
     ...    ${PUBLICATION_ID}
     ...    ${SEED_DATA_THEME_2_PUBLICATION_NAME}
     ...    ${ROLE_PERMISSIONS_THEME_TITLE}
-    ...    ${ROLE_PERMISSIONS_TOPIC_TITLE}
 
     user creates a fully populated higher review release
     ...    ${PUBLICATION_ID}
     ...    ${SEED_DATA_THEME_2_PUBLICATION_NAME}
     ...    ${ROLE_PERMISSIONS_THEME_TITLE}
-    ...    ${ROLE_PERMISSIONS_TOPIC_TITLE}
 
     user creates a fully populated approved release
     ...    ${PUBLICATION_ID}
     ...    ${SEED_DATA_THEME_2_PUBLICATION_NAME}
     ...    ${ROLE_PERMISSIONS_THEME_TITLE}
-    ...    ${ROLE_PERMISSIONS_TOPIC_TITLE}
 
     user creates a fully populated published release
     ...    ${PUBLICATION_ID}
     ...    ${SEED_DATA_THEME_2_PUBLICATION_NAME}
     ...    ${ROLE_PERMISSIONS_THEME_TITLE}
-    ...    ${ROLE_PERMISSIONS_TOPIC_TITLE}
 
 user gives release access to all releases of publication to analyst
     [Arguments]

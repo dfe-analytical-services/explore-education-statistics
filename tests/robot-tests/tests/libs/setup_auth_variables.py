@@ -48,7 +48,7 @@ def setup_auth_variables(user, email, password, identity_provider, clear_existin
             authenticated = True
         else:
             authenticated = False
-            logger.warn("Found invalid authentication information in local files!")
+            logger.warning("Found invalid authentication information in local files!")
 
     if not authenticated:
         logger.info(f"Logging in to obtain {user} authentication information...")

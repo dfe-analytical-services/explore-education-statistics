@@ -16,11 +16,11 @@ public record PublicationCacheViewModel
 
     public PublicationSupersededByViewModel? SupersededBy { get; init; } = new();
 
-    public List<ReleaseVersionTitleViewModel> Releases { get; init; } = new();
+    public List<ReleaseVersionTitleViewModel> Releases { get; init; } = [];
 
-    public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; init; } = new();
+    public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; init; } = [];
 
-    public TopicViewModel Topic { get; init; } = null!;
+    public ThemeViewModel Theme { get; init; } = null!;
 
     public ContactViewModel Contact { get; init; } = null!;
 

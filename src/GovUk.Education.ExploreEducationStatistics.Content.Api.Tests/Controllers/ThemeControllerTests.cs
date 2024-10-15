@@ -1,13 +1,13 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -23,28 +23,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             {
                 Id = Guid.NewGuid(),
                 Title = "Publication title",
-                Topics = AsList(
-                    new AllMethodologiesTopicViewModel
+                Publications = AsList(
+                    new AllMethodologiesPublicationViewModel
                     {
                         Id = Guid.NewGuid(),
-                        Title = "Topic title",
-                        Publications = AsList(
-                            new AllMethodologiesPublicationViewModel
+                        Title = "Publication title",
+                        Methodologies = AsList(
+                            new MethodologyVersionSummaryViewModel
                             {
                                 Id = Guid.NewGuid(),
-                                Title = "Publication title",
-                                Methodologies = AsList(
-                                    new MethodologyVersionSummaryViewModel
-                                    {
-                                        Id = Guid.NewGuid(),
-                                        Slug = "methodology-slug",
-                                        Title = "Methodology title"
-                                    }
-                                )
+                                Slug = "methodology-slug",
+                                Title = "Methodology title"
                             }
                         )
-                    }
-                )
+                    })
             }
         };
 

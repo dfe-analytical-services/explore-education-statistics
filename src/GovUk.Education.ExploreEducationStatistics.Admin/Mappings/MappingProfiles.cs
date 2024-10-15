@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -11,6 +8,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
 using DataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockViewModel;
 using EmbedBlockLinkViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.EmbedBlockLinkViewModel;
@@ -27,7 +27,6 @@ using ReleaseNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Vi
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 using ThemeViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ThemeViewModel;
-using TopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.TopicViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
@@ -79,16 +78,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<MethodologyVersion, IdTitleViewModel>();
 
             CreateMap<Theme, IdTitleViewModel>();
-            CreateMap<Topic, IdTitleViewModel>();
             CreateMap<Publication, PublicationSummaryViewModel>();
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(
                     dest => dest.Theme,
-                    m => m.MapFrom(p => p.Topic.Theme));
+                    m => m.MapFrom(p => p.Theme));
             CreateMap<Publication, PublicationCreateViewModel>()
                 .ForMember(
                     dest => dest.Theme,
-                    m => m.MapFrom(p => p.Topic.Theme));
+                    m => m.MapFrom(p => p.Theme));
 
             CreateContentBlockMap();
             CreateMap<DataBlockCreateRequest, DataBlock>()
@@ -110,8 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<FeaturedTableCreateRequest, FeaturedTable>();
 
             CreateMap<Theme, ThemeViewModel>()
-                .ForMember(theme => theme.Topics, m => m.MapFrom(t => t.Topics.OrderBy(topic => topic.Title)));
-            CreateMap<Topic, TopicViewModel>();
+                .ForMember(theme => theme.Publications, m => m.MapFrom(t => t.Publications.OrderBy(publication => publication.Title)));
 
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
@@ -131,13 +128,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         Title = rv.Publication.Title,
                         Slug = rv.Publication.Slug,
                         Contact = rv.Publication.Contact,
-                        Topic = new ManageContentPageViewModel.TopicViewModel
-                        {
-                            Theme = new ManageContentPageViewModel.ThemeViewModel
-                            {
-                                Title = rv.Publication.Topic.Theme.Title
-                            }
-                        },
                         Releases = rv.Publication.ReleaseVersions
                             .FindAll(otherReleaseVersion => rv.Id != otherReleaseVersion.Id &&
                                                      IsLatestVersionOfRelease(rv.Publication.ReleaseVersions, otherReleaseVersion.Id))
@@ -171,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(rv =>
                         rv.PublishScheduled.HasValue
                             ? rv.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?) null));
+                            : (DateTime?)null));
 
             CreateMap<Update, ReleaseNoteViewModel>();
 

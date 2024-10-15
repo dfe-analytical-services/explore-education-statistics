@@ -16,8 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Summary { get; set; }
 
-        public List<Topic> Topics { get; set; }
-
         public List<Publication> Publications { get; set; }
     }
 }

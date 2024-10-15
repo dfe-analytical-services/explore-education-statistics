@@ -15,7 +15,6 @@ Force Tags          Admin    Local    Dev
 Import permissions test variables
     Set suite variable    ${PUBLICATION_NAME}    ${ROLE_PERMISSIONS_PUBLICATION_APPROVER_PUBLICATION}
     Set suite variable    ${THEME_NAME}    ${ROLE_PERMISSIONS_THEME_TITLE}
-    Set suite variable    ${TOPIC_NAME}    ${ROLE_PERMISSIONS_TOPIC_TITLE}
     Set suite variable    ${PUBLISHED_RELEASE_TYPE}    ${ROLE_PERMISSIONS_PUBLISHED_RELEASE_TYPE}
 
 Validates publication approver publication page is correct
@@ -36,15 +35,15 @@ Check cannot create a legacy release
 
 Check cannot create a Methodology for a Publication if they don't have Publication Owner role
     user goes to methodologies and checks cannot create methodologies for publication    ${PUBLICATION_NAME}
-    ...    ${THEME_NAME}    ${TOPIC_NAME}
+    ...    ${THEME_NAME}
 
 Check cannot edit content for published release
     user navigates to published release page from dashboard    ${PUBLICATION_NAME}
-    ...    ${PUBLISHED_RELEASE_TYPE}    ${THEME_NAME}    ${TOPIC_NAME}
+    ...    ${PUBLISHED_RELEASE_TYPE}    ${THEME_NAME}
     user cannot see edit controls for release content    ${PUBLICATION_NAME}
 
 Check cannot create an amendment of a published release
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}
     user cannot see the create amendment controls for release    ${PUBLISHED_RELEASE_TYPE}
 
 Check can see the readonly "Release access" section of the "Team access" page

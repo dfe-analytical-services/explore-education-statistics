@@ -1,13 +1,12 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -17,19 +16,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListPublicationsForUser()
         {
             var user = new User();
-            var topic = new Topic
-            {
-                Theme = new Theme(),
-            };
+            var theme = new Theme();
 
             var userReleaseRoles = new List<UserReleaseRole>();
             var userPublicationRoles = new List<UserPublicationRole>();
 
-            // Set up a publication and releases related to the topic that will be granted via different release roles
+            // Set up a publication and releases related to the theme that will be granted via different release roles
             var relatedPublication1 = new Publication
             {
                 Title = "Related publication 1",
-                Topic = topic,
+                Theme = theme,
             };
             userReleaseRoles.AddRange(new List<UserReleaseRole>
             {
@@ -46,27 +42,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             });
 
-            // Set up a publication and releases related to the topic that will be granted via the Publication
+            // Set up a publication and releases related to the theme that will be granted via the Publication
             // Owner role
             userPublicationRoles.Add(new UserPublicationRole
             {
                 Publication = new Publication
                 {
                     Title = "Related publication 2",
-                    Topic = topic,
+                    Theme = theme,
                 },
                 User = user,
                 Role = PublicationRole.Owner
             });
 
-            // Set up a publication and releases related to the topic that will be granted via the Publication
+            // Set up a publication and releases related to the theme that will be granted via the Publication
             // Approver role
             userPublicationRoles.Add(new UserPublicationRole
             {
                 Publication = new Publication
                 {
                     Title = "Related publication 3",
-                    Topic = topic,
+                    Theme = theme,
                 },
                 User = user,
                 Role = PublicationRole.Approver
@@ -77,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.Topics.AddAsync(topic);
+                await contentDbContext.Themes.AddAsync(theme);
                 await contentDbContext.Publications.AddAsync(relatedPublication1);
                 await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRoles);
                 await contentDbContext.UserPublicationRoles.AddRangeAsync(userPublicationRoles);
@@ -87,11 +83,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id, topic.Id);
+                var result = await service.ListPublicationsForUser(user.Id, theme.Id);
 
                 // Result should contain Related publication 1, Related publication 2 and Related publication 3.
                 // Related publication 4 is excluded because it's only granted via the PrereleaseViewer release role
-                // Unrelated publications are excluded since they are for different topics
+                // Unrelated publications are excluded since they are for different themes
                 Assert.Equal(3, result.Count);
 
                 Assert.Equal("Related publication 2", result[0].Title);
@@ -109,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListPublicationsForUser_NoTopicIdProvided()
+        public async Task ListPublicationsForUser_NoThemeIdProvided()
         {
             var user = new User();
 
@@ -120,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Publication Owner publication",
-                        Topic = new Topic { Theme = new Theme(), },
+                        Theme = new Theme(),
                     },
                     User = user,
                     Role = PublicationRole.Owner,
@@ -130,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Publication Approver publication",
-                        Topic = new Topic { Theme = new Theme(), },
+                        Theme = new Theme(),
                     },
                     User = user,
                     Role = PublicationRole.Approver,
@@ -140,10 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Publication Owner publication 2",
-                        Topic = new Topic
-                        {
-                            Theme = new Theme(),
-                        },
+                        Theme = new Theme(),
                     },
                     User = user,
                     Role = PublicationRole.Owner,
@@ -161,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Publication = new Publication
                         {
                             Title = "Release Contributor publication",
-                            Topic = new Topic { Theme = new Theme(), },
+                            Theme = new Theme(),
                         },
                     },
                     User = user,
@@ -176,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Publication = new Publication
                         {
                             Title = "Release Viewer publication",
-                            Topic = new Topic { Theme = new Theme(), },
+                            Theme = new Theme(),
                         },
                     },
                     User = user,
@@ -191,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Publication = new Publication
                         {
                             Title = "Release PrereleaseViewer publication",
-                            Topic = new Topic { Theme = new Theme(), },
+                            Theme = new Theme(),
                         }
                     },
                     User = user,
@@ -206,10 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Publication = new Publication
                         {
                             Title = "Release Contributor publication 2",
-                            Topic = new Topic
-                            {
-                                Theme = new Theme(),
-                            },
+                            Theme = new Theme(),
                         }
                     },
                     User = user,
@@ -229,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id, topicId: null);
+                var result = await service.ListPublicationsForUser(user.Id, themeId: null);
 
                 // Result should contain all publications except the one associated with the
                 // Release.PrereleaseViewer role
@@ -258,12 +248,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListPublicationsForUser_NoPublicationsForTopic()
+        public async Task ListPublicationsForUser_NoPublicationsForTheme()
         {
             var user = new User();
-            var topic = new Topic();
+            var theme = new Theme();
 
-            // Set up a publication and release unrelated to the topic that will be granted via a release role
+            // Set up a publication and release unrelated to the theme that will be granted via a release role
 
             var userReleaseRole = new UserReleaseRole
             {
@@ -274,29 +264,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Unrelated publication 1",
-                        Topic = new Topic()
+                        Theme = new Theme(),
                     }
                 },
                 User = user,
                 Role = ReleaseRole.Contributor
             };
 
-            // Set up publication and release unrelated to the topic that will be granted via a publication role
+            // Set up publication and release unrelated to the theme that will be granted via a publication role
 
             var userPublicationRole = new UserPublicationRole
             {
                 Publication = new Publication
                 {
                     Title = "Unrelated publication 2",
-                    ReleaseVersions = new List<ReleaseVersion>
-                    {
+                    ReleaseVersions =
+                    [
                         new()
                         {
                             ReleaseName = "2012",
                             TimePeriodCoverage = AcademicYear
                         }
-                    },
-                    Topic = new Topic()
+                    ],
+                    Theme = new Theme()
                 },
                 User = user,
                 Role = PublicationRole.Owner
@@ -307,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.Topics.AddAsync(topic);
+                await contentDbContext.Themes.AddAsync(theme);
                 await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
                 await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
                 await contentDbContext.SaveChangesAsync();
@@ -316,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id, topic.Id);
+                var result = await service.ListPublicationsForUser(user.Id, theme.Id);
 
                 Assert.Empty(result);
             }
@@ -326,9 +316,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListPublicationsForUser_NoPublicationsForUser()
         {
             var user = new User();
-            var topic = new Topic();
+            var theme = new Theme();
 
-            // Set up a publication and release related to the topic that is granted via a release role but not for this user
+            // Set up a publication and release related to the theme that is granted via a release role but not for this user
 
             var userReleaseRole = new UserReleaseRole
             {
@@ -339,31 +329,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Related publication 1",
-                        Topic = topic
+                        Theme = theme,
                     }
                 },
-                UserId = new Guid(),
+                UserId = Guid.NewGuid(),
                 Role = ReleaseRole.Contributor
             };
 
-            // Set up a publication and release related to the topic that is granted via a publication role but not for this user
+            // Set up a publication and release related to the theme that is granted via a publication role but not for this user
 
             var userPublicationRole = new UserPublicationRole
             {
                 Publication = new Publication
                 {
                     Title = "Related publication 2",
-                    ReleaseVersions = new List<ReleaseVersion>
-                    {
+                    ReleaseVersions =
+                    [
                         new()
                         {
                             ReleaseName = "2012",
                             TimePeriodCoverage = AcademicYear
                         }
-                    },
-                    Topic = topic
+                    ],
+                    Theme = theme,
                 },
-                UserId = new Guid(),
+                UserId = Guid.NewGuid(),
                 Role = PublicationRole.Owner
             };
 
@@ -372,7 +362,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.Topics.AddAsync(topic);
+                await contentDbContext.Themes.AddAsync(theme);
                 await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
                 await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
                 await contentDbContext.SaveChangesAsync();
@@ -381,7 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id, topic.Id);
+                var result = await service.ListPublicationsForUser(user.Id, theme.Id);
 
                 Assert.Empty(result);
             }
@@ -391,14 +381,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListPublicationsForUser_PublicationGrantedByBothPublicationAndReleaseRoles()
         {
             var user = new User();
-            var topic = new Topic
-            {
-                Theme = new Theme(),
-            };
+            var theme = new Theme();
 
             // Check a Publication granted via the owner role is only returned once where it has a Release
             // also granted with roles to the same user
-            // Set up a publication and releases related to the topic that will be granted via different roles
+            // Set up a publication and releases related to the theme that will be granted via different roles
 
             var userReleaseRoles = new List<UserReleaseRole>();
             var userPublicationRoles = new List<UserPublicationRole>();
@@ -406,7 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Publication",
-                Topic = topic,
+                Theme = theme,
             };
 
             var releaseVersion = new ReleaseVersion
@@ -444,7 +431,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 contentDbContext.Users.Add(user);
-                contentDbContext.Topics.Add(topic);
+                contentDbContext.Themes.Add(theme);
                 contentDbContext.Publications.Add(publication);
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
@@ -455,7 +442,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var publications = await service.ListPublicationsForUser(user.Id, topic.Id);
+                var publications = await service.ListPublicationsForUser(user.Id, theme.Id);
 
                 var resultPublication = Assert.Single(publications);
                 Assert.Equal("Publication", resultPublication.Title);
@@ -466,35 +453,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task QueryPublicationsForTopic()
+        public async Task QueryPublicationsForTheme()
         {
-            var topic1 = new Topic
+            var theme1 = new Theme
             {
-                Title = "Topic 1",
-                Theme = new Theme(),
-                Publications = ListOf(
-                    new Publication { Title = "Topic 1 Publication 1", },
-                    new Publication { Title = "Topic 1 Publication 2", }),
+                Title = "Theme 1",
+                Publications = [
+                    new Publication { Title = "Theme 1 Publication 1", },
+                    new Publication { Title = "Theme 1 Publication 2", }],
             };
 
-            var topic2 = new Topic
+            var theme2 = new Theme
             {
-                Title = "Topic 2",
-                Theme = new Theme(),
-                Publications = ListOf(new Publication { Title = "Topic 2 Publication 1" }),
+                Title = "Theme 2",
+                Publications = [new() { Title = "Theme 2 Publication 1" }],
             };
 
-            var topic3 = new Topic
+            var theme3 = new Theme
             {
-                Title = "Topic 3",
-                Theme = new Theme(),
-                Publications = ListOf(new Publication { Title = "Topic 3 Publication 1" }),
+                Title = "Theme 3",
+                Publications = [new() { Title = "Theme 3 Publication 1" }],
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Topics.AddRangeAsync(topic1, topic2, topic3);
+                await contentDbContext.Themes.AddRangeAsync(theme1, theme2, theme3);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -502,60 +486,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = new PublicationRepository(contentDbContext);
                 var publications = await publicationService
-                    .QueryPublicationsForTopic(topic1.Id)
+                    .QueryPublicationsForTheme(theme1.Id)
                     .ToListAsync();
 
                 Assert.Equal(2, publications.Count);
-                Assert.Equal(topic1.Publications[0].Title, publications[0].Title);
-                Assert.Equal(topic1.Publications[1].Title, publications[1].Title);
-            }
-        }
-
-        [Fact]
-        public async Task QueryPublicationsForTopic_NoTopic()
-        {
-            var topic1 = new Topic
-            {
-                Title = "Topic 1",
-                Theme = new Theme(),
-                Publications = ListOf(
-                    new Publication { Title = "Topic 1 Publication 1", },
-                    new Publication { Title = "Topic 1 Publication 2", }),
-            };
-
-            var topic2 = new Topic
-            {
-                Title = "Topic 2",
-                Theme = new Theme(),
-                Publications = ListOf(new Publication { Title = "Topic 2 Publication 1" }),
-            };
-
-            var topic3 = new Topic
-            {
-                Title = "Topic 3",
-                Theme = new Theme(),
-                Publications = ListOf(new Publication { Title = "Topic 3 Publication 1" }),
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Topics.AddRangeAsync(topic1, topic2, topic3);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var publicationService = new PublicationRepository(contentDbContext);
-                var publications = await publicationService
-                    .QueryPublicationsForTopic()
-                    .ToListAsync();
-
-                Assert.Equal(4, publications.Count);
-                Assert.Equal(topic1.Publications[0].Title, publications[0].Title);
-                Assert.Equal(topic1.Publications[1].Title, publications[1].Title);
-                Assert.Equal(topic2.Publications[0].Title, publications[2].Title);
-                Assert.Equal(topic3.Publications[0].Title, publications[3].Title);
+                Assert.Equal(theme1.Publications[0].Title, publications[0].Title);
+                Assert.Equal(theme1.Publications[1].Title, publications[1].Title);
             }
         }
     }

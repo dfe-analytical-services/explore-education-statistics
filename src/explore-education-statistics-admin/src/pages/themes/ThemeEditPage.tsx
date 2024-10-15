@@ -28,7 +28,7 @@ const ThemeEditPage = ({
     <Page
       title="Edit theme"
       breadcrumbs={[
-        { name: 'Manage themes and topics', link: themesPath },
+        { name: 'Manage themes', link: themesPath },
         { name: 'Edit theme' },
       ]}
     >
