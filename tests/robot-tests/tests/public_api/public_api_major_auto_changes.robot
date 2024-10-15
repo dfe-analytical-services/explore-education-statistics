@@ -17,8 +17,8 @@ Test Teardown       Run Keyword If Test Failed    record test failure
 ${PUBLICATION_NAME}=    UI tests - Public API - major auto changes %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=      Financial year 3000-01
 ${RELEASE_2_NAME}=      Academic year 3010/11
-${SUBJECT_1_NAME}=      UI tests - Public API - major auto changes - subject 1 - %{RUN_IDENTIFIER}
-${SUBJECT_2_NAME}=      UI tests - Public API - major auto changes - subject 2 - %{RUN_IDENTIFIER}
+${SUBJECT_1_NAME}=      ${PUBLICATION_NAME} - Subject 1
+${SUBJECT_2_NAME}=      ${PUBLICATION_NAME} - Subject 2
 
 
 *** Test Cases ***

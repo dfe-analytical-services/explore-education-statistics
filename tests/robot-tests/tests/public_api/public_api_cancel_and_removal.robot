@@ -15,8 +15,8 @@ Test Setup          fail test fast if required
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - Public API - cancel and removal %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial year 3000-01
-${SUBJECT_NAME_1}=      UI test subject 1
-${SUBJECT_NAME_2}=      UI test subject 2
+${SUBJECT_NAME_1}=      ${PUBLICATION_NAME} - Subject 1
+${SUBJECT_NAME_2}=      ${PUBLICATION_NAME} - Subject 2
 
 
 *** Test Cases ***
@@ -55,7 +55,7 @@ Add data guidance to subjects
 Save data guidance
     user clicks button    Save guidance
 
-User clicks on 'Cancel' button while after selecting 1st API dataset
+User clicks on 'Cancel' button while after selecting 1st API data set
     user scrolls to the top of the page
     user clicks link    API data sets
     user waits until h2 is visible    API data sets
@@ -67,53 +67,51 @@ User clicks on 'Cancel' button while after selecting 1st API dataset
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
-User creates 2nd API dataset
+User creates 2nd API data set
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_NAME_2}
+    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_2}
     user clicks button    Confirm new API data set
 
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
-User waits until the 2nd API dataset status changes to 'Ready'
+User waits until the 2nd API data set status changes to 'Ready'
     user waits until h3 is visible    Draft version details
     user waits until draft API data set status contains    Ready
 
-Verify the contents inside the 'Draft API datasets' table
+Verify the contents inside the 'Draft API data sets' table
     user clicks link    Back to API data sets
     user waits until h3 is visible    Draft API data sets
 
-    user checks table column heading contains    1    1    Draft version
-    ...    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table column heading contains    1    2    Name    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table column heading contains    1    3    Status    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table column heading contains    1    4    Actions    xpath://table[@data-testid='draft-api-data-sets']
+    user checks table column heading contains    1    1    Draft version    testid:draft-api-data-sets
+    user checks table column heading contains    1    2    Name    testid:draft-api-data-sets
+    user checks table column heading contains    1    3    Status    testid:draft-api-data-sets
+    user checks table column heading contains    1    4    Actions    testid:draft-api-data-sets
 
-    user checks table cell contains    1    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table cell contains    1    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
+    user checks table cell contains    1    1    v1.0    testid:draft-api-data-sets
+    user checks table cell contains    1    3    Ready    testid:draft-api-data-sets
 
-Click on 'cancel' button while attempting to remove draft API dataset
-    user clicks button in table cell    1    4    Remove draft    xpath://table[@data-testid='draft-api-data-sets']
+Click on 'cancel' button while attempting to remove draft API data set
+    user clicks button in table cell    1    4    Remove draft    testid:draft-api-data-sets
 
     ${modal}=    user waits until modal is visible    Remove this draft API data set version
     user clicks button    Cancel    ${modal}
     user waits until h2 is visible    API data sets
 
-Verify the contents inside the 'Draft API datasets' table
+Verify the contents inside the 'Draft API data sets' table
     user waits until h3 is visible    Draft API data sets
 
-    user checks table column heading contains    1    1    Draft version
-    ...    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table column heading contains    1    2    Name    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table column heading contains    1    3    Status    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table column heading contains    1    4    Actions    xpath://table[@data-testid='draft-api-data-sets']
+    user checks table column heading contains    1    1    Draft version    testid:draft-api-data-sets
+    user checks table column heading contains    1    2    Name    testid:draft-api-data-sets
+    user checks table column heading contains    1    3    Status    testid:draft-api-data-sets
+    user checks table column heading contains    1    4    Actions    testid:draft-api-data-sets
 
-    user checks table cell contains    1    1    v1.0    xpath://table[@data-testid='draft-api-data-sets']
-    user checks table cell contains    1    3    Ready    xpath://table[@data-testid='draft-api-data-sets']
+    user checks table cell contains    1    1    v1.0    testid:draft-api-data-sets
+    user checks table cell contains    1    3    Ready    testid:draft-api-data-sets
 
-Remove draft API dataset
-    user clicks button in table cell    1    4    Remove draft    xpath://table[@data-testid='draft-api-data-sets']
+Remove draft API data set
+    user clicks button in table cell    1    4    Remove draft    testid:draft-api-data-sets
 
     ${modal}=    user waits until modal is visible    Remove this draft API data set version
     user clicks button    Remove this API data set version
@@ -121,16 +119,16 @@ Remove draft API dataset
     user waits until modal is not visible    Remove this draft API data set version
     user waits until h2 is visible    API data sets
 
-User creates 1st API dataset again
+User creates API data set again
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_NAME_1}
+    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_1}
     user clicks button    Confirm new API data set
 
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
-User waits until the 1st API dataset status changes to 'Ready'
+User waits until the 1st API data set status changes to 'Ready'
     user waits until h3 is visible    Draft version details
     user waits until draft API data set status contains    Ready
 
@@ -149,7 +147,7 @@ Verify newly published release is on Find Statistics page
 User navigates to data catalogue page
     user navigates to data catalogue page on public frontend
 
-Search with 1st API dataset
+Search for API data set
     user clicks element    id:searchForm-search
     user presses keys    ${PUBLICATION_NAME}
     user clicks radio    API data sets only
