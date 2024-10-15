@@ -1391,7 +1391,11 @@ public abstract class ReleaseServiceTests
             {
                 ReleaseSeries =
                 [
-                    new() { Id = Guid.NewGuid(), ReleaseId = release.Id }
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseId = release.Id
+                    }
                 ]
             };
 
@@ -1471,14 +1475,17 @@ public abstract class ReleaseServiceTests
             var cacheService = new Mock<IBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
 
+            var forceDeleteFiles = false;
+            var softDeleteOrphanedSubjects = true;
+            
             releaseDataFilesService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
+                mock.DeleteAll(releaseVersion.Id, forceDeleteFiles)).ReturnsAsync(Unit.Instance);
 
             releaseFileService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
+                mock.DeleteAll(releaseVersion.Id, forceDeleteFiles)).ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository.Setup(mock =>
-                mock.DeleteAllReleaseSubjects(releaseVersion.Id, true)).Returns(Task.CompletedTask);
+                mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects)).Returns(Task.CompletedTask);
 
             cacheService
                 .Setup(mock => mock.DeleteCacheFolderAsync(
@@ -1504,11 +1511,15 @@ public abstract class ReleaseServiceTests
 
                 // Assert
                 releaseDataFilesService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, false),
+                        mock.DeleteAll(releaseVersion.Id, forceDeleteFiles),
                     Times.Once);
 
                 releaseFileService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, false),
+                        mock.DeleteAll(releaseVersion.Id, forceDeleteFiles),
+                    Times.Once);
+
+                releaseSubjectRepository.Verify(mock =>
+                        mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects),
                     Times.Once);
 
                 VerifyAllMocks(cacheService,
@@ -1653,7 +1664,8 @@ public abstract class ReleaseServiceTests
 
                 // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
                 var unrelatedMethodology =
-                    await context.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithAnotherRelease.Id);
+                    await context.MethodologyVersions.SingleAsync(
+                        m => m.Id == methodologyScheduledWithAnotherRelease.Id);
                 Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
                 Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
                     unrelatedMethodology.ScheduledWithReleaseVersionId);
@@ -1754,7 +1766,11 @@ public abstract class ReleaseServiceTests
             {
                 ReleaseSeries =
                 [
-                    new() { Id = Guid.NewGuid(), ReleaseId = release.Id }
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseId = release.Id
+                    }
                 ]
             };
 
@@ -1834,14 +1850,18 @@ public abstract class ReleaseServiceTests
             var cacheService = new Mock<IBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
 
+            var forceDeleteFiles = true;
+            var softDeleteOrphanedSubjects = false;
+
             releaseDataFilesService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, true)).ReturnsAsync(Unit.Instance);
+                mock.DeleteAll(releaseVersion.Id, forceDeleteFiles)).ReturnsAsync(Unit.Instance);
 
             releaseFileService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, true)).ReturnsAsync(Unit.Instance);
+                mock.DeleteAll(releaseVersion.Id, forceDeleteFiles)).ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository.Setup(mock =>
-                mock.DeleteAllReleaseSubjects(releaseVersion.Id, true)).Returns(Task.CompletedTask);
+                    mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects))
+                .Returns(Task.CompletedTask);
 
             cacheService
                 .Setup(mock => mock.DeleteCacheFolderAsync(
@@ -1867,11 +1887,15 @@ public abstract class ReleaseServiceTests
 
                 // Assert
                 releaseDataFilesService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, true),
+                        mock.DeleteAll(releaseVersion.Id, forceDeleteFiles),
                     Times.Once);
 
                 releaseFileService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, true),
+                        mock.DeleteAll(releaseVersion.Id, forceDeleteFiles),
+                    Times.Once);
+
+                releaseSubjectRepository.Verify(mock =>
+                        mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects),
                     Times.Once);
 
                 VerifyAllMocks(cacheService,
@@ -1918,7 +1942,7 @@ public abstract class ReleaseServiceTests
                     .FirstAsync(r => r.Id == anotherUserReleaseInvite.Id);
 
                 Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
-                
+
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
                 var retrievedMethodologyVersion =
@@ -1933,7 +1957,8 @@ public abstract class ReleaseServiceTests
 
                 // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
                 var unrelatedMethodology =
-                    await context.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithAnotherRelease.Id);
+                    await context.MethodologyVersions.SingleAsync(
+                        m => m.Id == methodologyScheduledWithAnotherRelease.Id);
                 Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
                 Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
                     unrelatedMethodology.ScheduledWithReleaseVersionId);
