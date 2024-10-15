@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -11,6 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
 {
@@ -45,10 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public void UpdateRelatedInformationAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                    service.UpdateRelatedInformationAsync(
-                        releaseVersionId: _releaseVersion.Id,
-                        relatedInformationId: Guid.NewGuid(),
-                        new CreateUpdateLinkRequest()),
+                    service.UpdateRelatedInformation(
+                        _releaseVersion.Id,
+                        []),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
