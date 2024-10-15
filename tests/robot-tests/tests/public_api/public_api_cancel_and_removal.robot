@@ -62,8 +62,7 @@ User clicks on 'Cancel' button while after selecting 1st API dataset
 
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    id:apiDataSetCreateForm-releaseFileId    ${SUBJECT_NAME_1}
-    user clicks button by index    Cancel    3
+    user clicks button    Cancel    ${modal}
 
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
@@ -98,7 +97,7 @@ Click on 'cancel' button while attempting to remove draft API dataset
     user clicks button in table cell    1    4    Remove draft    xpath://table[@data-testid='draft-api-data-sets']
 
     ${modal}=    user waits until modal is visible    Remove this draft API data set version
-    user clicks button by index    Cancel    3
+    user clicks button    Cancel    ${modal}
     user waits until h2 is visible    API data sets
 
 Verify the contents inside the 'Draft API datasets' table

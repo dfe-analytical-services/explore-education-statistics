@@ -503,12 +503,6 @@ user clicks link
     [Arguments]    ${text}    ${parent}=css:body
     user clicks element    link:${text}    ${parent}
 
-user clicks link by index
-    [Arguments]    ${text}    ${index}=1    ${parent}=css:body
-    ${xpath}=    set variable    (//a[text()='${text}'])[${index}]
-    ${button}=    get webelement    ${xpath}
-    user clicks element    ${button}    ${parent}
-
 user clicks link containing text
     [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${False}
     ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
@@ -518,13 +512,6 @@ user clicks button
     [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${False}
     ${button}=    user gets button element    ${text}    ${parent}    exact_match=${exact_match}
     user clicks element    ${button}
-
-user clicks button by index
-    [Arguments]    ${text}    ${index}=1    ${parent}=css:body    ${exact_match}=${False}
-    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
-    ${xpath}=    set variable    (//button[${text_matcher}])[${index}]
-    ${button}=    get webelement    ${xpath}
-    user clicks element    ${button}    ${parent}
 
 user waits until button is clickable
     [Arguments]    ${button_text}

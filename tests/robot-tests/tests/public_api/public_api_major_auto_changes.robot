@@ -167,7 +167,7 @@ Confirm finalization of this API data set version
     user waits until page contains    Draft API data set version is ready to be published
 
 User navigates to 'changelog and guidance notes' page and update relevant details in it
-    user clicks link by index    View changelog and guidance notes    1
+    user clicks link    View changelog and guidance notes    id:draft-version-summary
     user waits until page contains    API data set changelog
 
     user enters text into element    name:notes
@@ -178,7 +178,7 @@ User navigates to 'changelog and guidance notes' page and update relevant detail
     user clicks link    Back to API data set details
 
 User clicks on 'View preview token log' link inside the 'Draft version details' section
-    user clicks link by index    View changelog and guidance notes    2
+    user clicks link    View changelog and guidance notes    id:draft-version-summary
 
 Validate the contents in the 'API data set changelog' page.
     user waits until page contains    API data set changelog
