@@ -122,6 +122,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task DeleteTestRelease()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_releaseVersion, CanDeleteTestRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseService(userService.Object);
+                        return service.DeleteTestReleaseVersion(_releaseVersion.Id);
+                    }
+                );
+        }
+        
+        [Fact]
         public async Task ListReleasesWithStatuses_CanViewAllReleases()
         {
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>();

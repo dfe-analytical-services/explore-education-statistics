@@ -255,6 +255,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanDeleteSpecificRelease);
         }
 
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanDeleteTestReleaseVersion(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
+        {
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanDeleteTestRelease);
+        }
+
         public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewReleaseVersionStatusHistory(
             this IUserService userService,
             ReleaseVersion releaseVersion)
