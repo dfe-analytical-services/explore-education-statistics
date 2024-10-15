@@ -220,6 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
                     forceDeleteFiles: false,
+                    softDeleteOrphanedSubjects: true,
                     cancellationToken));
         }
 
@@ -233,12 +234,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
                     forceDeleteFiles: true,
+                    softDeleteOrphanedSubjects: false,
                     cancellationToken));
         }
 
         private async Task<Either<ActionResult, Unit>> DoDeleteReleaseVersion(
             ReleaseVersion releaseVersion,
             bool forceDeleteFiles = false,
+            bool softDeleteOrphanedSubjects = false,
             CancellationToken cancellationToken = default)
         {
             return await _processorClient
@@ -268,7 +271,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.SaveChangesAsync(cancellationToken);
 
                     // TODO: This may be redundant (investigate as part of EES-1295)
-                    await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseVersionId: releaseVersion.Id);
+                    await _releaseSubjectRepository.DeleteAllReleaseSubjects(
+                        releaseVersionId: releaseVersion.Id,
+                        softDeleteOrphanedSubjects: softDeleteOrphanedSubjects);
                 });
         }
 
