@@ -618,12 +618,15 @@ user puts release into draft
     user checks summary list contains    Scheduled release    ${expected_scheduled_release_date}
     user checks summary list contains    Next release expected    ${expected_next_release_date}
 
-user puts release into higher level review
+user edits release status
     user clicks link    Sign off
     user waits until page finishes loading
     user waits until h2 is visible    Sign off    %{WAIT_SMALL}
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
+
+user puts release into higher level review
+    user edits release status
     user clicks radio    Ready for higher review (this will notify approvers)
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Ready for higher review
     user clicks button    Update status
@@ -637,14 +640,7 @@ user approves release for scheduled publication
     ...    ${next_release_month}=01
     ...    ${next_release_year}=2200
     ...    ${update_amendment_published_date}=${False}
-    user clicks link    Sign off
-    user waits until page finishes loading
-    user waits until h2 is visible    Sign off    %{WAIT_SMALL}
-    user waits until page contains button    Edit release status    %{WAIT_SMALL}
-
-    user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
-
+    user edits release status
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
     IF    ${update_amendment_published_date}
@@ -1000,3 +996,28 @@ user creates legacy release
     user clicks button    Save legacy release
     user waits until page finishes loading
     user waits until page contains button    Create legacy release
+
+user checks checklist warnings contains
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-warnings
+    user waits until element contains    testid:releaseChecklist-warnings    ${text}
+
+user checks checklist warnings contains link
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-warnings
+    user waits until parent contains element    testid:releaseChecklist-warnings    link:${text}
+
+user checks checklist warnings does not contain link
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-warnings
+    user waits until parent does not contain element    testid:releaseChecklist-warnings    link:${text}
+
+user checks checklist errors contains
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-errors
+    user waits until element contains    testid:releaseChecklist-errors    ${text}
+
+user checks checklist errors contains link
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-errors
+    user waits until parent contains element    testid:releaseChecklist-errors    link:${text}
