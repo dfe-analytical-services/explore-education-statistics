@@ -110,17 +110,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseVersion)
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(releaseVersion => _mapper
-                    .Map<ReleaseViewModel>(releaseVersion) with
-                {
-                    PreReleaseUsersOrInvitesAdded = _context
-                            .UserReleaseRoles
-                            .Any(role => role.ReleaseVersionId == releaseVersionId
-                                         && role.Role == ReleaseRole.PrereleaseViewer) ||
-                            _context
-                            .UserReleaseInvites
-                            .Any(role => role.ReleaseVersionId == releaseVersionId
-                                         && role.Role == ReleaseRole.PrereleaseViewer)
-                });
+                        .Map<ReleaseViewModel>(releaseVersion) with
+                    {
+                        PreReleaseUsersOrInvitesAdded = _context
+                                                            .UserReleaseRoles
+                                                            .Any(role => role.ReleaseVersionId == releaseVersionId
+                                                                         && role.Role ==
+                                                                         ReleaseRole.PrereleaseViewer) ||
+                                                        _context
+                                                            .UserReleaseInvites
+                                                            .Any(role => role.ReleaseVersionId == releaseVersionId
+                                                                         && role.Role == ReleaseRole.PrereleaseViewer)
+                    });
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
@@ -216,7 +217,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
-                .OnSuccess(releaseVersion => DoDeleteReleaseVersion(releaseVersion, cancellationToken));
+                .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
+                    releaseVersion: releaseVersion,
+                    forceDeleteFiles: false,
+                    cancellationToken));
         }
 
         public Task<Either<ActionResult, Unit>> DeleteTestReleaseVersion(
@@ -226,11 +230,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanDeleteTestReleaseVersion)
-                .OnSuccess(releaseVersion => DoDeleteReleaseVersion(releaseVersion, cancellationToken));
+                .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
+                    releaseVersion: releaseVersion,
+                    forceDeleteFiles: true,
+                    cancellationToken));
         }
 
         private async Task<Either<ActionResult, Unit>> DoDeleteReleaseVersion(
             ReleaseVersion releaseVersion,
+            bool forceDeleteFiles = false,
             CancellationToken cancellationToken = default)
         {
             return await _processorClient
@@ -238,8 +246,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(async _ =>
                     await _cacheService.DeleteCacheFolderAsync(
                         new PrivateReleaseContentFolderCacheKey(releaseVersion.Id)))
-                .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseVersion.Id))
-                .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseVersion.Id))
+                .OnSuccessDo(() => _releaseDataFileService.DeleteAll(
+                    releaseVersionId: releaseVersion.Id,
+                    forceDelete: forceDeleteFiles))
+                .OnSuccessDo(() => _releaseFileService.DeleteAll(
+                    releaseVersionId: releaseVersion.Id,
+                    forceDelete: forceDeleteFiles))
                 .OnSuccessDo(async _ =>
                 {
                     if (!releaseVersion.Amendment)
