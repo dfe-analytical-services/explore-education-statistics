@@ -1,4 +1,11 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -31,13 +38,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -1846,6 +1846,7 @@ public abstract class ReleaseServiceTests
 
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var cacheService = new Mock<IBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
@@ -1863,6 +1864,10 @@ public abstract class ReleaseServiceTests
                     mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects))
                 .Returns(Task.CompletedTask);
 
+            releasePublishingStatusRepository.Setup(mock => 
+                    mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
+                .Returns(Task.CompletedTask);
+
             cacheService
                 .Setup(mock => mock.DeleteCacheFolderAsync(
                     ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
@@ -1878,6 +1883,7 @@ public abstract class ReleaseServiceTests
                 var releaseService = BuildReleaseService(context,
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     cacheService: cacheService.Object,
                     processorClient: processorClient.Object);
@@ -2562,6 +2568,7 @@ public abstract class ReleaseServiceTests
         IDataImportService? dataImportService = null,
         IFootnoteRepository? footnoteRepository = null,
         IDataBlockService? dataBlockService = null,
+        IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
         IReleaseSubjectRepository? releaseSubjectRepository = null,
         IDataSetVersionService? dataSetVersionService = null,
         IProcessorClient? processorClient = null,
@@ -2587,6 +2594,7 @@ public abstract class ReleaseServiceTests
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
             dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
+            releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(Strict),
             releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
