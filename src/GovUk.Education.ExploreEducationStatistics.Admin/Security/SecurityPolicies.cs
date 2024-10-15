@@ -42,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanMakeAmendmentOfSpecificRelease,
         CanPublishSpecificRelease,
         CanDeleteSpecificRelease,
+        CanDeleteTestRelease,
         CanViewSpecificPreReleaseSummary,
         CanResolveSpecificComment,
         CanUpdateSpecificComment,
