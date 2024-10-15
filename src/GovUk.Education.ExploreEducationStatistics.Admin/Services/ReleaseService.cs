@@ -56,6 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataImportService _dataImportService;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
+        private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IDataSetVersionService _dataSetVersionService;
         private readonly IProcessorClient _processorClient;
@@ -78,6 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDataImportService dataImportService,
             IFootnoteRepository footnoteRepository,
             IDataBlockService dataBlockService,
+            IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IReleaseSubjectRepository releaseSubjectRepository,
             IDataSetVersionService dataSetVersionService,
             IProcessorClient processorClient,
@@ -97,6 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _dataImportService = dataImportService;
             _footnoteRepository = footnoteRepository;
             _dataBlockService = dataBlockService;
+            _releasePublishingStatusRepository = releasePublishingStatusRepository;
             _releaseSubjectRepository = releaseSubjectRepository;
             _dataSetVersionService = dataSetVersionService;
             _processorClient = processorClient;
@@ -221,6 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     releaseVersion: releaseVersion,
                     forceDeleteFiles: false,
                     softDeleteOrphanedSubjects: true,
+                    deletePublishingStatus: false,
                     cancellationToken));
         }
 
@@ -235,13 +239,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     releaseVersion: releaseVersion,
                     forceDeleteFiles: true,
                     softDeleteOrphanedSubjects: false,
+                    deletePublishingStatus: true,
                     cancellationToken));
         }
 
         private async Task<Either<ActionResult, Unit>> DoDeleteReleaseVersion(
             ReleaseVersion releaseVersion,
             bool forceDeleteFiles = false,
-            bool softDeleteOrphanedSubjects = false,
+            bool softDeleteOrphanedSubjects = true,
+            bool deletePublishingStatus = false,
             CancellationToken cancellationToken = default)
         {
             return await _processorClient
@@ -270,6 +276,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync(cancellationToken);
 
+                    if (deletePublishingStatus)
+                    {
+                        await _releasePublishingStatusRepository.RemovePublisherReleaseStatuses(releaseVersionIds: [releaseVersion.Id]);
+                    }
+                    
                     // TODO: This may be redundant (investigate as part of EES-1295)
                     await _releaseSubjectRepository.DeleteAllReleaseSubjects(
                         releaseVersionId: releaseVersion.Id,

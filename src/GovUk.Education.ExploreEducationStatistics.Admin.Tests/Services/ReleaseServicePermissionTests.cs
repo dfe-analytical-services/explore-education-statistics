@@ -327,6 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IDataImportService>(),
                 Mock.Of<IFootnoteRepository>(),
                 Mock.Of<IDataBlockService>(),
+                Mock.Of<IReleasePublishingStatusRepository>(),
                 Mock.Of<IReleaseSubjectRepository>(),
                 Mock.Of<IDataSetVersionService>(),
                 Mock.Of<IProcessorClient>(),
