@@ -4,9 +4,6 @@ import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/
 import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React from 'react';
 
-const publicApiBaseUrl = process.env.PUBLIC_API_BASE_URL;
-const publicApiDocsUrl = process.env.PUBLIC_API_DOCUMENTATION_URL;
-
 interface Props {
   id: string;
   name: string;
@@ -23,8 +20,8 @@ export default function DataSetFileApiQuickStart({ id, name, version }: Props) {
         dataSetId={id}
         dataSetName={name}
         dataSetVersion={version}
-        publicApiBaseUrl={publicApiBaseUrl ?? ''}
-        publicApiDocsUrl={publicApiDocsUrl ?? ''}
+        publicApiBaseUrl={process.env.PUBLIC_API_BASE_URL}
+        publicApiDocsUrl={process.env.PUBLIC_API_DOCS_URL}
         renderLink={linkProps => <Link {...linkProps} />}
       />
     </DataSetFilePageSection>

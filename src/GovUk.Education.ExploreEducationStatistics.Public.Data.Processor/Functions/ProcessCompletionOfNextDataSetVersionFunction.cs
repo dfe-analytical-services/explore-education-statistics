@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
@@ -12,7 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 
 public class ProcessCompletionOfNextDataSetVersionFunction(
     PublicDataDbContext publicDataDbContext,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : BaseProcessDataSetVersionFunction(publicDataDbContext)
+    IDataSetVersionPathResolver dataSetVersionPathResolver,
+    IDataSetVersionChangeService dataSetVersionChangeService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
     [Function(nameof(ProcessCompletionOfNextDataSetVersion))]
     public async Task ProcessCompletionOfNextDataSetVersion(
@@ -31,6 +33,7 @@ public class ProcessCompletionOfNextDataSetVersionFunction(
         {
             await context.CallActivity(ActivityNames.UpdateFileStoragePath, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.ImportMetadata, logger, context.InstanceId);
+            await context.CallActivity(ActivityNames.CreateChanges, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.ImportData, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.WriteDataFiles, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.CompleteNextDataSetVersionImportProcessing, logger,
@@ -45,6 +48,16 @@ public class ProcessCompletionOfNextDataSetVersionFunction(
 
             await context.CallActivity(ActivityNames.HandleProcessingFailure, logger, context.InstanceId);
         }
+    }
+
+    [Function(ActivityNames.CreateChanges)]
+    public async Task CreateChanges(
+        [ActivityTrigger] Guid instanceId,
+        CancellationToken cancellationToken)
+    {
+        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
+        await UpdateImportStage(dataSetVersionImport, DataSetVersionImportStage.CreatingChanges, cancellationToken);
+        await dataSetVersionChangeService.CreateChanges(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
     [Function(ActivityNames.UpdateFileStoragePath)]

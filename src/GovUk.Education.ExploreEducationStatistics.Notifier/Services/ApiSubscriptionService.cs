@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
@@ -25,13 +25,13 @@ using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Notifier.V
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 
 internal class ApiSubscriptionService(
-    IOptions<AppSettingsOptions> appSettingsOptions,
+    IOptions<AppOptions> appOptions,
     IOptions<GovUkNotifyOptions> govUkNotifyOptions,
     ITokenService tokenService,
     IEmailService emailService,
     IApiSubscriptionRepository apiSubscriptionRepository) : IApiSubscriptionService
 {
-    private readonly string _publicAppUrl = appSettingsOptions.Value.PublicAppUrl;
+    private readonly string _publicAppUrl = appOptions.Value.PublicAppUrl;
 
     public async Task<Either<ActionResult, ApiSubscriptionViewModel>> RequestPendingSubscription(
         Guid dataSetId,

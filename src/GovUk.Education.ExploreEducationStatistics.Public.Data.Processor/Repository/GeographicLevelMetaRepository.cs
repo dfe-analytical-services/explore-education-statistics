@@ -50,11 +50,10 @@ public class GeographicLevelMetaRepository(
             .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
             .ToList();
 
-        var meta = new GeographicLevelMeta
+        return new GeographicLevelMeta
         {
             DataSetVersionId = dataSetVersion.Id,
             Levels = geographicLevels
         };
-        return meta;
     }
 }

@@ -119,7 +119,7 @@ user navigates to release page from dashboard
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${RELEASE_TABLE_TESTID}
     user scrolls to element    ${ROW}
 
-    user clicks link by visible text    ${LINK_TEXT}    ${ROW}
+    user clicks link containing text    ${LINK_TEXT}    ${ROW}
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
 
 user navigates to draft release page from dashboard
@@ -407,7 +407,7 @@ user adds note to methodology
     user clicks button    Add note
     user enters text into element    label:New methodology note    ${note}
     user clicks button    Save note
-    ${date}=    get current datetime    %-d %B %Y
+    ${date}=    get london date
     user waits until element contains    css:#methodologyNotes time    ${date}
     user waits until element contains    css:#methodologyNotes p    ${note}
 
@@ -562,11 +562,38 @@ user navigates to admin dashboard
     ...    css:[data-testid='topic-publications'],[data-testid='no-permission-to-access-releases']
     ...    %{WAIT_SMALL}
 
+user uploads subject and waits until complete
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    ${FOLDER}=${FILES_DIR}
+    user uploads subject
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    Complete
+    ...    ${FOLDER}
+
+user uploads subject and waits until importing
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    ${FOLDER}=${FILES_DIR}
+    user uploads subject
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    Importing
+    ...    ${FOLDER}
+
 user uploads subject
     [Arguments]
     ...    ${SUBJECT_NAME}
     ...    ${SUBJECT_FILE}
     ...    ${META_FILE}
+    ...    ${IMPORT_STATUS}
     ...    ${FOLDER}=${FILES_DIR}
     user clicks link    Data and files
     user waits until page contains element    id:dataFileUploadForm-subjectTitle    %{WAIT_SMALL}
@@ -574,52 +601,17 @@ user uploads subject
     user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
-    user waits until page contains accordion section    ${SUBJECT_NAME}    %{WAIT_SMALL}
-    user opens accordion section    ${SUBJECT_NAME}
-    ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
-    user waits until page finishes loading
-    user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
-
-user waits until data upload displays importing
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    ...    ${SUBJECT_FILE}
-    ...    ${META_FILE}
-    ...    ${FOLDER}=${FILES_DIR}
-    user clicks link    Data and files
-    user waits until page contains element    id:dataFileUploadForm-subjectTitle    %{WAIT_SMALL}
-    user enters text into element    id:dataFileUploadForm-subjectTitle    ${SUBJECT_NAME}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
-    user clicks button    Upload data files
-    user waits until page finishes loading
-    user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
-    user waits until page contains accordion section    ${SUBJECT_NAME}    %{WAIT_SMALL}
-    user opens accordion section    ${SUBJECT_NAME}
-    ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
-    user checks headed table body row contains    Status    Importing    ${section}    %{WAIT_DATA_FILE_IMPORT}
-
-user waits until large data upload is completed
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    ...    ${SUBJECT_FILE}
-    ...    ${META_FILE}
-    ...    ${FOLDER}=${FILES_DIR}
-    user clicks link    Data and files
-    user waits until page contains element    id:dataFileUploadForm-subjectTitle    %{WAIT_SMALL}
-    user enters text into element    id:dataFileUploadForm-subjectTitle    ${SUBJECT_NAME}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
-    user clicks button    Upload data files
-    user waits until page finishes loading
-    user waits for caches to expire
     user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
     user waits until page contains accordion section    ${SUBJECT_NAME}    %{WAIT_SMALL}
     user scrolls to accordion section    ${SUBJECT_NAME}
     user opens accordion section    ${SUBJECT_NAME}
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
-    user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
+
+    IF    "${IMPORT_STATUS}" != "Importing"
+        user waits until page finishes loading
+    END
+
+    user checks headed table body row contains    Status    ${IMPORT_STATUS}    ${section}    %{WAIT_DATA_FILE_IMPORT}
 
 user waits until data upload is completed
     [Arguments]
@@ -629,7 +621,6 @@ user waits until data upload is completed
     user opens accordion section    ${SUBJECT_NAME}
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
     user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
-
 
 user puts release into draft
     [Arguments]
@@ -733,14 +724,14 @@ user changes methodology status to Approved
     user clicks element    id:methodologyStatusForm-status-Approved
     user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Approved by UI tests
     user clicks element    id:methodologyStatusForm-publishingStrategy-${publishing_strategy}
-    IF    ${is_publishing_strategy_with_release} is ${TRUE}
+    IF    ${is_publishing_strategy_with_release} is ${True}
         user waits until element is enabled    css:[name="withReleaseId"]
         user chooses select option    css:[name="withReleaseId"]    ${with_release}
     END
     user clicks button    Update status
     user waits until h2 is visible    Sign off
     user checks summary list contains    Status    Approved
-    IF    ${is_publishing_strategy_with_release} is ${TRUE}
+    IF    ${is_publishing_strategy_with_release} is ${True}
         user checks summary list contains    When to publish    With a specific release
         user checks summary list contains    Publish with release    ${with_release}
     ELSE
@@ -950,7 +941,8 @@ user updates free text key stat
     user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="guidanceTitle"]
     ...    ${guidance_title}
 
-    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//textarea[@name="guidanceText"]    ${guidance_text}
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//textarea[@name="guidanceText"]
+    ...    ${guidance_text}
 
     user clicks button    Save
     user waits until page does not contain button    Save

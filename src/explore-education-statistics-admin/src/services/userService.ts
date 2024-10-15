@@ -72,11 +72,16 @@ export interface ResourceRoles {
   Release?: string[];
 }
 
+export interface RemoveUser {
+  userId: string;
+}
+
 export interface UsersService {
   getRoles(): Promise<Role[]>;
   getReleases(): Promise<IdTitlePair[]>;
   getResourceRoles(): Promise<ResourceRoles>;
   getUser(userId: string): Promise<User>;
+  deleteUser(email: string): Promise<RemoveUser>;
   addUserReleaseRole: (
     userId: string,
     userReleaseRole: UserReleaseRoleSubmission,
@@ -128,6 +133,9 @@ const userService: UsersService = {
   },
   updateUser(userId: string, update: UserUpdate): Promise<boolean> {
     return client.put(`/user-management/users/${userId}`, update);
+  },
+  deleteUser(email: string): Promise<RemoveUser> {
+    return client.delete(`/user-management/user/${email}`);
   },
 
   addUserReleaseRole(

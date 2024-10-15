@@ -17,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -39,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
         private readonly IUserPublicationInviteRepository _userPublicationInviteRepository;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly bool _userDeletionAllowed;
 
         public UserManagementService(
             UsersAndRolesDbContext usersAndRolesDbContext,
@@ -52,8 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserInviteRepository userInviteRepository,
             IUserReleaseInviteRepository userReleaseInviteRepository,
             IUserPublicationInviteRepository userPublicationInviteRepository,
-            UserManager<ApplicationUser> userManager,
-            IConfiguration configuration)
+            UserManager<ApplicationUser> userManager)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -66,7 +63,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userReleaseInviteRepository = userReleaseInviteRepository;
             _userPublicationInviteRepository = userPublicationInviteRepository;
             _userManager = userManager;
-            _userDeletionAllowed = configuration.GetValue<bool>("enableThemeDeletion");
         }
 
         public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()
@@ -419,7 +415,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> DeleteUser(string email)
         {
-            return await CheckCanDeleteUser(email)
+            return await _userService
+                .CheckCanManageAllUsers()
                 .OnSuccessDo(async () =>
                 {
                     // Delete the Identity Framework user, if found.
@@ -465,22 +462,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _contentDbContext.SaveChangesAsync();
                     await _usersAndRolesDbContext.SaveChangesAsync();
                 });
-        }
-
-        private async Task<Either<ActionResult, Unit>> CheckCanDeleteUser(string email)
-        {
-            if (!_userDeletionAllowed)
-            {
-                return new ForbidResult();
-            }
-
-            // We currently only allow test users to be deleted.
-            if (!email.ToLower().StartsWith("ees-test."))
-            {
-                return new ForbidResult();
-            }
-
-            return Unit.Instance;
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateUserDoesNotExist(string email)

@@ -9,10 +9,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -44,24 +43,14 @@ public abstract class NotifierFunctionsIntegrationTest
         return fixture.StorageConnectionString();
     }
 
-    protected AppSettingsOptions GetAppSettingsOptions()
+    protected AppOptions GetAppOptions()
     {
-        return GetRequiredService<IOptions<AppSettingsOptions>>().Value;
+        return GetRequiredService<IOptions<AppOptions>>().Value;
     }
 
     protected GovUkNotifyOptions GetGovUkNotifyOptions()
     {
         return GetRequiredService<IOptions<GovUkNotifyOptions>>().Value;
-    }
-
-    protected async Task AddTestSubscription(string tableName, SubscriptionEntity subscription)
-    {
-        var storageAccount = CloudStorageAccount.Parse(StorageConnectionString());
-        var tableClient = storageAccount.CreateCloudTableClient();
-        var table = tableClient.GetTableReference(tableName);
-        await table.CreateIfNotExistsAsync();
-
-        await table.ExecuteAsync(TableOperation.InsertOrReplace(subscription));
     }
 
     protected async Task CreateApiSubscriptions(params ApiSubscription[] subscriptions)
@@ -158,7 +147,7 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
                     .AddInMemoryCollection(new Dictionary<string, string?>
                     {
                         {
-                            $"{AppSettingsOptions.Section}:{nameof(AppSettingsOptions.NotifierStorageConnectionString)}",
+                            $"{AppOptions.Section}:{nameof(AppOptions.NotifierStorageConnectionString)}",
                             StorageConnectionString()
                         }
                     });

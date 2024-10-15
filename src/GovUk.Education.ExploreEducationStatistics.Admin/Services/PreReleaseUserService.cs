@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -15,10 +16,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -30,8 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _context;
         private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
-        private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
+        private readonly IOptions<AppOptions> _appOptions;
+        private readonly IOptions<NotifyOptions> _notifyOptions;
         private readonly IPreReleaseService _preReleaseService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
@@ -39,25 +40,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserInviteRepository _userInviteRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PreReleaseUserService(ContentDbContext context,
             UsersAndRolesDbContext usersAndRolesDbContext,
-            IConfiguration configuration,
             IEmailService emailService,
+            IOptions<AppOptions> appOptions,
+            IOptions<NotifyOptions> notifyOptions,
             IPreReleaseService preReleaseService,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IUserRepository userRepository,
             IUserInviteRepository userInviteRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
-            IUserReleaseInviteRepository userReleaseInviteRepository,
-            IHttpContextAccessor httpContextAccessor)
+            IUserReleaseInviteRepository userReleaseInviteRepository)
         {
             _context = context;
             _usersAndRolesDbContext = usersAndRolesDbContext;
-            _configuration = configuration;
             _emailService = emailService;
+            _appOptions = appOptions;
+            _notifyOptions = notifyOptions;
             _preReleaseService = preReleaseService;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
@@ -65,7 +66,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userInviteRepository = userInviteRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
             _userReleaseInviteRepository = userReleaseInviteRepository;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Either<ActionResult, List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseVersionId)
@@ -337,13 +337,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Reference(rv => rv.Publication)
                 .LoadAsync();
 
-            var template = _configuration.GetValue<string>("NotifyPreReleaseTemplateId");
-
-            var scheme = _httpContextAccessor.HttpContext!.Request.Scheme;
-            var host = _httpContextAccessor.HttpContext.Request.Host;
+            var url = _appOptions.Value.Url;
+            var template = _notifyOptions.Value.PreReleaseTemplateId;
 
             var prereleaseUrl =
-                $"{scheme}://{host}/publication/{releaseVersion.PublicationId}/release/{releaseVersion.Id}/prerelease/content";
+                $"{url}/publication/{releaseVersion.PublicationId}/release/{releaseVersion.Id}/prerelease/content";
 
             var preReleaseWindow = _preReleaseService.GetPreReleaseWindow(releaseVersion);
             var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();

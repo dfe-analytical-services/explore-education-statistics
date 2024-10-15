@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -189,16 +191,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     new ReleaseVersionRepository(contentDbContext),
                     new UserReleaseRoleRepository(contentDbContext),
                     new UserPublicationRoleRepository(contentDbContext),
-                    preReleaseService ?? new PreReleaseService(Options.Create(new PreReleaseOptions
-                    {
-                        PreReleaseAccess = new PreReleaseAccessOptions
+                    preReleaseService ?? new PreReleaseService(
+                        new PreReleaseAccessOptions
                         {
                             AccessWindow = new AccessWindowOptions
                             {
                                 MinutesBeforeReleaseTimeStart = 200,
                             }
-                        }
-                    }))));
+                        }.ToOptionsWrapper()
+                    )));
         }
     }
 }

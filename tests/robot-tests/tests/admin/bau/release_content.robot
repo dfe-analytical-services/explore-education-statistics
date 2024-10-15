@@ -25,7 +25,7 @@ Upload a subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Academic year 2025/26
 
-    user uploads subject    Dates test subject    dates.csv    dates.meta.csv
+    user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
 
 Create 4 data blocks
     user creates data block for dates csv
@@ -62,7 +62,7 @@ Add summary content to release
 
 Add release note to release
     user adds a release note    Test release note one
-    ${date}=    get current datetime    %-d %B %Y
+    ${date}=    get london date
     user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
@@ -81,9 +81,9 @@ Add secondary statistics
     ...    ${expected_select_options}
 
 Check secondary statistics are included correctly
-    user waits until element is visible    id:${SECONDARY_STATS_TABLE_TAB_ID}   %{WAIT_MEDIUM}
+    user waits until element is visible    id:${SECONDARY_STATS_TABLE_TAB_ID}    %{WAIT_MEDIUM}
     user scrolls to element    id:${SECONDARY_STATS_TABLE_TAB_ID}
-    user clicks element    id:${SECONDARY_STATS_TABLE_TAB_ID} 
+    user clicks element    id:${SECONDARY_STATS_TABLE_TAB_ID}
     user checks page contains    Data Block 1 title
     user checks page contains element    css:table
     user checks page contains button    Change secondary stats
@@ -249,8 +249,7 @@ Verify that validation prevents adding an invalid link
 
 
 *** Keywords ***
-
 User waits until secondary stats table tab is visible
     [Arguments]    ${SECONDARY_STATS_TABLE_TAB_ID}    ${timeout}= %{TIMEOUT}
-    wait until keyword succeeds     ${timeout}    5 sec    Element Should Be Visible    id=${SECONDARY_STATS_TABLE_TAB_ID}
-
+    wait until keyword succeeds    ${timeout}    5 sec    Element Should Be Visible
+    ...    id=${SECONDARY_STATS_TABLE_TAB_ID}

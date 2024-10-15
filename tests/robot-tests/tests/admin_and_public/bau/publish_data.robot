@@ -72,8 +72,10 @@ Verify new release summary
     user checks summary list contains    Release type    Accredited official statistics
 
 Upload subjects to release
-    user uploads subject    ${SUBJECT_1_NAME}    tiny-two-filters.csv    tiny-two-filters.meta.csv
-    user uploads subject    ${SUBJECT_2_NAME}    upload-file-test.csv    upload-file-test-with-filter.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_1_NAME}    tiny-two-filters.csv
+    ...    tiny-two-filters.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_2_NAME}    upload-file-test.csv
+    ...    upload-file-test-with-filter.meta.csv
 
 Navigate to Footnotes page
     user clicks link    Footnotes
@@ -502,7 +504,8 @@ Add text block with link to a featured table to accordion section
     ${block}=    user starts editing accordion section text block    Test section    1
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${toolbar}=    get editor toolbar    ${block}
-    ${insert}=    user gets button element    Insert    ${toolbar}
+    ${insert}=    get child element    parent_locator=${toolbar}
+    ...    child_locator=css:[data-cke-tooltip-text="Insert"]
     user clicks element    ${insert}
     ${button}=    user gets button element    Insert featured table link    ${toolbar}
     user clicks element    ${button}

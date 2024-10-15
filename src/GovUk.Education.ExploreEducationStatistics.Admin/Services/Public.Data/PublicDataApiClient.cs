@@ -10,7 +10,7 @@ using Azure.Core;
 using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Settings;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Hosting;

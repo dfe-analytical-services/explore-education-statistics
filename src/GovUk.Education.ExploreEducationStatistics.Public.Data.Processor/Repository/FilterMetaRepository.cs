@@ -17,10 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public class FilterMetaRepository(
     PublicDataDbContext publicDataDbContext,
-    IOptions<AppSettingsOptions> appSettingsOptions,
+    IOptions<AppOptions> appOptions,
     IDataSetVersionPathResolver dataSetVersionPathResolver) : IFilterMetaRepository
 {
-    private readonly AppSettingsOptions _appSettingsOptions = appSettingsOptions.Value;
+    private readonly AppOptions _appOptions = appOptions.Value;
 
     public async Task<IDictionary<FilterMeta, List<FilterOptionMeta>>> ReadFilterMetas(
         IDuckDbConnection duckDbConnection,
@@ -53,16 +53,37 @@ public class FilterMetaRepository(
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken = default)
     {
+        var publicIdMappings = await CreatePublicIdMappings(dataSetVersion, cancellationToken);
+
+        var currentMetaId = await publicDataDbContext.NextSequenceValue(
+            PublicDataDbContext.FilterMetasIdSequence,
+            cancellationToken);
+
         var metas = await GetFilterMetas(
             duckDbConnection,
             dataSetVersion,
             allowedColumns,
             cancellationToken);
 
+        foreach (var meta in metas)
+        {
+            meta.Id = currentMetaId++;
+            meta.PublicId = publicIdMappings.Filters.GetValueOrDefault(meta.Column, SqidEncoder.Encode(meta.Id));
+        }
+
         publicDataDbContext.FilterMetas.AddRange(metas);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-        var publicIdMappings = await CreatePublicIdMappings(dataSetVersion, cancellationToken);
+        // Avoid trying to set to 0 (which only
+        // happens synthetically during tests).
+        if (currentMetaId > 1)
+        {
+            await publicDataDbContext.SetSequenceValue(
+                PublicDataDbContext.FilterMetasIdSequence,
+                currentMetaId - 1,
+                cancellationToken
+            );
+        }
 
         foreach (var meta in metas)
         {
@@ -80,21 +101,13 @@ public class FilterMetaRepository(
                 .Merge()
                 .Using(options)
                 .On(
-                    o => new
-                    {
-                        o.Label,
-                        o.IsAggregate
-                    },
-                    o => new
-                    {
-                        o.Label,
-                        o.IsAggregate
-                    }
+                    o => new { o.Label, o.IsAggregate },
+                    o => new { o.Label, o.IsAggregate }
                 )
                 .InsertWhenNotMatched()
                 .MergeAsync(cancellationToken);
 
-            var currentId = await publicDataDbContext.NextSequenceValue(
+            var currentLinkId = await publicDataDbContext.NextSequenceValue(
                 PublicDataDbContext.FilterOptionMetaLinkSequence,
                 cancellationToken);
 
@@ -104,7 +117,7 @@ public class FilterMetaRepository(
             {
                 var batch = options
                     .Skip(current)
-                    .Take(_appSettingsOptions.MetaInsertBatchSize)
+                    .Take(_appOptions.MetaInsertBatchSize)
                     .ToList();
 
                 // Although not necessary for filter options, we've adopted the 'row key'
@@ -127,7 +140,7 @@ public class FilterMetaRepository(
                             publicIdMappings: publicIdMappings,
                             filter: meta,
                             option: option,
-                            defaultPublicIdFn: () => SqidEncoder.Encode(currentId++)),
+                            defaultPublicIdFn: () => SqidEncoder.Encode(currentLinkId++)),
                         MetaId = meta.Id,
                         OptionId = option.Id
                     })
@@ -136,7 +149,7 @@ public class FilterMetaRepository(
                 publicDataDbContext.FilterOptionMetaLinks.AddRange(links);
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-                current += _appSettingsOptions.MetaInsertBatchSize;
+                current += _appOptions.MetaInsertBatchSize;
             }
 
             var insertedLinks = await publicDataDbContext.FilterOptionMetaLinks
@@ -150,11 +163,17 @@ public class FilterMetaRepository(
                     $"Inserted: {insertedLinks}, expected: {options.Count}");
             }
 
-            // Increase the sequence only by the amount that we used to generate new PublicIds. 
-            await publicDataDbContext.SetSequenceValue(
-                PublicDataDbContext.FilterOptionMetaLinkSequence,
-                currentId - 1,
-                cancellationToken);
+            // Avoid trying to set to 0 (which only
+            // happens synthetically during tests).
+            if (currentLinkId > 1)
+            {
+                // Increase the sequence only by the amount that we used to generate new PublicIds.
+                await publicDataDbContext.SetSequenceValue(
+                    PublicDataDbContext.FilterOptionMetaLinkSequence,
+                    currentLinkId - 1,
+                    cancellationToken
+                );
+            }
         }
     }
 
@@ -164,42 +183,26 @@ public class FilterMetaRepository(
         IReadOnlySet<string> allowedColumns,
         CancellationToken cancellationToken)
     {
-        var currentId = await publicDataDbContext.NextSequenceValue(
-            PublicDataDbContext.FilterMetasIdSequence,
-            cancellationToken);
+        var metaRows = await duckDbConnection.SqlBuilder(
+                $"""
+                 SELECT *
+                 FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
+                 WHERE "col_type" = {MetaFileRow.ColumnType.Filter.ToString()}
+                 AND "col_name" IN ({allowedColumns})
+                 """)
+            .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken);
 
-        var metas = (await duckDbConnection.SqlBuilder(
-                    $"""
-                     SELECT *
-                     FROM '{dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion):raw}'
-                     WHERE "col_type" = {MetaFileRow.ColumnType.Filter.ToString()}
-                     AND "col_name" IN ({allowedColumns})
-                     """)
-                .QueryAsync<MetaFileRow>(cancellationToken: cancellationToken)
-            )
+        return metaRows
             .OrderBy(row => row.Label)
-            .Select(row =>
+            .Select(row => new FilterMeta
             {
-                var id = currentId++;
-
-                return new FilterMeta
-                {
-                    Id = id,
-                    PublicId = SqidEncoder.Encode(id),
-                    Column = row.ColName,
-                    DataSetVersionId = dataSetVersion.Id,
-                    Label = row.Label,
-                    Hint = row.FilterHint ?? string.Empty
-                };
+                PublicId = string.Empty,
+                Column = row.ColName,
+                DataSetVersionId = dataSetVersion.Id,
+                Label = row.Label,
+                Hint = row.FilterHint ?? string.Empty
             })
             .ToList();
-
-        await publicDataDbContext.SetSequenceValue(
-            PublicDataDbContext.FilterMetasIdSequence,
-            currentId - 1,
-            cancellationToken);
-
-        return metas;
     }
 
     private async Task<List<FilterOptionMeta>> GetFilterOptionMeta(
@@ -230,32 +233,40 @@ public class FilterMetaRepository(
         DataSetVersion dataSetVersion,
         CancellationToken cancellationToken)
     {
-        var mappings = await EntityFrameworkQueryableExtensions
-            .SingleOrDefaultAsync(publicDataDbContext
-                    .DataSetVersionMappings,
-                mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id,
-                cancellationToken);
+        var mappings = await publicDataDbContext.DataSetVersionMappings
+            .Where(mapping => mapping.TargetDataSetVersionId == dataSetVersion.Id)
+            .SingleOrDefaultAsync(token: cancellationToken);
 
         if (mappings is null)
         {
             return new PublicIdMappings();
         }
 
-        var mappingsByFilter = mappings
-            .FilterMappingPlan
+        var filterMappings = mappings.FilterMappingPlan
+            .Mappings
+            .Where(mapping => mapping.Value.Type is MappingType.AutoMapped or MappingType.ManualMapped)
+            .ToDictionary(
+                filter => filter.Key,
+                filter => filter.Value.PublicId);
+
+        var filterOptionMappings = mappings.FilterMappingPlan
             .Mappings
             .ToDictionary(
-                keySelector: filter => filter.Key,
-                elementSelector: filter => filter
-                    .Value
+                filter => filter.Key,
+                filter => filter.Value
                     .OptionMappings
                     .Values
                     .Where(mapping => mapping.Type is MappingType.AutoMapped or MappingType.ManualMapped)
                     .ToDictionary(
-                        keySelector: mapping => mapping.CandidateKey!,
-                        elementSelector: mapping => mapping.PublicId));
+                        mapping => mapping.CandidateKey!,
+                        mapping => mapping.PublicId)
+            );
 
-        return new PublicIdMappings { Filters = mappingsByFilter };
+        return new PublicIdMappings
+        {
+            Filters = filterMappings,
+            FilterOptions = filterOptionMappings,
+        };
     }
 
     private static string CreatePublicIdForFilterOptionMetaLink(
@@ -273,11 +284,19 @@ public class FilterMetaRepository(
 
     private record PublicIdMappings
     {
-        public Dictionary<string, Dictionary<string, string>> Filters { get; init; } = [];
+        /// <summary>
+        /// Filter public IDs mappings by column.
+        /// </summary>
+        public Dictionary<string, string> Filters { get; init; } = [];
+
+        /// <summary>
+        /// Filter option public ID mappings grouped by filter column.
+        /// </summary>
+        public Dictionary<string, Dictionary<string, string>> FilterOptions { get; init; } = [];
 
         public string? GetPublicIdForFilterOptionCandidate(string filterKey, string filterOptionCandidateKey)
         {
-            if (!Filters.TryGetValue(filterKey, out var filterOptionMappings))
+            if (!FilterOptions.TryGetValue(filterKey, out var filterOptionMappings))
             {
                 return null;
             }

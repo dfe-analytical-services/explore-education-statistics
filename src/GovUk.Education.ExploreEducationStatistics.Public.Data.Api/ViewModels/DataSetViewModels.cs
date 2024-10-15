@@ -36,15 +36,15 @@ public record DataSetViewModel
     public required DataSetStatus Status { get; init; }
 
     /// <summary>
+    /// The ID of the data set that supersedes this data set (if it has been deprecated).
+    /// </summary>
+    /// <example>2118a6df-4934-4a1f-ad2e-4589d2b9ccaf</example>
+    public Guid? SupersedingDataSetId { get; init; }
+
+    /// <summary>
     /// The latest published data set version.
     /// </summary>
     public required DataSetLatestVersionViewModel LatestVersion { get; init; }
-
-    /// <summary>
-    /// The ID of the data set that supersedes this data set (if it has been deprecated).
-    /// </summary>
-    /// <example>null</example>
-    public Guid? SupersedingDataSetId { get; init; }
 }
 
 /// <summary>

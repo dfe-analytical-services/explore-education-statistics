@@ -77,6 +77,7 @@ public static class ProcessorHostBuilder
                     .AddScoped<IDataSetVersionService, DataSetVersionService>()
                     .AddScoped<IDataSetMetaService, DataSetMetaService>()
                     .AddScoped<IDataSetVersionMappingService, DataSetVersionMappingService>()
+                    .AddScoped<IDataSetVersionChangeService, DataSetVersionChangeService>()
                     .AddScoped<IDataDuckDbRepository, DataDuckDbRepository>()
                     .AddScoped<IFilterOptionsDuckDbRepository, FilterOptionsDuckDbRepository>()
                     .AddScoped<IIndicatorsDuckDbRepository, IndicatorsDuckDbRepository>()
@@ -90,11 +91,11 @@ public static class ProcessorHostBuilder
                     .AddScoped<IParquetService, ParquetService>()
                     .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
                         new PrivateBlobStorageService(
-                            provider.GetRequiredService<IOptions<AppSettingsOptions>>().Value
+                            provider.GetRequiredService<IOptions<AppOptions>>().Value
                                 .PrivateStorageConnectionString,
                             provider.GetRequiredService<ILogger<IBlobStorageService>>()))
-                    .Configure<AppSettingsOptions>(
-                        hostBuilderContext.Configuration.GetSection(AppSettingsOptions.Section))
+                    .Configure<AppOptions>(
+                        hostBuilderContext.Configuration.GetSection(AppOptions.Section))
                     .Configure<DataFilesOptions>(
                         hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section));
                 

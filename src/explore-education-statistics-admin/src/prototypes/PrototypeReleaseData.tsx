@@ -3,7 +3,7 @@ import Link from '@admin/components/Link';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
-import RelatedAside from '@common/components/RelatedAside';
+import RelatedContent from '@common/components/RelatedContent';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import stylesKeyStat from '@common/modules/find-statistics/components/KeyStat.module.scss';
@@ -144,7 +144,7 @@ const PrototypeReleaseData = () => {
             <PageSearchForm inputLabel="Search this page" />
           </div>
           <div className="govuk-grid-column-one-third">
-            <RelatedAside>
+            <RelatedContent>
               <h2 className="govuk-heading-m">Quick links</h2>
               <ul className="govuk-list">
                 <li>
@@ -203,7 +203,7 @@ const PrototypeReleaseData = () => {
                   </a>
                 </li>
               </ul>
-            </RelatedAside>
+            </RelatedContent>
           </div>
         </div>
 

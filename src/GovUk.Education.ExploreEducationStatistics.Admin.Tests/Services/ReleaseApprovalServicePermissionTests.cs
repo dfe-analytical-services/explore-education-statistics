@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -9,10 +10,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -151,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IPreReleaseUserService>(),
                 Mock.Of<IReleaseFileRepository>(),
                 Mock.Of<IReleaseFileService>(),
-                Options.Create(new ReleaseApprovalOptions()),
+                new ReleaseApprovalOptions().ToOptionsWrapper(),
                 Mock.Of<IUserReleaseRoleService>(),
                 Mock.Of<IEmailTemplateService>(),
                 Mock.Of<IUserRepository>()

@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 
 import requests
-from robot.libraries.BuiltIn import BuiltIn
 from tests.libs import local_storage_helper
 
 # To prevent InsecureRequestWarning
@@ -91,6 +90,7 @@ def user_creates_test_publication_via_api(publication_name: str, topic_id: str =
             "title": publication_name,
             "summary": f"{publication_name} summary",
             "topicId": chosen_topic_id,
+            "themeId": os.getenv("TEST_THEME_ID"),
             "contact": {
                 "contactName": "UI test contact name",
                 "contactTelNo": "0123 4567",
@@ -165,20 +165,17 @@ def user_resets_user_roles_via_api_if_required(user_emails: list) -> None:
 
     for user_email in user_emails:
         if user_email not in allowed_users:
-            raise AssertionError(f"`User emails` must contain only allowed users: {allowed_users}")
-        try:
-            user_ids = [_get_prerelease_user_details_via_api(user_email)["id"]]
-            _ = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
-            BuiltIn().log(f"All userReleaseRoles & userPublicationRoles reset for user: {user_email}")
-        except TypeError or IndexError:
-            BuiltIn().log(f"User with email {user_email} does not exist in pre-release user list", "WARN")
+            raise AssertionError(
+                f"Not allowed to reset roles for {user_email}. Can only reset user roles for following users: {allowed_users}"
+            )
 
-            try:
-                user_ids = [_get_user_details_via_api(user_email)["id"]]
-                _ = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
-                BuiltIn().log(f"All userReleaseRoles & userPublicationRoles reset for user: {user_email}")
-            except TypeError or IndexError:
-                BuiltIn().log(f"User with email {user_email} does not exist in user list", "WARN")
+        user = _get_user_details_via_api(user_email)
+
+        if not user:
+            user = _get_prerelease_user_details_via_api(user_email)
+            assert user, f"Failed to find user with email {user_email}"
+
+        user_removes_all_release_and_publication_roles_from_user(user["id"])
 
 
 def user_creates_test_release_via_api(
@@ -218,21 +215,35 @@ def delete_test_user(email: str):
 
 
 def _get_user_details_via_api(user_email: str):
-    users = admin_client.get("/api/user-management/users").json()
+    response = admin_client.get("/api/user-management/users")
+
+    assert response.status_code == 200, "Error when fetching users via api"
+
+    users = response.json()
 
     matching_users = list(filter(lambda user: user["email"] == user_email, users))
 
-    assert matching_users, f"Could not find user with email {user_email}"
+    if len(matching_users) == 0:
+        return None
+
+    assert len(matching_users) == 1, f"Should only have found one user with email {user_email}"
 
     return matching_users[0]
 
 
 def _get_prerelease_user_details_via_api(user_email: str):
-    users = admin_client.get("/api/user-management/pre-release").json()
+    response = admin_client.get("/api/user-management/pre-release")
+
+    assert response.status_code == 200, "Error when fetching prerelease users via api"
+
+    users = response.json()
 
     matching_users = list(filter(lambda user: user["email"] == user_email, users))
 
-    assert matching_users, f"Could not find user with email {user_email}"
+    if len(matching_users) == 0:
+        return None
+
+    assert len(matching_users) == 1, f"Should only have found one prerelease user with email {user_email}"
 
     return matching_users[0]
 

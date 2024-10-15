@@ -33,7 +33,7 @@ Upload a subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
 
-    user uploads subject    Dates test subject    dates.csv    dates.meta.csv
+    user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
 
 Create a data block
     user creates data block for dates csv

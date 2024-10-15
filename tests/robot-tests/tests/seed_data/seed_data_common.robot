@@ -46,9 +46,9 @@ user creates a fully populated approved release
     ...    ${RELEASE_YEAR}
     ...    ${RELEASE_TYPE}
     ${days_until_release}=    set variable    10000
-    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
-    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
-    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+    ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
+    ${publish_date_month}=    get london month date    offset_days=${days_until_release}
+    ${publish_date_year}=    get london year    offset_days=${days_until_release}
     user approves release for scheduled publication
     ...    ${publish_date_day}
     ...    ${publish_date_month}
@@ -90,7 +90,7 @@ user creates a fully populated draft release
     ...    ${TOPIC_NAME}
 
     # add data files
-    user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
+    user uploads subject and waits until complete    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
     # add data guidance
     user clicks link    Data guidance

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Cronos;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
@@ -386,13 +387,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return ValidationActionResult(errors);
         }
-    }
-
-    public record ReleaseApprovalOptions
-    {
-        public const string ReleaseApproval = "ReleaseApproval";
-
-        public string PublishReleasesCronSchedule { get; init; } = string.Empty;
-        public string PublishReleaseContentCronSchedule { get; init; } = string.Empty;
     }
 }

@@ -71,14 +71,24 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     majorChanges: {
       filters: [
         {
-          previousState: { id: 'filter-1', label: 'Filter 1', hint: '' },
+          previousState: {
+            id: 'filter-1',
+            column: 'filter_1',
+            label: 'Filter 1',
+            hint: '',
+          },
         },
       ],
     },
     minorChanges: {
       filters: [
         {
-          currentState: { id: 'filter-2', label: 'Filter 2', hint: '' },
+          currentState: {
+            id: 'filter-2',
+            column: 'filter_2',
+            label: 'Filter 2',
+            hint: '',
+          },
         },
       ],
     },
@@ -115,7 +125,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     const minorChanges = within(screen.getByTestId('minor-changes'));
 
     expect(minorChanges.getByTestId('added-filters')).toHaveTextContent(
-      'Filter 2 (id: filter-2)',
+      'Filter 2 (id: filter-2, column: filter_2)',
     );
   });
 
@@ -142,7 +152,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     const majorChanges = within(screen.getByTestId('major-changes'));
 
     expect(majorChanges.getByTestId('deleted-filters')).toHaveTextContent(
-      'Filter 1 (id: filter-1)',
+      'Filter 1 (id: filter-1, column: filter_1)',
     );
 
     expect(
@@ -152,7 +162,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     const minorChanges = within(screen.getByTestId('minor-changes'));
 
     expect(minorChanges.getByTestId('added-filters')).toHaveTextContent(
-      'Filter 2 (id: filter-2)',
+      'Filter 2 (id: filter-2, column: filter_2)',
     );
   });
 

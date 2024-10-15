@@ -33,7 +33,7 @@ Verify release summary
     user verifies release summary    Financial year    3000-01    Accredited official statistics
 
 Upload subject
-    user uploads subject    Dates test subject    dates.csv    dates.meta.csv
+    user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
 
 Add data guidance
     user clicks link    Data guidance
@@ -232,7 +232,7 @@ Verify data block is updated correctly
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
 
     user checks chart title contains    ${datablock}    Updated dates table title
-    user clicks link by visible text    Table    ${datablock}
+    user clicks link containing text    Table    ${datablock}
     user waits until parent contains element    ${datablock}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
     user waits until parent contains element    ${datablock}    xpath:.//*[.="Source: Updated dates source"]
@@ -244,10 +244,10 @@ Add public prerelease access list
 
 Approve release for scheduled publication
     ${days_until_release}=    set variable    0
-    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
-    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
-    ${publish_date_month_word}=    get current datetime    %B    ${days_until_release}
-    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+    ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
+    ${publish_date_month}=    get london month date    offset_days=${days_until_release}
+    ${publish_date_month_word}=    get london month word    offset_days=${days_until_release}
+    ${publish_date_year}=    get london year    offset_days=${days_until_release}
 
     user approves release for scheduled publication
     ...    ${publish_date_day}
@@ -273,7 +273,7 @@ Get public release link
 Publish the scheduled release
     user waits for scheduled release to be published immediately
 
-    ${EXPECTED_PUBLISHED_DATE}=    get current datetime    ${DATE_FORMAT_MEDIUM}
+    ${EXPECTED_PUBLISHED_DATE}=    get london date
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify newly published release is on Find Statistics page
@@ -407,7 +407,7 @@ Verify Dates data block accordion section
     user checks chart title contains    ${section}    Updated dates table title
     user checks infographic chart contains alt    ${section}    Sample alt text
 
-    user clicks link by visible text    Table    ${section}
+    user clicks link containing text    Table    ${section}
     user waits until parent contains element    ${section}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
     user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]
@@ -434,7 +434,7 @@ Verify Dates data block table has footnotes
 Verify Dates data block Fast Track page
     ${release_url}=    user gets url
 
-    user clicks link by visible text    Explore data    testid:Data block - Dates data block name-table-tab
+    user clicks link containing text    Explore data    testid:Data block - Dates data block name-table-tab
 
     user waits until page contains title    Create your own tables
     user waits until page contains    This is the latest data
@@ -724,7 +724,7 @@ Add release note to first amendment
     user clicks button    Add note
     user enters text into element    id:create-release-note-form-reason    Test release note one
     user clicks button    Save note
-    ${date}=    get current datetime    ${DATE_FORMAT_MEDIUM}
+    ${date}=    get london date
     user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
@@ -739,10 +739,10 @@ Update public prerelease access list
 
 Approve amendment for scheduled release
     ${days_until_release}=    set variable    1
-    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
-    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
-    ${publish_date_month_word}=    get current datetime    %B    ${days_until_release}
-    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+    ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
+    ${publish_date_month}=    get london month date    offset_days=${days_until_release}
+    ${publish_date_month_word}=    get london month word    offset_days=${days_until_release}
+    ${publish_date_year}=    get london year    offset_days=${days_until_release}
 
     user approves release for scheduled publication
     ...    ${publish_date_day}
@@ -753,7 +753,7 @@ Approve amendment for scheduled release
 
     user waits for scheduled release to be published immediately
 
-    ${EXPECTED_PUBLISHED_DATE}=    get current datetime    ${DATE_FORMAT_MEDIUM}
+    ${EXPECTED_PUBLISHED_DATE}=    get london date
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify amendment is on Find Statistics page again
@@ -882,7 +882,7 @@ Verify amendment Dates data block accordion section
     user checks chart title contains    ${section}    Amended sample title
     user checks infographic chart contains alt    ${section}    Amended sample alt text
 
-    user clicks link by visible text    Table    ${section}
+    user clicks link containing text    Table    ${section}
     user waits until parent contains element    ${section}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Amended dates table title"]
     user waits until parent contains element    ${section}    xpath:.//*[.="Source: Amended dates source"]
@@ -915,7 +915,7 @@ Verify amendment Dates data block table has footnotes
 Verify amendment Dates data block Fast Track page
     ${release_url}=    user gets url
 
-    user clicks link by visible text    Explore data    testid:Data block - Dates data block name-table-tab
+    user clicks link containing text    Explore data    testid:Data block - Dates data block name-table-tab
 
     user waits until page contains title    Create your own tables
     user waits until page contains    This is the latest data
@@ -966,7 +966,7 @@ Override release published date to past date
     ${release_id}=    get release id from url
     ${published_override}=    Get Current Date    UTC    increment=-1000 days    result_format=datetime
     user updates release published date via api    ${release_id}    ${published_override}
-    ${EXPECTED_PUBLISHED_DATE}=    format datetime    ${published_override}    ${DATE_FORMAT_MEDIUM}
+    ${EXPECTED_PUBLISHED_DATE}=    get london date    offset_days=-1000
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify published date on publication page is overriden with past date
@@ -1005,9 +1005,9 @@ Remove the content section that originally contained the deleted data block
 
 Approve release amendment for scheduled publication and update published date
     ${days_until_release}=    set variable    2
-    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
-    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
-    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+    ${publish_date_day}=    get london day of month    offset_days=${days_until_release}
+    ${publish_date_month}=    get london month date    offset_days=${days_until_release}
+    ${publish_date_year}=    get london year    offset_days=${days_until_release}
     user approves release for scheduled publication
     ...    ${publish_date_day}
     ...    ${publish_date_month}
@@ -1016,7 +1016,7 @@ Approve release amendment for scheduled publication and update published date
     ...    next_release_year=4001
     ...    update_amendment_published_date=${True}
     user waits for scheduled release to be published immediately
-    ${EXPECTED_PUBLISHED_DATE}=    get current datetime    ${DATE_FORMAT_MEDIUM}
+    ${EXPECTED_PUBLISHED_DATE}=    get london date
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify published date on publication page has been updated

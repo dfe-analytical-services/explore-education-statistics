@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -826,6 +826,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("SupersededById")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("ThemeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -845,6 +848,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasFilter("[LatestPublishedReleaseVersionId] IS NOT NULL");
 
                     b.HasIndex("SupersededById");
+
+                    b.HasIndex("ThemeId");
 
                     b.HasIndex("TopicId");
 
@@ -1808,6 +1813,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .WithMany()
                         .HasForeignKey("SupersededById");
 
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", "Theme")
+                        .WithMany("Publications")
+                        .HasForeignKey("ThemeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", "Topic")
                         .WithMany("Publications")
                         .HasForeignKey("TopicId")
@@ -1842,6 +1853,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("LatestPublishedReleaseVersion");
 
                     b.Navigation("SupersededBy");
+
+                    b.Navigation("Theme");
 
                     b.Navigation("Topic");
                 });
@@ -2180,6 +2193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", b =>
                 {
+                    b.Navigation("Publications");
+
                     b.Navigation("Topics");
                 });
 

@@ -160,7 +160,9 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
     filtersMapping?.candidates,
     filtersMapping?.mappings,
     mappableFilterOptions,
+    mappableFilters,
     newFilterOptions,
+    newFilters,
   ]);
 
   const updateMappingState = useCallback(

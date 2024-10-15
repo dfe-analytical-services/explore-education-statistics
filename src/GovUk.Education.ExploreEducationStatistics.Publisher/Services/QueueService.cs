@@ -48,7 +48,8 @@ public class QueueService(
 
         await releasePublishingKeys
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async key => await releasePublishingStatusService.UpdateFilesStage(key,
-                ReleasePublishingStatusFilesStage.Queued));
+            .ForEachAwaitAsync(async key =>
+                await releasePublishingStatusService.UpdateFilesStage(key,
+                    ReleasePublishingStatusFilesStage.Queued));
     }
 }

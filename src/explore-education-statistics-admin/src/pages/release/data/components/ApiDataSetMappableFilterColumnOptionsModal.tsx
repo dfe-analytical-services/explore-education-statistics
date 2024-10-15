@@ -24,7 +24,10 @@ export default function ApiDataSetMappableFilterColumnOptionsModal({
 }: Props) {
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const optionChunks = useMemo(() => chunk(options, pageSize), [options]);
+  const optionChunks = useMemo(
+    () => chunk(options, pageSize),
+    [options, pageSize],
+  );
 
   const totalPages = optionChunks.length;
 

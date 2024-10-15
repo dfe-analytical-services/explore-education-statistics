@@ -29,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Notifier.Model\GovUk.Education.ExploreEducationStatistics.Notifier.Model.csproj" />
   </ItemGroup>
   <ItemGroup>

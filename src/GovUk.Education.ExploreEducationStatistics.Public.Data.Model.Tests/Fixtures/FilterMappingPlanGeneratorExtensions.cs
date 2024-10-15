@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 
@@ -13,66 +14,72 @@ public static class FilterMappingPlanGeneratorExtensions
 
     public static Generator<FilterMappingPlan> FilterMappingPlanFromFilterMeta(
         this DataFixture fixture,
-        List<FilterMeta>? sourceFilters = null,
-        List<FilterMeta>? targetFilters = null)
+        IEnumerable<FilterMeta>? sourceFilters = null,
+        IEnumerable<FilterMeta>? targetFilters = null)
     {
         var filterMappingPlanGenerator = fixture.Generator<FilterMappingPlan>();
-    
+
         sourceFilters?.ForEach(sourceFilter =>
         {
-            var filterMappingGenerator = fixture
-                .DefaultFilterMapping()
-                .WithSource(fixture
-                    .DefaultMappableFilter()
+            var autoMappedFilter = targetFilters?.SingleOrDefault(f => f.Column == sourceFilter.Column);
+
+            var filterMappingGenerator = fixture.DefaultFilterMapping()
+                .WithSource(fixture.DefaultMappableFilter()
                     .WithLabel(sourceFilter.Label))
+                .WithType(autoMappedFilter is not null ? MappingType.AutoMapped : MappingType.AutoNone)
+                .WithCandidateKey(autoMappedFilter?.Column)
                 .WithPublicId(sourceFilter.PublicId);
-           
+
             sourceFilter.Options.ForEach(option =>
             {
+                var sourceKey = MappingKeyGenerators.FilterOptionMeta(option);
+                var sourceLink = sourceFilter.OptionLinks.SingleOrDefault(l => l.OptionId == option.Id);
+
+                var autoMappedOption = autoMappedFilter?.Options
+                    .SingleOrDefault(o => MappingKeyGenerators.FilterOptionMeta(o) == sourceKey);
+
                 filterMappingGenerator.AddOptionMapping(
-                    sourceKey: MappingKeyGenerators.FilterOptionMeta(option),
-                    fixture
-                        .DefaultFilterOptionMapping()
-                        .WithSource(fixture
-                            .DefaultMappableFilterOption()
+                    sourceKey: sourceKey,
+                    mapping: fixture.DefaultFilterOptionMapping()
+                        .WithSource(fixture.DefaultMappableFilterOption()
                             .WithLabel(option.Label))
-                        .WithPublicId($"{sourceFilter.PublicId} :: {option.Label}"));
+                        .WithType(autoMappedOption is not null ? MappingType.AutoMapped : MappingType.AutoNone)
+                        .WithCandidateKey(autoMappedOption is not null
+                            ? MappingKeyGenerators.FilterOptionMeta(autoMappedOption)
+                            : null)
+                        .WithPublicId(sourceLink?.PublicId ?? $"{sourceFilter.PublicId} :: {option.Label}")
+                );
             });
 
-            filterMappingPlanGenerator.AddFilterMapping(
-                columnName: sourceFilter.PublicId,
-                filterMappingGenerator);
+            filterMappingPlanGenerator.AddFilterMapping(sourceFilter.Column,filterMappingGenerator);
         });
-        
+
         targetFilters?.ForEach(targetFilter =>
         {
             var filterCandidateGenerator = fixture
                 .DefaultFilterMappingCandidate()
                 .WithLabel(targetFilter.Label);
-            
+
             targetFilter.Options.ForEach(option =>
             {
                 filterCandidateGenerator.AddOptionCandidate(
                     targetKey: MappingKeyGenerators.FilterOptionMeta(option),
-                    fixture
-                        .DefaultMappableFilterOption()
+                    candidate: fixture.DefaultMappableFilterOption()
                         .WithLabel(option.Label));
             });
 
-            filterMappingPlanGenerator.AddFilterCandidate(
-                columnName: targetFilter.PublicId,
-                filterCandidateGenerator);
+            filterMappingPlanGenerator.AddFilterCandidate(targetFilter.Column, filterCandidateGenerator);
         });
-        
+
         return filterMappingPlanGenerator;
     }
-    
+
     public static Generator<FilterMappingPlan> AddFilterMapping(
         this Generator<FilterMappingPlan> generator,
         string columnName,
         FilterMapping mapping)
         => generator.ForInstance(s => s.AddFilterMapping(columnName, mapping));
-    
+
     public static Generator<FilterMappingPlan> AddFilterCandidate(
         this Generator<FilterMappingPlan> generator,
         string columnName,
@@ -173,9 +180,9 @@ public static class FilterMappingPlanGeneratorExtensions
 
     public static Generator<FilterMapping> WithCandidateKey(
         this Generator<FilterMapping> generator,
-        string candidateKey)
+        string? candidateKey)
         => generator.ForInstance(s => s.SetCandidateKey(candidateKey));
-    
+
     public static Generator<FilterMapping> AddOptionMapping(
         this Generator<FilterMapping> generator,
         string sourceKey,
@@ -214,7 +221,7 @@ public static class FilterMappingPlanGeneratorExtensions
         string columnName,
         FilterOptionMapping mapping)
         => instanceSetter.Set((_, plan) => plan.OptionMappings.Add(columnName, mapping));
-    
+
     /**
      * FilterMappingCandidate
      */
@@ -228,7 +235,7 @@ public static class FilterMappingPlanGeneratorExtensions
         this Generator<FilterMappingCandidate> generator,
         string label)
         => generator.ForInstance(s => s.SetLabel(label));
-    
+
     public static Generator<FilterMappingCandidate> AddOptionCandidate(
         this Generator<FilterMappingCandidate> generator,
         string targetKey,
@@ -304,7 +311,7 @@ public static class FilterMappingPlanGeneratorExtensions
         => generator.ForInstance(s => s
             .SetType(MappingType.None)
             .SetCandidateKey(null));
-    
+
     public static Generator<FilterOptionMapping> WithAutoMapped(
         this Generator<FilterOptionMapping> generator,
         string candidateKey)

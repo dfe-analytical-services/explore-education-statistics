@@ -77,11 +77,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ReleasePublishingStatusState state,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
         {
-            return await releasePublishingStatusService.Create(
-                message.ReleasePublishingKey,
+            var key = new ReleasePublishingKey(
+                message.ReleasePublishingKey.ReleaseVersionId,
+                message.ReleasePublishingKey.ReleaseStatusId);
+
+            await releasePublishingStatusService.Create(
+                key,
                 state,
                 message.Immediate,
                 logMessages);
+
+            return key;
         }
 
         private async Task MarkScheduledReleaseStatusAsSuperseded(NotifyChangeMessage message)
@@ -92,11 +98,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 message.ReleaseVersionId,
                 ReleasePublishingStatusOverallStage.Scheduled);
 
-            await scheduled
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async status =>
-                    await releasePublishingStatusService.UpdateState(status.AsTableRowKey(),
-                        ReleasePublishingStatusStates.SupersededState));
+            foreach (var status in scheduled)
+            {
+                await releasePublishingStatusService.UpdateState(status.AsTableRowKey(),
+                    ReleasePublishingStatusStates.SupersededState);
+            }
         }
     }
 }

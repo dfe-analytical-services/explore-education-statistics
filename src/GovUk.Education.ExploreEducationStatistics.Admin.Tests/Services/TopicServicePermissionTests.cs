@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -15,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
@@ -113,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleasePublishingStatusRepository? releasePublishingStatusRepository = null)
         {
             return new TopicService(
-                Mock.Of<IConfiguration>(),
+                Mock.Of<IOptions<AppOptions>>(),
                 contentContext ?? Mock.Of<ContentDbContext>(),
                 statisticsContext ?? Mock.Of<StatisticsDbContext>(),
                 persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Topic>(_topic.Id, _topic).Object,

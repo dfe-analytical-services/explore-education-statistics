@@ -30,7 +30,8 @@ Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Calendar year 2000
 
-    user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+    user uploads subject and waits until complete    UI test subject    upload-file-test.csv
+    ...    upload-file-test.meta.csv
 
 Add metadata guidance
     user clicks link    Data guidance
@@ -141,13 +142,13 @@ Add basic release content
     user navigates to content page    ${PUBLICATION_NAME}
 
     # FALSE to not add headline block, as we needed to add that to publish the original release
-    user adds basic release content    ${PUBLICATION_NAME}    ${FALSE}
+    user adds basic release content    ${PUBLICATION_NAME}    ${False}
 
 Add release note to amendment
     user clicks button    Add note
     user enters text into element    id:create-release-note-form-reason    Test release note
     user clicks button    Save note
-    ${date}=    get current datetime    ${DATE_FORMAT_MEDIUM}
+    ${date}=    get london date
     user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note
 
@@ -204,10 +205,10 @@ Validate prerelease has not started for Analyst user during amendment as it is s
 
 Approve amendment for a scheduled release and check warning text
     user changes to bau1
-    ${day}=    get current datetime    %-d    2
-    ${month}=    get current datetime    %-m    2
-    ${month_word}=    get current datetime    %B    2
-    ${year}=    get current datetime    %Y    2
+    ${day}=    get london day of month    offset_days=2
+    ${month}=    get london month date    offset_days=2
+    ${month_word}=    get london month word    offset_days=2
+    ${year}=    get london year    offset_days=2
     user navigates to admin frontend    ${RELEASE_URL}/status
     user clicks button    Edit release status
     user clicks radio    Approved for publication
@@ -238,20 +239,18 @@ Validate prerelease window is not yet open for Analyst user
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1
-    ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2
+    ${start_date}=    get london date    offset_days=1
+    ${end_date}=    get london date    offset_days=2
 
-    ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
-    ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
     user checks page contains
-    ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
+    ...    Pre-release access will be available from ${start_date} at 00:00 until it is published on ${end_date}.
 
 Start prerelease
     user changes to bau1
-    ${day}=    get current datetime    %-d    1
-    ${month}=    get current datetime    %-m    1
-    ${month_word}=    get current datetime    %B    1
-    ${year}=    get current datetime    %Y    1
+    ${day}=    get london day of month    offset_days=1
+    ${month}=    get london month date    offset_days=1
+    ${month_word}=    get london month word    offset_days=1
+    ${year}=    get london year    offset_days=1
     user navigates to admin frontend    ${RELEASE_URL}/status
     user clicks button    Edit release status
     user clicks radio    On a specific date

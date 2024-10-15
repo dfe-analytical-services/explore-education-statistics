@@ -1,11 +1,13 @@
 using Asp.Versioning;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net.Mime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers;
 
@@ -24,8 +26,8 @@ public class DataSetsController(
     /// Gets a specific data set’s summary details.
     /// </remarks>
     [HttpGet("{dataSetId:guid}")]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The requested data set summary", type: typeof(DataSetViewModel))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [SwaggerResponse(200, "The requested data set summary.", type: typeof(DataSetViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetViewModel>> GetDataSet(
@@ -46,8 +48,8 @@ public class DataSetsController(
     /// Get the metadata about a data set. Use this to create data set queries.
     /// </remarks>
     [HttpGet("{dataSetId:guid}/meta")]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The requested data set version metadata", type: typeof(DataSetMetaViewModel))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [SwaggerResponse(200, "The requested data set version metadata.", type: typeof(DataSetMetaViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetMetaViewModel>> GetDataSetMeta(
@@ -58,7 +60,7 @@ public class DataSetsController(
     {
         return await dataSetService
             .GetMeta(
-                dataSetId: dataSetId, 
+                dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion,
                 types: request.ParsedTypes(),
                 cancellationToken: cancellationToken)
@@ -83,7 +85,7 @@ public class DataSetsController(
     ///
     /// The `indicators` query parameter is required and **at least one** indicator must be specified.
     ///
-    /// Each indicator should be a string containing the indicator ID e.g. `headcount`, `enrolments`.
+    /// Each indicator should be a string containing the indicator ID e.g. `4xbOu`, `8g1RI`.
     ///
     /// ## Filters
     ///
@@ -138,7 +140,7 @@ public class DataSetsController(
     /// ### Examples
     ///
     /// - `LA|code|E08000019` matches any local authority with code `E08000019`
-    /// - `REG|id|abcde` matches any region with ID `abcde`
+    /// - `REG|id|6bQgZ` matches any region with ID `6bQgZ`
     /// - `SCH|urn|140821` matches any school with URN `140821`
     ///
     /// ## Time periods
@@ -186,7 +188,7 @@ public class DataSetsController(
     /// Sorts are applied in the order they are provided and should be strings
     /// formatted like `{field}|{direction}` where:
     ///
-    /// - `field` is the name of the field to sort e.g. `time_period`
+    /// - `field` is the name of the field to sort e.g. `timePeriod`
     /// - `direction` is the direction to sort in e.g. ascending (`Asc`) or descending (`Desc`)
     ///
     /// The `field` can be one of the following:
@@ -194,18 +196,20 @@ public class DataSetsController(
     /// - `timePeriod` to sort by time period
     /// - `geographicLevel` to sort by the geographic level of the data
     /// - `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)
-    /// - A filter ID (e.g. `characteristic`, `school_type`) to sort by the options in that filter
-    /// - An indicator ID (e.g. `sess_authorised`, `enrolments`) to sort by the values in that indicator
+    /// - `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)
+    /// - `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)
     ///
     /// ### Examples
     ///
     /// - `timePeriod|Desc` sorts by time period in descending order
     /// - `geographicLevel|Asc` sorts by geographic level in ascending order
     /// - `location|REG|Asc` sorts by regions in ascending order
+    /// - `filter|3RxWP|Desc` sorts by options in filter `3RxWP` in descending order
+    /// - `indicator|7a1dk|Asc` sorts by values in indicator `7a1dk` in ascending order
     /// </remarks>
     [HttpGet("{dataSetId:guid}/query")]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The paginated list of query results", type: typeof(DataSetQueryPaginatedResultsViewModel))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [SwaggerResponse(200, "The paginated list of query results.", type: typeof(DataSetQueryPaginatedResultsViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
@@ -234,9 +238,9 @@ public class DataSetsController(
     /// and consequently can express more complex queries.
     /// </remarks>
     [HttpPost("{dataSetId:guid}/query")]
-    [Consumes("application/json")]
-    [Produces("application/json")]
-    [SwaggerResponse(200, "The paginated list of query results", type: typeof(DataSetQueryPaginatedResultsViewModel))]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces(MediaTypeNames.Application.Json)]
+    [SwaggerResponse(200, "The paginated list of query results.", type: typeof(DataSetQueryPaginatedResultsViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
     [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
@@ -249,5 +253,42 @@ public class DataSetsController(
         return await dataSetQueryService
             .Query(dataSetId, request, dataSetVersion, cancellationToken)
             .HandleFailuresOrOk();
+    }
+
+    /// <summary>
+    /// Download a data set as CSV
+    /// </summary>
+    /// <remarks>
+    /// The CSV response will render its metadata in a human-readable format (instead of
+    /// machine-readable IDs). The CSV is not subject to the same backward compatibility
+    /// guarantees as the data set's JSON representation in other endpoints.
+    /// </remarks>
+    [HttpGet("{dataSetId:guid}/csv")]
+    [SwaggerResponse(
+        200,
+        description: "The data set CSV file.",
+        type: typeof(string),
+        contentTypes: MediaTypeNames.Text.Csv
+    )]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel), contentTypes: MediaTypeNames.Application.Json)]
+    [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel), contentTypes: MediaTypeNames.Application.Json)]
+    public async Task<ActionResult> DownloadDataSetCsv(
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
+        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")][FromQuery] string? dataSetVersion,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetService
+            .DownloadDataSet(
+                dataSetId: dataSetId,
+                dataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken
+            )
+            .OnSuccess(fileStreamResult =>
+            {
+                HttpContext.Response.Headers.ContentEncoding = ContentEncodings.Gzip;
+
+                return fileStreamResult;
+            })
+            .HandleFailures();
     }
 }
