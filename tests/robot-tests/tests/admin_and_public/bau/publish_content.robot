@@ -48,7 +48,8 @@ Add text block with link to absence glossary entry to accordion section
     ${block}=    user starts editing accordion section text block    Test section    1
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${toolbar}=    get editor toolbar    ${block}
-    ${insert}=    user gets button element    Insert    ${toolbar}
+    ${insert}=    get child element    parent_locator=${toolbar}
+    ...    child_locator=css:[data-cke-tooltip-text="Insert"]
     user clicks element    ${insert}
     ${button}=    user gets button element    Insert glossary link    ${toolbar}
     user clicks element    ${button}

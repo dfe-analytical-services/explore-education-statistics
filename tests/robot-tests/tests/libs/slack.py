@@ -22,7 +22,7 @@ class SlackService:
 
         self.client = WebClient(token=self.slack_app_token)
 
-    def _build_test_results_attachments(self, env: str, suites_ran: str, suites_failed: [], run_index: int):
+    def _build_test_results_attachments(self, env: str, suites_ran: str, suites_failed: [], number_of_test_runs: int):
         with open(f"{PATH}{os.sep}output.xml", "rb") as report:
             contents = report.read()
 
@@ -51,7 +51,7 @@ class SlackService:
                 "fields": [
                     {"type": "mrkdwn", "text": f"*Environment*\n{env}"},
                     {"type": "mrkdwn", "text": f"*Suite*\n{suites_ran.replace('tests/', '')}"},
-                    {"type": "mrkdwn", "text": f"*Total runs*\n{run_index + 1}"},
+                    {"type": "mrkdwn", "text": f"*Total runs*\n{number_of_test_runs}"},
                     {"type": "mrkdwn", "text": f"*Total test cases*\n{total_tests_count}"},
                     {"type": "mrkdwn", "text": f"*Passed test cases*\n{passed_tests}"},
                     {"type": "mrkdwn", "text": f"*Failed test cases*\n{failed_tests}"},

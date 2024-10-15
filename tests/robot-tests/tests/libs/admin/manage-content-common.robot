@@ -27,7 +27,7 @@ user navigates to content page
     user waits until page finishes loading
 
 user adds basic release content
-    [Arguments]    ${publication}    ${add_headlines_block}=${TRUE}
+    [Arguments]    ${publication}    ${add_headlines_block}=${True}
     user adds summary text block
     user adds content to summary text block    Test summary text for ${publication}
 
@@ -186,9 +186,9 @@ user chooses and embeds data block
     [Arguments]
     ...    ${datablock_name}
     user chooses select option    css:select[name="selectedDataBlock"]    ${datablock_name}
-    user waits until button is enabled    Embed    %{WAIT_SMALL}
-    user clicks button    Embed
-    user waits until page does not contain button    Embed    %{WAIT_MEDIUM}
+    user waits until button is enabled    Embed    %{WAIT_SMALL}    exact_match=${True}
+    user clicks button    Embed    exact_match=${True}
+    user waits until page does not contain button    Embed    %{WAIT_MEDIUM}    exact_match=${True}
     user waits until page finishes loading
 
 user opens nth editable accordion section
@@ -374,7 +374,7 @@ user adds content to accordion section text block
 
     ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
 
-    IF    "${append}" == "${FALSE}"
+    IF    "${append}" == "${False}"
         user presses keys    CTRL+a
         user presses keys    BACKSPACE
     ELSE
@@ -468,12 +468,14 @@ user adds image to accordion section text block with retry
     ...    ${FILES_DIR}${filename}
 
     user scrolls up    300
-    wait until keyword succeeds     ${timeout}    %{WAIT_SMALL} sec    user clicks button    Change image text alternative
+    wait until keyword succeeds    ${timeout}    %{WAIT_SMALL} sec    user clicks button
+    ...    Change image text alternative
     user enters text into element    label:Text alternative    ${alt_text}
     user clicks element    css:button.ck-button-save
     sleep    5
     user scrolls up    100
-    wait until keyword succeeds     ${timeout}    %{WAIT_SMALL} sec    user clicks element    xpath://div[@title="Insert paragraph after block"]
+    wait until keyword succeeds    ${timeout}    %{WAIT_SMALL} sec    user clicks element
+    ...    css:[title="Insert paragraph after block"]
 
     # wait for the API to save the image and for the src attribute to be updated before continuing
     user waits until parent contains element    ${block}
@@ -566,7 +568,7 @@ user adds link to accordion section text block
     ${button}=    user gets button element    Link    ${toolbar}
     user clicks element    ${button}
     user enters text into element    label:Link URL    ${url}
-    
+
     # Save
     user presses keys    TAB
     user presses keys    ENTER

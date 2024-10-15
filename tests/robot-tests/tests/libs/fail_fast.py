@@ -27,6 +27,7 @@ def record_test_failure():
         visual.capture_screenshot()
         visual.capture_large_screenshot()
         _capture_html()
+        _raise_assertion_error("Recorded test failure")
 
     if BuiltIn().get_variable_value("${prompt_to_continue_on_failure}") == "1":
         _prompt_to_continue()

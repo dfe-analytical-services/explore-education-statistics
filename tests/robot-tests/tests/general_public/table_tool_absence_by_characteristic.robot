@@ -137,8 +137,8 @@ Reorder Gender to be column group
     user clicks button    Move and reorder table headers
     # Column group needs to be inside the viewport
     user scrolls to element    xpath://button[text()="Update and view reordered table"]
-    user clicks button    Move    testId:rowGroups-0
-    user clicks button    Move    testId:rowGroups-0
+    user clicks button    Move    testId:rowGroups-0    exact_match=${True}
+    user clicks button    Move Characteristic to columns    testId:rowGroups-0
     user clicks button    Done    testId:columnGroups-1
 
 Move Gender to be first column group

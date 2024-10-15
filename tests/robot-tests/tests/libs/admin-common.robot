@@ -119,7 +119,7 @@ user navigates to release page from dashboard
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${RELEASE_TABLE_TESTID}
     user scrolls to element    ${ROW}
 
-    user clicks link by visible text    ${LINK_TEXT}    ${ROW}
+    user clicks link containing text    ${LINK_TEXT}    ${ROW}
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
 
 user navigates to draft release page from dashboard
@@ -724,14 +724,14 @@ user changes methodology status to Approved
     user clicks element    id:methodologyStatusForm-status-Approved
     user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Approved by UI tests
     user clicks element    id:methodologyStatusForm-publishingStrategy-${publishing_strategy}
-    IF    ${is_publishing_strategy_with_release} is ${TRUE}
+    IF    ${is_publishing_strategy_with_release} is ${True}
         user waits until element is enabled    css:[name="withReleaseId"]
         user chooses select option    css:[name="withReleaseId"]    ${with_release}
     END
     user clicks button    Update status
     user waits until h2 is visible    Sign off
     user checks summary list contains    Status    Approved
-    IF    ${is_publishing_strategy_with_release} is ${TRUE}
+    IF    ${is_publishing_strategy_with_release} is ${True}
         user checks summary list contains    When to publish    With a specific release
         user checks summary list contains    Publish with release    ${with_release}
     ELSE
