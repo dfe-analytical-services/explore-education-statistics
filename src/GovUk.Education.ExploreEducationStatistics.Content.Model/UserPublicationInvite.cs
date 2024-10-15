@@ -23,8 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime Created { get; set; }
 
-        public User CreatedBy { get; set; } = null!;
+        public User? CreatedBy { get; set; } = null!;
 
-        public Guid CreatedById { get; set; }
+        public Guid? CreatedById { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<UserPublicationRole> Create(Guid userId,
             Guid publicationId,
             PublicationRole role,
-            Guid createdById);
+            Guid? createdById);
 
         Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId);
 

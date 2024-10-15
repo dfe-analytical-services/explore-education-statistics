@@ -49,8 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Database
             modelBuilder.Entity<UserInvite>()
                 .HasOne(c => c.CreatedBy)
                 .WithMany()
-                .HasForeignKey("CreatedById")
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
                 modelBuilder.Entity<UserInvite>()
                 .Property(invite => invite.Created)

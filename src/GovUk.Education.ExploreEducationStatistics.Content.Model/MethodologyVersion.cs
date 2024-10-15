@@ -49,10 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         // TODO - can this be non-nullable?
         public DateTime? Created { get; set; }
 
-        // TODO - can this be non-nullable?
         public User? CreatedBy { get; set; }
 
-        // TODO - can this be non-nullable?
         public Guid? CreatedById { get; set; }
 
         public MethodologyVersion? PreviousVersion { get; set; }

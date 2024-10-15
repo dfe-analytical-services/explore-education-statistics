@@ -1,4 +1,4 @@
-#nullable enable
+#nullable enable // @MarkFix needs sorting see EES-5573 branch where it is sorted
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

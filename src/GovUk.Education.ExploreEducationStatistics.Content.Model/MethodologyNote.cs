@@ -18,13 +18,13 @@ public class MethodologyNote : ICreatedTimestamp<DateTime>
 
     public DateTime Created { get; set; }
 
-    public User CreatedBy { get; set; } = null!;
+    public User? CreatedBy { get; set; } = null!;
 
-    public Guid CreatedById { get; set; }
+    public Guid? CreatedById { get; set; }
 
     public DateTime? Updated { get; set; }
 
     public Guid? UpdatedById { get; set; }
 
-    public User UpdatedBy { get; set; } = null!;
+    public User? UpdatedBy { get; set; } = null!;
 }

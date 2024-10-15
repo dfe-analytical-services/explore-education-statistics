@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -38,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
         private readonly IUserPublicationInviteRepository _userPublicationInviteRepository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IDatabaseHelper _databaseHelper;
 
         public UserManagementService(
             UsersAndRolesDbContext usersAndRolesDbContext,
@@ -50,7 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserInviteRepository userInviteRepository,
             IUserReleaseInviteRepository userReleaseInviteRepository,
             IUserPublicationInviteRepository userPublicationInviteRepository,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IDatabaseHelper databaseHelper)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -63,6 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userReleaseInviteRepository = userReleaseInviteRepository;
             _userPublicationInviteRepository = userPublicationInviteRepository;
             _userManager = userManager;
+            _databaseHelper = databaseHelper;
         }
 
         public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()
@@ -451,6 +455,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // Delete the internal EES user, if found.
                     if (internalUser != null)
                     {
+                        // @MarkFix set all columns using UserId to null - i.e. CreatedById etc.
+                        await RemoveUserIdUsesInOtherTables(internalUser.Id);
+
                         _contentDbContext.Users.Remove(internalUser);
                     }
 
@@ -474,6 +481,122 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return Unit.Instance;
+        }
+
+        private async Task RemoveUserIdUsesInOtherTables(Guid userId)
+        {
+            await _usersAndRolesDbContext.UserInvites
+                .Where(invite =>
+                    userId.ToString()
+                        .Equals(invite.CreatedById == null ? "" : invite.CreatedById.ToString(),
+                            StringComparison.OrdinalIgnoreCase))
+                .ExecuteUpdateAsync(setters =>
+                    setters.SetProperty(invite => invite.CreatedById, (string?)null));
+
+            await _databaseHelper.DoInTransaction(_contentDbContext, async ctxDelegate =>
+            {
+                await ctxDelegate.UserPublicationInvites
+                .Where(invite => invite.CreatedById == userId)
+                .ExecuteUpdateAsync(setters =>
+                    setters.SetProperty(invite => invite.CreatedById, (Guid?)null));
+
+                await ctxDelegate.UserReleaseInvites
+                    .Where(invite => invite.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(invite => invite.CreatedById, (Guid?)null));
+
+                await ctxDelegate.UserPublicationRoles
+                    .Where(role => role.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(role => role.CreatedById, (Guid?)null));
+
+                await ctxDelegate.UserPublicationRoles
+                    .Where(role => role.DeletedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(role => role.DeletedById, (Guid?)null));
+
+                await ctxDelegate.UserReleaseRoles
+                    .Where(role => role.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(role => role.CreatedById, (Guid?)null));
+
+                await ctxDelegate.UserReleaseRoles
+                    .Where(role => role.DeletedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(role => role.DeletedById, (Guid?)null));
+
+                await ctxDelegate.ReleaseStatus
+                    .Where(status => status.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(status => status.CreatedById, (Guid?)null));
+
+                await ctxDelegate.Comment
+                    .Where(comment => comment.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(comment => comment.CreatedById, (Guid?)null));
+
+                await ctxDelegate.Comment
+                    .Where(comment => comment.ResolvedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(comment => comment.ResolvedById, (Guid?)null));
+
+                await ctxDelegate.FeaturedTables
+                    .Where(ft => ft.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(ft => ft.CreatedById, (Guid?)null));
+
+                await ctxDelegate.FeaturedTables
+                    .Where(ft => ft.UpdatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(ft => ft.UpdatedById, (Guid?)null));
+
+                await ctxDelegate.Files
+                    .Where(file => file.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(file => file.CreatedById, (Guid?)null));
+
+                await ctxDelegate.GlossaryEntries
+                    .Where(entry => entry.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(entry => entry.CreatedById, (Guid?)null));
+
+                await ctxDelegate.KeyStatistics
+                    .Where(keyStat => keyStat.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(keyStat => keyStat.CreatedById, (Guid?)null));
+
+                await ctxDelegate.KeyStatistics
+                    .Where(keyStat => keyStat.UpdatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(keyStat => keyStat.UpdatedById, (Guid?)null));
+
+                await ctxDelegate.MethodologyNotes
+                    .Where(note => note.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(note => note.CreatedById, (Guid?)null));
+
+                await ctxDelegate.MethodologyNotes
+                    .Where(note => note.UpdatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(note => note.UpdatedById, (Guid?)null));
+
+                await ctxDelegate.MethodologyStatus
+                    .Where(status => status.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(status => status.CreatedById, (Guid?)null));
+
+                await ctxDelegate.MethodologyVersions
+                    .Where(status => status.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(status => status.CreatedById, (Guid?)null));
+
+                await ctxDelegate.ReleaseVersions
+                    .Where(status => status.CreatedById == userId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(status => status.CreatedById, (Guid?)null));
+
+                // @MarkFix just needs Update table sorting I think? Then all columns are sorted?
+            });
         }
     }
 }
