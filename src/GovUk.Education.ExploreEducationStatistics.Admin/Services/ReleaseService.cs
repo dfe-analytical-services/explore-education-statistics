@@ -126,9 +126,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
         {
             return await ReleaseCreateRequestValidator.Validate(releaseCreate)
-                .OnSuccess(async () => await _persistenceHelper.CheckEntityExists<Publication>(releaseCreate.PublicationId))
+                .OnSuccess(async () =>
+                    await _persistenceHelper.CheckEntityExists<Publication>(releaseCreate.PublicationId))
                 .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
-                .OnSuccessDo(async _ => await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
+                .OnSuccessDo(async _ =>
+                    await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
                 .OnSuccess(async publication =>
                 {
                     var newReleaseVersion = new ReleaseVersion
@@ -197,8 +199,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var methodologiesScheduledWithRelease =
                         GetMethodologiesScheduledWithRelease(releaseVersionId)
-                        .Select(m => new IdTitleViewModel(m.Id, m.Title))
-                        .ToList();
+                            .Select(m => new IdTitleViewModel(m.Id, m.Title))
+                            .ToList();
 
                     return new DeleteReleasePlanViewModel
                     {
@@ -214,18 +216,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
-                .OnSuccessDo(releaseVersion =>
-                {
-                    if (releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Draft)
-                    {
-                        throw new Exception("Can only delete draft releases");
-                    }
-                })
-                .OnSuccessDo(async () => await _processorClient.BulkDeleteDataSetVersions(releaseVersionId))
-                .OnSuccessDo(async release => await _cacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(release.Id)))
-                .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseVersionId))
-                .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseVersionId))
-                .OnSuccessVoid(async releaseVersion =>
+                .OnSuccess(releaseVersion => DoDeleteReleaseVersion(releaseVersion, cancellationToken));
+        }
+
+        public Task<Either<ActionResult, Unit>> DeleteTestReleaseVersion(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken = default)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanDeleteTestReleaseVersion)
+                .OnSuccess(releaseVersion => DoDeleteReleaseVersion(releaseVersion, cancellationToken));
+        }
+
+        private async Task<Either<ActionResult, Unit>> DoDeleteReleaseVersion(
+            ReleaseVersion releaseVersion,
+            CancellationToken cancellationToken = default)
+        {
+            return await _processorClient
+                .BulkDeleteDataSetVersions(releaseVersion.Id, cancellationToken)
+                .OnSuccessDo(async _ =>
+                    await _cacheService.DeleteCacheFolderAsync(
+                        new PrivateReleaseContentFolderCacheKey(releaseVersion.Id)))
+                .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseVersion.Id))
+                .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseVersion.Id))
+                .OnSuccessDo(async _ =>
                 {
                     if (!releaseVersion.Amendment)
                     {
@@ -236,12 +251,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await SoftDeleteForAmendment(releaseVersion, cancellationToken);
                     }
 
-                    UpdateMethodologies(releaseVersionId);
+                    UpdateMethodologies(releaseVersion.Id);
 
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync(cancellationToken);
 
                     // TODO: This may be redundant (investigate as part of EES-1295)
-                    await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseVersionId: releaseVersionId);
+                    await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseVersionId: releaseVersion.Id);
                 });
         }
 
@@ -575,16 +590,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             subjectId: tuple.releaseFile.File.SubjectId);
 
                     var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null
-                    ? null
-                    : new DeleteApiDataSetVersionPlanViewModel
-                    {
-                        DataSetId = tuple.apiDataSetVersion.DataSetId,
-                        DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
-                        Id = tuple.apiDataSetVersion.Id,
-                        Version = tuple.apiDataSetVersion.PublicVersion,
-                        Status = tuple.apiDataSetVersion.Status,
-                        Valid = false
-                    };
+                        ? null
+                        : new DeleteApiDataSetVersionPlanViewModel
+                        {
+                            DataSetId = tuple.apiDataSetVersion.DataSetId,
+                            DataSetTitle = tuple.apiDataSetVersion.DataSet.Title,
+                            Id = tuple.apiDataSetVersion.Id,
+                            Version = tuple.apiDataSetVersion.PublicVersion,
+                            Status = tuple.apiDataSetVersion.Status,
+                            Valid = false
+                        };
 
                     return new DeleteDataFilePlanViewModel
                     {

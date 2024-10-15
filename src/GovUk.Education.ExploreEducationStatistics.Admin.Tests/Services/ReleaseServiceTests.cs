@@ -1742,6 +1742,286 @@ public abstract class ReleaseServiceTests
         }
     }
 
+    public class DeleteTestReleaseVersionTests : ReleaseServiceTests
+    {
+        [Fact]
+        public async Task Success()
+        {
+            // Arrange
+            var release = _dataFixture.DefaultRelease().Generate();
+
+            var publication = new Publication
+            {
+                ReleaseSeries =
+                [
+                    new() { Id = Guid.NewGuid(), ReleaseId = release.Id }
+                ]
+            };
+
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = release.Id,
+                Publication = publication,
+                Version = 0,
+                ReleaseId = release.Id
+            };
+
+            // This Methodology is scheduled to go out with the Release being deleted.
+            var methodologyScheduledWithRelease = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
+                ScheduledWithReleaseVersionId = releaseVersion.Id,
+                Methodology =
+                    new Methodology { OwningPublicationTitle = "Methodology scheduled with this Release" },
+            };
+
+            // This Methodology has nothing to do with the Release being deleted.
+            var methodologyScheduledWithAnotherRelease = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
+                ScheduledWithReleaseVersionId = Guid.NewGuid(),
+                Methodology = new Methodology
+                {
+                    OwningPublicationTitle = "Methodology scheduled with another Release",
+                },
+            };
+
+            var userReleaseRole = new UserReleaseRole
+            {
+                UserId = User.Id,
+                ReleaseVersion = releaseVersion
+            };
+
+            var userReleaseInvite = new UserReleaseInvite { ReleaseVersion = releaseVersion };
+
+            var anotherRelease = new ReleaseVersion
+            {
+                Publication = publication,
+                Version = 0
+            };
+
+            var anotherUserReleaseRole = new UserReleaseRole
+            {
+                Id = Guid.NewGuid(),
+                ReleaseVersion = anotherRelease
+            };
+
+            var anotherUserReleaseInvite = new UserReleaseInvite
+            {
+                Id = Guid.NewGuid(),
+                ReleaseVersion = anotherRelease
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(release);
+                context.ReleaseVersions.AddRange(releaseVersion, anotherRelease);
+                context.UserReleaseRoles.AddRange(userReleaseRole, anotherUserReleaseRole);
+                context.UserReleaseInvites.AddRange(userReleaseInvite, anotherUserReleaseInvite);
+                context.MethodologyVersions.AddRange(methodologyScheduledWithRelease,
+                    methodologyScheduledWithAnotherRelease);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var cacheService = new Mock<IBlobCacheService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
+
+            releaseDataFilesService.Setup(mock =>
+                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
+
+            releaseFileService.Setup(mock =>
+                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
+
+            releaseSubjectRepository.Setup(mock =>
+                mock.DeleteAllReleaseSubjects(releaseVersion.Id, true)).Returns(Task.CompletedTask);
+
+            cacheService
+                .Setup(mock => mock.DeleteCacheFolderAsync(
+                    ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
+                .Returns(Task.CompletedTask);
+
+            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
+                    releaseVersion.Id,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context,
+                    releaseDataFileService: releaseDataFilesService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    releaseSubjectRepository: releaseSubjectRepository.Object,
+                    cacheService: cacheService.Object,
+                    processorClient: processorClient.Object);
+
+                // Act
+                var result = await releaseService.DeleteTestReleaseVersion(releaseVersion.Id);
+
+                // Assert
+                releaseDataFilesService.Verify(mock =>
+                        mock.DeleteAll(releaseVersion.Id, false),
+                    Times.Once);
+
+                releaseFileService.Verify(mock =>
+                        mock.DeleteAll(releaseVersion.Id, false),
+                    Times.Once);
+
+                VerifyAllMocks(cacheService,
+                    releaseDataFilesService,
+                    releaseFileService,
+                    processorClient
+                );
+
+                result.AssertRight();
+
+                // assert that hard-deleted entities no longer exist
+                var hardDeletedRelease = await context
+                    .ReleaseVersions
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
+
+                Assert.Null(hardDeletedRelease);
+
+                var hardDeletedReleaseRole = await context
+                    .UserReleaseRoles
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(r => r.Id == userReleaseRole.Id);
+
+                Assert.Null(hardDeletedReleaseRole);
+
+                var hardDeletedReleaseInvite = await context
+                    .UserReleaseInvites
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(r => r.Id == userReleaseInvite.Id);
+
+                Assert.Null(hardDeletedReleaseInvite);
+
+                // assert that other entities were not accidentally hard-deleted
+                var retrievedAnotherReleaseRole = await context
+                    .UserReleaseRoles
+                    .IgnoreQueryFilters()
+                    .FirstAsync(r => r.Id == anotherUserReleaseRole.Id);
+
+                Assert.False(retrievedAnotherReleaseRole.SoftDeleted);
+
+                var retrievedAnotherReleaseInvite = await context
+                    .UserReleaseInvites
+                    .IgnoreQueryFilters()
+                    .FirstAsync(r => r.Id == anotherUserReleaseInvite.Id);
+
+                Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
+                
+                // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
+                // to do so
+                var retrievedMethodologyVersion =
+                    await context.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithRelease.Id);
+                Assert.True(retrievedMethodologyVersion.ScheduledForPublishingImmediately);
+                Assert.Null(retrievedMethodologyVersion.ScheduledWithReleaseVersionId);
+                Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodologyVersion.Status);
+                Assert.InRange(DateTime.UtcNow
+                        .Subtract(retrievedMethodologyVersion.Updated!.Value).Milliseconds,
+                    0,
+                    1500);
+
+                // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
+                var unrelatedMethodology =
+                    await context.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithAnotherRelease.Id);
+                Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
+                Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
+                    unrelatedMethodology.ScheduledWithReleaseVersionId);
+            }
+        }
+
+        [Fact]
+        public async Task ProcessorReturns400_Returns400()
+        {
+            var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.Add(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var processorClient = new Mock<IProcessorClient>(Strict);
+
+            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
+                    releaseVersion.Id,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new BadRequestObjectResult(new ValidationProblemViewModel
+                {
+                    Errors = new ErrorViewModel[]
+                    {
+                        new()
+                        {
+                            Path = "error path",
+                            Code = "error code"
+                        }
+                    }
+                }));
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(
+                    context,
+                    processorClient: processorClient.Object);
+
+                var result = await releaseService.DeleteTestReleaseVersion(releaseVersion.Id);
+
+                VerifyAllMocks(processorClient);
+
+                var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+                validationProblem.AssertHasError(
+                    expectedPath: "error path",
+                    expectedCode: "error code");
+            }
+        }
+
+        [Fact]
+        public async Task ProcessorThrows_Throws()
+        {
+            var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.Add(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var processorClient = new Mock<IProcessorClient>(Strict);
+
+            processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
+                    releaseVersion.Id,
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new HttpRequestException());
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(
+                    context,
+                    processorClient: processorClient.Object);
+
+                await Assert.ThrowsAsync<HttpRequestException>(async () =>
+                    await releaseService.DeleteTestReleaseVersion(releaseVersion.Id));
+
+                VerifyAllMocks(processorClient);
+            }
+        }
+    }
+
     public class UpdateReleasePublishedTests : ReleaseServiceTests
     {
         [Fact]
