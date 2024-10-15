@@ -1835,10 +1835,10 @@ public abstract class ReleaseServiceTests
             var processorClient = new Mock<IProcessorClient>(Strict);
 
             releaseDataFilesService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
+                mock.DeleteAll(releaseVersion.Id, true)).ReturnsAsync(Unit.Instance);
 
             releaseFileService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, false)).ReturnsAsync(Unit.Instance);
+                mock.DeleteAll(releaseVersion.Id, true)).ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository.Setup(mock =>
                 mock.DeleteAllReleaseSubjects(releaseVersion.Id, true)).Returns(Task.CompletedTask);
@@ -1867,11 +1867,11 @@ public abstract class ReleaseServiceTests
 
                 // Assert
                 releaseDataFilesService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, false),
+                        mock.DeleteAll(releaseVersion.Id, true),
                     Times.Once);
 
                 releaseFileService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, false),
+                        mock.DeleteAll(releaseVersion.Id, true),
                     Times.Once);
 
                 VerifyAllMocks(cacheService,
