@@ -68,9 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetMyThemes_NoAccessToSystem()
+        public async Task GetMyThemes_NoAccessToSystem()
         {
-            PolicyCheckBuilder()
+            await PolicyCheckBuilder()
                 .SetupCheck(SecurityPolicies.RegisteredUser, false)
                 .AssertForbidden(
                     async userService =>
@@ -83,9 +83,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void CreateTheme()
+        public async Task CreateTheme()
         {
-            PolicyCheckBuilder()
+            await PolicyCheckBuilder()
                 .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertForbidden(
                     async userService =>
@@ -104,9 +104,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void UpdateTheme()
+        public async Task UpdateTheme()
         {
-            PolicyCheckBuilder()
+            await PolicyCheckBuilder()
                 .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertForbidden(
                     async userService =>
@@ -126,10 +126,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetTheme()
+        public async Task GetTheme()
         {
-            PolicyCheckBuilder()
-                .SetupResourceCheck(_theme, SecurityPolicies.CanManageAllTaxonomy, false)
+            await PolicyCheckBuilder()
+                .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertForbidden(
                     async userService =>
                     {
@@ -141,9 +141,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void DeleteTheme()
+        public async Task DeleteTheme()
         {
-            PolicyCheckBuilder()
+            await PolicyCheckBuilder()
                 .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertForbidden(
                     async userService =>
@@ -177,32 +177,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private ThemeService SetupThemeService(
             ContentDbContext contentContext = null,
-            StatisticsDbContext statisticsContext = null,
             IMapper mapper = null,
             PersistenceHelper<ContentDbContext> persistenceHelper = null,
             IUserService userService = null,
-            IBlobCacheService cacheService = null,
             IMethodologyService methodologyService = null,
-            IReleaseSubjectRepository releaseSubjectRepository = null,
-            IReleaseFileService releaseFileService = null,
-            IReleaseDataFileService releaseDataFileService = null,
-            IReleasePublishingStatusRepository releasePublishingStatusRepository = null,
-            IPublishingService publishingService = null)
+            IPublishingService publishingService = null,
+            IReleaseService releaseService = null)
         {
             return new ThemeService(
                 DefaultAppOptions(),
-                contentContext ?? new Mock<ContentDbContext>().Object,
-                statisticsContext ?? new Mock<StatisticsDbContext>().Object,
+                contentContext ?? Mock.Of<ContentDbContext>(),
                 mapper ?? AdminMapper(),
                 persistenceHelper ?? MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object,
                 userService ?? AlwaysTrueUserService().Object,
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-                releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
-                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
-                releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),
-                releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(),
-                publishingService ?? new Mock<IPublishingService>().Object,
-                cacheService ?? Mock.Of<IBlobCacheService>(Strict)
+                publishingService ?? Mock.Of<IPublishingService>(Strict),
+                releaseService ?? Mock.Of<IReleaseService>(Strict)
             );
         }
     }
