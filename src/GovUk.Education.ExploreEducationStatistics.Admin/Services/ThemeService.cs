@@ -146,7 +146,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             CancellationToken cancellationToken = default)
         {
             return await _userService.CheckCanManageAllTaxonomy()
-                .OnSuccess(() => _persistenceHelper.CheckEntityExists<Theme>(themeId, q => q.Include(t => t.Publications)))
+                .OnSuccess(() =>
+                    _persistenceHelper.CheckEntityExists<Theme>(themeId, q => q.Include(t => t.Publications)))
                 .OnSuccessDo(CheckCanDeleteTheme)
                 .OnSuccessDo(async theme =>
                 {
@@ -155,8 +156,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToList();
 
                     return await DeleteMethodologiesForPublications(publicationIdsToDelete)
-                       .OnSuccess(() => DeleteReleasesForPublications(publicationIdsToDelete))
-                       .OnSuccess(() => DeletePublications(publicationIdsToDelete));
+                        .OnSuccess(() => DeleteReleasesForPublications(publicationIdsToDelete))
+                        .OnSuccess(() => DeletePublications(publicationIdsToDelete));
                 })
                 .OnSuccessVoid(async theme =>
                 {
@@ -196,6 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 publication.LatestPublishedReleaseVersionId = null;
             });
 
+            _contentDbContext.UpdateRange(publications);
             await _contentDbContext.SaveChangesAsync();
 
             // Some Content Db Releases may be soft-deleted and therefore not visible.

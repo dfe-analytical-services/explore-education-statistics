@@ -218,10 +218,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             CancellationToken cancellationToken = default)
         {
             return _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .CheckEntityExists<ReleaseVersion>(
+                    id: releaseVersionId,
+                    query => query.Include(rv => rv.Publication.Theme))
                 .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
+                    forceDeleteAllPublicApiData: false,
                     forceDeleteFiles: false,
                     deleteStatisticsRelease: false,
                     hardDeleteContentReleaseVersion: !releaseVersion.Amendment,
@@ -233,10 +236,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             CancellationToken cancellationToken = default)
         {
             return _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .CheckEntityExists<ReleaseVersion>(
+                    id: releaseVersionId,
+                    query => query.Include(rv => rv.Publication.Theme))
                 .OnSuccess(_userService.CheckCanDeleteTestReleaseVersion)
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
+                    forceDeleteAllPublicApiData: true,
                     forceDeleteFiles: true,
                     deleteStatisticsRelease: true,
                     hardDeleteContentReleaseVersion: true,
@@ -245,13 +251,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> DoDeleteReleaseVersion(
             ReleaseVersion releaseVersion,
+            bool forceDeleteAllPublicApiData = false,
             bool forceDeleteFiles = false,
             bool deleteStatisticsRelease = false,
             bool hardDeleteContentReleaseVersion = false,
             CancellationToken cancellationToken = default)
         {
             return await _processorClient
-                .BulkDeleteDataSetVersions(releaseVersion.Id, cancellationToken)
+                .BulkDeleteDataSetVersions(
+                    releaseVersionId: releaseVersion.Id,
+                    forceDeleteAll: forceDeleteAllPublicApiData,
+                    cancellationToken: cancellationToken)
                 .OnSuccessDo(async _ =>
                     await _cacheService.DeleteCacheFolderAsync(
                         new PrivateReleaseContentFolderCacheKey(releaseVersion.Id)))
@@ -280,9 +290,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         // Delete release entries in the Azure Storage ReleaseStatus table - if not it will attempt to publish
                         // deleted releases that were left scheduled
-                        await _releasePublishingStatusRepository.RemovePublisherReleaseStatuses(releaseVersionIds: [releaseVersion.Id]);
+                        await _releasePublishingStatusRepository.RemovePublisherReleaseStatuses(releaseVersionIds:
+                            [releaseVersion.Id]);
                     }
-                    
+
                     if (deleteStatisticsRelease)
                     {
                         var statsReleaseVersion = await _statisticsDbContext
@@ -317,8 +328,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await DeleteReleaseSeriesItem(releaseVersion, cancellationToken);
             await DeleteDataBlocks(releaseVersion.Id, cancellationToken);
 
-            var release = await _context.Releases.FindAsync(releaseVersion.ReleaseId, cancellationToken);
-            _context.Releases.Remove(release!);
+            _context.ReleaseVersions.Remove(releaseVersion);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            var release = await _context
+                .Releases
+                .Include(release => release.Versions)
+                .SingleAsync(
+                    release => release.Id == releaseVersion.ReleaseId,
+                    cancellationToken);
+
+            if (release.Versions.Count == 0)
+            {
+                _context.Releases.Remove(release);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
 
             // We suspect this is only necessary for the unit tests, as the in-memory database doesn't perform a cascade delete
             await DeleteRoles(releaseVersion.Id, hardDelete: true, cancellationToken);
@@ -413,8 +437,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 dataBlockParent.LatestPublishedVersionId = null;
             });
 
-            await _context.SaveChangesAsync(cancellationToken);            
-            
+            await _context.SaveChangesAsync(cancellationToken);
+
             // Then remove the now-unreferenced DataBlockVersions.
             _context.DataBlockVersions.RemoveRange(dataBlockVersions);
             await _context.SaveChangesAsync(cancellationToken);

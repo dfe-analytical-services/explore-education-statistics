@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
@@ -25,7 +25,7 @@ public class DeleteTestReleaseAuthorizationHandler(
             return Task.CompletedTask;
         }
 
-        if (!context.User.IsInRole(GlobalRoles.Role.BauUser.ToString()))
+        if (!context.User.IsInRole(GlobalRoles.Role.BauUser.GetEnumLabel()))
         {
             return Task.CompletedTask;
         }

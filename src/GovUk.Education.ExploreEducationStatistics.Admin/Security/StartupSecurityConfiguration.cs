@@ -226,6 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, DeleteSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, DeleteTestReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MarkReleaseAsDraftAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MarkReleaseAsHigherLevelReviewAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MarkReleaseAsApprovedAuthorizationHandler>();

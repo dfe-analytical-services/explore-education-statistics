@@ -47,6 +47,7 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.S
 using static Moq.MockBehavior;
 using IReleaseVersionRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using StatsReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -1397,7 +1398,8 @@ public abstract class ReleaseServiceTests
                         Id = Guid.NewGuid(),
                         ReleaseId = release.Id
                     }
-                ]
+                ],
+                Theme = new Theme()
             };
 
             var releaseVersion = new ReleaseVersion
@@ -1475,7 +1477,7 @@ public abstract class ReleaseServiceTests
                     methodologyScheduledWithAnotherRelease);
                 await context.SaveChangesAsync();
             }
-            
+
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 context.ReleaseVersion.AddRange(statisticsReleaseVersion);
@@ -1490,7 +1492,8 @@ public abstract class ReleaseServiceTests
 
             var forceDeleteFiles = false;
             var softDeleteOrphanedSubjects = true;
-            
+            var forceDeletePublicApiData = false;
+
             releaseDataFilesService.Setup(mock =>
                 mock.DeleteAll(releaseVersion.Id, forceDeleteFiles)).ReturnsAsync(Unit.Instance);
 
@@ -1498,7 +1501,8 @@ public abstract class ReleaseServiceTests
                 mock.DeleteAll(releaseVersion.Id, forceDeleteFiles)).ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository.Setup(mock =>
-                mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects)).Returns(Task.CompletedTask);
+                    mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects))
+                .Returns(Task.CompletedTask);
 
             cacheService
                 .Setup(mock => mock.DeleteCacheFolderAsync(
@@ -1507,6 +1511,7 @@ public abstract class ReleaseServiceTests
 
             processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
                     releaseVersion.Id,
+                    forceDeletePublicApiData,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
@@ -1669,7 +1674,8 @@ public abstract class ReleaseServiceTests
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
                 var retrievedMethodologyVersion =
-                    await contentDbContext.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithRelease.Id);
+                    await contentDbContext.MethodologyVersions.SingleAsync(m =>
+                        m.Id == methodologyScheduledWithRelease.Id);
                 Assert.True(retrievedMethodologyVersion.ScheduledForPublishingImmediately);
                 Assert.Null(retrievedMethodologyVersion.ScheduledWithReleaseVersionId);
                 Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodologyVersion.Status);
@@ -1698,7 +1704,14 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task ProcessorReturns400_Returns400()
         {
-            var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid(),
+                Publication = new Publication
+                {
+                    Theme = new Theme()
+                }
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1710,8 +1723,11 @@ public abstract class ReleaseServiceTests
 
             var processorClient = new Mock<IProcessorClient>(Strict);
 
+            var forceDeletePublicApiData = false;
+
             processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
                     releaseVersion.Id,
+                    forceDeletePublicApiData,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new BadRequestObjectResult(new ValidationProblemViewModel
                 {
@@ -1746,8 +1762,15 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task ProcessorThrows_Throws()
         {
-            var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
-
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid(),
+                Publication = new Publication
+                {
+                    Theme = new Theme()
+                }
+            };
+            
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1758,8 +1781,11 @@ public abstract class ReleaseServiceTests
 
             var processorClient = new Mock<IProcessorClient>(Strict);
 
+            var forceDeletePublicApiData = false;
+
             processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
                     releaseVersion.Id,
+                    forceDeletePublicApiData,
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new HttpRequestException());
 
@@ -1794,7 +1820,8 @@ public abstract class ReleaseServiceTests
                         Id = Guid.NewGuid(),
                         ReleaseId = release.Id
                     }
-                ]
+                ],
+                Theme = new Theme()
             };
 
             var releaseVersion = new ReleaseVersion
@@ -1805,7 +1832,7 @@ public abstract class ReleaseServiceTests
                 ReleaseId = release.Id,
                 ApprovalStatus = ReleaseApprovalStatus.Approved
             };
-            
+
             var statisticsReleaseVersion = new StatsReleaseVersion
             {
                 Id = releaseVersion.Id,
@@ -1873,7 +1900,7 @@ public abstract class ReleaseServiceTests
                     methodologyScheduledWithAnotherRelease);
                 await context.SaveChangesAsync();
             }
-            
+
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 context.ReleaseVersion.AddRange(statisticsReleaseVersion);
@@ -1889,6 +1916,7 @@ public abstract class ReleaseServiceTests
 
             var forceDeleteFiles = true;
             var softDeleteOrphanedSubjects = false;
+            var forceDeletePublicApiData = true;
 
             releaseDataFilesService.Setup(mock =>
                 mock.DeleteAll(releaseVersion.Id, forceDeleteFiles)).ReturnsAsync(Unit.Instance);
@@ -1900,7 +1928,7 @@ public abstract class ReleaseServiceTests
                     mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects))
                 .Returns(Task.CompletedTask);
 
-            releasePublishingStatusRepository.Setup(mock => 
+            releasePublishingStatusRepository.Setup(mock =>
                     mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
                 .Returns(Task.CompletedTask);
 
@@ -1911,6 +1939,7 @@ public abstract class ReleaseServiceTests
 
             processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
                     releaseVersion.Id,
+                    forceDeletePublicApiData,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
@@ -1993,7 +2022,8 @@ public abstract class ReleaseServiceTests
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
                 var retrievedMethodologyVersion =
-                    await contentDbContext.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithRelease.Id);
+                    await contentDbContext.MethodologyVersions.SingleAsync(m =>
+                        m.Id == methodologyScheduledWithRelease.Id);
                 Assert.True(retrievedMethodologyVersion.ScheduledForPublishingImmediately);
                 Assert.Null(retrievedMethodologyVersion.ScheduledWithReleaseVersionId);
                 Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodologyVersion.Status);
@@ -2022,7 +2052,14 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task ProcessorReturns400_Returns400()
         {
-            var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid(),
+                Publication = new Publication
+                {
+                    Theme = new Theme()
+                }
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -2034,8 +2071,11 @@ public abstract class ReleaseServiceTests
 
             var processorClient = new Mock<IProcessorClient>(Strict);
 
+            var forceDeletePublicApiData = true;
+
             processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
                     releaseVersion.Id,
+                    forceDeletePublicApiData,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new BadRequestObjectResult(new ValidationProblemViewModel
                 {
@@ -2070,7 +2110,14 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task ProcessorThrows_Throws()
         {
-            var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid(),
+                Publication = new Publication
+                {
+                    Theme = new Theme()
+                }
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -2082,8 +2129,11 @@ public abstract class ReleaseServiceTests
 
             var processorClient = new Mock<IProcessorClient>(Strict);
 
+            var forceDeletePublicApiData = true;
+
             processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
                     releaseVersion.Id,
+                    forceDeletePublicApiData,
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new HttpRequestException());
 
