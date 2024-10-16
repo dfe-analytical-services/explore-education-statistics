@@ -56,12 +56,16 @@ const BauUsersPage = () => {
                       Manage
                     </Link>
                     {/* EES-5573 */}
-                    {/* <ButtonText */}
-                    {/*  onClick={() => handleDeleteUser(user.email)} */}
-                    {/*  className={styles.deleteUserButton} */}
-                    {/* > */}
-                    {/*  Delete */}
-                    {/* </ButtonText> */}
+                    {/* <DeleteUserModal
+                      triggerButton={
+                        <ButtonText
+                          className={styles.deleteUserButton}
+                        >
+                          Delete
+                        </ButtonText>
+                      }
+                      onConfirm={async () => await handleDeleteUser(user.email)}
+                    /> */}
                   </td>
                 </tr>
               ))}
