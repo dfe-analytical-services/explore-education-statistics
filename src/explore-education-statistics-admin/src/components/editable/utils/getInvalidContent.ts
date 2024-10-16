@@ -56,21 +56,16 @@ export default function getInvalidContent(
     }
 
     const level = parseNumber(heading.name.split('heading')[1]);
-    const headingText = heading.children.map(child => child.data).join('');
 
     if (index === 0) {
-      if (level !== 3) {
-        errors.push({
-          type: 'skippedHeadingLevel',
-          message: `h2 (section title) to h${level} (${headingText})`,
-        });
-      }
       return;
     }
 
     const previousLevel = parseNumber(
       allHeadings[index - 1].name.split('heading')[1],
     );
+
+    const headingText = heading.children.map(child => child.data).join('');
 
     if (level && previousLevel && level > previousLevel + 1) {
       const previousHeadingText = allHeadings[index - 1].children
