@@ -225,6 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     forceDeleteFiles: false,
                     deletePublishingStatus: false,
                     deleteStatisticsRelease: false,
+                    hardDeleteContentReleaseVersion: !releaseVersion.Amendment,
                     cancellationToken));
         }
 
@@ -240,6 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     forceDeleteFiles: true,
                     deletePublishingStatus: true,
                     deleteStatisticsRelease: true,
+                    hardDeleteContentReleaseVersion: true,
                     cancellationToken));
         }
 
@@ -248,6 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             bool forceDeleteFiles = false,
             bool deletePublishingStatus = false,
             bool deleteStatisticsRelease = false,
+            bool hardDeleteContentReleaseVersion = false,
             CancellationToken cancellationToken = default)
         {
             return await _processorClient
@@ -263,13 +266,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     forceDelete: forceDeleteFiles))
                 .OnSuccessDo(async _ =>
                 {
-                    if (!releaseVersion.Amendment)
+                    if (hardDeleteContentReleaseVersion)
                     {
-                        await HardDeleteForDraft(releaseVersion, cancellationToken);
+                        await HardDeleteReleaseVersion(releaseVersion, cancellationToken);
                     }
                     else
                     {
-                        await SoftDeleteForAmendment(releaseVersion, cancellationToken);
+                        await SoftDeleteReleaseVersion(releaseVersion, cancellationToken);
                     }
 
                     UpdateMethodologies(releaseVersion.Id);
@@ -308,7 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task HardDeleteForDraft(
+        private async Task HardDeleteReleaseVersion(
             ReleaseVersion releaseVersion,
             CancellationToken cancellationToken)
         {
@@ -323,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await DeleteInvites(releaseVersion.Id, hardDelete: true, cancellationToken);
         }
 
-        private async Task SoftDeleteForAmendment(
+        private async Task SoftDeleteReleaseVersion(
             ReleaseVersion releaseVersion,
             CancellationToken cancellationToken)
         {
