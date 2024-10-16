@@ -10,6 +10,8 @@ import baseRender from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React, { ReactElement } from 'react';
+import { DataSet } from '@common/modules/charts/types/dataSet';
+import { ChartBoundaryLevelsFormValues } from '../ChartBoundaryLevelsForm';
 
 describe('ChartBoundaryLevelsConfiguration', () => {
   const testTable = testFullTable;
@@ -51,6 +53,18 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       title: 'Boundary levels configuration',
     },
   };
+  const testDataSets: DataSet[] = [
+    {
+      filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+      indicator: 'authorised-absence-sessions',
+      timePeriod: '2014_AY',
+    },
+    {
+      filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+      indicator: 'authorised-absence-sessions',
+      timePeriod: '2015_AY',
+    },
+  ];
 
   function render(element: ReactElement) {
     return baseRender(
@@ -64,13 +78,39 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     );
   }
 
+  test('renders without table one or less dataset is included', () => {
+    render(
+      <ChartBoundaryLevelsConfiguration
+        data={testTable.results}
+        meta={testMeta}
+        axisMajor={{
+          dataSets: [testDataSets[0]],
+          groupBy: 'locations',
+          referenceLines: [],
+          type: 'major',
+          visible: true,
+        }}
+        legend={{
+          position: 'top',
+          items: [],
+        }}
+        options={testDefaultChartOptions}
+        onChange={noop}
+        onSubmit={noop}
+      />,
+    );
+    expect(
+      screen.queryByText('Set boundary levels per data set'),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders correctly without initial values', () => {
     render(
       <ChartBoundaryLevelsConfiguration
         data={testTable.results}
         meta={testMeta}
         axisMajor={{
-          dataSets: [],
+          dataSets: testDataSets,
           groupBy: 'locations',
           referenceLines: [],
           type: 'major',
@@ -86,9 +126,9 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Boundary level')).not.toHaveValue();
+    expect(screen.getByLabelText('Default boundary level')).not.toHaveValue();
     const boundaryLevels = within(
-      screen.getByLabelText('Boundary level'),
+      screen.getByLabelText('Default boundary level'),
     ).getAllByRole('option');
 
     expect(boundaryLevels).toHaveLength(4);
@@ -100,6 +140,19 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     expect(boundaryLevels[2]).toHaveValue('2');
     expect(boundaryLevels[3]).toHaveTextContent('Boundary level 3');
     expect(boundaryLevels[3]).toHaveValue('3');
+
+    expect(
+      screen.getByText('Set boundary levels per data set'),
+    ).toBeInTheDocument();
+
+    const rows = screen.getAllByRole('row');
+    expect(rows).toHaveLength(3);
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells[0]).toHaveTextContent(
+      'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, All locations, 2014/15)',
+    );
+    expect(row1Cells[1]).toHaveTextContent('Use default');
   });
 
   test('renders correctly with initial values', () => {
@@ -108,7 +161,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         data={testTable.results}
         meta={testMeta}
         axisMajor={{
-          dataSets: [],
+          dataSets: testDataSets,
           groupBy: 'locations',
           referenceLines: [],
           type: 'major',
@@ -122,12 +175,24 @@ describe('ChartBoundaryLevelsConfiguration', () => {
           ...testDefaultChartOptions,
           boundaryLevel: 2,
         }}
+        map={{
+          dataSetConfigs: testDataSets.map(dataSet => ({
+            dataSet,
+            dataGrouping: { type: 'Custom', customGroups: [] },
+            boundaryLevel: 3,
+          })),
+        }}
         onChange={noop}
         onSubmit={noop}
       />,
     );
 
-    expect(screen.getByLabelText('Boundary level')).toHaveValue('2');
+    expect(screen.getByLabelText('Default boundary level')).toHaveValue('2');
+    const rows = screen.getAllByRole('row');
+    expect(rows).toHaveLength(3);
+
+    expect(within(rows[1]).getByRole('combobox')).toHaveValue('3');
+    expect(within(rows[2]).getByRole('combobox')).toHaveValue('3');
   });
 
   test('calls `onChange` handler when form values change', async () => {
@@ -138,7 +203,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         data={testTable.results}
         meta={testMeta}
         axisMajor={{
-          dataSets: [],
+          dataSets: testDataSets,
           groupBy: 'locations',
           referenceLines: [],
           type: 'major',
@@ -154,11 +219,24 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       />,
     );
 
-    await user.selectOptions(screen.getByLabelText('Boundary level'), ['2']);
+    await user.selectOptions(screen.getByLabelText('Default boundary level'), [
+      '2',
+    ]);
 
-    expect(handleChange).toHaveBeenCalledWith<[ChartOptions]>({
-      ...testDefaultChartOptions,
+    expect(handleChange).toHaveBeenCalledWith<[ChartBoundaryLevelsFormValues]>({
       boundaryLevel: 2,
+      dataSetConfigs: testDataSets.map(dataSet => ({ dataSet })),
+    });
+
+    const rows = screen.getAllByRole('row');
+    await user.selectOptions(within(rows[1]).getByRole('combobox'), ['2']);
+
+    expect(handleChange).toHaveBeenCalledWith<[ChartBoundaryLevelsFormValues]>({
+      boundaryLevel: 2,
+      dataSetConfigs: [
+        { dataSet: testDataSets[0], boundaryLevel: 2 },
+        { dataSet: testDataSets[1] },
+      ],
     });
   });
 
@@ -168,7 +246,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         data={testTable.results}
         meta={testMeta}
         axisMajor={{
-          dataSets: [],
+          dataSets: testDataSets,
           groupBy: 'locations',
           referenceLines: [],
           type: 'major',
@@ -208,7 +286,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         data={testTable.results}
         meta={testMeta}
         axisMajor={{
-          dataSets: [],
+          dataSets: testDataSets,
           groupBy: 'locations',
           referenceLines: [],
           type: 'major',
@@ -224,7 +302,9 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       />,
     );
 
-    await user.selectOptions(screen.getByLabelText('Boundary level'), ['2']);
+    await user.selectOptions(screen.getByLabelText('Default boundary level'), [
+      '2',
+    ]);
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -233,9 +313,11 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     );
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith<[ChartOptions]>({
-        ...testDefaultChartOptions,
+      expect(handleSubmit).toHaveBeenCalledWith<
+        [ChartBoundaryLevelsFormValues]
+      >({
         boundaryLevel: 2,
+        dataSetConfigs: testDataSets.map(dataSet => ({ dataSet })),
       });
     });
   });
@@ -248,7 +330,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         data={testTable.results}
         meta={testMeta}
         axisMajor={{
-          dataSets: [],
+          dataSets: testDataSets,
           groupBy: 'locations',
           referenceLines: [],
           type: 'major',
@@ -274,9 +356,11 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     );
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith<[ChartOptions]>({
-        ...testDefaultChartOptions,
+      expect(handleSubmit).toHaveBeenCalledWith<
+        [ChartBoundaryLevelsFormValues]
+      >({
         boundaryLevel: 3,
+        dataSetConfigs: testDataSets.map(dataSet => ({ dataSet })),
       });
     });
   });

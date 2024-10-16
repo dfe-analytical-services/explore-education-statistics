@@ -246,7 +246,6 @@ export const chartBuilderReducer: Reducer<
               isEqual(existingDataSet, dataSet),
             )! ?? {};
 
-          if (boundaryLevel) console.log({ boundaryLevel });
           return { dataSet, boundaryLevel, dataGrouping };
         },
       );
