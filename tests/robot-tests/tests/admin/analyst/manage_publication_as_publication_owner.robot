@@ -77,7 +77,7 @@ Update publication details
     user waits until page contains element    id:publicationDetailsForm-summary
 
     # Only BAU should see theme
-    user checks page does not contain element    id:publicationDetailsForm-themeId
+    user checks page does not contain element    name:themeId
 
     # Only BAU users should see supersededById
     user checks page does not contain element    id:publicationDetailsForm-supersededById
