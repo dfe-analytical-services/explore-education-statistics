@@ -1,118 +1,134 @@
-import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
-import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
+import ChartBoundaryLevelsForm, {
+  ChartBoundaryLevelsFormValues,
+} from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsForm';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
-import Effect from '@common/components/Effect';
-import FormProvider from '@common/components/form/FormProvider';
-import Form from '@common/components/form/Form';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import {
+  AxisConfiguration,
+  MapConfig,
+} from '@common/modules/charts/types/chart';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
+import expandDataSet from '@common/modules/charts/util/expandDataSet';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
+import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import parseNumber from '@common/utils/number/parseNumber';
-import Yup from '@common/validation/yup';
-import merge from 'lodash/merge';
-import React, { ReactNode, useCallback } from 'react';
-
-const formId = 'chartBoundaryLevelsConfigurationForm';
-
-interface FormValues {
-  boundaryLevel?: number;
-}
+import { isEqual } from 'lodash';
+import React, { ReactNode, useCallback, useMemo } from 'react';
+import generateDataSetLabel from './utils/generateDataSetLabel';
 
 interface Props {
   buttons?: ReactNode;
+  axisMajor: AxisConfiguration;
+  data: TableDataResult[];
+  legend: LegendConfiguration;
+  map?: MapConfig;
   meta: FullTableMeta;
   options: ChartOptions;
-  onChange: (values: ChartOptions) => void;
-  onSubmit: (chartOptions: ChartOptions) => void;
+  onChange: (values: Partial<ChartBoundaryLevelsFormValues>) => void;
+  onSubmit: (values: ChartBoundaryLevelsFormValues) => void;
 }
 
 export default function ChartBoundaryLevelsConfiguration({
   buttons,
+  axisMajor,
+  data,
+  legend,
+  map,
   meta,
   options,
   onChange,
   onSubmit,
 }: Props) {
-  const { updateForm, submitForms } = useChartBuilderFormsContext();
-
   const normalizeValues = useCallback(
-    (values: FormValues): ChartOptions => {
+    (
+      values: Partial<ChartBoundaryLevelsFormValues>,
+    ): ChartBoundaryLevelsFormValues => {
       // Use `merge` as we want to avoid potential undefined
       // values from overwriting existing values
-      return merge({}, options, values, {
+      return {
         boundaryLevel: values.boundaryLevel
           ? parseNumber(values.boundaryLevel)
           : undefined,
-      });
+        dataSetConfigs:
+          values.dataSetConfigs?.map(({ boundaryLevel, dataSet }) => ({
+            boundaryLevel: parseNumber(boundaryLevel),
+            dataSet,
+          })) ?? [],
+      };
     },
-    [options],
+    [],
   );
 
+  const handleSubmit = useCallback(
+    (values: ChartBoundaryLevelsFormValues) => {
+      onSubmit(normalizeValues(values));
+    },
+    [onSubmit, normalizeValues],
+  );
   const handleChange = useCallback(
-    (values: FormValues) => {
+    (values: Partial<ChartBoundaryLevelsFormValues>) => {
       onChange(normalizeValues(values));
     },
-    [normalizeValues, onChange],
+    [onChange, normalizeValues],
   );
 
-  return (
-    <FormProvider
-      enableReinitialize
-      initialValues={{ boundaryLevel: options.boundaryLevel }}
-      validationSchema={Yup.object<FormValues>({
-        boundaryLevel: Yup.number()
-          .transform(value => (Number.isNaN(value) ? undefined : value))
-          .nullable()
-          .oneOf(meta.boundaryLevels.map(level => level.id))
-          .required('Choose a boundary level'),
-      })}
-    >
-      {({ formState, watch }) => {
-        const values = watch();
-        return (
-          <Form
-            id={formId}
-            onSubmit={async () => {
-              onSubmit(normalizeValues(values));
-              await submitForms();
-            }}
-          >
-            <Effect value={values} onChange={handleChange} />
-            <Effect
-              value={{
-                formKey: 'boundaryLevels',
-                isValid: formState.isValid,
-                submitCount: formState.submitCount,
-              }}
-              onChange={updateForm}
-              onMount={updateForm}
-            />
-            <FormFieldSelect<FormValues>
-              label="Boundary level"
-              hint="Select a version of geographical data to use"
-              name="boundaryLevel"
-              order={[]}
-              options={[
-                {
-                  label: 'Please select',
-                  value: '',
-                },
-                ...meta.boundaryLevels.map(({ id, label }) => ({
-                  value: id,
-                  label,
-                })),
-              ]}
-            />
+  const { dataSetConfigs, boundaryLevel } =
+    useMemo<ChartBoundaryLevelsFormValues>(() => {
+      const dataSetCategories = createDataSetCategories({
+        axisConfiguration: {
+          ...axisMajor,
+          groupBy: 'locations',
+        },
+        data,
+        meta,
+      });
 
-            <ChartBuilderSaveActions
-              formId={formId}
-              formKey="boundaryLevels"
-              disabled={formState.isSubmitting}
-            >
-              {buttons}
-            </ChartBuilderSaveActions>
-          </Form>
-        );
-      }}
-    </FormProvider>
+      const dataSetCategoryConfigs = getDataSetCategoryConfigs({
+        dataSetCategories,
+        legendItems: legend.items,
+        meta,
+        deprecatedDataClassification: options.dataClassification,
+        deprecatedDataGroups: options.dataGroups,
+      });
+
+      return {
+        boundaryLevel: options.boundaryLevel,
+        dataSetConfigs: dataSetCategoryConfigs.map(({ rawDataSet }) => ({
+          dataSet: rawDataSet,
+          boundaryLevel: map?.dataSetConfigs.find(config =>
+            isEqual(config.dataSet, rawDataSet),
+          )?.boundaryLevel,
+        })),
+      };
+    }, [axisMajor, data, meta, legend.items, map, options]);
+
+  const mappedDataSetConfigs = useMemo(() => {
+    return Object.values(dataSetConfigs).map(dataSetConfig => {
+      const expandedDataSet = expandDataSet(dataSetConfig.dataSet, meta);
+      const label = generateDataSetLabel(expandedDataSet);
+      const key = generateDataSetKey(dataSetConfig.dataSet);
+
+      return {
+        label,
+        key,
+      };
+    });
+  }, [meta, dataSetConfigs]);
+
+  return (
+    <ChartBoundaryLevelsForm
+      hasDataSetBoundaryLevels={false}
+      buttons={buttons}
+      boundaryLevelOptions={meta.boundaryLevels.map(({ id, label }) => ({
+        label,
+        value: id,
+      }))}
+      dataSetRows={mappedDataSetConfigs}
+      initialValues={{ boundaryLevel, dataSetConfigs }}
+      onChange={handleChange}
+      onSubmit={handleSubmit}
+    />
   );
 }

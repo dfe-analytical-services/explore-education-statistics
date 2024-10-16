@@ -5,6 +5,7 @@ import { FormIdContextProvider } from '@common/components/form/contexts/FormIdCo
 import createErrorHelper from '@common/components/form/validation/createErrorHelper';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
+import { isEqual } from 'lodash';
 import camelCase from 'lodash/camelCase';
 import React, {
   FormEvent,
@@ -24,6 +25,7 @@ interface Props<TFormValues extends FieldValues> {
   submitId?: string;
   showErrorSummary?: boolean;
   visuallyHiddenErrorSummary?: boolean;
+  onChange?: (values: Partial<TFormValues>) => Promise<void> | void;
   onSubmit: (values: TFormValues) => Promise<void> | void;
 }
 
@@ -52,6 +54,7 @@ export default function Form<TFormValues extends FieldValues>({
   submitId = `${id}-submit`,
   showErrorSummary = true,
   visuallyHiddenErrorSummary = false,
+  onChange,
   onSubmit,
 }: Props<TFormValues>) {
   const isMounted = useMountedRef();
@@ -67,9 +70,15 @@ export default function Form<TFormValues extends FieldValues>({
     handleSubmit: submit,
   } = useFormContext<TFormValues>();
 
-  const values = useWatch();
+  const values = useWatch<TFormValues>();
   const previousValues = useRef(values);
   const previousSubmitCount = useRef(submitCount);
+
+  useEffect(() => {
+    if (!isEqual(previousValues.current, values)) {
+      onChange?.(values);
+    }
+  }, [previousValues, values, onChange]);
 
   const { getAllErrors } = createErrorHelper({
     errors,

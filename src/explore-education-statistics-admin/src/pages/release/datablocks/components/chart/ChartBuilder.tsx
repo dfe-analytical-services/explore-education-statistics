@@ -1,17 +1,14 @@
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import ChartAxisConfiguration from '@admin/pages/release/datablocks/components/chart/ChartAxisConfiguration';
+import ChartBoundaryLevelsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsConfiguration';
 import ChartBuilderPreview from '@admin/pages/release/datablocks/components/chart/ChartBuilderPreview';
 import ChartConfiguration from '@admin/pages/release/datablocks/components/chart/ChartConfiguration';
+import ChartDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingsConfiguration';
 import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration';
 import ChartDefinitionSelector from '@admin/pages/release/datablocks/components/chart/ChartDefinitionSelector';
 import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
-import ChartBoundaryLevelsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsConfiguration';
-import ChartDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingsConfiguration';
 import { ChartBuilderFormsContextProvider } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
-import {
-  ChartOptions,
-  useChartBuilderReducer,
-} from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
+import { useChartBuilderReducer } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
@@ -54,6 +51,7 @@ import { isServerValidationError } from '@common/validation/serverValidations';
 import { produce } from 'immer';
 import omit from 'lodash/omit';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { ChartBoundaryLevelsFormValues } from './ChartBoundaryLevelsForm';
 
 const chartDefinitions: ChartDefinition[] = [
   lineChartBlockDefinition,
@@ -274,14 +272,17 @@ const ChartBuilder = ({
     200,
   );
 
-  const handleBoundaryLevelChange = useCallback(
-    async (values: ChartOptions) => {
-      actions.updateChartOptions(values);
+  const handleDefaultBoundaryLevelChange = useCallback(
+    async ({
+      boundaryLevel,
+      dataSetConfigs,
+    }: ChartBoundaryLevelsFormValues) => {
+      actions.updateChartBoundaryLevels({ boundaryLevel, dataSetConfigs });
 
       setDataLoading(true);
 
       await onTableQueryUpdate({
-        boundaryLevel: parseNumber(values.boundaryLevel),
+        boundaryLevel: parseNumber(boundaryLevel),
       });
 
       setDataLoading(false);
@@ -357,9 +358,11 @@ const ChartBuilder = ({
               )}
 
               {forms.boundaryLevels &&
+                axes.major &&
+                forms.dataGroupings &&
                 definition?.type === 'map' &&
                 options &&
-                meta.boundaryLevels.length && (
+                legend && (
                   <TabsSection
                     title="Boundary levels"
                     headingTitle="Boundary levels"
@@ -367,10 +370,14 @@ const ChartBuilder = ({
                   >
                     <ChartBoundaryLevelsConfiguration
                       buttons={deleteButton}
-                      meta={meta}
+                      axisMajor={axes.major}
+                      data={data}
+                      legend={legend}
                       options={options}
-                      onChange={handleBoundaryLevelChange}
-                      onSubmit={actions.updateChartOptions}
+                      map={map}
+                      meta={meta}
+                      onChange={handleDefaultBoundaryLevelChange}
+                      onSubmit={actions.updateChartBoundaryLevels}
                     />
                   </TabsSection>
                 )}
@@ -385,13 +392,13 @@ const ChartBuilder = ({
                     id={forms.dataGroupings.id}
                   >
                     <ChartDataGroupingsConfiguration
-                      axisMajor={axes.major}
                       buttons={deleteButton}
+                      axisMajor={axes.major}
                       data={data}
-                      map={map}
                       legend={legend}
-                      meta={meta}
                       options={options}
+                      map={map}
+                      meta={meta}
                       onChange={handleMapConfigurationChange}
                       onSubmit={values => {
                         actions.updateChartMapConfiguration(values);
@@ -406,7 +413,6 @@ const ChartBuilder = ({
                     />
                   </TabsSection>
                 )}
-
               {forms.legend && axes.major && legend && (
                 <TabsSection
                   title="Legend"

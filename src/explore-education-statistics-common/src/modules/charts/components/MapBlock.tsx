@@ -1,14 +1,14 @@
 import { SelectOption } from '@common/components/form/FormSelect';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
+import MapControls from '@common/modules/charts/components/MapControls';
+import MapGeoJSON from '@common/modules/charts/components/MapGeoJSON';
+import MapLegend from '@common/modules/charts/components/MapLegend';
+import MapSelectedItem from '@common/modules/charts/components/MapSelectedItem';
 import createMapDataSetCategories, {
   MapDataSetCategory,
 } from '@common/modules/charts/components/utils/createMapDataSetCategories';
-import { LegendDataGroup } from '@common/modules/charts/components/utils/generateLegendDataGroups';
-import MapGeoJSON from '@common/modules/charts/components/MapGeoJSON';
-import MapControls from '@common/modules/charts/components/MapControls';
-import MapLegend from '@common/modules/charts/components/MapLegend';
-import MapSelectedItem from '@common/modules/charts/components/MapSelectedItem';
 import generateFeaturesAndDataGroups from '@common/modules/charts/components/utils/generateFeaturesAndDataGroups';
+import { LegendDataGroup } from '@common/modules/charts/components/utils/generateLegendDataGroups';
 import {
   AxisConfiguration,
   ChartDefinition,
@@ -23,11 +23,11 @@ import getDataSetCategoryConfigs, {
 } from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import { GeoJsonFeatureProperties } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
+import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
-import orderBy from 'lodash/orderBy';
 import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
 
@@ -160,7 +160,7 @@ export default function MapBlock({
   );
 
   const dataSetOptions = useMemo<SelectOption[]>(() => {
-    return orderBy(
+    return naturalOrderBy(
       Object.values(dataSetCategoryConfigs).map(dataSet => ({
         label: dataSet.config.label,
         value: dataSet.dataKey,

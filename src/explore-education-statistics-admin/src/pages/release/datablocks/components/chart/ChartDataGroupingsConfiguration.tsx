@@ -1,8 +1,7 @@
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
-import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import ChartDataGroupingForm from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingForm';
+import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import generateDataSetLabel from '@admin/pages/release/datablocks/components/chart/utils/generateDataSetLabel';
-import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import ButtonText from '@common/components/ButtonText';
 import Effect from '@common/components/Effect';
 import Modal from '@common/components/Modal';
@@ -12,15 +11,16 @@ import {
   MapDataSetConfig,
   dataGroupingTypes,
 } from '@common/modules/charts/types/chart';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import isEqual from 'lodash/isEqual';
 import React, { ReactNode, useMemo, useState } from 'react';
+import { ChartOptions } from './reducers/chartBuilderReducer';
 
 const formId = 'chartDataGroupingsConfigurationForm';
 
@@ -146,7 +146,11 @@ const ChartDataGroupingsConfiguration = ({
       </table>
 
       {editDataSetConfig && (
-        <Modal open={!!editDataSetConfig} title="Edit groupings">
+        <Modal
+          open
+          title="Edit groupings"
+          onExit={() => setEditDataSetConfig(undefined)}
+        >
           <ChartDataGroupingForm
             dataSetConfig={editDataSetConfig.dataSetConfig}
             dataSetConfigs={initialValues.dataSetConfigs}

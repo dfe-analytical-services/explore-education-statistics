@@ -14,9 +14,11 @@ import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { Chart } from '@common/services/types/blocks';
 import deepMerge from 'deepmerge';
+import { isEqual, merge } from 'lodash';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
 import { Reducer } from 'use-immer';
+import { ChartBoundaryLevelsFormValues } from '../ChartBoundaryLevelsForm';
 
 export interface ChartOptions extends ChartDefinitionOptions {
   file?: File;
@@ -48,6 +50,10 @@ export type ChartBuilderActions =
   | {
       type: 'UPDATE_CHART_LEGEND';
       payload: LegendConfiguration;
+    }
+  | {
+      type: 'UPDATE_CHART_MAP_BOUNDARY_LEVELS';
+      payload: ChartBoundaryLevelsFormValues;
     }
   | {
       type: 'UPDATE_CHART_MAP_CONFIGURATION';
@@ -225,10 +231,48 @@ export const chartBuilderReducer: Reducer<
 
       break;
     }
-    case 'UPDATE_CHART_MAP_CONFIGURATION': {
+    case 'UPDATE_CHART_MAP_BOUNDARY_LEVELS': {
+      draft.options = {
+        ...(draft.options as ChartOptions),
+        boundaryLevel: action.payload.boundaryLevel,
+      };
+
+      const existingDataSetConfigs = draft.map?.dataSetConfigs ?? [];
+      const dataSetConfigs = action.payload.dataSetConfigs.map(
+        // add existing dataGrouping to new MapDataSetConfigs
+        ({ dataSet, boundaryLevel }) => {
+          const { dataGrouping } =
+            existingDataSetConfigs.find(({ dataSet: existingDataSet }) =>
+              isEqual(existingDataSet, dataSet),
+            )! ?? {};
+
+          return merge({}, { dataSet, boundaryLevel, dataGrouping });
+        },
+      );
+
       draft.map = {
         ...draft.map,
-        dataSetConfigs: action.payload,
+        dataSetConfigs,
+      };
+
+      break;
+    }
+    case 'UPDATE_CHART_MAP_CONFIGURATION': {
+      const existingDataSetConfigs = draft.map?.dataSetConfigs ?? [];
+      const dataSetConfigs = action.payload.map(
+        // add existing boundaryLevel to new MapDataSetConfigs
+        ({ dataSet, dataGrouping }) => {
+          const { boundaryLevel } = existingDataSetConfigs.find(
+            ({ dataSet: existingDataSet }) => isEqual(existingDataSet, dataSet),
+          )!;
+
+          return merge({}, { dataSet, boundaryLevel, dataGrouping });
+        },
+      );
+
+      draft.map = {
+        ...draft.map,
+        dataSetConfigs,
       };
 
       break;
@@ -312,6 +356,15 @@ export function useChartBuilderReducer(
     [dispatch],
   );
 
+  const updateChartBoundaryLevels = useCallback(
+    (payload: ChartBoundaryLevelsFormValues) => {
+      dispatch({
+        type: 'UPDATE_CHART_MAP_BOUNDARY_LEVELS',
+        payload,
+      });
+    },
+    [dispatch],
+  );
   const updateChartMapConfiguration = useCallback(
     (dataSetConfigs: MapDataSetConfig[]) => {
       dispatch({
@@ -343,6 +396,7 @@ export function useChartBuilderReducer(
       updateDataSets,
       updateChartDefinition,
       updateChartLegend,
+      updateChartBoundaryLevels,
       updateChartMapConfiguration,
       updateChartOptions,
       updateChartAxis,
@@ -353,6 +407,7 @@ export function useChartBuilderReducer(
       updateChartAxis,
       updateChartDefinition,
       updateChartLegend,
+      updateChartBoundaryLevels,
       updateChartMapConfiguration,
       updateChartOptions,
       resetState,
