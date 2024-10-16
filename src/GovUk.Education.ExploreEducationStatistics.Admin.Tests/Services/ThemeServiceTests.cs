@@ -1,14 +1,15 @@
 #nullable enable
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -16,15 +17,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -32,6 +26,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 using Theme = GovUk.Education.ExploreEducationStatistics.Content.Model.Theme;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -45,7 +40,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             await using var context = InMemoryApplicationDbContext();
 
-            var service = SetupThemeService(context);
+            var publishingService = new Mock<IPublishingService>(Strict);
+            
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
+                .ReturnsAsync(Unit.Instance);
+
+            var service = SetupThemeService(
+                contentDbContext: context,
+                publishingService: publishingService.Object);
+            
             var result = await service.CreateTheme(
                 new ThemeSaveViewModel
                 {
@@ -54,7 +57,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             );
 
+            VerifyAllMocks(publishingService);
+            
             result.AssertRight();
+            
             Assert.Equal("Test theme", result.Right.Title);
             Assert.Equal("test-theme", result.Right.Slug);
             Assert.Equal("Test summary", result.Right.Summary);
@@ -121,7 +127,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupThemeService(context);
+                var publishingService = new Mock<IPublishingService>(Strict);
+            
+                publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
+                    .ReturnsAsync(Unit.Instance);
+
+                // Arrange
+                var service = SetupThemeService(
+                    contentDbContext: context,
+                    publishingService: publishingService.Object);
+                
                 var result = await service.UpdateTheme(
                     theme.Id,
                     new ThemeSaveViewModel
@@ -131,7 +146,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
+                VerifyAllMocks(publishingService);
+                
                 result.AssertRight();
+                
                 Assert.Equal("Updated theme", result.Right.Title);
                 Assert.Equal("updated-theme", result.Right.Slug);
                 Assert.Equal("Updated summary", result.Right.Summary);
@@ -292,18 +310,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "UI test theme to delete"
             };
 
-            var dataBlockParent = _fixture
-                .DefaultDataBlockParent()
-                .WithLatestDraftVersion(_fixture
-                    .DefaultDataBlockVersion()
-                    .WithReleaseVersionId(releaseVersionId)
-                    .Generate())
-                .WithLatestPublishedVersion(_fixture
-                    .DefaultDataBlockVersion()
-                    .WithReleaseVersionId(releaseVersionId)
-                    .Generate())
-                .Generate();
-
             var releaseVersion = _fixture
                 .DefaultReleaseVersion()
                 .WithId(releaseVersionId)
@@ -312,9 +318,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .DefaultPublication()
                         .WithTheme(theme)
                         .Generate())
-                .WithDataBlockVersions(ListOf(
-                    dataBlockParent.LatestDraftVersion!,
-                    dataBlockParent.LatestPublishedVersion!))
                 .Generate();
 
             var methodology = _fixture
@@ -322,70 +325,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithOwningPublication(releaseVersion.Publication)
                 .Generate();
 
-            var statsReleaseVersion = new Data.Model.ReleaseVersion
-            {
-                Id = releaseVersionId,
-                PublicationId = releaseVersion.Publication.Id
-            };
-
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentContext = InMemoryApplicationDbContext(contextId))
-            await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentContext.ReleaseVersions.Add(releaseVersion);
                 contentContext.Methodologies.Add(methodology);
-                statisticsContext.ReleaseVersion.Add(statsReleaseVersion);
-
                 await contentContext.SaveChangesAsync();
-                await statisticsContext.SaveChangesAsync();
             }
 
             await using (var contentContext = InMemoryApplicationDbContext(contextId))
-            await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 Assert.Equal(1, contentContext.Publications.Count());
                 Assert.Equal(1, contentContext.PublicationMethodologies.Count());
                 Assert.Equal(1, contentContext.ReleaseVersions.Count());
-                Assert.Equal(2, contentContext.DataBlockVersions.Count());
-                Assert.Equal(1, contentContext.DataBlockParents.Count());
-                Assert.Equal(1, statisticsContext.ReleaseVersion.Count());
             }
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
-            var releaseFileService = new Mock<IReleaseFileService>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var methodologyService = new Mock<IMethodologyService>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
-            var cacheService = new Mock<IBlobCacheService>(Strict);
-            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
+            var releaseService = new Mock<IReleaseService>(Strict);
 
             await using (var contentContext = InMemoryApplicationDbContext(contextId))
-            await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = SetupThemeService(
                     contentContext,
-                    statisticsContext,
-                    releaseDataFileService: releaseDataFileService.Object,
-                    releaseFileService: releaseFileService.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     methodologyService: methodologyService.Object,
                     publishingService: publishingService.Object,
-                    cacheService: cacheService.Object,
-                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object);
+                    releaseService: releaseService.Object);
 
-                releaseDataFileService
-                    .Setup(s => s.DeleteAll(releaseVersionId, true))
+                releaseService
+                    .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
                     .ReturnsAsync(Unit.Instance);
-
-                releaseFileService
-                    .Setup(s => s.DeleteAll(releaseVersionId, true))
-                    .ReturnsAsync(Unit.Instance);
-
-                releaseSubjectRepository
-                    .Setup(s => s.DeleteAllReleaseSubjects(releaseVersionId, false))
-                    .Returns(Task.CompletedTask);
-
+                
                 methodologyService
                     .Setup(s => s.DeleteMethodology(methodology.Id, true))
                     .ReturnsAsync(Unit.Instance);
@@ -393,32 +365,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
                     .ReturnsAsync(Unit.Instance);
 
-                cacheService
-                    .Setup(s =>
-                        s.DeleteCacheFolderAsync(
-                            ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersionId))))
-                    .Returns(Task.CompletedTask);
-
-                releasePublishingStatusRepository.Setup(mock =>
-                        mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
-                    .Returns(Task.CompletedTask);
-
                 var result = await service.DeleteTheme(theme.Id);
+                
                 VerifyAllMocks(releaseDataFileService,
-                    releaseFileService,
-                    releaseSubjectRepository,
                     methodologyService,
                     publishingService,
-                    cacheService,
-                    releasePublishingStatusRepository);
+                    releaseService);
 
                 result.AssertRight();
 
                 Assert.Empty(contentContext.Publications);
-                Assert.Empty(contentContext.ReleaseVersions);
-                Assert.Empty(contentContext.DataBlockVersions);
-                Assert.Empty(contentContext.DataBlockParents);
-                Assert.Empty(statisticsContext.ReleaseVersion);
             }
         }
 
@@ -446,139 +402,70 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = publicationId,
                 Theme = theme,
-                ReleaseVersions = AsList(new ReleaseVersion
-                {
-                    Id = releaseVersion2Id,
-                    PreviousVersionId = releaseVersion1Id
-                },
-                    new ReleaseVersion { Id = releaseVersion1Id },
-                    new ReleaseVersion
+                ReleaseVersions = [
+                    new Content.Model.ReleaseVersion
+                    {
+                        Id = releaseVersion2Id,
+                        PreviousVersionId = releaseVersion1Id
+                    },
+                    new Content.Model.ReleaseVersion { Id = releaseVersion1Id },
+                    new Content.Model.ReleaseVersion
                     {
                         Id = releaseVersion4Id,
                         PreviousVersionId = releaseVersion3Id
                     },
-                    new ReleaseVersion
+                    new Content.Model.ReleaseVersion
                     {
                         Id = releaseVersion3Id,
                         PreviousVersionId = releaseVersion2Id
-                    })
+                    }
+                ]
             };
-
-            var statsReleases = AsList(new Data.Model.ReleaseVersion
-            {
-                Id = releaseVersion1Id,
-                PublicationId = publicationId
-            },
-                new Data.Model.ReleaseVersion
-                {
-                    Id = releaseVersion2Id,
-                    PublicationId = publicationId
-                },
-                new Data.Model.ReleaseVersion
-                {
-                    Id = releaseVersion3Id,
-                    PublicationId = publicationId
-                },
-                new Data.Model.ReleaseVersion
-                {
-                    Id = releaseVersion4Id,
-                    PublicationId = publicationId
-                });
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentContext = InMemoryApplicationDbContext(contextId))
-            await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentContext.Publications.Add(publication);
                 contentContext.Themes.Add(theme);
-                statisticsContext.ReleaseVersion.AddRange(statsReleases);
-
                 await contentContext.SaveChangesAsync();
-                await statisticsContext.SaveChangesAsync();
 
                 Assert.Equal(1, contentContext.Publications.Count());
                 Assert.Equal(1, contentContext.Themes.Count());
                 Assert.Equal(4, contentContext.ReleaseVersions.Count());
-                Assert.Equal(4, statisticsContext.ReleaseVersion.Count());
             }
 
-            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
-            var releaseFileService = new Mock<IReleaseFileService>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
-            var cacheService = new Mock<IBlobCacheService>(Strict);
-            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
+            var releaseService = new Mock<IReleaseService>(Strict);
 
             await using (var contentContext = InMemoryApplicationDbContext(contextId))
-            await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = SetupThemeService(
                     contentContext,
-                    statisticsContext,
-                    releaseDataFileService: releaseDataFileService.Object,
-                    releaseFileService: releaseFileService.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     publishingService: publishingService.Object,
-                    cacheService: cacheService.Object,
-                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object);
+                    releaseService: releaseService.Object);
 
-                var releaseDataFileDeleteSequence = new MockSequence();
+                var releaseVersionDeleteSequence = new MockSequence();
 
-                releaseVersionIdsInExpectedDeleteOrder.ForEach(releaseId =>
-                    releaseDataFileService
-                        .InSequence(releaseDataFileDeleteSequence)
-                        .Setup(s => s.DeleteAll(releaseId, true))
+                releaseVersionIdsInExpectedDeleteOrder.ForEach(releaseVersionId =>
+                    releaseService
+                        .InSequence(releaseVersionDeleteSequence)
+                        .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
                         .ReturnsAsync(Unit.Instance));
-
-                var releaseFileDeleteSequence = new MockSequence();
-
-                releaseVersionIdsInExpectedDeleteOrder.ForEach(releaseId =>
-                    releaseFileService
-                        .InSequence(releaseFileDeleteSequence)
-                        .Setup(s => s.DeleteAll(releaseId, true))
-                        .ReturnsAsync(Unit.Instance));
-
-                var releaseSubjectDeleteSequence = new MockSequence();
-
-                releaseVersionIdsInExpectedDeleteOrder.ForEach(releaseId =>
-                    releaseSubjectRepository
-                        .InSequence(releaseSubjectDeleteSequence)
-                        .Setup(s => s.DeleteAllReleaseSubjects(releaseId, false))
-                        .Returns(Task.CompletedTask));
-
-                var releaseCacheInvalidationSequence = new MockSequence();
-
-                releaseVersionIdsInExpectedDeleteOrder.ForEach(releaseId =>
-                    cacheService
-                        .InSequence(releaseCacheInvalidationSequence)
-                        .Setup(s =>
-                            s.DeleteCacheFolderAsync(
-                                ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseId))))
-                        .Returns(Task.CompletedTask));
 
                 publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
                     .ReturnsAsync(Unit.Instance);
 
-                releasePublishingStatusRepository.Setup(mock =>
-                        mock.RemovePublisherReleaseStatuses(releaseVersionIdsInExpectedDeleteOrder))
-                    .Returns(Task.CompletedTask);
-
                 var result = await service.DeleteTheme(themeId);
+                
                 VerifyAllMocks(
-                    releaseDataFileService,
-                    releaseFileService,
-                    releaseSubjectRepository,
                     publishingService,
-                    cacheService,
-                    releasePublishingStatusRepository);
+                    releaseService);
 
                 result.AssertRight();
 
                 Assert.Equal(0, contentContext.Publications.Count());
                 Assert.Equal(0, contentContext.Themes.Count());
-                Assert.Equal(0, contentContext.ReleaseVersions.Count());
-                Assert.Equal(0, statisticsContext.ReleaseVersion.Count());
             }
         }
 
@@ -656,18 +543,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "UI test theme to delete"
             };
 
-            var dataBlockParent = _fixture
-                .DefaultDataBlockParent()
-                .WithLatestDraftVersion(_fixture
-                    .DefaultDataBlockVersion()
-                    .WithReleaseVersionId(releaseVersionId)
-                    .Generate())
-                .WithLatestPublishedVersion(_fixture
-                    .DefaultDataBlockVersion()
-                    .WithReleaseVersionId(releaseVersionId)
-                    .Generate())
-                .Generate();
-
             var releaseVersion = _fixture
                 .DefaultReleaseVersion()
                 .WithId(releaseVersionId)
@@ -676,21 +551,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .DefaultPublication()
                         .WithTheme(theme)
                         .Generate())
-                .WithDataBlockVersions(ListOf(
-                    dataBlockParent.LatestDraftVersion!,
-                    dataBlockParent.LatestPublishedVersion!))
                 .Generate();
 
             var methodology = _fixture
                 .DefaultMethodology()
                 .WithOwningPublication(releaseVersion.Publication)
                 .Generate();
-
-            var statsReleaseVersion = new Data.Model.ReleaseVersion
-            {
-                Id = releaseVersionId,
-                PublicationId = releaseVersion.Publication.Id
-            };
 
             var otherReleaseVersionId = Guid.NewGuid();
 
@@ -700,19 +566,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "UI test theme to retain"
             };
 
-            var otherDataBlockParent = _fixture
-                .DefaultDataBlockParent()
-                .WithLatestDraftVersion(_fixture
-                    .DefaultDataBlockVersion()
-                    .WithReleaseVersionId(otherReleaseVersionId)
-                    .Generate())
-                .WithLatestPublishedVersion(_fixture
-                    .DefaultDataBlockVersion()
-                    .WithReleaseVersionId(otherReleaseVersionId)
-                    .Generate())
-                .Generate();
-
-            var otherRelease = _fixture
+            var otherReleaseVersion = _fixture
                 .DefaultReleaseVersion()
                 .WithId(otherReleaseVersionId)
                 .WithPublication(
@@ -720,78 +574,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .DefaultPublication()
                         .WithTheme(otherTheme)
                         .Generate())
-                .WithDataBlockVersions(ListOf(
-                    otherDataBlockParent.LatestDraftVersion!,
-                    otherDataBlockParent.LatestPublishedVersion!))
                 .Generate();
 
             var otherMethodology = _fixture
                 .DefaultMethodology()
-                .WithOwningPublication(otherRelease.Publication)
+                .WithOwningPublication(otherReleaseVersion.Publication)
                 .Generate();
-
-            var otherStatsReleaseVersion = new Data.Model.ReleaseVersion
-            {
-                Id = otherReleaseVersionId,
-                PublicationId = otherRelease.Publication.Id
-            };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentContext = InMemoryApplicationDbContext(contextId))
-            await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 contentContext.Methodologies.AddRange(methodology, otherMethodology);
-                contentContext.ReleaseVersions.AddRange(releaseVersion, otherRelease);
+                contentContext.ReleaseVersions.AddRange(releaseVersion, otherReleaseVersion);
                 contentContext.Themes.AddRange(theme, otherTheme);
-                statisticsContext.ReleaseVersion.AddRange(statsReleaseVersion, otherStatsReleaseVersion);
 
                 await contentContext.SaveChangesAsync();
-                await statisticsContext.SaveChangesAsync();
 
                 Assert.Equal(2, contentContext.Publications.Count());
                 Assert.Equal(2, contentContext.Themes.Count());
                 Assert.Equal(2, contentContext.Methodologies.Count());
                 Assert.Equal(2, contentContext.PublicationMethodologies.Count());
-                Assert.Equal(2, contentContext.ReleaseVersions.Count());
-                Assert.Equal(4, contentContext.DataBlockVersions.Count());
-                Assert.Equal(2, contentContext.DataBlockParents.Count());
-                Assert.Equal(2, statisticsContext.ReleaseVersion.Count());
             }
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
-            var releaseFileService = new Mock<IReleaseFileService>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var methodologyService = new Mock<IMethodologyService>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
-            var cacheService = new Mock<IBlobCacheService>(Strict);
-            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
+            var releaseService = new Mock<IReleaseService>(Strict);
 
             await using (var contentContext = InMemoryApplicationDbContext(contextId))
-            await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = SetupThemeService(
                     contentContext,
-                    statisticsContext,
-                    releaseDataFileService: releaseDataFileService.Object,
-                    releaseFileService: releaseFileService.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     methodologyService: methodologyService.Object,
                     publishingService: publishingService.Object,
-                    cacheService: cacheService.Object,
-                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object);
-
-                releaseDataFileService
-                    .Setup(s => s.DeleteAll(releaseVersionId, true))
-                    .ReturnsAsync(Unit.Instance);
-
-                releaseFileService
-                    .Setup(s => s.DeleteAll(releaseVersionId, true))
-                    .ReturnsAsync(Unit.Instance);
-
-                releaseSubjectRepository
-                    .Setup(s => s.DeleteAllReleaseSubjects(releaseVersionId, false))
-                    .Returns(Task.CompletedTask);
+                    releaseService: releaseService.Object);
 
                 methodologyService
                     .Setup(s => s.DeleteMethodology(methodology.Id, true))
@@ -800,33 +617,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
                     .ReturnsAsync(Unit.Instance);
 
-                cacheService
-                    .Setup(s =>
-                        s.DeleteCacheFolderAsync(
-                            ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersionId))))
-                    .Returns(Task.CompletedTask);
-
-                releasePublishingStatusRepository.Setup(mock =>
-                        mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersionId }))
-                    .Returns(Task.CompletedTask);
+                releaseService
+                    .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
+                    .ReturnsAsync(Unit.Instance);
 
                 var result = await service.DeleteTheme(theme.Id);
+                
                 VerifyAllMocks(releaseDataFileService,
-                    releaseFileService,
-                    releaseSubjectRepository,
                     methodologyService,
                     publishingService,
-                    cacheService,
-                    releasePublishingStatusRepository);
+                    releaseService);
 
                 result.AssertRight();
 
-                Assert.Equal(otherRelease.Publication.Id, contentContext.Publications.Single().Id);
+                Assert.Equal(otherReleaseVersion.Publication.Id, contentContext.Publications.Single().Id);
                 Assert.Equal(otherTheme.Id, contentContext.Themes.Single().Id);
-                Assert.Equal(otherRelease.Id, contentContext.ReleaseVersions.Single().Id);
-                Assert.Equal(otherRelease.Id, statisticsContext.ReleaseVersion.Single().Id);
-                contentContext.DataBlockVersions.ForEach(dataBlockVersion =>
-                    Assert.Equal(otherReleaseVersionId, dataBlockVersion.ReleaseVersionId));
             }
         }
 
@@ -873,12 +678,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
+                var publishingService = new Mock<IPublishingService>(Strict);
+            
+                publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
+                    .ReturnsAsync(Unit.Instance);
+
                 // Arrange
-                var service = SetupThemeService(context);
+                var service = SetupThemeService(
+                    contentDbContext: context,
+                    publishingService: publishingService.Object);
 
                 // Act
                 await service.DeleteUITestThemes();
 
+                VerifyAllMocks(publishingService);
+                
                 // Assert
                 var themesResult = await context.Themes.ToListAsync();
                 var publicationsResult = await context.Publications.ToListAsync();
@@ -923,16 +737,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static ThemeService SetupThemeService(
             ContentDbContext? contentDbContext = null,
-            StatisticsDbContext? statisticsDbContext = null,
             IMapper? mapper = null,
             IUserService? userService = null,
-            IBlobCacheService? cacheService = null,
             IMethodologyService? methodologyService = null,
-            IReleaseSubjectRepository? releaseSubjectRepository = null,
-            IReleaseFileService? releaseFileService = null,
-            IReleaseDataFileService? releaseDataFileService = null,
-            IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
             IPublishingService? publishingService = null,
+            IReleaseService? releaseService = null,
             bool enableThemeDeletion = true)
         {
             contentDbContext ??= new Mock<ContentDbContext>().Object;
@@ -940,17 +749,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ThemeService(
                 new AppOptions { EnableThemeDeletion = enableThemeDeletion }.ToOptionsWrapper(),
                 contentDbContext,
-                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
                 mapper ?? AdminMapper(),
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-                releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
-                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
-                releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),
-                releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(),
-                publishingService ?? new Mock<IPublishingService>().Object,
-                cacheService ?? Mock.Of<IBlobCacheService>(Strict)
+                publishingService ?? Mock.Of<IPublishingService>(Strict),
+                releaseService ??  Mock.Of<IReleaseService>(Strict)
             );
         }
     }
