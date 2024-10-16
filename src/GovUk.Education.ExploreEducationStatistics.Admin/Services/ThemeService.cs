@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
@@ -6,23 +11,14 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
@@ -32,46 +28,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ThemeService : IThemeService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
-        private readonly IReleaseFileService _releaseFileService;
-        private readonly IReleaseSubjectRepository _releaseSubjectRepository;
-        private readonly IReleaseDataFileService _releaseDataFileService;
-        private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
         private readonly IMethodologyService _methodologyService;
         private readonly IPublishingService _publishingService;
-        private readonly IBlobCacheService _cacheService;
+        private readonly IReleaseService _releaseService;
         private readonly bool _themeDeletionAllowed;
 
         public ThemeService(
             IOptions<AppOptions> appOptions,
             ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext,
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IMethodologyService methodologyService,
-            IReleaseFileService releaseFileService,
-            IReleaseSubjectRepository releaseSubjectRepository,
-            IReleaseDataFileService releaseDataFileService,
-            IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IPublishingService publishingService,
-            IBlobCacheService cacheService)
+            IReleaseService releaseService)
         {
             _contentDbContext = contentDbContext;
-            _statisticsDbContext = statisticsDbContext;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _methodologyService = methodologyService;
-            _releaseFileService = releaseFileService;
-            _releaseSubjectRepository = releaseSubjectRepository;
-            _releaseDataFileService = releaseDataFileService;
-            _releasePublishingStatusRepository = releasePublishingStatusRepository;
             _publishingService = publishingService;
-            _cacheService = cacheService;
+            _releaseService = releaseService;
             _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
         }
 
@@ -133,9 +114,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, ThemeViewModel>> GetTheme(Guid id)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Theme>(id)
-                .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
+            return await _userService
+                .CheckCanManageAllTaxonomy()
+                .OnSuccess(() => _persistenceHelper.CheckEntityExists<Theme>(id))
                 .OnSuccess(_mapper.Map<ThemeViewModel>);
         }
 
@@ -232,12 +213,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(ids => Guid.Parse(ids.Id))
                 .ToList();
 
-            // Delete release entries in the Azure Storage ReleaseStatus table - if not it will attempt to publish
-            // deleted releases that were left scheduled
-            await _releasePublishingStatusRepository.RemovePublisherReleaseStatuses(releaseVersionIdsInDeleteOrder);
-
             return await releaseVersionIdsInDeleteOrder
-                .Select(DeleteContentAndStatsRelease)
+                .Select(releaseVersionId => _releaseService.DeleteTestReleaseVersion(releaseVersionId))
                 .OnSuccessAll()
                 .OnSuccessVoid();
         }
@@ -254,106 +231,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> DeleteContentAndStatsRelease(Guid releaseVersionId)
-        {
-            var contentReleaseVersion = await _contentDbContext
-                .ReleaseVersions
-                .IgnoreQueryFilters()
-                .SingleAsync(rv => rv.Id == releaseVersionId);
-
-            if (!contentReleaseVersion.SoftDeleted)
-            {
-                var removeReleaseFilesAndCachedContent =
-                    await _releaseDataFileService.DeleteAll(releaseVersionId, forceDelete: true)
-                        .OnSuccessDo(() => _releaseFileService.DeleteAll(releaseVersionId, forceDelete: true))
-                        .OnSuccessDo(() => DeleteCachedReleaseContent(releaseVersionId));
-
-                if (removeReleaseFilesAndCachedContent.IsLeft)
-                {
-                    return removeReleaseFilesAndCachedContent;
-                }
-            }
-
-            await RemoveReleaseDependencies(releaseVersionId);
-            await DeleteStatsDbRelease(releaseVersionId);
-
-            _contentDbContext.ReleaseVersions.Remove(contentReleaseVersion);
-            await _contentDbContext.SaveChangesAsync();
-            return Unit.Instance;
-        }
-
-        private async Task DeleteStatsDbRelease(Guid releaseVersionId)
-        {
-            var statsRelease = await _statisticsDbContext
-                .ReleaseVersion
-                .AsQueryable()
-                .SingleOrDefaultAsync(rv => rv.Id == releaseVersionId);
-
-            if (statsRelease != null)
-            {
-                await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseVersionId: statsRelease.Id,
-                    softDeleteOrphanedSubjects: false);
-                _statisticsDbContext.ReleaseVersion.Remove(statsRelease);
-                await _statisticsDbContext.SaveChangesAsync();
-            }
-        }
-
-        private Task DeleteCachedReleaseContent(Guid releaseVersionId)
-        {
-            return _cacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseVersionId));
-        }
-
-        private async Task RemoveReleaseDependencies(Guid releaseVersionId)
-        {
-            var keyStats = _contentDbContext
-                .KeyStatistics
-                .Where(ks => ks.ReleaseVersionId == releaseVersionId);
-
-            _contentDbContext.KeyStatistics.RemoveRange(keyStats);
-
-            var dataBlockVersions = await _contentDbContext
-                .DataBlockVersions
-                .Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
-                .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId)
-                .ToListAsync();
-
-            var dataBlockParents = dataBlockVersions
-                .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
-                .Distinct()
-                .ToList();
-
-            // Unset the DataBlockVersion references from the DataBlockParent.
-            dataBlockParents.ForEach(dataBlockParent =>
-            {
-                dataBlockParent.LatestDraftVersionId = null;
-                dataBlockParent.LatestPublishedVersionId = null;
-            });
-
-            await _contentDbContext.SaveChangesAsync();
-
-            // Then remove the now-unreferenced DataBlockVersions.
-            _contentDbContext.DataBlockVersions.RemoveRange(dataBlockVersions);
-            await _contentDbContext.SaveChangesAsync();
-
-            // And finally, delete the DataBlockParents if they are now orphaned.
-            var orphanedDataBlockParents = dataBlockParents
-                .Where(dataBlockParent =>
-                    !_contentDbContext
-                        .DataBlockVersions
-                        .Any(dataBlockVersion => dataBlockVersion.DataBlockParentId == dataBlockParent.Id))
-                .ToList();
-
-            _contentDbContext.DataBlockParents.RemoveRange(orphanedDataBlockParents);
-            await _contentDbContext.SaveChangesAsync();
-        }
-
         public async Task<Either<ActionResult, Unit>> DeleteUITestThemes(CancellationToken cancellationToken = default)
         {
             return !_themeDeletionAllowed
-                ? (Either<ActionResult, Unit>)new ForbidResult()
+                ? new ForbidResult()
                 : await _userService.CheckCanManageAllTaxonomy()
                     .OnSuccess(_ => _contentDbContext.Themes
-                        .Where(theme => theme.Title.Contains("UI test")))
+                        .Where(theme => theme.Title.Contains("UI test theme")))
                     .OnSuccessVoid(async themes =>
                     {
                         foreach (var theme in themes)

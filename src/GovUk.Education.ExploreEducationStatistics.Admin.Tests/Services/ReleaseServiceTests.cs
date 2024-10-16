@@ -1801,8 +1801,9 @@ public abstract class ReleaseServiceTests
             {
                 Id = release.Id,
                 Publication = publication,
-                Version = 0,
-                ReleaseId = release.Id
+                Version = 1,
+                ReleaseId = release.Id,
+                ApprovalStatus = ReleaseApprovalStatus.Approved
             };
             
             var statisticsReleaseVersion = new StatsReleaseVersion
@@ -1942,10 +1943,12 @@ public abstract class ReleaseServiceTests
                         mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects),
                     Times.Once);
 
-                VerifyAllMocks(cacheService,
+                VerifyAllMocks(
+                    cacheService,
                     releaseDataFilesService,
                     releaseFileService,
-                    processorClient
+                    processorClient,
+                    releasePublishingStatusRepository
                 );
 
                 result.AssertRight();

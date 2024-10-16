@@ -1,4 +1,9 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -25,11 +30,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -223,7 +223,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
                     forceDeleteFiles: false,
-                    deletePublishingStatus: false,
                     deleteStatisticsRelease: false,
                     hardDeleteContentReleaseVersion: !releaseVersion.Amendment,
                     cancellationToken));
@@ -239,7 +238,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
                     forceDeleteFiles: true,
-                    deletePublishingStatus: true,
                     deleteStatisticsRelease: true,
                     hardDeleteContentReleaseVersion: true,
                     cancellationToken));
@@ -248,7 +246,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, Unit>> DoDeleteReleaseVersion(
             ReleaseVersion releaseVersion,
             bool forceDeleteFiles = false,
-            bool deletePublishingStatus = false,
             bool deleteStatisticsRelease = false,
             bool hardDeleteContentReleaseVersion = false,
             CancellationToken cancellationToken = default)
@@ -279,8 +276,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    if (deletePublishingStatus)
+                    if (releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved)
                     {
+                        // Delete release entries in the Azure Storage ReleaseStatus table - if not it will attempt to publish
+                        // deleted releases that were left scheduled
                         await _releasePublishingStatusRepository.RemovePublisherReleaseStatuses(releaseVersionIds: [releaseVersion.Id]);
                     }
                     
