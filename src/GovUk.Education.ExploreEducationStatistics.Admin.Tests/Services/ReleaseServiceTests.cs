@@ -48,6 +48,7 @@ using static Moq.MockBehavior;
 using IReleaseVersionRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
+using StatsReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -1407,6 +1408,12 @@ public abstract class ReleaseServiceTests
                 ReleaseId = release.Id
             };
 
+            var statisticsReleaseVersion = new StatsReleaseVersion
+            {
+                Id = releaseVersion.Id,
+                PublicationId = releaseVersion.Publication.Id
+            };
+
             // This Methodology is scheduled to go out with the Release being deleted.
             var methodologyScheduledWithRelease = new MethodologyVersion
             {
@@ -1468,6 +1475,12 @@ public abstract class ReleaseServiceTests
                     methodologyScheduledWithAnotherRelease);
                 await context.SaveChangesAsync();
             }
+            
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                context.ReleaseVersion.AddRange(statisticsReleaseVersion);
+                await context.SaveChangesAsync();
+            }
 
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
@@ -1497,9 +1510,12 @@ public abstract class ReleaseServiceTests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context,
+                var releaseService = BuildReleaseService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
@@ -1533,21 +1549,21 @@ public abstract class ReleaseServiceTests
                 if (isDraft)
                 {
                     // assert that hard-deleted entities no longer exist
-                    var hardDeletedRelease = await context
+                    var hardDeletedRelease = await contentDbContext
                         .ReleaseVersions
                         .IgnoreQueryFilters()
                         .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
                     Assert.Null(hardDeletedRelease);
 
-                    var hardDeletedReleaseRole = await context
+                    var hardDeletedReleaseRole = await contentDbContext
                         .UserReleaseRoles
                         .IgnoreQueryFilters()
                         .FirstOrDefaultAsync(r => r.Id == userReleaseRole.Id);
 
                     Assert.Null(hardDeletedReleaseRole);
 
-                    var hardDeletedReleaseInvite = await context
+                    var hardDeletedReleaseInvite = await contentDbContext
                         .UserReleaseInvites
                         .IgnoreQueryFilters()
                         .FirstOrDefaultAsync(r => r.Id == userReleaseInvite.Id);
@@ -1555,14 +1571,14 @@ public abstract class ReleaseServiceTests
                     Assert.Null(hardDeletedReleaseInvite);
 
                     // assert that other entities were not accidentally hard-deleted
-                    var retrievedAnotherReleaseRole = await context
+                    var retrievedAnotherReleaseRole = await contentDbContext
                         .UserReleaseRoles
                         .IgnoreQueryFilters()
                         .FirstAsync(r => r.Id == anotherUserReleaseRole.Id);
 
                     Assert.False(retrievedAnotherReleaseRole.SoftDeleted);
 
-                    var retrievedAnotherReleaseInvite = await context
+                    var retrievedAnotherReleaseInvite = await contentDbContext
                         .UserReleaseInvites
                         .IgnoreQueryFilters()
                         .FirstAsync(r => r.Id == anotherUserReleaseInvite.Id);
@@ -1572,26 +1588,26 @@ public abstract class ReleaseServiceTests
                 else
                 {
                     // assert that soft-deleted entities are no longer discoverable by default
-                    var softDeletedRelease = await context
+                    var softDeletedRelease = await contentDbContext
                         .ReleaseVersions
                         .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
                     Assert.Null(softDeletedRelease);
 
-                    var softDeletedReleaseRole = await context
+                    var softDeletedReleaseRole = await contentDbContext
                         .UserReleaseRoles
                         .FirstOrDefaultAsync(r => r.Id == userReleaseRole.Id);
 
                     Assert.Null(softDeletedReleaseRole);
 
-                    var softDeletedReleaseInvite = await context
+                    var softDeletedReleaseInvite = await contentDbContext
                         .UserReleaseInvites
                         .FirstOrDefaultAsync(r => r.Id == userReleaseInvite.Id);
 
                     Assert.Null(softDeletedReleaseInvite);
 
                     // assert that soft-deleted entities do not appear via references from other entities by default
-                    var publicationWithoutDeletedRelease = await context
+                    var publicationWithoutDeletedRelease = await contentDbContext
                         .Publications
                         .Include(p => p.ReleaseVersions)
                         .AsNoTracking()
@@ -1601,21 +1617,21 @@ public abstract class ReleaseServiceTests
                     Assert.Equal(anotherRelease.Id, publicationWithoutDeletedRelease.ReleaseVersions[0].Id);
 
                     // assert that soft-deleted entities have had their soft-deleted flag set to true
-                    var updatedRelease = await context
+                    var updatedRelease = await contentDbContext
                         .ReleaseVersions
                         .IgnoreQueryFilters()
                         .FirstAsync(rv => rv.Id == releaseVersion.Id);
 
                     Assert.True(updatedRelease.SoftDeleted);
 
-                    var updatedReleaseRole = await context
+                    var updatedReleaseRole = await contentDbContext
                         .UserReleaseRoles
                         .IgnoreQueryFilters()
                         .FirstAsync(r => r.Id == userReleaseRole.Id);
 
                     Assert.True(updatedReleaseRole.SoftDeleted);
 
-                    var updatedReleaseInvite = await context
+                    var updatedReleaseInvite = await contentDbContext
                         .UserReleaseInvites
                         .IgnoreQueryFilters()
                         .FirstAsync(r => r.Id == userReleaseInvite.Id);
@@ -1623,7 +1639,7 @@ public abstract class ReleaseServiceTests
                     Assert.True(updatedReleaseInvite.SoftDeleted);
 
                     // assert that soft-deleted entities appear via references from other entities when explicitly searched for
-                    var publicationWithDeletedRelease = await context
+                    var publicationWithDeletedRelease = await contentDbContext
                         .Publications
                         .Include(p => p.ReleaseVersions)
                         .IgnoreQueryFilters()
@@ -1637,13 +1653,13 @@ public abstract class ReleaseServiceTests
                     Assert.False(publicationWithDeletedRelease.ReleaseVersions[1].SoftDeleted);
 
                     // assert that other entities were not accidentally soft-deleted
-                    var retrievedAnotherReleaseRole = await context
+                    var retrievedAnotherReleaseRole = await contentDbContext
                         .UserReleaseRoles
                         .FirstAsync(r => r.Id == anotherUserReleaseRole.Id);
 
                     Assert.False(retrievedAnotherReleaseRole.SoftDeleted);
 
-                    var retrievedAnotherReleaseInvite = await context
+                    var retrievedAnotherReleaseInvite = await contentDbContext
                         .UserReleaseInvites
                         .FirstAsync(r => r.Id == anotherUserReleaseInvite.Id);
 
@@ -1653,7 +1669,7 @@ public abstract class ReleaseServiceTests
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
                 var retrievedMethodologyVersion =
-                    await context.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithRelease.Id);
+                    await contentDbContext.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithRelease.Id);
                 Assert.True(retrievedMethodologyVersion.ScheduledForPublishingImmediately);
                 Assert.Null(retrievedMethodologyVersion.ScheduledWithReleaseVersionId);
                 Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodologyVersion.Status);
@@ -1664,11 +1680,18 @@ public abstract class ReleaseServiceTests
 
                 // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
                 var unrelatedMethodology =
-                    await context.MethodologyVersions.SingleAsync(
+                    await contentDbContext.MethodologyVersions.SingleAsync(
                         m => m.Id == methodologyScheduledWithAnotherRelease.Id);
                 Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
                 Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
                     unrelatedMethodology.ScheduledWithReleaseVersionId);
+
+                // We don't expect the Statistics ReleaseVersion to be deleted at this point, whether the
+                // Content ReleaseVersion is a draft or not. This needs to remain until the stored procedure
+                // that removes soft-deleted Subjects related to this ReleaseVersion is run. 
+                Assert.NotNull(await statisticsDbContext
+                    .ReleaseVersion
+                    .SingleOrDefaultAsync(rv => rv.Id == statisticsReleaseVersion.Id));
             }
         }
 
@@ -1781,6 +1804,12 @@ public abstract class ReleaseServiceTests
                 Version = 0,
                 ReleaseId = release.Id
             };
+            
+            var statisticsReleaseVersion = new StatsReleaseVersion
+            {
+                Id = releaseVersion.Id,
+                PublicationId = releaseVersion.Publication.Id
+            };
 
             // This Methodology is scheduled to go out with the Release being deleted.
             var methodologyScheduledWithRelease = new MethodologyVersion
@@ -1843,6 +1872,12 @@ public abstract class ReleaseServiceTests
                     methodologyScheduledWithAnotherRelease);
                 await context.SaveChangesAsync();
             }
+            
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                context.ReleaseVersion.AddRange(statisticsReleaseVersion);
+                await context.SaveChangesAsync();
+            }
 
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
@@ -1878,9 +1913,12 @@ public abstract class ReleaseServiceTests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context,
+                var releaseService = BuildReleaseService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
@@ -1913,21 +1951,21 @@ public abstract class ReleaseServiceTests
                 result.AssertRight();
 
                 // assert that hard-deleted entities no longer exist
-                var hardDeletedRelease = await context
+                var hardDeletedRelease = await contentDbContext
                     .ReleaseVersions
                     .IgnoreQueryFilters()
                     .FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
                 Assert.Null(hardDeletedRelease);
 
-                var hardDeletedReleaseRole = await context
+                var hardDeletedReleaseRole = await contentDbContext
                     .UserReleaseRoles
                     .IgnoreQueryFilters()
                     .FirstOrDefaultAsync(r => r.Id == userReleaseRole.Id);
 
                 Assert.Null(hardDeletedReleaseRole);
 
-                var hardDeletedReleaseInvite = await context
+                var hardDeletedReleaseInvite = await contentDbContext
                     .UserReleaseInvites
                     .IgnoreQueryFilters()
                     .FirstOrDefaultAsync(r => r.Id == userReleaseInvite.Id);
@@ -1935,14 +1973,14 @@ public abstract class ReleaseServiceTests
                 Assert.Null(hardDeletedReleaseInvite);
 
                 // assert that other entities were not accidentally hard-deleted
-                var retrievedAnotherReleaseRole = await context
+                var retrievedAnotherReleaseRole = await contentDbContext
                     .UserReleaseRoles
                     .IgnoreQueryFilters()
                     .FirstAsync(r => r.Id == anotherUserReleaseRole.Id);
 
                 Assert.False(retrievedAnotherReleaseRole.SoftDeleted);
 
-                var retrievedAnotherReleaseInvite = await context
+                var retrievedAnotherReleaseInvite = await contentDbContext
                     .UserReleaseInvites
                     .IgnoreQueryFilters()
                     .FirstAsync(r => r.Id == anotherUserReleaseInvite.Id);
@@ -1952,7 +1990,7 @@ public abstract class ReleaseServiceTests
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
                 var retrievedMethodologyVersion =
-                    await context.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithRelease.Id);
+                    await contentDbContext.MethodologyVersions.SingleAsync(m => m.Id == methodologyScheduledWithRelease.Id);
                 Assert.True(retrievedMethodologyVersion.ScheduledForPublishingImmediately);
                 Assert.Null(retrievedMethodologyVersion.ScheduledWithReleaseVersionId);
                 Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodologyVersion.Status);
@@ -1963,11 +2001,18 @@ public abstract class ReleaseServiceTests
 
                 // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
                 var unrelatedMethodology =
-                    await context.MethodologyVersions.SingleAsync(
+                    await contentDbContext.MethodologyVersions.SingleAsync(
                         m => m.Id == methodologyScheduledWithAnotherRelease.Id);
                 Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
                 Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
                     unrelatedMethodology.ScheduledWithReleaseVersionId);
+
+                // We expect the Statistics ReleaseVersion to be deleted immediately for test ReleaseVersions,
+                // as they do not use Subjects large enough to warrant using the stored procedure that cleans up
+                // soft-deleted Subjects.
+                Assert.Null(await statisticsDbContext
+                    .ReleaseVersion
+                    .SingleOrDefaultAsync(rv => rv.Id == statisticsReleaseVersion.Id));
             }
         }
 

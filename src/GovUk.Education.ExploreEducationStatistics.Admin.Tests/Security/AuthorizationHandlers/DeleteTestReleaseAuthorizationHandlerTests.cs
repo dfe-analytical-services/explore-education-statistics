@@ -15,33 +15,49 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
     {
         private static readonly ReleaseVersion TestReleaseVersion = new()
         {
-            ApprovalStatus = ReleaseApprovalStatus.Draft,
+            ApprovalStatus = ReleaseApprovalStatus.Approved,
             Version = 1,
-            Publication = new Publication { Topic = new Topic { Title = "UI test topic" } }
+            Publication = new Publication { Theme = new Theme { Title = "UI test theme" } }
+        };
+        
+        private static readonly ReleaseVersion SeedReleaseVersion = new()
+        {
+            ApprovalStatus = ReleaseApprovalStatus.Approved,
+            Version = 1,
+            Publication = new Publication { Theme = new Theme { Title = "Seed theme" } }
         };
 
-        private static readonly ReleaseVersion NonTestReleaseVersion = new()
+        private static readonly ReleaseVersion RealReleaseVersion = new()
         {
-            ApprovalStatus = ReleaseApprovalStatus.Draft,
+            ApprovalStatus = ReleaseApprovalStatus.Approved,
             Version = 1,
-            Publication = new Publication { Topic = new Topic { Title = "Normal topic" } }
+            Publication = new Publication { Theme = new Theme { Title = "Normal theme" } }
         };
 
         [Fact]
-        public async Task Success()
+        public async Task Success_TestRelease()
         {
             await AssertHandlerSucceedsWithCorrectGlobalRoles<ReleaseVersion, DeleteTestReleaseRequirement>(
                 _ => CreateHandler(enableThemeDeletion: true),
                 TestReleaseVersion,
                 rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]);
         }
-
+        
         [Fact]
-        public async Task NonTestReleaseVersion_Forbidden()
+        public async Task Success_SeedRelease()
         {
             await AssertHandlerSucceedsWithCorrectGlobalRoles<ReleaseVersion, DeleteTestReleaseRequirement>(
                 _ => CreateHandler(enableThemeDeletion: true),
-                NonTestReleaseVersion);
+                SeedReleaseVersion,
+                rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]);
+        }
+
+        [Fact]
+        public async Task RealReleaseVersion_Forbidden()
+        {
+            await AssertHandlerSucceedsWithCorrectGlobalRoles<ReleaseVersion, DeleteTestReleaseRequirement>(
+                _ => CreateHandler(enableThemeDeletion: true),
+                RealReleaseVersion);
         }
 
         [Fact]

@@ -223,8 +223,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
                     forceDeleteFiles: false,
-                    softDeleteOrphanedSubjects: true,
                     deletePublishingStatus: false,
+                    deleteStatisticsRelease: false,
                     cancellationToken));
         }
 
@@ -238,16 +238,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
                     forceDeleteFiles: true,
-                    softDeleteOrphanedSubjects: false,
                     deletePublishingStatus: true,
+                    deleteStatisticsRelease: true,
                     cancellationToken));
         }
 
         private async Task<Either<ActionResult, Unit>> DoDeleteReleaseVersion(
             ReleaseVersion releaseVersion,
             bool forceDeleteFiles = false,
-            bool softDeleteOrphanedSubjects = true,
             bool deletePublishingStatus = false,
+            bool deleteStatisticsRelease = false,
             CancellationToken cancellationToken = default)
         {
             return await _processorClient
@@ -281,10 +281,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _releasePublishingStatusRepository.RemovePublisherReleaseStatuses(releaseVersionIds: [releaseVersion.Id]);
                     }
                     
-                    // TODO: This may be redundant (investigate as part of EES-1295)
-                    await _releaseSubjectRepository.DeleteAllReleaseSubjects(
-                        releaseVersionId: releaseVersion.Id,
-                        softDeleteOrphanedSubjects: softDeleteOrphanedSubjects);
+                    if (deleteStatisticsRelease)
+                    {
+                        var statsReleaseVersion = await _statisticsDbContext
+                            .ReleaseVersion
+                            .SingleOrDefaultAsync(
+                                statsReleaseVersion => statsReleaseVersion.Id == releaseVersion.Id,
+                                cancellationToken);
+
+                        if (statsReleaseVersion != null)
+                        {
+                            await _releaseSubjectRepository.DeleteAllReleaseSubjects(
+                                releaseVersionId: statsReleaseVersion.Id,
+                                softDeleteOrphanedSubjects: false);
+                            _statisticsDbContext.ReleaseVersion.Remove(statsReleaseVersion);
+                            await _statisticsDbContext.SaveChangesAsync(cancellationToken);
+                        }
+                    }
+                    else
+                    {
+                        // TODO: This may be redundant (investigate as part of EES-1295)
+                        await _releaseSubjectRepository.DeleteAllReleaseSubjects(
+                            releaseVersionId: releaseVersion.Id,
+                            softDeleteOrphanedSubjects: true);
+                    }
                 });
         }
 
