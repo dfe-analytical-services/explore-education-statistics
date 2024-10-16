@@ -1,14 +1,12 @@
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import ChartAxisConfiguration from '@admin/pages/release/datablocks/components/chart/ChartAxisConfiguration';
+import ChartBoundaryLevelsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsConfiguration';
 import ChartBuilderPreview from '@admin/pages/release/datablocks/components/chart/ChartBuilderPreview';
 import ChartConfiguration from '@admin/pages/release/datablocks/components/chart/ChartConfiguration';
+import ChartDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingsConfiguration';
 import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration';
 import ChartDefinitionSelector from '@admin/pages/release/datablocks/components/chart/ChartDefinitionSelector';
 import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
-import ChartBoundaryLevelsConfiguration, {
-  ChartBoundaryLevelsFormValues,
-} from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsConfiguration';
-import ChartDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingsConfiguration';
 import { ChartBuilderFormsContextProvider } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { useChartBuilderReducer } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
@@ -53,6 +51,7 @@ import { isServerValidationError } from '@common/validation/serverValidations';
 import { produce } from 'immer';
 import omit from 'lodash/omit';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { ChartBoundaryLevelsFormValues } from './ChartBoundaryLevelsForm';
 
 const chartDefinitions: ChartDefinition[] = [
   lineChartBlockDefinition,
