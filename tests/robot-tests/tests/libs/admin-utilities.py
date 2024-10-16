@@ -122,7 +122,7 @@ def user_waits_for_release_process_status_to_be(status, timeout):
 
 def user_checks_dashboard_theme_dropdown_exists():
     try:
-        sl().driver.find_element(By.ID, "publicationsReleases-theme-themeId")
+        sl().driver.find_element(By.ID, "publicationsReleases-theme")
     except NoSuchElementException:
         return False
 

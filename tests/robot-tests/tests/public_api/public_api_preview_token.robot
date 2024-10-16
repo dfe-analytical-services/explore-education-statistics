@@ -278,7 +278,7 @@ User checks relevant headings exist on API data set details page
     user waits until h2 is visible    API data set version history
 
 User verifies 'Data set details' section
-    user checks summary list contains    Theme    Test theme    id:dataSetDetails
+    user checks summary list contains    Theme    %{TEST_THEME_NAME}    id:dataSetDetails
     user checks summary list contains    Publication    ${PUBLICATION_NAME}    id:dataSetDetails
     user checks summary list contains    Release    ${RELEASE_NAME}    id:dataSetDetails
     user checks summary list contains    Release type    Accredited official statistics    id:dataSetDetails

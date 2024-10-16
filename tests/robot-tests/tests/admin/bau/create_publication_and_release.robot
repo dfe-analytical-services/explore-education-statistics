@@ -26,13 +26,13 @@ Go to Create publication page for "UI tests theme" theme
     user waits until h1 is visible    Create new publication
 
 Enters contact details
-    user enters text into element    id:publicationForm-teamName    Post-16 statistics team
-    user enters text into element    id:publicationForm-teamEmail    post16.statistics@education.gov.uk
-    user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
-    user enters text into element    id:publicationForm-contactTelNo    0123456789
+    user enters text into element    name:teamName    Post-16 statistics team
+    user enters text into element    name:teamEmail    post16.statistics@education.gov.uk
+    user enters text into element    name:contactName    UI Tests Contact Name
+    user enters text into element    name:contactTelNo    0123456789
 
 Option to set superseding publication should not appear
-    user checks page does not contain element    id:publicationForm-supersede
+    user checks page does not contain element    name:supersede
 
 Error message appears when submitting and title is empty
     user checks element is not visible    id:publicationForm-title-error    %{WAIT_SMALL}
@@ -40,11 +40,11 @@ Error message appears when submitting and title is empty
     user waits until element is visible    id:publicationForm-title-error    %{WAIT_SMALL}
 
 Enter new publication title
-    user enters text into element    id:publicationForm-title    ${PUBLICATION_NAME} (created)
+    user enters text into element    name:title    ${PUBLICATION_NAME} (created)
     user checks element is not visible    id:publicationForm-title-error    %{WAIT_SMALL}
 
 Enter new publication summary
-    user enters text into element    id:publicationForm-summary    ${PUBLICATION_NAME} summary
+    user enters text into element    name:summary    ${PUBLICATION_NAME} summary
 
 User redirects to the dashboard after saving publication
     user clicks button    Save publication
@@ -76,9 +76,9 @@ Update publication's details
 
     user clicks button    Edit publication details
 
-    user enters text into element    id:publicationDetailsForm-title    ${PUBLICATION_NAME}
-    user enters text into element    id:publicationDetailsForm-summary    ${PUBLICATION_NAME} summary updated
-    user chooses select option    id:publicationDetailsForm-themeId    ${CREATED_THEME_NAME}
+    user enters text into element    name:title    ${PUBLICATION_NAME}
+    user enters text into element    name:summary    ${PUBLICATION_NAME} summary updated
+    user chooses select option    name:themeId    ${CREATED_THEME_NAME}
 
     user clicks button    Update publication details
 
@@ -98,10 +98,10 @@ Update publication's contact
 
     user clicks button    Edit contact details
 
-    user enters text into element    id:publicationContactForm-teamName    Special educational needs statistics team
-    user enters text into element    id:publicationContactForm-teamEmail    sen.statistics@education.gov.uk
-    user enters text into element    id:publicationContactForm-contactName    UI Tests Contact Name
-    user enters text into element    id:publicationContactForm-contactTelNo    0987654321
+    user enters text into element    name:teamName    Special educational needs statistics team
+    user enters text into element    name:teamEmail    sen.statistics@education.gov.uk
+    user enters text into element    name:contactName    UI Tests Contact Name
+    user enters text into element    name:contactTelNo    0987654321
 
     user clicks button    Update contact details
 
@@ -144,8 +144,8 @@ Create new release for publication
     user clicks link    Create new release
     user waits until h1 is visible    Create new release
 
-    user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageCode
-    user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
+    user waits until page contains element    name:timePeriodCoverageCode
+    user waits until page contains element    name:timePeriodCoverageStartYear
 
 Verify Release type options
     user checks page contains radio    Accredited official statistics
@@ -155,8 +155,8 @@ Verify Release type options
     user checks page contains radio    Management information
 
 Create new release
-    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Spring term
-    user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2025
+    user chooses select option    name:timePeriodCoverageCode    Spring term
+    user enters text into element    name:timePeriodCoverageStartYear    2025
     user clicks radio    Accredited official statistics
     user clicks button    Create new release
     user waits until page contains title caption    Edit release for Spring term 2025/26
@@ -172,9 +172,9 @@ Edit release summary
     user waits until page contains link    Edit release summary
     user clicks link    Edit release summary
     user waits until h2 is visible    Edit release summary
-    user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
-    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Summer term
-    user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2026
+    user waits until page contains element    name:timePeriodCoverageStartYear
+    user chooses select option    name:timePeriodCoverageCode    Summer term
+    user enters text into element    name:timePeriodCoverageStartYear    2026
     user clicks radio    Official statistics
     user clicks button    Update release summary
 

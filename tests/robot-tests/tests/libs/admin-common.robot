@@ -94,7 +94,7 @@ user selects dashboard theme if possible
     user waits until page finishes loading
     ${dropdowns_exist}=    user checks dashboard theme dropdown exists
     IF    ${dropdowns_exist}
-        user chooses select option    id:publicationsReleases-theme-themeId    ${theme_name}
+        user chooses select option    name:themeId    ${theme_name}
         user waits until page contains    ${theme_name}
     END
 
