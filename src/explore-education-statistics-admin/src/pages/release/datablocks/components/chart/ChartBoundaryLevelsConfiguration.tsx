@@ -1,3 +1,6 @@
+import ChartBoundaryLevelsForm, {
+  ChartBoundaryLevelsFormValues,
+} from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsForm';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import {
   AxisConfiguration,
@@ -13,9 +16,6 @@ import { TableDataResult } from '@common/services/tableBuilderService';
 import parseNumber from '@common/utils/number/parseNumber';
 import { isEqual } from 'lodash';
 import React, { ReactNode, useCallback, useMemo } from 'react';
-import ChartBoundaryLevelsForm, {
-  ChartBoundaryLevelsFormValues,
-} from './ChartBoundaryLevelsForm';
 import generateDataSetLabel from './utils/generateDataSetLabel';
 
 interface Props {
@@ -119,6 +119,7 @@ export default function ChartBoundaryLevelsConfiguration({
 
   return (
     <ChartBoundaryLevelsForm
+      hasDataSetBoundaryLevels={false}
       buttons={buttons}
       boundaryLevelOptions={meta.boundaryLevels.map(({ id, label }) => ({
         label,
