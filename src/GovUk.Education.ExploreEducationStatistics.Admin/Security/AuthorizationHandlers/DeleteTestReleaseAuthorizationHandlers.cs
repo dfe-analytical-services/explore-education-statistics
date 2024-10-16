@@ -30,9 +30,9 @@ public class DeleteTestReleaseAuthorizationHandler(
             return Task.CompletedTask;
         }
 
-        var topic = releaseVersion.Publication.Topic;
+        var theme = releaseVersion.Publication.Theme;
 
-        if (topic.Title.StartsWith("UI test topic") && !topic.Title.StartsWith("Seed topic"))
+        if (theme.Title.StartsWith("UI test theme") || theme.Title.StartsWith("Seed theme"))
         {
             context.Succeed(requirement);
         }
