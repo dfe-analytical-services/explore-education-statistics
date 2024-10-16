@@ -316,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             CancellationToken cancellationToken)
         {
             await DeleteReleaseSeriesItem(releaseVersion, cancellationToken);
-            DeleteDataBlocks(releaseVersion.Id);
+            await DeleteDataBlocks(releaseVersion.Id, cancellationToken);
 
             var release = await _context.Releases.FindAsync(releaseVersion.ReleaseId, cancellationToken);
             _context.Releases.Remove(release!);
@@ -394,13 +394,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context.Publications.Update(publication);
         }
 
-        private void DeleteDataBlocks(Guid releaseVersionId)
+        private async Task DeleteDataBlocks(Guid releaseVersionId, CancellationToken cancellationToken = default)
         {
-            var dataBlocks = _context.DataBlockVersions
-                .Where(dbv => dbv.ReleaseVersionId == releaseVersionId)
-                .Select(dbv => dbv.DataBlockParent);
+            var dataBlockVersions = await _context
+                .DataBlockVersions
+                .Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId)
+                .ToListAsync(cancellationToken);
 
-            _context.DataBlockParents.RemoveRange(dataBlocks);
+            var dataBlockParents = dataBlockVersions
+                .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .Distinct()
+                .ToList();
+
+            // Unset the DataBlockVersion references from the DataBlockParent.
+            dataBlockParents.ForEach(dataBlockParent =>
+            {
+                dataBlockParent.LatestDraftVersionId = null;
+                dataBlockParent.LatestPublishedVersionId = null;
+            });
+
+            await _context.SaveChangesAsync(cancellationToken);            
+            
+            // Then remove the now-unreferenced DataBlockVersions.
+            _context.DataBlockVersions.RemoveRange(dataBlockVersions);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // And finally, delete the DataBlockParents if they are now orphaned.
+            var orphanedDataBlockParents = dataBlockParents
+                .Where(dataBlockParent =>
+                    !_context
+                        .DataBlockVersions
+                        .Any(dataBlockVersion => dataBlockVersion.DataBlockParentId == dataBlockParent.Id))
+                .ToList();
+
+            _context.DataBlockParents.RemoveRange(orphanedDataBlockParents);
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
         private void UpdateMethodologies(Guid releaseVersionId)

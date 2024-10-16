@@ -1383,7 +1383,7 @@ public abstract class ReleaseServiceTests
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task Success(bool isDraft)
+        public async Task Success(bool isAmendment)
         {
             // Arrange
             var release = _dataFixture.DefaultRelease().Generate();
@@ -1404,7 +1404,7 @@ public abstract class ReleaseServiceTests
             {
                 Id = release.Id,
                 Publication = publication,
-                Version = isDraft ? 0 : 1,
+                Version = isAmendment ? 0 : 1,
                 ReleaseId = release.Id
             };
 
@@ -1546,7 +1546,7 @@ public abstract class ReleaseServiceTests
 
                 result.AssertRight();
 
-                if (isDraft)
+                if (isAmendment)
                 {
                     // assert that hard-deleted entities no longer exist
                     var hardDeletedRelease = await contentDbContext
