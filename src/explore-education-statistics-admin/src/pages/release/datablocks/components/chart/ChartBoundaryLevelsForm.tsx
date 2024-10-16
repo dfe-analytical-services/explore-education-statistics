@@ -17,6 +17,7 @@ export interface ChartBoundaryLevelsFormValues {
 }
 
 interface Props {
+  hasDataSetBoundaryLevels?: boolean; // feature flag (remove once)
   buttons?: ReactNode;
   boundaryLevelOptions: { label: string; value: number }[];
   initialValues?: ChartBoundaryLevelsFormValues;
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export default function ChartBoundaryLevelsForm({
+  hasDataSetBoundaryLevels = true,
   buttons,
   boundaryLevelOptions,
   dataSetRows,
@@ -84,8 +86,16 @@ export default function ChartBoundaryLevelsForm({
               onMount={updateForm}
             />
             <FormFieldSelect<ChartBoundaryLevelsFormValues>
-              label="Default boundary level"
-              hint="Select a version of geographical data to use across any data sets that don't have a specific one set"
+              label={
+                hasDataSetBoundaryLevels
+                  ? 'Default boundary level'
+                  : 'Boundary level'
+              }
+              hint={`Select a version of geographical data to use${
+                hasDataSetBoundaryLevels
+                  ? "across any data sets that don't have a specific one set"
+                  : ''
+              }`}
               name="boundaryLevel"
               order={[]}
               options={[
@@ -96,7 +106,7 @@ export default function ChartBoundaryLevelsForm({
                 ...boundaryLevelOptions,
               ]}
             />
-            {dataSetRows.length > 1 && (
+            {hasDataSetBoundaryLevels && dataSetRows.length > 1 && (
               <>
                 <h4>Set boundary levels per data set</h4>
                 <table data-testid="chart-dataset-boundary-levels">

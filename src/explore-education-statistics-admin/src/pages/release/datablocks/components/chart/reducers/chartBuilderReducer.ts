@@ -14,11 +14,11 @@ import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { Chart } from '@common/services/types/blocks';
 import deepMerge from 'deepmerge';
-import { isEqual } from 'lodash';
+import { isEqual, merge } from 'lodash';
 import mapValues from 'lodash/mapValues';
 import { useCallback, useMemo } from 'react';
 import { Reducer } from 'use-immer';
-import { ChartBoundaryLevelsFormValues } from '../ChartBoundaryLevelsConfiguration';
+import { ChartBoundaryLevelsFormValues } from '../ChartBoundaryLevelsForm';
 
 export interface ChartOptions extends ChartDefinitionOptions {
   file?: File;
@@ -246,7 +246,7 @@ export const chartBuilderReducer: Reducer<
               isEqual(existingDataSet, dataSet),
             )! ?? {};
 
-          return { dataSet, boundaryLevel, dataGrouping };
+          return merge({}, { dataSet, boundaryLevel, dataGrouping });
         },
       );
 
@@ -266,7 +266,7 @@ export const chartBuilderReducer: Reducer<
             ({ dataSet: existingDataSet }) => isEqual(existingDataSet, dataSet),
           )!;
 
-          return { dataSet, boundaryLevel, dataGrouping };
+          return merge({}, { dataSet, boundaryLevel, dataGrouping });
         },
       );
 
