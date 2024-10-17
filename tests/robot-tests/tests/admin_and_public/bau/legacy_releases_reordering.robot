@@ -13,11 +13,11 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${RELEASE_NAME}=                        Academic year Q1 2022/23
-${PUBLICATION_NAME}=                    ui-tests-legacy-releases-%{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                    UI tests - legacy releases-%{RUN_IDENTIFIER}
 ${PUBLIC_PUBLICATION_URL_ENDING}=       /find-statistics/${PUBLICATION_NAME}
 ${DESCRIPTION}=                         legacy release description
 ${UPDATED_DESCRIPTION}=                 updated legacy release description
-${PUBLIC_URL_WITHOUT_AUTH}           ${EMPTY}
+${PUBLIC_URL_WITHOUT_AUTH}              ${EMPTY}
 
 
 *** Test Cases ***

@@ -149,16 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() =>
                     _persistenceHelper.CheckEntityExists<Theme>(themeId, q => q.Include(t => t.Publications)))
                 .OnSuccessDo(CheckCanDeleteTheme)
-                .OnSuccessDo(async theme =>
-                {
-                    var publicationIdsToDelete = theme.Publications
-                        .Select(p => p.Id)
-                        .ToList();
-
-                    return await DeleteMethodologiesForPublications(publicationIdsToDelete)
-                        .OnSuccess(() => DeleteReleasesForPublications(publicationIdsToDelete))
-                        .OnSuccess(() => DeletePublications(publicationIdsToDelete));
-                })
+                .OnSuccessDo(theme => DeletePublicationsForTheme(theme, cancellationToken))
                 .OnSuccessVoid(async theme =>
                 {
                     _contentDbContext.Themes.Remove(theme);
@@ -166,6 +157,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _publishingService.TaxonomyChanged(cancellationToken);
                 });
+        }
+
+        private async Task<Either<List<ActionResult>, Unit>> DeletePublicationsForTheme(
+            Theme theme, CancellationToken cancellationToken)
+        {
+            var publicationIds = theme
+                .Publications
+                .Select(publication => publication.Id)
+                .ToList();
+            
+            var deletePublicationResults = await publicationIds
+                .ToAsyncEnumerable()
+                .SelectAwait(async publicationId =>
+                    await DeleteMethodologiesForPublications([publicationId])
+                        .OnSuccess(() => DeleteReleasesForPublications([publicationId]))
+                        .OnSuccess(() => DeletePublications([publicationId])))
+                .ToListAsync(cancellationToken);
+
+            return deletePublicationResults
+                .AggregateSuccessesAndFailures()
+                .OnSuccessVoid();
         }
 
         private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublications(
@@ -225,10 +237,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var publications = await _contentDbContext
                 .Publications
+                .Include(publication => publication.Contact)
                 .Where(publication => publicationIds.Contains(publication.Id))
                 .ToListAsync();
 
+            var contacts = publications
+                .Select(publication => publication.Contact)
+                .ToList();
+            
             _contentDbContext.Publications.RemoveRange(publications);
+            _contentDbContext.Contacts.RemoveRange(contacts);
             await _contentDbContext.SaveChangesAsync();
             return Unit.Instance;
         }
