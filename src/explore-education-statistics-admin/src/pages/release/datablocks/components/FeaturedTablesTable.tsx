@@ -1,6 +1,4 @@
 import Link from '@admin/components/Link';
-import DroppableArea from '@admin/components/DroppableArea';
-import DraggableItem, { DragHandle } from '@admin/components/DraggableItem';
 import { FeaturedTable } from '@admin/services/featuredTableService';
 import { ReleaseDataBlockSummary } from '@admin/services/dataBlockService';
 import {
@@ -10,12 +8,13 @@ import {
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
+import ReorderableList from '@common/components/ReorderableList';
+import { ReorderableListItem } from '@common/components/ReorderableItem';
 import reorder from '@common/utils/reorder';
 import useToggle from '@common/hooks/useToggle';
 import React, { useEffect, useState } from 'react';
 import { generatePath } from 'react-router';
 import orderBy from 'lodash/orderBy';
-import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 
 interface Props {
   canUpdateRelease: boolean;
@@ -41,8 +40,50 @@ export default function FeaturedTablesTable({
     useState(featuredTables);
 
   useEffect(() => {
-    setCurrentFeaturedTables(featuredTables);
+    setCurrentFeaturedTables(orderBy(featuredTables, 'order'));
   }, [featuredTables]);
+
+  if (isReordering) {
+    return (
+      <ReorderableList
+        heading="Reorder featured tables"
+        id="featured-tables"
+        list={currentFeaturedTables.reduce<ReorderableListItem[]>(
+          (acc, featuredTable) => {
+            const dataBlock = dataBlocks.find(
+              block => block.id === featuredTable.dataBlockId,
+            );
+            if (dataBlock) {
+              acc.push({
+                id: featuredTable.id,
+                label: `${dataBlock.name} (${featuredTable.name})`,
+              });
+            }
+            return acc;
+          },
+          [],
+        )}
+        onConfirm={async () => {
+          await onSaveOrder(currentFeaturedTables);
+          toggleIsReordering.off();
+        }}
+        onMoveItem={({ prevIndex, nextIndex }) => {
+          const reordered = reorder(
+            currentFeaturedTables,
+            prevIndex,
+            nextIndex,
+          ).map((table, index) => ({
+            ...table,
+            order: index,
+          }));
+          setCurrentFeaturedTables(reordered);
+        }}
+        onReverse={() => {
+          setCurrentFeaturedTables(currentFeaturedTables.toReversed());
+        }}
+      />
+    );
+  }
 
   return (
     <>
@@ -52,94 +93,53 @@ export default function FeaturedTablesTable({
           <Button
             className="govuk-!-margin-bottom-4"
             variant="secondary"
-            onClick={async () => {
-              if (isReordering) {
-                await onSaveOrder(currentFeaturedTables);
-              }
-              toggleIsReordering();
-            }}
+            onClick={toggleIsReordering.on}
           >
-            {isReordering ? 'Save order' : 'Reorder featured tables'}
+            Reorder featured tables
           </Button>
         )}
       </div>
 
-      <DragDropContext
-        onDragEnd={result => {
-          if (!result.destination) {
-            return;
-          }
-          const reordered = reorder(
-            currentFeaturedTables,
-            result.source.index,
-            result.destination.index,
-          ).map((table, index) => ({
-            ...table,
-            order: index,
-          }));
-          setCurrentFeaturedTables(reordered);
-        }}
-      >
-        <Droppable droppableId="footnotes" isDropDisabled={!isReordering}>
-          {(droppableProvided, droppableSnapshot) => (
-            <table data-testid="featuredTables">
-              <thead>
-                <tr>
-                  <th scope="col" className="govuk-!-width-one-quarter">
-                    Data block name
-                  </th>
-                  <th scope="col">Has chart</th>
-                  <th scope="col">In content</th>
-                  <th scope="col">Featured table name</th>
-                  <th scope="col">Created date</th>
-                  <th scope="col" className="govuk-table__header--actions">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <DroppableArea
-                droppableProvided={droppableProvided}
-                droppableSnapshot={droppableSnapshot}
-                tag="tbody"
-              >
-                {orderBy(currentFeaturedTables, 'order').map(
-                  (featuredTable, index) => {
-                    const dataBlock = dataBlocks.find(
-                      block => block.id === featuredTable.dataBlockId,
-                    );
-                    return dataBlock ? (
-                      <DraggableItem
-                        hideDragHandle
-                        id={featuredTable.id}
-                        index={index}
-                        isReordering={isReordering}
-                        key={featuredTable.id}
-                        tag="tr"
-                      >
-                        <FeaturedTablesRow
-                          canUpdateRelease={canUpdateRelease}
-                          dataBlock={dataBlock}
-                          featuredTable={featuredTable}
-                          isReordering={isReordering}
-                          link={generatePath<ReleaseDataBlockRouteParams>(
-                            releaseDataBlockEditRoute.path,
-                            {
-                              publicationId,
-                              releaseId,
-                              dataBlockId: featuredTable.dataBlockId,
-                            },
-                          )}
-                          onDelete={onDelete}
-                        />
-                      </DraggableItem>
-                    ) : null;
+      <table data-testid="featuredTables">
+        <thead>
+          <tr>
+            <th scope="col" className="govuk-!-width-one-quarter">
+              Data block name
+            </th>
+            <th scope="col">Has chart</th>
+            <th scope="col">In content</th>
+            <th scope="col">Featured table name</th>
+            <th scope="col">Created date</th>
+            <th scope="col" className="govuk-table__header--actions">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentFeaturedTables.map(featuredTable => {
+            const dataBlock = dataBlocks.find(
+              block => block.id === featuredTable.dataBlockId,
+            );
+            return dataBlock ? (
+              <FeaturedTablesRow
+                canUpdateRelease={canUpdateRelease}
+                dataBlock={dataBlock}
+                featuredTable={featuredTable}
+                key={featuredTable.id}
+                link={generatePath<ReleaseDataBlockRouteParams>(
+                  releaseDataBlockEditRoute.path,
+                  {
+                    publicationId,
+                    releaseId,
+                    dataBlockId: featuredTable.dataBlockId,
                   },
                 )}
-              </DroppableArea>
-            </table>
-          )}
-        </Droppable>
-      </DragDropContext>
+                onDelete={onDelete}
+              />
+            ) : null;
+          })}
+        </tbody>
+      </table>
     </>
   );
 }
@@ -148,7 +148,6 @@ interface FeaturedTablesRowProps {
   canUpdateRelease: boolean;
   dataBlock: ReleaseDataBlockSummary;
   featuredTable: FeaturedTable;
-  isReordering: boolean;
   link: string;
   onDelete: (dataBlock: ReleaseDataBlockSummary) => void;
 }
@@ -157,12 +156,11 @@ function FeaturedTablesRow({
   canUpdateRelease,
   dataBlock,
   featuredTable,
-  isReordering,
   link,
   onDelete,
 }: FeaturedTablesRowProps) {
   return (
-    <>
+    <tr>
       <td>{dataBlock.name}</td>
       <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
       <td>{dataBlock.inContent ? 'Yes' : 'No'}</td>
@@ -177,29 +175,23 @@ function FeaturedTablesRow({
         )}
       </td>
       <td className="govuk-table__cell--actions govuk-!-width-one-quarter">
-        {!isReordering ? (
-          <>
-            <Link
-              className="govuk-!-margin-bottom-0"
-              unvisited
-              to={link}
-              data-testid={`Edit data block ${dataBlock.name}`}
-            >
-              {canUpdateRelease ? 'Edit block' : 'View block'}
-            </Link>
-            {canUpdateRelease && (
-              <ButtonText
-                className="govuk-!-margin-bottom-0"
-                onClick={() => onDelete(dataBlock)}
-              >
-                Delete block
-              </ButtonText>
-            )}
-          </>
-        ) : (
-          <DragHandle className="govuk-!-margin-right-2" />
+        <Link
+          className="govuk-!-margin-bottom-0"
+          unvisited
+          to={link}
+          data-testid={`Edit data block ${dataBlock.name}`}
+        >
+          {canUpdateRelease ? 'Edit block' : 'View block'}
+        </Link>
+        {canUpdateRelease && (
+          <ButtonText
+            className="govuk-!-margin-bottom-0"
+            onClick={() => onDelete(dataBlock)}
+          >
+            Delete block
+          </ButtonText>
         )}
       </td>
-    </>
+    </tr>
   );
 }
