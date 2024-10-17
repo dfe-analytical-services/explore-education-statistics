@@ -120,7 +120,7 @@ describe('ReleaseFootnotesPage', () => {
       });
 
       expect(
-        screen.queryByRole('button', { name: 'Save order' }),
+        screen.queryByRole('button', { name: 'Confirm order' }),
       ).not.toBeInTheDocument();
       expect(
         screen.getByRole('link', { name: 'Create footnote' }),
@@ -131,7 +131,7 @@ describe('ReleaseFootnotesPage', () => {
       );
 
       expect(
-        screen.getByRole('button', { name: 'Save order' }),
+        screen.getByRole('button', { name: 'Confirm order' }),
       ).toBeInTheDocument();
       expect(
         screen.queryByRole('button', { name: 'Reorder footnotes' }),
@@ -150,18 +150,20 @@ describe('ReleaseFootnotesPage', () => {
         screen.queryByRole('button', { name: 'See matching criteria' }),
       ).not.toBeInTheDocument();
 
-      expect(screen.getByTestId('Footnote - Footnote 1 content')).toBe(
+      const reorderableItems = screen.getAllByTestId('reorderable-item');
+
+      expect(reorderableItems[0]).toBe(
         screen.getByRole('button', { name: 'Footnote 1 content' }),
       );
-      expect(screen.getByTestId('Footnote - Footnote 3 content')).toBe(
-        screen.getByRole('button', { name: 'Footnote 3 content' }),
+      expect(reorderableItems[1]).toBe(
+        screen.getByRole('button', { name: 'Footnote 2 content' }),
       );
-      expect(screen.getByTestId('Footnote - Footnote 3 content')).toBe(
+      expect(reorderableItems[2]).toBe(
         screen.getByRole('button', { name: 'Footnote 3 content' }),
       );
     });
 
-    test('calls the footnotes service when save order is clicked', async () => {
+    test('calls the footnotes service when confirm order is clicked', async () => {
       permissionService.canUpdateRelease.mockResolvedValue(true);
       footnoteService.getFootnoteMeta.mockResolvedValue(testFootnoteMeta);
       footnoteService.getFootnotes.mockResolvedValue(testFootnotes);
@@ -175,9 +177,11 @@ describe('ReleaseFootnotesPage', () => {
         screen.getByRole('button', { name: 'Reorder footnotes' }),
       );
       await waitFor(() => {
-        expect(screen.getByText('Save order')).toBeInTheDocument();
+        expect(screen.getByText('Confirm order')).toBeInTheDocument();
       });
-      await userEvent.click(screen.getByRole('button', { name: 'Save order' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Confirm order' }),
+      );
 
       expect(footnoteService.updateFootnotesOrder).toHaveBeenCalledWith(
         'release-1',

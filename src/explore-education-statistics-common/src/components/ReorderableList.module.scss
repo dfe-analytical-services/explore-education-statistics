@@ -1,0 +1,12 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.dropArea {
+  &:focus {
+    outline: $govuk-focus-width solid $govuk-focus-colour;
+  }
+}
+
+.dropAreaActive {
+  background: govuk-colour('light-grey');
+  outline: $govuk-focus-width solid $govuk-focus-colour;
+}
