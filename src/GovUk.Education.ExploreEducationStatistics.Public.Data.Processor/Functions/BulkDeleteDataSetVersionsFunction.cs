@@ -17,12 +17,14 @@ public class BulkDeleteDataSetVersionsFunction(
             Route = $"{nameof(BulkDeleteDataSetVersions)}/{{releaseVersionId}}")]
         HttpRequest httpRequest,
         Guid releaseVersionId,
-        CancellationToken cancellationToken)
+        [FromQuery] bool forceDeleteAll = false,
+        CancellationToken cancellationToken = default)
     {
         try
         {
             return await dataSetVersionService.BulkDeleteVersions(
                     releaseVersionId,
+                    forceDeleteAll: forceDeleteAll,
                     cancellationToken: cancellationToken)
                 .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }

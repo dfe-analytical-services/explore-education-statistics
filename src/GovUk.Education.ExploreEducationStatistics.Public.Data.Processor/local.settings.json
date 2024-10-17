@@ -12,5 +12,8 @@
   "Host": {
     "LocalHttpPort": 7074,
     "CORS": "*"
+  },
+  "App": {
+    "EnableThemeDeletion": true
   }
 }

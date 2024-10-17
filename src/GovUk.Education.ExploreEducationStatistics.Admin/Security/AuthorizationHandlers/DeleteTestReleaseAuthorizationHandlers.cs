@@ -32,7 +32,7 @@ public class DeleteTestReleaseAuthorizationHandler(
 
         var theme = releaseVersion.Publication.Theme;
 
-        if (theme.Title.StartsWith("UI test theme") || theme.Title.StartsWith("Seed theme"))
+        if (theme.IsTestOrSeedTheme())
         {
             context.Succeed(requirement);
         }

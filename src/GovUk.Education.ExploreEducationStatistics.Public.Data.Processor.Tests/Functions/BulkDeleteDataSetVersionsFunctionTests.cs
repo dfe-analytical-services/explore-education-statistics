@@ -8,11 +8,13 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using FileInfo = System.IO.FileInfo;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -542,14 +544,208 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                 expectedCode: ValidationMessages.OneOrMoreDataSetVersionsCanNotBeDeleted.Code);
         }
 
-        private async Task<IActionResult> BulkDeleteDataSetVersions(Guid releaseVersionId)
+        public class ForceDeleteTests(ProcessorFunctionsIntegrationTestFixture fixture)
+            : BulkDeleteDataSetVersionsTests(fixture)
+        {
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
+                MemberType = typeof(DataSetVersionStatusTheoryData))]
+            public async Task TestTheme_ThemeDeletionNotAllowed_Returns400(
+                DataSetVersionStatus dataSetVersionStatus)
+            {
+                ReleaseVersion releaseVersion = DataFixture
+                    .DefaultReleaseVersion()
+                    .WithPublication(DataFixture
+                        .DefaultPublication()
+                        .WithTheme(DataFixture
+                            .DefaultTheme()
+                            .WithTitle("UI test theme")));
+
+                ReleaseFile releaseFile = DataFixture
+                    .DefaultReleaseFile()
+                    .WithFile(DataFixture.DefaultFile(FileType.Data))
+                    .WithReleaseVersion(releaseVersion);
+
+                await AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFile);
+                });
+
+                var dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithPublicationId(releaseVersion.PublicationId)
+                    .WithStatusPublished()
+                    .Generate();
+
+                await AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSet));
+
+                // Data set version that is not in a deletable state without force delete
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithDataSet(dataSet)
+                    .WithRelease(DataFixture
+                        .DefaultDataSetVersionRelease()
+                        .WithReleaseFileId(releaseFile.Id))
+                    .WithVersionNumber(major: 1, minor: 0)
+                    .WithStatus(dataSetVersionStatus)
+                    .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+                await AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                // Request force deletion but without delete support from the
+                // environment configuration
+                var response = await BulkDeleteDataSetVersions(
+                    releaseVersionId: releaseVersion.Id,
+                    forceDeleteAll: true);
+
+                var validationProblem = response.AssertBadRequestWithValidationProblem();
+
+                validationProblem.AssertHasError(
+                    expectedPath: "releaseVersionId",
+                    expectedCode: ValidationMessages.OneOrMoreDataSetVersionsCanNotBeDeleted.Code);
+            }
+
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
+                MemberType = typeof(DataSetVersionStatusTheoryData))]
+            public async Task TestTheme_ThemeDeletionAllowed_Success(
+                DataSetVersionStatus dataSetVersionStatus)
+            {
+                ReleaseVersion releaseVersion = DataFixture
+                    .DefaultReleaseVersion()
+                    .WithPublication(DataFixture
+                        .DefaultPublication()
+                        .WithTheme(DataFixture
+                            .DefaultTheme()
+                            .WithTitle("UI test theme")));
+
+                ReleaseFile releaseFile = DataFixture
+                    .DefaultReleaseFile()
+                    .WithFile(DataFixture.DefaultFile(FileType.Data))
+                    .WithReleaseVersion(releaseVersion);
+
+                await AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFile);
+                });
+
+                var dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithPublicationId(releaseVersion.PublicationId)
+                    .WithStatusPublished()
+                    .Generate();
+
+                await AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSet));
+
+                // Data set version that is not in a deletable state without force delete
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithDataSet(dataSet)
+                    .WithRelease(DataFixture
+                        .DefaultDataSetVersionRelease()
+                        .WithReleaseFileId(releaseFile.Id))
+                    .WithVersionNumber(major: 1, minor: 0)
+                    .WithStatus(dataSetVersionStatus)
+                    .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+                await AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                // Request force deletion with support from the environment configuration
+                var response = await BulkDeleteDataSetVersions(
+                    releaseVersionId: releaseVersion.Id,
+                    forceDeleteAll: true,
+                    themeDeletionAllowed: true);
+
+                response.AssertNoContent();
+            }
+
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
+                MemberType = typeof(DataSetVersionStatusTheoryData))]
+            public async Task NonTestTheme_ThemeDeletionAllowed_Returns400(
+                DataSetVersionStatus dataSetVersionStatus)
+            {
+                ReleaseVersion releaseVersion = DataFixture
+                    .DefaultReleaseVersion()
+                    .WithPublication(DataFixture
+                        .DefaultPublication()
+                        .WithTheme(DataFixture
+                            .DefaultTheme()
+                            .WithTitle("Non-test theme")));
+
+                ReleaseFile releaseFile = DataFixture
+                    .DefaultReleaseFile()
+                    .WithFile(DataFixture.DefaultFile(FileType.Data))
+                    .WithReleaseVersion(releaseVersion);
+
+                await AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFile);
+                });
+
+                var dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithPublicationId(releaseVersion.PublicationId)
+                    .WithStatusPublished()
+                    .Generate();
+
+                await AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSet));
+
+                // Data set version that is not in a deletable state without force delete
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithDataSet(dataSet)
+                    .WithRelease(DataFixture
+                        .DefaultDataSetVersionRelease()
+                        .WithReleaseFileId(releaseFile.Id))
+                    .WithVersionNumber(major: 1, minor: 0)
+                    .WithStatus(dataSetVersionStatus)
+                    .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+                await AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                // Request force deletion with support from the environment configuration
+                // but targeting a non-Test DataSetVersion.
+                var response = await BulkDeleteDataSetVersions(
+                    releaseVersionId: releaseVersion.Id,
+                    forceDeleteAll: true,
+                    themeDeletionAllowed: true);
+
+                var validationProblem = response.AssertBadRequestWithValidationProblem();
+
+                validationProblem.AssertHasError(
+                    expectedPath: "releaseVersionId",
+                    expectedCode: ValidationMessages.OneOrMoreDataSetVersionsCanNotBeDeleted.Code);
+            }
+        }
+
+        private async Task<IActionResult> BulkDeleteDataSetVersions(
+            Guid releaseVersionId,
+            bool forceDeleteAll = false,
+            bool themeDeletionAllowed = false)
         {
             var function = GetRequiredService<BulkDeleteDataSetVersionsFunction>();
 
+            var appOptions = GetRequiredService<IOptions<AppOptions>>();
+            appOptions.Value.EnableThemeDeletion = themeDeletionAllowed;
+
             return await function.BulkDeleteDataSetVersions(
-                null!,
-                releaseVersionId,
-                CancellationToken.None);
+                httpRequest: null!,
+                releaseVersionId: releaseVersionId,
+                forceDeleteAll: forceDeleteAll,
+                cancellationToken: CancellationToken.None);
         }
     }
 }

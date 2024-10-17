@@ -9,5 +9,5 @@ public class AppOptions
 
     public bool EnableSwagger { get; init; }
 
-    public bool EnableThemeDeletion { get; init; }
+    public bool EnableThemeDeletion { get; init; } = false;
 }

@@ -238,8 +238,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return !_themeDeletionAllowed
                 ? new ForbidResult()
                 : await _userService.CheckCanManageAllTaxonomy()
-                    .OnSuccess(_ => _contentDbContext.Themes
-                        .Where(theme => theme.Title.Contains("UI test theme")))
+                    .OnSuccess(async _ => (await _contentDbContext
+                        .Themes
+                        .ToListAsync(cancellationToken))
+                        .Where(theme => theme.IsTestOrSeedTheme()))
                     .OnSuccessVoid(async themes =>
                     {
                         foreach (var theme in themes)
@@ -263,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // don't really have a mechanism to clean things up
             // properly across the entire application.
             // TODO: EES-1295 ability to completely delete releases
-            if (!theme.Title.StartsWith("UI test theme") && !theme.Title.StartsWith("Seed theme"))
+            if (!theme.IsTestOrSeedTheme())
             {
                 return new ForbidResult();
             }
