@@ -32,6 +32,7 @@ import DataUploadCancelButton from '@admin/pages/release/data/components/DataUpl
 import React, { useCallback, useEffect, useState } from 'react';
 import { generatePath } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
+import { reverse, uniqBy } from 'lodash';
 
 interface Props {
   publicationId: string;
@@ -151,7 +152,10 @@ const ReleaseDataUploadsSection = ({
           break;
       }
       setActiveFileIds(newFiles.map(file => file.id));
-      setDataFiles(currentDataFiles => [...currentDataFiles, ...newFiles]);
+      setDataFiles(currentDataFiles =>
+        // double reverse keeps *new* files as uniq item and at the end of the list
+        reverse(uniqBy(reverse([...currentDataFiles, ...newFiles]), 'title')),
+      );
     },
     [releaseId],
   );
