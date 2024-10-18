@@ -217,10 +217,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             CancellationToken cancellationToken = default)
         {
-            return _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(
-                    id: releaseVersionId,
-                    query => query.Include(rv => rv.Publication.Theme))
+            return _context
+                .ReleaseVersions
+                .SingleOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
                 .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
@@ -235,11 +234,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             CancellationToken cancellationToken = default)
         {
-            return _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(
-                    id: releaseVersionId,
-                    query => query.Include(rv => rv.Publication.Theme))
-                .OnSuccess(_userService.CheckCanDeleteTestReleaseVersion)
+            return _context
+                .ReleaseVersions
+                .IgnoreQueryFilters()
+                .SingleOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
+                .OnSuccessDo(_userService.CheckCanDeleteTestReleaseVersion)
+                .OnSuccessDo(async releaseVersion =>
+                {
+                    var subjects = await _statisticsDbContext
+                        .ReleaseSubject
+                        .IgnoreQueryFilters()
+                        .Where(releaseSubject => releaseSubject.ReleaseVersionId == releaseVersion.Id)
+                        .Select(releaseSubject => releaseSubject.Subject)
+                        .ToListAsync(cancellationToken);
+                    
+                    releaseVersion.SoftDeleted = false;
+                    subjects.ForEach(subject => subject.SoftDeleted = false);
+
+                    _context.ReleaseVersions.Update(releaseVersion);
+                    _statisticsDbContext.Subject.UpdateRange(subjects);
+
+                    await _context.SaveChangesAsync(cancellationToken);
+                    await _statisticsDbContext.SaveChangesAsync(cancellationToken);
+                })
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
                     forceDeleteAllPublicApiData: true,
