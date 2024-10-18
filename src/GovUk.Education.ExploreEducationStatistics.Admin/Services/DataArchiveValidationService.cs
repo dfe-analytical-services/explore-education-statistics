@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -13,6 +8,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.IO.Compression;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -106,26 +106,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (dataSetNamesFile == null)
             {
                 return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
-                    {
-                        Code = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Code,
-                        Message = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Message,
-                    });
+                {
+                    Code = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Code,
+                    Message = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Message,
+                });
             }
 
             unprocessedArchiveFiles.Remove(dataSetNamesFile);
 
             List<string> headers;
-            await using (var dataSetNamesStream = dataSetNamesFile.Open()) {
+            await using (var dataSetNamesStream = dataSetNamesFile.Open())
+            {
                 headers = await CsvUtils.GetCsvHeaders(dataSetNamesStream);
             }
 
             if (headers is not ["file_name", "dataset_name"])
             {
                 return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
-                    {
-                        Code = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Code,
-                        Message = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Message,
-                    });
+                {
+                    Code = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Code,
+                    Message = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Message,
+                });
             }
 
             var fileNameIndex = headers[0] == "file_name" ? 0 : 1;
@@ -155,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     errors.Add(ValidationMessages.GenerateErrorDatasetNamesCsvFilenamesShouldNotEndDotCsv(baseFilename));
                 });
 
-            // Check for duplicate data set titles - because the bulk zip itself main contain duplicates!
+            // Check for duplicate data set titles - because the bulk zip itself may contain duplicates!
             dataSetNamesCsvEntries
                 .GroupBy(entry => entry.Title)
                 .Where(group => group.Count() > 1)
@@ -167,9 +168,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .GenerateErrorDataSetTitleShouldBeUnique(duplicateTitle));
                 });
 
-            // Check for duplicate data set filenames - because the bulk zip itself main contain duplicates!
+            // Check for duplicate data set filenames - because the bulk zip itself may contain duplicates!
             dataSetNamesCsvEntries
-                .GroupBy(entry  => entry.BaseFilename)
+                .GroupBy(entry => entry.BaseFilename)
                 .Where(group => group.Count() > 1)
                 .Select(group => group.Key)
                 .ToList()
@@ -185,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             var dataSetFiles = new List<ArchiveDataSetFile>();
-            foreach(var entry in dataSetNamesCsvEntries)
+            foreach (var entry in dataSetNamesCsvEntries)
             {
                 var dataFile = archive.GetEntry($"{entry.BaseFilename}.csv");
                 var metaFile = archive.GetEntry($"{entry.BaseFilename}.meta.csv");
@@ -252,10 +253,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             List<ErrorViewModel> errors = [];
 
+            if (zipFile is null)
+            {
+                errors.Add(ValidationMessages.GenerateErrorFileIsNull(nameof(zipFile)));
+                return errors;
+            }
+
             if (zipFile.FileName.Length > MaxFilenameSize)
             {
                 errors.Add(ValidationMessages.GenerateErrorFilenameTooLong(
-                        zipFile.FileName, MaxFilenameSize));
+                    zipFile.FileName, MaxFilenameSize));
             }
 
             if (!zipFile.FileName.ToLower().EndsWith(".zip"))

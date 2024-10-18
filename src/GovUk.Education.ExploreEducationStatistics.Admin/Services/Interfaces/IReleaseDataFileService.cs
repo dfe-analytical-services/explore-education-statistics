@@ -1,11 +1,11 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -43,6 +43,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IFormFile zipFormFile,
             string? dataSetTitle,
             Guid? replacingFileId);
+
+        Task<Either<ActionResult, List<ArchiveDataSetFile>>> UploadAsBulkZipPlan(
+            Guid releaseVersionId,
+            IFormFile bulkZipFormFile);
 
         Task<Either<ActionResult, List<DataFileInfo>>> UploadAsBulkZip(
             Guid releaseVersionId,

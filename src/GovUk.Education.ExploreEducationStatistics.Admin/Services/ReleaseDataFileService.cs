@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -18,6 +14,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid fileId,
             bool forceDelete = false)
         {
-            return await Delete(releaseVersionId, [ fileId ], forceDelete: forceDelete);
+            return await Delete(releaseVersionId, [fileId], forceDelete: forceDelete);
         }
 
         public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
@@ -277,7 +277,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             return newDataSetTitle;
                         })
-                        .OnSuccess(async tuple => {
+                        .OnSuccess(async tuple =>
+                        {
 
                             var (replacingFile, newDataSetTitle) = tuple;
 
@@ -428,6 +429,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, List<ArchiveDataSetFile>>> UploadAsBulkZipPlan(
+            Guid releaseVersionId,
+            IFormFile bulkZipFormFile)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(_ =>
+                {
+                    return _dataArchiveValidationService.ValidateBulkDataArchiveFile(
+                        releaseVersionId,
+                        bulkZipFormFile);
+                });
+        }
+
         public async Task<Either<ActionResult, List<DataFileInfo>>> UploadAsBulkZip(
             Guid releaseVersionId,
             IFormFile bulkZipFormFile)
@@ -454,61 +470,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // each data/meta file pair are extracted to blob storage by _dataImportService.Import
                     await UploadFileToStorage(bulkZipFile, bulkZipFormFile);
 
-                        var results = new List<DataFileInfo>();
+                    var results = new List<DataFileInfo>();
 
-                        foreach (var archiveFile in dataArchiveFiles)
-                        {
-                            var subjectId = await _releaseVersionRepository
-                                .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
+                    foreach (var archiveFile in dataArchiveFiles)
+                    {
+                        var subjectId = await _releaseVersionRepository
+                            .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
 
-                            var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId);
+                        var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId);
 
-                            var dataFile = await _releaseDataFileRepository.Create(
-                                releaseVersionId: releaseVersionId,
-                                subjectId: subjectId,
-                                filename: archiveFile.DataFilename,
-                                contentLength: archiveFile.DataFileSize,
-                                type: FileType.Data,
-                                createdById: _userService.GetUserId(),
-                                name: archiveFile.Title,
-                                source: bulkZipFile,
-                                order: releaseDataFileOrder);
+                        var dataFile = await _releaseDataFileRepository.Create(
+                            releaseVersionId: releaseVersionId,
+                            subjectId: subjectId,
+                            filename: archiveFile.DataFilename,
+                            contentLength: archiveFile.DataFileSize,
+                            type: FileType.Data,
+                            createdById: _userService.GetUserId(),
+                            name: archiveFile.Title,
+                            source: bulkZipFile,
+                            order: releaseDataFileOrder);
 
-                            var dataReleaseFile = await _contentDbContext.ReleaseFiles
-                                .Include(rf => rf.File)
-                                .SingleAsync(rf =>
-                                    rf.ReleaseVersionId == releaseVersionId
-                                    && rf.FileId == dataFile.Id);
+                        var dataReleaseFile = await _contentDbContext.ReleaseFiles
+                            .Include(rf => rf.File)
+                            .SingleAsync(rf =>
+                                rf.ReleaseVersionId == releaseVersionId
+                                && rf.FileId == dataFile.Id);
 
-                            var metaFile = await _releaseDataFileRepository.Create(
-                                releaseVersionId: releaseVersionId,
-                                subjectId: subjectId,
-                                filename: archiveFile.MetaFilename,
-                                contentLength: archiveFile.MetaFileSize,
-                                type: Metadata,
-                                createdById: _userService.GetUserId(),
-                                source: bulkZipFile);
+                        var metaFile = await _releaseDataFileRepository.Create(
+                            releaseVersionId: releaseVersionId,
+                            subjectId: subjectId,
+                            filename: archiveFile.MetaFilename,
+                            contentLength: archiveFile.MetaFileSize,
+                            type: Metadata,
+                            createdById: _userService.GetUserId(),
+                            source: bulkZipFile);
 
-                            var dataImport = await _dataImportService.Import(
-                                subjectId: subjectId,
-                                dataFile: dataFile,
+                        var dataImport = await _dataImportService.Import(
+                            subjectId: subjectId,
+                            dataFile: dataFile,
+                            metaFile: metaFile,
+                            sourceZipFile: bulkZipFile);
+
+                        var permissions = await _userService.GetDataFilePermissions(dataFile);
+
+                        results.Add(
+                            BuildDataFileViewModel(
+                                dataReleaseFile: dataReleaseFile,
                                 metaFile: metaFile,
-                                sourceZipFile: bulkZipFile);
+                                archiveFile.Title,
+                                dataImport.TotalRows,
+                                dataImport.Status,
+                                permissions));
+                    }
 
-                            var permissions = await _userService.GetDataFilePermissions(dataFile);
-
-                            results.Add(
-                                BuildDataFileViewModel(
-                                    dataReleaseFile: dataReleaseFile,
-                                    metaFile: metaFile,
-                                    archiveFile.Title,
-                                    dataImport.TotalRows,
-                                    dataImport.Status,
-                                    permissions));
-                        }
-
-                        return results;
-                    }));
+                    return results;
+                }));
         }
 
         private async Task<DataFileInfo> BuildDataFileViewModel(ReleaseFile releaseFile)
