@@ -1,4 +1,7 @@
-import { DataFile } from '@admin/services/releaseDataFileService';
+import releaseDataFileService, {
+  DataFile,
+  UploadDataFilesRequest,
+} from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -16,6 +19,8 @@ import {
 import Yup from '@common/validation/yup';
 import React, { useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
+import ModalConfirm from '@common/components/ModalConfirm';
+import useToggle from '@common/hooks/useToggle';
 
 type FileType = 'csv' | 'zip' | 'bulkZip';
 
@@ -123,6 +128,18 @@ export default function DataFileUploadForm({
   onSubmit,
 }: Props) {
   const [selectedFileType, setSelectedFileType] = useState<FileType>('csv');
+  const [showModal, toggleShowModal] = useToggle(false);
+  const [bulkUploadPlan, setBulkUploadPlan] =
+    useState<UploadDataFilesRequest[]>();
+
+  async function getPlan(bulkZipFile: File) {
+    setBulkUploadPlan(
+      await releaseDataFileService.getUploadBulkZipDataFilePlan(
+        'b4bf34a9-7547-4116-7a39-08dced0991cc',
+        bulkZipFile,
+      ), // TODO: Get the actual releaseId from URL?
+    );
+  }
 
   const getErrorMappings = () => {
     return isDataReplacement
@@ -294,9 +311,41 @@ export default function DataFileUploadForm({
               />
 
               <ButtonGroup>
-                <Button type="submit" disabled={formState.isSubmitting}>
-                  Upload data files
-                </Button>
+                {uploadType === 'bulkZip' ? (
+                  <ModalConfirm
+                    title="Upload summary"
+                    open={showModal}
+                    onConfirm={() => {
+                      toggleShowModal.off();
+                    }}
+                    onExit={toggleShowModal.off}
+                    onCancel={toggleShowModal.off}
+                    triggerButton={
+                      // throws a 400 because file is null (TODO: Add validation to prevent this)
+                      <Button
+                        type="button"
+                        disabled={formState.isSubmitting}
+                        onClick={() =>
+                          getPlan(defaultInitialValues.bulkZipFile!)
+                        }
+                      >
+                        Upload data files
+                      </Button>
+                    }
+                  >
+                    {bulkUploadPlan && (
+                      <ul>
+                        {bulkUploadPlan.map(bup => (
+                          <li key={bup.dataFile.name}>{bup.dataFile.name}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </ModalConfirm>
+                ) : (
+                  <Button type="submit" disabled={formState.isSubmitting}>
+                    Upload data files
+                  </Button>
+                )}
 
                 <ButtonText
                   disabled={formState.isSubmitting}

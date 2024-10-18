@@ -156,6 +156,22 @@ const releaseDataFileService = {
 
     return mapFile(file);
   },
+  async getUploadBulkZipDataFilePlan(
+    releaseId: string,
+    zipFile: File,
+  ): Promise<UploadDataFilesRequest[]> {
+    const data = new FormData();
+    data.append('zipFile', zipFile);
+
+    const response = await client.post<UploadDataFilesRequest[]>(
+      `/release/${releaseId}/bulk-zip-data-plan`,
+      data,
+    );
+
+    console.log(response);
+    return response;
+    // return response.map(file => mapFile(file));
+  },
   async uploadBulkZipDataFile(
     releaseId: string,
     zipFile: File,
