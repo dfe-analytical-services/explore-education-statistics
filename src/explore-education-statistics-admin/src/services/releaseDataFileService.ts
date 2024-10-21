@@ -65,6 +65,15 @@ export type UploadZipDataFileRequest =
       zipFile: File;
     };
 
+export type ArchiveDataSetFile = {
+  title: string;
+  dataFilename: string;
+  dataFileSize: number;
+  metaFilename: string;
+  metaFileSize: number;
+  replacingFile: File;
+};
+
 export interface DataFileUpdateRequest {
   title: string;
 }
@@ -155,6 +164,18 @@ const releaseDataFileService = {
     );
 
     return mapFile(file);
+  },
+  async getUploadBulkZipDataFilePlan(
+    releaseId: string,
+    zipFile: File,
+  ): Promise<ArchiveDataSetFile[]> {
+    const data = new FormData();
+    data.append('zipFile', zipFile);
+
+    return client.post<ArchiveDataSetFile[]>(
+      `/release/${releaseId}/bulk-zip-data-plan`,
+      data,
+    );
   },
   async uploadBulkZipDataFile(
     releaseId: string,

@@ -1,4 +1,7 @@
-import { DataFile } from '@admin/services/releaseDataFileService';
+import releaseDataFileService, {
+  ArchiveDataSetFile,
+  DataFile,
+} from '@admin/services/releaseDataFileService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -16,6 +19,8 @@ import {
 import Yup from '@common/validation/yup';
 import React, { useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
+import ModalConfirm from '@common/components/ModalConfirm';
+import useToggle from '@common/hooks/useToggle';
 
 type FileType = 'csv' | 'zip' | 'bulkZip';
 
@@ -114,15 +119,30 @@ function baseErrorMappings(
 interface Props {
   dataFiles?: DataFile[];
   isDataReplacement?: boolean;
+  releaseId?: string;
   onSubmit: (values: DataFileUploadFormValues) => void | Promise<void>;
 }
 
 export default function DataFileUploadForm({
   dataFiles,
   isDataReplacement = false,
+  releaseId,
   onSubmit,
 }: Props) {
   const [selectedFileType, setSelectedFileType] = useState<FileType>('csv');
+  const [showModal, toggleShowModal] = useToggle(false);
+  const [bulkUploadPlan, setBulkUploadPlan] = useState<ArchiveDataSetFile[]>();
+
+  async function getBulkUploadPlan(zipFile: File | null | undefined) {
+    if (releaseId && zipFile) {
+      setBulkUploadPlan(
+        await releaseDataFileService.getUploadBulkZipDataFilePlan(
+          releaseId,
+          zipFile,
+        ),
+      );
+    }
+  }
 
   const getErrorMappings = () => {
     return isDataReplacement
@@ -216,8 +236,10 @@ export default function DataFileUploadForm({
       resetAfterSubmit
       validationSchema={validationSchema}
     >
-      {({ formState, reset, getValues }) => {
+      {({ formState, reset, getValues, watch, trigger }) => {
         const uploadType = getValues('uploadType');
+        const values = watch();
+
         return (
           <Form id="dataFileUploadForm" onSubmit={onSubmit}>
             <div style={{ position: 'relative' }}>
@@ -294,9 +316,61 @@ export default function DataFileUploadForm({
               />
 
               <ButtonGroup>
-                <Button type="submit" disabled={formState.isSubmitting}>
-                  Upload data files
-                </Button>
+                {uploadType === 'bulkZip' ? (
+                  <>
+                    <Button
+                      type="button"
+                      disabled={formState.isSubmitting}
+                      onClick={async () => {
+                        const isValid = await trigger();
+
+                        if (isValid) {
+                          getBulkUploadPlan(values.bulkZipFile);
+                          toggleShowModal.on();
+                        }
+                      }}
+                    >
+                      Upload data files
+                    </Button>
+
+                    <ModalConfirm
+                      title="Upload summary"
+                      open={showModal}
+                      onConfirm={() => {
+                        onSubmit(values);
+                        toggleShowModal.off();
+                      }}
+                      onExit={toggleShowModal.off}
+                      onCancel={toggleShowModal.off}
+                    >
+                      {!bulkUploadPlan ? (
+                        <LoadingSpinner text="Generating upload plan..." />
+                      ) : (
+                        <ul>
+                          {bulkUploadPlan.map(archiveDataSet => (
+                            <li key={archiveDataSet.title}>
+                              {archiveDataSet.title}
+                              <ul>
+                                <li key={archiveDataSet.dataFilename}>
+                                  {archiveDataSet.dataFilename} (
+                                  {archiveDataSet.dataFileSize} bytes)
+                                </li>
+                                <li key={archiveDataSet.metaFilename}>
+                                  {archiveDataSet.metaFilename} (
+                                  {archiveDataSet.metaFileSize} bytes)
+                                </li>
+                              </ul>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </ModalConfirm>
+                  </>
+                ) : (
+                  <Button type="submit" disabled={formState.isSubmitting}>
+                    Upload data files
+                  </Button>
+                )}
 
                 <ButtonText
                   disabled={formState.isSubmitting}

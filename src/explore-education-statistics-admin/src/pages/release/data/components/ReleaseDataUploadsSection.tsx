@@ -187,7 +187,11 @@ const ReleaseDataUploadsSection = ({
         </ul>
       </InsetText>
       {canUpdateRelease ? (
-        <DataFileUploadForm dataFiles={dataFiles} onSubmit={handleSubmit} />
+        <DataFileUploadForm
+          dataFiles={dataFiles}
+          releaseId={releaseId}
+          onSubmit={handleSubmit}
+        />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.

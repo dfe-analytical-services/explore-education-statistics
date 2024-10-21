@@ -224,6 +224,7 @@ const ReleaseDataFileReplacePage = ({
 
                 <DataFileUploadForm
                   isDataReplacement
+                  releaseId={releaseId}
                   onSubmit={values => handleSubmit(dataFile, values)}
                 />
               </section>
