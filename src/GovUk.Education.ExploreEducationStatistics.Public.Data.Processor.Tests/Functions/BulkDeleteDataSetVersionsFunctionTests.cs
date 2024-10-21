@@ -13,8 +13,11 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using LinqToDB;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
+using Moq;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using FileInfo = System.IO.FileInfo;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -71,7 +74,9 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
 
             await AddTestData<ContentDbContext>(context =>
             {
-                context.ReleaseFiles.AddRange([previousReleaseFile, targetReleaseFileWithOldFile, .. targetReleaseFilesWithNewFiles]);
+                context.ReleaseFiles.AddRange([
+                    previousReleaseFile, targetReleaseFileWithOldFile, .. targetReleaseFilesWithNewFiles
+                ]);
             });
 
             DataSet otherDataSet = DataFixture
@@ -85,7 +90,8 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                 .WithPublicationId(publication.Id)
                 .GenerateList(3);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange([otherDataSet, .. targetDataSets]));
+            await AddTestData<PublicDataDbContext>(context =>
+                context.DataSets.AddRange([otherDataSet, .. targetDataSets]));
 
             DataSetVersion otherDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -174,23 +180,28 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                 var targetReleaseFileWithNewFile = targetReleaseFilesWithNewFiles[i];
 
                 // Assert that the TARGET parquet data set folder, linked to the release version being deleted, is now removed
-                var targetDataSetDirectory = Directory.GetParent(_dataSetVersionPathResolver.DirectoryPath(targetDataSetVersion));
+                var targetDataSetDirectory =
+                    Directory.GetParent(_dataSetVersionPathResolver.DirectoryPath(targetDataSetVersion));
                 Assert.False(Directory.Exists(targetDataSetDirectory!.FullName));
 
                 // Assert that the TARGET Data Set has been deleted
                 Assert.Null(await publicDataDbContext.DataSets.SingleOrDefaultAsync(ds => ds.Id == targetDataSet.Id));
 
                 // Assert that the TARGET Data Set Version has been deleted
-                Assert.Null(await publicDataDbContext.DataSetVersions.SingleOrDefaultAsync(dsv => dsv.Id == targetDataSetVersion.Id));
+                Assert.Null(
+                    await publicDataDbContext.DataSetVersions.SingleOrDefaultAsync(dsv =>
+                        dsv.Id == targetDataSetVersion.Id));
 
                 // Assert that the TARGET Data Set Version metadata is deleted
                 await AssertMetadataIsDeleted(publicDataDbContext, targetDataSetVersion);
 
                 // Assert that the TARGET Data Set Version Import has been deleted
-                Assert.Null(await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(dsvi => dsvi.Id == targetDataSetVersion.Imports.Single().Id));
+                Assert.Null(await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(dsvi =>
+                    dsvi.Id == targetDataSetVersion.Imports.Single().Id));
 
                 // Assert that the TARGET Release File has been unassociated with its Public API DataSet
-                var targetReleaseFile = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == targetReleaseFileWithNewFile.Id);
+                var targetReleaseFile =
+                    await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == targetReleaseFileWithNewFile.Id);
                 Assert.Null(targetReleaseFile.PublicApiDataSetId);
                 Assert.Null(targetReleaseFile.PublicApiDataSetVersion);
             }
@@ -205,7 +216,8 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
 
             // Assert that the OTHER data set folder, and its contents, linked to the NON-TARGET release version remains
             // as it was
-            var otherDataSetFolder = Directory.GetParent(_dataSetVersionPathResolver.DirectoryPath(otherDataSetVersion));
+            var otherDataSetFolder =
+                Directory.GetParent(_dataSetVersionPathResolver.DirectoryPath(otherDataSetVersion));
             Assert.True(Directory.Exists(otherDataSetFolder!.FullName));
 
             var otherDataSetFolderEntries = Directory.GetFileSystemEntries(otherDataSetFolder.FullName);
@@ -219,16 +231,19 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             Assert.NotNull(await publicDataDbContext.DataSets.SingleAsync(ds => ds.Id == otherDataSet.Id));
 
             // Assert that the OTHER Data Set Version has NOT been deleted
-            Assert.NotNull(await publicDataDbContext.DataSetVersions.SingleAsync(dsv => dsv.Id == otherDataSetVersion.Id));
+            Assert.NotNull(
+                await publicDataDbContext.DataSetVersions.SingleAsync(dsv => dsv.Id == otherDataSetVersion.Id));
 
             // Assert that the OTHER Data Set Version metadata is NOT deleted
             await AssertMetadataIsNotDeleted(publicDataDbContext, otherDataSetVersion);
 
             // Assert that the OTHER Data Set Version Import has NOT been deleted
-            Assert.NotNull(await publicDataDbContext.DataSetVersionImports.SingleAsync(dsvi => dsvi.Id == otherDataSetVersion.Imports.Single().Id));
+            Assert.NotNull(await publicDataDbContext.DataSetVersionImports.SingleAsync(dsvi =>
+                dsvi.Id == otherDataSetVersion.Imports.Single().Id));
 
             // Assert that the PREVIOUS Release File is still associated with its Public API DataSet
-            var previousReleaseFilePostDelete = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == previousReleaseFile.Id);
+            var previousReleaseFilePostDelete =
+                await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == previousReleaseFile.Id);
             Assert.Equal(otherDataSet.Id, previousReleaseFilePostDelete.PublicApiDataSetId);
             Assert.Equal(otherDataSetVersion.SemVersion(), previousReleaseFilePostDelete.PublicApiDataSetVersion);
         }
@@ -351,7 +366,8 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             release1Version1ReleaseFile.PublicApiDataSetVersion = release1Version1DataSetVersion.SemVersion();
             release2Version1ReleaseFile.PublicApiDataSetId = release2Version1DataSet.Id;
             release2Version1ReleaseFile.PublicApiDataSetVersion = release2Version1DataSetVersion.SemVersion();
-            release2Version2ReleaseFile.PublicApiDataSetId = release1Version1DataSet.Id; // Same Data Set series as release1version1
+            release2Version2ReleaseFile.PublicApiDataSetId =
+                release1Version1DataSet.Id; // Same Data Set series as release1version1
             release2Version2ReleaseFile.PublicApiDataSetVersion = release2Version2DataSetVersion.SemVersion();
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.UpdateRange(
@@ -370,7 +386,8 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             {
                 var dataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
                 Directory.CreateDirectory(dataSetVersionDirectory);
-                await System.IO.File.Create(Path.Combine(dataSetVersionDirectory, $"{dataSetVersion.SemVersion()}.txt")).DisposeAsync();
+                await System.IO.File.Create(Path.Combine(dataSetVersionDirectory, $"{dataSetVersion.SemVersion()}.txt"))
+                    .DisposeAsync();
             }
 
             var response = await BulkDeleteDataSetVersions(release2Version2.Id);
@@ -381,39 +398,54 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             await using var contentDataDbContext = GetDbContext<ContentDbContext>();
 
             // Assert that the parquet folder for the new, DRAFT, API Data Set Version linked to the release version being deleted, is now deleted
-            var release2Version2DataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(release2Version2DataSetVersion);
+            var release2Version2DataSetVersionDirectory =
+                _dataSetVersionPathResolver.DirectoryPath(release2Version2DataSetVersion);
             Assert.False(Directory.Exists(release2Version2DataSetVersionDirectory));
 
             // Assert that the parent parquet folder for the API Data Set, linked to the release version being deleted, has NOT been deleted
-            var release1Version1DataSetDirectory = Directory.GetParent(_dataSetVersionPathResolver.DirectoryPath(release2Version2DataSetVersion));
+            var release1Version1DataSetDirectory =
+                Directory.GetParent(_dataSetVersionPathResolver.DirectoryPath(release2Version2DataSetVersion));
             Assert.True(Directory.Exists(release1Version1DataSetDirectory!.FullName));
 
             // Assert that the parquet folder, and its contents, for the API Data Set Version linked to Release 1 Version 1, has NOT been deleted
-            var release1Version1DataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(release1Version1DataSetVersion);
+            var release1Version1DataSetVersionDirectory =
+                _dataSetVersionPathResolver.DirectoryPath(release1Version1DataSetVersion);
             Assert.True(Directory.Exists(release1Version1DataSetVersionDirectory));
 
-            var release1Version1DataSetVersionDirectoryEntries = Directory.GetFileSystemEntries(release1Version1DataSetVersionDirectory);
-            Assert.Single(release1Version1DataSetVersionDirectoryEntries, entry => new FileInfo(entry).Name == $"{release1Version1DataSetVersion.SemVersion()}.txt");
+            var release1Version1DataSetVersionDirectoryEntries =
+                Directory.GetFileSystemEntries(release1Version1DataSetVersionDirectory);
+            Assert.Single(release1Version1DataSetVersionDirectoryEntries,
+                entry => new FileInfo(entry).Name == $"{release1Version1DataSetVersion.SemVersion()}.txt");
 
             // Assert that the parquet folder, and its contents, for the API Data Set Version linked to Release 2 Version 1, has NOT been deleted
-            var release2Version1DataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(release2Version1DataSetVersion);
+            var release2Version1DataSetVersionDirectory =
+                _dataSetVersionPathResolver.DirectoryPath(release2Version1DataSetVersion);
             Assert.True(Directory.Exists(release2Version1DataSetVersionDirectory));
 
-            var release2Version1DataSetVersionDirectoryEntries = Directory.GetFileSystemEntries(release2Version1DataSetVersionDirectory);
-            Assert.Single(release2Version1DataSetVersionDirectoryEntries, entry => new FileInfo(entry).Name == $"{release2Version1DataSetVersion.SemVersion()}.txt");
+            var release2Version1DataSetVersionDirectoryEntries =
+                Directory.GetFileSystemEntries(release2Version1DataSetVersionDirectory);
+            Assert.Single(release2Version1DataSetVersionDirectoryEntries,
+                entry => new FileInfo(entry).Name == $"{release2Version1DataSetVersion.SemVersion()}.txt");
 
             // Assert that the TARGET API Data Set, linked to the release version being deleted, has NOT been deleted
-            Assert.NotNull(await publicDataDbContext.DataSets.SingleOrDefaultAsync(ds => ds.Id == release1Version1DataSet.Id));
+            Assert.NotNull(
+                await publicDataDbContext.DataSets.SingleOrDefaultAsync(ds => ds.Id == release1Version1DataSet.Id));
 
             // Assert that the OTHER Data Set has NOT been deleted
             Assert.NotNull(await publicDataDbContext.DataSets.SingleAsync(ds => ds.Id == release2Version1DataSet.Id));
 
             // Assert that the TARGET Data Set Version has been deleted
-            Assert.Null(await publicDataDbContext.DataSetVersions.SingleOrDefaultAsync(dsv => dsv.Id == release2Version2DataSetVersion.Id));
+            Assert.Null(
+                await publicDataDbContext.DataSetVersions.SingleOrDefaultAsync(dsv =>
+                    dsv.Id == release2Version2DataSetVersion.Id));
 
             // Assert that the OTHER Data Set Versions have NOT been deleted
-            Assert.NotNull(await publicDataDbContext.DataSetVersions.SingleAsync(dsv => dsv.Id == release1Version1DataSetVersion.Id));
-            Assert.NotNull(await publicDataDbContext.DataSetVersions.SingleAsync(dsv => dsv.Id == release2Version1DataSetVersion.Id));
+            Assert.NotNull(
+                await publicDataDbContext.DataSetVersions.SingleAsync(
+                    dsv => dsv.Id == release1Version1DataSetVersion.Id));
+            Assert.NotNull(
+                await publicDataDbContext.DataSetVersions.SingleAsync(
+                    dsv => dsv.Id == release2Version1DataSetVersion.Id));
 
             // Assert that the TARGET Data Set Version metadata is deleted
             await AssertMetadataIsDeleted(publicDataDbContext, release2Version2DataSetVersion);
@@ -423,62 +455,72 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             await AssertMetadataIsNotDeleted(publicDataDbContext, release2Version1DataSetVersion);
 
             // Assert that the TARGET Data Set Version Import has been deleted
-            Assert.Null(await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(dsvi => dsvi.Id == release2Version2DataSetVersion.Imports.Single().Id));
+            Assert.Null(await publicDataDbContext.DataSetVersionImports.SingleOrDefaultAsync(dsvi =>
+                dsvi.Id == release2Version2DataSetVersion.Imports.Single().Id));
 
             // Assert that the OTHER Data Set Version Imports have NOT been deleted
-            Assert.NotNull(await publicDataDbContext.DataSetVersionImports.SingleAsync(dsvi => dsvi.Id == release1Version1DataSetVersion.Imports.Single().Id));
-            Assert.NotNull(await publicDataDbContext.DataSetVersionImports.SingleAsync(dsvi => dsvi.Id == release2Version1DataSetVersion.Imports.Single().Id));
+            Assert.NotNull(await publicDataDbContext.DataSetVersionImports.SingleAsync(dsvi =>
+                dsvi.Id == release1Version1DataSetVersion.Imports.Single().Id));
+            Assert.NotNull(await publicDataDbContext.DataSetVersionImports.SingleAsync(dsvi =>
+                dsvi.Id == release2Version1DataSetVersion.Imports.Single().Id));
 
             // Assert that the TARGET Release File has been unassociated with its Public API DataSet
-            var targetReleaseFile = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == release2Version2ReleaseFile.Id);
+            var targetReleaseFile =
+                await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == release2Version2ReleaseFile.Id);
 
             Assert.Null(targetReleaseFile.PublicApiDataSetId);
             Assert.Null(targetReleaseFile.PublicApiDataSetVersion);
 
             // Assert that the OTHER Release Files are still associated with their Public API DataSets
-            var release1Version1ReleaseFilePostDelete = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == release1Version1ReleaseFile.Id);
-            var release2Version1ReleaseFilePostDelete = await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == release2Version1ReleaseFile.Id);
+            var release1Version1ReleaseFilePostDelete =
+                await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == release1Version1ReleaseFile.Id);
+            var release2Version1ReleaseFilePostDelete =
+                await contentDataDbContext.ReleaseFiles.SingleAsync(f => f.Id == release2Version1ReleaseFile.Id);
 
             Assert.Equal(release1Version1DataSet.Id, release1Version1ReleaseFilePostDelete.PublicApiDataSetId);
-            Assert.Equal(release1Version1DataSetVersion.SemVersion(), release1Version1ReleaseFilePostDelete.PublicApiDataSetVersion);
+            Assert.Equal(release1Version1DataSetVersion.SemVersion(),
+                release1Version1ReleaseFilePostDelete.PublicApiDataSetVersion);
             Assert.Equal(release2Version1DataSet.Id, release2Version1ReleaseFilePostDelete.PublicApiDataSetId);
-            Assert.Equal(release2Version1DataSetVersion.SemVersion(), release2Version1ReleaseFilePostDelete.PublicApiDataSetVersion);
+            Assert.Equal(release2Version1DataSetVersion.SemVersion(),
+                release2Version1ReleaseFilePostDelete.PublicApiDataSetVersion);
         }
 
-        private static async Task AssertMetadataIsDeleted(PublicDataDbContext publicDataDbContext, DataSetVersion dataSetVersion)
+        private static async Task AssertMetadataIsDeleted(PublicDataDbContext publicDataDbContext,
+            DataSetVersion dataSetVersion)
         {
             Assert.False(await publicDataDbContext.FilterMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+                .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
             Assert.False(await publicDataDbContext.FilterOptionMetaLinks
-                    .AnyAsync(foml => dataSetVersion.FilterMetas.Contains(foml.Meta)));
+                .AnyAsync(foml => dataSetVersion.FilterMetas.Contains(foml.Meta)));
             Assert.False(await publicDataDbContext.LocationMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+                .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
             Assert.False(await publicDataDbContext.LocationOptionMetaLinks
-                    .AnyAsync(loml => dataSetVersion.LocationMetas.Contains(loml.Meta)));
+                .AnyAsync(loml => dataSetVersion.LocationMetas.Contains(loml.Meta)));
             Assert.False(await publicDataDbContext.IndicatorMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+                .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
             Assert.False(await publicDataDbContext.GeographicLevelMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+                .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
             Assert.False(await publicDataDbContext.TimePeriodMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+                .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
         }
 
-        private static async Task AssertMetadataIsNotDeleted(PublicDataDbContext publicDataDbContext, DataSetVersion dataSetVersion)
+        private static async Task AssertMetadataIsNotDeleted(PublicDataDbContext publicDataDbContext,
+            DataSetVersion dataSetVersion)
         {
             Assert.True(await publicDataDbContext.FilterMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+                .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
             Assert.True(await publicDataDbContext.FilterOptionMetaLinks
-                    .AnyAsync(foml => dataSetVersion.FilterMetas.Contains(foml.Meta)));
+                .AnyAsync(foml => dataSetVersion.FilterMetas.Contains(foml.Meta)));
             Assert.True(await publicDataDbContext.LocationMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+                .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
             Assert.True(await publicDataDbContext.LocationOptionMetaLinks
-                    .AnyAsync(loml => dataSetVersion.LocationMetas.Contains(loml.Meta)));
+                .AnyAsync(loml => dataSetVersion.LocationMetas.Contains(loml.Meta)));
             Assert.True(await publicDataDbContext.IndicatorMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+                .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
             Assert.True(await publicDataDbContext.GeographicLevelMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+                .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
             Assert.True(await publicDataDbContext.TimePeriodMetas
-                    .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
+                .AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id));
         }
 
         [Theory]
@@ -545,8 +587,128 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
         }
 
         public class ForceDeleteTests(ProcessorFunctionsIntegrationTestFixture fixture)
-            : BulkDeleteDataSetVersionsTests(fixture)
+            : BulkDeleteDataSetVersionsFunctionTests(fixture)
         {
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
+                MemberType = typeof(DataSetVersionStatusTheoryData))]
+            public async Task TestTheme_ThemeDeletionAllowed_Success(
+                DataSetVersionStatus dataSetVersionStatus)
+            {
+                ReleaseVersion releaseVersion = DataFixture
+                    .DefaultReleaseVersion()
+                    .WithPublication(DataFixture
+                        .DefaultPublication()
+                        .WithTheme(DataFixture
+                            .DefaultTheme()
+                            .WithTitle("UI test theme")));
+
+                ReleaseFile releaseFile = DataFixture
+                    .DefaultReleaseFile()
+                    .WithFile(DataFixture.DefaultFile(FileType.Data))
+                    .WithReleaseVersion(releaseVersion);
+
+                await AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFile);
+                });
+
+                var dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithPublicationId(releaseVersion.PublicationId)
+                    .WithStatusPublished()
+                    .Generate();
+
+                await AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSet));
+
+                // Data set version that is not in a deletable state without force delete
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithDataSet(dataSet)
+                    .WithRelease(DataFixture
+                        .DefaultDataSetVersionRelease()
+                        .WithReleaseFileId(releaseFile.Id))
+                    .WithVersionNumber(major: 1, minor: 0)
+                    .WithStatus(dataSetVersionStatus)
+                    .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+                await AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                // Request force deletion with support from the environment configuration
+                var response = await BulkDeleteDataSetVersions(
+                    releaseVersionId: releaseVersion.Id,
+                    forceDeleteAll: true,
+                    themeDeletionAllowed: true);
+
+                response.AssertNoContent();
+            }
+
+            [Theory]
+            [MemberData(nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
+                MemberType = typeof(DataSetVersionStatusTheoryData))]
+            public async Task ForceDeleteNotSpecified_Returns400(
+                DataSetVersionStatus dataSetVersionStatus)
+            {
+                ReleaseVersion releaseVersion = DataFixture
+                    .DefaultReleaseVersion()
+                    .WithPublication(DataFixture
+                        .DefaultPublication()
+                        .WithTheme(DataFixture
+                            .DefaultTheme()
+                            .WithTitle("UI test theme")));
+
+                ReleaseFile releaseFile = DataFixture
+                    .DefaultReleaseFile()
+                    .WithFile(DataFixture.DefaultFile(FileType.Data))
+                    .WithReleaseVersion(releaseVersion);
+
+                await AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFile);
+                });
+
+                var dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithPublicationId(releaseVersion.PublicationId)
+                    .WithStatusPublished()
+                    .Generate();
+
+                await AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSet));
+
+                // Data set version that is not in a deletable state without force delete
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                    .WithDataSet(dataSet)
+                    .WithRelease(DataFixture
+                        .DefaultDataSetVersionRelease()
+                        .WithReleaseFileId(releaseFile.Id))
+                    .WithVersionNumber(major: 1, minor: 0)
+                    .WithStatus(dataSetVersionStatus)
+                    .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+                await AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                // Don't explicitly request force deletion.
+                var response = await BulkDeleteDataSetVersions(
+                    releaseVersionId: releaseVersion.Id,
+                    themeDeletionAllowed: true,
+                    forceDeleteAll: null);
+
+                var validationProblem = response.AssertBadRequestWithValidationProblem();
+
+                validationProblem.AssertHasError(
+                    expectedPath: "releaseVersionId",
+                    expectedCode: ValidationMessages.OneOrMoreDataSetVersionsCanNotBeDeleted.Code);
+            }
+
             [Theory]
             [MemberData(nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
                 MemberType = typeof(DataSetVersionStatusTheoryData))]
@@ -612,64 +774,6 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             [Theory]
             [MemberData(nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
                 MemberType = typeof(DataSetVersionStatusTheoryData))]
-            public async Task TestTheme_ThemeDeletionAllowed_Success(
-                DataSetVersionStatus dataSetVersionStatus)
-            {
-                ReleaseVersion releaseVersion = DataFixture
-                    .DefaultReleaseVersion()
-                    .WithPublication(DataFixture
-                        .DefaultPublication()
-                        .WithTheme(DataFixture
-                            .DefaultTheme()
-                            .WithTitle("UI test theme")));
-
-                ReleaseFile releaseFile = DataFixture
-                    .DefaultReleaseFile()
-                    .WithFile(DataFixture.DefaultFile(FileType.Data))
-                    .WithReleaseVersion(releaseVersion);
-
-                await AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(releaseFile);
-                });
-
-                var dataSet = DataFixture
-                    .DefaultDataSet()
-                    .WithPublicationId(releaseVersion.PublicationId)
-                    .WithStatusPublished()
-                    .Generate();
-
-                await AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSet));
-
-                // Data set version that is not in a deletable state without force delete
-                DataSetVersion dataSetVersion = DataFixture
-                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                    .WithDataSet(dataSet)
-                    .WithRelease(DataFixture
-                        .DefaultDataSetVersionRelease()
-                        .WithReleaseFileId(releaseFile.Id))
-                    .WithVersionNumber(major: 1, minor: 0)
-                    .WithStatus(dataSetVersionStatus)
-                    .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
-
-                await AddTestData<PublicDataDbContext>(context =>
-                {
-                    context.DataSetVersions.AddRange(dataSetVersion);
-                    context.DataSets.Update(dataSet);
-                });
-
-                // Request force deletion with support from the environment configuration
-                var response = await BulkDeleteDataSetVersions(
-                    releaseVersionId: releaseVersion.Id,
-                    forceDeleteAll: true,
-                    themeDeletionAllowed: true);
-
-                response.AssertNoContent();
-            }
-
-            [Theory]
-            [MemberData(nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
-                MemberType = typeof(DataSetVersionStatusTheoryData))]
             public async Task NonTestTheme_ThemeDeletionAllowed_Returns400(
                 DataSetVersionStatus dataSetVersionStatus)
             {
@@ -730,22 +834,29 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                     expectedCode: ValidationMessages.OneOrMoreDataSetVersionsCanNotBeDeleted.Code);
             }
         }
+    }
 
-        private async Task<IActionResult> BulkDeleteDataSetVersions(
-            Guid releaseVersionId,
-            bool forceDeleteAll = false,
-            bool themeDeletionAllowed = false)
-        {
-            var function = GetRequiredService<BulkDeleteDataSetVersionsFunction>();
+    private async Task<IActionResult> BulkDeleteDataSetVersions(
+        Guid releaseVersionId,
+        bool? forceDeleteAll = false,
+        bool themeDeletionAllowed = false)
+    {
+        var function = GetRequiredService<BulkDeleteDataSetVersionsFunction>();
 
-            var appOptions = GetRequiredService<IOptions<AppOptions>>();
-            appOptions.Value.EnableThemeDeletion = themeDeletionAllowed;
+        var appOptions = GetRequiredService<IOptions<AppOptions>>();
+        appOptions.Value.EnableThemeDeletion = themeDeletionAllowed;
 
-            return await function.BulkDeleteDataSetVersions(
-                httpRequest: null!,
-                releaseVersionId: releaseVersionId,
-                forceDeleteAll: forceDeleteAll,
-                cancellationToken: CancellationToken.None);
-        }
+        var request = new Mock<HttpRequest>(MockBehavior.Strict);
+
+        var requestParams = forceDeleteAll != null
+            ? new Dictionary<string, StringValues> { { nameof(forceDeleteAll), forceDeleteAll + "" } }
+            : new Dictionary<string, StringValues>();
+
+        request.Setup(r => r.Query).Returns(new QueryCollection(requestParams));
+
+        return await function.BulkDeleteDataSetVersions(
+            httpRequest: request.Object,
+            releaseVersionId: releaseVersionId,
+            cancellationToken: CancellationToken.None);
     }
 }

@@ -419,7 +419,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Id = releaseVersion3Id,
                         PreviousVersionId = releaseVersion2Id
                     }
-                ]
+                ],
+                Contact = new Contact()
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -646,6 +647,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 ThemeId = uiTestTheme1Id,
                 Title = "UI test theme",
+                Contact = new Contact()
             };
 
             var standardTitleThemePublication = new Publication

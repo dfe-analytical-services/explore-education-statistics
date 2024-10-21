@@ -112,19 +112,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseVersion)
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
-                .OnSuccess(releaseVersion => _mapper
-                        .Map<ReleaseViewModel>(releaseVersion) with
+                .OnSuccess(releaseVersion =>
+                {
+                    var prereleaseRolesOrInvitesAdded =
+                        _context
+                            .UserReleaseRoles
+                            .Any(role => role.ReleaseVersionId == releaseVersionId
+                                         && role.Role == ReleaseRole.PrereleaseViewer) ||
+                        _context
+                            .UserReleaseInvites
+                            .Any(role => role.ReleaseVersionId == releaseVersionId
+                                         && role.Role == ReleaseRole.PrereleaseViewer);
+
+                    return _mapper.Map<ReleaseViewModel>(releaseVersion) with
                     {
-                        PreReleaseUsersOrInvitesAdded = _context
-                                                            .UserReleaseRoles
-                                                            .Any(role => role.ReleaseVersionId == releaseVersionId
-                                                                         && role.Role ==
-                                                                         ReleaseRole.PrereleaseViewer) ||
-                                                        _context
-                                                            .UserReleaseInvites
-                                                            .Any(role => role.ReleaseVersionId == releaseVersionId
-                                                                         && role.Role == ReleaseRole.PrereleaseViewer)
-                    });
+                        PreReleaseUsersOrInvitesAdded = prereleaseRolesOrInvitesAdded
+                    };
+                });
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
@@ -223,9 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
-                    forceDeleteAllPublicApiData: false,
-                    forceDeleteFiles: false,
-                    deleteStatisticsRelease: false,
+                    forceDeleteRelatedData: false,
                     hardDeleteContentReleaseVersion: !releaseVersion.Amendment,
                     cancellationToken));
         }
@@ -247,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Where(releaseSubject => releaseSubject.ReleaseVersionId == releaseVersion.Id)
                         .Select(releaseSubject => releaseSubject.Subject)
                         .ToListAsync(cancellationToken);
-                    
+
                     releaseVersion.SoftDeleted = false;
                     subjects.ForEach(subject => subject.SoftDeleted = false);
 
@@ -259,35 +261,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 })
                 .OnSuccess(releaseVersion => DoDeleteReleaseVersion(
                     releaseVersion: releaseVersion,
-                    forceDeleteAllPublicApiData: true,
-                    forceDeleteFiles: true,
-                    deleteStatisticsRelease: true,
+                    forceDeleteRelatedData: true,
                     hardDeleteContentReleaseVersion: true,
                     cancellationToken));
         }
 
         private async Task<Either<ActionResult, Unit>> DoDeleteReleaseVersion(
             ReleaseVersion releaseVersion,
-            bool forceDeleteAllPublicApiData = false,
-            bool forceDeleteFiles = false,
-            bool deleteStatisticsRelease = false,
+            bool forceDeleteRelatedData = false,
             bool hardDeleteContentReleaseVersion = false,
             CancellationToken cancellationToken = default)
         {
             return await _processorClient
                 .BulkDeleteDataSetVersions(
                     releaseVersionId: releaseVersion.Id,
-                    forceDeleteAll: forceDeleteAllPublicApiData,
+                    forceDeleteAll: forceDeleteRelatedData,
                     cancellationToken: cancellationToken)
                 .OnSuccessDo(async _ =>
                     await _cacheService.DeleteCacheFolderAsync(
                         new PrivateReleaseContentFolderCacheKey(releaseVersion.Id)))
                 .OnSuccessDo(() => _releaseDataFileService.DeleteAll(
                     releaseVersionId: releaseVersion.Id,
-                    forceDelete: forceDeleteFiles))
+                    forceDelete: forceDeleteRelatedData))
                 .OnSuccessDo(() => _releaseFileService.DeleteAll(
                     releaseVersionId: releaseVersion.Id,
-                    forceDelete: forceDeleteFiles))
+                    forceDelete: forceDeleteRelatedData))
                 .OnSuccessDo(async _ =>
                 {
                     if (hardDeleteContentReleaseVersion)
@@ -311,7 +309,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             [releaseVersion.Id]);
                     }
 
-                    if (deleteStatisticsRelease)
+                    // TODO: This may be redundant (investigate as part of EES-1295)
+                    await _releaseSubjectRepository.DeleteAllReleaseSubjects(
+                        releaseVersionId: releaseVersion.Id,
+                        softDeleteOrphanedSubjects: !forceDeleteRelatedData);
+
+                    if (forceDeleteRelatedData)
                     {
                         var statsReleaseVersion = await _statisticsDbContext
                             .ReleaseVersion
@@ -321,19 +324,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         if (statsReleaseVersion != null)
                         {
-                            await _releaseSubjectRepository.DeleteAllReleaseSubjects(
-                                releaseVersionId: statsReleaseVersion.Id,
-                                softDeleteOrphanedSubjects: false);
                             _statisticsDbContext.ReleaseVersion.Remove(statsReleaseVersion);
                             await _statisticsDbContext.SaveChangesAsync(cancellationToken);
                         }
-                    }
-                    else
-                    {
-                        // TODO: This may be redundant (investigate as part of EES-1295)
-                        await _releaseSubjectRepository.DeleteAllReleaseSubjects(
-                            releaseVersionId: releaseVersion.Id,
-                            softDeleteOrphanedSubjects: true);
                     }
                 });
         }
