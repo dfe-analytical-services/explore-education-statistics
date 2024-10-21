@@ -76,9 +76,8 @@ Update publication details
 
     user waits until page contains element    id:publicationDetailsForm-summary
 
-    # Only BAU should see theme and topic
-    user checks page does not contain element    id:publicationDetailsForm-themeId
-    user checks page does not contain element    id:publicationDetailsForm-topicId
+    # Only BAU should see theme
+    user checks page does not contain element    name:themeId
 
     # Only BAU users should see supersededById
     user checks page does not contain element    id:publicationDetailsForm-supersededById
@@ -92,5 +91,4 @@ Update publication details
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
     user checks summary list contains    Publication summary    UI test publication summary
     user checks summary list contains    Theme    %{TEST_THEME_NAME}
-    user checks summary list contains    Topic    %{TEST_TOPIC_NAME}
     user checks summary list contains    Superseding publication    This publication is not archived

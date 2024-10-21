@@ -43,7 +43,6 @@ export const options: Options = {
 
 interface SetupData {
   themeId: string;
-  topicId: string;
   publicationId: string;
 }
 
@@ -99,30 +98,22 @@ export function setup(): SetupData {
     title: testData.themeName,
   });
 
-  const { id: topicId } = adminService.getOrCreateTopic({
-    themeId,
-    title: testData.topicName,
-  });
-
   const { id: publicationId } = adminService.getOrCreatePublication({
-    topicId,
+    themeId,
     title: publicationTitle,
   });
 
-  console.log(
-    `Created Theme ${themeId}, Topic ${topicId}, Publication ${publicationId}`,
-  );
+  console.log(`Created Theme ${themeId}, Publication ${publicationId}`);
 
   loggingUtils.logDashboardUrls();
 
   return {
     themeId,
-    topicId,
     publicationId,
   };
 }
 
-const performTest = ({ topicId, publicationId }: SetupData) => {
+const performTest = ({ themeId, publicationId }: SetupData) => {
   const accessToken = getOrRefreshAccessTokens(
     supportsRefreshTokens,
     userName,
@@ -140,7 +131,7 @@ const performTest = ({ topicId, publicationId }: SetupData) => {
   console.log(`Creating Release ${year} for file import to be uploaded to`);
 
   const { id: releaseId } = adminService.getOrCreateRelease({
-    topicId,
+    themeId,
     publicationId,
     publicationTitle,
     year,
@@ -229,7 +220,7 @@ const performTest = ({ topicId, publicationId }: SetupData) => {
   });
 };
 
-export const teardown = ({ themeId, topicId }: SetupData) => {
+export const teardown = ({ themeId }: SetupData) => {
   if (tearDownData) {
     const accessToken = getOrRefreshAccessTokens(
       supportsRefreshTokens,
@@ -240,10 +231,9 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
 
     const adminService = createAdminService(adminUrl, accessToken);
 
-    adminService.deleteTopic({ topicId });
     adminService.deleteTheme({ themeId });
 
-    console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
+    console.log(`Deleted Theme ${themeId}`);
   }
 };
 

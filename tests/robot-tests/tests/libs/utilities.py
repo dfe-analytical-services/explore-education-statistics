@@ -146,7 +146,7 @@ def user_waits_until_parent_contains_element(
             error,
         )
     except Exception as err:
-        logger.warn(
+        logger.warning(
             f"Error whilst executing utilities.py user_waits_until_parent_contains_element() "
             f"with parent {parent_locator_or_element} and child locator {child_locator} - {err}"
         )
@@ -184,7 +184,7 @@ def user_waits_until_parent_contains_element_without_retries(
             error,
         )
     except Exception as err:
-        logger.warn(
+        logger.warning(
             f"Error whilst executing utilities.py user_waits_until_parent_contains_element() "
             f"with parent {parent_locator} and child locator {child_locator} - {err}"
         )
@@ -223,7 +223,7 @@ def user_waits_until_parent_does_not_contain_element(
             error,
         )
     except Exception as err:
-        logger.warn(
+        logger.warning(
             f"Error whilst executing utilities.py "
             f"user_waits_until_parent_does_not_contain_element() with parent {parent_locator} "
             f"and child locator {child_locator} - {err}"
@@ -268,7 +268,7 @@ def get_child_elements(parent_locator: object, child_locator: str):
         parent_el = _get_parent_webelement_from_locator(parent_locator)
         return element_finder().find_elements(child_locator, parent=parent_el)
     except Exception as err:
-        logger.warn(f"Error whilst executing utilities.py get_child_elements() - {err}")
+        logger.warning(f"Error whilst executing utilities.py get_child_elements() - {err}")
         raise_assertion_error(err)
 
 
@@ -345,14 +345,12 @@ def user_is_on_admin_dashboard(admin_url: str) -> bool:
     return left_part == admin_url or left_part == f"{admin_url}/dashboard"
 
 
-def user_is_on_admin_dashboard_with_theme_and_topic_selected(admin_url: str, theme: str, topic: str) -> bool:
+def user_is_on_admin_dashboard_with_theme_selected(admin_url: str, theme: str) -> bool:
     if not user_is_on_admin_dashboard(admin_url):
         return False
-    selected_theme = sl().get_selected_list_label("id:publicationsReleases-themeTopic-themeId")
+    selected_theme = sl().get_selected_list_label("id:publicationsReleases-theme-themeId")
     if selected_theme != theme:
         return False
-    selected_topic = sl().get_selected_list_label("id:publicationsReleases-themeTopic-topicId")
-    return selected_topic == topic
 
 
 def user_navigates_to_admin_dashboard_if_needed(admin_url: str):
@@ -415,6 +413,6 @@ def get_child_element_with_retry(parent_locator: object, child_locator: str, max
             return get_child_element(parent_locator, child_locator)
         except NoSuchElementException:
             retry_count += 1
-            logger.warn(f"Child element not found, after ({max_retries}) retries")
+            logger.warning(f"Child element not found, after ({max_retries}) retries")
             time.sleep(retry_delay)
     raise AssertionError(f"Failed to find child element after {max_retries} retries.")

@@ -1,11 +1,11 @@
 #nullable enable
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
@@ -22,11 +22,10 @@ public class ThemeService : IThemeService
     {
         return await _contentDbContext.Themes
             .Where(theme =>
-                theme.Topics.Any(topic =>
-                    topic.Publications.Any(publication =>
-                        publication.LatestPublishedReleaseVersionId.HasValue &&
-                        (publication.SupersededById == null ||
-                         !publication.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))))
+                theme.Publications.Any(publication =>
+                    publication.LatestPublishedReleaseVersionId.HasValue &&
+                    (publication.SupersededById == null ||
+                    !publication.SupersededBy!.LatestPublishedReleaseVersionId.HasValue)))
             .OrderBy(theme => theme.Title)
             .Select(theme => new ThemeViewModel(
                 theme.Id,

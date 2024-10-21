@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -15,6 +10,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
@@ -75,36 +75,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree()
         {
             var themes = await _contentDbContext.Themes
-                .Include(theme => theme.Topics)
-                .ThenInclude(topic => topic.Publications)
+                .Include(theme => theme.Publications)
                 .AsNoTracking()
                 .Select(theme => new AllMethodologiesThemeViewModel
                 {
                     Id = theme.Id,
                     Title = theme.Title,
-                    Topics = theme.Topics.Select(topic => new AllMethodologiesTopicViewModel
-                    {
-                        Id = topic.Id,
-                        Title = topic.Title,
-                        Publications = topic.Publications.Select(publication =>
+                    Publications = theme.Publications.Select(publication =>
                             new AllMethodologiesPublicationViewModel
                             {
                                 Id = publication.Id,
                                 Title = publication.Title
                             }).ToList()
-                    }).ToList()
                 })
                 .ToListAsync();
 
-            await themes.SelectMany(model => model.Topics)
-                .SelectMany(model => model.Publications)
+            await themes.SelectMany(model => model.Publications)
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async publication =>
                     publication.Methodologies = await BuildMethodologiesForPublication(publication.Id));
 
-            themes.ForEach(theme => theme.RemoveTopicNodesWithoutMethodologiesAndSort());
+            themes.ForEach(theme => theme.RemovePublicationNodesWithoutMethodologiesAndSort());
 
-            return themes.Where(theme => theme.Topics.Any())
+            return themes.Where(theme => theme.Publications.Any())
                 .OrderBy(theme => theme.Title)
                 .ToList();
         }

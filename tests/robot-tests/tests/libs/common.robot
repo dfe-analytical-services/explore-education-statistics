@@ -503,12 +503,6 @@ user clicks link
     [Arguments]    ${text}    ${parent}=css:body
     user clicks element    link:${text}    ${parent}
 
-user clicks link by index
-    [Arguments]    ${text}    ${index}=1    ${parent}=css:body
-    ${xpath}=    set variable    (//a[text()='${text}'])[${index}]
-    ${button}=    get webelement    ${xpath}
-    user clicks element    ${button}    ${parent}
-
 user clicks link containing text
     [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${False}
     ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
@@ -518,13 +512,6 @@ user clicks button
     [Arguments]    ${text}    ${parent}=css:body    ${exact_match}=${False}
     ${button}=    user gets button element    ${text}    ${parent}    exact_match=${exact_match}
     user clicks element    ${button}
-
-user clicks button by index
-    [Arguments]    ${text}    ${index}=1    ${parent}=css:body    ${exact_match}=${False}
-    ${text_matcher}=    get xpath text matcher    ${text}    ${exact_match}
-    ${xpath}=    set variable    (//button[${text_matcher}])[${index}]
-    ${button}=    get webelement    ${xpath}
-    user clicks element    ${button}    ${parent}
 
 user waits until button is clickable
     [Arguments]    ${button_text}
@@ -909,11 +896,6 @@ user clicks checkbox
     user scrolls to element    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
     user clicks element    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
 
-user clicks checkbox by selector
-    [Arguments]    ${locator}
-    user scrolls to element    ${locator}
-    user clicks element    ${locator}
-
 user checks checkbox is checked
     [Arguments]    ${label}    ${exact_match}=${True}
     ${text_matcher}=    get xpath text matcher    ${label}    ${exact_match}
@@ -946,13 +928,19 @@ user checks list has x items
     [Arguments]    ${locator}    ${count}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
-    user waits until parent contains element    ${list}    css:li    count=${count}
+    # Use xpath to more precisely get the direct child items underneath the
+    # parent list and ignore any nested lists and their children.
+    # CSS selector shouldn't be used here as child selector `>` doesn't seem to work.
+    user waits until parent contains element    ${list}    xpath:./li    count=${count}
 
 user gets list item element
     [Arguments]    ${locator}    ${item_num}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
-    ${item}=    get child element    ${list}    css:li:nth-child(${item_num})
+    # Use xpath to more precisely get the direct child items underneath the
+    # parent list and ignore any nested lists and their children.
+    # CSS selector shouldn't be used here as child selector `>` doesn't seem to work.
+    ${item}=    get child element    ${list}    xpath:./li[${item_num}]
     [Return]    ${item}
 
 user checks list item contains
@@ -966,7 +954,7 @@ user checks list item is visually hidden
     user checks element is visually hidden    ${item}
 
 user checks list contains exact items in order
-    [Arguments]    ${locator}    ${expected_items}    ${parent}=css:body
+    [Arguments]    ${locator}    @{expected_items}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
     ${actual}=    get child elements    ${list}    css:li

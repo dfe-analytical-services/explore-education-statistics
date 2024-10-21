@@ -14,26 +14,25 @@ ${PUBLICATION_NAME}         UI tests - create publication %{RUN_IDENTIFIER}
 
 ${CREATED_THEME_ID}         ${EMPTY}
 ${CREATED_THEME_NAME}       UI test theme - create publication %{RUN_IDENTIFIER}
-${CREATED_TOPIC_NAME}       UI test topic - create publication %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***
-Go to Create publication page for "UI tests topic" topic
-    user selects dashboard theme and topic if possible
+Go to Create publication page for "UI tests theme" theme
+    user selects dashboard theme if possible
     user waits until page contains link    Create new publication
     user checks page does not contain button    ${PUBLICATION_NAME}
     user clicks link    Create new publication
-    user waits until page contains title caption    %{TEST_TOPIC_NAME}
+    user waits until page contains title caption    %{TEST_THEME_NAME}
     user waits until h1 is visible    Create new publication
 
 Enters contact details
-    user enters text into element    id:publicationForm-teamName    Post-16 statistics team
-    user enters text into element    id:publicationForm-teamEmail    post16.statistics@education.gov.uk
-    user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
-    user enters text into element    id:publicationForm-contactTelNo    0123456789
+    user enters text into element    name:teamName    Post-16 statistics team
+    user enters text into element    name:teamEmail    post16.statistics@education.gov.uk
+    user enters text into element    name:contactName    UI Tests Contact Name
+    user enters text into element    name:contactTelNo    0123456789
 
 Option to set superseding publication should not appear
-    user checks page does not contain element    id:publicationForm-supersede
+    user checks page does not contain element    name:supersede
 
 Error message appears when submitting and title is empty
     user checks element is not visible    id:publicationForm-title-error    %{WAIT_SMALL}
@@ -41,11 +40,11 @@ Error message appears when submitting and title is empty
     user waits until element is visible    id:publicationForm-title-error    %{WAIT_SMALL}
 
 Enter new publication title
-    user enters text into element    id:publicationForm-title    ${PUBLICATION_NAME} (created)
+    user enters text into element    name:title    ${PUBLICATION_NAME} (created)
     user checks element is not visible    id:publicationForm-title-error    %{WAIT_SMALL}
 
 Enter new publication summary
-    user enters text into element    id:publicationForm-summary    ${PUBLICATION_NAME} summary
+    user enters text into element    name:summary    ${PUBLICATION_NAME} summary
 
 User redirects to the dashboard after saving publication
     user clicks button    Save publication
@@ -67,9 +66,8 @@ Verify new publication's contact
     user checks summary list contains    Contact name    UI Tests Contact Name
     user checks summary list contains    Contact telephone    123456789
 
-Create new test theme and topic
+Create new test theme
     ${theme_id}=    user creates theme via api    ${CREATED_THEME_NAME}
-    ${topic_id}=    user creates topic via api    ${CREATED_TOPIC_NAME}    ${theme_id}
     set suite variable    ${CREATED_THEME_ID}    ${theme_id}
 
 Update publication's details
@@ -78,10 +76,9 @@ Update publication's details
 
     user clicks button    Edit publication details
 
-    user enters text into element    id:publicationDetailsForm-title    ${PUBLICATION_NAME}
-    user enters text into element    id:publicationDetailsForm-summary    ${PUBLICATION_NAME} summary updated
-    user chooses select option    id:publicationDetailsForm-themeId    ${CREATED_THEME_NAME}
-    user chooses select option    id:publicationDetailsForm-topicId    ${CREATED_TOPIC_NAME}
+    user enters text into element    name:title    ${PUBLICATION_NAME}
+    user enters text into element    name:summary    ${PUBLICATION_NAME} summary updated
+    user chooses select option    name:themeId    ${CREATED_THEME_NAME}
 
     user clicks button    Update publication details
 
@@ -93,7 +90,6 @@ Verify publication details have been updated
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
     user checks summary list contains    Publication summary    ${PUBLICATION_NAME} summary updated
     user checks summary list contains    Theme    ${CREATED_THEME_NAME}
-    user checks summary list contains    Topic    ${CREATED_TOPIC_NAME}
     user checks summary list contains    Superseding publication    This publication is not archived
 
 Update publication's contact
@@ -102,10 +98,10 @@ Update publication's contact
 
     user clicks button    Edit contact details
 
-    user enters text into element    id:publicationContactForm-teamName    Special educational needs statistics team
-    user enters text into element    id:publicationContactForm-teamEmail    sen.statistics@education.gov.uk
-    user enters text into element    id:publicationContactForm-contactName    UI Tests Contact Name
-    user enters text into element    id:publicationContactForm-contactTelNo    0987654321
+    user enters text into element    name:teamName    Special educational needs statistics team
+    user enters text into element    name:teamEmail    sen.statistics@education.gov.uk
+    user enters text into element    name:contactName    UI Tests Contact Name
+    user enters text into element    name:contactTelNo    0987654321
 
     user clicks button    Update contact details
 
@@ -121,7 +117,6 @@ Verify contact details have been updated
 
 Add a methodology
     user creates methodology for publication    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}
-    ...    ${CREATED_TOPIC_NAME}
 
 Verify new methodology is attached to publication
     user checks summary list contains    Title    ${PUBLICATION_NAME}
@@ -149,8 +144,8 @@ Create new release for publication
     user clicks link    Create new release
     user waits until h1 is visible    Create new release
 
-    user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageCode
-    user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
+    user waits until page contains element    name:timePeriodCoverageCode
+    user waits until page contains element    name:timePeriodCoverageStartYear
 
 Verify Release type options
     user checks page contains radio    Accredited official statistics
@@ -160,8 +155,8 @@ Verify Release type options
     user checks page contains radio    Management information
 
 Create new release
-    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Spring term
-    user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2025
+    user chooses select option    name:timePeriodCoverageCode    Spring term
+    user enters text into element    name:timePeriodCoverageStartYear    2025
     user clicks radio    Accredited official statistics
     user clicks button    Create new release
     user waits until page contains title caption    Edit release for Spring term 2025/26
@@ -177,9 +172,9 @@ Edit release summary
     user waits until page contains link    Edit release summary
     user clicks link    Edit release summary
     user waits until h2 is visible    Edit release summary
-    user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
-    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Summer term
-    user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2026
+    user waits until page contains element    name:timePeriodCoverageStartYear
+    user chooses select option    name:timePeriodCoverageCode    Summer term
+    user enters text into element    name:timePeriodCoverageStartYear    2026
     user clicks radio    Official statistics
     user clicks button    Update release summary
 

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -13,6 +9,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 using Semver;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 // ReSharper disable StringLiteralTypo
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
@@ -49,7 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<PublicationMethodology> PublicationMethodologies { get; set; }
         public virtual DbSet<MethodologyFile> MethodologyFiles { get; set; }
         public virtual DbSet<Theme> Themes { get; set; }
-        public virtual DbSet<Topic> Topics { get; set; }
         public virtual DbSet<Publication> Publications { get; set; }
         public virtual DbSet<ReleaseVersion> ReleaseVersions { get; set; }
         public virtual DbSet<Release> Releases { get; set; }
@@ -345,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         private static void ConfigurePublicationMethodology(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<PublicationMethodology>()
-                .HasKey(pm => new {pm.PublicationId, pm.MethodologyId});
+                .HasKey(pm => new { pm.PublicationId, pm.MethodologyId });
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasOne(pm => pm.Publication)
@@ -511,7 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<ReleaseVersion>()
-                .HasIndex(rv => new {rv.PreviousVersionId, rv.Version});
+                .HasIndex(rv => new { rv.PreviousVersionId, rv.Version });
 
             modelBuilder.Entity<ReleaseVersion>()
                 .HasOne(rv => rv.CreatedBy)
@@ -635,10 +634,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         private static void ConfigureRedirects(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<PublicationRedirect>()
-                .HasKey(pr => new {pr.PublicationId, pr.Slug});
+                .HasKey(pr => new { pr.PublicationId, pr.Slug });
 
             modelBuilder.Entity<MethodologyRedirect>()
-                .HasKey(mr => new {mr.MethodologyVersionId, mr.Slug});
+                .HasKey(mr => new { mr.MethodologyVersionId, mr.Slug });
         }
 
         private static void ConfigureUser(ModelBuilder modelBuilder)

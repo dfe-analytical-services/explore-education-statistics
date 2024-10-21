@@ -71,8 +71,7 @@ public class PublicationService : IPublicationService
             .CheckEntityExists<Publication>(query => query
                 .Include(p => p.ReleaseVersions)
                 .Include(p => p.Contact)
-                .Include(p => p.Topic)
-                .ThenInclude(topic => topic.Theme)
+                .Include(p => p.Theme)
                 .Include(p => p.SupersededBy)
                 .Where(p => p.Slug == publicationSlug))
             .OnSuccess(async publication =>
@@ -129,15 +128,14 @@ public class PublicationService : IPublicationService
     public async Task<IList<PublicationTreeThemeViewModel>> GetPublicationTree()
     {
         var themes = await _contentDbContext.Themes
-            .Include(theme => theme.Topics)
-            .ThenInclude(topic => topic.Publications)
+            .Include(theme => theme.Publications)
             .ThenInclude(publication => publication.SupersededBy)
             .ToListAsync();
 
         return await themes
             .ToAsyncEnumerable()
             .SelectAwait(async theme => await BuildPublicationTreeTheme(theme))
-            .Where(theme => theme.Topics.Any())
+            .Where(theme => theme.Publications.Any())
             .OrderBy(theme => theme.Title)
             .ToListAsync();
     }
@@ -174,7 +172,7 @@ public class PublicationService : IPublicationService
 
         if (themeId.HasValue)
         {
-            baseQueryable = baseQueryable.Where(p => p.Topic.ThemeId == themeId.Value);
+            baseQueryable = baseQueryable.Where(p => p.ThemeId == themeId.Value);
         }
 
         // Apply a free-text search filter
@@ -218,7 +216,7 @@ public class PublicationService : IPublicationService
                     Slug = result.Value.Slug,
                     Summary = result.Value.Summary,
                     Title = result.Value.Title,
-                    Theme = result.Value.Topic.Theme.Title,
+                    Theme = result.Value.Theme.Title,
                     Published = result.Value.LatestPublishedReleaseVersion!.Published!.Value,
                     Type = result.Value.LatestPublishedReleaseVersion!.Type,
                     Rank = result.Rank
@@ -233,19 +231,19 @@ public class PublicationService : IPublicationService
         bool isSuperseded,
         List<ReleaseSeriesItemViewModel> releaseSeries)
     {
-        var topic = new TopicViewModel(new ThemeViewModel(
-            publication.Topic.Theme.Id,
-            Slug: publication.Topic.Theme.Slug,
-            Title: publication.Topic.Theme.Title,
-            Summary: publication.Topic.Theme.Summary
-        ));
+        var theme = new ThemeViewModel(
+            publication.Theme.Id,
+            publication.Theme.Slug,
+            publication.Theme.Title,
+            publication.Theme.Summary
+        );
 
         return new PublicationCacheViewModel
         {
             Id = publication.Id,
             Title = publication.Title,
             Slug = publication.Slug,
-            Topic = topic,
+            Theme = theme,
             Contact = new ContactViewModel(publication.Contact),
             ExternalMethodology = publication.ExternalMethodology != null
                 ? new ExternalMethodologyViewModel(publication.ExternalMethodology)
@@ -274,25 +272,7 @@ public class PublicationService : IPublicationService
 
     private async Task<PublicationTreeThemeViewModel> BuildPublicationTreeTheme(Theme theme)
     {
-        var topics = await theme.Topics
-            .ToAsyncEnumerable()
-            .SelectAwait(async topic => await BuildPublicationTreeTopic(topic))
-            .Where(topic => topic.Publications.Any())
-            .OrderBy(topic => topic.Title)
-            .ToListAsync();
-
-        return new PublicationTreeThemeViewModel
-        {
-            Id = theme.Id,
-            Title = theme.Title,
-            Summary = theme.Summary,
-            Topics = topics
-        };
-    }
-
-    private async Task<PublicationTreeTopicViewModel> BuildPublicationTreeTopic(Topic topic)
-    {
-        var publications = await topic.Publications
+        var publications = await theme.Publications
             .Where(publication => publication.LatestPublishedReleaseVersionId != null)
             .ToAsyncEnumerable()
             .SelectAwait(async publication =>
@@ -300,10 +280,11 @@ public class PublicationService : IPublicationService
             .OrderBy(publication => publication.Title)
             .ToListAsync();
 
-        return new PublicationTreeTopicViewModel
+        return new PublicationTreeThemeViewModel
         {
-            Id = topic.Id,
-            Title = topic.Title,
+            Id = theme.Id,
+            Title = theme.Title,
+            Summary = theme.Summary,
             Publications = publications
         };
     }

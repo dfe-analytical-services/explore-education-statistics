@@ -41,7 +41,6 @@ export const options: Options = {
 
 interface SetupData {
   themeId: string;
-  topicId: string;
   subjectId: string;
   subjectMeta: SubjectMeta;
 }
@@ -79,20 +78,15 @@ function getOrCreateReleaseWithSubject() {
     title: testData.themeName,
   });
 
-  const { id: topicId } = adminService.getOrCreateTopic({
-    themeId,
-    title: testData.topicName,
-  });
-
   const { id: publicationId } = adminService.getOrCreatePublication({
-    topicId,
+    themeId,
     title: publicationTitle,
   });
 
   const { id: releaseId, approvalStatus } = adminService.getOrCreateRelease({
     publicationId,
     publicationTitle,
-    topicId,
+    themeId,
     year: 2000,
     timePeriodCoverage: 'AY',
   });
@@ -146,7 +140,6 @@ function getOrCreateReleaseWithSubject() {
 
   return {
     themeId,
-    topicId,
     releaseId,
     subjectId,
   };
@@ -155,8 +148,7 @@ function getOrCreateReleaseWithSubject() {
 export function setup(): SetupData {
   const adminService = createAdminService(adminUrl, authTokens.accessToken);
 
-  const { themeId, topicId, releaseId, subjectId } =
-    getOrCreateReleaseWithSubject();
+  const { themeId, releaseId, subjectId } = getOrCreateReleaseWithSubject();
 
   const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
 
@@ -164,7 +156,6 @@ export function setup(): SetupData {
 
   return {
     themeId,
-    topicId,
     subjectId,
     subjectMeta,
   };
@@ -203,7 +194,7 @@ const performTest = ({ subjectId, subjectMeta }: SetupData) => {
   }
 };
 
-export const teardown = ({ themeId, topicId }: SetupData) => {
+export const teardown = ({ themeId }: SetupData) => {
   if (tearDownData) {
     const accessToken = getOrRefreshAccessTokens(
       supportsRefreshTokens,
@@ -214,10 +205,9 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
 
     const adminService = createAdminService(adminUrl, accessToken);
 
-    adminService.deleteTopic({ topicId });
     adminService.deleteTheme({ themeId });
 
-    console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
+    console.log(`Deleted Theme ${themeId}`);
   }
 };
 

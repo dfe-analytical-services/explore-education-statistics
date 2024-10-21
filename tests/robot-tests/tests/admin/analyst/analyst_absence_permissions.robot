@@ -11,16 +11,16 @@ Force Tags          Admin    Local    Dev
 
 
 *** Test Cases ***
-Validate Analyst1 can see correct themes and topics
-    user waits until h3 is visible    ${PUPILS_AND_SCHOOLS_THEME_TITLE} / ${PUPIL_ABSENCE_TOPIC_TITLE}
+Validate Analyst1 can see correct themes
+    user waits until h3 is visible    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     ${ABSENCE_PUBLICATIONS}=    get webelement
-    ...    xpath://*[@data-testid="topic-publications-${PUPILS_AND_SCHOOLS_THEME_TITLE}-${PUPIL_ABSENCE_TOPIC_TITLE}"]
+    ...    xpath://*[@data-testid="theme-publications-${PUPILS_AND_SCHOOLS_THEME_TITLE}"]
     user waits until parent contains element    ${ABSENCE_PUBLICATIONS}
     ...    link:${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
-    user waits until h3 is visible    ${PUPILS_AND_SCHOOLS_THEME_TITLE} / ${EXCLUSIONS_TOPIC_TITLE}
+    user waits until h3 is visible    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     ${EXCLUSION_PUBLICATIONS}=    get webelement
-    ...    xpath://*[@data-testid="topic-publications-${PUPILS_AND_SCHOOLS_THEME_TITLE}-${EXCLUSIONS_TOPIC_TITLE}"]
+    ...    xpath://*[@data-testid="theme-publications-${PUPILS_AND_SCHOOLS_THEME_TITLE}"]
     user waits until parent contains element    ${EXCLUSION_PUBLICATIONS}
     ...    link:${EXCLUSIONS_PUBLICATION_TITLE}
 

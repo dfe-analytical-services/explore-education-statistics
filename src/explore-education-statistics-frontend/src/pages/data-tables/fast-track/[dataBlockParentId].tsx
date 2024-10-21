@@ -33,7 +33,6 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> =
     }
 
     const selectedPublication = themeMeta
-      .flatMap(option => option.topics)
       .flatMap(option => option.publications)
       .find(option => option.id === fastTrack.query.publicationId);
 

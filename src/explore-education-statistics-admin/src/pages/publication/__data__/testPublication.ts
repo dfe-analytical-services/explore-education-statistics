@@ -16,7 +16,6 @@ export const testPublication: PublicationWithPermissions = {
   summary: 'Publication 1 summary',
   slug: 'publication-1-slug',
   theme: { id: 'theme-1', title: 'Theme 1' },
-  topic: { id: 'theme-1-topic-2', title: 'Theme 1 Topic 2' },
   permissions: {
     canAdoptMethodologies: true,
     canCreateReleases: true,

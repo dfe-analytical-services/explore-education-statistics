@@ -13,7 +13,6 @@ Force Tags          Admin    Local    AltersData    Dev
 
 
 *** Variables ***
-${TOPIC_NAME}=              %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=        UI tests - create data block with chart %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}=          UI test data block
 ${CONTENT_SECTION_NAME}=    Test data block section

@@ -6,9 +6,6 @@ import {
   themeCreateRoute,
   themeEditRoute,
   ThemeParams,
-  ThemeTopicParams,
-  topicCreateRoute,
-  topicEditRoute,
 } from '@admin/routes/routes';
 import themeService from '@admin/services/themeService';
 import Accordion from '@common/components/Accordion';
@@ -28,10 +25,7 @@ const ThemesPage = () => {
   );
 
   return (
-    <Page
-      title="Manage themes and topics"
-      breadcrumbs={[{ name: 'Manage themes and topics' }]}
-    >
+    <Page title="Manage themes" breadcrumbs={[{ name: 'Manage themes' }]}>
       <LoadingSpinner loading={isLoading}>
         <Accordion id="themes">
           {themes.map(theme => (
@@ -59,47 +53,6 @@ const ThemesPage = () => {
                   {theme.summary}
                 </SummaryListItem>
               </SummaryList>
-
-              <section data-testid={`Topics for ${theme.title}`}>
-                <h3>Topics</h3>
-
-                {theme.topics.length > 0 ? (
-                  <SummaryList>
-                    {theme.topics.map(topic => (
-                      <SummaryListItem
-                        key={topic.id}
-                        term={topic.title}
-                        actions={
-                          <Link
-                            data-testid={`Edit ${topic.title} topic link for ${theme.title}`}
-                            unvisited
-                            to={generatePath<ThemeTopicParams>(
-                              topicEditRoute.path,
-                              {
-                                themeId: theme.id,
-                                topicId: topic.id,
-                              },
-                            )}
-                          >
-                            Edit topic
-                          </Link>
-                        }
-                      />
-                    ))}
-                  </SummaryList>
-                ) : (
-                  <p>No topics for this theme</p>
-                )}
-              </section>
-
-              <ButtonLink
-                data-testid={`Create topic link for ${theme.title}`}
-                to={generatePath<ThemeParams>(topicCreateRoute.path, {
-                  themeId: theme.id,
-                })}
-              >
-                Create topic
-              </ButtonLink>
             </AccordionSection>
           ))}
         </Accordion>

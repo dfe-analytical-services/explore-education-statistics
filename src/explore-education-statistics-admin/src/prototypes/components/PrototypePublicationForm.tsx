@@ -56,15 +56,14 @@ const PrototypePublicationForm = ({
     if (selectedThemeId) {
       setSearchTerm('');
       return (
-        options
-          .find(option => option.id === selectedThemeId)
-          ?.topics.flatMap(topic => topic.publications) ?? []
+        options.find(option => option.id === selectedThemeId)?.publications ??
+        []
       );
     }
     if (searchTerm) {
       setSelectedThemeId('');
       return options
-        .flatMap(theme => theme.topics.flatMap(topic => topic.publications))
+        .flatMap(theme => theme.publications)
         .filter(publication =>
           publication.title.toLowerCase().includes(searchTerm.toLowerCase()),
         );
@@ -201,7 +200,6 @@ const PrototypePublicationForm = ({
         }
 
         const publication = options
-          .flatMap(option => option.topics)
           .flatMap(option => option.publications)
           .find(
             option =>

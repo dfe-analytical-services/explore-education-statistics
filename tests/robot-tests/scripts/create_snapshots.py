@@ -75,8 +75,13 @@ class SnapshotService:
         print(f"Validating snapshot: {name}")
         create_snapshot_func = self._get_create_snapshot_func(name)
         path_to_file = os.path.join(os.getcwd(), "tests/snapshots", name)
-        with open(path_to_file, "r") as file:
-            snapshot = file.read()
+
+        try:
+            with open(path_to_file, "r") as file:
+                snapshot = file.read()
+        except FileNotFoundError:
+            return False
+
         return snapshot == create_snapshot_func()
 
     def _write_snapshot_to_file(self, name: str) -> None:
@@ -167,7 +172,7 @@ class SnapshotService:
             theme_label.click()
             theme = {"theme_heading": theme_label.text, "publications": []}
 
-            publication_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-publications-"]')
+            publication_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-publicationId-"]')
 
             for publication_label in publication_labels:
                 theme["publications"].append(publication_label.text)

@@ -207,7 +207,7 @@ def validate_environment_variables():
 
 
 # If running all tests, or admin, admin_and_public, admin_and_public_2, public_api or seed_data suites,
-# these change data on environments and require test themes, test topics and user authentication.
+# these change data on environments and require test themes and user authentication.
 #
 # We check for both explicit forward slashes AND OS-specific separators here, as in Windows
 # we can expect to get either scenario depending upon how we're running these tests e.g.

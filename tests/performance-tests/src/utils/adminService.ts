@@ -5,8 +5,7 @@ import TestData from '../tests/testData';
 import {
   Publication,
   Release,
-  Topic,
-  ThemeAndTopics,
+  Theme,
   SubjectMeta,
   FullTableQuery,
   OverallStage,
@@ -40,14 +39,14 @@ export class AdminService {
   }
 
   getThemes() {
-    const { json } = this.client.get<ThemeAndTopics[]>(
+    const { json } = this.client.get<Theme[]>(
       `/api/themes`,
       applicationJsonHeaders,
     );
     return json;
   }
 
-  getTheme({ title }: { title: string }): ThemeAndTopics | undefined {
+  getTheme({ title }: { title: string }): Theme | undefined {
     return this.getThemes().find(
       ({ title: existingTitle }) => existingTitle === title,
     );
@@ -81,63 +80,22 @@ export class AdminService {
     return this.client.delete(`/api/themes/${themeId}`);
   }
 
-  getTopic({
-    themeId,
-    title,
-  }: {
-    themeId: string;
-    title: string;
-  }): Topic | undefined {
-    return this.getThemes()
-      .flatMap(theme => theme.topics)
-      .find(topic => topic.themeId === themeId && topic.title === title);
-  }
-
-  createTopic({ themeId, title }: { themeId: string; title: string }) {
-    const { response, json } = this.client.post<{ id: string }>(
-      `/api/topics`,
-      JSON.stringify({
-        themeId,
-        title,
-      }),
-      applicationJsonHeaders,
-    );
-
-    /* eslint-disable-next-line no-console */
-    console.log(`Created Topic ${title}`);
-
-    return {
-      id: json.id,
-      response,
-    };
-  }
-
-  getOrCreateTopic(params: { themeId: string; title: string }) {
-    return {
-      id: this.getTopic(params)?.id ?? this.createTopic(params).id,
-    };
-  }
-
-  deleteTopic({ topicId }: { topicId: string }) {
-    return this.client.delete(`/api/topics/${topicId}`);
-  }
-
-  getPublications({ topicId }: { topicId: string }): Publication[] {
+  getPublications({ themeId }: { themeId: string }): Publication[] {
     const { json } = this.client.get<Publication[]>(
-      `/api/publications?topicId=${encodeURI(topicId)}`,
+      `/api/publications?themeId=${encodeURI(themeId)}`,
       applicationJsonHeaders,
     );
     return json;
   }
 
   getPublication({
-    topicId,
+    themeId,
     title,
   }: {
-    topicId: string;
+    themeId: string;
     title: string;
   }): Publication | undefined {
-    return this.getPublications({ topicId }).find(
+    return this.getPublications({ themeId }).find(
       publication => publication.title === title,
     );
   }
@@ -156,11 +114,11 @@ export class AdminService {
     return json.results;
   }
 
-  createPublication({ topicId, title }: { topicId: string; title: string }) {
+  createPublication({ themeId, title }: { themeId: string; title: string }) {
     const { response, json } = this.client.post<{ id: string }>(
       `/api/publications`,
       JSON.stringify({
-        topicId,
+        themeId,
         title,
         contact: {
           contactName: 'Team Contact',
@@ -182,23 +140,23 @@ export class AdminService {
     };
   }
 
-  getOrCreatePublication(params: { topicId: string; title: string }) {
+  getOrCreatePublication(params: { themeId: string; title: string }) {
     return {
       id: this.getPublication(params)?.id ?? this.createPublication(params).id,
     };
   }
 
   getRelease({
-    topicId,
+    themeId,
     publicationTitle,
     year,
   }: {
-    topicId: string;
+    themeId: string;
     publicationTitle: string;
     year: number;
   }): Release | undefined {
     const publication = this.getPublication({
-      topicId,
+      themeId,
       title: publicationTitle,
     });
     if (!publication) {
@@ -255,20 +213,20 @@ export class AdminService {
   }
 
   getOrCreateRelease({
-    topicId,
+    themeId,
     publicationId,
     publicationTitle,
     year,
     timePeriodCoverage,
   }: {
-    topicId: string;
+    themeId: string;
     publicationId: string;
     publicationTitle: string;
     year: number;
     timePeriodCoverage: 'AY' | 'FY';
   }) {
     const existingRelease = this.getRelease({
-      topicId,
+      themeId,
       publicationTitle,
       year,
     });

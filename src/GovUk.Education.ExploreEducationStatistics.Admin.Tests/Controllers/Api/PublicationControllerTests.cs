@@ -1,7 +1,4 @@
 #nullable enable
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -9,10 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
 
@@ -23,12 +22,11 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
         [Fact]
         public async Task Success()
         {
-            Topic topic = DataFixture.DefaultTopic()
-                .WithTheme(DataFixture.DefaultTheme());
+            var theme = DataFixture.DefaultTheme().Generate();
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
-                context.Topics.Add(topic);
+                context.Themes.Add(theme);
             });
 
             var request = new PublicationCreateRequest
@@ -42,7 +40,7 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                     ContactName = "Contact",
                     ContactTelNo = "01234567890"
                 },
-                TopicId = topic.Id
+                ThemeId = theme.Id
             };
 
             var response = await CreatePublication(request);
@@ -57,10 +55,8 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                 () => Assert.Equal(request.Contact.TeamEmail, result.Contact.TeamEmail),
                 () => Assert.Equal(request.Contact.ContactName, result.Contact.ContactName),
                 () => Assert.Equal(request.Contact.ContactTelNo, result.Contact.ContactTelNo),
-                () => Assert.Equal(topic.Id, result.Topic.Id),
-                () => Assert.Equal(topic.Title, result.Topic.Title),
-                () => Assert.Equal(topic.Theme.Id, result.Theme.Id),
-                () => Assert.Equal(topic.Theme.Title, result.Theme.Title),
+                () => Assert.Equal(theme.Id, result.Theme.Id),
+                () => Assert.Equal(theme.Title, result.Theme.Title),
                 () => Assert.Null(result.SupersededById),
                 () => Assert.False(result.IsSuperseded)
             );
@@ -69,8 +65,7 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
 
             var saved = await context.Publications
                 .Include(p => p.Contact)
-                .Include(p => p.Topic)
-                .ThenInclude(t => t.Theme)
+                .Include(p => p.Theme)
                 .SingleAsync(p => p.Id == result.Id);
 
             Assert.Multiple(
@@ -81,27 +76,23 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                 () => Assert.Equal(request.Contact.TeamEmail, saved.Contact.TeamEmail),
                 () => Assert.Equal(request.Contact.ContactName, saved.Contact.ContactName),
                 () => Assert.Equal(request.Contact.ContactTelNo, saved.Contact.ContactTelNo),
-                () => Assert.Equal(topic.Id, saved.Topic.Id),
-                () => Assert.Equal(topic.Title, saved.Topic.Title),
-                () => Assert.Equal(topic.Theme.Id, saved.Topic.Theme.Id),
-                () => Assert.Equal(topic.Theme.Title, saved.Topic.Theme.Title)
+                () => Assert.Equal(theme.Id, saved.Theme.Id),
+                () => Assert.Equal(theme.Title, saved.Theme.Title)
             );
         }
 
         [Fact]
         public async Task PublicationSlugNotUnique_ReturnsValidationError()
         {
-            Publication publication = DataFixture.DefaultPublication()
-                .WithTopic(DataFixture.DefaultTopic()
-                    .WithTheme(DataFixture.DefaultTheme()));
+            var publication = DataFixture.DefaultPublication()
+                .WithTheme(DataFixture.DefaultTheme()).Generate();
 
-            Topic topic = DataFixture.DefaultTopic()
-                .WithTheme(DataFixture.DefaultTheme());
+            var theme = DataFixture.DefaultTheme().Generate();
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
                 context.Publications.Add(publication);
-                context.Topics.Add(topic);
+                context.Themes.Add(theme);
             });
 
             var request = new PublicationCreateRequest
@@ -116,7 +107,7 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                     ContactName = "Contact",
                     ContactTelNo = "01234567890"
                 },
-                TopicId = topic.Id
+                ThemeId = theme.Id
             };
 
             var response = await CreatePublication(request);
@@ -135,12 +126,11 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
         [Fact]
         public async Task UserHasNoAccessToCreatePublication_ReturnsForbidden()
         {
-            Topic topic = DataFixture.DefaultTopic()
-                .WithTheme(DataFixture.DefaultTheme());
+            var theme = DataFixture.DefaultTheme().Generate();
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
-                context.Topics.Add(topic);
+                context.Themes.Add(theme);
             });
 
             var request = new PublicationCreateRequest
@@ -154,7 +144,7 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                     ContactName = "Contact",
                     ContactTelNo = "01234567890"
                 },
-                TopicId = topic.Id
+                ThemeId = theme.Id
             };
 
             var client = TestApp
@@ -170,12 +160,10 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
             PublicationCreateRequest request,
             HttpClient? client = null)
         {
-            var user = DataFixture
-                .AuthenticatedUser()
-                .WithClaim(SecurityClaimTypes.CreateAnyPublication.ToString());
-
             client ??= TestApp
-                .SetUser(user)
+                .SetUser(DataFixture
+                    .AuthenticatedUser()
+                    .WithClaim(SecurityClaimTypes.CreateAnyPublication.ToString()))
                 .CreateClient();
 
             return await client.PostAsJsonAsync("api/publications", request);
