@@ -718,10 +718,13 @@ assert that AOP code is executed only once.
 #### Configuring Linux for running unit and integration tests
 
 Due to the resource requirements of the integration tests, Linux users need to ensure that the system running the tests
-is capable of doing so. The `max_user_watches` setting must be set to a high enough limit, for example by running:
+is capable of doing so. The `max_user_watches` and `max_user_instances` settings must be set to a high enough limit,
+for example by running:
 
 ```sh
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+echo fs.inotify.max_user_instances=524288 | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
 ```
 
 ### Resetting Azurite

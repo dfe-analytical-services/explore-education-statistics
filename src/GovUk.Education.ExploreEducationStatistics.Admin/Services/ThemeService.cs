@@ -146,18 +146,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             CancellationToken cancellationToken = default)
         {
             return await _userService.CheckCanManageAllTaxonomy()
-                .OnSuccess(() => _persistenceHelper.CheckEntityExists<Theme>(themeId, q => q.Include(t => t.Publications)))
+                .OnSuccess(() =>
+                    _persistenceHelper.CheckEntityExists<Theme>(themeId, q => q.Include(t => t.Publications)))
                 .OnSuccessDo(CheckCanDeleteTheme)
-                .OnSuccessDo(async theme =>
-                {
-                    var publicationIdsToDelete = theme.Publications
-                        .Select(p => p.Id)
-                        .ToList();
-
-                    return await DeleteMethodologiesForPublications(publicationIdsToDelete)
-                       .OnSuccess(() => DeleteReleasesForPublications(publicationIdsToDelete))
-                       .OnSuccess(() => DeletePublications(publicationIdsToDelete));
-                })
+                .OnSuccessDo(theme => DeletePublicationsForTheme(theme, cancellationToken))
                 .OnSuccessVoid(async theme =>
                 {
                     _contentDbContext.Themes.Remove(theme);
@@ -165,6 +157,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _publishingService.TaxonomyChanged(cancellationToken);
                 });
+        }
+
+        private async Task<Either<List<ActionResult>, Unit>> DeletePublicationsForTheme(
+            Theme theme, CancellationToken cancellationToken)
+        {
+            var publicationIds = theme
+                .Publications
+                .Select(publication => publication.Id)
+                .ToList();
+            
+            var deletePublicationResults = await publicationIds
+                .ToAsyncEnumerable()
+                .SelectAwait(async publicationId =>
+                    await DeleteMethodologiesForPublications([publicationId])
+                        .OnSuccess(() => DeleteReleasesForPublications([publicationId]))
+                        .OnSuccess(() => DeletePublications([publicationId])))
+                .ToListAsync(cancellationToken);
+
+            return deletePublicationResults
+                .AggregateSuccessesAndFailures()
+                .OnSuccessVoid();
         }
 
         private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublications(
@@ -196,6 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 publication.LatestPublishedReleaseVersionId = null;
             });
 
+            _contentDbContext.UpdateRange(publications);
             await _contentDbContext.SaveChangesAsync();
 
             // Some Content Db Releases may be soft-deleted and therefore not visible.
@@ -223,10 +237,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var publications = await _contentDbContext
                 .Publications
+                .Include(publication => publication.Contact)
                 .Where(publication => publicationIds.Contains(publication.Id))
                 .ToListAsync();
 
+            var contacts = publications
+                .Select(publication => publication.Contact)
+                .ToList();
+            
             _contentDbContext.Publications.RemoveRange(publications);
+            _contentDbContext.Contacts.RemoveRange(contacts);
             await _contentDbContext.SaveChangesAsync();
             return Unit.Instance;
         }
@@ -236,8 +256,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return !_themeDeletionAllowed
                 ? new ForbidResult()
                 : await _userService.CheckCanManageAllTaxonomy()
-                    .OnSuccess(_ => _contentDbContext.Themes
-                        .Where(theme => theme.Title.Contains("UI test theme")))
+                    .OnSuccess(async _ => (await _contentDbContext
+                        .Themes
+                        .ToListAsync(cancellationToken))
+                        .Where(theme => theme.IsTestOrSeedTheme()))
                     .OnSuccessVoid(async themes =>
                     {
                         foreach (var theme in themes)
@@ -261,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // don't really have a mechanism to clean things up
             // properly across the entire application.
             // TODO: EES-1295 ability to completely delete releases
-            if (!theme.Title.StartsWith("UI test theme") && !theme.Title.StartsWith("Seed theme"))
+            if (!theme.IsTestOrSeedTheme())
             {
                 return new ForbidResult();
             }

@@ -22,13 +22,13 @@ Force Tags          Local    Dev
 
 
 *** Variables ***
-${PUBLICATION_NAME}     Seed data mechanism publication %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}     UI tests - seed data mechanism publication %{RUN_IDENTIFIER}
 
 
 *** Test Cases ***
 Create publication and releases
     ${PUBLICATION_ID}=    user creates test publication via api
-    ...    Seed data mechanism publication %{RUN_IDENTIFIER}
+    ...    ${PUBLICATION_NAME}
 
     user creates a fully populated published release
     ...    ${PUBLICATION_ID}

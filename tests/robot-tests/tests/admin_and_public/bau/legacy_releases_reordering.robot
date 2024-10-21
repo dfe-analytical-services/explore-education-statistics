@@ -13,8 +13,9 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${RELEASE_NAME}=                        Academic year Q1 2022/23
-${PUBLICATION_NAME}=                    ui-tests-legacy-releases-%{RUN_IDENTIFIER}
-${PUBLIC_PUBLICATION_URL_ENDING}=       /find-statistics/${PUBLICATION_NAME}
+${PUBLICATION_NAME}=                    UI tests - legacy releases-%{RUN_IDENTIFIER}
+${PUBLICATION_SLUG}=                    ui-tests-legacy-releases-%{RUN_IDENTIFIER}
+${PUBLIC_PUBLICATION_URL_ENDING}=       /find-statistics/${PUBLICATION_SLUG}
 ${DESCRIPTION}=                         legacy release description
 ${UPDATED_DESCRIPTION}=                 updated legacy release description
 ${PUBLIC_URL_WITHOUT_AUTH}              ${EMPTY}
@@ -56,7 +57,7 @@ Validate that publication and legacy releases exist in the page
     set suite variable    ${PUBLIC_URL_WITHOUT_AUTH}
 
     user checks table cell contains    1    1    Academic year 2020/21
-    user checks table cell contains    1    2    ${PUBLIC_URL_WITHOUT_AUTH}/find-statistics/${PUBLICATION_NAME}/2020-21
+    user checks table cell contains    1    2    ${PUBLIC_URL_WITHOUT_AUTH}/find-statistics/${PUBLICATION_SLUG}/2020-21
     user checks table cell contains    1    3    Unpublished
 
     user checks table cell contains    2    1    ${DESCRIPTION}
