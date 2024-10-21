@@ -17,18 +17,26 @@ public class BulkDeleteDataSetVersionsFunction(
             Route = $"{nameof(BulkDeleteDataSetVersions)}/{{releaseVersionId}}")]
         HttpRequest httpRequest,
         Guid releaseVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
+        var forceDeleteAllParam = !httpRequest.Query["forceDeleteAll"].IsNullOrEmpty()
+            ? httpRequest.Query["forceDeleteAll"].ToString()
+            : "false";
+
+        var forceDeleteAll = bool.Parse(forceDeleteAllParam);
+
         try
         {
             return await dataSetVersionService.BulkDeleteVersions(
                     releaseVersionId,
+                    forceDeleteAll: forceDeleteAll,
                     cancellationToken: cancellationToken)
                 .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
         catch (Exception ex)
         {
-            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(BulkDeleteDataSetVersionsFunction));
+            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'",
+                nameof(BulkDeleteDataSetVersionsFunction));
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }

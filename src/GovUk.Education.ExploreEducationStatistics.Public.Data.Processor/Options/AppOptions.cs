@@ -11,4 +11,6 @@ public class AppOptions
     /// and filter option meta link rows into the public data db.
     /// </summary>
     public required int MetaInsertBatchSize { get; set; }
+
+    public bool EnableThemeDeletion { get; set; }
 }
