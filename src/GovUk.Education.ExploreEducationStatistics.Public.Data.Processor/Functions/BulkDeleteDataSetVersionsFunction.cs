@@ -19,11 +19,8 @@ public class BulkDeleteDataSetVersionsFunction(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default)
     {
-        var forceDeleteAllParam = !httpRequest.Query["forceDeleteAll"].IsNullOrEmpty()
-            ? httpRequest.Query["forceDeleteAll"].ToString()
-            : "false";
-
-        var forceDeleteAll = bool.Parse(forceDeleteAllParam);
+        var forceDeleteAll =
+            httpRequest.GetRequestParamBool(paramName: "forceDeleteAll", defaultValue: false);
 
         try
         {

@@ -166,13 +166,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Publications
                 .Select(publication => publication.Id)
                 .ToList();
-            
+
             var deletePublicationResults = await publicationIds
                 .ToAsyncEnumerable()
                 .SelectAwait(async publicationId =>
-                    await DeleteMethodologiesForPublications([publicationId])
-                        .OnSuccess(() => DeleteReleasesForPublications([publicationId]))
-                        .OnSuccess(() => DeletePublications([publicationId])))
+                    await DeleteMethodologiesForPublication(publicationId)
+                        .OnSuccess(() => DeleteReleasesForPublication(publicationId))
+                        .OnSuccess(() => DeletePublication(publicationId)))
                 .ToListAsync(cancellationToken);
 
             return deletePublicationResults
@@ -180,27 +180,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessVoid();
         }
 
-        private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublications(
-            IEnumerable<Guid> publicationIds)
+        private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublication(
+            Guid publicationId)
         {
             var methodologyIdsToDelete = await _contentDbContext
                 .PublicationMethodologies
                 .AsQueryable()
-                .Where(pm => pm.Owner && publicationIds.Contains(pm.PublicationId))
+                .Where(pm => pm.Owner && pm.PublicationId == publicationId)
                 .Select(pm => pm.MethodologyId)
                 .ToListAsync();
 
             return await methodologyIdsToDelete
                 .Select(methodologyId => _methodologyService.DeleteMethodology(methodologyId, true))
-                .OnSuccessAll()
-                .OnSuccessVoid();
+                .OnSuccessAllReturnVoid();
         }
 
-        private async Task<Either<ActionResult, Unit>> DeleteReleasesForPublications(IEnumerable<Guid> publicationIds)
+        private async Task<Either<ActionResult, Unit>> DeleteReleasesForPublication(Guid publicationId)
         {
             var publications = await _contentDbContext
                 .Publications
-                .Where(publication => publicationIds.Contains(publication.Id))
+                .Where(publication => publication.Id == publicationId)
                 .ToListAsync();
 
             publications.ForEach(publication =>
@@ -217,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseVersionIdsToDelete = await _contentDbContext
                 .ReleaseVersions
                 .IgnoreQueryFilters()
-                .Where(rv => publicationIds.Contains(rv.PublicationId))
+                .Where(rv => rv.PublicationId == publicationId)
                 .Select(rv => new IdAndPreviousVersionIdPair<string>(rv.Id.ToString(),
                     rv.PreviousVersionId != null ? rv.PreviousVersionId.ToString() : null))
                 .ToListAsync();
@@ -229,24 +228,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return await releaseVersionIdsInDeleteOrder
                 .Select(releaseVersionId => _releaseService.DeleteTestReleaseVersion(releaseVersionId))
-                .OnSuccessAll()
-                .OnSuccessVoid();
+                .OnSuccessAllReturnVoid();
         }
 
-        private async Task<Either<ActionResult, Unit>> DeletePublications(IEnumerable<Guid> publicationIds)
+        private async Task<Either<ActionResult, Unit>> DeletePublication(Guid publicationId)
         {
-            var publications = await _contentDbContext
+            var publication = await _contentDbContext
                 .Publications
                 .Include(publication => publication.Contact)
-                .Where(publication => publicationIds.Contains(publication.Id))
-                .ToListAsync();
+                .SingleAsync(publication => publication.Id == publicationId);
 
-            var contacts = publications
-                .Select(publication => publication.Contact)
-                .ToList();
-            
-            _contentDbContext.Publications.RemoveRange(publications);
-            _contentDbContext.Contacts.RemoveRange(contacts);
+            _contentDbContext.Publications.RemoveRange(publication);
+            _contentDbContext.Contacts.RemoveRange(publication.Contact);
             await _contentDbContext.SaveChangesAsync();
             return Unit.Instance;
         }
@@ -257,8 +250,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ? new ForbidResult()
                 : await _userService.CheckCanManageAllTaxonomy()
                     .OnSuccess(async _ => (await _contentDbContext
-                        .Themes
-                        .ToListAsync(cancellationToken))
+                            .Themes
+                            .ToListAsync(cancellationToken))
                         .Where(theme => theme.IsTestOrSeedTheme()))
                     .OnSuccessVoid(async themes =>
                     {

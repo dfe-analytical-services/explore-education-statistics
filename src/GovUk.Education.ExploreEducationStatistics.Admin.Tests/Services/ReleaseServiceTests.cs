@@ -1489,18 +1489,16 @@ public abstract class ReleaseServiceTests
             var cacheService = new Mock<IBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
 
-            var forceDeleteFiles = false;
-            var softDeleteOrphanedSubjects = true;
-            var forceDeletePublicApiData = false;
+            var forceDeleteRelatedData = false;
 
             releaseDataFilesService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, forceDeleteFiles)).ReturnsAsync(Unit.Instance);
+                mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData)).ReturnsAsync(Unit.Instance);
 
             releaseFileService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, forceDeleteFiles)).ReturnsAsync(Unit.Instance);
+                mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData)).ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository.Setup(mock =>
-                    mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects))
+                    mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
                 .Returns(Task.CompletedTask);
 
             cacheService
@@ -1510,7 +1508,7 @@ public abstract class ReleaseServiceTests
 
             processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
                     releaseVersion.Id,
-                    forceDeletePublicApiData,
+                    forceDeleteRelatedData,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
@@ -1531,15 +1529,15 @@ public abstract class ReleaseServiceTests
 
                 // Assert
                 releaseDataFilesService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, forceDeleteFiles),
+                        mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
                     Times.Once);
 
                 releaseFileService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, forceDeleteFiles),
+                        mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
                     Times.Once);
 
                 releaseSubjectRepository.Verify(mock =>
-                        mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects),
+                        mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData),
                     Times.Once);
 
                 VerifyAllMocks(cacheService,
@@ -1706,10 +1704,7 @@ public abstract class ReleaseServiceTests
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Theme = new Theme()
-                }
+                Publication = new Publication { Theme = new Theme() }
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1764,12 +1759,9 @@ public abstract class ReleaseServiceTests
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Theme = new Theme()
-                }
+                Publication = new Publication { Theme = new Theme() }
             };
-            
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1916,18 +1908,16 @@ public abstract class ReleaseServiceTests
             var cacheService = new Mock<IBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
 
-            var forceDeleteFiles = true;
-            var softDeleteOrphanedSubjects = false;
-            var forceDeletePublicApiData = true;
+            var forceDeleteRelatedData = true;
 
             releaseDataFilesService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, forceDeleteFiles)).ReturnsAsync(Unit.Instance);
+                mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData)).ReturnsAsync(Unit.Instance);
 
             releaseFileService.Setup(mock =>
-                mock.DeleteAll(releaseVersion.Id, forceDeleteFiles)).ReturnsAsync(Unit.Instance);
+                mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData)).ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository.Setup(mock =>
-                    mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects))
+                    mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
                 .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository.Setup(mock =>
@@ -1941,7 +1931,7 @@ public abstract class ReleaseServiceTests
 
             processorClient.Setup(mock => mock.BulkDeleteDataSetVersions(
                     releaseVersion.Id,
-                    forceDeletePublicApiData,
+                    forceDeleteRelatedData,
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
@@ -1963,15 +1953,15 @@ public abstract class ReleaseServiceTests
 
                 // Assert
                 releaseDataFilesService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, forceDeleteFiles),
+                        mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
                     Times.Once);
 
                 releaseFileService.Verify(mock =>
-                        mock.DeleteAll(releaseVersion.Id, forceDeleteFiles),
+                        mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
                     Times.Once);
 
                 releaseSubjectRepository.Verify(mock =>
-                        mock.DeleteAllReleaseSubjects(releaseVersion.Id, softDeleteOrphanedSubjects),
+                        mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData),
                     Times.Once);
 
                 VerifyAllMocks(
@@ -2057,10 +2047,7 @@ public abstract class ReleaseServiceTests
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Theme = new Theme()
-                }
+                Publication = new Publication { Theme = new Theme() }
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -2117,10 +2104,7 @@ public abstract class ReleaseServiceTests
             var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Theme = new Theme()
-                }
+                Publication = new Publication { Theme = new Theme() }
             };
 
             var contextId = Guid.NewGuid().ToString();
