@@ -461,7 +461,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var subjectId = await _releaseVersionRepository
                                 .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
 
-                            var releaseDataFileOrder = await GetNextDataFileOrder(releaseVersionId);
+                            var releaseDataFileOrder = await GetNextDataFileOrder(
+                                releaseVersionId, archiveFile.ReplacingFile);
 
                             var dataFile = await _releaseDataFileRepository.Create(
                                 releaseVersionId: releaseVersionId,
@@ -471,6 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 type: FileType.Data,
                                 createdById: _userService.GetUserId(),
                                 name: archiveFile.Title,
+                                replacingDataFile: archiveFile.ReplacingFile,
                                 source: bulkZipFile,
                                 order: releaseDataFileOrder);
 

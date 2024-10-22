@@ -308,6 +308,20 @@ public static class ValidationMessages
         };
     }
 
+    public static readonly LocalizableMessage CannotReplaceDataSetWithApiDataSet = new(
+        Code: nameof(CannotReplaceDataSetWithApiDataSet),
+        Message: "Data set with title '{0}' cannot be replaced as it has an API data set."
+    );
+
+    public static ErrorViewModel GenerateErrorCannotReplaceDataSetWithApiDataSet(string title)
+    {
+        return new ErrorViewModel
+        {
+            Code = CannotReplaceDataSetWithApiDataSet.Code,
+            Message = string.Format(CannotReplaceDataSetWithApiDataSet.Message, title),
+        };
+    }
+
     public static readonly LocalizableMessage PreviewTokenExpired = new(
         Code: nameof(PreviewTokenExpired),
         Message: "The preview token is expired."
