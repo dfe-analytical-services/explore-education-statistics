@@ -136,6 +136,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpPost("release/{releaseVersionId:guid}/bulk-zip-data-plan")]
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<List<ArchiveDataSetFile>>> UploadDataSetsAsBulkZipPlan(
+            Guid releaseVersionId,
+            IFormFile zipFile)
+        {
+            return await _releaseDataFileService
+                .UploadAsBulkZipPlan(releaseVersionId, zipFile)
+                .HandleFailuresOrOk();
+        }
+
         [HttpPost("release/{releaseVersionId:guid}/bulk-zip-data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]

@@ -2943,6 +2943,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UploadAsBulkZipPlan()
+        {
+            const string zipFileName = "test-data-archive.zip";
+
+            var releaseVersion = new ReleaseVersion
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                Publication = new Publication
+                {
+                    Title = "Test publication",
+                    Theme = new Theme
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Test theme"
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var zipFormFile = CreateFormFileMock(zipFileName, "application/zip").Object;
+
+            var archiveFile1 = new ArchiveDataSetFile("One", "one.csv", "one.meta.csv");
+            var archiveFile2 = new ArchiveDataSetFile("Two", "two.csv", "two.meta.csv");
+
+            var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                dataArchiveValidationService
+                    .Setup(s => s.ValidateBulkDataArchiveFile(
+                        releaseVersion.Id,
+                        zipFormFile))
+                    .ReturnsAsync(new List<ArchiveDataSetFile>
+                    {
+                        archiveFile1, archiveFile2,
+                    });
+
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    dataArchiveValidationService: dataArchiveValidationService.Object,
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object
+                );
+
+                var result = (await service
+                    .UploadAsBulkZipPlan(releaseVersion.Id, zipFormFile))
+                    .AssertRight();
+
+                MockUtils.VerifyAllMocks(
+                    dataArchiveValidationService,
+                    fileUploadsValidatorService);
+
+                Assert.Equal(2, result.Count);
+
+                Assert.Equal("One", result[0].Title);
+                Assert.Equal("one.csv", result[0].DataFilename);
+                Assert.Equal("one.meta.csv", result[0].MetaFilename);
+
+                Assert.Equal("Two", result[1].Title);
+                Assert.Equal("two.csv", result[1].DataFilename);
+                Assert.Equal("two.meta.csv", result[1].MetaFilename);
+            }
+        }
+
+        [Fact]
         public async Task UploadAsBulkZip_Order()
         {
             const string zipFileName = "test-data-archive.zip";

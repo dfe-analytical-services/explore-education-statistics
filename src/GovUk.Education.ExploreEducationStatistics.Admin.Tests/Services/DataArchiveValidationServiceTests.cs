@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -14,6 +10,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using File = System.IO.File;
@@ -264,6 +264,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             VerifyAllMocks(fileUploadsValidatorService, fileTypeService);
+        }
+
+        [Fact]
+        public async Task ValidateBulkDataArchiveFile_Fail_FileIsNull()
+        {
+            var releaseVersionId = Guid.NewGuid();
+
+            var service = SetupDataArchiveValidationService();
+            IFormFile? archive = null;
+
+            var result = await service.ValidateBulkDataArchiveFile(
+                releaseVersionId,
+                archive!);
+
+            result
+                .AssertLeft()
+                .AssertBadRequestWithValidationErrors([
+                    new ErrorViewModel
+                    {
+                        Code = ValidationMessages.FileIsNull.Code,
+                        Message = string.Format(ValidationMessages.FileIsNull.Message, "zipFile")
+                    }
+                ]);
         }
 
         [Fact]

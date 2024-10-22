@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -17,6 +14,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -185,6 +185,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             zipFormFile: new Mock<IFormFile>().Object,
                             dataSetTitle: "",
                             replacingFileId: null);
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task UploadAsBulkZipPlan()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseDataFileService(userService: userService.Object);
+                        return service.UploadAsBulkZipPlan(
+                            releaseVersionId: _releaseVersion.Id,
+                            bulkZipFormFile: new Mock<IFormFile>().Object);
                     }
                 );
         }

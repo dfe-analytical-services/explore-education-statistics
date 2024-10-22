@@ -1,9 +1,9 @@
 #nullable enable
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
@@ -176,6 +176,20 @@ public static class ValidationMessages
         Code: nameof(DatasetNamesCsvFilenamesShouldNotEndDotCsv),
         Message: "Inside dataset_names.csv, file_name cell entries should not end in '.csv' i.e. should be 'filename' not 'filename.csv'. Filename found with extension: '{0}'."
     );
+
+    public static readonly LocalizableMessage FileIsNull = new(
+        Code: nameof(FileIsNull),
+        Message: "Argument provided for parameter '{0}' is null."
+    );
+
+    public static ErrorViewModel GenerateErrorFileIsNull(string parameterName)
+    {
+        return new ErrorViewModel
+        {
+            Code = FileIsNull.Code,
+            Message = string.Format(FileIsNull.Message, parameterName),
+        };
+    }
 
     public static ErrorViewModel GenerateErrorDatasetNamesCsvFilenamesShouldNotEndDotCsv(string filename)
     {
