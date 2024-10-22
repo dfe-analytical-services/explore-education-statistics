@@ -176,7 +176,7 @@ const TableHeadersGroupControls = ({
                     toggleReverseOrder(groupName);
                   }}
                 >
-                  Reverse<VisuallyHidden> {legend}</VisuallyHidden>
+                  Reverse order<VisuallyHidden> {legend}</VisuallyHidden>
                 </Button>
               </>
             )}
