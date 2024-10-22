@@ -124,7 +124,7 @@ Add new contributors to release
 Validate contributors for 2002/03 release again
     user checks table body has x rows    1    testid:releaseContributors
     user checks table cell contains    1    1    Analyst3 User3    testid:releaseContributors
-    user checks table cell contains    1    2    EES-test.analyst3@dfedevelopment.onmicrosoft.com
+    user checks table cell contains    1    2    ees-test.analyst3@dfedevelopment.onmicrosoft.com
     ...    testid:releaseContributors
 
 Remove all analyst3 contributor access to publication
