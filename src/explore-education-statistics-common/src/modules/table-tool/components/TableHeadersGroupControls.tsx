@@ -42,6 +42,7 @@ const TableHeadersGroupControls = ({
     setActiveGroup,
     toggleExpandedList,
     toggleGroupDraggingEnabled,
+    toggleReverseOrder,
     toggleMoveControlsActive,
   } = useTableHeadersContext();
   const { isMedia: isDesktopMedia } = useDesktopMedia();
@@ -149,7 +150,7 @@ const TableHeadersGroupControls = ({
             ) : (
               <>
                 <Button
-                  className="govuk-!-width-one-half"
+                  className="govuk-!-width-one-third"
                   disabled={!!disableControls}
                   onClick={() => {
                     setActiveGroup(id);
@@ -160,13 +161,22 @@ const TableHeadersGroupControls = ({
                   <VisuallyHidden>{` items in ${legend}`}</VisuallyHidden>
                 </Button>
                 <Button
-                  className="govuk-!-width-one-half"
+                  className="govuk-!-width-one-third"
                   disabled={!!disableControls}
                   onClick={() => {
                     toggleMoveControlsActive(id);
                   }}
                 >
                   Move<VisuallyHidden> {legend}</VisuallyHidden>
+                </Button>
+                <Button
+                  className="govuk-!-width-one-third"
+                  disabled={!!disableControls}
+                  onClick={() => {
+                    toggleReverseOrder(groupName);
+                  }}
+                >
+                  Reverse<VisuallyHidden> {legend}</VisuallyHidden>
                 </Button>
               </>
             )}
