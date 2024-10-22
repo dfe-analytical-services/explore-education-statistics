@@ -9,8 +9,8 @@ import styles from './BauUsersPage.module.scss';
 const BauUsersPage = () => {
   const { value, isLoading } = useAsyncRetry(() => userService.getUsers());
 
+  // EES-5573
   // const handleDeleteUser = async (userEmail: string) => {
-  //   // EES-5573
   //   await userService
   //     .deleteUser(userEmail)
   //     .then(() => {
