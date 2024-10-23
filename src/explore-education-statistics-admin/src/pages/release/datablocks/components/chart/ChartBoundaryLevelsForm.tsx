@@ -1,86 +1,114 @@
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
+import generateDataSetLabel from '@admin/pages/release/datablocks/components/chart/utils/generateDataSetLabel';
 import Effect from '@common/components/Effect';
 import Form from '@common/components/form/Form';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormProvider from '@common/components/form/FormProvider';
+import { SelectOption } from '@common/components/form/FormSelect';
 import { MapDataSetConfig } from '@common/modules/charts/types/chart';
+import expandDataSet from '@common/modules/charts/util/expandDataSet';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import Yup from '@common/validation/yup';
-import React, { ReactNode, useMemo } from 'react';
-import { AnyObject, NumberSchema, ObjectSchema } from 'yup';
+import React, { ReactNode, useCallback, useMemo } from 'react';
+import { ObjectSchema } from 'yup';
 
 const formId = 'chartBoundaryLevelsConfigurationForm';
 
 export interface ChartBoundaryLevelsFormValues {
-  boundaryLevel?: number;
-  dataSetConfigs: Omit<MapDataSetConfig, 'dataGrouping'>[];
+  boundaryLevel?: string;
+  dataSetConfigs: {
+    boundaryLevel?: string;
+  }[];
 }
 
 interface Props {
-  hasDataSetBoundaryLevels?: boolean; // feature flag (remove once)
   buttons?: ReactNode;
-  boundaryLevelOptions: { label: string; value: number }[];
-  initialValues?: ChartBoundaryLevelsFormValues;
-  dataSetRows: { key: string; label: string }[];
+  initialValues: ChartBoundaryLevelsFormValues;
+  dataSetConfigs: MapDataSetConfig[];
+  // TODO: EES-5402 - Remove when all boundary level changes are done
+  hasDataSetBoundaryLevels?: boolean;
+  meta: FullTableMeta;
   onChange: (values: Partial<ChartBoundaryLevelsFormValues>) => void;
   onSubmit: (values: ChartBoundaryLevelsFormValues) => void;
 }
 
 export default function ChartBoundaryLevelsForm({
-  hasDataSetBoundaryLevels = true,
   buttons,
-  boundaryLevelOptions,
-  dataSetRows,
+  dataSetConfigs,
+  // TODO: EES-5402 - Remove when all boundary level changes are done
+  hasDataSetBoundaryLevels,
   initialValues,
+  meta,
   onChange,
   onSubmit,
 }: Props) {
   const { updateForm, submitForms } = useChartBuilderFormsContext();
 
+  const boundaryLevelOptions = useMemo<SelectOption<string>[]>(() => {
+    return meta.boundaryLevels.map(level => {
+      return {
+        label: level.label,
+        value: level.id.toString(),
+      };
+    });
+  }, [meta.boundaryLevels]);
+
+  const dataSetRows = useMemo(() => {
+    return dataSetConfigs.map(dataSetConfig => {
+      const expandedDataSet = expandDataSet(dataSetConfig.dataSet, meta);
+      const label = generateDataSetLabel(expandedDataSet);
+      const key = generateDataSetKey(dataSetConfig.dataSet);
+
+      return {
+        key,
+        label,
+      };
+    });
+  }, [dataSetConfigs, meta]);
+
   const validationSchema = useMemo<
     ObjectSchema<ChartBoundaryLevelsFormValues>
   >(() => {
     return Yup.object({
-      boundaryLevel: Yup.number()
-        .transform(value => (Number.isNaN(value) ? undefined : value))
-        .nullable()
-        .oneOf(boundaryLevelOptions.map(({ value }) => value))
-        .required('Choose a boundary level'),
+      boundaryLevel: Yup.string().required('Choose a boundary level'),
       dataSetConfigs: Yup.array()
         .of(
           Yup.object({
-            boundaryLevel: Yup.mixed<number | ''>().test(
-              'dataset-boundary-is-number-or-empty',
-              'Must be a number or an empty string',
-              value => !Number.isNaN(value) || value === '',
-            ) as NumberSchema<number, AnyObject, undefined, ''>,
-            dataSet: Yup.object({
-              filters: Yup.array().required(),
-            }).required(),
+            boundaryLevel: Yup.string().optional(),
           }),
         )
         .required(),
     });
-  }, [boundaryLevelOptions]);
+  }, []);
+
+  const handleSubmit = useCallback(
+    async (values: ChartBoundaryLevelsFormValues) => {
+      onSubmit(values);
+      await submitForms();
+    },
+    [onSubmit, submitForms],
+  );
 
   return (
     <FormProvider
-      validationSchema={validationSchema}
+      enableReinitialize
       initialValues={initialValues}
+      validationSchema={validationSchema}
     >
-      {({ formState, watch }) => {
-        const values = watch();
+      {({ formState }) => {
         return (
           <Form<ChartBoundaryLevelsFormValues>
             id={formId}
-            onSubmit={onSubmit}
             onChange={onChange}
+            onSubmit={handleSubmit}
           >
             <Effect
               value={{
                 formKey: 'boundaryLevels',
                 isValid: formState.isValid,
-                submitCount: 0,
+                submitCount: formState.submitCount,
               }}
               onChange={updateForm}
               onMount={updateForm}
@@ -148,10 +176,6 @@ export default function ChartBoundaryLevelsForm({
               formId={formId}
               formKey="boundaryLevels"
               disabled={formState.isSubmitting}
-              onClick={async () => {
-                onSubmit(values);
-                await submitForms();
-              }}
             >
               {buttons}
             </ChartBuilderSaveActions>
