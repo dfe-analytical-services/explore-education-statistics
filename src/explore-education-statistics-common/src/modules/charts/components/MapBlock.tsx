@@ -18,9 +18,9 @@ import {
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
-import getDataSetCategoryConfigs, {
-  DataSetCategoryConfig,
-} from '@common/modules/charts/util/getDataSetCategoryConfigs';
+import getMapDataSetCategoryConfigs, {
+  MapDataSetCategoryConfig,
+} from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import { GeoJsonFeatureProperties } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import naturalOrderBy from '@common/utils/array/naturalOrderBy';
@@ -136,14 +136,14 @@ export default function MapBlock({
     [axisMajor, data, meta],
   );
 
-  const dataSetCategoryConfigs = useMemo<Dictionary<DataSetCategoryConfig>>(
+  const dataSetCategoryConfigs = useMemo<Dictionary<MapDataSetCategoryConfig>>(
     () =>
       keyBy(
-        getDataSetCategoryConfigs({
+        getMapDataSetCategoryConfigs({
           dataSetCategories,
+          dataSetConfigs: map?.dataSetConfigs,
           legendItems: legend.items,
           meta,
-          dataSetConfigs: map?.dataSetConfigs,
           deprecatedDataGroups,
           deprecatedDataClassification,
         }),
@@ -151,9 +151,9 @@ export default function MapBlock({
       ),
     [
       dataSetCategories,
-      map?.dataSetConfigs,
-      legend,
+      legend.items,
       meta,
+      map,
       deprecatedDataGroups,
       deprecatedDataClassification,
     ],

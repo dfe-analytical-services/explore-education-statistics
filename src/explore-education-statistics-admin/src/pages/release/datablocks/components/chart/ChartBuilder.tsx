@@ -9,6 +9,7 @@ import ChartDefinitionSelector from '@admin/pages/release/datablocks/components/
 import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
 import { ChartBuilderFormsContextProvider } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { useChartBuilderReducer } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
+import { MapBoundaryLevelConfig } from '@admin/pages/release/datablocks/components/chart/types/mapConfig';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
@@ -51,7 +52,6 @@ import { isServerValidationError } from '@common/validation/serverValidations';
 import { produce } from 'immer';
 import omit from 'lodash/omit';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { ChartBoundaryLevelsFormValues } from './ChartBoundaryLevelsForm';
 
 const chartDefinitions: ChartDefinition[] = [
   lineChartBlockDefinition,
@@ -107,7 +107,7 @@ interface Props {
   onTableQueryUpdate: TableQueryUpdateHandler;
 }
 
-const ChartBuilder = ({
+export default function ChartBuilder({
   data,
   meta,
   releaseId,
@@ -116,7 +116,7 @@ const ChartBuilder = ({
   onChartSave,
   onChartDelete,
   onTableQueryUpdate,
-}: Props) => {
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [showDeleteModal, toggleDeleteModal] = useToggle(false);
@@ -124,10 +124,12 @@ const ChartBuilder = ({
   const [isDataLoading, setDataLoading] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
 
-  const { state: chartBuilderState, actions } = useChartBuilderReducer(
-    initialChart,
+  const { state: chartBuilderState, actions } = useChartBuilderReducer({
+    chart: initialChart,
+    data,
+    meta,
     tableTitle,
-  );
+  });
 
   const { axes, map, definition, options, legend } = chartBuilderState;
 
@@ -262,8 +264,8 @@ const ChartBuilder = ({
     200,
   );
 
-  const [handleMapConfigurationChange] = useDebouncedCallback(
-    actions.updateChartMapConfiguration,
+  const [handleMapDataGroupingsChange] = useDebouncedCallback(
+    actions.updateMapDataGroupings,
     200,
   );
 
@@ -273,16 +275,13 @@ const ChartBuilder = ({
   );
 
   const handleDefaultBoundaryLevelChange = useCallback(
-    async ({
-      boundaryLevel,
-      dataSetConfigs,
-    }: ChartBoundaryLevelsFormValues) => {
-      actions.updateChartBoundaryLevels({ boundaryLevel, dataSetConfigs });
+    async (config: MapBoundaryLevelConfig) => {
+      actions.updateMapBoundaryLevels(config);
 
       setDataLoading(true);
 
       await onTableQueryUpdate({
-        boundaryLevel: parseNumber(boundaryLevel),
+        boundaryLevel: parseNumber(config.boundaryLevel),
       });
 
       setDataLoading(false);
@@ -358,11 +357,9 @@ const ChartBuilder = ({
               )}
 
               {forms.boundaryLevels &&
-                axes.major &&
-                forms.dataGroupings &&
                 definition?.type === 'map' &&
-                options &&
-                legend && (
+                map &&
+                options && (
                   <TabsSection
                     title="Boundary levels"
                     headingTitle="Boundary levels"
@@ -370,22 +367,18 @@ const ChartBuilder = ({
                   >
                     <ChartBoundaryLevelsConfiguration
                       buttons={deleteButton}
-                      axisMajor={axes.major}
-                      data={data}
-                      legend={legend}
                       options={options}
                       map={map}
                       meta={meta}
                       onChange={handleDefaultBoundaryLevelChange}
-                      onSubmit={actions.updateChartBoundaryLevels}
+                      onSubmit={actions.updateMapBoundaryLevels}
                     />
                   </TabsSection>
                 )}
-              {axes.major &&
-                forms.dataGroupings &&
+              {forms.dataGroupings &&
                 definition?.type === 'map' &&
-                options &&
-                legend && (
+                map &&
+                options && (
                   <TabsSection
                     title="Data groupings"
                     headingTitle="Data groupings"
@@ -393,15 +386,12 @@ const ChartBuilder = ({
                   >
                     <ChartDataGroupingsConfiguration
                       buttons={deleteButton}
-                      axisMajor={axes.major}
-                      data={data}
-                      legend={legend}
-                      options={options}
                       map={map}
                       meta={meta}
-                      onChange={handleMapConfigurationChange}
-                      onSubmit={values => {
-                        actions.updateChartMapConfiguration(values);
+                      onChange={handleMapDataGroupingsChange}
+                      onSubmit={config => {
+                        actions.updateMapDataGroupings(config);
+
                         if (options.dataClassification) {
                           actions.updateChartOptions({
                             ...options,
@@ -483,6 +473,4 @@ const ChartBuilder = ({
       </ModalConfirm>
     </div>
   );
-};
-
-export default ChartBuilder;
+}
