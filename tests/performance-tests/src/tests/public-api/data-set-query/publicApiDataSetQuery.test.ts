@@ -95,11 +95,12 @@ export function setup(): SetupData {
       );
 
       const dataSetMeta = dataSetsFilteredByName.map(dataSet => {
-        const { meta } = publicApiService.getDataSetsMeta(dataSet.id);
+        const { meta } = publicApiService.getDataSetMeta(dataSet.id);
         return {
           ...meta,
           id: dataSet.id,
           name: dataSet.title,
+          totalResults: dataSet.latestVersion.totalResults,
         };
       });
 

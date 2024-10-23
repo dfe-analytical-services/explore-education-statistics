@@ -2870,7 +2870,7 @@
             "type": "influxdb",
             "uid": "P76A45B24F43298D1"
           },
-          "query": "SELECT max(\"value\") FROM \"ees_public_api_individual_query_response_rows\" WHERE $timeFilter GROUP BY time(10s) fill(null)",
+          "query": "SELECT mean(\"value\") FROM \"ees_public_api_individual_query_response_rows\" WHERE $timeFilter GROUP BY time(10s) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -3080,8 +3080,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red",
-                "value": null
+                "color": "light-red"
               },
               {
                 "color": "red",
@@ -3173,8 +3172,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red",
-                "value": null
+                "color": "light-red"
               },
               {
                 "color": "red",
@@ -3235,8 +3233,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red",
-                "value": null
+                "color": "light-red"
               },
               {
                 "color": "red",
@@ -3331,8 +3328,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red",
-                "value": null
+                "color": "light-red"
               },
               {
                 "color": "red",
@@ -3393,8 +3389,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red",
-                "value": null
+                "color": "light-red"
               },
               {
                 "color": "red",
@@ -3458,8 +3453,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red",
-                "value": null
+                "color": "light-red"
               },
               {
                 "color": "red",
@@ -3523,8 +3517,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red",
-                "value": null
+                "color": "light-red"
               },
               {
                 "color": "red",

@@ -35,12 +35,15 @@ export interface Publication {
 interface DataSet {
   id: string;
   title: string;
-  description: string;
-  timePeriods: {
-    start: string;
-    end: string;
+  summary: string;
+  latestVersion: {
+    totalResults: number;
+    timePeriods: {
+      start: string;
+      end: string;
+    };
+    geographicLevels: string[];
   };
-  geographicLevels: string[];
 }
 
 export interface Paged<T> {
@@ -200,7 +203,7 @@ class PublicApiService {
     };
   }
 
-  getDataSetsMeta(dataSetId: string) {
+  getDataSetMeta(dataSetId: string) {
     const { response, json } = this.client.get<DataSetMeta>(
       `/v1/data-sets/${dataSetId}/meta`,
     );
