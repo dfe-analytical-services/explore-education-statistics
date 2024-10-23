@@ -1,5 +1,5 @@
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 import render from '@common-test/render';
@@ -146,6 +146,27 @@ describe('DataFileUploadForm', () => {
           selector: '#dataFileUploadForm-bulkZipFile-error',
         }),
       ).toBeInTheDocument();
+    });
+  });
+
+  test('shows bulk upload plan modal when upload button is clicked', async () => {
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
+
+    const file = new File(['hello, world!'], 'test.zip', {
+      type: 'application/zip',
+    });
+
+    await user.click(screen.getByLabelText('Bulk ZIP upload'));
+    await user.upload(screen.getByLabelText('Upload bulk ZIP file'), file);
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Upload data files',
+      }),
+    );
+
+    await waitFor(() => {
+      const modal = within(screen.getByRole('dialog'));
+      expect(modal.getByText('Upload summary')).toBeInTheDocument();
     });
   });
 

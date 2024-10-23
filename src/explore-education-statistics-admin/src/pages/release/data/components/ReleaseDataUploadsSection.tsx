@@ -56,9 +56,11 @@ const ReleaseDataUploadsSection = ({
   const [activeFileIds, setActiveFileIds] = useState<string[]>();
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
 
-  const { data: initialDataFiles = [], isLoading } = useQuery(
-    releaseDataFileQueries.list(releaseId),
-  );
+  const {
+    data: initialDataFiles = [],
+    isLoading,
+    refetch: refetchDataFiles,
+  } = useQuery(releaseDataFileQueries.list(releaseId));
 
   // Store the data files on state so we can reliably update them
   // when the permissions/status change.
@@ -152,10 +154,7 @@ const ReleaseDataUploadsSection = ({
           break;
       }
       setActiveFileIds(newFiles.map(file => file.id));
-      setDataFiles(currentDataFiles =>
-        // double reverse keeps *new* files as uniq item and at the end of the list
-        reverse(uniqBy(reverse([...currentDataFiles, ...newFiles]), 'title')),
-      );
+      refetchDataFiles();
     },
     [releaseId],
   );
@@ -191,7 +190,11 @@ const ReleaseDataUploadsSection = ({
         </ul>
       </InsetText>
       {canUpdateRelease ? (
-        <DataFileUploadForm dataFiles={dataFiles} onSubmit={handleSubmit} />
+        <DataFileUploadForm
+          dataFiles={dataFiles}
+          releaseId={releaseId}
+          onSubmit={handleSubmit}
+        />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.
