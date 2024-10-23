@@ -10,6 +10,16 @@ export interface EnvironmentAndUsers {
 export default function getEnvironmentAndUsersFromFile(
   environmentName: string,
 ): EnvironmentAndUsers {
-  const environmentAndUsersFilePath = `.environment-details.${environmentName}.json`;
-  return JSON.parse(open(environmentAndUsersFilePath)) as EnvironmentAndUsers;
+  const environmentFilePath = `.env.${environmentName}.json`;
+  const environment = JSON.parse(open(environmentFilePath)) as Environment;
+
+  const loginCredentialsPath = `.login-tokens.${environmentName}.json`;
+  const loginCredentials = JSON.parse(
+    open(loginCredentialsPath),
+  ) as AuthDetails[];
+
+  return {
+    environment,
+    users: loginCredentials,
+  };
 }

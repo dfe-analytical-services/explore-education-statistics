@@ -99,10 +99,10 @@ sudo ufw allow from 172.30.0.0/24 to any port 5031 # Keycloak
 #### Obtain auth tokens for Admin testing and data creation during test setup
 
 This step is only required if running performance tests that require access to the Admin API.
-It requires the above step of creating environment-specific .env.json files first.
+It requires the above step of creating environment-specific .env.<environment>.json files first.
 
 ```bash
-npm run store-environment-details --environment=<environment> --users=<user names>
+npm run login --environment=<environment> --users=<user names>
 ``` 
 
 This obtains an `access_token` and a `refresh_token` that can be used to access protected resources
@@ -113,14 +113,16 @@ This will look in the `.env.<environment>.json` file for a user with `"name": "<
 that user's credentials to log into Admin in order to obtain their auth tokens.
 
 Details of the environment and the users' access tokens can then be found in a generated file
-named `dist/.environment-details.<environment>.json`. This file is then used by the tests
+named `dist/.login-tokens.<environment>.json`. This file is then used by the tests
 themselves to run against the same environment.
 
 As a concrete example:
 
 ```bash
-npm run store-environment-details --environment=local --users=bau1
+npm run login --environment=local --users=bau1
 ```
+
+will store access and refresh tokens for the user `bau1` against the local environment.
 
 #### Run individual tests
 
@@ -351,7 +353,7 @@ Run the following to test that the environment under test supports refresh token
 in your `.env.<environment>.json file).
 
 ```bash
-npm run store-environment-details --environment=<environment> --users=bau1)
+npm run login --environment=<environment> --users=bau1)
 npm run test dist/refreshTokens.test.js --environment=local
 ```
 
