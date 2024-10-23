@@ -14,7 +14,7 @@ export default function getEnvironmentAndUsersFromFile(
   const environment = JSON.parse(open(environmentFilePath))
     .environment as Environment;
 
-  const loginCredentialsPath = `.login-tokens.${environmentName}.json`;
+  const loginCredentialsPath = `.auth-tokens.${environmentName}.json`;
   const loginCredentials = JSON.parse(
     open(loginCredentialsPath),
   ) as AuthDetails[];

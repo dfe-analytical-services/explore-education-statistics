@@ -47,7 +47,7 @@ const writeLoginCredentialsToFile = async (
     }),
   );
 
-  const loginCredentialsFilePath = `/home/node/app/dist/.login-tokens.${environmentName}.json`;
+  const loginCredentialsFilePath = `/home/node/app/dist/.auth-tokens.${environmentName}.json`;
   fs.writeFileSync(loginCredentialsFilePath, JSON.stringify(authTokens));
 };
 
