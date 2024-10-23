@@ -3,4 +3,3 @@ packages:
   - 'src/explore-education-statistics-ckeditor'
   - 'src/explore-education-statistics-common'
   - 'src/explore-education-statistics-frontend'
-  - 'tests/performance-tests'
