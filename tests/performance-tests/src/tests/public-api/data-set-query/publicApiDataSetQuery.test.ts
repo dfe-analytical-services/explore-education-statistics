@@ -25,6 +25,10 @@ export const individualQuerySpeedTrend = new Trend(
   'ees_public_api_individual_query_speed',
   true,
 );
+export const individualQueryResponseRowsTrend = new Trend(
+  'ees_public_api_individual_query_response_rows',
+  false,
+);
 export const individualQueryRequestCount = new Counter(
   'ees_public_api_individual_query_request_count',
 );
@@ -139,44 +143,32 @@ const performTest = ({ publications }: SetupData) => {
 
   const query = queryGenerator.generateQuery(dataSetMeta);
 
-  let totalResultsReturned = 0;
-  let totalPagesReturned = 0;
-  let allResultsFound = false;
-  let currentPage = 1;
-
   const startTime = Date.now();
 
   try {
-    while (!allResultsFound) {
-      individualQueryRequestCount.add(1);
+    individualQueryRequestCount.add(1);
 
-      const { results } = publicApiService.queryDataSet({
-        dataSetId: dataSetMeta.id,
-        query,
-        page: currentPage,
-      });
+    const { results } = publicApiService.queryDataSet({
+      dataSetId: dataSetMeta.id,
+      query,
+    });
 
-      const requestTime = Date.now() - startTime;
+    const requestTime = Date.now() - startTime;
 
-      individualQuerySpeedTrend.add(requestTime);
-      individualQueryCompleteCount.add(1);
+    individualQuerySpeedTrend.add(requestTime);
+    individualQueryCompleteCount.add(1);
+    individualQueryResponseRowsTrend.add(results.results.length);
 
-      totalPagesReturned += 1;
-      totalResultsReturned += results.results.length;
+    const totalResponsesTimeMillis = Date.now() - startTime;
 
-      if (results.paging.totalResults === 0) {
-        allResultsFound = true;
-      } else if (results.paging.page === results.paging.totalPages) {
-        allResultsFound = true;
-      } else if (
-        dataSetConfig.maxResultsPerDataSet &&
-        totalResultsReturned >= dataSetConfig.maxResultsPerDataSet
-      ) {
-        allResultsFound = true;
-      } else {
-        currentPage += 1;
-      }
-    }
+    logQueryResponse({
+      publication,
+      dataSetName: dataSetMeta.name,
+      query,
+      totalResultsReturned: results.results.length,
+      totalPagesReturned: 1,
+      totalResponsesTimeMillis,
+    });
   } catch (error: unknown) {
     if (isRefinedResponse(error)) {
       if (error.error_code === 1211) {
@@ -208,10 +200,7 @@ const performTest = ({ publications }: SetupData) => {
     } else {
       logErrorObject(error);
 
-      const url = publicApiService.getDataSetQueryUrl({
-        dataSetId: dataSetMeta.id,
-        page: currentPage,
-      });
+      const url = `/v1/data-sets/${dataSetMeta.id}/query`;
 
       queryFailureCount.add(1);
       errorRate.add(1);
@@ -223,20 +212,7 @@ const performTest = ({ publications }: SetupData) => {
         requestBody: query,
       });
     }
-
-    return;
   }
-
-  const totalResponsesTimeMillis = Date.now() - startTime;
-
-  logQueryResponse({
-    publication,
-    dataSetName: dataSetMeta.name,
-    query,
-    totalResultsReturned,
-    totalPagesReturned,
-    totalResponsesTimeMillis,
-  });
 };
 
 export const teardown = ({ testConfig }: SetupData) => {

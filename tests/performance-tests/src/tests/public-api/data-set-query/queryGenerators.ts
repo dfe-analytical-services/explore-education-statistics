@@ -55,14 +55,14 @@ class DataSetQueryGenerator {
     this.comparableOperators = comparableOperators;
   }
 
-  generateQuery(dataSetMeta: DataSetMeta) {
+  generateQuery(dataSetMeta: DataSetMeta): DataSetQueryRequest {
     const indicatorRange = new Range(0.1, 0.5);
     const indicators = pickRandomItems(
       dataSetMeta.indicators,
       Math.min(indicatorRange.random(), this.maxArrayItems),
     );
     return {
-      facets: this.generateDataSetQueryNode({
+      criteria: this.generateDataSetQueryNode({
         dataSetMeta,
         currentDepth: 1,
       }),
@@ -105,8 +105,8 @@ class DataSetQueryGenerator {
     }
   }
 
-  private generateIdListClause(
-    idList: string[],
+  private generateIdListClause<T>(
+    idList: T[],
     range: Range,
   ): DataSetQueryIdPredicate {
     const operator = pickRandom(this.idOperators);
@@ -179,13 +179,18 @@ class DataSetQueryGenerator {
     const timePeriodsRange = new Range(0.1, 0.5);
     const geographicLevelRange = new Range(0.1, 0.5);
 
-    const flatLocations = Object.values(dataSetMeta.locations)
-      .flat()
-      .map(l => l.id);
+    const flatLocations = dataSetMeta.locations.flatMap(locationLevel =>
+      locationLevel.options.map(locationOption => ({
+        level: locationLevel.level.code,
+        id: locationOption.id,
+      })),
+    );
+
     const flatFilterItems = pickRandomItems(
       dataSetMeta.filters,
       filterRange.random(),
     ).flatMap(f => f.options);
+
     const availableGeographicLevels = Object.keys(dataSetMeta.locations);
 
     const filterItems = this.generateIdListClause(
@@ -203,7 +208,10 @@ class DataSetQueryGenerator {
       : undefined;
 
     const timePeriods = this.generateComparableListClause(
-      dataSetMeta.timePeriods,
+      dataSetMeta.timePeriods.map(tp => ({
+        code: tp.code,
+        period: tp.period,
+      })),
       timePeriodsRange,
     );
 

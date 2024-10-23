@@ -20,8 +20,6 @@ const queries = (__ENV.QUERIES ?? 'simple') as 'simple' | 'complex';
 
 const limitToDataSetTitles = __ENV.DATA_SET_TITLES?.split(',');
 const maxDataSetRows = parseIntOptional(__ENV.DATA_SET_MAX_ROWS);
-const maxResultsToReturnPerDataSet =
-  parseIntOptional(__ENV.MAX_RESULTS_PER_DATA_SET) || 10000;
 
 function getOptions(): Options {
   switch (profile) {
@@ -84,7 +82,6 @@ function getQueryConfig(): QueryGeneratorConfig {
 export interface DataSetConfig {
   limitToTitles?: string[];
   maxRows?: number;
-  maxResultsPerDataSet?: number;
 }
 
 export interface Config {
@@ -99,7 +96,6 @@ const config: Config = {
   dataSetConfig: {
     limitToTitles: limitToDataSetTitles,
     maxRows: maxDataSetRows,
-    maxResultsPerDataSet: maxResultsToReturnPerDataSet,
   },
 };
 

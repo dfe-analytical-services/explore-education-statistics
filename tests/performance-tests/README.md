@@ -94,6 +94,7 @@ sudo ufw allow from 172.30.0.0/24 to any port 5000 # Data API
 sudo ufw allow from 172.30.0.0/24 to any port 5010 # Content API
 sudo ufw allow from 172.30.0.0/24 to any port 5021 # Admin site / Admin API
 sudo ufw allow from 172.30.0.0/24 to any port 5031 # Keycloak
+sudo ufw allow from 172.30.0.0/24 to any port 5051 # Public API
 ```
 
 #### Obtain auth tokens for Admin testing and data creation during test setup
@@ -298,19 +299,6 @@ by the tests can be filtered down however using the following parameters:
   data sets during the run. The default value is undefined, which does not filter data sets by title.
 * DATA_SET_MAX_ROWS - the maximum number of rows for data sets to be used in this run. The default value
   is undefined, which does not filter data sets by their size.
-
-##### Max results per data set
-
-This test can be configured to bring back a certain amount of query results for any data set being
-queried. This may require more than one query depending on the number of results desired and the
-page size of the query response being used.
-
-* MAX_RESULTS_PER_DATA_SET - the maximum results to retrieve for a data set being queried. For instance,
-  if 20,000 is configured, it would result in 2 queries of the data set for page 1 and 2 at a page size
-  of 10,000 results (assuming that there were at least 20,000 results that matched the query).
-
-`npm run test dist/publicApiDataSetQuery.test.js --environment=dev --
--e PROFILE=load -e QUERIES=complex -e DATA_SET_MAX_ROWS=500000`
 
 ## Transpiling and Bundling
 

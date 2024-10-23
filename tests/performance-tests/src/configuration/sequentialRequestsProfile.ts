@@ -21,5 +21,6 @@ export default function sequentialRequestProfile(
   return {
     duration: `${mainStageDurationMinutes}m`,
     vus: 1,
+    insecureSkipTLSVerify: true,
   };
 }

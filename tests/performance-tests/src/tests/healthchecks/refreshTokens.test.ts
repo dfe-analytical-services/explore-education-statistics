@@ -17,7 +17,7 @@ export const errorRate = new Rate('errors');
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
-const { adminUrl, refreshTokenUrl } = environmentAndUsers.environment;
+const { adminUrl } = environmentAndUsers.environment;
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
