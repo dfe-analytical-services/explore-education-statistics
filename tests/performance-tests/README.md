@@ -1,6 +1,6 @@
 # EES performance tests
 
-The performance test suite is built using [k6](https://k6.io/) and visualised using 
+The performance test suite is built using [k6](https://k6.io/) and visualised using
 [Grafana](https://grafana.com/) and [InfluxDB](https://www.influxdata.com/).
 
 ## How it works
@@ -50,11 +50,12 @@ some load, for example.
 npm start
 ```
 
-To stop them later, run `npm stop`. Note that this will not destroy any data. To remove any data, run `npm run stop-and-clear-data`. 
+To stop them later, run `npm stop`. Note that this will not destroy any data. To remove any data,
+run `npm run stop-and-clear-data`.
 
 ### Compile the tests
 
-The tests are written in Typescript so we need to transpile them to work in K6 (which as an aside is 
+The tests are written in Typescript so we need to transpile them to work in K6 (which as an aside is
 Go-based, not Node JS-based). We use Webpack and Babel for this.
 
 ```bash
@@ -64,7 +65,7 @@ npm run webpack # use "npm run webpack watch" instead if wanting to continue run
 
 ### Run the tests
 
-#### Create environment-specific .env.<environment>.json files 
+#### Create environment-specific .env.<environment>.json files
 
 This step is only required if running performance tests that require access to the Admin API.
 These files will store environment-specific user credentials for accessing Admin.
@@ -76,15 +77,15 @@ be any value that we can load test against. As an example, if doing load testing
 development against a local environment, we would create a file called
 `tests/performance-tests/.env.local.json` and supply the local user credentials within the file.
 
-#### Allow access to host ports from containers 
+#### Allow access to host ports from containers
 
 This step is only required if running performance tests locally against the host machine.
 
 If running Ubuntu and running the tests against your local machine, ports under test from K6
 will be protected by default by `Ubuntu Firewall`.
 
-To grant access to these ports from containers on the 
-[K6 subnet as defined in docker-compose.yml](docker-compose.yml), 
+To grant access to these ports from containers on the
+[K6 subnet as defined in docker-compose.yml](docker-compose.yml),
 run the following commands:
 
 ```bash
@@ -92,7 +93,7 @@ sudo ufw allow from 172.30.0.0/24 to any port 3000 # Public site
 sudo ufw allow from 172.30.0.0/24 to any port 5000 # Data API
 sudo ufw allow from 172.30.0.0/24 to any port 5010 # Content API
 sudo ufw allow from 172.30.0.0/24 to any port 5021 # Admin site / Admin API
-sudo ufw allow from 172.30.0.0/24 to any port 5030 # Keycloak
+sudo ufw allow from 172.30.0.0/24 to any port 5031 # Keycloak
 ```
 
 #### Obtain auth tokens for Admin testing and data creation during test setup
@@ -108,11 +109,11 @@ This obtains an `access_token` and a `refresh_token` that can be used to access 
 in the Admin API. The `refresh_token` allows long-running tests to refresh their access token if
 it's going to expire mid-test.
 
-This will look in the `.env.<environment>.json` file for a user with `"name": "<user name>"` and use 
+This will look in the `.env.<environment>.json` file for a user with `"name": "<user name>"` and use
 that user's credentials to log into Admin in order to obtain their auth tokens.
 
 Details of the environment and the users' access tokens can then be found in a generated file
-named `dist/.environment-details.<environment>.json`. This file is then used by the tests 
+named `dist/.environment-details.<environment>.json`. This file is then used by the tests
 themselves to run against the same environment.
 
 As a concrete example:
@@ -134,8 +135,8 @@ npm run test dist/import.test.js --environment=local
 ```
 
 Each test script is runnable against any environment. They will find existing or set up new
-dependent data before the test's VUs begin running, and will tear down any data that cannot be 
-reused by a subsequent run when the tests finish. This is achieved using K6's `setup()` and 
+dependent data before the test's VUs begin running, and will tear down any data that cannot be
+reused by a subsequent run when the tests finish. This is achieved using K6's `setup()` and
 `teardown()` lifecycles.
 
 ### Monitor the test results
@@ -146,7 +147,7 @@ View the results of real-time or historic test runs by visiting:
 http://localhost:3005/d/ees-dashboard/ees-dashboard?orgId=1&refresh=5s
 ```
 
-This Dashboard shows EES-specific custom metrics, such as the length of time it takes to 
+This Dashboard shows EES-specific custom metrics, such as the length of time it takes to
 complete table tool queries, the stages of progress that importing data files have reached
 so far, and so on.
 
@@ -159,16 +160,16 @@ http://localhost:3005/d/k6/k6-load-testing-results?orgId=1&refresh=5s
 This is an out-of-the-box Grafana / K6 Dashboard that captures general low-level performance
 statistics.
 
-## Command-line test parameters 
+## Command-line test parameters
 
 Some variables are available in certain tests to allow the running of the tests with different
 test data should we need to do so, but without needing to alter the test code. We use environment
-variables to supply the tests with variables using the `-e` flag. All variables have default 
+variables to supply the tests with variables using the `-e` flag. All variables have default
 values to fall back on.
 
-Note that in various tests that deal with file imports, we allow the selection of data files to 
-use with that test on the command line. We can supply large data files as ZIP files using the naming 
-convention of `big-file1.zip`, `big-file2.zip` etc, and place them in the 
+Note that in various tests that deal with file imports, we allow the selection of data files to
+use with that test on the command line. We can supply large data files as ZIP files using the naming
+convention of `big-file1.zip`, `big-file2.zip` etc, and place them in the
 [imports assets folder](src/tests/admin/import/assets). With this naming convention, they will
 be ignored by Git.
 
@@ -192,7 +193,7 @@ for a given duration.
 
 See [rampingRequestRateProfile.ts](src/configuration/rampingRequestRateProfile.ts).
 
-This is typically used for stress testing, where traffic starts from zero requests per minute and 
+This is typically used for stress testing, where traffic starts from zero requests per minute and
 slowly increases over time, to find the point at which the system under test becomes unstable.
 
 * RPS - the rate of requests generated per second at the point of maximum stress (the end of the main
@@ -205,7 +206,7 @@ slowly increases over time, to find the point at which the system under test bec
 See [spikeProfile.ts](src/configuration/spikeProfile.ts).
 
 This is typically used to test sudden spikes in traffic, the immediate effect on the system under test
-and the recovery time post-spike. 
+and the recovery time post-spike.
 
 * PRE_SPIKE_DURATION_MINS - the duration of the stage prior to the traffic spike.
 * SPIKE_DURATION_MINS - the duration of the traffic spike.
@@ -220,7 +221,7 @@ See [sequentialRequestsProfile.ts](src/configuration/sequentialRequestsProfile.t
 This is used to execute the main test script one at a time, with no concurrency. This is
 typically used to be able to measure performance on an individual request basis.
 
-* MAIN_TEST_STAGE_DURATION_MINS - the duration of the main stage of the test. There is no 
+* MAIN_TEST_STAGE_DURATION_MINS - the duration of the main stage of the test. There is no
   cooldown period with this profile.
 
 ### Individual test options
@@ -230,10 +231,10 @@ Full sets of options per test are available below as examples:
 #### import.test.js
 
 * PUBLICATION_TITLE - default value is "import.test.ts".
-* DATA_FILE - default value is "small-file.csv" which is in source control. See notes above on the use 
+* DATA_FILE - default value is "small-file.csv" which is in source control. See notes above on the use
   of large ZIP files.
 
-`npm run test dist/import.test.js --environment=dev --users=bau1 -- 
+`npm run test dist/import.test.js --environment=dev --users=bau1 --
 -e PUBLICATION_TITLE="Import publication" -e DATA_FILE="big-file1.zip"`
 
 #### getReleasePage.test.js
@@ -245,7 +246,7 @@ This test supports various different performance testing scenarios.
 * PROFILE - supported values are "load", "stress", "spike", "sequential".
 
 Each of these profiles has a default set of configuration out-of-the-box. They can however be
-fine-tuned further using the common override parameters defined in 
+fine-tuned further using the common override parameters defined in
 [Common load profiles](#common-load-profiles).
 
 #### publicTableBuilderQuery.test.js
@@ -275,12 +276,12 @@ This test supports various different performance testing scenarios.
 * PROFILE - supported values are "load", "stress", "spike", "sequential".
 
 Each of these profiles has a default set of configuration out-of-the-box. They can however be
-fine-tuned further using the common override parameters defined in 
+fine-tuned further using the common override parameters defined in
 [Common load profiles](#common-load-profiles).
 
 ##### Query generation
 
-This test generates queries for the Public API. There are 2 out-of-the-box scenarios for the types of 
+This test generates queries for the Public API. There are 2 out-of-the-box scenarios for the types of
 queries that can be generated:
 
 * QUERIES - default value is "simple", which generates simple small queries. Other value is "complex"
@@ -288,23 +289,23 @@ queries that can be generated:
 
 ##### Data set selection
 
-This test by default targets any data sets that are discoverable via the Public API. The data sets used 
+This test by default targets any data sets that are discoverable via the Public API. The data sets used
 by the tests can be filtered down however using the following parameters:
 
 * DATA_SET_TITLES - a comma-separated list of data set titles, which will cause the test to only use those
-  data sets during the run. The default value is undefined, which does not filter data sets by title. 
-* DATA_SET_MAX_ROWS - the maximum number of rows for data sets to be used in this run. The default value 
+  data sets during the run. The default value is undefined, which does not filter data sets by title.
+* DATA_SET_MAX_ROWS - the maximum number of rows for data sets to be used in this run. The default value
   is undefined, which does not filter data sets by their size.
 
 ##### Max results per data set
 
-This test can be configured to bring back a certain amount of query results for any data set being 
-queried. This may require more than one query depending on the number of results desired and the 
+This test can be configured to bring back a certain amount of query results for any data set being
+queried. This may require more than one query depending on the number of results desired and the
 page size of the query response being used.
 
 * MAX_RESULTS_PER_DATA_SET - the maximum results to retrieve for a data set being queried. For instance,
-  if 20,000 is configured, it would result in 2 queries of the data set for page 1 and 2 at a page size 
-  of 10,000 results (assuming that there were at least 20,000 results that matched the query). 
+  if 20,000 is configured, it would result in 2 queries of the data set for page 1 and 2 at a page size
+  of 10,000 results (assuming that there were at least 20,000 results that matched the query).
 
 `npm run test dist/publicApiDataSetQuery.test.js --environment=dev --
 -e PROFILE=load -e QUERIES=complex -e DATA_SET_MAX_ROWS=500000`
@@ -315,33 +316,33 @@ The tests are written in Typescript so we need to transpile them to work in K6 (
 Go-based, not Node JS-based). By default, k6 can only run ES5.1 JavaScript code. To use TypeScript, we
 set up a bundler that converts TypeScript to JavaScript code.
 
-If you want to learn more, check out 
+If you want to learn more, check out
 [Bundling node modules in k6](https://k6.io/docs/using-k6/modules#bundling-node-modules).
 
-We also have some Typescript Node scripts that are used directly by Node.js that require bundling and 
+We also have some Typescript Node scripts that are used directly by Node.js that require bundling and
 transpiling in the same fashion.
 
 ## Troubleshooting
 
 ### Exceptions and stacktraces in Typescript code
 
-We can use source maps to be able to trace errors back to the original Typescript source when 
-encountering errors in transpiled Javascript code. This is provided via the `source-map-support` 
+We can use source maps to be able to trace errors back to the original Typescript source when
+encountering errors in transpiled Javascript code. This is provided via the `source-map-support`
 package.
 
-To enable this in Node, we can supply the `-r source-map-support/register` option whilst running the 
+To enable this in Node, we can supply the `-r source-map-support/register` option whilst running the
 problem script. For example:
 
 ```bash
 node -r source-map-support/register dist/logAuthTokens.js local bau1
 ```
 
-would result in stacktraces that point back to the original `src/auth/logAuthTokens.ts` Typescript 
+would result in stacktraces that point back to the original `src/auth/logAuthTokens.ts` Typescript
 file.
 
 ### Healthcheck tests
 
-We have some test scripts that ascertain that the infrastructure of the environment we're testing 
+We have some test scripts that ascertain that the infrastructure of the environment we're testing
 against and our own utils and helper scripts are behaving themselves.
 
 #### Refresh token support
@@ -370,9 +371,9 @@ The output should look like:
 
 ### Client-side errors when generating load
 
-Errors can be encountered when generating load from a host machine due to insufficient resources. K6 has 
+Errors can be encountered when generating load from a host machine due to insufficient resources. K6 has
 a guide for [running large tests](https://k6.io/docs/testing-guides/running-large-tests/) which makes some
-suggestions as to how to fine-tune a machine for load generation. The following settings changes can make 
+suggestions as to how to fine-tune a machine for load generation. The following settings changes can make
 a big difference on a Linux machine:
 
 As root:

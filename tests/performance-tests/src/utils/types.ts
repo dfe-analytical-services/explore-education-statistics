@@ -70,4 +70,9 @@ export interface Publication {
   themeId: string;
 }
 
+export interface Theme {
+  id: string;
+  title: string;
+}
+
 export default {};

@@ -43,7 +43,7 @@ export const getAuthTokens = async (
   await page.goto(adminUrl);
 
   await page.waitForXPath('//*[.="Sign in"]', {
-    timeout: 5000,
+    timeout: 10000,
   });
 
   await page.click('button[class="govuk-button govuk-button--start"]');
@@ -61,15 +61,35 @@ export const getAuthTokens = async (
     }
 
     return await page.evaluate(() => {
+      let idToken = '';
+      let accessToken = '';
+      let refreshToken = '';
+      let expiry = 0;
+
       for (let i = 0; i < localStorage.length; i += 1) {
         const key = localStorage.key(i) as string;
-        const value = localStorage.getItem(key) as string;
-        const json = JSON.parse(value);
-        if (json.access_token) {
-          return json;
+        const json = JSON.parse(localStorage.getItem(key) as string);
+
+        if (key.includes('-accesstoken-')) {
+          accessToken = json.secret;
+          expiry = json.expiresOn;
+        }
+
+        if (key.includes('-refreshtoken-')) {
+          refreshToken = json.secret;
+        }
+
+        if (key.includes('-idtoken-')) {
+          idToken = json.secret;
         }
       }
-      return null;
+
+      return {
+        id_token: idToken,
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        expires_at: new Date(expiry * 1000),
+      };
     });
   } finally {
     await browser.close();
@@ -83,7 +103,7 @@ const getAuthTokensAzure = async (
 ) => {
   await page.waitForXPath("//*[.='Sign in']", {
     visible: true,
-    timeout: 5000,
+    timeout: 10000,
   });
 
   const emailInput = await page.$x("//*[@name='loginfmt']");
@@ -96,7 +116,7 @@ const getAuthTokensAzure = async (
   try {
     await page.waitForXPath("//*[.='Enter password']", {
       visible: true,
-      timeout: 5000,
+      timeout: 10000,
     });
   } catch (e) {
     const content = await page.content();
@@ -121,7 +141,7 @@ const getAuthTokensAzure = async (
   try {
     await page.waitForXPath("//*[.='Stay signed in?']", {
       visible: true,
-      timeout: 5000,
+      timeout: 10000,
     });
   } catch (e) {
     const content = await page.content();
@@ -152,7 +172,7 @@ const getAuthTokensKeycloak = async (
 ) => {
   await page.waitForXPath("//*[contains(text(), 'Sign in to your account')]", {
     visible: true,
-    timeout: 5000,
+    timeout: 10000,
   });
 
   const emailInput = await page.$x("//*[@id='username']");
@@ -166,7 +186,7 @@ const getAuthTokensKeycloak = async (
 
   await page.waitForXPath("//*[.='Dashboard']", {
     visible: true,
-    timeout: 5000,
+    timeout: 10000,
   });
 };
 

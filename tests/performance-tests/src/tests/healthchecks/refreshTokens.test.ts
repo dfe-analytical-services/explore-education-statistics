@@ -17,7 +17,7 @@ export const errorRate = new Rate('errors');
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
-const { adminUrl } = environmentAndUsers.environment;
+const { adminUrl, refreshTokenUrl } = environmentAndUsers.environment;
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
@@ -42,11 +42,7 @@ const performTest = () => {
 
   const refreshedTokens1 = refreshAuthTokens({
     userName,
-    adminUrl,
-    clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
-    clientSecret: '',
     refreshToken: authTokens.refreshToken,
-    supportsRefreshTokens: true,
   });
 
   if (
@@ -93,11 +89,7 @@ const performTest = () => {
 
   const refreshedTokens2 = refreshAuthTokens({
     userName,
-    adminUrl,
-    clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
-    clientSecret: '',
     refreshToken: refreshedTokens1.authTokens.refreshToken,
-    supportsRefreshTokens: true,
   });
 
   if (

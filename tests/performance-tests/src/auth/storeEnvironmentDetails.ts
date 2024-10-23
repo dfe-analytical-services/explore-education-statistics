@@ -16,9 +16,12 @@ export interface Environment {
   contentApiUrl: string;
   dataApiUrl: string;
   publicApiUrl: string;
-  idp: IdpOption;
   users: User[];
-  supportsRefreshTokens: boolean;
+  idp: IdpOption;
+  openIdConnect: {
+    clientId: string;
+    refreshTokenUrl: string;
+  };
 }
 
 const getEnvironmentAndUsers = async (
