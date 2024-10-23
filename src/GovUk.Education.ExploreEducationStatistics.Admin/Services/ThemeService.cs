@@ -1,10 +1,10 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -16,6 +16,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -28,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ThemeService : IThemeService
     {
         private readonly ContentDbContext _contentDbContext;
+        private readonly PublicDataDbContext _publicDataDbContext;
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
@@ -35,10 +38,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPublishingService _publishingService;
         private readonly IReleaseService _releaseService;
         private readonly bool _themeDeletionAllowed;
+        private readonly Func<List<ReleaseVersion>, List<ReleaseVersionAndDataSetVersions>> _releaseVersionAndDataSetVersionGetter;
 
         public ThemeService(
             IOptions<AppOptions> appOptions,
             ContentDbContext contentDbContext,
+            PublicDataDbContext publicDataDbContext,
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
@@ -47,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseService releaseService)
         {
             _contentDbContext = contentDbContext;
+            _publicDataDbContext = publicDataDbContext;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
@@ -213,17 +219,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             // Some Content Db Releases may be soft-deleted and therefore not visible.
             // Ignore the query filter to make sure they are found
-            var releaseVersionIdsToDelete = await _contentDbContext
+            var releaseVersionsToDelete = await _contentDbContext
                 .ReleaseVersions
+                .AsNoTracking()
                 .IgnoreQueryFilters()
+                .Include(rv => rv.Release)
                 .Where(rv => rv.PublicationId == publicationId)
-                .Select(rv => new IdAndPreviousVersionIdPair<string>(rv.Id.ToString(),
-                    rv.PreviousVersionId != null ? rv.PreviousVersionId.ToString() : null))
                 .ToListAsync();
 
-            var releaseVersionIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
-                .Sort(releaseVersionIdsToDelete)
-                .Select(ids => Guid.Parse(ids.Id))
+            var releaseVersionsAndDataSetVersions = await releaseVersionsToDelete
+                .ToAsyncEnumerable()
+                .SelectAwait(async rv =>
+                {
+                    var releaseFileIds = await _contentDbContext
+                        .ReleaseFiles
+                        .Where(rf => rf.ReleaseVersionId == rv.Id)
+                        .Select(rf => rf.Id)
+                        .ToListAsync();
+
+                    var dataSetVersions = await _publicDataDbContext
+                        .DataSetVersions
+                        .Where(dsv => releaseFileIds.Contains(dsv.Release.ReleaseFileId))
+                        .ToListAsync();
+
+                    return new ReleaseVersionAndDataSetVersions(
+                        ReleaseVersion: rv,
+                        DataSetVersions: dataSetVersions);
+                })
+                .ToListAsync();
+
+            var releaseVersionIdsInDeleteOrder = releaseVersionsAndDataSetVersions
+                .Order(new DependentReleaseVersionDeleteOrderComparator())
+                .Select(rv => rv.ReleaseVersion.Id)
                 .ToList();
 
             return await releaseVersionIdsInDeleteOrder
@@ -305,6 +332,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(publication => publication.Theme)
                 .Distinct()
                 .ToListAsync();
+        }
+    }
+
+    public record ReleaseVersionAndDataSetVersions(
+        ReleaseVersion ReleaseVersion,
+        List<DataSetVersion> DataSetVersions);
+
+    public class DependentReleaseVersionDeleteOrderComparator : IComparer<ReleaseVersionAndDataSetVersions>
+    {
+        public int Compare(ReleaseVersionAndDataSetVersions? version1, ReleaseVersionAndDataSetVersions? version2)
+        {
+            if (version1 == null || version2 == null)
+            {
+                return Comparer<ReleaseVersionAndDataSetVersions>.Default.Compare(version1, version2);
+            }
+
+            var releaseVersion1 = version1.ReleaseVersion;
+            var releaseVersion2 = version2.ReleaseVersion;
+            
+            // Compare ReleaseVersions if they both belong to the same Release ancestry.
+            if (releaseVersion1.ReleaseId == releaseVersion2.ReleaseId)
+            {
+                // Delete the most recent version first.
+                if (releaseVersion1.Version != releaseVersion2.Version)
+                {
+                    return -releaseVersion1.Version.CompareTo(releaseVersion2.Version);
+                }
+
+                // Delete non-cancelled ReleaseVersions first.
+                if (releaseVersion1.SoftDeleted != releaseVersion2.SoftDeleted)
+                {
+                    return releaseVersion1.SoftDeleted ? 1 : 0;
+                }
+
+                return -releaseVersion1.Created.CompareTo(releaseVersion2.Created);
+            }
+
+            // If one ReleaseVersion contains a later version of a Public API DataSet than the other, order it
+            // towards the top of the list so that it is deleted prior to a previous version of that DataSet
+            // being deleted.
+            foreach (var dataSetVersion in version1.DataSetVersions)
+            {
+                var matchingDataSetVersion = version2
+                    .DataSetVersions
+                    .SingleOrDefault(dsv2 => dsv2.DataSetId == dataSetVersion.DataSetId);
+
+                if (matchingDataSetVersion == null)
+                {
+                    continue;
+                }
+
+                return -dataSetVersion.SemVersion().ComparePrecedenceTo(matchingDataSetVersion.SemVersion());
+            }
+
+            // Fall back to deleting the ReleaseVersion from the newest Release series first.
+            return -releaseVersion1.Release.Created.CompareTo(releaseVersion2.Release.Created);
         }
     }
 }
