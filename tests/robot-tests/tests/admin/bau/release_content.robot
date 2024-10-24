@@ -67,10 +67,10 @@ Add release note to release
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
 Add Useful information related page link to release
-    user clicks button    Add related page link
+    user clicks button    Add related page
     user enters text into element    id:relatedPageForm-description    Test link one
     user enters text into element    id:relatedPageForm-url    http://test1.example.com/test1
-    user clicks button    Create link    id:relatedPageForm
+    user clicks button    Save    id:relatedPageForm
     user checks page does not contain element    id:${SECONDARY_STATS_TABLE_TAB_ID}
 
 Add secondary statistics
