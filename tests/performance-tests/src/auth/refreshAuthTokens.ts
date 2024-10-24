@@ -17,7 +17,7 @@ export default function refreshAuthTokens({
   userName,
   refreshToken,
 }: RefreshTokenParams): AuthDetails | undefined {
-  const { openIdConnect } = environmentAndUsers.environment;
+  const { openIdConnect, adminUrl } = environmentAndUsers.environment;
   const { refreshTokenUrl, clientId } = openIdConnect;
 
   const requestBody = {
@@ -26,7 +26,13 @@ export default function refreshAuthTokens({
     refresh_token: refreshToken,
   };
 
-  const response = http.post(refreshTokenUrl, requestBody);
+  const params = {
+    headers: {
+      Origin: adminUrl,
+    },
+  };
+
+  const response = http.post(refreshTokenUrl, requestBody, params);
 
   if (response.status !== 200) {
     console.log(
