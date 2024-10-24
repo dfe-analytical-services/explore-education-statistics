@@ -193,10 +193,13 @@ class DataSetQueryGenerator {
 
     const availableGeographicLevels = Object.keys(dataSetMeta.locations);
 
-    const filterItems = this.generateIdListClause(
-      flatFilterItems.map(fi => fi.id),
-      filterItemRange,
-    );
+    const filterItems =
+      flatFilterItems.length > 0
+        ? this.generateIdListClause(
+            flatFilterItems.map(fi => fi.id),
+            filterItemRange,
+          )
+        : undefined;
 
     const locations = this.generateIdListClause(flatLocations, locationsRange);
 

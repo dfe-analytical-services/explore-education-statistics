@@ -156,6 +156,8 @@ const performTest = ({ publications }: SetupData) => {
 
     const requestTime = Date.now() - startTime;
 
+    console.log(`Query completed in ${requestTime} ms`);
+
     individualQuerySpeedTrend.add(requestTime);
     individualQueryCompleteCount.add(1);
     individualQueryResponseRowsTrend.add(results.results.length);
@@ -189,6 +191,16 @@ const performTest = ({ publications }: SetupData) => {
 
       if (error.error_code >= 1630 && error.error_code <= 1649) {
         http2StreamErrorRate.add(1);
+      }
+
+      if (error.status === 400 || error.status === 500) {
+        console.log('Error from query endpoint.\n');
+        console.log('Metadata was:\n');
+        console.log(JSON.stringify(dataSetMeta, null, 2));
+        console.log('Query was:\n');
+        console.log(JSON.stringify(query, null, 2));
+        console.log('Error was:\n');
+        console.log(JSON.stringify(error, null, 2));
       }
 
       queryFailureCount.add(1);
