@@ -14,10 +14,14 @@ export default function getEnvironmentAndUsersFromFile(
   const environment = JSON.parse(open(environmentFilePath))
     .environment as Environment;
 
-  const loginCredentialsPath = `.auth-tokens.${environmentName}.json`;
-  const loginCredentials = JSON.parse(
-    open(loginCredentialsPath),
-  ) as AuthDetails[];
+  let loginCredentials: AuthDetails[];
+
+  try {
+    const loginCredentialsPath = `.auth-tokens.${environmentName}.json`;
+    loginCredentials = JSON.parse(open(loginCredentialsPath)) as AuthDetails[];
+  } catch {
+    loginCredentials = [];
+  }
 
   return {
     environment,
