@@ -12,6 +12,9 @@ The performance test suite is built using [k6](https://k6.io/) and visualised us
     ```bash
     cd tests/performance-tests
    
+    # Install Node dependencies.
+    pnpm i
+   
     # Copy the default .env JSON file for a local environment.
     cp .env.example.json .env.local.json  
     
