@@ -50,7 +50,7 @@ export interface ChartBuilderFormsContextValue {
   hasSubmitted: boolean;
   isSubmitting: boolean;
   isValid: boolean;
-  submitForms: () => void;
+  submitForms: () => Promise<void>;
   updateForm: (nextState: UpdateFormState) => void;
 }
 

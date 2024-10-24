@@ -2,7 +2,7 @@ import { MapDataSetCategory } from '@common/modules/charts/components/utils/crea
 import generateLegendDataGroups, {
   LegendDataGroup,
 } from '@common/modules/charts/components/utils/generateLegendDataGroups';
-import { DataSetCategoryConfig } from '@common/modules/charts/util/getDataSetCategoryConfigs';
+import { MapDataSetCategoryConfig } from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import generateHslColour from '@common/utils/colour/generateHslColour';
 import {
   MapFeature,
@@ -14,7 +14,7 @@ export default function generateFeaturesAndDataGroups({
   selectedDataSetConfig,
 }: {
   dataSetCategories: MapDataSetCategory[];
-  selectedDataSetConfig: DataSetCategoryConfig;
+  selectedDataSetConfig: MapDataSetCategoryConfig;
 }): {
   features: MapFeatureCollection;
   dataGroups: LegendDataGroup[];
