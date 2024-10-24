@@ -30,7 +30,10 @@ describe('RelatedPagesSection', () => {
         screen.getByRole('heading', { name: 'Related pages' }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: 'Add related page link' }),
+        screen.getByRole('button', { name: 'Add related page' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Edit pages' }),
       ).toBeInTheDocument();
       const pages = screen.getAllByRole('listitem');
       expect(pages).toHaveLength(1);
@@ -39,9 +42,6 @@ describe('RelatedPagesSection', () => {
           name: 'Related information description',
         }),
       ).toHaveAttribute('href', 'https://test.com');
-      expect(
-        within(pages[0]).getByRole('button', { name: 'Remove link' }),
-      ).toBeInTheDocument();
     });
 
     test('renders correctly without related pages', () => {
@@ -54,8 +54,11 @@ describe('RelatedPagesSection', () => {
         screen.getByRole('heading', { name: 'Related pages' }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: 'Add related page link' }),
+        screen.getByRole('button', { name: 'Add related page' }),
       ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Edit pages' }),
+      ).not.toBeInTheDocument();
       expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
     });
 
@@ -67,89 +70,14 @@ describe('RelatedPagesSection', () => {
       );
 
       await user.click(
-        screen.getByRole('button', { name: 'Add related page link' }),
+        screen.getByRole('button', { name: 'Add related page' }),
       );
 
-      expect(screen.getByLabelText('Title')).toBeInTheDocument();
-      expect(screen.getByLabelText('Link URL')).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: 'Create link' }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: 'Cancel' }),
-      ).toBeInTheDocument();
-    });
-
-    test('shows a validation error when no title is set', async () => {
-      const { user } = render(
-        <EditingContextProvider editingMode="edit">
-          <RelatedPagesSection release={testRelease} />
-        </EditingContextProvider>,
-      );
-
-      await user.click(
-        screen.getByRole('button', { name: 'Add related page link' }),
-      );
-
-      await user.click(screen.getByLabelText('Title'));
-      await user.click(screen.getByRole('button', { name: 'Create link' }));
-
-      await waitFor(() => {
-        expect(screen.getByText('There is a problem')).toBeInTheDocument();
-        expect(
-          screen.getByRole('link', {
-            name: 'Enter a link title',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows a validation error when no url is set', async () => {
-      const { user } = render(
-        <EditingContextProvider editingMode="edit">
-          <RelatedPagesSection release={testRelease} />
-        </EditingContextProvider>,
-      );
-
-      await user.click(
-        screen.getByRole('button', { name: 'Add related page link' }),
-      );
-
-      await user.click(screen.getByLabelText('Link URL'));
-      await user.click(screen.getByRole('button', { name: 'Create link' }));
-
-      await waitFor(() => {
-        expect(screen.getByText('There is a problem')).toBeInTheDocument();
-        expect(
-          screen.getByRole('link', {
-            name: 'Enter a link URL',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows a validation error when the url is invalid', async () => {
-      const { user } = render(
-        <EditingContextProvider editingMode="edit">
-          <RelatedPagesSection release={testRelease} />
-        </EditingContextProvider>,
-      );
-
-      await user.click(
-        screen.getByRole('button', { name: 'Add related page link' }),
-      );
-
-      await user.type(screen.getByLabelText('Link URL'), 'Not a url');
-      await user.click(screen.getByRole('button', { name: 'Create link' }));
-
-      await waitFor(() => {
-        expect(screen.getByText('There is a problem')).toBeInTheDocument();
-        expect(
-          screen.getByRole('link', {
-            name: 'Enter a valid link URL',
-          }),
-        ).toBeInTheDocument();
-      });
+      const modal = within(screen.getByRole('dialog'));
+      expect(modal.getByLabelText('Title')).toBeInTheDocument();
+      expect(modal.getByLabelText('Link URL')).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     });
 
     test('successfully adds a link', async () => {
@@ -157,7 +85,7 @@ describe('RelatedPagesSection', () => {
         { ...testRelease.relatedInformation[0] },
         { description: 'Test title', id: 'test-id', url: 'https://gov.uk' },
       ];
-      releaseContentRelatedInformationService.create.mockResolvedValue(
+      releaseContentRelatedInformationService.update.mockResolvedValue(
         newLinks,
       );
 
@@ -168,15 +96,18 @@ describe('RelatedPagesSection', () => {
       );
 
       await user.click(
-        screen.getByRole('button', { name: 'Add related page link' }),
+        screen.getByRole('button', { name: 'Add related page' }),
       );
 
-      await user.type(screen.getByLabelText('Title'), 'Test title');
-      await user.type(screen.getByLabelText('Link URL'), 'https://gov.uk');
-      await user.click(screen.getByRole('button', { name: 'Create link' }));
+      const modal = within(screen.getByRole('dialog'));
+      await user.type(modal.getByLabelText('Title'), 'Test title');
+      await user.type(modal.getByLabelText('Link URL'), 'https://gov.uk');
+      await user.click(modal.getByRole('button', { name: 'Save' }));
 
-      expect(
-        await screen.findByRole('button', { name: 'Add related page link' }),
+      await waitFor(() =>
+        expect(
+          screen.queryByText('Add related page link'),
+        ).not.toBeInTheDocument(),
       );
 
       const pages = screen.getAllByRole('listitem');
@@ -187,21 +118,14 @@ describe('RelatedPagesSection', () => {
         }),
       ).toHaveAttribute('href', 'https://test.com');
       expect(
-        within(pages[0]).getByRole('button', { name: 'Remove link' }),
-      ).toBeInTheDocument();
-
-      expect(
         within(pages[1]).getByRole('link', {
           name: 'Test title',
         }),
       ).toHaveAttribute('href', 'https://gov.uk');
-      expect(
-        within(pages[1]).getByRole('button', { name: 'Remove link' }),
-      ).toBeInTheDocument();
     });
 
     test('successfully removes a link', async () => {
-      releaseContentRelatedInformationService.delete.mockResolvedValue([]);
+      releaseContentRelatedInformationService.update.mockResolvedValue([]);
 
       const { user } = render(
         <EditingContextProvider editingMode="edit">
@@ -209,20 +133,20 @@ describe('RelatedPagesSection', () => {
         </EditingContextProvider>,
       );
 
-      const pages = screen.getAllByRole('listitem');
-      expect(pages).toHaveLength(1);
-      expect(
-        within(pages[0]).getByRole('link', {
-          name: 'Related information description',
-        }),
-      ).toHaveAttribute('href', 'https://test.com');
+      await user.click(screen.getByRole('button', { name: 'Edit pages' }));
+
+      const modal = within(screen.getByRole('dialog'));
 
       await user.click(
-        within(pages[0]).getByRole('button', { name: 'Remove link' }),
+        modal.getByRole('button', {
+          name: 'Remove Related information description',
+        }),
       );
 
       waitFor(() =>
-        expect(screen.queryByRole('listitem')).not.toBeInTheDocument(),
+        expect(
+          modal.queryByText('Related information description'),
+        ).not.toBeInTheDocument(),
       );
     });
   });
@@ -246,10 +170,10 @@ describe('RelatedPagesSection', () => {
       ).toHaveAttribute('href', 'https://test.com');
 
       expect(
-        screen.queryByRole('button', { name: 'Remove link' }),
+        screen.queryByRole('button', { name: 'Add related page' }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: 'Add related page link' }),
+        screen.queryByRole('button', { name: 'Edit pages' }),
       ).not.toBeInTheDocument();
     });
 
@@ -263,7 +187,10 @@ describe('RelatedPagesSection', () => {
         screen.queryByRole('heading', { name: 'Related pages' }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: 'Add related page link' }),
+        screen.queryByRole('button', { name: 'Add related page' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Edit pages' }),
       ).not.toBeInTheDocument();
       expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
     });
