@@ -1,7 +1,9 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
@@ -47,10 +49,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/csv" }
-                    }
+                    new HeaderDictionary { { Accept, "text/csv" } }
                 );
 
             var request = mock.Object;
@@ -65,10 +64,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html" } }
                 );
 
             var request = mock.Object;
@@ -83,10 +79,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html, application/json, text/csv" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html, application/json, text/csv" } }
                 );
 
             var request = mock.Object;
@@ -102,10 +95,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html, application/json" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html, application/json" } }
                 );
 
             var request = mock.Object;
@@ -120,10 +110,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/*" }
-                    }
+                    new HeaderDictionary { { Accept, "text/*" } }
                 );
 
             var request = mock.Object;
@@ -138,10 +125,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "*/*" }
-                    }
+                    new HeaderDictionary { { Accept, "*/*" } }
                 );
 
             var request = mock.Object;
@@ -186,10 +170,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "not valid" }
-                    }
+                    new HeaderDictionary { { Accept, "not valid" } }
                 );
 
             var request = mock.Object;
@@ -204,17 +185,14 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "not valid" }
-                    }
+                    new HeaderDictionary { { Accept, "not valid" } }
                 );
 
             var request = mock.Object;
 
             Assert.Throws<FormatException>(() => request.Accepts("not valid"));
         }
-        
+
         [Fact]
         public void Single_True()
         {
@@ -222,10 +200,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html" } }
                 );
 
             var request = mock.Object;
@@ -241,10 +216,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html" } }
                 );
 
             var request = mock.Object;
@@ -260,10 +232,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/*" }
-                    }
+                    new HeaderDictionary { { Accept, "text/*" } }
                 );
 
             var request = mock.Object;
@@ -280,10 +249,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "*/*" }
-                    }
+                    new HeaderDictionary { { Accept, "*/*" } }
                 );
 
             var request = mock.Object;
@@ -299,10 +265,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html" } }
                 );
 
             var request = mock.Object;
@@ -318,10 +281,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html" } }
                 );
 
             var request = mock.Object;
@@ -338,10 +298,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html" } }
                 );
 
             var request = mock.Object;
@@ -357,10 +314,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/*" }
-                    }
+                    new HeaderDictionary { { Accept, "text/*" } }
                 );
 
             var request = mock.Object;
@@ -376,10 +330,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "*/*" }
-                    }
+                    new HeaderDictionary { { Accept, "*/*" } }
                 );
 
             var request = mock.Object;
@@ -395,10 +346,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html, application/json" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html, application/json" } }
                 );
 
             var request = mock.Object;
@@ -414,10 +362,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html, application/json" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html, application/json" } }
                 );
 
             var request = mock.Object;
@@ -433,10 +378,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "*/*" }
-                    }
+                    new HeaderDictionary { { Accept, "*/*" } }
                 );
 
             var request = mock.Object;
@@ -451,10 +393,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html" } }
                 );
 
             var request = mock.Object;
@@ -469,10 +408,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html" } }
                 );
 
             var request = mock.Object;
@@ -487,10 +423,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html, text/csv" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html, text/csv" } }
                 );
 
             var request = mock.Object;
@@ -505,10 +438,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/html, text/pdf" }
-                    }
+                    new HeaderDictionary { { Accept, "text/html, text/pdf" } }
                 );
 
             var request = mock.Object;
@@ -523,10 +453,7 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "text/csv, application/*" }
-                    }
+                    new HeaderDictionary { { Accept, "text/csv, application/*" } }
                 );
 
             var request = mock.Object;
@@ -541,15 +468,138 @@ public static class HttpRequestExtensionsTests
 
             mock.SetupGet(m => m.Headers)
                 .Returns(
-                    new HeaderDictionary
-                    {
-                        { Accept, "application/*, text/*" }
-                    }
+                    new HeaderDictionary { { Accept, "application/*, text/*" } }
                 );
 
             var request = mock.Object;
 
             Assert.False(request.Accepts(exact: true, "application/json", "text/csv"));
+        }
+    }
+
+    public class GetRequestParamTests
+    {
+        [Fact]
+        public void Success()
+        {
+            var mock = new Mock<HttpRequest>();
+
+            mock.Setup(m => m.Query)
+                .Returns(
+                    new QueryCollection(new Dictionary<string, StringValues> { { "testParam", "testValue" } })
+                );
+
+            var request = mock.Object;
+
+            Assert.Equal("testValue", request.GetRequestParam("testParam"));
+        }
+
+        [Fact]
+        public void Success_NoMatchingRequestParam()
+        {
+            var mock = new Mock<HttpRequest>();
+
+            mock.Setup(m => m.Query)
+                .Returns(
+                    new QueryCollection(new Dictionary<string, StringValues> { { "testParam", "testValue" } })
+                );
+
+            var request = mock.Object;
+
+            Assert.Null(request.GetRequestParam("anotherParam"));
+        }
+
+        [Fact]
+        public void Success_NoMatchingRequestParam_DefaultValue()
+        {
+            var mock = new Mock<HttpRequest>();
+
+            mock.Setup(m => m.Query)
+                .Returns(
+                    new QueryCollection(new Dictionary<string, StringValues> { { "testParam", "testValue" } })
+                );
+
+            var request = mock.Object;
+
+            Assert.Equal("defaultValue", request.GetRequestParam("anotherParam", defaultValue: "defaultValue"));
+        }
+    }
+
+    public class GetRequestParamBoolTests
+    {
+        [Theory]
+        [InlineData("true", false)]
+        [InlineData("true", true)]
+        [InlineData("false", false)]
+        [InlineData("false", true)]
+        public void Success(string? paramValue, bool defaultValue)
+        {
+            var mock = new Mock<HttpRequest>();
+
+            mock.Setup(m => m.Query)
+                .Returns(
+                    new QueryCollection(new Dictionary<string, StringValues> { { "testParam", paramValue } })
+                );
+
+            var request = mock.Object;
+
+            var value = request.GetRequestParamBool("testParam", defaultValue: defaultValue);
+            Assert.Equal(bool.Parse(paramValue), value);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Success_NoMatchingRequestParam(bool defaultValue)
+        {
+            var mock = new Mock<HttpRequest>();
+
+            mock.Setup(m => m.Query)
+                .Returns(
+                    new QueryCollection(new Dictionary<string, StringValues> { { "testParam", "true" } })
+                );
+
+            var request = mock.Object;
+
+            var value = request.GetRequestParamBool("anotherParam", defaultValue);
+            Assert.Equal(defaultValue, value);
+        }
+
+        [Theory]
+        [InlineData("", true)]
+        [InlineData("", false)]
+        [InlineData(null, true)]
+        [InlineData(null, false)]
+        public void Success_EmptyValues_UseDefault(string? paramValue, bool defaultValue)
+        {
+            var mock = new Mock<HttpRequest>();
+
+            mock.Setup(m => m.Query)
+                .Returns(
+                    new QueryCollection(new Dictionary<string, StringValues> { { "testParam", paramValue } })
+                );
+
+            var request = mock.Object;
+
+            var value = request.GetRequestParamBool("testParam", defaultValue);
+            Assert.Equal(defaultValue, value);
+        }
+
+        [Theory]
+        [InlineData("invalid")]
+        [InlineData("1")]
+        public void Failure_NonBooleanStrings(string paramValue)
+        {
+            var mock = new Mock<HttpRequest>();
+
+            mock.Setup(m => m.Query)
+                .Returns(
+                    new QueryCollection(new Dictionary<string, StringValues> { { "testParam", paramValue } })
+                );
+
+            var request = mock.Object;
+
+            Assert.Throws<FormatException>(() => request.GetRequestParamBool("testParam", false));
         }
     }
 }

@@ -90,8 +90,8 @@ Invite Pre-release users
     user clicks link    Pre-release access
     user waits until h2 is visible    Manage pre-release user access
     ${emails}=    Catenate    SEPARATOR=\n
-    ...    simulate-delivered-1@notifications.service.gov.uk
-    ...    simulate-delivered-2@notifications.service.gov.uk
+    ...    simulate-delivered-prerelease-and-amend-1@notifications.service.gov.uk
+    ...    simulate-delivered-prerelease-and-amend-2@notifications.service.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     ${modal}=    user waits until modal is visible    Confirm pre-release invitations
@@ -99,10 +99,10 @@ Invite Pre-release users
     ...    Email notifications will be sent when the release is approved for publication.
 
     user checks list has x items    testid:invitableList    2    ${modal}
-    user checks list item contains    testid:invitableList    1    simulate-delivered-1@notifications.service.gov.uk
-    ...    ${modal}
-    user checks list item contains    testid:invitableList    2    simulate-delivered-2@notifications.service.gov.uk
-    ...    ${modal}
+    user checks list item contains    testid:invitableList    1
+    ...    simulate-delivered-prerelease-and-amend-1@notifications.service.gov.uk    ${modal}
+    user checks list item contains    testid:invitableList    2
+    ...    simulate-delivered-prerelease-and-amend-2@notifications.service.gov.uk    ${modal}
     user clicks button    Confirm
 
 Go to "Sign off" page again
@@ -175,7 +175,7 @@ Invite Pre-release users during amendment
     user clicks link    Pre-release access
     user waits until h2 is visible    Manage pre-release user access
     ${emails}=    Catenate    SEPARATOR=\n
-    ...    simulate-delivered@notifications.service.gov.uk
+    ...    simulate-delivered-prerelease-and-amend-3@notifications.service.gov.uk
     ...    EES-test.ANALYST1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
@@ -184,8 +184,8 @@ Invite Pre-release users during amendment
     ...    Email notifications will be sent when the release is approved for publication.
 
     user checks list has x items    testid:invitableList    2    ${modal}
-    user checks list item contains    testid:invitableList    1    simulate-delivered@notifications.service.gov.uk
-    ...    ${modal}
+    user checks list item contains    testid:invitableList    1
+    ...    simulate-delivered-prerelease-and-amend-3@notifications.service.gov.uk    ${modal}
     user checks list item contains    testid:invitableList    2    EES-test.ANALYST1@education.gov.uk    ${modal}
     user clicks button    Confirm
 
@@ -292,3 +292,11 @@ Validate public prerelease access list as Analyst user
 
     user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
     user waits until page contains    Amended test public access list    %{WAIT_SMALL}
+
+
+*** Keywords ***
+do suite teardown
+    user closes the browser
+    delete user invite via api    simulate-delivered-prerelease-and-amend-1@notifications.service.gov.uk
+    delete user invite via api    simulate-delivered-prerelease-and-amend-2@notifications.service.gov.uk
+    delete user invite via api    simulate-delivered-prerelease-and-amend-3@notifications.service.gov.uk

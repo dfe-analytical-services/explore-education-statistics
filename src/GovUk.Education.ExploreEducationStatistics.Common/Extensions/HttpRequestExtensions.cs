@@ -89,4 +89,29 @@ public static class HttpRequestExtensions
     {
         return httpRequest.Headers.TryGetValue(headerName, out headerValues);
     }
+
+    public static string? GetRequestParam(
+        this HttpRequest httpRequest,
+        string paramName)
+    {
+        return httpRequest.Query[paramName];
+    }
+
+    public static string GetRequestParam(
+        this HttpRequest httpRequest,
+        string paramName,
+        string defaultValue)
+    {
+        var value = GetRequestParam(httpRequest, paramName);
+        return !value.IsNullOrEmpty() ? value! : defaultValue;
+    }
+
+    public static bool GetRequestParamBool(
+        this HttpRequest httpRequest,
+        string paramName,
+        bool defaultValue)
+    {
+        var paramValue = GetRequestParam(httpRequest, paramName, defaultValue + "");
+        return bool.Parse(paramValue);
+    }
 }

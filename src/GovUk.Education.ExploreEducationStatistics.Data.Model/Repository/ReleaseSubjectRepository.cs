@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 // Use raw delete as EF can't correctly figure out how to cascade the delete, whilst the database can.
                 // N.B. This delete will be slow if there are a large number of observations but this is only
                 // executed by the tests when the theme is torn down so ensure files used are < 1000 rows.
-                context.Subject.FromSqlInterpolated($"DELETE Subject WHERE Id = {subjectId}");
+                context.Database.ExecuteSqlInterpolated($"DELETE FROM Subject WHERE Id = {subjectId}");
             }
         }
     }

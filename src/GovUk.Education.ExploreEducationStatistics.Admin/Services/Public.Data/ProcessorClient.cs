@@ -71,10 +71,11 @@ internal class ProcessorClient(
 
     public async Task<Either<ActionResult, Unit>> BulkDeleteDataSetVersions(
         Guid releaseVersionId,
+        bool forceDeleteAll = false,
         CancellationToken cancellationToken = default)
     {
         return await SendDelete(
-            $"api/BulkDeleteDataSetVersions/{releaseVersionId}",
+            $"api/BulkDeleteDataSetVersions/{releaseVersionId}?forceDeleteAll={forceDeleteAll}",
             cancellationToken: cancellationToken);
     }
 

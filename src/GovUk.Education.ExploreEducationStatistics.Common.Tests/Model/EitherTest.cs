@@ -323,7 +323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.True(aggregate.IsLeft);
             Assert.Equal(["failure 1", "failure 2"], aggregate.Left);
         }
-        
+
         [Fact]
         public void AggregateSuccessesAndFailures_MixedFailuresAndSuccess()
         {
@@ -336,6 +336,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             var aggregate = eithers.AggregateSuccessesAndFailures();
             Assert.True(aggregate.IsLeft);
             Assert.Equal(["failure 1"], aggregate.Left);
+        }
+
+        [Fact]
+        public void OnSuccessAllReturnVoid()
+        {
+            var either1 = new Either<int, string>("either1");
+            var either2 = new Either<int, string>("either2");
+            var either3 = new Either<int, string>("either3");
+
+            var eitherList = ListOf(either1, either2, either3);
+
+            var results = eitherList.OnSuccessAllReturnVoid();
+
+            Assert.True(results.IsRight);
+            Assert.Equal(Unit.Instance, results.Right);
+        }
+
+        [Fact]
+        public void OnSuccessAllReturnVoid_Left()
+        {
+            var either1 = new Either<int, string>("either1");
+            var either2 = new Either<int, string>(2);
+            var either3 = new Either<int, string>(3);
+
+            var eitherList = ListOf(either1, either2, either3);
+
+            var results = eitherList.OnSuccessAllReturnVoid();
+
+            Assert.True(results.IsLeft);
+            Assert.Equal(2, results.Left);
         }
     }
 
@@ -1769,33 +1799,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public void OnSuccessAllReturnVoid()
+        public async Task OnSuccessAllReturnVoid()
         {
-            var either1 = new Either<int, string>("either1");
-            var either2 = new Either<int, string>("either2");
-            var either3 = new Either<int, string>("either3");
+            var eitherTask1 = Task.Run(async () =>
+            {
+                await Task.Delay(50);
+                return new Either<int, string>("task1");
+            });
+            var eitherTask2 = Task.Run(async () =>
+            {
+                await Task.Delay(10);
+                return new Either<int, string>("task2");
+            });
+            var eitherTask3 = Task.Run(async () =>
+            {
+                await Task.Delay(30);
+                return new Either<int, string>("task3");
+            });
 
-            var eitherList = ListOf(either1, either2, either3);
+            var eitherList = ListOf(eitherTask1, eitherTask2, eitherTask3);
 
-            var results = eitherList.OnSuccessAllReturnVoid();
+            var results = await eitherList.OnSuccessAllReturnVoid();
 
             Assert.True(results.IsRight);
             Assert.Equal(Unit.Instance, results.Right);
         }
 
         [Fact]
-        public void OnSuccessAllReturnVoid_Left()
+        public async Task OnSuccessAllReturnVoid_Left()
         {
-            var either1 = new Either<int, string>("either1");
-            var either2 = new Either<int, string>(2);
-            var either3 = new Either<int, string>(3);
+            var eitherTask1 = Task.Run(async () =>
+            {
+                await Task.Delay(50);
+                return new Either<int, string>("task1");
+            });
+            var eitherTask2 = Task.Run(async () =>
+            {
+                await Task.Delay(10);
+                return new Either<int, string>(500);
+            });
+            var eitherTask3 = Task.Run(async () =>
+            {
+                await Task.Delay(30);
+                return new Either<int, string>("task3");
+            });
 
-            var eitherList = ListOf(either1, either2, either3);
+            var eitherList = ListOf(eitherTask1, eitherTask2, eitherTask3);
 
-            var results = eitherList.OnSuccessAllReturnVoid();
+            var result = await eitherList.OnSuccessAllReturnVoid();
 
-            Assert.True(results.IsLeft);
-            Assert.Equal(2, results.Left);
+            result.AssertLeft(500);
         }
     }
 }
