@@ -1,13 +1,12 @@
 import useCallbackRef from '@common/hooks/useCallbackRef';
 import useIntersectionObserver from '@common/hooks/useIntersectionObserver';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
-import { DataSetCategoryConfig } from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import {
   MapFeature,
   MapFeatureCollection,
   MapFeatureProperties,
 } from '@common/modules/charts/components/MapBlock';
-
+import { MapDataSetCategoryConfig } from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
 import { FeatureCollection } from 'geojson';
@@ -16,7 +15,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GeoJSON, useMap } from 'react-leaflet';
 
 interface Props {
-  dataSetCategoryConfigs: Dictionary<DataSetCategoryConfig>;
+  dataSetCategoryConfigs: Dictionary<MapDataSetCategoryConfig>;
   features?: MapFeatureCollection;
   selectedFeature?: MapFeature;
   selectedDataSetKey: string;
