@@ -1,5 +1,5 @@
 import refreshAuthTokens from '../auth/refreshAuthTokens';
-import { AuthTokens } from '../auth/getAuthDetails';
+import { AuthTokens } from '../auth/getAuthTokens';
 
 // Note that this would be best invoked from within httpClient.ts prior to any HTTP requests going out.  Currently
 // it is invoked directly from the tests themselves.

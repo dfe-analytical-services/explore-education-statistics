@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import { AuthDetails } from '../auth/getAuthDetails';
+import { AuthDetails } from '../auth/getAuthTokens';
 import { Environment } from '../auth/storeAuthTokens';
 
 export interface EnvironmentAndUsers {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'fs';
 import dotenvJson from 'dotenv-json-complex';
-import getAuthDetails, { IdpOption } from './getAuthDetails';
+import getAuthTokens, { IdpOption } from './getAuthTokens';
 
 export interface User {
   name: string;
@@ -37,7 +37,7 @@ const writeLoginCredentialsToFile = async (
 
   const authTokens = await Promise.all(
     users.map(async ({ name, email, password }) => {
-      return getAuthDetails(
+      return getAuthTokens(
         name,
         email,
         password,
@@ -47,7 +47,7 @@ const writeLoginCredentialsToFile = async (
     }),
   );
 
-  const loginCredentialsFilePath = `/home/node/app/dist/.auth-tokens.${environmentName}.json`;
+  const loginCredentialsFilePath = `dist/.auth-tokens.${environmentName}.json`;
   fs.writeFileSync(loginCredentialsFilePath, JSON.stringify(authTokens));
 };
 
