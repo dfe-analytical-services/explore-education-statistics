@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -12,6 +9,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -62,12 +62,12 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 LegacyLinkUrl = "http://test.com/",
             }
         },
-        Topic = new TopicViewModel(new ThemeViewModel(
+        Theme = new ThemeViewModel(
             Guid.NewGuid(),
             Slug: "",
             Title: "",
             Summary: ""
-        ))
+        )
     };
 
     [Fact]
@@ -146,18 +146,11 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = ListOf(new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
+            Publications = ListOf(new PublicationTreePublicationViewModel
             {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        AnyLiveReleaseHasData = true
-                    })
-                }
-            }
+                Title = "Publication A",
+                AnyLiveReleaseHasData = true
+            })
         });
 
         PublicBlobCacheService
@@ -192,18 +185,11 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
+            Publications = ListOf(new PublicationTreePublicationViewModel
             {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        AnyLiveReleaseHasData = true
-                    })
-                }
-            }
+                Title = "Publication A",
+                AnyLiveReleaseHasData = true
+            })
         };
 
         PublicBlobCacheService
@@ -227,18 +213,11 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
+            Publications = ListOf(new PublicationTreePublicationViewModel
             {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        AnyLiveReleaseHasData = true
-                    })
-                }
-            }
+                Title = "Publication A",
+                AnyLiveReleaseHasData = true
+            })
         };
 
         await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataCatalogue);
@@ -250,18 +229,11 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
+            Publications = ListOf(new PublicationTreePublicationViewModel
             {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        AnyLiveReleaseHasData = false
-                    })
-                }
-            }
+                Title = "Publication A",
+                AnyLiveReleaseHasData = false
+            })
         };
 
         await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.DataCatalogue);
@@ -273,19 +245,12 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
+            Publications = ListOf(new PublicationTreePublicationViewModel
             {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        IsSuperseded = false,
-                        LatestReleaseHasData = true
-                    })
-                }
-            }
+                Title = "Publication A",
+                IsSuperseded = false,
+                LatestReleaseHasData = true
+            })
         };
 
         await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataTables);
@@ -297,19 +262,12 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
+            Publications = ListOf(new PublicationTreePublicationViewModel
             {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        IsSuperseded = true,
-                        LatestReleaseHasData = true
-                    })
-                }
-            }
+                Title = "Publication A",
+                IsSuperseded = true,
+                LatestReleaseHasData = true
+            })
         };
 
         await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataTables);
@@ -321,19 +279,12 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
+            Publications = ListOf(new PublicationTreePublicationViewModel
             {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        IsSuperseded = false,
-                        LatestReleaseHasData = false
-                    })
-                }
-            }
+                Title = "Publication A",
+                IsSuperseded = false,
+                LatestReleaseHasData = false
+            })
         };
 
         await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.DataTables);
@@ -345,18 +296,11 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
+            Publications = ListOf(new PublicationTreePublicationViewModel
             {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        AnyLiveReleaseHasData = true
-                    })
-                }
-            }
+                Title = "Publication A",
+                AnyLiveReleaseHasData = true
+            })
         };
 
         await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.FastTrack);
@@ -368,18 +312,11 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
+            Publications = ListOf(new PublicationTreePublicationViewModel
             {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        AnyLiveReleaseHasData = false
-                    })
-                }
-            }
+                Title = "Publication A",
+                AnyLiveReleaseHasData = false
+            })
         };
 
         await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.FastTrack);
@@ -453,15 +390,9 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     {
         var publicationTree = new PublicationTreeThemeViewModel
         {
-            Topics = new List<PublicationTreeTopicViewModel>
+            Publications = new List<PublicationTreePublicationViewModel>
             {
                 new()
-                {
-                    Publications = new List<PublicationTreePublicationViewModel>
-                    {
-                        new()
-                    }
-                }
             }
         };
 

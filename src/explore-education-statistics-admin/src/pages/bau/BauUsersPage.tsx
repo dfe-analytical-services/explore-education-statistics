@@ -1,26 +1,25 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import userService from '@admin/services/userService';
-import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import logger from '@common/services/logger';
 import React from 'react';
 import styles from './BauUsersPage.module.scss';
 
 const BauUsersPage = () => {
   const { value, isLoading } = useAsyncRetry(() => userService.getUsers());
 
-  const handleDeleteUser = async (userEmail: string) => {
-    await userService
-      .deleteUser(userEmail)
-      .then(() => {
-        window.location.reload();
-      })
-      .catch(error => {
-        logger.info(`Error encountered when deleting the user - ${error}`);
-      });
-  };
+  // EES-5573
+  // const handleDeleteUser = async (userEmail: string) => {
+  //   await userService
+  //     .deleteUser(userEmail)
+  //     .then(() => {
+  //       window.location.reload();
+  //     })
+  //     .catch(error => {
+  //       logger.info(`Error encountered when deleting the user - ${error}`);
+  //     });
+  // };
 
   return (
     <Page
@@ -57,12 +56,24 @@ const BauUsersPage = () => {
                     >
                       Manage
                     </Link>
-                    <ButtonText
-                      onClick={() => handleDeleteUser(user.email)}
-                      className={styles.deleteUserButton}
+                    {/* EES-5573 */}
+                    {/* <ModalConfirm
+                      title="Confirm you want to delete this user"
+                      triggerButton={
+                        <ButtonText className={styles.deleteUserButton}>
+                          Delete
+                        </ButtonText>
+                      }
+                      onConfirm={async () => await handleDeleteUser(user.email)}
                     >
-                      Delete
-                    </ButtonText>
+                      <p>
+                        By deleting this User you will remove all access and
+                        permissions they have on the service. This change cannot
+                        be reversed. Users who are removed and then need access
+                        at a later point will need to be re-invited to the
+                        service as a new user.
+                      </p>
+                    </ModalConfirm> */}
                   </td>
                 </tr>
               ))}

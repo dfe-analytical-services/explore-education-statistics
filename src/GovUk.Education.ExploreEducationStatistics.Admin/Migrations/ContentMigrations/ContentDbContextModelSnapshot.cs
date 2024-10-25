@@ -833,9 +833,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("TopicId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
 
@@ -850,8 +847,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasIndex("SupersededById");
 
                     b.HasIndex("ThemeId");
-
-                    b.HasIndex("TopicId");
 
                     b.ToTable("Publications");
                 });
@@ -1097,29 +1092,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasKey("Id");
 
                     b.ToTable("Themes");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ThemeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ThemeId");
-
-                    b.ToTable("Topics");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Update", b =>
@@ -1819,12 +1791,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", "Topic")
-                        .WithMany("Publications")
-                        .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ExternalMethodology", "ExternalMethodology", b1 =>
                         {
                             b1.Property<Guid>("PublicationId")
@@ -1855,8 +1821,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("SupersededBy");
 
                     b.Navigation("Theme");
-
-                    b.Navigation("Topic");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationMethodology", b =>
@@ -1958,17 +1922,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("Publication");
 
                     b.Navigation("Release");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", "Theme")
-                        .WithMany("Topics")
-                        .HasForeignKey("ThemeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Theme");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Update", b =>
@@ -2192,13 +2145,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", b =>
-                {
-                    b.Navigation("Publications");
-
-                    b.Navigation("Topics");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>
                 {
                     b.Navigation("Publications");
                 });

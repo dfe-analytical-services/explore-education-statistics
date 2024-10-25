@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 
 def raise_assertion_error(err_msg):
     sl().failure_occurred()
-    logger.warn(err_msg)
+    logger.warning(err_msg)
     raise AssertionError(err_msg)
 
 
@@ -120,10 +120,9 @@ def user_waits_for_release_process_status_to_be(status, timeout):
     raise_assertion_error(f"Release process status wasn't {status} after {timeout} seconds!")
 
 
-def user_checks_dashboard_theme_topic_dropdowns_exist():
+def user_checks_dashboard_theme_dropdown_exists():
     try:
-        sl().driver.find_element(By.ID, "publicationsReleases-themeTopic-themeId")
-        sl().driver.find_element(By.ID, "publicationsReleases-themeTopic-topicId")
+        sl().driver.find_element(By.ID, "publicationsReleases-theme")
     except NoSuchElementException:
         return False
 

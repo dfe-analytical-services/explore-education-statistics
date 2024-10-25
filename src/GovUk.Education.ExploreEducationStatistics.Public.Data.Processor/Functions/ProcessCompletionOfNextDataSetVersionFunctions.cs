@@ -5,51 +5,15 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.DurableTask;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class ProcessCompletionOfNextDataSetVersionFunction(
+public class ProcessCompletionOfNextDataSetVersionFunctions(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
     IDataSetVersionChangeService dataSetVersionChangeService) : BaseProcessDataSetVersionFunction(publicDataDbContext)
 {
-    [Function(nameof(ProcessCompletionOfNextDataSetVersion))]
-    public async Task ProcessCompletionOfNextDataSetVersion(
-        [OrchestrationTrigger] TaskOrchestrationContext context,
-        ProcessDataSetVersionContext input)
-    {
-        var logger = context.CreateReplaySafeLogger(nameof(ProcessCompletionOfNextDataSetVersion));
-
-        logger.LogInformation(
-            "Processing completion of import for next data set version (InstanceId={InstanceId}, " +
-            "DataSetVersionId={DataSetVersionId})",
-            context.InstanceId,
-            input.DataSetVersionId);
-
-        try
-        {
-            await context.CallActivity(ActivityNames.UpdateFileStoragePath, logger, context.InstanceId);
-            await context.CallActivity(ActivityNames.ImportMetadata, logger, context.InstanceId);
-            await context.CallActivity(ActivityNames.CreateChanges, logger, context.InstanceId);
-            await context.CallActivity(ActivityNames.ImportData, logger, context.InstanceId);
-            await context.CallActivity(ActivityNames.WriteDataFiles, logger, context.InstanceId);
-            await context.CallActivity(ActivityNames.CompleteNextDataSetVersionImportProcessing, logger,
-                context.InstanceId);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e,
-                "Activity failed with an exception (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
-                context.InstanceId,
-                input.DataSetVersionId);
-
-            await context.CallActivity(ActivityNames.HandleProcessingFailure, logger, context.InstanceId);
-        }
-    }
-
     [Function(ActivityNames.CreateChanges)]
     public async Task CreateChanges(
         [ActivityTrigger] Guid instanceId,

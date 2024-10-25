@@ -7,10 +7,8 @@ Resource    ../../admin-common.robot
 user goes to methodologies and checks cannot create methodologies for publication
     [Arguments]    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
     user navigates to methodologies on publication page    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
 
     user checks page does not contain button    Create new methodology
     user checks page does not contain link    Add external methodology

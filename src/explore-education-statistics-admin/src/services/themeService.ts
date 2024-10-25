@@ -1,4 +1,3 @@
-import { Topic } from '@admin/services/topicService';
 import client from '@admin/services/utils/service';
 
 export interface Theme {
@@ -6,7 +5,6 @@ export interface Theme {
   title: string;
   summary: string;
   slug: string;
-  topics: Topic[];
 }
 
 interface SaveThemeRequest {

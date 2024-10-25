@@ -18,8 +18,8 @@ const getAnswers = async (choices: readonly string[]) => {
         await promptService.createRelease();
         break;
 
-      case 'delete theme & topic':
-        await promptService.deleteThemeAndTopic();
+      case 'delete theme':
+        await promptService.deleteTheme();
         break;
 
       case 'create new publication':

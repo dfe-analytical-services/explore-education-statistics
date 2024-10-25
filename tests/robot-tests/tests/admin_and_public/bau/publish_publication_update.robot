@@ -49,7 +49,6 @@ Update publication details
     user checks summary list contains    Publication title    ${PUBLICATION_NAME_UPDATED}
     user checks summary list contains    Publication summary    ${PUBLICATION_NAME} summary
     user checks summary list contains    Theme    %{TEST_THEME_NAME}
-    user checks summary list contains    Topic    %{TEST_TOPIC_NAME}
     user checks summary list contains    Superseding publication    This publication is not archived
 
 Update publication contact
@@ -77,7 +76,7 @@ Update publication contact
 Check publication is updated on dashboard
     user navigates to admin dashboard if needed    %{ADMIN_URL}
     user waits until h1 is visible    Dashboard
-    user selects dashboard theme and topic if possible
+    user selects dashboard theme if possible
 
     user waits until page contains link    ${PUBLICATION_NAME_UPDATED}
 

@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
@@ -18,6 +13,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -68,19 +68,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 },
                 Slug = "test-publication",
                 Title = "Publication",
-                Topic = new Topic
+                Theme = new Theme
                 {
-                    Theme = new Theme
-                    {
-                        Title = "Theme"
-                    }
+                    Title = "Theme"
                 }
             };
 
             var releaseVersion = new ReleaseVersion
             {
                 Id = releaseVersionId,
-                NextReleaseDate = new PartialDate {Day = "9", Month = "9", Year = "2040"},
+                NextReleaseDate = new PartialDate { Day = "9", Month = "9", Year = "2040" },
                 PreReleaseAccessList = "Test access list",
                 Publication = publication,
                 Release = new Release { Id = releaseId },
@@ -147,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             var otherReleaseVersion = new ReleaseVersion
             {
-                NextReleaseDate = new PartialDate {Day = "8", Month = "8", Year = "2040"},
+                NextReleaseDate = new PartialDate { Day = "8", Month = "8", Year = "2040" },
                 Publication = publication,
                 PublishScheduled = DateTime.Parse("2020-08-07T23:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
                 Published = null,
@@ -377,9 +374,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Null(contentPublication.ExternalMethodology);
                 Assert.Equal("test-publication", contentPublication.Slug);
                 Assert.Equal("Publication", contentPublication.Title);
-                Assert.Equal("Theme", contentPublication.Topic.Theme.Title);
-                Assert.NotNull(contentPublication.Topic);
-                Assert.NotNull(contentPublication.Topic.Theme);
 
                 var contentPublicationReleaseSeries = contentPublication.ReleaseSeries;
                 Assert.Equal(3, contentPublicationReleaseSeries.Count);
@@ -426,15 +420,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Contact = new Contact(),
                 Slug = "test-publication",
                 Title = "Publication",
-                Topic = new Topic
-                {
-                    Theme = new Theme(),
-                }
+                Theme = new Theme()
             };
 
             var releaseVersion = new ReleaseVersion
             {
-                NextReleaseDate = new PartialDate {Day = "9", Month = "9", Year = "2040"},
+                NextReleaseDate = new PartialDate { Day = "9", Month = "9", Year = "2040" },
                 PreReleaseAccessList = "Test access list",
                 Publication = publication,
                 PublishScheduled = DateTime.Parse("2020-09-08T23:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
@@ -592,12 +583,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 },
                 Slug = "test-publication",
                 Title = "Publication",
-                Topic = new Topic
+                Theme = new Theme
                 {
-                    Theme = new Theme
-                    {
-                        Title = "Theme"
-                    }
+                    Title = "Theme"
                 }
             };
 

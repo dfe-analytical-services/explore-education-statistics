@@ -55,5 +55,8 @@ describe('DataSetFileApiQuickStart', () => {
     expect(screen.getByLabelText('POST data set query URL')).toHaveDisplayValue(
       /data-sets\/api-data-set-id\/query\?dataSetVersion=1.0/,
     );
+    expect(screen.getByLabelText('GET data set CSV URL')).toHaveDisplayValue(
+      /data-sets\/api-data-set-id\/csv\?dataSetVersion=1.0/,
+    );
   });
 });

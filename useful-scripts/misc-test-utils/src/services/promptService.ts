@@ -6,7 +6,6 @@ import chalk from 'chalk';
 import Guid from '../utils/Guid';
 import createPublicationAndRelease from '../modules/release/createPublicationAndRelease';
 import themeService from './themeService';
-import topicService from './topicService';
 import createPublication from '../modules/publication/createPublication';
 import createReleaseAndPublish from '../modules/publication/publishPublication';
 import uploadSingleSubject from '../modules/subject/uploadSubject';
@@ -72,19 +71,7 @@ const promptService = {
     await publishAllReleases(publication.id);
   },
 
-  deleteThemeAndTopic: async () => {
-    const topic = await prompt({
-      name: 'id',
-      type: 'input',
-      message: 'Topic ID',
-      prefix: '>',
-      validate: async input => {
-        if (!Guid.isGuid(input)) {
-          return 'Not a valid GUID';
-        }
-        return true;
-      },
-    });
+  deleteTheme: async () => {
     const theme = await prompt({
       name: 'id',
       type: 'input',
@@ -97,7 +84,6 @@ const promptService = {
         return true;
       },
     });
-    await topicService.renameTopic(topic.id, theme.id);
     await themeService.renameTheme(theme.id);
     await themeService.deleteTheme(theme.id);
   },

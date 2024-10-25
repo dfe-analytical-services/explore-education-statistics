@@ -11,7 +11,7 @@ import React from 'react';
 
 const PublicationDetailsPage = () => {
   const { publication, onReload } = usePublicationContext();
-  const { id, title, summary, permissions, supersededById, theme, topic } =
+  const { id, title, summary, permissions, supersededById, theme } =
     publication;
   const [readOnly, toggleReadOnly] = useToggle(true);
 
@@ -35,7 +35,6 @@ const PublicationDetailsPage = () => {
               {summary ?? 'Not set'}
             </SummaryListItem>
             <SummaryListItem term="Theme">{theme?.title}</SummaryListItem>
-            <SummaryListItem term="Topic">{topic?.title}</SummaryListItem>
             <SummaryListItem term="Superseding publication">
               {supersededById
                 ? supersedingPublication?.title
@@ -58,7 +57,6 @@ const PublicationDetailsPage = () => {
             title,
             summary,
             themeId: theme.id,
-            topicId: topic.id,
           }}
           publicationId={id}
           publicationSlug={publication.slug}

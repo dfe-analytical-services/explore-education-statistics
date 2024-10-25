@@ -55,7 +55,6 @@ const PrototypeManagePublication = () => {
               Pupil absence in schools in England
             </SummaryListItem>
             <SummaryListItem term="Theme">Pupil and schools</SummaryListItem>
-            <SummaryListItem term="Topic">Pupil absence</SummaryListItem>
           </SummaryList>
           <div>
             <Button
@@ -94,18 +93,6 @@ const PrototypeManagePublication = () => {
               <select
                 name="theme"
                 id="theme"
-                className="govuk-select govuk-!-width-one-half"
-              >
-                <option value="">Pupils and schools</option>
-              </select>
-            </FormGroup>
-            <FormGroup>
-              <label htmlFor="theme" className="govuk-label">
-                Select topic
-              </label>
-              <select
-                name="topic"
-                id="topic"
                 className="govuk-select govuk-!-width-one-half"
               >
                 <option value="">Pupils and schools</option>

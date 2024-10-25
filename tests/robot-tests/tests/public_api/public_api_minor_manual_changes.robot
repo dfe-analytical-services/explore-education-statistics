@@ -17,8 +17,8 @@ Test Teardown       Run Keyword If Test Failed    record test failure
 ${PUBLICATION_NAME}=    UI tests - Public API - minor manual changes %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=      Financial year 3000-01
 ${RELEASE_2_NAME}=      Academic year 3010/11
-${SUBJECT_1_NAME}=      UI tests - Public API - minor manual changes - subject 1 - %{RUN_IDENTIFIER}
-${SUBJECT_2_NAME}=      UI tests - Public API - minor manual changes - subject 2 - %{RUN_IDENTIFIER}
+${SUBJECT_1_NAME}=      ${PUBLICATION_NAME} - Subject 1
+${SUBJECT_2_NAME}=      ${PUBLICATION_NAME} - Subject 2
 
 
 *** Test Cases ***
@@ -66,7 +66,7 @@ Create the initial API data set version
 
 User waits until the initial API data set version's status changes to "Ready"
     user waits until h3 is visible    Draft version details
-    wait until keyword succeeds    10x    %{WAIT_SMALL}s    Verify status of API data sets    Ready
+    user waits until draft API data set status contains    Ready
 
 Add headline text block to Content page
     user clicks link    Back to API data sets
@@ -193,7 +193,7 @@ Verify location mapping changes
     user waits until element contains    xpath://table[@data-testid='mappable-table-region']/caption//strong[1]
     ...    1 mapped location    %{WAIT_LONG}
 
-Validate the row headings and its contents in the 'Regions' section(after mapping)
+Validate the row headings and its contents in the 'Regions' section after mapping
     user waits until h3 is visible    Locations not found in new data set
     user checks table column heading contains    1    1    Current data set
     user checks table column heading contains    1    2    New data set
@@ -207,12 +207,12 @@ Validate the row headings and its contents in the 'Regions' section(after mappin
 
     user clicks link    Back
 
-Validate the version status of location task
+Validate the version status of location task is now complete
     user waits until h3 is visible    Draft version tasks
     user waits until parent contains element    testid:map-locations-task    link:Map locations
     user waits until parent contains element    id:map-locations-task-status    text:Complete
     user waits until parent contains element    testid:map-filters-task    link:Map filters
-    user waits until parent contains element    id:map-filters-task-status    text:Complete
+    user waits until parent contains element    id:map-filters-task-status    text:Incomplete
 
 User clicks on Map filters link
     user clicks link    Map filters
@@ -247,7 +247,7 @@ Verify filter mapping changes
     user waits until element contains    xpath://table[@data-testid='mappable-table-school_type']/caption//strong[1]
     ...    1 mapped filter option    %{WAIT_LONG}
 
-Validate the row headings and its contents in the 'filters options' section(after mapping)
+Validate the row headings and its contents in the 'filters options' section after mapping
     user waits until h3 is visible    Filter options not found in new data set
     user checks table column heading contains    1    1    Current data set
     user checks table column heading contains    1    2    New data set
@@ -268,7 +268,7 @@ Confirm finalization of this API data set version
     user waits until page contains    Draft API data set version is ready to be published
 
 User navigates to 'changelog and guidance notes' page and update relevant details in it
-    user clicks link by index    View changelog and guidance notes    1
+    user clicks link    View changelog and guidance notes    id:draft-version-summary
     user waits until page contains    API data set changelog
 
     user enters text into element    name:notes
@@ -279,7 +279,7 @@ User navigates to 'changelog and guidance notes' page and update relevant detail
     user clicks link    Back to API data set details
 
 User clicks on 'View preview token log' link inside the 'Draft version details' section
-    user clicks link by index    View changelog and guidance notes    2
+    user clicks link    View changelog and guidance notes    id:draft-version-summary
 
 Validate the contents in the 'API data set changelog' page.
     user waits until page contains    API data set changelog

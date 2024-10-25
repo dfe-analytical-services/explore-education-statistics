@@ -301,7 +301,6 @@ export const getServerSideProps: GetServerSideProps<
   });
 
   const selectedPublication = themeMeta
-    .flatMap(option => option.topics)
     .flatMap(option => option.publications)
     .find(option => option.slug === publicationSlug);
 

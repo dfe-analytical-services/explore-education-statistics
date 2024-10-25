@@ -50,11 +50,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             File? replacingFile = null)
         {
             List<ErrorViewModel> errors = [];
+            var isReplacement = replacingFile != null;
 
             errors.AddRange(ValidateDataSetTitle(
                 releaseVersionId,
                 dataSetTitle,
-                isReplacement: replacingFile != null));
+                isReplacement));
 
             errors.AddRange(ValidateDataFileNames(
                 releaseVersionId,
@@ -73,6 +74,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 dataFileStream,
                 metaFileName,
                 metaFileStream));
+
+            if (isReplacement)
+            {
+                var releaseFileWithApiDataSet = _context.ReleaseFiles
+                    .SingleOrDefault(rf =>
+                        rf.ReleaseVersionId == releaseVersionId
+                        && rf.Name == dataSetTitle
+                        && rf.PublicApiDataSetId != null);
+                if (releaseFileWithApiDataSet != null)
+                {
+                    errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSetTitle));
+                }
+            }
 
             return errors;
         }
@@ -103,8 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             ArchiveDataSetFile archiveDataSet,
             Stream dataFileStream,
-            Stream metaFileStream,
-            File? replacingFile = null)
+            Stream metaFileStream)
         {
             return await ValidateDataSetFilesForUpload(
                 releaseVersionId: releaseVersionId,
@@ -115,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 metaFileName: archiveDataSet.MetaFilename,
                 metaFileLength: archiveDataSet.MetaFileSize,
                 metaFileStream: metaFileStream,
-                replacingFile: replacingFile);
+                replacingFile: archiveDataSet.ReplacingFile);
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)

@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
@@ -26,7 +26,7 @@ public static class PublicationGeneratorExtensions
         this Generator<Publication> generator,
         Guid id)
         => generator.ForInstance(s => s.SetId(id));
-    
+
     public static Generator<Publication> WithLatestPublishedReleaseVersion(
         this Generator<Publication> generator,
         ReleaseVersion releaseVersion)
@@ -72,15 +72,15 @@ public static class PublicationGeneratorExtensions
         Publication? supersededBy)
         => generator.ForInstance(p => p.SetSupersededBy(supersededBy));
 
-    public static Generator<Publication> WithTopicId(
+    public static Generator<Publication> WithThemeId(
         this Generator<Publication> generator,
-        Guid topicId)
-        => generator.ForInstance(s => s.SetTopicId(topicId));
+        Guid themeId)
+        => generator.ForInstance(s => s.SetThemeId(themeId));
 
-    public static Generator<Publication> WithTopic(
+    public static Generator<Publication> WithTheme(
         this Generator<Publication> generator,
-        Topic topic)
-        => generator.ForInstance(s => s.SetTopic(topic));
+        Theme theme)
+        => generator.ForInstance(s => s.SetTheme(theme));
 
     public static InstanceSetters<Publication> SetId(
         this InstanceSetters<Publication> setters,
@@ -98,11 +98,11 @@ public static class PublicationGeneratorExtensions
         Guid? latestPublishedReleaseVersionId)
         => setters.Set(p => p.LatestPublishedReleaseVersionId, latestPublishedReleaseVersionId);
 
-    public static Generator<Publication> WithTopics(this Generator<Publication> generator,
-        IEnumerable<Topic> topics)
+    public static Generator<Publication> WithThemes(this Generator<Publication> generator,
+        IEnumerable<Theme> themes)
     {
-        topics.ForEach((topic, index) =>
-            generator.ForIndex(index, s => s.SetTopic(topic)));
+        themes.ForEach((theme, index) =>
+            generator.ForIndex(index, s => s.SetTheme(theme)));
 
         return generator;
     }
@@ -239,14 +239,14 @@ public static class PublicationGeneratorExtensions
         Guid? supersededById)
         => setters.Set(p => p.SupersededById, supersededById);
 
-    private static InstanceSetters<Publication> SetTopicId(
+    private static InstanceSetters<Publication> SetThemeId(
         this InstanceSetters<Publication> setters,
-        Guid topicId)
-        => setters.Set(p => p.TopicId, topicId);
+        Guid themeId)
+        => setters.Set(p => p.ThemeId, themeId);
 
-    private static InstanceSetters<Publication> SetTopic(
+    private static InstanceSetters<Publication> SetTheme(
         this InstanceSetters<Publication> setters,
-        Topic topic)
-        => setters.Set(p => p.Topic, topic)
-            .SetTopicId(topic.Id);
+        Theme theme)
+        => setters.Set(p => p.Theme, theme)
+            .SetThemeId(theme.Id);
 }

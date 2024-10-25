@@ -6,17 +6,11 @@ export interface PublicationMethodologySummary {
   title: string;
   methodologies: MethodologySummary[];
 }
-export interface MethodologyTopic {
-  id: string;
-  title: string;
-  publications: PublicationMethodologySummary[];
-}
-
 export interface MethodologyTheme {
   id: string;
   title: string;
   summary: string;
-  topics: MethodologyTopic[];
+  publications: PublicationMethodologySummary[];
 }
 
 export interface ThemeSummary {

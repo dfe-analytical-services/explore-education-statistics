@@ -305,19 +305,12 @@ describe('TableToolPage', () => {
       id: 'ee1855ca-d1e1-4f04-a795-cbd61d326a1f',
       title: 'Pupils and schools',
       summary: '',
-      topics: [
+      publications: [
         {
-          id: 'c9f0b897-d58a-42b0-9d12-ca874cc7c810',
-          title: 'Admission appeals',
-          summary: '',
-          publications: [
-            {
-              id: testPublicationId,
-              title: 'Test publication',
-              slug: 'test-publication',
-              isSuperseded: false,
-            },
-          ],
+          id: testPublicationId,
+          title: 'Test publication',
+          slug: 'test-publication',
+          isSuperseded: false,
         },
       ],
     },

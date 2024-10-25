@@ -288,11 +288,11 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
         return
         [
             typeof(CreateDataSetFunction),
-            typeof(ProcessInitialDataSetVersionFunction),
+            typeof(CompleteInitialDataSetVersionProcessingFunction),
             typeof(CreateNextDataSetVersionMappingsFunction),
-            typeof(ProcessNextDataSetVersionMappingsFunction),
+            typeof(ProcessNextDataSetVersionMappingsFunctions),
             typeof(CompleteNextDataSetVersionImportFunction),
-            typeof(ProcessCompletionOfNextDataSetVersionFunction),
+            typeof(ProcessCompletionOfNextDataSetVersionFunctions),
             typeof(DeleteDataSetVersionFunction),
             typeof(CopyCsvFilesFunction),
             typeof(ImportMetadataFunction),

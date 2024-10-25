@@ -1,8 +1,8 @@
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
@@ -20,57 +20,39 @@ public class ThemeServiceTests
                 Slug = "theme-c",
                 Title = "Theme C",
                 Summary = "Theme C summary",
-                Topics = new List<Topic>
-                {
+                Publications =
+                [
                     new()
                     {
-                        Publications = new List<Publication>
-                        {
-                            new()
-                            {
-                                LatestPublishedReleaseVersionId = Guid.NewGuid()
-                            }
-                        }
+                        LatestPublishedReleaseVersionId = Guid.NewGuid()
                     }
-                }
+                ]
             },
             new()
             {
                 Slug = "theme-a",
                 Title = "Theme A",
                 Summary = "Theme A summary",
-                Topics = new List<Topic>
-                {
+                Publications =
+                [
                     new()
                     {
-                        Publications = new List<Publication>
-                        {
-                            new()
-                            {
-                                LatestPublishedReleaseVersionId = Guid.NewGuid()
-                            }
-                        }
+                        LatestPublishedReleaseVersionId = Guid.NewGuid()
                     }
-                }
+                ]
             },
             new()
             {
                 Slug = "theme-b",
                 Title = "Theme B",
                 Summary = "Theme B summary",
-                Topics = new List<Topic>
-                {
+                Publications =
+                [
                     new()
                     {
-                        Publications = new List<Publication>
-                        {
-                            new()
-                            {
-                                LatestPublishedReleaseVersionId = Guid.NewGuid()
-                            }
-                        }
+                        LatestPublishedReleaseVersionId = Guid.NewGuid()
                     }
-                }
+                ]
             }
         };
 
@@ -109,72 +91,40 @@ public class ThemeServiceTests
     [Fact]
     public async Task ListThemes_ExcludesThemesWithNoPublishedReleases()
     {
-        var themes = new List<Theme>
+        var themeWithoutPublication = new Theme
         {
-            // Theme has no topics and should be excluded
-            new()
-            {
-                Title = "Theme A",
-                Topics = new List<Topic>()
-            },
-            // Theme has topic with no publications and should be excluded
-            new()
-            {
-                Title = "Theme B",
-                Topics = new List<Topic>
+            Title = "Theme A",
+            Publications = []
+        };
+
+        var themeWithoutPublishedPublication = new Theme
+        {
+            Title = "Theme B",
+            Publications =
+            [
+                new()
                 {
-                    new()
-                    {
-                        Publications = new List<Publication>()
-                    }
+                    LatestPublishedReleaseVersionId = null
                 }
-            },
-            // Theme has topic with publication that's not published and should be excluded
-            new()
-            {
-                Title = "Theme C",
-                Topics = new List<Topic>
+            ]
+        };
+
+        var themeWithPublishedReleases = new Theme
+        {
+            Title = "Theme C",
+            Publications =
+            [
+                new()
                 {
-                    new()
-                    {
-                        Publications = new List<Publication>
-                        {
-                            new()
-                            {
-                                LatestPublishedReleaseVersionId = null
-                            }
-                        }
-                    }
+                    LatestPublishedReleaseVersionId = Guid.NewGuid()
                 }
-            },
-            // Theme has published releases
-            new()
-            {
-                Title = "Theme D",
-                Topics = new List<Topic>
-                {
-                    new()
-                    {
-                        Publications = new List<Publication>
-                        {
-                            new()
-                            {
-                                LatestPublishedReleaseVersionId = Guid.NewGuid()
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Publications = new List<Publication>()
-                    }
-                }
-            }
+            ]
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Themes.AddRangeAsync(themes);
+            await context.Themes.AddRangeAsync(themeWithoutPublication, themeWithoutPublishedPublication, themeWithPublishedReleases);
             await context.SaveChangesAsync();
         }
 
@@ -185,94 +135,62 @@ public class ThemeServiceTests
             var result = await service.ListThemes();
 
             var theme = Assert.Single(result);
-            Assert.Equal(themes[3].Id, theme.Id);
-            Assert.Equal("Theme D", theme.Title);
+            Assert.Equal(themeWithPublishedReleases.Id, theme.Id);
+            Assert.Equal("Theme C", theme.Title);
         }
     }
 
     [Fact]
     public async Task ListThemes_ExcludesThemesWithOnlySupersededPublications()
     {
-        var themes = new List<Theme>
+        var themeWithPublishedSupersededPublication = new Theme
         {
-            // Theme has superseded publication and should be excluded
-            new()
-            {
-                Title = "Theme A",
-                Topics = new List<Topic>
+            Title = "Theme A",
+            Publications =
+            [
+                new()
                 {
-                    new()
+                    LatestPublishedReleaseVersionId = Guid.NewGuid(),
+                    SupersededBy = new Publication
                     {
-                        Publications = new List<Publication>
-                        {
-                            new()
-                            {
-                                LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                                SupersededBy = new Publication
-                                {
-                                    // Superseding publication is published
-                                    LatestPublishedReleaseVersionId = Guid.NewGuid()
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Publications = new List<Publication>()
+                        LatestPublishedReleaseVersionId = Guid.NewGuid()
                     }
                 }
-            },
-            // Theme has superseded publication but the superseding publication is not published yet
-            new()
-            {
-                Title = "Theme B",
-                Topics = new List<Topic>
+            ]
+        };
+
+        var themeWithUnpublishedSupersededPublication = new Theme
+        {
+            Title = "Theme B",
+            Publications =
+            [
+                new()
                 {
-                    new()
+                    LatestPublishedReleaseVersionId = Guid.NewGuid(),
+                    SupersededBy = new Publication
                     {
-                        Publications = new List<Publication>
-                        {
-                            new()
-                            {
-                                LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                                SupersededBy = new Publication
-                                {
-                                    // Superseding publication is not published
-                                    LatestPublishedReleaseVersionId = null
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Publications = new List<Publication>()
+                        LatestPublishedReleaseVersionId = null
                     }
                 }
-            },
-            // Theme has publication which is not superseded
-            new()
-            {
-                Title = "Theme C",
-                Topics = new List<Topic>
+            ]
+        };
+
+        var themeWithNonSupersededPublication = new Theme
+        {
+            Title = "Theme C",
+            Publications =
+            [
+                new()
                 {
-                    new()
-                    {
-                        Publications = new List<Publication>
-                        {
-                            new()
-                            {
-                                LatestPublishedReleaseVersionId = Guid.NewGuid()
-                            }
-                        }
-                    },
+                    LatestPublishedReleaseVersionId = Guid.NewGuid()
                 }
-            },
+            ]
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Themes.AddRangeAsync(themes);
+            await context.Themes.AddRangeAsync(themeWithPublishedSupersededPublication, themeWithUnpublishedSupersededPublication, themeWithNonSupersededPublication);
             await context.SaveChangesAsync();
         }
 
@@ -284,10 +202,10 @@ public class ThemeServiceTests
 
             Assert.Equal(2, result.Count);
 
-            Assert.Equal(themes[1].Id, result[0].Id);
+            Assert.Equal(themeWithUnpublishedSupersededPublication.Id, result[0].Id);
             Assert.Equal("Theme B", result[0].Title);
 
-            Assert.Equal(themes[2].Id, result[1].Id);
+            Assert.Equal(themeWithNonSupersededPublication.Id, result[1].Id);
             Assert.Equal("Theme C", result[1].Title);
         }
     }

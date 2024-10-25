@@ -8,56 +8,44 @@ const testThemes: MethodologyTheme[] = [
     id: 'theme-1',
     summary: 'Theme 1 summary',
     title: 'Theme 1',
-    topics: [
+    publications: [
       {
-        id: 'topic-1',
-        publications: [
+        id: 'publication-1',
+        methodologies: [
           {
-            id: 'publication-1',
-            methodologies: [
-              {
-                id: 'methodology-1',
-                slug: 'methodology-1-slug',
-                title: 'Methodology 1',
-              },
-            ],
-            title: 'Publication 1',
-          },
-          {
-            id: 'publication-2',
-            methodologies: [
-              {
-                id: 'methodology-2',
-                slug: 'methodology-2-slug',
-                title: 'Methodology 2',
-              },
-              {
-                id: 'methodology-3',
-                slug: 'methodology-3-slug',
-                title: 'Methodology 3',
-              },
-            ],
-            title: 'Publication 2',
+            id: 'methodology-1',
+            slug: 'methodology-1-slug',
+            title: 'Methodology 1',
           },
         ],
-        title: 'Topic 1',
+        title: 'Publication 1',
       },
       {
-        id: 'topic-2',
-        publications: [
+        id: 'publication-2',
+        methodologies: [
           {
-            id: 'publication-3',
-            methodologies: [
-              {
-                id: 'methodology-4',
-                slug: 'methodology-4-slug',
-                title: 'Methodology 4',
-              },
-            ],
-            title: 'Publication 3',
+            id: 'methodology-2',
+            slug: 'methodology-2-slug',
+            title: 'Methodology 2',
+          },
+          {
+            id: 'methodology-3',
+            slug: 'methodology-3-slug',
+            title: 'Methodology 3',
           },
         ],
-        title: 'Topic 2',
+        title: 'Publication 2',
+      },
+      {
+        id: 'publication-3',
+        methodologies: [
+          {
+            id: 'methodology-4',
+            slug: 'methodology-4-slug',
+            title: 'Methodology 4',
+          },
+        ],
+        title: 'Publication 3',
       },
     ],
   },
@@ -65,39 +53,22 @@ const testThemes: MethodologyTheme[] = [
     id: 'theme-2',
     summary: 'Theme 2 summary',
     title: 'Theme 2',
-    topics: [
+    publications: [
       {
-        id: 'topic-3',
-        publications: [],
-        title: 'Topic 3',
+        id: 'publication-4',
+        methodologies: [],
+        title: 'Publication 4',
       },
       {
-        id: 'topic-4',
-        publications: [
+        id: 'publication-5',
+        methodologies: [
           {
-            id: 'publication-4',
-            methodologies: [],
-            title: 'Publication 4',
+            id: 'methodology-5',
+            slug: 'methodology-5-slug',
+            title: 'Methodology 5',
           },
         ],
-        title: 'Topic 4',
-      },
-      {
-        id: 'topic-5',
-        publications: [
-          {
-            id: 'publication-5',
-            methodologies: [
-              {
-                id: 'methodology-5',
-                slug: 'methodology-5-slug',
-                title: 'Methodology 5',
-              },
-            ],
-            title: 'Publication 5',
-          },
-        ],
-        title: 'Topic 5',
+        title: 'Publication 5',
       },
     ],
   },
@@ -105,34 +76,28 @@ const testThemes: MethodologyTheme[] = [
     id: 'theme-3',
     summary: 'Theme 3 summary',
     title: 'Theme 3',
-    topics: [
+    publications: [
       {
-        id: 'topic-6',
-        publications: [
+        id: 'publication-6',
+        methodologies: [
           {
-            id: 'publication-6',
-            methodologies: [
-              {
-                id: 'methodology-6',
-                slug: 'methodology-6-slug',
-                title: 'Methodology 6',
-              },
-            ],
-            title: 'Publication 6',
-          },
-          {
-            id: 'publication-7',
-            methodologies: [
-              {
-                id: 'methodology-6',
-                slug: 'methodology-6-slug',
-                title: 'Methodology 6',
-              },
-            ],
-            title: 'Publication 7',
+            id: 'methodology-6',
+            slug: 'methodology-6-slug',
+            title: 'Methodology 6',
           },
         ],
-        title: 'Topic 6',
+        title: 'Publication 6',
+      },
+      {
+        id: 'publication-7',
+        methodologies: [
+          {
+            id: 'methodology-6',
+            slug: 'methodology-6-slug',
+            title: 'Methodology 6',
+          },
+        ],
+        title: 'Publication 7',
       },
     ],
   },

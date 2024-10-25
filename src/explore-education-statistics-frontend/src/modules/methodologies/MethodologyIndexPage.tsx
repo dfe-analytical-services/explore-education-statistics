@@ -1,9 +1,6 @@
 import AccordionSection from '@common/components/AccordionSection';
 import RelatedInformation from '@common/components/RelatedInformation';
-import themeService, {
-  MethodologyTheme,
-  MethodologyTopic,
-} from '@common/services/themeService';
+import themeService, { MethodologyTheme } from '@common/services/themeService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Accordion from '@common/components/Accordion';
 import Link from '@frontend/components/Link';
@@ -66,27 +63,23 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
           }}
         >
           {themes.map(
-            ({
-              id: themeId,
-              title: themeTitle,
-              summary: themeSummary,
-              topics,
-            }) => (
+            ({ id: themeId, title: themeTitle, summary: themeSummary }) => (
               <AccordionSection
                 key={themeId}
                 heading={themeTitle}
                 caption={themeSummary}
               >
                 <ul className="govuk-!-margin-top-0">
-                  {orderBy(getMethodologiesForTopics(topics), 'title').map(
-                    methodology => (
-                      <li key={methodology.id}>
-                        <Link to={`/methodology/${methodology.slug}`}>
-                          {methodology.title}
-                        </Link>
-                      </li>
-                    ),
-                  )}
+                  {orderBy(
+                    getMethodologiesForTheme(themes, themeId),
+                    'title',
+                  ).map(methodology => (
+                    <li key={methodology.id}>
+                      <Link to={`/methodology/${methodology.slug}`}>
+                        {methodology.title}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               </AccordionSection>
             ),
@@ -111,9 +104,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
 
 export default MethodologyIndexPage;
 
-function getMethodologiesForTopics(topics: MethodologyTopic[]) {
-  const methodologies = topics.flatMap(topic =>
-    topic.publications.flatMap(pub => pub.methodologies),
-  );
+function getMethodologiesForTheme(themes: MethodologyTheme[], themeId: string) {
+  const theme = themes.find(mt => mt.id === themeId);
+
+  const methodologies = theme?.publications.flatMap(pub => pub.methodologies);
   return uniqBy(methodologies, methodology => methodology.id);
 }

@@ -38,15 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly DataFixture _dataFixture = new();
 
         [Fact]
-        public async Task ListPublications_CanViewAllPublications_Topic()
+        public async Task ListPublications_CanViewAllPublications_Theme()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "Topic title",
-                Theme = new Theme
-                {
-                    Title = "Theme title",
-                },
+                Title = "Theme title",
             };
 
             var publication1 = new Publication
@@ -54,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Test Publication",
                 Summary = "Test summary",
                 Slug = "test-slug",
-                Topic = topic,
+                Theme = theme,
                 Contact = new Contact
                 {
                     ContactName = "contact name",
@@ -67,12 +63,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication2 = new Publication
             {
-                Topic = new Topic(),
+                Theme = new(),
             };
 
             var publication3 = new Publication
             {
-                Topic = new Topic(),
+                Theme = new(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -95,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(publication1.Topic.Id);
+                    .ListPublications(publication1.Theme.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -105,10 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication1.Title, publicationViewModel.Title);
                 Assert.Equal(publication1.Summary, publicationViewModel.Summary);
                 Assert.Equal(publication1.Slug, publicationViewModel.Slug);
-                Assert.Equal(publication1.Topic.Id, publicationViewModel.Topic.Id);
-                Assert.Equal(publication1.Topic.Title, publicationViewModel.Topic.Title);
-                Assert.Equal(publication1.Topic.Theme.Id, publicationViewModel.Theme.Id);
-                Assert.Equal(publication1.Topic.Theme.Title, publicationViewModel.Theme.Title);
+                Assert.Equal(publication1.Theme.Id, publicationViewModel.Theme.Id);
+                Assert.Equal(publication1.Theme.Title, publicationViewModel.Theme.Title);
 
                 Assert.Null(publicationViewModel.SupersededById);
                 Assert.False(publicationViewModel.IsSuperseded);
@@ -120,32 +114,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListPublications_CanViewAllPublications_Order()
         {
-            var topic = new Topic
-            {
-                Theme = new Theme(),
-            };
+            var theme = new Theme();
 
             var publication1 = new Publication
             {
                 Title = "A",
-                Topic = topic,
+                Theme = theme,
             };
 
             var publication2 = new Publication
             {
                 Title = "B",
-                Topic = topic,
+                Theme = theme,
             };
 
             var publication3 = new Publication
             {
                 Title = "C",
-                Topic = topic,
+                Theme = theme,
             };
 
             var userService = new Mock<IUserService>(Strict);
 
-            userService.Setup(s => s.GetUserId()).Returns(new Guid());
+            userService.Setup(s => s.GetUserId()).Returns(Guid.NewGuid());
             userService.Setup(s => s.MatchesPolicy(RegisteredUser)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(true);
 
@@ -163,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(topic.Id);
+                    .ListPublications(theme.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -180,29 +171,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListPublications_CanViewAllPublications_NoTopic()
+        public async Task ListPublications_CanViewAllPublications_NoTheme()
         {
             var publication1 = new Publication
             {
                 Title = "publication1",
-                Topic = new Topic { Theme = new Theme(), },
+                Theme = new(),
             };
 
             var publication2 = new Publication
             {
                 Title = "publication2",
-                Topic = new Topic { Theme = new Theme(), },
+                Theme = new(),
             };
 
             var publication3 = new Publication
             {
                 Title = "publication3",
-                Topic = new Topic { Theme = new Theme(), },
+                Theme = new(),
             };
 
             var userService = new Mock<IUserService>(Strict);
 
-            userService.Setup(s => s.GetUserId()).Returns(new Guid());
+            userService.Setup(s => s.GetUserId()).Returns(Guid.NewGuid());
             userService.Setup(s => s.MatchesPolicy(RegisteredUser)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(true);
 
@@ -227,15 +218,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(3, publicationViewModelList.Count);
                 Assert.Equal(publication1.Id, publicationViewModelList[0].Id);
                 Assert.Equal(publication1.Title, publicationViewModelList[0].Title);
-                Assert.Equal(publication1.TopicId, publicationViewModelList[0].Topic.Id);
+                Assert.Equal(publication1.ThemeId, publicationViewModelList[0].Theme.Id);
 
                 Assert.Equal(publication2.Id, publicationViewModelList[1].Id);
                 Assert.Equal(publication2.Title, publicationViewModelList[1].Title);
-                Assert.Equal(publication2.TopicId, publicationViewModelList[1].Topic.Id);
+                Assert.Equal(publication2.ThemeId, publicationViewModelList[1].Theme.Id);
 
                 Assert.Equal(publication3.Id, publicationViewModelList[2].Id);
                 Assert.Equal(publication3.Title, publicationViewModelList[2].Title);
-                Assert.Equal(publication3.TopicId, publicationViewModelList[2].Topic.Id);
+                Assert.Equal(publication3.ThemeId, publicationViewModelList[2].Theme.Id);
             }
         }
 
@@ -244,13 +235,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var user = new User { Id = Guid.NewGuid(), };
 
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "Topic title",
-                Theme = new Theme
-                {
-                    Title = "Theme title",
-                },
+                Title = "Theme title",
             };
 
             var publication1 = new Publication
@@ -258,18 +245,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Test Publication",
                 Summary = "Test summary",
                 Slug = "test-slug",
-                Topic = topic,
+                Theme = theme,
                 SupersededBy = null,
             };
 
             var publication2 = new Publication
             {
-                Topic = new Topic(),
+                Theme = new(),
             };
 
             var publication3 = new Publication
             {
-                Topic = new Topic(),
+                Theme = new(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -311,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(topic.Id);
+                    .ListPublications(theme.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -321,10 +308,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication1.Title, publicationViewModel.Title);
                 Assert.Equal(publication1.Summary, publicationViewModel.Summary);
                 Assert.Equal(publication1.Slug, publicationViewModel.Slug);
-                Assert.Equal(publication1.Topic.Id, publicationViewModel.Topic.Id);
-                Assert.Equal(publication1.Topic.Title, publicationViewModel.Topic.Title);
-                Assert.Equal(publication1.Topic.Theme.Id, publicationViewModel.Theme.Id);
-                Assert.Equal(publication1.Topic.Theme.Title, publicationViewModel.Theme.Title);
+                Assert.Equal(publication1.Theme.Id, publicationViewModel.Theme.Id);
+                Assert.Equal(publication1.Theme.Title, publicationViewModel.Theme.Title);
 
                 Assert.Null(publicationViewModel.SupersededById);
                 Assert.False(publicationViewModel.IsSuperseded);
@@ -338,24 +323,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var user = new User { Id = Guid.NewGuid(), };
 
-            var topic = new Topic { Theme = new Theme(), };
+            var theme = new Theme();
 
             var publication1 = new Publication
             {
                 Title = "A",
-                Topic = topic,
+                Theme = theme,
             };
 
             var publication2 = new Publication
             {
                 Title = "B",
-                Topic = topic,
+                Theme = theme,
             };
 
             var publication3 = new Publication
             {
                 Title = "C",
-                Topic = topic,
+                Theme = theme,
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -397,7 +382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(topic.Id);
+                    .ListPublications(theme.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -415,32 +400,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListPublications_CannotViewAllPublications_NoTopic()
+        public async Task ListPublications_CannotViewAllPublications_NoTheme()
         {
             var user = new User { Id = Guid.NewGuid(), };
 
             var publication1 = new Publication
             {
                 Title = "publication1",
-                Topic = new Topic { Theme = new Theme(), },
+                Theme = new(),
             };
 
             var publication2 = new Publication
             {
                 Title = "publication2",
-                Topic = new Topic { Theme = new Theme(), },
+                Theme = new(),
             };
 
             var publication3 = new Publication
             {
                 Title = "publication3",
-                Topic = new Topic { Theme = new Theme(), },
+                Theme = new(),
             };
 
             var publication4 = new Publication
             {
                 Title = "publication4",
-                Topic = new Topic { Theme = new Theme(), },
+                Theme = new(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -494,15 +479,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication1.Id, publicationViewModelList[0].Id);
                 Assert.Equal(publication1.Title, publicationViewModelList[0].Title);
-                Assert.Equal(publication1.TopicId, publicationViewModelList[0].Topic.Id);
+                Assert.Equal(publication1.ThemeId, publicationViewModelList[0].Theme.Id);
 
                 Assert.Equal(publication2.Id, publicationViewModelList[1].Id);
                 Assert.Equal(publication2.Title, publicationViewModelList[1].Title);
-                Assert.Equal(publication2.TopicId, publicationViewModelList[1].Topic.Id);
+                Assert.Equal(publication2.ThemeId, publicationViewModelList[1].Theme.Id);
 
                 Assert.Equal(publication3.Id, publicationViewModelList[2].Id);
                 Assert.Equal(publication3.Title, publicationViewModelList[2].Title);
-                Assert.Equal(publication3.TopicId, publicationViewModelList[2].Topic.Id);
+                Assert.Equal(publication3.ThemeId, publicationViewModelList[2].Theme.Id);
             }
         }
 
@@ -514,14 +499,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Test publication",
                 Summary = "Test summary",
                 Slug = "test-publication",
-                Topic = new Topic
+                Theme = new Theme
                 {
-                    Title = "Test topic",
-                    Theme = new Theme
-                    {
-                        Title = "Test theme"
-                    }
-                },
+                    Title = "Test theme"
+                }
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -543,11 +524,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.Summary, result.Summary);
                 Assert.Equal(publication.Slug, result.Slug);
 
-                Assert.Equal(publication.Topic.Id, result.Topic.Id);
-                Assert.Equal(publication.Topic.Title, result.Topic.Title);
-
-                Assert.Equal(publication.Topic.ThemeId, result.Theme.Id);
-                Assert.Equal(publication.Topic.Theme.Title, result.Theme.Title);
+                Assert.Equal(publication.Theme.Id, result.Theme.Id);
+                Assert.Equal(publication.Theme.Title, result.Theme.Title);
 
                 Assert.Null(result.SupersededById);
                 Assert.False(result.IsSuperseded);
@@ -561,10 +539,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication
             {
-                Topic = new Topic
-                {
-                    Theme = new Theme(),
-                },
+                Theme = new Theme(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -652,10 +627,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Test publication",
-                Topic = new Topic
-                {
-                    Theme = new Theme(),
-                },
+                Theme = new Theme(),
                 SupersededBy = new Publication
                 {
                     LatestPublishedReleaseVersionId = Guid.NewGuid()
@@ -690,10 +662,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Test publication",
-                Topic = new Topic
-                {
-                    Theme = new Theme(),
-                },
+                Theme = new Theme(),
                 SupersededBy = new Publication
                 {
                     // Superseding publication doesn't have a published release
@@ -789,20 +758,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreatePublication()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "Test topic",
-                Theme = new Theme
-                {
-                    Title = "Test theme",
-                },
+                Title = "Test theme",
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.Add(topic);
+                context.Add(theme);
                 await context.SaveChangesAsync();
             }
 
@@ -823,7 +788,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TeamName = "Test team",
                             TeamEmail = "john.smith@test.com",
                         },
-                        TopicId = topic.Id
+                        ThemeId = theme.Id
                     }
                 );
 
@@ -836,18 +801,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test team", publicationViewModel.Contact.TeamName);
                 Assert.Equal("john.smith@test.com", publicationViewModel.Contact.TeamEmail);
 
-                Assert.Equal(topic.Id, publicationViewModel.Topic.Id);
-                Assert.Equal(topic.Title, publicationViewModel.Topic.Title);
-
-                Assert.Equal(topic.Theme.Id, publicationViewModel.Theme.Id);
-                Assert.Equal(topic.Theme.Title, publicationViewModel.Theme.Title);
+                Assert.Equal(theme.Id, publicationViewModel.Theme.Id);
+                Assert.Equal(theme.Title, publicationViewModel.Theme.Title);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var createdPublication = await context.Publications
                     .Include(p => p.Contact)
-                    .Include(p => p.Topic)
+                    .Include(p => p.Theme)
                     .FirstAsync(p => p.Title == "Test publication");
 
                 Assert.NotNull(createdPublication);
@@ -862,28 +824,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test team", createdPublication.Contact.TeamName);
                 Assert.Equal("john.smith@test.com", createdPublication.Contact.TeamEmail);
 
-                Assert.Equal(topic.Id, createdPublication.TopicId);
-                Assert.Equal("Test topic", createdPublication.Topic.Title);
+                Assert.Equal(theme.Id, createdPublication.ThemeId);
+                Assert.Equal("Test theme", createdPublication.Theme.Title);
             }
         }
 
         [Fact]
         public async Task CreatePublication_NoContactTelNo()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "Test topic",
-                Theme = new Theme
-                {
-                    Title = "Test theme",
-                },
+                Title = "Test theme",
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.Add(topic);
+                context.Add(theme);
                 await context.SaveChangesAsync();
             }
 
@@ -904,7 +862,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TeamName = "Test team",
                             TeamEmail = "john.smith@test.com",
                         },
-                        TopicId = topic.Id
+                        ThemeId = theme.Id
                     }
                 );
 
@@ -927,7 +885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreatePublication_FailsWithNonExistingTopic()
+        public async Task CreatePublication_FailsWithNonExistingTheme()
         {
             await using var context = InMemoryApplicationDbContext();
 
@@ -938,25 +896,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PublicationCreateRequest
                 {
                     Title = "Test publication",
-                    TopicId = Guid.NewGuid()
+                    ThemeId = Guid.NewGuid()
                 });
 
-            result.AssertBadRequest(TopicDoesNotExist);
+            result.AssertBadRequest(ThemeDoesNotExist);
         }
 
         [Fact]
         public async Task CreatePublication_FailsWithNonUniqueSlug()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "Test topic"
+                Title = "Test theme"
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.Add(topic);
+                context.Add(theme);
                 context.Add(
                     new Publication
                     {
@@ -977,7 +935,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationCreateRequest
                     {
                         Title = "Test publication",
-                        TopicId = topic.Id
+                        ThemeId = theme.Id
                     }
                 );
 
@@ -988,10 +946,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdatePublication_NotPublished()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "New topic",
-                Theme = new Theme(),
+                Title = "New theme",
             };
 
             var publication = new Publication
@@ -999,9 +956,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Old title",
                 Summary = "Old summary",
                 Slug = "old-slug",
-                Topic = new Topic
+                Theme = new Theme
                 {
-                    Title = "Old topic"
+                    Title = "Old theme"
                 },
                 Contact = new Contact
                 {
@@ -1017,7 +974,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.Add(topic);
+                context.Add(theme);
                 context.Add(publication);
 
                 await context.SaveChangesAsync();
@@ -1045,7 +1002,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "New title",
                         Summary = "New summary",
-                        TopicId = topic.Id,
+                        ThemeId = theme.Id,
                         SupersededById = newSupersededById,
                     }
                 );
@@ -1057,8 +1014,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New title", viewModel.Title);
                 Assert.Equal("New summary", viewModel.Summary);
 
-                Assert.Equal(topic.Id, viewModel.Topic.Id);
-                Assert.Equal(topic.Title, viewModel.Topic.Title);
+                Assert.Equal(theme.Id, viewModel.Theme.Id);
+                Assert.Equal(theme.Title, viewModel.Theme.Title);
 
                 Assert.Equal(newSupersededById, viewModel.SupersededById);
             }
@@ -1067,7 +1024,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var updatedPublication = await context.Publications
                     .Include(p => p.Contact)
-                    .Include(p => p.Topic)
+                    .Include(p => p.Theme)
                     .SingleAsync(p => p.Title == "New title");
 
                 Assert.False(updatedPublication.Live);
@@ -1081,8 +1038,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Old team", updatedPublication.Contact.TeamName);
                 Assert.Equal("old.smith@test.com", updatedPublication.Contact.TeamEmail);
 
-                Assert.Equal(topic.Id, updatedPublication.TopicId);
-                Assert.Equal("New topic", updatedPublication.Topic.Title);
+                Assert.Equal(theme.Id, updatedPublication.ThemeId);
+                Assert.Equal("New theme", updatedPublication.Theme.Title);
 
                 var publicationRedirects = await context.PublicationRedirects.ToListAsync();
                 Assert.Empty(publicationRedirects);
@@ -1092,10 +1049,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdatePublication_AlreadyPublished()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "New topic",
-                Theme = new Theme(),
+                Title = "New theme",
             };
 
             var supersedingPublicationToRemove = new Publication
@@ -1108,9 +1064,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Slug = "old-title",
                 Title = "Old title",
                 Summary = "Old summary",
-                Topic = new Topic
+                Theme = new Theme
                 {
-                    Title = "Old topic"
+                    Title = "Old theme"
                 },
                 Contact = new Contact
                 {
@@ -1132,7 +1088,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.AddRange(topic, publication, supersedingPublicationToRemove, supersededPublication);
+                context.AddRange(theme, publication, supersedingPublicationToRemove, supersededPublication);
                 await context.SaveChangesAsync();
             }
 
@@ -1185,7 +1141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "New title",
                         Summary = "New summary",
-                        TopicId = topic.Id,
+                        ThemeId = theme.Id,
                         SupersededById = newSupersededById,
                     }
                 );
@@ -1199,8 +1155,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New title", viewModel.Title);
                 Assert.Equal("New summary", viewModel.Summary);
 
-                Assert.Equal(topic.Id, viewModel.Topic.Id);
-                Assert.Equal(topic.Title, viewModel.Topic.Title);
+                Assert.Equal(theme.Id, viewModel.Theme.Id);
+                Assert.Equal(theme.Title, viewModel.Theme.Title);
 
                 Assert.Equal(newSupersededById, viewModel.SupersededById);
             }
@@ -1209,7 +1165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var updatedPublication = await context.Publications
                     .Include(p => p.Contact)
-                    .Include(p => p.Topic)
+                    .Include(p => p.Theme)
                     .SingleAsync(p => p.Title == "New title");
 
                 Assert.True(updatedPublication.Live);
@@ -1223,8 +1179,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Old team", updatedPublication.Contact.TeamName);
                 Assert.Equal("old.smith@test.com", updatedPublication.Contact.TeamEmail);
 
-                Assert.Equal(topic.Id, updatedPublication.TopicId);
-                Assert.Equal("New topic", updatedPublication.Topic.Title);
+                Assert.Equal(theme.Id, updatedPublication.ThemeId);
+                Assert.Equal("New theme", updatedPublication.Theme.Title);
 
                 Assert.Equal(newSupersededById, updatedPublication.SupersededById);
 
@@ -1245,10 +1201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Slug = "old-title",
                 Title = "Old title",
-                Topic = new Topic
-                {
-                    Theme = new Theme(),
-                },
+                Theme = new Theme(),
                 Contact = new Contact
                 {
                     ContactName = "Old name",
@@ -1329,7 +1282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publication.Id,
                     new PublicationSaveRequest
                     {
-                        TopicId = publication.TopicId,
+                        ThemeId = publication.ThemeId,
                         Title = "New title",
                         Summary = "New summary",
                     }
@@ -1348,7 +1301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var updatedPublication = await context.Publications
                     .Include(p => p.Contact)
-                    .Include(p => p.Topic)
+                    .Include(p => p.Theme)
                     .SingleAsync(p => p.Title == "New title");
 
                 Assert.True(updatedPublication.Live);
@@ -1371,10 +1324,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void UpdatePublication_NoTitleOrSupersededByChange()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "New topic",
-                Theme = new Theme(),
+                Title = "theme",
             };
 
             var publication = new Publication
@@ -1382,9 +1334,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Old title",
                 Summary = "Old summary",
                 Slug = "old-title",
-                Topic = new Topic
+                Theme = new Theme
                 {
-                    Title = "Old topic"
+                    Title = "Old theme"
                 },
                 Contact = new Contact
                 {
@@ -1400,7 +1352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.Add(topic);
+                context.Add(theme);
                 context.Add(publication);
 
                 await context.SaveChangesAsync();
@@ -1420,7 +1372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "Old title",
                         Summary = "New summary",
-                        TopicId = topic.Id,
+                        ThemeId = theme.Id,
                         SupersededById = publication.SupersededById,
                     }
                 );
@@ -1442,10 +1394,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test title",
                 Slug = "test-slug",
-                Topic = new Topic
+                Theme = new Theme
                 {
-                    Title = "Test topic",
-                    Theme = new Theme(),
+                    Title = "Test theme",
                 },
                 LatestPublishedReleaseVersion = new ReleaseVersion()
             };
@@ -1509,7 +1460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "Test title",
                         Slug = "test-slug",
-                        TopicId = publication.TopicId,
+                        ThemeId = publication.ThemeId,
                     }
                 );
 
@@ -1568,56 +1519,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdatePublication_FailsWithNonExistingTopic()
-        {
-            var publication = new Publication
-            {
-                Title = "Test publication",
-                Topic = new Topic
-                {
-                    Title = "Test topic"
-                },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = BuildPublicationService(context);
-
-                // Service method under test
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveRequest
-                    {
-                        Title = "Test publication",
-                        TopicId = Guid.NewGuid(),
-                    }
-                );
-
-                result.AssertBadRequest(TopicDoesNotExist);
-            }
-        }
-
-        [Fact]
         public async Task UpdatePublication_CreateRedirectIfLiveSlugChanged()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "Topic title",
-                Theme = new Theme(),
+                Title = "Theme title",
             };
             var publication = new Publication
             {
                 Title = "Current title",
                 Slug = "current-title",
-                Topic = topic,
+                Theme = theme,
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
             };
             var olderRedirect = new PublicationRedirect
@@ -1676,7 +1588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveRequest
                     {
                         Title = "New title",
-                        TopicId = topic.Id,
+                        ThemeId = theme.Id,
                     }
                 );
 
@@ -1706,16 +1618,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdatePublication_ChangeBackToPreviousLiveSlug()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "Topic title",
-                Theme = new Theme(),
+                Title = "Theme title",
             };
             var publication = new Publication
             {
                 Title = "Title",
                 Slug = "title",
-                Topic = topic,
+                Theme = theme,
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
             };
             var olderRedirect = new PublicationRedirect
@@ -1774,7 +1685,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveRequest
                     {
                         Title = "Older title",
-                        TopicId = topic.Id,
+                        ThemeId = theme.Id,
                     }
                 );
 
@@ -1804,21 +1715,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdatePublication_OtherPublicationHasSlug()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "Topic title"
+                Title = "Theme title"
             };
             var publication = new Publication
             {
                 Title = "Test publication",
                 Slug = "test-publication",
-                Topic = topic,
+                Theme = theme,
             };
             var otherPublication = new Publication
             {
                 Title = "Duplicated title",
                 Slug = "duplicated-title",
-                Topic = topic,
+                Theme = theme,
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1840,7 +1751,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveRequest
                     {
                         Title = "Duplicated title",
-                        TopicId = topic.Id,
+                        ThemeId = theme.Id,
                     }
                 );
 
@@ -1863,15 +1774,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdatePublication_SlugUsedByRedirect()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "Topic title"
+                Title = "Theme title"
             };
             var publication = new Publication
             {
                 Title = "Test publication",
                 Slug = "test-publication",
-                Topic = topic,
+                Theme = theme,
             };
             var publicationRedirect = new PublicationRedirect
             {
@@ -1897,7 +1808,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveRequest
                     {
                         Title = "Duplicated title",
-                        TopicId = topic.Id,
+                        ThemeId = theme.Id,
                     }
                 );
 
@@ -1922,15 +1833,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdatePublication_MethodologyInheritedNewSlugAlreadyUsed()
         {
-            var topic = new Topic
+            var theme = new Theme
             {
-                Title = "Topic title"
+                Title = "Theme title"
             };
             var publication = new Publication
             {
                 Title = "Test publication",
                 Slug = "test-publication",
-                Topic = topic,
+                Theme = theme,
             };
             var methodology = new Methodology
             {
@@ -1980,7 +1891,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveRequest
                     {
                         Title = "Already used by methodology",
-                        TopicId = topic.Id,
+                        ThemeId = theme.Id,
                     }
                 );
 
@@ -2749,10 +2660,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     _dataFixture
                         .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
                 .WithLegacyLinks(legacyLinks)
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2823,10 +2731,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
                         .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2898,10 +2803,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithLegacyLinks(legacyLinks)
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2944,10 +2846,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2986,10 +2885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     _dataFixture
                         .DefaultRelease(publishedVersions: 1, year: 2020)))
                 .WithLegacyLinks(legacyLinks)
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3064,10 +2960,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3138,10 +3031,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     _dataFixture
                         .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
                 .WithLegacyLinks(legacyLinks)
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3245,10 +3135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithLegacyLinks(legacyLinks)
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3285,10 +3172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithReleases(ListOf<Release>(
                     _dataFixture
                         .DefaultRelease(publishedVersions: 1, year: 2020)))
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3323,10 +3207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithReleases(ListOf<Release>(
                     _dataFixture
                         .DefaultRelease(publishedVersions: 1, year: 2020)))
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3373,10 +3254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithReleases(ListOf<Release>(
                     _dataFixture
                         .DefaultRelease(publishedVersions: 1, year: 2020)))
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3418,10 +3296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithTopic(_dataFixture
-                    .DefaultTopic()
-                    .WithTheme(_dataFixture
-                        .DefaultTheme()));
+                .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

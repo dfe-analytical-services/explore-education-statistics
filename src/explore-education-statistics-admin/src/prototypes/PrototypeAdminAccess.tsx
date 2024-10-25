@@ -47,10 +47,10 @@ const PrototypeManagePublication = () => {
           <div className="govuk-grid-column-three-quarters">
             <h3 className="govuk-heading-l">Update release access</h3>
             <form>
-              <label htmlFor="topic" className="govuk-label">
+              <label htmlFor="release" className="govuk-label">
                 Select release
               </label>
-              <select name="topic" id="topic" className="govuk-select">
+              <select name="release" id="release" className="govuk-select">
                 <option value="">Academic year 2020/21 (Not live)</option>
                 <option value="">
                   Academic year 2019/20 (Live - Latest release)

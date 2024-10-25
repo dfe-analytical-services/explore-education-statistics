@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -11,28 +8,21 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
-    public class RelatedInformationService : IRelatedInformationService
+    public class RelatedInformationService(
+        ContentDbContext context,
+        IPersistenceHelper<ContentDbContext> persistenceHelper,
+        IUserService userService) : IRelatedInformationService
     {
-        private readonly ContentDbContext _context;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IUserService _userService;
-
-        public RelatedInformationService(ContentDbContext context,
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IUserService userService)
-        {
-            _context = context;
-            _persistenceHelper = persistenceHelper;
-            _userService = userService;
-        }
-
         public Task<Either<ActionResult, List<Link>>> GetRelatedInformationAsync(Guid releaseVersionId)
         {
-            return _persistenceHelper
+            return persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(releaseVersion => releaseVersion.RelatedInformation);
         }
@@ -40,9 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, List<Link>>> AddRelatedInformationAsync(Guid releaseVersionId,
             CreateUpdateLinkRequest request)
         {
-            return _persistenceHelper
+            return persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async releaseVersion =>
                 {
                     if (releaseVersion.RelatedInformation == null)
@@ -57,34 +47,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         Url = request.Url
                     });
 
-                    _context.ReleaseVersions.Update(releaseVersion);
-                    await _context.SaveChangesAsync();
+                    context.ReleaseVersions.Update(releaseVersion);
+                    await context.SaveChangesAsync();
                     return releaseVersion.RelatedInformation;
                 });
         }
 
-        public Task<Either<ActionResult, List<Link>>> UpdateRelatedInformationAsync(
-            Guid releaseVersionId, Guid relatedInformationId, CreateUpdateLinkRequest request)
+        public Task<Either<ActionResult, List<Link>>> UpdateRelatedInformation(
+            Guid releaseVersionId,
+            List<CreateUpdateLinkRequest> updatedLinkRequests,
+            CancellationToken cancellationToken = default)
         {
-            return _persistenceHelper
+            return persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async releaseVersion =>
                 {
-                    var toUpdate = releaseVersion
-                        .RelatedInformation
-                        .Find(item => item.Id == relatedInformationId);
+                    var updatedLinks = new List<Link>();
 
-                    if (toUpdate == null)
-                    {
-                        return NotFound<List<Link>>();
-                    }
+                    updatedLinkRequests.ForEach(r => updatedLinks.Add(
+                        new Link
+                        {
+                            Id = Guid.NewGuid(),
+                            Description = r.Description,
+                            Url = r.Url
+                        }));
 
-                    toUpdate.Description = request.Description;
-                    toUpdate.Url = request.Url;
+                    releaseVersion.RelatedInformation = updatedLinks;
+                    await context.SaveChangesAsync(cancellationToken);
 
-                    _context.ReleaseVersions.Update(releaseVersion);
-                    await _context.SaveChangesAsync();
                     return releaseVersion.RelatedInformation;
                 });
         }
@@ -92,16 +83,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, List<Link>>> DeleteRelatedInformationAsync(Guid releaseVersionId,
             Guid relatedInformationId)
         {
-            return _persistenceHelper
+            return persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async releaseVersion =>
                 {
                     releaseVersion.RelatedInformation.Remove(
                         releaseVersion.RelatedInformation.Find(item => item.Id == relatedInformationId));
 
-                    _context.ReleaseVersions.Update(releaseVersion);
-                    await _context.SaveChangesAsync();
+                    context.ReleaseVersions.Update(releaseVersion);
+                    await context.SaveChangesAsync();
                     return releaseVersion.RelatedInformation;
                 });
         }

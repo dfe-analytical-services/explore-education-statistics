@@ -69,7 +69,7 @@ def take_screenshot_of_element(element: WebElement, filename: str):
         element.screenshot(filepath)
         return f"file://{filepath}"
     except BaseException:
-        logger.warn(f"Unable to take a screenshot of element for file {filename}")
+        logger.warning(f"Unable to take a screenshot of element for file {filename}")
         return ""
 
 

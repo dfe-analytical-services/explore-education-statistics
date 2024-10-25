@@ -12,7 +12,7 @@ const ThemeCreatePage = ({ history }: RouteComponentProps<ThemeParams>) => {
     <Page
       title="Create theme"
       breadcrumbs={[
-        { name: 'Manage themes and topics', link: themesRoute.path },
+        { name: 'Manage themes', link: themesRoute.path },
         { name: 'Create theme' },
       ]}
     >

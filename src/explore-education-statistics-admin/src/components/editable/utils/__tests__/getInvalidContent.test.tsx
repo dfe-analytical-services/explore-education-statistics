@@ -258,26 +258,27 @@ describe('getInvalidContent', () => {
     ]);
   });
 
-  test('returns an error when the first heading is higher than h3', () => {
-    const testContent: JsonElement[] = [
-      {
-        name: 'heading4',
-        children: [
-          {
-            data: 'heading 4',
-          },
-        ],
-      },
-    ];
+  it.each([
+    ['heading4', 'heading 4'],
+    ['heading5', 'heading 5'],
+  ])(
+    'returns no errors when the first heading is higher than h3',
+    (headingName, headingData) => {
+      const testContent: JsonElement[] = [
+        {
+          name: headingName,
+          children: [
+            {
+              data: headingData,
+            },
+          ],
+        },
+      ];
 
-    const result = getInvalidContent(testContent);
-    expect(result).toEqual([
-      {
-        type: 'skippedHeadingLevel',
-        message: 'h2 (section title) to h4 (heading 4)',
-      },
-    ]);
-  });
+      const result = getInvalidContent(testContent);
+      expect(result).toHaveLength(0);
+    },
+  );
 
   test('returns an error when there is repeated link text within the same page where the links are different', () => {
     const testContent: JsonElement[] = [

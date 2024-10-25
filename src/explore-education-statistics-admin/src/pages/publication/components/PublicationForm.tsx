@@ -39,7 +39,6 @@ interface Props {
   cancelButton?: ReactNode;
   id?: string;
   themeId: string;
-  topicId: string;
   onSubmit: () => void | Promise<void>;
 }
 
@@ -47,7 +46,6 @@ export default function PublicationForm({
   cancelButton,
   id = 'publicationForm',
   themeId,
-  topicId,
   onSubmit,
 }: Props) {
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
@@ -102,7 +100,6 @@ export default function PublicationForm({
       summary,
       title,
       themeId,
-      topicId,
       contact,
     });
 

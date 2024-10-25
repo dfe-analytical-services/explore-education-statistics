@@ -11,7 +11,6 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${TOPIC_NAME}=          %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=    UI tests - upload files %{RUN_IDENTIFIER}
 
 
