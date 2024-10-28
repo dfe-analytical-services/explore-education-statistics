@@ -1,0 +1,37 @@
+<% if schema.format %>
+- Format: `<%= schema.format %>`
+<% end %>
+
+<% unless schema.max_length.nil? %>
+- Maximum length: `<%= schema.max_length %>`
+<% end %>
+<% if schema.min_length != 0 %>
+- Minimum length: `<%= schema.min_length %>`
+<% end %>
+
+<% unless schema.max_items.nil? %>
+- Maximum items: `<%= schema.max_items %>`
+<% end %>
+<% if schema.min_items != 0 %>
+- Minimum items: `<%= schema.min_items %>`
+<% end %>
+
+<% if schema.unique_items? %>
+- Items must be unique
+<% end %>
+
+<% unless schema.minimum.nil? && schema.maximum.nil? && schema.format.nil? %>
+<% if schema.minimum %>
+- <%= schema.exclusive_minimum? ? 'Minimum (exclusive)' : 'Minimum' %>: `<%= schema.minimum %>`
+<% end %>
+<% if schema.maximum %>
+- <%= schema.exclusive_maximum? ? 'Maximum (exclusive)' : 'Maximum' %>: `<%= schema.maximum %>`
+<% end %>
+<% end %>
+
+<% unless schema.max_properties.nil? %>
+- Maximum properties: `<%= schema.max_properties %>`
+<% end %>
+<% if schema.min_properties != 0 %>
+- Minimum properties: `<%= schema.min_properties %>`
+<% end %>

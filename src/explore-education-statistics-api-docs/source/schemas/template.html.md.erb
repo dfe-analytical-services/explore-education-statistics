@@ -1,0 +1,59 @@
+# <%= title %>
+
+<% if schema.description %>
+<%= schema.description %>
+<% end %>
+
+<% if schema.enum %>
+Allowed options:
+
+<% schema.enum.each do |item| %>
+- `<%= item %>`
+<% end %>
+<% end %>
+
+<% properties = get_schema_properties(schema) %>
+
+<% if properties.any? %>
+## Properties
+
+<div aria-label="Properties" class="app-table-container" role="region" tabindex="0">
+  <table>
+    <thead>
+    <tr>
+      <th scope="col">Property</th>
+      <th scope="col">Type</th>
+      <th scope="col">Required</th>
+      <th scope="col">Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% properties.each do |name, property| %>
+      <tr>
+        <td><code class="app-word-break--normal"><%= name %></code></td>
+        <td><%= render_schema_type(property) %></td>
+        <td><%= is_required_schema_property?(schema, property) %></td>
+        <td>
+          <%= partial("partials/schema_description", :locals => {
+            description: property.description,
+            schema: property
+          }) %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+<% end %>
+
+<% unless is_primitive_schema(schema) %>
+## Example schema
+
+<% schema_json = json_pretty(schema_example(schema)) %>
+
+<% unless schema_json.blank? %>
+```json
+<%= schema_json %>
+```
+<% end %>
+<% end %>

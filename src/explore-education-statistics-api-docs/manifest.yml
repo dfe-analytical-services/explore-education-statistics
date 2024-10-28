@@ -1,0 +1,8 @@
+---
+applications:
+- name: tdt-documentation
+  memory: 64M
+  instances: 2
+  buildpack: staticfile_buildpack
+  routes:
+    - route: 	tdt-documentation.london.cloudapps.digital

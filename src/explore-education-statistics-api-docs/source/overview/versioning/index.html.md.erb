@@ -1,0 +1,58 @@
+---
+title: Versioning
+last_reviewed_on: 2024-09-18
+review_in: 6 months
+weight: 4
+---
+
+# Versioning
+
+The Explore Education Statistics (EES) API uses URL-based versioning. Each endpoint encodes its current
+version within its URL e.g. `/api/v1/the-endpoint`, `/api/v2/the-endpoint`, etc.
+
+When backwards-incompatible changes to an endpoint are unavoidable, a new version of the endpoint
+will be published. Backwards-incompatible changes may include things like:
+
+- removing properties in the request or response schema
+- changing the structure of the request or response schema
+- changing validation rules for the request
+
+In the event that a new endpoint version is necessary, the previous version(s) of the endpoint will
+be maintained for as long as possible. This should provide sufficient opportunity to migrate to the
+new endpoint version.
+
+For new major API versions, guidance on migrating your existing code will be published in the
+changelog documentation for the API.
+
+## Data set versioning
+
+Data sets available through this API may introduce changes over time. Similar to other types of
+versioning, major or minor versions will be published as required.
+
+The following are considered **major** (breaking) changes:
+
+- facets (filters, geographic levels, locations, time periods) were deleted
+- indicators were deleted
+
+The following are considered **minor** changes:
+
+- facets were added
+- facet options were added
+- facet details were updated (e.g. label, hint)
+- facet options were updated (e.g. label)
+- indicators were added
+- indicator details were updated (e.g. label, unit, decimal places)
+- data values were updated
+
+As long as you have specified a data set version to use, any query that you have previously created
+should continue to work as normal regardless of new versions being published.
+
+### Upgrading to newer versions
+
+When you wish to upgrade a query to use a newer data set version, it's important to check the
+changes introduced by the version and consider if they affect your consuming code.
+
+You can find lists of changes via:
+
+- the data set's changelog on its details page on the EES website (see [Data catalogue](https://explore-education-statistics.service.gov.uk/data-catalogue))
+- the [Get a data set version's changes](/endpoints/GetDataSetVersionChanges/index.html) endpoint

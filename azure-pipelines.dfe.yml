@@ -11,7 +11,8 @@ variables:
   BuildConfiguration: 'Release'
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
-  NODE_VERSION: 20.16.0
+  NodeVersion: 20.16.0
+  RubyVersion: 3.3.5
   AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
 
 trigger:
@@ -208,10 +209,10 @@ jobs:
     workspace:
       clean: all
     steps:
-      - task: NodeTool@0
-        displayName: 'Install Node.js $(NODE_VERSION)'
+      - task: NodeTool@1
+        displayName: 'Install Node.js $(NodeVersion)'
         inputs:
-          versionSpec: $(NODE_VERSION)
+          version: $(NodeVersion)
 
       - task: 'Bash@3'
         displayName: 'corepack enable'
@@ -276,10 +277,10 @@ jobs:
     workspace:
       clean: all
     steps:
-      - task: NodeTool@0
-        displayName: 'Install Node.js $(NODE_VERSION)'
+      - task: NodeTool@1
+        displayName: 'Install Node.js $(NodeVersion)'
         inputs:
-          versionSpec: $(NODE_VERSION)
+          version: $(NodeVersion)
 
       - task: 'Bash@3'
         displayName: 'corepack enable'
@@ -360,6 +361,29 @@ jobs:
           repository: 'ees-public-frontend'
           command: 'push'
           tags: $(Build.BuildNumber)
+
+  - job: 'API docs'
+    pool:
+      vmImage: 'ubuntu-22.04'
+    workspace:
+      clean: all
+    steps:
+      - task: NodeTool@1
+        displayName: Install Node.js $(NodeVersion)
+        inputs:
+          version: $(NodeVersion)
+
+      - task: UseRubyVersion@0
+        displayName: Install Ruby $(RubyVersion)
+        inputs:
+          versionSpec: $(RubyVersion)
+
+      - task: Bash@3
+        displayName: Build
+        workingDirectory: src/explore-education-statistics-api-docs
+        inputs:
+          targetType: inline
+          script: bundle exec middleman build
 
   - job: 'MiscellaneousArtifacts'
     pool:

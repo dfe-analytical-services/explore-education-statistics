@@ -1,0 +1,27 @@
+name: Notify expired documentation
+on:
+  schedule:
+    - cron: '5 12 * * 1-5'  # 12:05 UTC, Monday to Friday
+  workflow_dispatch:
+
+env:
+  DOCS_PATH: src/explore-education-statistics-api-docs
+
+jobs:
+  slack-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          working-directory: ${{ env.DOCS_PATH }}
+
+      - name: notify:expired
+        run: bundle exec rake notify:expired
+        working-directory: ${{ env.DOCS_PATH }}
+        env:
+          REALLY_POST_TO_SLACK: ${{ (github.event_name == 'schedule') && 1 || 0 }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          OVERRIDE_SLACK_MESSAGE_PREFIX: "Please ensure that the Public API documentation is up to date."
