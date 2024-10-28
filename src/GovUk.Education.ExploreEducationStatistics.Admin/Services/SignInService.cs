@@ -98,13 +98,9 @@ public class SignInService : ISignInService
             return new SignInResponseViewModel(LoginResult.ExpiredInvite);
         }
 
-        // Mark the invite as accepted.
         inviteToSystem.Accepted = true;
 
-        // See if we have an "internal" User record in existence yet that has a matching email address to the
-        // new user logging in.  If we do, create this new AspNetUser record with a matching one-to-one id.
-        // Otherwise, later on we'll create a new "internal" Users record with an id matching this AspNetUser's
-        // id, continuing to establish the one-to-one relationship.
+        // This will also fetch soft-deleted users
         var existingInternalUser = await _contentDbContext
             .Users
             .AsQueryable()
@@ -132,12 +128,20 @@ public class SignInService : ISignInService
             return new StatusCodeResult(500);
         }
 
-        // If adding the new Identity Framework user records succeeded, continue on to create internal User
-        // and Role records for the application itself and sign the user in.
+        // Now we have created Identity Framework user records, we can create internal User and Role records
+        // for the application itself.
 
-        // If we didn't yet have an existing "internal" User record matching this new login in the Users
-        // table, create one now, being sure to establish the one-to-one id relationship between the
-        // AspNetUsers record and the Users record.
+        // If the user was previously soft deleted, we undo it. When a user is soft deleted, all the user's database
+        // entries are removed *except* for the ContentDb's User table entry.
+        if (existingInternalUser?.Deleted != null)
+        {
+            existingInternalUser.FirstName = newAspNetUser.FirstName;
+            existingInternalUser.LastName = newAspNetUser.LastName;
+            existingInternalUser.Deleted = null;
+            await HandleReleaseInvites(existingInternalUser.Id, existingInternalUser.Email);
+            await HandlePublicationInvites(existingInternalUser.Id, existingInternalUser.Email);
+        }
+
         if (existingInternalUser == null)
         {
             var newInternalUser = new User
@@ -149,26 +153,8 @@ public class SignInService : ISignInService
             };
 
             await _contentDbContext.Users.AddAsync(newInternalUser);
-
-            // Accept any invites to specific Releases.
-            var releaseInvites = await _releaseInviteRepository.ListByEmail(profile.Email);
-            await releaseInvites
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(invite => _releaseRoleRepository.Create(
-                    userId: newInternalUser.Id,
-                    releaseVersionId: invite.ReleaseVersionId,
-                    role: invite.Role,
-                    createdById: invite.CreatedById));
-
-            // Accept any invites to specific Publications.
-            var publicationInvites = await _publicationInviteRepository.ListByEmail(profile.Email);
-            await publicationInvites
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(invite => _publicationRoleRepository.Create(
-                    userId: newInternalUser.Id,
-                    publicationId: invite.PublicationId,
-                    role: invite.Role,
-                    createdById: invite.CreatedById));
+            await HandleReleaseInvites(newInternalUser.Id, newInternalUser.Email);
+            await HandlePublicationInvites(newInternalUser.Id, newInternalUser.Email);
         }
 
         await _contentDbContext.SaveChangesAsync();
@@ -179,6 +165,30 @@ public class SignInService : ISignInService
             UserProfile: new UserProfile(
                 Id: Guid.Parse(newAspNetUser.Id),
                 FirstName: newAspNetUser.FirstName));
+    }
+
+    private async Task HandleReleaseInvites(Guid newUserId, string email)
+    {
+        var releaseInvites = await _releaseInviteRepository.ListByEmail(email);
+        await releaseInvites
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(invite => _releaseRoleRepository.Create(
+                userId: newUserId,
+                releaseVersionId: invite.ReleaseVersionId,
+                role: invite.Role,
+                createdById: invite.CreatedById));
+    }
+
+    private async Task HandlePublicationInvites(Guid newUserId, string email)
+    {
+        var publicationInvites = await _publicationInviteRepository.ListByEmail(email);
+        await publicationInvites
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(invite => _publicationRoleRepository.Create(
+                userId: newUserId,
+                publicationId: invite.PublicationId,
+                role: invite.Role,
+                createdById: invite.CreatedById));
     }
 
     private async Task HandleExpiredInvite(

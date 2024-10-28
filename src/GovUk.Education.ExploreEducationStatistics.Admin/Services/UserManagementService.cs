@@ -448,10 +448,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Where(invite => invite.Email.ToLower() == email.ToLower())
                         .ToListAsync();
 
-                    // Delete the internal EES user, if found.
+                    // We don't remove the ContentDb's Users entry. All other stuff related to the
+                    // user is removed. This is done so if that user's Id exists in other table's
+                    // Created/Updated/DeletedById columns, that info isn't lost and we don't have to worry about
+                    // referential integrity (which we would if we removed the User table entry).
                     if (internalUser != null)
                     {
-                        _contentDbContext.Users.Remove(internalUser);
+                        internalUser.Deleted = DateTime.UtcNow;
                     }
 
                     // Delete any invites that they may have had.

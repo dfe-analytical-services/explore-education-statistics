@@ -12,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Email { get; set; }
 
+        public DateTime? Deleted { get; set; }
+
         public string DisplayName => $"{FirstName} {LastName}";
     }
 }
