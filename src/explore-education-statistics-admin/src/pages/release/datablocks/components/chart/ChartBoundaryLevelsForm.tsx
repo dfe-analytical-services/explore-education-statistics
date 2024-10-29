@@ -97,13 +97,19 @@ export default function ChartBoundaryLevelsForm({
       initialValues={initialValues}
       validationSchema={validationSchema}
     >
-      {({ formState }) => {
+      {({ formState, reset }) => {
         return (
           <Form<ChartBoundaryLevelsFormValues>
             id={formId}
             onChange={onChange}
             onSubmit={handleSubmit}
           >
+            <Effect
+              value={dataSetRows}
+              onChange={() => {
+                reset();
+              }}
+            />
             <Effect
               value={{
                 formKey: 'boundaryLevels',
