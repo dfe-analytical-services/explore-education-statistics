@@ -1,0 +1,27 @@
+<div aria-label="Parameters" class="app-table-container" role="region" tabindex="0">
+  <table>
+    <thead>
+    <tr>
+      <th scope="col">Parameter</th>
+      <th scope="col">Type</th>
+      <th scope="col">Required</th>
+      <th scope="col">Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% parameters.each do |parameter| %>
+      <tr>
+        <td><code class="app-word-break--normal"><%= parameter.name %></code></td>
+        <td><%= render_schema_type(parameter.schema) %></td>
+        <td><%= parameter.required? %></td>
+        <td>
+          <%= partial("partials/schema_description", :locals => {
+            description: parameter.description,
+            schema: parameter.schema
+          }) %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>

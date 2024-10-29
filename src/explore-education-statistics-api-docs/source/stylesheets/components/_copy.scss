@@ -1,0 +1,44 @@
+.app-copy-button {
+  $copy-button-colour: #00823b;
+
+  @include govuk-font(16);
+  background-color: govuk-colour('white');
+  box-shadow: 0 2px 0 0 govuk-colour('green');
+  border: 1px solid $copy-button-colour;
+  color: $copy-button-colour;
+  cursor: pointer;
+  min-width: 110px;
+  opacity: 0;
+  padding: 3px 10px;
+  position: absolute;
+  right: govuk-spacing(2);
+  text-align: center;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  top: govuk-spacing(2);
+  z-index: 1;
+
+  &:focus:not(:hover) {
+    background-color: $govuk-focus-colour;
+    box-shadow: 0 2px 0 0 $govuk-focus-text-colour;
+    color: $govuk-focus-text-colour;
+  }
+
+  &:active,
+  &:focus {
+    border: 2px solid $govuk-focus-colour;
+    box-shadow: none;
+    opacity: 1;
+    outline: 2px solid transparent;
+    padding: 2px 10px; // Counter increased border size
+  }
+
+  &:active {
+    box-shadow: none;
+    margin-top: 2px;
+  }
+}
+
+.highlight:hover > .app-copy-button {
+  opacity: 1;
+}
