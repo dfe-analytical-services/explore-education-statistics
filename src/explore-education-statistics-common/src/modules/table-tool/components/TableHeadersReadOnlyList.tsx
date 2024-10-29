@@ -2,7 +2,7 @@ import DragIcon from '@common/components/DragIcon';
 import styles from '@common/modules/table-tool/components/TableHeadersReadOnlyList.module.scss';
 import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
 import { Filter } from '@common/modules/table-tool/types/filters';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 interface Props {
@@ -24,15 +24,19 @@ const TableHeadersReadOnlyList = ({
     useTableHeadersContext();
   const isExpanded = expandedLists.includes(id);
 
-  const { getValues } = useFormContext();
-  const list: Filter[] = getValues(name);
+  const { getValues, setValue } = useFormContext();
+
+  const [list, setList] = useState<Filter[]>(getValues(name));
 
   const displayItems = isExpanded ? list.length : defaultNumberOfItems;
 
-  if (reverseOrderIds.includes(name) && isReverse) {
-    list.reverse();
-    setIsReverse(false);
-  }
+  useEffect(() => {
+    if (reverseOrderIds.includes(name) && isReverse) {
+      setList(list.toReversed());
+      setValue(name, list.toReversed());
+      setIsReverse(false);
+    }
+  }, [isReverse, list, name, reverseOrderIds, setIsReverse, setValue]);
 
   return (
     <>
