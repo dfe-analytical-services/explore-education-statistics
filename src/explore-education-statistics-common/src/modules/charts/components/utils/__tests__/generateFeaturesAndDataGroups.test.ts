@@ -1,24 +1,24 @@
-import generateFeaturesAndDataGroups from '@common/modules/charts/components/utils/generateFeaturesAndDataGroups';
-import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
-import { MapDataSetCategory } from '@common/modules/charts/components/utils/createMapDataSetCategories';
-import { DataSetCategoryConfig } from '@common/modules/charts/util/getDataSetCategoryConfigs';
-import expandDataSet from '@common/modules/charts/util/expandDataSet';
-import { MapFeatureCollection } from '@common/modules/charts/components/MapBlock';
-import { LegendDataGroup } from '@common/modules/charts/components/utils/generateLegendDataGroups';
 import {
-  testLocation1,
-  testLocation2,
-  testLocation3,
-  testTimePeriod1,
   testDataGrouping,
   testDataSet1,
+  testDataSet2,
+  testDataSet3,
   testGeoJsonFeature1,
   testGeoJsonFeature2,
   testGeoJsonFeature3,
-  testDataSet2,
-  testDataSet3,
+  testLocation1,
+  testLocation2,
+  testLocation3,
   testSubjectMeta,
+  testTimePeriod1,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
+import { MapFeatureCollection } from '@common/modules/charts/components/MapBlock';
+import { MapDataSetCategory } from '@common/modules/charts/components/utils/createMapDataSetCategories';
+import generateFeaturesAndDataGroups from '@common/modules/charts/components/utils/generateFeaturesAndDataGroups';
+import { LegendDataGroup } from '@common/modules/charts/components/utils/generateLegendDataGroups';
+import expandDataSet from '@common/modules/charts/util/expandDataSet';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
+import { MapDataSetCategoryConfig } from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import { Indicator } from '@common/modules/table-tool/types/filters';
 
 describe('generateFeaturesAndDataGroups', () => {
@@ -55,7 +55,7 @@ describe('generateFeaturesAndDataGroups', () => {
         geoJson: testGeoJsonFeature3,
       },
     ];
-    const testSelectedDataSetConfig: DataSetCategoryConfig = {
+    const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
       config: {
         label: 'Indicator 1 (Time period 1)',
         colour: '#12436D',
@@ -203,7 +203,7 @@ describe('generateFeaturesAndDataGroups', () => {
       ],
     };
 
-    const testSelectedDataSetConfig: DataSetCategoryConfig = {
+    const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
       config: {
         label: 'Indicator 1 (Time period 1)',
         colour: '#12436D',
@@ -312,7 +312,7 @@ describe('generateFeaturesAndDataGroups', () => {
       ],
     };
 
-    const testSelectedDataSetConfig: DataSetCategoryConfig = {
+    const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
       config: {
         label: 'Indicator 1 (Time period 1)',
         colour: '#12436D',
@@ -421,7 +421,7 @@ describe('generateFeaturesAndDataGroups', () => {
       ],
     };
 
-    const testSelectedDataSetConfig: DataSetCategoryConfig = {
+    const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
       config: {
         label: 'Indicator 1 (Time period 1)',
         colour: '#4763a5',
