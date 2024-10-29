@@ -10,7 +10,7 @@ import getDataSetCategoryConfigs, {
 } from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import keyBy from 'lodash/keyBy';
 
-const defaultDataGrouping: DataGroupingConfig = {
+export const defaultDataGrouping: DataGroupingConfig = {
   customGroups: [],
   numberOfGroups: 5,
   type: 'EqualIntervals',
@@ -24,7 +24,6 @@ export interface MapDataSetCategoryConfig extends DataSetCategoryConfig {
 interface GetMapDataSetCategoryConfigsOptions
   extends GetDataSetCategoryConfigsOptions {
   dataSetConfigs?: MapDataSetConfig[];
-  defaultBoundaryLevel?: number;
   /**
    * Data classification and data groups are now in `dataSetConfigs`
    * as they are per data set instead of for all data sets (EES-3858).
@@ -41,7 +40,6 @@ interface GetMapDataSetCategoryConfigsOptions
 
 export default function getMapDataSetCategoryConfigs({
   dataSetConfigs = [],
-  defaultBoundaryLevel,
   deprecatedDataClassification,
   deprecatedDataGroups,
   ...options
@@ -66,11 +64,13 @@ export default function getMapDataSetCategoryConfigs({
     const dataSetConfig =
       dataSetConfigsByDataSet[dataSetCategoryConfig.dataKey];
 
-    const dataGrouping = dataSetConfig?.dataGrouping ?? defaultDataGrouping;
+    const { dataGrouping, boundaryLevel } = dataSetConfig ?? {
+      dataGrouping: defaultDataGrouping,
+    };
 
     return {
       ...dataSetCategoryConfig,
-      boundaryLevel: defaultBoundaryLevel ?? dataSetConfig?.boundaryLevel,
+      boundaryLevel,
       dataGrouping: deprecatedGrouping ?? dataGrouping,
     };
   });
