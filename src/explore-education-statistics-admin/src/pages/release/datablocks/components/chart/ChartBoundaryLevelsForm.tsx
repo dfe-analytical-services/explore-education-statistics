@@ -127,7 +127,7 @@ export default function ChartBoundaryLevelsForm({
               }
               hint={`Select a version of geographical data to use${
                 hasDataSetBoundaryLevels
-                  ? "across any data sets that don't have a specific one set"
+                  ? " across any data sets that don't have a specific one set"
                   : ''
               }`}
               name="boundaryLevel"

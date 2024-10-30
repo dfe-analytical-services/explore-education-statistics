@@ -11,11 +11,10 @@ import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React, { ReactElement } from 'react';
 import { DataSet } from '@common/modules/charts/types/dataSet';
-import { ChartBoundaryLevelsFormValues } from '../ChartBoundaryLevelsForm';
+import { defaultDataGrouping } from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
+import { MapBoundaryLevelConfig } from '../types/mapConfig';
 
 describe('ChartBoundaryLevelsConfiguration', () => {
-  const testTable = testFullTable;
-
   const testDefaultChartOptions: ChartOptions = {
     alt: '',
     height: 600,
@@ -81,22 +80,12 @@ describe('ChartBoundaryLevelsConfiguration', () => {
   test('renders without table one or less dataset is included', () => {
     render(
       <ChartBoundaryLevelsConfiguration
-        data={testTable.results}
+        map={{ dataSetConfigs: [] }}
         meta={testMeta}
-        axisMajor={{
-          dataSets: [testDataSets[0]],
-          groupBy: 'locations',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
         options={testDefaultChartOptions}
         onChange={noop}
         onSubmit={noop}
+        hasDataSetBoundaryLevels
       />,
     );
     expect(
@@ -107,22 +96,25 @@ describe('ChartBoundaryLevelsConfiguration', () => {
   test('renders correctly without initial values', () => {
     render(
       <ChartBoundaryLevelsConfiguration
-        data={testTable.results}
+        map={{
+          dataSetConfigs: [
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[0],
+              boundaryLevel: undefined,
+            },
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[1],
+              boundaryLevel: undefined,
+            },
+          ],
+        }}
         meta={testMeta}
-        axisMajor={{
-          dataSets: testDataSets,
-          groupBy: 'locations',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
         options={testDefaultChartOptions}
         onChange={noop}
         onSubmit={noop}
+        hasDataSetBoundaryLevels
       />,
     );
 
@@ -158,32 +150,28 @@ describe('ChartBoundaryLevelsConfiguration', () => {
   test('renders correctly with initial values', () => {
     render(
       <ChartBoundaryLevelsConfiguration
-        data={testTable.results}
+        map={{
+          dataSetConfigs: [
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[0],
+              boundaryLevel: 3,
+            },
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[1],
+              boundaryLevel: 3,
+            },
+          ],
+        }}
         meta={testMeta}
-        axisMajor={{
-          dataSets: testDataSets,
-          groupBy: 'locations',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
         options={{
           ...testDefaultChartOptions,
           boundaryLevel: 2,
         }}
-        map={{
-          dataSetConfigs: testDataSets.map(dataSet => ({
-            dataSet,
-            dataGrouping: { type: 'Custom', customGroups: [] },
-            boundaryLevel: 3,
-          })),
-        }}
         onChange={noop}
         onSubmit={noop}
+        hasDataSetBoundaryLevels
       />,
     );
 
@@ -200,22 +188,23 @@ describe('ChartBoundaryLevelsConfiguration', () => {
 
     const { user } = render(
       <ChartBoundaryLevelsConfiguration
-        data={testTable.results}
+        map={{
+          dataSetConfigs: [
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[0],
+            },
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[1],
+            },
+          ],
+        }}
         meta={testMeta}
-        axisMajor={{
-          dataSets: testDataSets,
-          groupBy: 'locations',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
         options={testDefaultChartOptions}
         onChange={handleChange}
         onSubmit={noop}
+        hasDataSetBoundaryLevels
       />,
     );
 
@@ -223,15 +212,17 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       '2',
     ]);
 
-    expect(handleChange).toHaveBeenCalledWith<[ChartBoundaryLevelsFormValues]>({
+    expect(handleChange).toHaveBeenCalledWith<[MapBoundaryLevelConfig]>({
       boundaryLevel: 2,
-      dataSetConfigs: testDataSets.map(dataSet => ({ dataSet })),
+      dataSetConfigs: testDataSets.map(dataSet => ({
+        dataSet,
+      })),
     });
 
     const rows = screen.getAllByRole('row');
     await user.selectOptions(within(rows[1]).getByRole('combobox'), ['2']);
 
-    expect(handleChange).toHaveBeenCalledWith<[ChartBoundaryLevelsFormValues]>({
+    expect(handleChange).toHaveBeenCalledWith<[MapBoundaryLevelConfig]>({
       boundaryLevel: 2,
       dataSetConfigs: [
         { dataSet: testDataSets[0], boundaryLevel: 2 },
@@ -243,22 +234,23 @@ describe('ChartBoundaryLevelsConfiguration', () => {
   test('submitting fails with validation errors if no boundary level set', async () => {
     const { user } = render(
       <ChartBoundaryLevelsConfiguration
-        data={testTable.results}
+        map={{
+          dataSetConfigs: [
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[0],
+            },
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[1],
+            },
+          ],
+        }}
         meta={testMeta}
-        axisMajor={{
-          dataSets: testDataSets,
-          groupBy: 'locations',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
         options={testDefaultChartOptions}
         onChange={noop}
         onSubmit={noop}
+        hasDataSetBoundaryLevels
       />,
     );
 
@@ -283,22 +275,23 @@ describe('ChartBoundaryLevelsConfiguration', () => {
 
     const { user } = render(
       <ChartBoundaryLevelsConfiguration
-        data={testTable.results}
+        map={{
+          dataSetConfigs: [
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[0],
+            },
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[1],
+            },
+          ],
+        }}
         meta={testMeta}
-        axisMajor={{
-          dataSets: testDataSets,
-          groupBy: 'locations',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
         options={testDefaultChartOptions}
         onChange={noop}
         onSubmit={handleSubmit}
+        hasDataSetBoundaryLevels
       />,
     );
 
@@ -313,9 +306,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     );
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith<
-        [ChartBoundaryLevelsFormValues]
-      >({
+      expect(handleSubmit).toHaveBeenCalledWith<[MapBoundaryLevelConfig]>({
         boundaryLevel: 2,
         dataSetConfigs: testDataSets.map(dataSet => ({ dataSet })),
       });
@@ -327,25 +318,26 @@ describe('ChartBoundaryLevelsConfiguration', () => {
 
     const { user } = render(
       <ChartBoundaryLevelsConfiguration
-        data={testTable.results}
+        map={{
+          dataSetConfigs: [
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[0],
+            },
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: testDataSets[1],
+            },
+          ],
+        }}
         meta={testMeta}
-        axisMajor={{
-          dataSets: testDataSets,
-          groupBy: 'locations',
-          referenceLines: [],
-          type: 'major',
-          visible: true,
-        }}
-        legend={{
-          position: 'top',
-          items: [],
-        }}
         options={{
           ...testDefaultChartOptions,
           boundaryLevel: 3,
         }}
         onChange={noop}
         onSubmit={handleSubmit}
+        hasDataSetBoundaryLevels
       />,
     );
 
@@ -356,9 +348,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     );
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith<
-        [ChartBoundaryLevelsFormValues]
-      >({
+      expect(handleSubmit).toHaveBeenCalledWith<[MapBoundaryLevelConfig]>({
         boundaryLevel: 3,
         dataSetConfigs: testDataSets.map(dataSet => ({ dataSet })),
       });
