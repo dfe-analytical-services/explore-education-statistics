@@ -40,7 +40,9 @@ jobs:
         inputs:
           workingDirectory: $(WorkingDirectory)
           targetType: inline
-          script: bundle exec middleman build
+          script: |
+            bundle install
+            bundle exec middleman build
 
       - task: PublishPipelineArtifact@1
         displayName: Publish artifact
