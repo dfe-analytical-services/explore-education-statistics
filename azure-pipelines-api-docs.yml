@@ -37,8 +37,8 @@ jobs:
 
       - task: Bash@3
         displayName: Build
-        workingDirectory: ${{ variables.WorkingDirectory }}
         inputs:
+          workingDirectory: $(WorkingDirectory)
           targetType: inline
           script: bundle exec middleman build
 
