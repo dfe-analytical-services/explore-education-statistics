@@ -36,7 +36,6 @@ stages:
     ${{ if not(eq(parameters.dependsOn, '')) }}:
       dependsOn: ${{parameters.dependsOn}}
     jobs:
-      - deployment: Deploy API Docs
       - deployment: Deploy
         displayName: 'Deploy ${{parameters.environment}} Infrastructure Bicep template and applications'
         environment: '${{parameters.environment}}'
