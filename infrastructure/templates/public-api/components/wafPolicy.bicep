@@ -7,6 +7,18 @@ param name string
 @description('Specifies a set of tags with which to tag the resource in Azure')
 param tagValues object
 
+var owaspRuleGroupOverrides = [
+  {
+    ruleGroupName: 'REQUEST-913-SCANNER-DETECTION'
+    rules: [
+      {
+        ruleId: '913101'
+        state: 'Disabled'
+      }
+    ]
+  }
+]
+
 resource policy 'Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies@2023-11-01' = {
   name: name
   location: location
@@ -26,6 +38,7 @@ resource policy 'Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolic
         {
           ruleSetType: 'OWASP'
           ruleSetVersion: '3.2'
+          ruleGroupOverrides: owaspRuleGroupOverrides
         }
         {
           ruleSetType: 'Microsoft_BotManagerRuleSet'
