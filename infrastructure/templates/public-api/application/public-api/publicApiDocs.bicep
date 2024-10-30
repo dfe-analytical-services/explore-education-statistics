@@ -9,8 +9,8 @@ param appSku staticWebAppSkuType = 'Free'
 @description('A set of tags for the resource.')
 param tagValues object
 
-module publicApiDocs  '../../components/staticWebApp.bicep' = {
-  name: 'publicApiDocs'
+module publicApiDocsApp  '../../components/staticWebApp.bicep' = {
+  name: 'publicApiDocsAppDeploy'
   params: {
     name: resourceNames.publicApi.docsApp
     tagValues: tagValues

@@ -21,4 +21,5 @@ resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
     name: sku
     size: sku
   }
+  properties: {}
 }
