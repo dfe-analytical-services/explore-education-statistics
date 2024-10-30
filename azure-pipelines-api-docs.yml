@@ -1,0 +1,49 @@
+variables:
+  NodeVersion: 20.16.0
+  RubyVersion: 3.3.5
+  WorkingDirectory: src/explore-education-statistics-api-docs
+
+trigger:
+  branches:
+    include:
+      - master
+      - dev
+      - test
+  paths:
+    include:
+      - ${{ variables.WorkingDirectory }}
+
+pr:
+  - master
+  - dev
+  - test
+
+jobs:
+  - job: Build
+    pool:
+      vmImage: ubuntu-22.04
+    workspace:
+      clean: all
+    steps:
+      - task: UseNode@1
+        displayName: Install Node.js $(NodeVersion)
+        inputs:
+          version: $(NodeVersion)
+
+      - task: UseRubyVersion@0
+        displayName: Install Ruby $(RubyVersion)
+        inputs:
+          versionSpec: $(RubyVersion)
+
+      - task: Bash@3
+        displayName: Build
+        workingDirectory: $(WorkingDirectory)
+        inputs:
+          targetType: inline
+          script: bundle exec middleman build
+
+      - task: PublishPipelineArtifact@1
+        displayName: Publish artifact
+        inputs:
+          artifactName: public-api-docs
+          targetPath: $(WorkingDirectory)/build
