@@ -10,13 +10,20 @@ parameters:
 
 resources:
   pipelines:
-    - pipeline: EESBuildPipeline
+    - pipeline: MainBuild
       source: Explore Education Statistics
       trigger:
         branches:
-          - refs/heads/dev
-          - refs/heads/test
-          - refs/heads/master
+          - dev
+          - test
+          - master
+    - pipeline: DocsBuild
+      source: EES - Public API - Docs
+      trigger:
+        branches:
+          - dev
+          - test
+          - master
 
 variables:
   - group: Public API Infrastructure - common
@@ -43,7 +50,7 @@ variables:
   - name: prodParamFile
     value: $(paramDirectory)/main-prod.bicepparam
   - name: upstreamPipelineBuildNumber
-    value: $(resources.pipeline.EESBuildPipeline.runName)
+    value: $(resources.pipeline.MainBuild.runName)
   - name: deployContainerApp
     value: ${{parameters.deployContainerApp}}
   - name: updatePsqlFlexibleServer
@@ -60,7 +67,7 @@ stages:
       environment: 'Development'
       serviceConnection: $(serviceConnectionDevelopment)
       parameterFile: $(devParamFile)
-  
+
   - template: deploy-stage-template.yml
     parameters:
       stageName: 'Deploy_to_Development'

@@ -11,7 +11,7 @@ variables:
   BuildConfiguration: 'Release'
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
-  NODE_VERSION: 20.16.0
+  NodeVersion: 20.16.0
   AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
 
 trigger:
@@ -23,6 +23,8 @@ trigger:
   paths:
     exclude:
       - infrastructure/
+      - src/explore-education-statistics-api-docs
+
 pr:
   - master
   - dev
@@ -155,7 +157,7 @@ jobs:
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Public API - Data Processor Artifact'
         inputs:
-          artifactName: 'public-api-data-processor-$(Build.BuildNumber)'
+          artifactName: 'public-api-data-processor'
           targetPath: '$(Build.ArtifactStagingDirectory)/public-api-data-processor'
 
       - task: 'DotNetCoreCLI@2'
@@ -208,10 +210,10 @@ jobs:
     workspace:
       clean: all
     steps:
-      - task: NodeTool@0
-        displayName: 'Install Node.js $(NODE_VERSION)'
+      - task: UseNode@1
+        displayName: 'Install Node.js $(NodeVersion)'
         inputs:
-          versionSpec: $(NODE_VERSION)
+          version: $(NodeVersion)
 
       - task: 'Bash@3'
         displayName: 'corepack enable'
@@ -276,10 +278,10 @@ jobs:
     workspace:
       clean: all
     steps:
-      - task: NodeTool@0
-        displayName: 'Install Node.js $(NODE_VERSION)'
+      - task: UseNode@1
+        displayName: 'Install Node.js $(NodeVersion)'
         inputs:
-          versionSpec: $(NODE_VERSION)
+          version: $(NodeVersion)
 
       - task: 'Bash@3'
         displayName: 'corepack enable'
