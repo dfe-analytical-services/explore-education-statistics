@@ -1,6 +1,6 @@
 variables:
   NodeVersion: 20.16.0
-  RubyVersion: 3.3.5
+  RubyVersion: 3.2
   WorkingDirectory: src/explore-education-statistics-api-docs
 
 trigger:
@@ -33,7 +33,7 @@ jobs:
       - task: UseRubyVersion@0
         displayName: Install Ruby $(RubyVersion)
         inputs:
-          versionSpec: $(RubyVersion)
+          versionSpec: '>= $(RubyVersion)'
 
       - task: Bash@3
         displayName: Build
