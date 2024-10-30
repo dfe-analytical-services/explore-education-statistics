@@ -430,11 +430,10 @@ Check data blocks are shown in the featured tables table
 
 Reorder featured tables
     user clicks button    Reorder featured tables
-    user sets focus to element    css:tbody tr:first-child
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
-    user clicks button    Save order
+    user clicks button    Confirm order
 
 Check featured tables were reordered
     user checks table cell contains    1    1    UI Test data block name 2    testid:featuredTables
@@ -473,11 +472,10 @@ Reorder footnotes
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
     user clicks button    Reorder footnotes
-    user sets focus to element    testid:Footnote - ${FOOTNOTE_ALL}
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
-    user clicks button    Save order
+    user clicks button    Confirm order
 
 Check footnotes were reordered on data block
     user sets focus to element    link:Data blocks    xpath://*[@aria-label="Release"]

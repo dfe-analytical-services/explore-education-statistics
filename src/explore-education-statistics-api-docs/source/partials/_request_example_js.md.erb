@@ -1,0 +1,19 @@
+```js
+const url = '<%= url %>';
+<% if body_json %>
+const headers = {
+  'Content-Type': 'application/json'
+};
+const body = <%= body_json %>;
+<% end %>
+
+const response = await fetch(url, {
+  method: '<%= http_method %>',
+<% if body_json %>
+  headers,
+  body: JSON.stringify(body)
+  <% end %>
+});
+
+console.log(response.json());
+```

@@ -17,7 +17,7 @@ ${PUBLICATION_NAME}=                    ui-tests-legacy-releases-%{RUN_IDENTIFIE
 ${PUBLIC_PUBLICATION_URL_ENDING}=       /find-statistics/${PUBLICATION_NAME}
 ${DESCRIPTION}=                         legacy release description
 ${UPDATED_DESCRIPTION}=                 updated legacy release description
-${PUBLIC_URL_WITHOUT_AUTH}           ${EMPTY}
+${PUBLIC_URL_WITHOUT_AUTH}              ${EMPTY}
 
 
 *** Test Cases ***
@@ -131,7 +131,6 @@ Reorder the legacy releases
     user clicks button    OK
     user waits until modal is not visible    Reorder legacy releases
     user waits until page contains button    Confirm order
-    user sets focus to element    css:tbody tr:first-child
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN

@@ -34,6 +34,7 @@ type resourceNamesType = {
     dataProcessorIdentity: string
     dataProcessorPlan: string
     dataProcessorStorageAccountsPrefix: string
+    docsApp: string
     publicApiStorageAccount: string
     publicApiFileshare: string
   }
@@ -87,3 +88,6 @@ type containerRegistryRoleType = 'AcrPull'
 
 @export()
 type keyVaultRoleType = 'Secrets User' | 'Certificate User'
+
+@export()
+type staticWebAppSkuType = 'Free' | 'Standard'

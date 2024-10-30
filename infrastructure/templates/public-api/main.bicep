@@ -1,5 +1,5 @@
 import { abbreviations } from 'abbreviations.bicep'
-import { firewallRuleType, principalNameAndIdType } from 'types.bicep'
+import { firewallRuleType, principalNameAndIdType, staticWebAppSkuType } from 'types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -44,6 +44,9 @@ param postgreSqlEntraIdAdminPrincipals principalNameAndIdType[] = []
 
 @description('ACR : Specifies the resource group in which the shared Container Registry lives.')
 param acrResourceGroupName string = ''
+
+@description('Public API docs app : SKU to use.')
+param docsAppSku staticWebAppSkuType = 'Free'
 
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
@@ -142,6 +145,7 @@ var resourceNames = {
     dataProcessorIdentity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.webSitesFunctions}-processor'
     dataProcessorPlan: '${publicApiResourcePrefix}-${abbreviations.webServerFarms}-${abbreviations.webSitesFunctions}-processor'
     dataProcessorStorageAccountsPrefix: '${subscription}eessaprocessor'
+    docsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
     publicApiFileshare: '${publicApiResourcePrefix}-fs-data'
     publicApiStorageAccount: '${replace(publicApiResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}'
   }
@@ -260,6 +264,16 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     postgreSqlServerModule
     apiAppIdentityModule
   ]
+}
+
+// Deploy Public API docs.
+module docsModule 'application/public-api/publicApiDocs.bicep' = {
+  name: 'publicApiDocsModuleDeploy'
+  params: {
+    appSku: docsAppSku
+    resourceNames: resourceNames
+    tagValues: tagValues
+  }
 }
 
 // Create an Application Gateway to serve public traffic for the Public API Container App.
