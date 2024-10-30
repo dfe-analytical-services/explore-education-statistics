@@ -137,6 +137,26 @@ export default function ApiDataSetQuickStart({
           children: 'Guidance: Query data set (POST)',
         })}
       </p>
+
+      <Heading>Download data set as CSV</Heading>
+
+      <UrlContainer
+        className="govuk-!-margin-bottom-2"
+        id="data-set-download-csv-endpoint"
+        label={
+          <>
+            GET<VisuallyHidden> data set CSV URL</VisuallyHidden>
+          </>
+        }
+        labelHidden={false}
+        url={`${publicApiBaseUrl}/data-sets/${dataSetId}/csv?dataSetVersion=${dataSetVersion}`}
+      />
+      <p>
+        {renderLink({
+          to: `${publicApiDocsUrl}/endpoints/DownloadDataSetCsv`,
+          children: 'Guidance: Download data set as CSV',
+        })}
+      </p>
     </>
   );
 }

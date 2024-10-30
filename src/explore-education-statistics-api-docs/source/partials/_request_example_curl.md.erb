@@ -1,0 +1,13 @@
+<% command = "curl -X #{http_method} #{url}"
+
+   if body_json
+     command += " \\"
+   end
+%>
+```bash
+<%= command %>
+<% if body_json %>
+ -H 'Content-Type: application/json' \
+ -d '<%= body_json %>'
+<% end %>
+```

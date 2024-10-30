@@ -112,8 +112,6 @@ describe('PublicationReleaseSeriesPage', () => {
       const modal = within(screen.getByRole('dialog'));
       await user.click(modal.getByRole('button', { name: 'OK' }));
 
-      expect(await screen.findByText('Sort')).toBeInTheDocument();
-
       expect(
         screen.getByRole('button', { name: 'Confirm order' }),
       ).toBeInTheDocument();

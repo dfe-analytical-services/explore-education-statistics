@@ -142,4 +142,4 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
 
 output containerAppFqdn string = apiContainerAppModule.outputs.containerAppFqdn
 output containerAppName string = apiContainerAppModule.outputs.containerAppName
-output containerAppHealthProbeRelativeUrl string = '/docs'
+output containerAppHealthProbeRelativeUrl string = '/health'

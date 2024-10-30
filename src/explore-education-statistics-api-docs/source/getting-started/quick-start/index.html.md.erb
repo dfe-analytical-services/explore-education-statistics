@@ -1,0 +1,592 @@
+---
+title: Quick start
+last_reviewed_on: 2024-09-16
+review_in: 6 months
+weight: 1
+---
+
+# Quick start
+
+In this guide, you'll learn about how the explore education statistics (EES) API is structured and
+how to use it to perform a basic data query.
+
+## What you'll need
+
+To run request examples in this guide, it is a good idea to come prepared with a HTTP or API client
+tool. Good recommendations for beginners are [Postman](https://www.postman.com/)
+or [Insomnia](https://insomnia.rest/).
+
+Some prior knowledge of working with your chosen HTTP client will be necessary to work with the
+examples.
+
+## How the API is organised
+
+The API endpoints are organised in a way that reflects how data is organised in EES.
+
+Data is published in **publications**. Each publication covers a specific topic such as
+schools or higher education.
+
+A publication will contain **data sets** that are relevant to the particular topic. Data sets are
+composed of data that has been collected over a period of time at varying geographic levels e.g. for
+local authorities. Updates to data sets are typically published at regular intervals e.g. yearly,
+monthly, etc.
+
+Given the above, the API exposes endpoints that mirror this:
+
+- publication endpoints: `/publications`
+- data set endpoints: `/data-sets`
+
+## Workflow for querying data
+
+To query the data available on the API, this will require the following steps:
+
+1. Find the publication you are interested in
+2. Find the data set you interested in (from the publication)
+3. Get the data set's metadata
+4. Create and run a query against the data set
+
+In the following sections, this guide will walk you through how to perform the above steps.
+
+### Step 1: Find a publication
+
+To find a publication that you may be interested in, you'll need to make a `GET` request to the
+[List publications](/endpoints/ListPublications/index.html) endpoint:
+
+```
+GET <%= api_url "/api/v1/publications" %>
+```
+
+This endpoint will respond with something like the following (parts have been omitted for brevity):
+
+```json
+{
+  "paging" : {
+    "page" : 1,
+    "pageSize" : 20,
+    "totalPages" : 3,
+    "totalResults" : 50
+  },
+  "results" : [
+    {
+      "id" : "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
+      "slug" : "Pupil-absence-in-schools-in-England",
+      "title" : "Pupil absence in schools in England",
+      "summary": "Pupil absence, including overall, authorised and unauthorised absence...",
+      "lastPublished": "2023-11-10T09:15:00+00:00"
+    }
+  ]
+}
+```
+
+This endpoint does not return all publications in a single request. Instead, it is **paginated**
+and returns the publications in pages (or batches), with each page containing a maximum number of
+publications.
+
+You can request additional pages of publications by appending a `page` query parameter to the
+endpoint URL. For example:
+
+```
+# Fetch page 2
+GET <%= api_url "/api/v1/publications?page=2" %>
+
+# Fetch page 3
+GET <%= api_url "/api/v1/publications?page=3" %>
+```
+
+The possible values of `page` will be dictated by the total number of results (across all pages)
+and the `pageSize` query parameter. For example, the following request would show 30 results per
+page instead of the default:
+
+```
+GET <%= api_url "/api/v1/publications?page=1&pageSize=30" %>
+```
+
+Each page of results contains a `paging` property which describes the current page and the total
+numbers of pages and results. This information can be used to set the query parameters for the next
+page of results.
+
+To make it easier to find a specific publication, you can append a `search` query parameter to the
+URL as well. The following example would search for publications matching the term 'pupil absence':
+
+```
+GET <%= api_url "/api/v1/publications?search=pupil+absence" %>
+```
+
+Like a typical URL, you can combine query parameters together with `&`. For example, you'd use
+the following URL to get page 2 of publications matching the term 'pupil absence':
+
+```
+GET <%= api_url "/api/v1/publications?search=pupil+absence&page=2" %>
+```
+
+Once you find a publication you are interested in, proceed to the next step.
+
+### Step 2: Find a data set
+
+Now that you have a publication that you are interested, you can use this to find data sets related
+to it. This can be done using
+the [List a publication's data sets](/endpoints/ListPublicationDataSets/index.html)
+endpoint:
+
+```
+GET <%= api_url "/api/v1/publications/{publicationId}/data-sets" %>
+```
+
+For this endpoint URL, you'd substitute the `{publicationId}` parameter with the `id` of the
+publication you are interested in.
+
+For example, given the following publication (parts omitted for brevity):
+
+```json
+{
+  "id" : "cbbd299f-8297-44bc-92ac-558bcf51f8ad",
+  "slug" : "Pupil-absence-in-schools-in-England",
+  "title" : "Pupil absence in schools in England",
+  "summary": "Pupil absence, including overall, authorised and unauthorised absence...",
+  "lastPublished": "2023-11-10T09:15:00+00:00"
+}
+```
+
+You'd make the following `GET` request:
+
+```
+GET <%= api_url "/api/v1/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad/data-sets" %>
+```
+
+The endpoint responds with a paginated list of the publication's data sets which will look like the
+following:
+
+```json
+{
+  "paging": {
+    "page": 1,
+    "pageSize": 10,
+    "totalResults": 1,
+    "totalPages": 1
+  },
+  "results": [
+    {
+      "id": "63cfc86e-c334-4e58-2912-08da0807d53c",
+      "title": "Absence rates",
+      "summary": "Absence information for full academic year 2020/21 for pupils aged 5-15.",
+      "status": "Published",
+      "latestVersion": {
+        "version": "1.0",
+        "published": "2022-12-01T12:00:00Z",
+        "totalResults": 201625,
+        "file": {
+          "id": "84ee3cc9-21bf-44d8-89fd-98c6d7fc74f3"
+        },
+        "timePeriods": {
+          "start": "2020/21",
+          "end": "2020/21"
+        },
+        "geographicLevels": [
+          "National",
+          "Local authority"
+        ],
+        "filters": [
+          "Phase type",
+          "Characteristic"
+        ],
+        "indicators": [
+          "Number of authorised absence sessions",
+          "Number of unauthorised absence sessions"
+        ]
+      }
+    }
+  ]
+}
+```
+
+Each data set result provides high-level information about its contents and metadata. You can use
+this information to help identify a data set that you'd be interested in looking at further.
+
+Once you have chosen a data set, proceed to the next step.
+
+### Step 3: Get the data set's metadata
+
+Now that you have a chosen a data set, you'll want to query it for some data. To create a query,
+you'll need to use the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html) endpoint.
+This provides information about all the filterable facets and indicators available to a data set.
+
+**Facets** are specific features / characteristics of the data. These are used in a data set query
+to filter down the data that is returned.
+
+Some examples of facets include:
+
+- time periods e.g. 2022/23 (academic year), 2023 (calendar year), January (month), Week 1 (week)
+- locations e.g. England (country), Yorkshire (region), Sheffield (local authority)
+- school type e.g. state-funded primary, state-funded secondary
+- pupil characteristics like ethnicity and gender
+
+**Indicators** are types of data points that were collected, for example:
+
+- numbers of pupils, sessions, etc
+- rates of change
+- proportions / percentages
+
+Both facets and indicators need to be part of a query for data to be returned.
+
+Facets and indicators are collectively referenced as a data set's **metadata**. To fetch this for
+your chosen data set, make the following `GET` request:
+
+```
+GET <%= api_url "/api/v1/data-sets/{dataSetId}/meta" %>
+```
+
+To use this URL, substitute in the `{dataSetId}` parameter with the `id` of your chosen data set.
+
+The endpoint will return something like the following:
+
+```json
+{
+  "filters": [
+    {
+      "id": "gIyO9",
+      "column": "school_type",
+      "label": "School type",
+      "hint": "Filter by school type",
+      "options": [
+        {
+          "id": "1oX7c",
+          "label": "Total",
+          "isAggregate": true
+        },
+        {
+          "id": "uKR2K",
+          "label": "State-funded primary"
+        }
+      ]
+    }
+  ],
+  "indicators": [
+    {
+      "id": "04nTr",
+      "column": "sess_authorised",
+      "label": "Number of authorised absence sessions",
+      "unit": "",
+      "decimalPlaces": 0
+    }
+  ],
+  "geographicLevels": [
+    {
+      "code": "NAT",
+      "label": "National"
+    },
+    {
+      "code": "REG",
+      "label": "Regional"
+    }
+  ],
+  "locations": [
+    {
+      "level": {
+        "code": "NAT",
+        "label": "National"
+      },
+      "options": [
+        {
+          "id": "2FmYX",
+          "code": "E92000001",
+          "name": "England"
+        }
+      ]
+    },
+    {
+      "level": {
+        "code": "REG",
+        "label": "Regional"
+      },
+      "options": [
+        {
+          "id": "e0768",
+          "code": "E12000001",
+          "name": "North East"
+        },
+        {
+          "id": "GQbUn",
+          "code": "E12000002",
+          "name": "North West"
+        }
+      ]
+    }
+  ],
+  "timePeriods": [
+    {
+      "code": "AY",
+      "label": "2021/22",
+      "period": "2021/2022"
+    },
+    {
+      "code": "AY",
+      "label": "2022/23",
+      "period": "2022/2023"
+    }
+  ]
+}
+```
+
+The **core facets** are found under the `timePeriods`, `geographicLevels` and `locations` properties.
+
+The `locations` property contains the data set's location options grouped by the geographic level
+they reside in. Each location option has an `id` and may contain additional code fields (e.g. ONS
+codes) to identify them.
+
+In the above example, there are location options for:
+
+- 'England' (`2FmYX`) at 'National' geographic level
+- 'North East' (`e0768`) and 'North West' (`GQbUn`) at 'Regional' geographic level
+
+The `geographicLevels` property contains the different geographic levels that the data was collected
+at. Each geographic level is identified by its `code` and a full list of these can be found in the
+[GeographicLevelCode schema](/schemas/GeographicLevelCode/index.html).
+
+In the above example, there are geographic level options for 'National' (`NAT`) and 'Regional' (`REG`)
+geographic levels.
+
+The `timePeriods` property contains the time periods the data was collected at. The time period options
+are represented by a `code` that describes the time period's type and a `period` that describes the
+date range. A full list of time period codes can be found in the [TimePeriodCode schema](/schemas/TimePeriodCode/index.html).
+
+In the above example there is a single time period option for 'academic year 2022/23'.
+
+Any **additional facets** are found under the `filters` property, which groups them by their filter.
+Each filter is identified by an `id`. The example above has a 'School type' filter with an ID of `gIyO9`.
+
+Each filter will have a set of filter options. The example above has 'State-funded primary' and
+'Total' options for 'School type'. Filter options also have their own `id` properties that can be used
+to identify them.
+
+Some filter options are aggregates of the entire filter and are marked by an `isAggregate` property
+set to true. In the above example, the 'Total' school type is an aggregate of all school types
+(e.g. primary, secondary, special schools, etc).
+
+Finally, the `indicators` property contains the data set's indicators. Each indicator contains an
+`id` to identify it and may also contain:
+
+- a `unit` property specifying the mathematical unit that was used in the measurement
+- a `decimalPlaces` property specifying the recommended number of decimal places to use when
+    displaying the indicator's value
+
+Spend some time getting familiarised with the metadata response and proceed to the next step when
+ready.
+
+### Step 4: Create and run your data set query
+
+In this final step, you'll need to use the metadata from the previous step to create and run your
+query against the [Query a data set](/endpoints/QueryDataSetPost/index.html) endpoint.
+
+To use this endpoint, a `POST` request needs to be sent to the endpoint URL with an appropriate
+request body. The most basic request would look like the following:
+
+```
+POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
+{
+  "indicators": []
+}
+```
+
+As seen previously, you need to substitute the `{dataSetId}` parameter with the `id` of your chosen
+data set.
+
+The request body must contain an `indicators` property with a list of indicator IDs, which can can
+found in the data set's metadata (under each indicator option's `id` property). The data values in
+the response will correspond to the indicators that you specify.
+
+To refine your query to a subset of the data, you will also need to provide some filtering criteria
+by adding a `criteria` property to your query request:
+
+```
+POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
+{
+  "indicators": [],
+  "criteria": {}
+}
+```
+
+The `criteria` property at its simplest must be an object that describes which facets the query
+should filter on. The facet object has properties that align with the different facet types seen
+in the metadata step previously.
+
+The table below describes the facet properties you can use and how each facet option should be
+represented in the query:
+
+| Property           | Description                          | Facet option examples                                                            |
+|--------------------|--------------------------------------|----------------------------------------------------------------------------------|
+| `filters`          | Filter by filter option ID           | `1oX7c`, `uKR2K`                                                                 |
+| `geographicLevels` | Filter by geographic level code      | `LA`, `REG`, `NAT`                                                               |
+| `locations`        | Filter by location option ID or code | `{ "level: "REG", "code": "E12000001" }`,<br/>`{ "level: "NAT", "id": "2FmYX" }` |
+| `timePeriods`      | Filter by time period                | `{ "period": "2022/2023", "code": "AY" }`                                        |
+
+Note that all the facet properties are **optional** so you only need to use the ones relevant to
+your query.
+
+Each facet property must contain an object that describe how the facet options should be compared to
+the results when filtering. Some examples of comparators that can be used:
+
+| Comparator | Description              | Multiple values? | Example                                          |
+|------------|--------------------------|------------------|--------------------------------------------------|
+| `eq`       | Equal to                 | No               | `"eq": "1oX7c"`                                  |
+| `notEq`    | Not equal to             | No               | `"notEq": "1oX7c"`                               |
+| `in`       | In a set                 | Yes              | `"in": ["1oX7c", "uKR2K"]`                       |
+| `notIn`    | Not in a set             | Yes              | `"notIn": ["1oX7c", "uKR2K"]`                    |
+| `lte`      | Less than or equal to    | No               | `"lte": { "period": "2022/2023", "code": "AY" }` |
+| `lt`       | Less than                | No               | `"lt": { "period": "2022/2023", "code": "AY" }`  |
+| `gte`      | Greater than or equal to | No               | `"gte": { "period": "2022/2023", "code": "AY" }` |
+| `gt`       | Greater than             | No               | `"gt": { "period": "2022/2023", "code": "AY" }`  |
+
+Using the above information and the metadata example from the previous step, the following query
+could be constructed:
+
+```json
+{
+  "criteria": {
+    "filters": {
+      "eq": ["uKR2K", "1oX7c"]
+    }
+  },
+  "indicators":  ["04nTr"]
+}
+```
+
+This query would filter so that only results in the 'State-funded primary' (filter option `uKR2K`)
+school type would be returned. Each result would then contain the 'Number of authorised absence
+sessions' (indicator `04nTr`) in its data values.
+
+You can add multiple clauses to the facet criteria object to refine your query further. For a fuller
+example, you could construct a query like the following:
+
+```json
+{
+  "criteria": {
+    "filters": {
+      "in": ["uKR2K", "1oX7c"]
+    },
+    "timePeriods": {
+      "lte": { "period": "2021/2022", "code": "AY" },
+      "gte": { "period": "2022/2023", "code": "AY" }
+    },
+    "locations": {
+      "notIn": [
+        { "level": "REG", "id": "e0768" }
+      ]
+    },
+    "geographicLevels": {
+      "eq": "LA"
+    }
+  },
+  "indicators":  ["04nTr"]
+}
+```
+
+The above example would query for the 'Number of authorised absence sessions' (indicator `04nTr`)
+matching the following criteria:
+
+- is for 'State-funded primary' (filter option `uKR2K`) or 'Total' (filter option `1oX7c`) school types
+- is during or after the 2021/22 academic year (time period `2021/2022` and code `AY`)
+- is during or before the 2022/23 academic year (time period `2022/2023` and code `AY`)
+- is not in the 'North East' (location `e0768`)
+- is collected at 'Local authority' level (geographic level `LA`)
+
+Different facet values and comparators can be provided to modify the query in different ways.
+It's advisable to spend a little time getting more familiar with the query API.
+
+The [Creating advanced data set queries](/getting-started/creating-advanced-data-set-queries/index.html)
+guide explores this topic in greater depth and is recommended for further reading.
+
+### The data set query response
+
+Once you have created your query, make the `POST` request to the endpoint. You should receive a
+paginated response that looks like:
+
+```json
+{
+  "paging": {
+    "page": 1,
+    "pageSize": 100,
+    "totalResults": 150,
+    "totalPages": 2
+  },
+  "results": [
+    {
+      "timePeriod": {
+        "code": "AY",
+        "period": "2022/2023"
+      },
+      "geographicLevel": "REG",
+      "locations": {
+        "NAT": "2FmYX",
+        "REG": "e0768"
+      },
+      "filters": {
+        "gIyO9": "uKR2K"
+      },
+      "values": {
+        "04nTr": "1708016"
+      }
+    }
+  ]
+}
+```
+
+The `results` part of this response contains a list of results containing a combination of facets
+and the data matching it.
+
+The `timePeriod` property describes the time period that the result was collected in. In the above
+example, this is academic year 2022/2023.
+
+The `geographicLevel` property describes the geographic level that the data was collected in. In
+the above example, the result's data was collected at 'Regional' (`REG`) level.
+
+The `locations` property describe the set of locations that correspond to the result. This is a
+dictionary where the keys correspond to geographic level codes and the values are an option ID within
+the corresponding geographic level.
+
+In the above example, the result's locations were 'England' (`2FmYX` at 'National' level) and
+'North East' (`e0768` at 'Regional' level).
+
+The `filters` property describes the additional facets corresponding to the result. This is a
+dictionary where the keys are the filter ID and the values are an option ID within the corresponding
+filter.
+
+In the above example, the result's 'School type' (`gIyO9`) filter was 'State-funded primary' (`uKR2K`).
+
+The `values` property of each result is a dictionary where the keys are the indicator IDs and
+the values are the respective indicator data values.
+
+In the above example, the 'Number of authorised absence sessions' (`04nTr`) indicator has a value
+of `1708016`.
+
+Note that reported values may not be numeric. In some instances, it may not be possible to report
+the data (e.g. due to suppression for anonymity) and a placeholder value may be used instead.
+
+Spend some time getting familiar with the structure of the results and try to find some results you
+are interested in.
+
+#### Note on paginated data
+
+Like some endpoints seen previously, the data set query's response is **paginated** meaning that the
+data is returned in multiple pages / batches. The `paging` property is returned as part of each
+response and describes the current page of data matching the query.
+
+You can set `page` and `pageSize` parameters in the query string to request different pages of
+results. For example, the following request would fetch page 5, with each page containing
+a maximum of 200 results:
+
+```
+POST <%= api_url "/api/v1/data-sets/{dataSetId}/query?page=5&pageSize=200" %>
+```
+
+## Conclusions
+
+This quick start guide has now run you through a basic workflow for retrieving some data from the
+EES API. The core workflow is the same for all data sets. The majority of use-cases will simply
+require you to adjust the parameters used.
+
+You should now have the basic tools to get started with the API, but you are encouraged to explore the
+documentation further. It is recommended that you read the [Overview section](/overview/index.html) to
+get a better understanding of the core API features.
+
+To learn more about data set queries and how to create more complex ones, it is recommended that you
+read the guide to [Creating advanced data set queries](/getting-started/creating-advanced-data-set-queries/index.html).

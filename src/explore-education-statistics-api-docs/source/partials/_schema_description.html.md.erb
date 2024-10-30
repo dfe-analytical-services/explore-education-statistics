@@ -1,0 +1,35 @@
+<%= description %>
+
+<% if schema.default %>
+Defaults to: `<%= schema.default %>`
+<% end %>
+
+<% if has_schema_validations(schema) %>
+Validation constraints:
+
+<%= partial("partials/schema_validations", :locals => { schema: schema }) %>
+<% end %>
+
+<% if !is_referenced_schema(schema) && schema.enum %>
+Allowed options:
+
+<% schema.enum.each do |item| %>
+- `<%= item %>`
+<% end %>
+<% end %>
+
+<% if schema.type == "array" && schema.items != nil %>
+<% if has_schema_validations(schema.items) %>
+Validation constraints for child items:
+
+<%= partial("partials/schema_validations", :locals => { schema: schema.items }) %>
+<% end %>
+
+<% if !is_referenced_schema(schema.items) && schema.items.enum %>
+Allowed options for child items:
+
+<% schema.items.enum.each do |item| %>
+- `<%= item %>`
+<% end %>
+<% end %>
+<% end %>
