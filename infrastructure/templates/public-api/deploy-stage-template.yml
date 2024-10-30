@@ -18,12 +18,6 @@ parameters:
   - name: condition
     type: string
 
-variables:
-  - name: dataProcessorFunctionAppName
-    value: ${{ subscription }}-ees-papi-fa-processor
-  - name: docsAppName
-    value: ${{ subscription }}-ees-papi-stapp-docs
-
 stages:
   - stage: ${{parameters.stageName}}
     displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
@@ -35,6 +29,10 @@ stages:
     variables:
       - group: Public API Infrastructure - ${{parameters.environment}}
       - group: Public API Infrastructure - ${{parameters.environment}} secrets
+      - name: dataProcessorFunctionAppName
+        value: ${{ parameters.subscription }}-ees-papi-fa-processor
+      - name: docsAppName
+        value: ${{ parameters.subscription }}-ees-papi-stapp-docs
     ${{ if not(eq(parameters.dependsOn, '')) }}:
       dependsOn: ${{parameters.dependsOn}}
     jobs:
