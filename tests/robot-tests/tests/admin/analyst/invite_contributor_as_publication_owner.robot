@@ -53,7 +53,7 @@ Assign various release access permissions to analysts
     ...    ${PUBLICATION_NAME}
     ...    Academic year 2000/01
     ...    Contributor
-    ...    EES-test.ANALYST3@dfedevelopment.onmicrosoft.com
+    ...    EES-test.analyst3@dfedevelopment.onmicrosoft.com
 
     user gives release access to analyst
     ...    ${PUBLICATION_NAME}
@@ -110,13 +110,13 @@ Add new contributors to release
 
     user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks checkbox is checked    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
-    user checks checkbox is not checked    Analyst3 User3 (ees-test.analyst3@dfedevelopment.onmicrosoft.com)
+    user checks checkbox is not checked    Analyst3 User3 (EES-test.analyst3@dfedevelopment.onmicrosoft.com)
 
     user clicks checkbox    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
-    user clicks checkbox    Analyst3 User3 (ees-test.analyst3@dfedevelopment.onmicrosoft.com)
+    user clicks checkbox    Analyst3 User3 (EES-test.analyst3@dfedevelopment.onmicrosoft.com)
 
     user checks checkbox is not checked    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
-    user checks checkbox is checked    Analyst3 User3 (ees-test.analyst3@dfedevelopment.onmicrosoft.com)
+    user checks checkbox is checked    Analyst3 User3 (EES-test.analyst3@dfedevelopment.onmicrosoft.com)
 
     user clicks button    Update contributors
     user waits until page contains    Update release access
@@ -124,7 +124,7 @@ Add new contributors to release
 Validate contributors for 2002/03 release again
     user checks table body has x rows    1    testid:releaseContributors
     user checks table cell contains    1    1    Analyst3 User3    testid:releaseContributors
-    user checks table cell contains    1    2    ees-test.analyst3@dfedevelopment.onmicrosoft.com
+    user checks table cell contains    1    2    EES-test.analyst3@dfedevelopment.onmicrosoft.com
     ...    testid:releaseContributors
 
 Remove all analyst3 contributor access to publication
