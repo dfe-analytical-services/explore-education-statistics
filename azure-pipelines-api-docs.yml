@@ -11,7 +11,7 @@ trigger:
       - test
   paths:
     include:
-      - ${{ variables.WorkingDirectory }}
+      - $(WorkingDirectory)
 
 pr:
   - master
@@ -37,7 +37,7 @@ jobs:
 
       - task: Bash@3
         displayName: Build
-        workingDirectory: $(WorkingDirectory)
+        workingDirectory: ${{ variables.WorkingDirectory }}
         inputs:
           targetType: inline
           script: bundle exec middleman build
