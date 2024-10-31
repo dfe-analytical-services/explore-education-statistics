@@ -33,8 +33,6 @@ stages:
         value: ${{ parameters.subscription }}-ees-papi-fa-processor
       - name: docsAppName
         value: ${{ parameters.subscription }}-ees-papi-stapp-docs
-      - name: docsAppBuildDirectory
-        value: $(System.DefaultWorkingDirectory)/src/explore-education-statistics-api-docs/build
     ${{ if not(eq(parameters.dependsOn, '')) }}:
       dependsOn: ${{parameters.dependsOn}}
     jobs:
@@ -115,22 +113,15 @@ stages:
                       deploymentToken=`az staticwebapp secrets list -n $(docsAppName) --query "properties.apiKey" -o tsv`
                       echo "##vso[task.setvariable variable=docsDeploymentToken;]$deploymentToken"
 
-                - task: Bash@3
-                  displayName: Copy API docs build artifact to repo
-                  inputs:
-                    targetType: inline
-                    script: |
-                      cp -r $(Pipeline.Workspace)/MainBuild/public-api-docs $(docsAppBuildDirectory)
-                      ls -l $(docsAppBuildDirectory)
-
                 - task: AzureStaticWebApp@0
                   displayName: Deploy API docs
                   inputs:
-                    app_location: $(docsAppBuildDirectory)
+                    app_location: /
                     output_location: '' # Leave this empty
                     skip_app_build: true
                     skip_api_build: true
                     azure_static_web_apps_api_token: $(docsDeploymentToken)
+                    cwd: $(Pipeline.Workspace)/MainBuild/public-api-docs
 
                 # We handle the non-infrastructure appsetting and connection string configuration here rather than directly
                 # in the Bicep files so that we can implement slot swapping.
