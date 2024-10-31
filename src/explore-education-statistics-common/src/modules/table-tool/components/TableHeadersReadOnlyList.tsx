@@ -24,7 +24,7 @@ const TableHeadersReadOnlyList = ({
   const isExpanded = expandedLists.includes(id);
   const { watch } = useFormContext();
 
-  const list = watch(name) as Filter[];
+  const list: Filter[] = watch(name);
   const displayItems = isExpanded ? list.length : defaultNumberOfItems;
 
   return (
