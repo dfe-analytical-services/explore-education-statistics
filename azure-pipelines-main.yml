@@ -89,7 +89,7 @@ jobs:
           arguments: --configuration $(BuildConfiguration)
 
       - task: DotNetCoreCLI@2
-        displayName: Publish Data API
+        displayName: Package Data API
         inputs:
           command: publish
           publishWebProjects: false
@@ -97,8 +97,14 @@ jobs:
           arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/data-api
           zipAfterPublish: True
 
+      - task: PublishPipelineArtifact@0
+        displayName: Publish Data API artifact
+        inputs:
+          artifactName: content-api
+          targetPath: $(Build.ArtifactStagingDirectory)/data-api
+
       - task: DotNetCoreCLI@2
-        displayName: Publish Content API
+        displayName: Package Content API
         inputs:
           command: publish
           publishWebProjects: false
@@ -107,22 +113,13 @@ jobs:
           zipAfterPublish: True
 
       - task: PublishPipelineArtifact@0
-        displayName: Publish Public frontend API Artifacts
+        displayName: Publish Content API artifact
         inputs:
-          artifactName: public-api
-          targetPath: $(Build.ArtifactStagingDirectory)/public-api
-
-      - task: DotNetCoreCLI@2
-        displayName: Publish Public API
-        inputs:
-          command: publish
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Api.csproj'
-          arguments: -r linux-musl-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api
-          zipAfterPublish: False
+          artifactName: content-api
+          targetPath: $(Build.ArtifactStagingDirectory)/content-api
 
       - task: Docker@2
-        displayName: Build Public API - API Docker image
+        displayName: Build Public API Docker image
         condition: eq(variables.IsBranchDeployable, true)
         inputs:
           containerRegistry: $(AcrServiceConnection)
@@ -136,7 +133,7 @@ jobs:
           DOCKER_BUILDKIT: 1
 
       - task: Docker@2
-        displayName: Push Public API - API Docker image
+        displayName: Push Public API Docker image
         condition: eq(variables.IsBranchDeployable, true)
         inputs:
           containerRegistry: $(AcrServiceConnection)
@@ -145,7 +142,7 @@ jobs:
           tags: $(Build.BuildNumber)
 
       - task: DotNetCoreCLI@2
-        displayName: Publish Public API - Data Processor Function
+        displayName: Package Public API Data Processor Function
         inputs:
           command: publish
           publishWebProjects: false
@@ -155,13 +152,13 @@ jobs:
           zipAfterPublish: True
 
       - task: PublishPipelineArtifact@0
-        displayName: Publish Public API - Data Processor Artifact
+        displayName: Publish Public API Data Processor artifact
         inputs:
           artifactName: public-api-data-processor
           targetPath: $(Build.ArtifactStagingDirectory)/public-api-data-processor
 
       - task: DotNetCoreCLI@2
-        displayName: Publish Notifier Function
+        displayName: Package Notifier Function
         inputs:
           command: publish
           publishWebProjects: false
@@ -170,13 +167,13 @@ jobs:
           zipAfterPublish: True
 
       - task: PublishPipelineArtifact@0
-        displayName: Publish Notifier Artifacts
+        displayName: Publish Notifier artifact
         inputs:
           artifactName: notifier
           targetPath: $(Build.ArtifactStagingDirectory)/notifier
 
       - task: DotNetCoreCLI@2
-        displayName: Publish Publisher Function
+        displayName: Package Publisher Function
         inputs:
           command: publish
           publishWebProjects: false
@@ -185,13 +182,13 @@ jobs:
           zipAfterPublish: True
 
       - task: PublishPipelineArtifact@0
-        displayName: Publish Publisher Artifacts
+        displayName: Publish Publisher artifact
         inputs:
           artifactName: publisher
           targetPath: $(Build.ArtifactStagingDirectory)/publisher
 
       - task: DotNetCoreCLI@2
-        displayName: Publish Processor Function
+        displayName: Package Processor Function
         inputs:
           command: publish
           publishWebProjects: false
@@ -200,7 +197,7 @@ jobs:
           zipAfterPublish: True
 
       - task: PublishPipelineArtifact@0
-        displayName: Publish Processor Artifacts
+        displayName: Publish Processor artifact
         inputs:
           artifactName: processor
           targetPath: $(Build.ArtifactStagingDirectory)/processor
@@ -260,7 +257,7 @@ jobs:
           TargetFolder: src/GovUk.Education.ExploreEducationStatistics.Admin/wwwroot
 
       - task: DotNetCoreCLI@2
-        displayName: Publish
+        displayName: Package Admin app
         inputs:
           command: publish
           publishWebProjects: false
@@ -268,9 +265,9 @@ jobs:
           arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
 
       - task: PublishPipelineArtifact@0
-        displayName: Publish Admin Artifact
+        displayName: Publish Admin artifact
         inputs:
-          artifactName: Admin
+          artifactName: admin
           targetPath: $(Build.ArtifactStagingDirectory)
 
   - job: Frontend
