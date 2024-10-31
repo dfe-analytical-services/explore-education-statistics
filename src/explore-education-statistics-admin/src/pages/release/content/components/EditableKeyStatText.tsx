@@ -8,7 +8,6 @@ import React, { useCallback } from 'react';
 
 export interface EditableKeyStatTextProps {
   isEditing?: boolean;
-  isReordering?: boolean;
   keyStat: KeyStatisticText;
   keyStatisticGuidanceTitles?: (string | undefined)[];
   testId?: string;
@@ -18,7 +17,6 @@ export interface EditableKeyStatTextProps {
 
 export default function EditableKeyStatText({
   isEditing = false,
-  isReordering = false,
   keyStat,
   keyStatisticGuidanceTitles,
   testId = 'keyStat',
@@ -42,7 +40,6 @@ export default function EditableKeyStatText({
         keyStatisticGuidanceTitles={keyStatisticGuidanceTitles?.filter(
           keyStatTitle => keyStatTitle === keyStat.title,
         )}
-        isReordering={isReordering}
         testId={testId}
         onSubmit={handleSubmit}
         onCancel={toggleShowForm.off}
@@ -58,7 +55,6 @@ export default function EditableKeyStatText({
       guidanceTitle={keyStat.guidanceTitle}
       guidanceText={keyStat.guidanceText}
       testId={testId}
-      isReordering={isReordering}
       isEditing={isEditing}
       onRemove={onRemove}
       onEdit={toggleShowForm.on}
