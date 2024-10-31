@@ -61,7 +61,6 @@ resource inboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01
   parent: vNet
 }
 
-// Deploy Data Processor Function.
 module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {

@@ -221,7 +221,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = {
 }
 
 module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthentication != null) {
-  name: '${functionAppName}AzureAuthentication'
+  name: '${functionAppName}AzureAuthenticationDeploy'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
     siteName: functionAppName
@@ -232,66 +232,24 @@ module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthenti
   }
 }
 
-resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
-  name: alertsGroupName
-}
-
-var commonUnhealthyMetricAlertRuleProperties = {
-  enabled: true
-  severity: 1
-  evaluationFrequency: 'PT1M'
-  windowSize: 'PT5M'
-  criteria: {
-    'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
-    allOf: [
-      {
-        name: 'Metric1'
-        criterionType: 'StaticThresholdCriterion'
-        metricName: 'HealthCheckStatus'
-        timeAggregation: 'Minimum'
-        operator: 'LessThan'
-        threshold: 100
-        skipMetricValidation: false
-      }
-    ]
+module healthMetricAlertModule 'alerts/health.bicep' = if (healthCheck != null) {
+  name: '${functionAppName}HealthMetricAlertDeploy'
+  params: {
+    alertName: healthCheck!.unhealthyMetricName
+    resourceId: functionApp.id
+    resourceType: 'Microsoft.Web/sites'
+    alertsGroupName: alertsGroupName
   }
-  actions: [
-    {
-      actionGroupId: alertsActionGroup.id
-    }
-  ]
-}
+} 
 
-resource functionAppUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = if (healthCheck != null) {
-  name: healthCheck!.unhealthyMetricName
-  location: 'Global'
-  properties: union(commonUnhealthyMetricAlertRuleProperties, {
-    scopes: [functionApp.id]
-    criteria: {
-      allOf: [union(
-        commonUnhealthyMetricAlertRuleProperties.criteria.allOf[0],
-        {
-          metricNamespace: 'Microsoft.Web/sites'
-        }
-      )]
-    }
-  })
-}
-
-resource stagingSlotUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = if (healthCheck != null) {
-  name: '${healthCheck!.unhealthyMetricName}Staging'
-  location: 'Global'
-  properties: union(commonUnhealthyMetricAlertRuleProperties, {
-    scopes: [stagingSlot.id]
-    criteria: {
-      allOf: [union(
-        commonUnhealthyMetricAlertRuleProperties.criteria.allOf[0],
-        {
-          metricNamespace: 'Microsoft.Web/sites/slots'
-        }
-      )]
-    }
-  })
+module healthMetricAlertStagingModule 'alerts/health.bicep' = if (healthCheck != null) {
+  name: '${functionAppName}HealthMetricAlertStagingDeploy'
+  params: {
+    alertName: '${healthCheck!.unhealthyMetricName}Staging'
+    resourceId: stagingSlot.id
+    resourceType: 'Microsoft.Web/sites/slots'
+    alertsGroupName: alertsGroupName
+  }
 }
 
 // Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.
