@@ -2,21 +2,26 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import userService from '@admin/services/userService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import userQueries from '@admin/queries/userQueries';
 import logger from '@common/services/logger';
 import ModalConfirm from '@common/components/ModalConfirm';
 import ButtonText from '@common/components/ButtonText';
 import styles from './BauUsersPage.module.scss';
 
 const BauUsersPage = () => {
-  const { value, isLoading } = useAsyncRetry(() => userService.getUsers());
+  const {
+    data: users = [],
+    isLoading,
+    refetch: refetchUsers,
+  } = useQuery(userQueries.getUsers);
 
   const handleDeleteUser = async (userEmail: string) => {
     await userService
       .deleteUser(userEmail)
       .then(() => {
-        window.location.reload();
+        refetchUsers();
       })
       .catch(error => {
         logger.info(`Error encountered when deleting the user - ${error}`);
@@ -44,9 +49,9 @@ const BauUsersPage = () => {
               <th scope="col">Actions</th>
             </tr>
           </thead>
-          {value && (
+          {users && (
             <tbody>
-              {value.map(user => (
+              {users.map(user => (
                 <tr key={user.id}>
                   <th scope="row">{user.name}</th>
                   <td>{user.email}</td>
