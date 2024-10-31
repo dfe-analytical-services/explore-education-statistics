@@ -121,6 +121,7 @@ stages:
                     targetType: inline
                     script: |
                       cp -r $(Pipeline.Workspace)/MainBuild/public-api-docs $(docsAppBuildDirectory)
+                      ls -l $(docsAppBuildDirectory)
 
                 - task: AzureStaticWebApp@0
                   displayName: Deploy API docs
