@@ -14,7 +14,7 @@ interface Props {
   list: ReorderableListItem[];
   testId?: string;
   onCancel?: () => void;
-  onConfirm: () => void;
+  onConfirm?: () => void;
   onMoveItem: ({
     prevIndex,
     nextIndex,
@@ -91,19 +91,21 @@ export default function ReorderableList({
           )}
         </Droppable>
       </DragDropContext>
-      <ButtonGroup>
-        <Button onClick={onConfirm}>Confirm order</Button>
-        {onReverse && (
-          <Button variant="secondary" onClick={onReverse}>
-            Reverse order
-          </Button>
-        )}
-        {onCancel && (
-          <Button variant="secondary" onClick={onCancel}>
-            Cancel reordering
-          </Button>
-        )}
-      </ButtonGroup>
+      {(onCancel || onConfirm || onReverse) && (
+        <ButtonGroup>
+          {onConfirm && <Button onClick={onConfirm}>Confirm order</Button>}
+          {onReverse && (
+            <Button variant="secondary" onClick={onReverse}>
+              Reverse order
+            </Button>
+          )}
+          {onCancel && (
+            <Button variant="secondary" onClick={onCancel}>
+              Cancel reordering
+            </Button>
+          )}
+        </ButtonGroup>
+      )}
     </>
   );
 }

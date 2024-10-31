@@ -1,3 +1,26 @@
-.openSectionBlock {
-  min-height: 40rem !important;
+@import '~govuk-frontend/dist/govuk/base';
+
+.draggable {
+  background: #fff;
+  border: 2px solid $govuk-border-colour;
+  border-bottom: 0;
+  max-height: 15rem;
+  overflow: hidden;
+  padding: govuk-spacing(1);
+  position: relative;
+  width: 100%;
+
+  &::before {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0) 50%,
+      rgba(255, 255, 255, 1) 100%
+    );
+    content: '\00a0';
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+  }
 }

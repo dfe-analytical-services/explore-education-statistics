@@ -67,7 +67,7 @@ export default function ReorderableItem({
       >
         <div className={styles.itemLabel}>
           <DragIcon className={styles.dragIcon} />
-          <span>{item.label}</span>
+          <div className={styles.labelInner}>{item.label}</div>
         </div>
       </div>
       {!dropAreaActive && !draggableSnapshot.isDragging && (
