@@ -20,23 +20,14 @@ const TableHeadersReadOnlyList = ({
   legend,
   name,
 }: Props) => {
-  const { expandedLists, reverseOrderIds, isReverse, setIsReverse } =
-    useTableHeadersContext();
+  const { expandedLists } = useTableHeadersContext();
   const isExpanded = expandedLists.includes(id);
 
-  const { getValues, setValue } = useFormContext();
+  const { getValues } = useFormContext();
 
-  const [list, setList] = useState<Filter[]>(getValues(name));
+  const list: Filter[] = getValues(name);
 
   const displayItems = isExpanded ? list.length : defaultNumberOfItems;
-
-  useEffect(() => {
-    if (reverseOrderIds.includes(name) && isReverse) {
-      setList(list.toReversed());
-      setValue(name, list.toReversed());
-      setIsReverse(false);
-    }
-  }, [isReverse, list, name, reverseOrderIds, setIsReverse, setValue]);
 
   return (
     <>

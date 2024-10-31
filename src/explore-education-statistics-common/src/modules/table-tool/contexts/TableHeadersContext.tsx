@@ -14,10 +14,8 @@ export interface TableHeadersContextState {
   groupDraggingActive: boolean;
   groupDraggingEnabled: boolean;
   moveControlsActive: string[];
-  reverseOrderIds: string[];
-  isReverse: boolean;
+  reverseOrder: string[];
   setActiveGroup: (listName?: string) => void;
-  setIsReverse: (reverse: boolean) => void;
   toggleExpandedList: (listName: string) => void;
   toggleGroupDraggingActive: (active: boolean) => void;
   toggleGroupDraggingEnabled: (enabled: boolean) => void;
@@ -31,10 +29,8 @@ const TableHeadersContext = createContext<TableHeadersContextState>({
   groupDraggingActive: false,
   groupDraggingEnabled: true,
   moveControlsActive: [],
-  reverseOrderIds: [],
-  isReverse: false,
+  reverseOrder: [],
   setActiveGroup: noop,
-  setIsReverse: noop,
   toggleExpandedList: noop,
   toggleGroupDraggingActive: noop,
   toggleGroupDraggingEnabled: noop,
@@ -70,8 +66,7 @@ export const TableHeadersContextProvider = ({
     initialGroupDraggingEnabled ?? true,
   );
   const [moveControlsActive, setMoveControlsActive] = useState<string[]>([]);
-  const [reverseOrderIds, setReverseOrderIds] = useState<string[]>([]);
-  const [isReverse, setIsReverse] = useState(false);
+  const [reverseOrder, setReverseOrder] = useState<string[]>([]);
 
   const state = useMemo<TableHeadersContextState>(() => {
     const toggleExpandedList = (listName: string) =>
@@ -89,11 +84,10 @@ export const TableHeadersContextProvider = ({
       );
 
     const toggleReverseOrder = (groupId: string) => {
-      setIsReverse(true);
-      setReverseOrderIds(current =>
-        current.includes(groupId) && current.length > 1
-          ? current.filter(currentId => currentId !== groupId)
-          : [groupId],
+      setReverseOrder(current =>
+        current.includes(groupId)
+          ? current.filter(currentName => currentName !== groupId)
+          : [...current, groupId],
       );
     };
 
@@ -108,9 +102,7 @@ export const TableHeadersContextProvider = ({
       toggleGroupDraggingActive,
       toggleGroupDraggingEnabled,
       toggleMoveControlsActive,
-      reverseOrderIds,
-      isReverse,
-      setIsReverse,
+      reverseOrder,
       toggleReverseOrder,
     };
   }, [
@@ -122,9 +114,7 @@ export const TableHeadersContextProvider = ({
     setActiveGroup,
     toggleGroupDraggingActive,
     toggleGroupDraggingEnabled,
-    reverseOrderIds,
-    isReverse,
-    setIsReverse,
+    reverseOrder,
   ]);
 
   return (

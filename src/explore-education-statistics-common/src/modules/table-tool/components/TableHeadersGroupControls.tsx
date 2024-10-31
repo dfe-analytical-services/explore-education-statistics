@@ -7,7 +7,9 @@ import { useDesktopMedia } from '@common/hooks/useMedia';
 import styles from '@common/modules/table-tool/components/TableHeadersGroupControls.module.scss';
 import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
 import classNames from 'classnames';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+import { Filter } from '../types/filters';
 
 interface Props {
   defaultNumberOfItems: number;
@@ -41,8 +43,8 @@ const TableHeadersGroupControls = ({
     expandedLists,
     setActiveGroup,
     toggleExpandedList,
-    toggleGroupDraggingEnabled,
     toggleReverseOrder,
+    toggleGroupDraggingEnabled,
     toggleMoveControlsActive,
   } = useTableHeadersContext();
   const { isMedia: isDesktopMedia } = useDesktopMedia();
@@ -50,6 +52,17 @@ const TableHeadersGroupControls = ({
   const displayItems = isExpanded ? totalItems : defaultNumberOfItems;
   const hasMoreItems = isExpanded || totalItems > displayItems;
   const disableControls = activeGroup && activeGroup !== id;
+  const { getValues, setValue } = useFormContext();
+  const list: Filter[] = getValues(groupName);
+  const [isReverse, setIsReverse] = useState(false);
+
+  useEffect(() => {
+    if (isReverse) {
+      setValue(groupName, list.toReversed());
+      toggleReverseOrder(id);
+      setIsReverse(false);
+    }
+  }, [groupName, id, isReverse, list, setValue, toggleReverseOrder]);
 
   return (
     <div className="govuk-!-padding-top-2">
@@ -172,9 +185,7 @@ const TableHeadersGroupControls = ({
                 <Button
                   className="govuk-!-width-one-third"
                   disabled={!!disableControls}
-                  onClick={() => {
-                    toggleReverseOrder(groupName);
-                  }}
+                  onClick={() => setIsReverse(true)}
                 >
                   Reverse order<VisuallyHidden> {legend}</VisuallyHidden>
                 </Button>
