@@ -136,9 +136,9 @@ describe('TableHeadersGroupControls', () => {
   });
 });
 
-jest.mock( "react-hook-form", () => ( {
-  ...jest.requireActual( "react-hook-form" ),
-  useFormContext: () => ( {
+jest.mock('react-hook-form', () => ({
+  ...jest.requireActual('react-hook-form'),
+  useFormContext: () => ({
     getValues: () => jest.fn(),
     setValues: () => jest.fn(),
   }),
