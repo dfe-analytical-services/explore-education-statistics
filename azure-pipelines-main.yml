@@ -94,7 +94,7 @@ jobs:
           command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
-          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api
+          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/data-api
           zipAfterPublish: True
 
       - task: DotNetCoreCLI@2
@@ -103,7 +103,7 @@ jobs:
           command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
-          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api
+          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/content-api
           zipAfterPublish: True
 
       - task: PublishPipelineArtifact@0
@@ -113,12 +113,12 @@ jobs:
           targetPath: $(Build.ArtifactStagingDirectory)/public-api
 
       - task: DotNetCoreCLI@2
-        displayName: Publish Public API - API project
+        displayName: Publish Public API
         inputs:
           command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Api.csproj'
-          arguments: -r linux-musl-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api/api
+          arguments: -r linux-musl-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api
           zipAfterPublish: False
 
       - task: Docker@2
@@ -128,8 +128,8 @@ jobs:
           containerRegistry: $(AcrServiceConnection)
           repository: ees-public-api/api
           command: build
-          Dockerfile: docker/public-api/api/Dockerfile
-          buildContext: $(Build.ArtifactStagingDirectory)/public-api/api/GovUk.Education.ExploreEducationStatistics.Public.Data.Api
+          Dockerfile: docker/public-api/Dockerfile
+          buildContext: $(Build.ArtifactStagingDirectory)/public-api/GovUk.Education.ExploreEducationStatistics.Public.Data.Api
           tags: $(Build.BuildNumber)
           arguments: --build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)
         env:
