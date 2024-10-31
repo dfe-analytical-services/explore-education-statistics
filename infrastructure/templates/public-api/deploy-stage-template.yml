@@ -92,6 +92,16 @@ stages:
                   parameters:
                     serviceConnection: ${{parameters.serviceConnection}}
 
+                # Workaround for deprecation warning preventing deployment token from
+                # being fetched in next step: https://github.com/Azure/azure-cli/issues/30048
+                - task: Bash@3
+                  name: InstallAzureCLI
+                  displayName: 'Install Azure CLI 2.64.0 as workaround'
+                  inputs:
+                    targetType: inline
+                    script: |
+                      pip install --force-reinstall azure-cli==2.64.0
+
                 - task: AzureCLI@2
                   displayName: 'Get Public API docs deployment token'
                   inputs:
@@ -100,7 +110,7 @@ stages:
                     scriptLocation: inlineScript
                     inlineScript: |
                       set -e
-                      deploymentToken=`az staticwebapp secrets list -n $(docsAppName) --query "properties.apiKey" -o tsc`
+                      deploymentToken=`az staticwebapp secrets list -n $(docsAppName) --query "properties.apiKey" -o tsv`
                       echo "##vso[task.setvariable variable=docsDeploymentToken;]$deploymentToken"
 
                 - task: AzureStaticWebApp@0
