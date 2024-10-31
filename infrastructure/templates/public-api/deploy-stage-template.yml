@@ -48,7 +48,7 @@ stages:
                   artifact: public-api-data-processor
 
                 - download: MainBuild
-                  displayName: Download Public API docs artifact
+                  displayName: Download API docs artifact
                   artifact: public-api-docs
 
                 - checkout: self
@@ -103,7 +103,7 @@ stages:
                       pip install --force-reinstall azure-cli==2.64.0
 
                 - task: AzureCLI@2
-                  displayName: 'Get Public API docs deployment token'
+                  displayName: 'Get API docs deployment token'
                   inputs:
                     azureSubscription: ${{parameters.serviceConnection}}
                     scriptType: bash
@@ -114,9 +114,10 @@ stages:
                       echo "##vso[task.setvariable variable=docsDeploymentToken;]$deploymentToken"
 
                 - task: AzureStaticWebApp@0
-                  displayName: 'Deploy Public API docs'
+                  displayName: 'Deploy API docs'
                   inputs:
-                    app_location: $(Pipeline.Workspace)/MainBuild/public-api-docs
+                    workingDirectory: $(Pipeline.Workspace)/MainBuild/public-api-docs
+                    app_location: .
                     output_location: '' # Leave this empty
                     skip_app_build: true
                     skip_api_build: true
