@@ -1,0 +1,46 @@
+---
+title: How to get CSV data
+last_reviewed_on: 2024-09-16
+review_in: 6 months
+weight: 2
+---
+
+# How to get CSV data
+
+In this guide, you'll learn how to get CSV data from the explore education statistics (EES) API.
+This may be particularly useful if you wish to access data sets in their entirety, or find it more
+comfortable to work with CSVs.
+
+## What you'll need
+
+You should already be familiar with the EES API. If not, you should read the [Quick start](/getting-started/quick-start/index.html)
+first as this guide will presume some prior knowledge.
+
+To run request examples in this guide, it is a good idea to come prepared with a HTTP or API client
+tool. Good recommendations for beginners are [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/).
+
+Some prior knowledge of working with your chosen HTTP client will be necessary to work with the
+examples.
+
+## Get an entire data set as a CSV file
+
+Every data set is created from an underlying CSV file that contains  **all** the data. You may find
+it useful (or necessary) to work with the underlying CSV instead of interacting with the data set
+via the API.
+
+The underlying CSV file can be downloaded via the [Download data set CSV](/endpoints/DownloadDataSetCsv/index.html)
+endpoint. To use this endpoint, you need to make a `GET` request:
+
+```
+GET <%= api_url "/api/v1/data-sets/{dataSetId}/csv" %>
+```
+
+In the request URL, you'd substitute the `{dataSetId}` parameter with your chosen data set's ID.
+
+Upon making this request, a download containing the CSV data should start. The file will
+be gzip compressed (like most of the API responses), meaning that your HTTP client will need to
+support gzip decompression to extract the contents.
+
+It should be noted that the CSV data will be use human-readable labels for its contents instead of
+machine-readable identifiers. This means that unlike the rest of the API, there are no backward
+compatibility guarantees between different versions of the data set.

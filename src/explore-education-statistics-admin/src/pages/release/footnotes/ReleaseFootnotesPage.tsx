@@ -104,18 +104,13 @@ const ReleaseFootnotesPage = ({
               </ButtonLink>
             )}
 
-            {footnotes.length > 1 && (
+            {footnotes.length > 1 && !isReordering && (
               <Button
                 className="govuk-!-margin-left-auto"
-                variant={!isReordering ? 'secondary' : undefined}
-                onClick={async () => {
-                  if (isReordering) {
-                    await handleSaveOrder();
-                  }
-                  toggleIsReordering();
-                }}
+                variant="secondary"
+                onClick={toggleIsReordering.on}
               >
-                {isReordering ? 'Save order' : 'Reorder footnotes'}
+                Reorder footnotes
               </Button>
             )}
           </div>
@@ -128,6 +123,10 @@ const ReleaseFootnotesPage = ({
           footnoteMeta={footnoteMeta}
           canUpdateRelease={canUpdateRelease}
           isReordering={isReordering}
+          onConfirmReordering={async () => {
+            await handleSaveOrder();
+            toggleIsReordering();
+          }}
           onDelete={async footnote => {
             await footnoteService.deleteFootnote(releaseId, footnote.id);
             setFootnotes({

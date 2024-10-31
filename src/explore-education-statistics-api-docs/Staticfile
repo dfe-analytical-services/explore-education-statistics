@@ -1,0 +1,4 @@
+root: build 
+http_strict_transport_security: true
+http_strict_transport_security_include_subdomains: true
+location_include: includes/*.conf

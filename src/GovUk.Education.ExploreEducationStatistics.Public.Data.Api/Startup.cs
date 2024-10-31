@@ -276,7 +276,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 .AllowAnonymous();
         });
 
-        app.UseHealthChecks("/api/health");
+        app.UseHealthChecks("/health");
     }
 
     private static void UpdateDatabase(IApplicationBuilder app)

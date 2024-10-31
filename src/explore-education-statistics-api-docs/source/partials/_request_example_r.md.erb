@@ -1,0 +1,21 @@
+```r
+library(httr)
+
+url <- "<%= url %>"
+<% if body_json %>
+body <- "<%= body_json %>"
+<% end %>
+
+<% if body_json %>
+response <- <%= http_method.upcase %>(
+  url,
+  body = body,
+  encode = "json",
+  content_type("application/json")
+)
+<% else %>
+response <- <%= http_method.upcase %>(url)
+<% end %>
+
+output <- content(response)
+```
