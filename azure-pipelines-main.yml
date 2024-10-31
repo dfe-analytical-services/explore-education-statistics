@@ -8,11 +8,11 @@ parameters:
       - test
 
 variables:
-  BuildConfiguration: 'Release'
+  BuildConfiguration: Release
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
-  NodeVersion: 20.16.0
-  RubyVersion: 3.2
+  NodeVersion: '20.16.0'
+  RubyVersion: '3.2'
   AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
 
 trigger:
@@ -31,336 +31,336 @@ pr:
   - test
 
 jobs:
-  - job: 'Backend'
-    pool: 'ees-ubuntu2204-xlarge'
+  - job: Backend
+    pool: ees-ubuntu2204-xlarge
     workspace:
       clean: all
     steps:
       - task: UseDotNet@2
-        displayName: 'Install .NET 8.0 SDK'
+        displayName: Install .NET 8.0 SDK
         inputs:
           version: 8.0.x
           performMultiLevelLookup: true
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Build'
+      - task: DotNetCoreCLI@2
+        displayName: Build
         inputs:
           projects: |
             **/GovUk.*/*csproj
             !**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj
-          arguments: '--configuration $(BuildConfiguration)'
+          arguments: --configuration $(BuildConfiguration)
 
       # TODO: Uncomment this step once formatter has been run globally.
       # This is because whitespace rules cannot be warnings or suggestions; they will always be errors
       # - task: DotNetCoreCLI@2
-      #   displayName: 'Verify Formatting and Style'
+      #   displayName:'Verify Formatting and Style
       #   inputs:
-      #     command: 'custom'
-      #     custom: 'format whitespace src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error'
-      #     arguments: '--verify-no-changes --verbosity diagnostic'
+      #     command: custom
+      #     custom: format whitespace src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error
+      #     arguments: --verify-no-changes --verbosity diagnostic
 
       - task: DotNetCoreCLI@2
-        displayName: 'Verify Formatting and Style'
+        displayName: Verify Formatting and Style
         inputs:
-          command: 'custom'
-          custom: 'format'
+          command: custom
+          custom: format
           ## TODO: Remove "--severity error" once style formatter has been run across project
-          arguments: 'style --verify-no-changes --verbosity diagnostic --severity error'
-          projects: 'src/GovUk.Education.ExploreEducationStatistics.sln'
+          arguments: style --verify-no-changes --verbosity diagnostic --severity error
+          projects: src/GovUk.Education.ExploreEducationStatistics.sln
 
       - task: DotNetCoreCLI@2
-        displayName: 'Verify Formatting and Style'
+        displayName: Verify Formatting and Style
         inputs:
-          command: 'custom'
-          custom: 'format'
+          command: custom
+          custom: format
           ## TODO: Remove "--severity error" once work has been done to resolve build warnings (https://dfedigital.atlassian.net/browse/EES-4594).
-          arguments: 'analyzers --verify-no-changes --verbosity diagnostic --severity error'
-          projects: 'src/GovUk.Education.ExploreEducationStatistics.sln'
+          arguments: analyzers --verify-no-changes --verbosity diagnostic --severity error
+          projects: src/GovUk.Education.ExploreEducationStatistics.sln
 
       # TODO: Wrap these ^ three tasks up into a single `dotnet format` task once all 3 above TODOs are TO-DONE ;)
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Test'
+      - task: DotNetCoreCLI@2
+        displayName: Test
         inputs:
-          command: 'test'
+          command: test
           projects: |
             **/GovUk.*[Tt]ests/*.csproj
             !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
-          arguments: '--configuration $(BuildConfiguration)'
+          arguments: --configuration $(BuildConfiguration)
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Data API'
+      - task: DotNetCoreCLI@2
+        displayName: Publish Data API
         inputs:
-          command: 'publish'
+          command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
-          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api'
+          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api
           zipAfterPublish: True
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Content API'
+      - task: DotNetCoreCLI@2
+        displayName: Publish Content API
         inputs:
-          command: 'publish'
+          command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
-          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api'
+          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api
           zipAfterPublish: True
 
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Public frontend API Artifacts'
+      - task: PublishPipelineArtifact@0
+        displayName: Publish Public frontend API Artifacts
         inputs:
-          artifactName: 'public-api'
-          targetPath: '$(Build.ArtifactStagingDirectory)/public-api'
+          artifactName: public-api
+          targetPath: $(Build.ArtifactStagingDirectory)/public-api
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Public API - API project'
+      - task: DotNetCoreCLI@2
+        displayName: Publish Public API - API project
         inputs:
-          command: 'publish'
+          command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Api.csproj'
-          arguments: '-r linux-musl-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api/api'
+          arguments: -r linux-musl-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api/api
           zipAfterPublish: False
 
       - task: Docker@2
-        displayName: 'Build Public API - API Docker image'
+        displayName: Build Public API - API Docker image
         condition: eq(variables.IsBranchDeployable, true)
         inputs:
-          containerRegistry: '$(AcrServiceConnection)'
-          repository: 'ees-public-api/api'
-          command: 'build'
-          Dockerfile: 'docker/public-api/api/Dockerfile'
-          buildContext: '$(Build.ArtifactStagingDirectory)/public-api/api/GovUk.Education.ExploreEducationStatistics.Public.Data.Api'
+          containerRegistry: $(AcrServiceConnection)
+          repository: ees-public-api/api
+          command: build
+          Dockerfile: docker/public-api/api/Dockerfile
+          buildContext: $(Build.ArtifactStagingDirectory)/public-api/api/GovUk.Education.ExploreEducationStatistics.Public.Data.Api
           tags: $(Build.BuildNumber)
-          arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
+          arguments: --build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)
         env:
           DOCKER_BUILDKIT: 1
 
       - task: Docker@2
-        displayName: 'Push Public API - API Docker image'
+        displayName: Push Public API - API Docker image
         condition: eq(variables.IsBranchDeployable, true)
         inputs:
-          containerRegistry: '$(AcrServiceConnection)'
-          repository: 'ees-public-api/api'
-          command: 'push'
+          containerRegistry: $(AcrServiceConnection)
+          repository: ees-public-api/api
+          command: push
           tags: $(Build.BuildNumber)
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Public API - Data Processor Function'
+      - task: DotNetCoreCLI@2
+        displayName: Publish Public API - Data Processor Function
         inputs:
-          command: 'publish'
+          command: publish
           publishWebProjects: false
           includeRootFolder: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api-data-processor'
+          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api-data-processor
           zipAfterPublish: True
 
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Public API - Data Processor Artifact'
+      - task: PublishPipelineArtifact@0
+        displayName: Publish Public API - Data Processor Artifact
         inputs:
-          artifactName: 'public-api-data-processor'
-          targetPath: '$(Build.ArtifactStagingDirectory)/public-api-data-processor'
+          artifactName: public-api-data-processor
+          targetPath: $(Build.ArtifactStagingDirectory)/public-api-data-processor
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Notifier Function'
+      - task: DotNetCoreCLI@2
+        displayName: Publish Notifier Function
         inputs:
-          command: 'publish'
+          command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/notifier'
+          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/notifier
           zipAfterPublish: True
 
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Notifier Artifacts'
+      - task: PublishPipelineArtifact@0
+        displayName: Publish Notifier Artifacts
         inputs:
-          artifactName: 'notifier'
-          targetPath: '$(Build.ArtifactStagingDirectory)/notifier'
+          artifactName: notifier
+          targetPath: $(Build.ArtifactStagingDirectory)/notifier
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Publisher Function'
+      - task: DotNetCoreCLI@2
+        displayName: Publish Publisher Function
         inputs:
-          command: 'publish'
+          command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/publisher'
+          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/publisher
           zipAfterPublish: True
 
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Publisher Artifacts'
+      - task: PublishPipelineArtifact@0
+        displayName: Publish Publisher Artifacts
         inputs:
-          artifactName: 'publisher'
-          targetPath: '$(Build.ArtifactStagingDirectory)/publisher'
+          artifactName: publisher
+          targetPath: $(Build.ArtifactStagingDirectory)/publisher
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Processor Function'
+      - task: DotNetCoreCLI@2
+        displayName: Publish Processor Function
         inputs:
-          command: 'publish'
+          command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/processor'
+          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/processor
           zipAfterPublish: True
 
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Processor Artifacts'
+      - task: PublishPipelineArtifact@0
+        displayName: Publish Processor Artifacts
         inputs:
-          artifactName: 'processor'
-          targetPath: '$(Build.ArtifactStagingDirectory)/processor'
+          artifactName: processor
+          targetPath: $(Build.ArtifactStagingDirectory)/processor
 
-  - job: 'Admin'
-    pool: 'ees-ubuntu2204-xlarge'
+  - job: Admin
+    pool: ees-ubuntu2204-xlarge
     workspace:
       clean: all
     steps:
       - task: UseNode@1
-        displayName: 'Install Node.js $(NodeVersion)'
+        displayName: Install Node.js $(NodeVersion)
         inputs:
           version: $(NodeVersion)
 
-      - task: 'Bash@3'
-        displayName: 'corepack enable'
+      - task: Bash@3
+        displayName: corepack enable
         inputs:
-          workingDir: '.'
-          targetType: 'inline'
-          script: 'corepack enable'
+          workingDir: .
+          targetType: inline
+          script: corepack enable
 
       - task: UseDotNet@2
-        displayName: 'Install .NET 8.0 SDK'
+        displayName: Install .NET 8.0 SDK
         inputs:
           version: 8.0.x
           performMultiLevelLookup: true
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Build'
+      - task: DotNetCoreCLI@2
+        displayName: Build
         inputs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          arguments: '--configuration $(BuildConfiguration)'
+          arguments: --configuration $(BuildConfiguration)
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Test'
+      - task: DotNetCoreCLI@2
+        displayName: Test
         inputs:
-          command: 'test'
+          command: test
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
-          arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+          arguments: --configuration $(BuildConfiguration) --collect "Code coverage"
 
-      - task: 'Bash@3'
-        displayName: 'pnpm i'
+      - task: Bash@3
+        displayName: pnpm i
         inputs:
-          targetType: 'inline'
-          script: 'pnpm i'
+          targetType: inline
+          script: pnpm i
 
-      - task: 'Bash@3'
-        displayName: 'pnpm run build'
+      - task: Bash@3
+        displayName: pnpm run build
         inputs:
-          targetType: 'inline'
-          script: 'pnpm --filter=explore-education-statistics-admin run build'
+          targetType: inline
+          script: pnpm --filter=explore-education-statistics-admin run build
 
       - task: CopyFiles@2
-        displayName: 'Copy files to wwwroot'
+        displayName: Copy files to wwwroot
         inputs:
-          SourceFolder: 'src/explore-education-statistics-admin/build'
+          SourceFolder: src/explore-education-statistics-admin/build
           TargetFolder: src/GovUk.Education.ExploreEducationStatistics.Admin/wwwroot
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish'
+      - task: DotNetCoreCLI@2
+        displayName: Publish
         inputs:
-          command: 'publish'
+          command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
 
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Admin Artifact'
+      - task: PublishPipelineArtifact@0
+        displayName: Publish Admin Artifact
         inputs:
-          artifactName: 'Admin'
-          targetPath: '$(Build.ArtifactStagingDirectory)'
+          artifactName: Admin
+          targetPath: $(Build.ArtifactStagingDirectory)
 
-  - job: 'Frontend'
-    pool: 'ees-ubuntu2204-xlarge'
+  - job: Frontend
+    pool: ees-ubuntu2204-xlarge
     workspace:
       clean: all
     steps:
       - task: UseNode@1
-        displayName: 'Install Node.js $(NodeVersion)'
+        displayName: Install Node.js $(NodeVersion)
         inputs:
           version: $(NodeVersion)
 
-      - task: 'Bash@3'
-        displayName: 'corepack enable'
+      - task: Bash@3
+        displayName: corepack enable
         inputs:
-          workingDir: '.'
-          targetType: 'inline'
-          script: 'corepack enable'
+          workingDir: .
+          targetType: inline
+          script: corepack enable
 
-      - task: 'Bash@3'
-        displayName: 'pnpm i'
+      - task: Bash@3
+        displayName: pnpm i
         inputs:
-          workingDir: '.'
-          targetType: 'inline'
-          script: 'pnpm i'
+          workingDir: .
+          targetType: inline
+          script: pnpm i
 
-      - task: 'Bash@3'
-        displayName: 'pnpm tsc'
+      - task: Bash@3
+        displayName: pnpm tsc
         inputs:
-          workingDir: '.'
-          targetType: 'inline'
-          script: 'pnpm tsc'
+          workingDir: .
+          targetType: inline
+          script: pnpm tsc
 
-      - task: 'Bash@3'
-        displayName: 'pnpm lint'
+      - task: Bash@3
+        displayName: pnpm lint
         inputs:
-          workingDir: '.'
-          targetType: 'inline'
-          script: 'pnpm lint'
+          workingDir: .
+          targetType: inline
+          script: pnpm lint
 
-      - task: 'Bash@3'
-        displayName: 'pnpm format:check'
+      - task: Bash@3
+        displayName: pnpm format:check
         inputs:
-          workingDir: '.'
-          targetType: 'inline'
-          script: 'pnpm format:check'
+          workingDir: .
+          targetType: inline
+          script: pnpm format:check
 
-      - task: 'Bash@3'
-        displayName: 'pnpm test:ci'
+      - task: Bash@3
+        displayName: pnpm test:ci
         inputs:
-          workingDir: '.'
-          targetType: 'inline'
-          script: 'pnpm test:ci'
+          workingDir: .
+          targetType: inline
+          script: pnpm test:ci
 
-      - task: 'PublishTestResults@2'
-        displayName: 'Publish frontend test results'
+      - task: PublishTestResults@2
+        displayName: Publish frontend test results
         inputs:
-          testResultsFormat: 'JUnit'
-          testResultsFiles: 'explore-education-statistics-*/junit-*.xml'
-          searchFolder: './src'
-          testRunTitle: 'Release Jest tests'
+          testResultsFormat: JUnit
+          testResultsFiles: explore-education-statistics-*/junit-*.xml
+          searchFolder: ./src
+          testRunTitle: Release Jest tests
           mergeTestResults: true
 
-      - task: 'Bash@3'
-        displayName: 'pnpm run build'
+      - task: Bash@3
+        displayName: pnpm run build
         inputs:
-          targetType: 'inline'
-          script: 'pnpm --filter=explore-education-statistics-frontend run build'
+          targetType: inline
+          script: pnpm --filter=explore-education-statistics-frontend run build
 
       - task: Docker@2
-        displayName: 'Build Public frontend Docker image'
+        displayName: Build Public frontend Docker image
         condition: eq(variables.IsBranchDeployable, true)
         inputs:
-          containerRegistry: '$(AcrServiceConnection)'
-          repository: 'ees-public-frontend'
-          command: 'build'
-          Dockerfile: 'docker/public-frontend/Dockerfile'
-          buildContext: '$(System.DefaultWorkingDirectory)'
+          containerRegistry: $(AcrServiceConnection)
+          repository: ees-public-frontend
+          command: build
+          Dockerfile: docker/public-frontend/Dockerfile
+          buildContext: $(System.DefaultWorkingDirectory)
           tags: $(Build.BuildNumber)
-          arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
+          arguments: --build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)
         env:
           DOCKER_BUILDKIT: 1
 
       - task: Docker@2
-        displayName: 'Push Public frontend Docker image'
+        displayName: Push Public frontend Docker image
         condition: eq(variables.IsBranchDeployable, true)
         inputs:
-          containerRegistry: '$(AcrServiceConnection)'
-          repository: 'ees-public-frontend'
-          command: 'push'
+          containerRegistry: $(AcrServiceConnection)
+          repository: ees-public-frontend
+          command: push
           tags: $(Build.BuildNumber)
 
   - job: ApiDocs
@@ -396,22 +396,22 @@ jobs:
           artifactName: public-api-docs
           targetPath: $(WorkingDirectory)/build
 
-  - job: 'MiscellaneousArtifacts'
+  - job: MiscellaneousArtifacts
     pool:
-      vmImage: 'ubuntu-22.04'
+      vmImage: ubuntu-22.04
     workspace:
       clean: all
     steps:
       - task: CopyFiles@2
-        displayName: 'Copy Pipfiles to tests'
+        displayName: Copy Pipfiles to tests
         inputs:
           Contents: |
             Pipfile
             Pipfile.lock
-          TargetFolder: 'tests'
+          TargetFolder: tests
 
       - task: PublishPipelineArtifact@0
-        displayName: 'Publish test files'
+        displayName: Publish test files
         inputs:
-          artifactName: 'tests'
-          targetPath: 'tests'
+          artifactName: tests
+          targetPath: tests

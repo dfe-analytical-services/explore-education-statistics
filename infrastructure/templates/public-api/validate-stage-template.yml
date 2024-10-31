@@ -15,7 +15,7 @@ parameters:
 
 stages:
   - stage: ${{parameters.stageName}}
-    displayName: 'Validate ${{parameters.environment}} Infrastructure'
+    displayName: Validate ${{parameters.environment}} Infrastructure
     # Prevent this stage from running in parallel with the same deploy stage in other ongoing runs of this pipeline.
     # Instead, multiple executions of this stage will be queued and run sequentially in the order that their pipelines
     # were triggered.
@@ -30,15 +30,15 @@ stages:
           - checkout: self
 
           - task: AzureCLI@2
-            displayName: 'Install Bicep'
+            displayName: Install Bicep
             inputs:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
               scriptLocation: inlineScript
-              inlineScript: 'az bicep install'
+              inlineScript: az bicep install
 
           - task: AzureCLI@2
-            displayName: 'Validate bicep scripts'
+            displayName: Validate Bicep scripts
             inputs:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
