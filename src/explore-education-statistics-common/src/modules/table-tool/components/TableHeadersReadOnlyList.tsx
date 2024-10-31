@@ -2,8 +2,8 @@ import DragIcon from '@common/components/DragIcon';
 import styles from '@common/modules/table-tool/components/TableHeadersReadOnlyList.module.scss';
 import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
 import { Filter } from '@common/modules/table-tool/types/filters';
-import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import React from 'react';
 
 interface Props {
   defaultNumberOfItems: number;
@@ -22,11 +22,9 @@ const TableHeadersReadOnlyList = ({
 }: Props) => {
   const { expandedLists } = useTableHeadersContext();
   const isExpanded = expandedLists.includes(id);
+  const { watch } = useFormContext();
 
-  const { getValues } = useFormContext();
-
-  const list: Filter[] = getValues(name);
-
+  const list = watch(name) as Filter[];
   const displayItems = isExpanded ? list.length : defaultNumberOfItems;
 
   return (
