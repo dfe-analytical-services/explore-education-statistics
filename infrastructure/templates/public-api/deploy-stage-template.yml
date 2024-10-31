@@ -116,7 +116,7 @@ stages:
                 - task: AzureStaticWebApp@0
                   displayName: 'Deploy Public API docs'
                   inputs:
-                    app_location: $(Pipeline.Workspace)/DocsBuild
+                    app_location: $(Pipeline.Workspace)/MainBuild/public-api-docs
                     output_location: '' # Leave this empty
                     skip_app_build: true
                     skip_api_build: true
