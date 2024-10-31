@@ -232,7 +232,7 @@ module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthenti
   }
 }
 
-module healthMetricAlertModule 'alerts/health.bicep' = if (healthCheck != null) {
+module healthMetricAlertModule 'alerts/healthAlert.bicep' = if (healthCheck != null) {
   name: '${functionAppName}HealthMetricAlertDeploy'
   params: {
     alertName: healthCheck!.unhealthyMetricName
@@ -242,7 +242,7 @@ module healthMetricAlertModule 'alerts/health.bicep' = if (healthCheck != null) 
   }
 } 
 
-module healthMetricAlertStagingModule 'alerts/health.bicep' = if (healthCheck != null) {
+module healthMetricAlertStagingModule 'alerts/healthAlert.bicep' = if (healthCheck != null) {
   name: '${functionAppName}HealthMetricAlertStagingDeploy'
   params: {
     alertName: '${healthCheck!.unhealthyMetricName}Staging'

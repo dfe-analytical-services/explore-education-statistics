@@ -9,6 +9,21 @@ param resourceId string
 @description('Type of the resource that this alert is being applied to.')
 param resourceType 'Microsoft.Web/sites' | 'Microsoft.Web/sites/slots'
 
+@description('The criterion type by which the metric is being evaluated.')
+param criterionType 'StaticThresholdCriterion'
+
+@description('The metric that is being measured.')
+param metricName 'HealthCheckStatus'
+
+@description('The time aggregation.')
+param timeAggregation 'Minimum'
+
+@description('The operator being used in the test.')
+param operator 'LessThan'
+
+@description('A static threshold to be evaluated against in compatible criterion types.')
+param threshold int = 100
+
 @description('The evaluation frequency.')
 param evaluationFrequency evaluationFrequencyType = 'PT1M'
 
@@ -22,7 +37,7 @@ resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing
   name: alertsGroupName
 }
 
-resource functionAppUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
+resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
   name: alertName
   location: 'Global'
   properties: {
@@ -36,11 +51,11 @@ resource functionAppUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@20
       allOf: [
         {
           name: 'Metric1'
-          criterionType: 'StaticThresholdCriterion'
-          metricName: 'HealthCheckStatus'
-          timeAggregation: 'Minimum'
-          operator: 'LessThan'
-          threshold: 100
+          criterionType: criterionType
+          metricName: metricName
+          timeAggregation: timeAggregation
+          operator: operator
+          threshold: threshold
           skipMetricValidation: false
           metricNamespace: resourceType
         }
