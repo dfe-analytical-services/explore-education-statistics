@@ -1,4 +1,4 @@
-import { evaluationFrequencyType, windowSizeType } from 'types.bicep'
+import { evaluationFrequencyType, metricNameType, operatorType, resourceTypeType, timeAggregationType, windowSizeType } from 'types.bicep'
 
 @description('Name of the alert.')
 param alertName string
@@ -7,19 +7,19 @@ param alertName string
 param resourceId string
 
 @description('Type of the resource that this alert is being applied to.')
-param resourceType 'Microsoft.Web/sites' | 'Microsoft.Web/sites/slots'
+param resourceType resourceTypeType
 
 @description('The criterion type by which the metric is being evaluated.')
 param criterionType 'StaticThresholdCriterion'
 
 @description('The metric that is being measured.')
-param metricName 'HealthCheckStatus'
+param metricName metricNameType
 
 @description('The time aggregation.')
-param timeAggregation 'Minimum'
+param timeAggregation timeAggregationType
 
 @description('The operator being used in the test.')
-param operator 'LessThan'
+param operator operatorType
 
 @description('A static threshold to be evaluated against in compatible criterion types.')
 param threshold int = 100
@@ -28,7 +28,7 @@ param threshold int = 100
 param evaluationFrequency evaluationFrequencyType = 'PT1M'
 
 @description('The window size.')
-param windowSize 'PT5M' = 'PT5M'
+param windowSize windowSizeType = 'PT5M'
 
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string

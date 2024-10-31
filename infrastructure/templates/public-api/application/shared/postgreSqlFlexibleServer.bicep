@@ -55,6 +55,7 @@ module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
     firewallRules: formattedFirewallRules
     databaseNames: ['public_data']
     privateEndpointSubnetId: privateEndpointSubnetId
+    alertsGroupName: resourceNames.existingResources.alertsGroup
     tagValues: tagValues
   }
 }

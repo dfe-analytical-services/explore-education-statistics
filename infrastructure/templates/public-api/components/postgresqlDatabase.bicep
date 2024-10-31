@@ -45,6 +45,9 @@ param firewallRules FirewallRule[] = []
 @description('An array of Entra ID admin principal names for this resource')
 param entraIdAdminPrincipals PrincipalNameAndId[] = []
 
+@description('Specifies the name of an alerts group for reporting metric alerts')
+param alertsGroupName string
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
@@ -135,6 +138,16 @@ resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/adminis
     firewallRuleAssignments
   ]
 }]
+
+module blockedByFirewallMetricAlertModule 'alerts/databases/blockedByFirewallAlert.bicep' = {
+  name: '${databaseServerName}BlockedByFirewallMetricAlertDeploy'
+  params: {
+    alertName: '${databaseServerName}BlockedByFirewall'
+    resourceId: postgreSQLDatabase.id
+    resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+    alertsGroupName: alertsGroupName
+  }
+}
 
 @description('The fully qualified Azure resource ID of the Database Server.')
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)
