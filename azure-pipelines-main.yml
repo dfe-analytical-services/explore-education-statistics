@@ -120,7 +120,7 @@ jobs:
 
       - task: Docker@2
         displayName: Build Public API Docker image
-        condition: eq(variables.IsBranchDeployable, true)
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           containerRegistry: $(AcrServiceConnection)
           repository: ees-public-api/api
@@ -134,7 +134,7 @@ jobs:
 
       - task: Docker@2
         displayName: Push Public API Docker image
-        condition: eq(variables.IsBranchDeployable, true)
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           containerRegistry: $(AcrServiceConnection)
           repository: ees-public-api/api
@@ -339,7 +339,7 @@ jobs:
 
       - task: Docker@2
         displayName: Build Public frontend Docker image
-        condition: eq(variables.IsBranchDeployable, true)
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           containerRegistry: $(AcrServiceConnection)
           repository: ees-public-frontend
@@ -353,7 +353,7 @@ jobs:
 
       - task: Docker@2
         displayName: Push Public frontend Docker image
-        condition: eq(variables.IsBranchDeployable, true)
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           containerRegistry: $(AcrServiceConnection)
           repository: ees-public-frontend
