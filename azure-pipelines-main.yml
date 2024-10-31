@@ -100,7 +100,7 @@ jobs:
       - task: PublishPipelineArtifact@0
         displayName: Publish Data API artifact
         inputs:
-          artifactName: content-api
+          artifactName: data-api
           targetPath: $(Build.ArtifactStagingDirectory)/data-api
 
       - task: DotNetCoreCLI@2
