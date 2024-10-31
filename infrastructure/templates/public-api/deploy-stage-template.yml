@@ -47,9 +47,8 @@ stages:
                   displayName: Download Data Processor Function App artifact
                   artifact: public-api-data-processor
 
-                - download: DocsBuild
+                - download: MainBuild
                   displayName: Download Public API docs artifact
-                  condition: eq(dependencies.DocsBuild.result, 'Succeeded')
                   artifact: public-api-docs
 
                 - checkout: self
@@ -95,7 +94,6 @@ stages:
 
                 - task: AzureCLI@2
                   displayName: 'Get Public API docs deployment token'
-                  condition: eq(dependencies.DocsBuild.result, 'Succeeded')
                   inputs:
                     azureSubscription: ${{parameters.serviceConnection}}
                     scriptType: bash
@@ -107,7 +105,6 @@ stages:
 
                 - task: AzureStaticWebApp@0
                   displayName: 'Deploy Public API docs'
-                  condition: eq(dependencies.DocsBuild.result, 'Succeeded')
                   inputs:
                     app_location: $(Pipeline.Workspace)/DocsBuild
                     output_location: '' # Leave this empty

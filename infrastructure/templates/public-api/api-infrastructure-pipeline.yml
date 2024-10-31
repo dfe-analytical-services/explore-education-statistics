@@ -17,13 +17,6 @@ resources:
           - dev
           - test
           - master
-    - pipeline: DocsBuild
-      source: EES - Public API - Docs
-      trigger:
-        branches:
-          - dev
-          - test
-          - master
 
 variables:
   - group: Public API Infrastructure - common

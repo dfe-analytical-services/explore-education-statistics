@@ -12,6 +12,7 @@ variables:
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
   NodeVersion: 20.16.0
+  RubyVersion: 3.2
   AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
 
 trigger:
@@ -23,7 +24,6 @@ trigger:
   paths:
     exclude:
       - infrastructure/
-      - src/explore-education-statistics-api-docs
 
 pr:
   - master
@@ -362,6 +362,39 @@ jobs:
           repository: 'ees-public-frontend'
           command: 'push'
           tags: $(Build.BuildNumber)
+
+  - job: ApiDocs
+    pool:
+      vmImage: ubuntu-22.04
+    workspace:
+      clean: all
+    variables:
+      WorkingDirectory: src/explore-education-statistics-api-docs
+    steps:
+      - task: UseNode@1
+        displayName: Install Node.js $(NodeVersion)
+        inputs:
+          version: $(NodeVersion)
+
+      - task: UseRubyVersion@0
+        displayName: Install Ruby $(RubyVersion)
+        inputs:
+          versionSpec: '>= $(RubyVersion)'
+
+      - task: Bash@3
+        displayName: Build
+        inputs:
+          workingDirectory: $(WorkingDirectory)
+          targetType: inline
+          script: |
+            bundle install
+            bundle exec middleman build
+
+      - task: PublishPipelineArtifact@1
+        displayName: Publish artifact
+        inputs:
+          artifactName: public-api-docs
+          targetPath: $(WorkingDirectory)/build
 
   - job: 'MiscellaneousArtifacts'
     pool:
