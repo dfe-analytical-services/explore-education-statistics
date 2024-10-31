@@ -51,6 +51,16 @@ stages:
                   displayName: Download API docs artifact
                   artifact: public-api-docs
 
+                # Workaround for deprecation warning preventing deployment token for
+                # API docs from being fetched: https://github.com/Azure/azure-cli/issues/30048
+                - task: Bash@3
+                  name: InstallAzureCLI
+                  displayName: Install Azure CLI 2.64.0 as workaround
+                  inputs:
+                    targetType: inline
+                    script: |
+                      pip install --force-reinstall azure-cli==2.64.0
+
                 - checkout: self
 
                 - task: AzureCLI@2
@@ -91,16 +101,6 @@ stages:
                 - template: pipeline-variables-from-bicep-outputs-template.yml
                   parameters:
                     serviceConnection: ${{parameters.serviceConnection}}
-
-                # Workaround for deprecation warning preventing deployment token from
-                # being fetched in next step: https://github.com/Azure/azure-cli/issues/30048
-                - task: Bash@3
-                  name: InstallAzureCLI
-                  displayName: Install Azure CLI 2.64.0 as workaround
-                  inputs:
-                    targetType: inline
-                    script: |
-                      pip install --force-reinstall azure-cli==2.64.0
 
                 - task: AzureCLI@2
                   displayName: Get API docs deployment token
