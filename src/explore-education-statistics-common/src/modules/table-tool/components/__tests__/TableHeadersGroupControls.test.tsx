@@ -136,6 +136,14 @@ describe('TableHeadersGroupControls', () => {
   });
 });
 
+jest.mock( "react-hook-form", () => ( {
+  ...jest.requireActual( "react-hook-form" ),
+  useFormContext: () => ( {
+    getValues: () => jest.fn(),
+    setValues: () => jest.fn(),
+  }),
+}));
+
 function render({
   activeGroup = undefined,
   expandedLists = [],
