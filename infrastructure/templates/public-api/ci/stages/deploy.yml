@@ -98,7 +98,7 @@ stages:
                             dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
                             apiAppRegistrationClientId='$(apiAppRegistrationClientId)'
 
-                - template: pipeline-variables-from-bicep-outputs-template.yml
+                - template: ../tasks/bicep-output-variables.yml
                   parameters:
                     serviceConnection: ${{parameters.serviceConnection}}
 
@@ -242,7 +242,7 @@ stages:
                         --slot staging \
                         --target-slot production
 
-              # - template: assign-app-role-to-service-principal-template.yml
+              # - template: ../tasks/assign-app-role-to-service-principal.yml
               #   parameters:
               #     serviceConnection: ${{parameters.serviceConnection}}
               #     appRoleName: Admin.Access
