@@ -13,8 +13,10 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+          working-directory: src/explore-education-statistics-api-docs
 
-      - name: notify:expired
+      - name: Notify expired docs
+        working-directory: src/explore-education-statistics-api-docs
         run: bundle exec rake notify:expired
         env:
           REALLY_POST_TO_SLACK: ${{ (github.event_name == 'schedule') && 1 || 0 }}
