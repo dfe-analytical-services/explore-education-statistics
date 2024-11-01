@@ -25,6 +25,6 @@ jobs:
         working-directory: src/explore-education-statistics-api-docs
         run: bundle exec rake notify:expired
         env:
-          REALLY_POST_TO_SLACK: ${{ (github.event_name == 'schedule') && 1 || !github.event.inputs.dry_run }}
+          REALLY_POST_TO_SLACK: ${{ (github.event_name == 'schedule') && 1 || (github.event.inputs.dry_run == false) }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           OVERRIDE_SLACK_MESSAGE_PREFIX: Please ensure that the Public API documentation is up to date.
