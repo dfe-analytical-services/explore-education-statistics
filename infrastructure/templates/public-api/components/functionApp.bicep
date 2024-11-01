@@ -235,7 +235,7 @@ module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthenti
 module healthMetricAlertModule 'alerts/sites/healthAlert.bicep' = if (healthCheck != null) {
   name: '${functionAppName}HealthMetricAlertDeploy'
   params: {
-    alertName: healthCheck!.unhealthyMetricName
+    resourceName: functionApp.name
     resourceId: functionApp.id
     resourceType: 'Microsoft.Web/sites'
     alertsGroupName: alertsGroupName
@@ -245,7 +245,27 @@ module healthMetricAlertModule 'alerts/sites/healthAlert.bicep' = if (healthChec
 module healthMetricAlertStagingModule 'alerts/sites/healthAlert.bicep' = if (healthCheck != null) {
   name: '${functionAppName}HealthMetricAlertStagingDeploy'
   params: {
-    alertName: '${healthCheck!.unhealthyMetricName}Staging'
+    resourceName: stagingSlot.name
+    resourceId: stagingSlot.id
+    resourceType: 'Microsoft.Web/sites/slots'
+    alertsGroupName: alertsGroupName
+  }
+}
+
+module cpuMetricAlertModule 'alerts/cpuAlert.bicep' = {
+  name: '${functionAppName}CpuPercentMetricAlertDeploy'
+  params: {
+    resourceName: functionApp.name 
+    resourceId: functionApp.id
+    resourceType: 'Microsoft.Web/sites'
+    alertsGroupName: alertsGroupName
+  }
+} 
+
+module cpuMetricAlertStagingModule 'alerts/cpuAlert.bicep' = if (healthCheck != null) {
+  name: '${functionAppName}CpuPercentMetricAlertStagingDeploy'
+  params: {
+    resourceName: stagingSlot.name 
     resourceId: stagingSlot.id
     resourceType: 'Microsoft.Web/sites/slots'
     alertsGroupName: alertsGroupName

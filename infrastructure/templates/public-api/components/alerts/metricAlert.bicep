@@ -9,9 +9,6 @@ param resourceId string
 @description('Type of the resource that this alert is being applied to.')
 param resourceType resourceTypeType
 
-@description('The criterion type by which the metric is being evaluated.')
-param criterionType 'StaticThresholdCriterion'
-
 @description('The metric that is being measured.')
 param metricName metricNameType
 
@@ -21,8 +18,15 @@ param timeAggregation timeAggregationType
 @description('The operator being used in the test.')
 param operator operatorType
 
-@description('A static threshold to be evaluated against in compatible criterion types.')
-param threshold int = 100
+@description('Settings for implementing tests against a statically defined threshold.')
+param staticThresholdSettings {
+  threshold: int
+}?
+
+@description('Settings for implementing tests against a dynamic threshold defined through machine learning.')
+param dynamicThresholdSettings {
+  alertSensitivity: 'Low' | 'Medium' | 'High'
+}?
 
 @description('The evaluation frequency.')
 param evaluationFrequency evaluationFrequencyType = 'PT1M'
@@ -37,6 +41,18 @@ resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing
   name: alertsGroupName
 }
 
+var thresholdSettings = staticThresholdSettings != null 
+? union({
+  criterionType: 'StaticThresholdCriterion'
+}, staticThresholdSettings!)
+: union({
+  criterionType: 'DynamicThresholdCriterion'
+  failingPeriods: {
+    minFailingPeriodsToAlert: 1
+    numberOfEvaluationPeriods: 1
+  }
+}, dynamicThresholdSettings!)
+
 resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
   name: alertName
   location: 'Global'
@@ -49,16 +65,14 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
     criteria: {
       'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
       allOf: [
-        {
+        union({
           name: 'Metric1'
-          criterionType: criterionType
           metricName: metricName
           timeAggregation: timeAggregation
           operator: operator
-          threshold: threshold
           skipMetricValidation: false
           metricNamespace: resourceType
-        }
+        }, thresholdSettings)
       ]
     }
     actions: [

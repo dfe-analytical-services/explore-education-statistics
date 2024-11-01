@@ -12,10 +12,16 @@ type resourceTypeType =
   | 'Microsoft.Sql/servers/databases'
 
 @export()
-type metricNameType = 'HealthCheckStatus' | 'blocked_by_firewall'
+type metricNameType = 
+  | 'blocked_by_firewall'
+  | 'cpu_percentage'
+  | 'HealthCheckStatus'
 
 @export()
 type operatorType = 'GreaterThan' | 'LessThan'
 
 @export()
-type timeAggregationType = 'Total' | 'Minimum'
+type timeAggregationType = 
+  | 'Total'
+  | 'Minimum'
+  | 'Average'

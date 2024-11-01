@@ -1,10 +1,10 @@
 import { evaluationFrequencyType, windowSizeType } from '../types.bicep'
 
-@description('Name of the alert.')
-param alertName string
-
 @description('Id of the resource that this alert is being applied to.')
 param resourceId string
+
+@description('Name of the resource that this alert is being applied to.')
+param resourceName string
 
 @description('Type of the resource that this alert is being applied to.')
 param resourceType 
@@ -20,6 +20,8 @@ param windowSize windowSizeType = 'PT5M'
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
 
+var alertName = '${replace(resourceName, '/', '-')}Unhealthy'
+
 module metricAlertModule '../metricAlert.bicep' = {
   name: '${alertName}Deploy'
   params: {
@@ -28,11 +30,12 @@ module metricAlertModule '../metricAlert.bicep' = {
     resourceId: resourceId
     resourceType: resourceType
     metricName: 'HealthCheckStatus'
-    criterionType: 'StaticThresholdCriterion'
     operator: 'LessThan'
-    threshold: 100
     timeAggregation: 'Minimum'
     evaluationFrequency: evaluationFrequency
     windowSize: windowSize
+    staticThresholdSettings: {
+      threshold: 100
+    }
   }
 }
