@@ -91,6 +91,9 @@ param dataProcessorAppRegistrationClientId string = ''
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the API Container App.')
 param apiAppRegistrationClientId string = ''
 
+@description('Specifies whether or not test Themes can be deleted in the environment.')
+param enableThemeDeletion bool = false
+
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
   DateProvisioned: dateProvisioned
@@ -321,3 +324,5 @@ output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreSto
 output keyVaultName string = resourceNames.existingResources.keyVault
 
 output dataProcessorPublicApiDataFileShareMountPath string = dataProcessorModule.outputs.publicApiDataFileShareMountPath
+
+output enableThemeDeletion bool = enableThemeDeletion

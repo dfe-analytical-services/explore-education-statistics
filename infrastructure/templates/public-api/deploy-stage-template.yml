@@ -143,6 +143,7 @@ stages:
                         --slot staging \
                         --settings \
                           "App__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
+                          "App__EnableThemeDeletion=${enableThemeDeletion}" \
                           "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
                           "DataFiles__BasePath=$(dataProcessorPublicApiDataFileShareMountPath)"
                       

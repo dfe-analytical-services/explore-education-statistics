@@ -34,7 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 // the user to have registered successfully with the service already.
                 options.AddPolicy(SecurityPolicies.RegisteredUser.ToString(), policy =>
                     policy.RequireAssertion(context =>
-                        context.User.HasClaim(claim => claim.Type == SecurityClaimTypes.ApplicationAccessGranted.ToString()) &&
+                        context.User.HasClaim(claim =>
+                            claim.Type == SecurityClaimTypes.ApplicationAccessGranted.ToString()) &&
                         context.User.HasScope(SecurityScopes.AccessAdminApiScope)));
 
                 /**
@@ -116,6 +117,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 
                 options.AddPolicy(SecurityPolicies.CanDeleteSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new DeleteSpecificReleaseRequirement()));
+
+                options.AddPolicy(SecurityPolicies.CanDeleteTestRelease.ToString(), policy =>
+                    policy.Requirements.Add(new DeleteTestReleaseRequirement()));
 
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy =>
                     policy.Requirements.Add(new ViewSubjectDataRequirement()));
@@ -209,8 +213,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificThemeAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateMethodologyForSpecificPublicationAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ManageExternalMethodologyForSpecificPublicationAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler>();
+            services
+                .AddTransient<IAuthorizationHandler,
+                    ManageExternalMethodologyForSpecificPublicationAuthorizationHandler>();
+            services
+                .AddTransient<IAuthorizationHandler, ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ManagePublicationReleaseSeriesAuthorizationHandler>();
 
             /**
@@ -219,6 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, DeleteSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, DeleteTestReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MarkReleaseAsDraftAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MarkReleaseAsHigherLevelReviewAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MarkReleaseAsApprovedAuthorizationHandler>();
@@ -236,7 +244,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             /**
              * Pre Release management
              */
-            services.AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
+            services
+                .AddTransient<IAuthorizationHandler, AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler>();
 
             /**
              * Methodology management
