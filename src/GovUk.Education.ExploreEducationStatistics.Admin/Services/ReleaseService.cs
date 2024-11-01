@@ -243,6 +243,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(_userService.CheckCanDeleteTestReleaseVersion)
                 .OnSuccessDo(async releaseVersion =>
                 {
+                    // Unset any Soft Deleted flags on Test ReleaseVersions / Subjects
+                    // prior to hard-deleting them, as a number of Services / Repositories that
+                    // will be called during the hard delete are not configured to look for
+                    // soft-deleted data.
                     var subjects = await _statisticsDbContext
                         .ReleaseSubject
                         .IgnoreQueryFilters()
