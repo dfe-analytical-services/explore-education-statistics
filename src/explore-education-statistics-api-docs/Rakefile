@@ -4,11 +4,7 @@ require 'chronic'
 task default: ["notify:expired"]
 
 namespace :notify do
-  host_url = ENV["HOST_URL"]
-
-  unless host_url
-    fail "The HOST_URL variable is required to run this task"
-  end
+  host_url = ENV.fetch("HOST_URL", "http://localhost:4567")
 
   pages_urls = [
     "#{host_url}/api/pages.json"
