@@ -233,7 +233,7 @@ module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthenti
 }
 
 module healthMetricAlertModule 'alerts/sites/healthAlert.bicep' = if (healthCheck != null) {
-  name: '${functionAppName}HealthMetricAlertDeploy'
+  name: '${functionAppName}HealthDeploy'
   params: {
     resourceName: functionApp.name
     resourceId: functionApp.id
@@ -253,7 +253,7 @@ module healthMetricAlertStagingModule 'alerts/sites/healthAlert.bicep' = if (hea
 }
 
 module cpuMetricAlertModule 'alerts/cpuAlert.bicep' = {
-  name: '${functionAppName}CpuPercentMetricAlertDeploy'
+  name: '${functionAppName}CpuPercentDeploy'
   params: {
     resourceName: functionApp.name 
     resourceId: functionApp.id

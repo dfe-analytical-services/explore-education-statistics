@@ -140,7 +140,7 @@ resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/adminis
 }]
 
 module blockedByFirewallMetricAlertModule 'alerts/databases/blockedByFirewallAlert.bicep' = {
-  name: '${postgreSQLDatabase.name}BlockedByFirewallMetricAlertDeploy'
+  name: '${postgreSQLDatabase.name}BlockedByFirewallDeploy'
   params: {
     resourceName: postgreSQLDatabase.name
     resourceId: postgreSQLDatabase.id
@@ -150,7 +150,7 @@ module blockedByFirewallMetricAlertModule 'alerts/databases/blockedByFirewallAle
 }
 
 module cpuMetricAlertModule 'alerts/cpuAlert.bicep' = {
-  name: '${postgreSQLDatabase.name}CpuPercentMetricAlertDeploy'
+  name: '${postgreSQLDatabase.name}CpuPercentDeploy'
   params: {
     resourceName: postgreSQLDatabase.name
     resourceId: postgreSQLDatabase.id

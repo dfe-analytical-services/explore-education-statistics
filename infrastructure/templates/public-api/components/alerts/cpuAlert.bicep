@@ -30,7 +30,7 @@ module metricAlertModule 'metricAlert.bicep' = {
     alertsGroupName: alertsGroupName
     resourceId: resourceId
     resourceType: resourceType
-    metricName: 'cpu_percentage'
+    metricName: 'cpu_percent'
     operator: 'GreaterThan'
     timeAggregation: 'Average'
     evaluationFrequency: evaluationFrequency
