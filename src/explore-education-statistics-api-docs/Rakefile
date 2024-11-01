@@ -4,14 +4,14 @@ require 'chronic'
 task default: ["notify:expired"]
 
 namespace :notify do
-  docs_url = ENV["DOCS_URL"]
+  host_url = ENV["HOST_URL"]
 
-  unless docs_url
-    fail "The DOCS_URL variable is required to run this task"
+  unless host_url
+    fail "The HOST_URL variable is required to run this task"
   end
 
   pages_urls = [
-    "#{docs_url}/api/pages.json"
+    "#{host_url}/api/pages.json"
   ]
 
   limits = {
