@@ -14,6 +14,8 @@ type resourceTypeType =
 @export()
 type metricNameType = 
   | 'blocked_by_firewall'
+  | 'connection_failed'
+  | 'connections_failed'
   | 'cpu_percent'
   | 'HealthCheckStatus'
 

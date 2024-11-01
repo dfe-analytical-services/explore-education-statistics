@@ -8,6 +8,7 @@ param resourceName string
 
 @description('Type of the resource that this alert is being applied to.')
 param resourceType 
+  | 'Microsoft.DBforPostgreSQL/flexibleServers'
   | 'Microsoft.Sql/servers/databases'
 
 @description('The evaluation frequency.')
@@ -19,7 +20,7 @@ param windowSize windowSizeType = 'PT5M'
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
 
-var alertName = '${replace(resourceName, '/', '-')}BlockedByFirewall'
+var alertName = '${replace(resourceName, '/', '-')}FailedConnections'
 
 module metricAlertModule '../staticMetricAlert.bicep' = {
   name: alertName
@@ -28,7 +29,9 @@ module metricAlertModule '../staticMetricAlert.bicep' = {
     alertsGroupName: alertsGroupName
     resourceId: resourceId
     resourceType: resourceType
-    metricName: 'blocked_by_firewall'
+    metricName: resourceType == 'Microsoft.DBforPostgreSQL/flexibleServers' 
+      ? 'connections_failed' 
+      : 'connection_failed'
     operator: 'GreaterThan'
     timeAggregation: 'Total'
     evaluationFrequency: evaluationFrequency

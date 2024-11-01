@@ -139,8 +139,8 @@ resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/adminis
   ]
 }]
 
-module blockedByFirewallMetricAlertModule 'alerts/databases/blockedByFirewallAlert.bicep' = {
-  name: '${postgreSQLDatabase.name}BlockedByFirewallDeploy'
+module failedConnectionsMetricAlertModule 'alerts/databases/failedConnectionsAlert.bicep' = {
+  name: '${postgreSQLDatabase.name}FailedConnectionsDeploy'
   params: {
     resourceName: postgreSQLDatabase.name
     resourceId: postgreSQLDatabase.id
