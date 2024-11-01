@@ -27,5 +27,5 @@ jobs:
         env:
           HOST_URL: ${{ vars.API_DOCS_URL }}
           REALLY_POST_TO_SLACK: ${{ (github.event_name == 'schedule') && 1 || (github.event.inputs.dry_run == 'false') && 1 || 0 }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERTS_WEBHOOK_URL }}
           OVERRIDE_SLACK_MESSAGE_PREFIX: Please ensure that the Public API documentation is up to date.
