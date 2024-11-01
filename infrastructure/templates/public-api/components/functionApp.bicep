@@ -243,33 +243,14 @@ module healthMetricAlertModule 'alerts/sites/healthAlert.bicep' = if (healthChec
 } 
 
 module healthMetricAlertStagingModule 'alerts/sites/healthAlert.bicep' = if (healthCheck != null) {
-  name: '${functionAppName}HealthMetricAlertStagingDeploy'
+  name: '${functionAppName}StagingHealthMetricAlertDeploy'
   params: {
-    resourceName: stagingSlot.name
+    resourceName: '${functionAppName}Staging'
     resourceId: stagingSlot.id
     resourceType: 'Microsoft.Web/sites/slots'
     alertsGroupName: alertsGroupName
   }
-}
 
-module cpuMetricAlertModule 'alerts/cpuAlert.bicep' = {
-  name: '${functionAppName}CpuPercentDeploy'
-  params: {
-    resourceName: functionApp.name 
-    resourceId: functionApp.id
-    resourceType: 'Microsoft.Web/sites'
-    alertsGroupName: alertsGroupName
-  }
-} 
-
-module cpuMetricAlertStagingModule 'alerts/cpuAlert.bicep' = if (healthCheck != null) {
-  name: '${functionAppName}CpuPercentMetricAlertStagingDeploy'
-  params: {
-    resourceName: stagingSlot.name 
-    resourceId: stagingSlot.id
-    resourceType: 'Microsoft.Web/sites/slots'
-    alertsGroupName: alertsGroupName
-  }
 }
 
 // Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.

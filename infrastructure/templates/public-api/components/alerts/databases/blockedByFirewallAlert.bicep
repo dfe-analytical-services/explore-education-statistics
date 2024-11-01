@@ -23,7 +23,7 @@ param alertsGroupName string
 var alertName = '${replace(resourceName, '/', '-')}BlockedByFirewall'
 
 module metricAlertModule '../metricAlert.bicep' = {
-  name: '${alertName}Deploy'
+  name: alertName
   params: {
     alertName: alertName
     alertsGroupName: alertsGroupName

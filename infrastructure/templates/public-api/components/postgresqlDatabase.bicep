@@ -149,7 +149,7 @@ module blockedByFirewallMetricAlertModule 'alerts/databases/blockedByFirewallAle
   }
 }
 
-module cpuMetricAlertModule 'alerts/cpuAlert.bicep' = {
+module cpuMetricAlertModule 'alerts/databases/cpuAlert.bicep' = {
   name: '${postgreSQLDatabase.name}CpuPercentDeploy'
   params: {
     resourceName: postgreSQLDatabase.name
