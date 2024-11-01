@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         await using var context = DbUtils.InMemoryApplicationDbContext(contextId);
 
-                        var service = SetupThemeService(userService: userService.Object, contentContext: context);
+                        var service = SetupThemeService(userService: userService.Object, contentDbContext: context);
                         var result = await service.GetThemes();
 
                         Assert.Single(result.Right);
@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private ThemeService SetupThemeService(
-            ContentDbContext? contentContext = null,
+            ContentDbContext? contentDbContext = null,
             PublicDataDbContext? publicDataDbContext = null,
             IMapper? mapper = null,
             PersistenceHelper<ContentDbContext>? persistenceHelper = null,
@@ -178,10 +178,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPublishingService? publishingService = null,
             IReleaseService? releaseService = null)
         {
+            var publicContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
+            var contentContext = contentDbContext ?? Mock.Of<ContentDbContext>();
+
             return new ThemeService(
-                DefaultAppOptions(),
-                contentContext ?? Mock.Of<ContentDbContext>(),
-                publicDataDbContext ?? Mock.Of<PublicDataDbContext>(),
+                appOptions: DefaultAppOptions(),
+                contentDbContext: contentContext,
+                dataSetVersionRepository: new DataSetVersionRepository(
+                    contentDbContext: contentContext,
+                    publicDataDbContext: publicContext),
                 mapper ?? AdminMapper(),
                 persistenceHelper ?? MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object,
                 userService ?? AlwaysTrueUserService().Object,

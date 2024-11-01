@@ -17,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -30,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ThemeService : IThemeService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly PublicDataDbContext _publicDataDbContext;
+        private readonly IDataSetVersionRepository _dataSetVersionRepository;
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
@@ -38,12 +37,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPublishingService _publishingService;
         private readonly IReleaseService _releaseService;
         private readonly bool _themeDeletionAllowed;
-        private readonly Func<List<ReleaseVersion>, List<ReleaseVersionAndDataSetVersions>> _releaseVersionAndDataSetVersionGetter;
 
         public ThemeService(
             IOptions<AppOptions> appOptions,
             ContentDbContext contentDbContext,
-            PublicDataDbContext publicDataDbContext,
+            IDataSetVersionRepository dataSetVersionRepository,
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
@@ -52,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseService releaseService)
         {
             _contentDbContext = contentDbContext;
-            _publicDataDbContext = publicDataDbContext;
+            _dataSetVersionRepository = dataSetVersionRepository;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
@@ -231,16 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToAsyncEnumerable()
                 .SelectAwait(async rv =>
                 {
-                    var releaseFileIds = await _contentDbContext
-                        .ReleaseFiles
-                        .Where(rf => rf.ReleaseVersionId == rv.Id)
-                        .Select(rf => rf.Id)
-                        .ToListAsync();
-
-                    var dataSetVersions = await _publicDataDbContext
-                        .DataSetVersions
-                        .Where(dsv => releaseFileIds.Contains(dsv.Release.ReleaseFileId))
-                        .ToListAsync();
+                    var dataSetVersions = await _dataSetVersionRepository.GetDataSetVersions(rv.Id);
 
                     return new ReleaseVersionAndDataSetVersions(
                         ReleaseVersion: rv,
@@ -350,7 +339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var releaseVersion1 = version1.ReleaseVersion;
             var releaseVersion2 = version2.ReleaseVersion;
-            
+
             // Compare ReleaseVersions if they both belong to the same Release ancestry.
             if (releaseVersion1.ReleaseId == releaseVersion2.ReleaseId)
             {

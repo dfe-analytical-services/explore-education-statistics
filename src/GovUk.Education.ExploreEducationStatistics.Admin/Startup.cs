@@ -493,6 +493,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddTransient<IDataSetVersionService, DataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
                 services.AddTransient<IPreviewTokenService, PreviewTokenService>();
+                services.AddTransient<IDataSetVersionRepository, DataSetVersionRepository>();
             }
             else
             {
@@ -509,6 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, NoOpDataSetVersionMappingService>();
                 services.AddTransient<IPreviewTokenService, NoOpPreviewTokenService>();
+                services.AddTransient<IDataSetVersionRepository, NoOpDataSetVersionRepository>();
             }
 
             services.AddTransient<INotificationClient>(s =>
@@ -949,5 +951,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Guid previewTokenId,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
+    }
+
+    internal class NoOpDataSetVersionRepository : IDataSetVersionRepository
+    {
+        public Task<List<DataSetVersion>> GetDataSetVersions(Guid releaseVersionId)
+        {
+            return Task.FromResult(new List<DataSetVersion>());
+        }
     }
 }
