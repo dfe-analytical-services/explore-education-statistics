@@ -18,15 +18,8 @@ param timeAggregation timeAggregationType
 @description('The operator being used in the test.')
 param operator operatorType
 
-@description('Settings for implementing tests against a statically defined threshold.')
-param staticThresholdSettings {
-  threshold: int
-}?
-
-@description('Settings for implementing tests against a dynamic threshold defined through machine learning.')
-param dynamicThresholdSettings {
-  alertSensitivity: 'Low' | 'Medium' | 'High'
-}?
+@description('A statically defined threshold to test against.')
+param alertSensitivity 'Low' | 'Medium' | 'High'
 
 @description('The evaluation frequency.')
 param evaluationFrequency evaluationFrequencyType = 'PT1M'
@@ -41,18 +34,6 @@ resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing
   name: alertsGroupName
 }
 
-var thresholdSettings = staticThresholdSettings != null 
-? union({
-  criterionType: 'StaticThresholdCriterion'
-}, staticThresholdSettings!)
-: union({
-  criterionType: 'DynamicThresholdCriterion'
-  failingPeriods: {
-    minFailingPeriodsToAlert: 1
-    numberOfEvaluationPeriods: 1
-  }
-}, dynamicThresholdSettings!)
-
 resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
   name: alertName
   location: 'Global'
@@ -63,17 +44,21 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
     evaluationFrequency: evaluationFrequency
     windowSize: windowSize
     criteria: {
-      'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
-      allOf: [
-        union({
-          name: 'Metric1'
-          metricName: metricName
-          timeAggregation: timeAggregation
-          operator: operator
-          skipMetricValidation: false
-          metricNamespace: resourceType
-        }, thresholdSettings)
-      ]
+      'odata.type': 'Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria' 
+      allOf: [{
+        criterionType: 'DynamicThresholdCriterion'
+        name: 'Metric1'
+        metricName: metricName
+        metricNamespace: resourceType
+        timeAggregation: timeAggregation
+        operator: operator
+        alertSensitivity: alertSensitivity
+        skipMetricValidation: false
+        failingPeriods: {
+          minFailingPeriodsToAlert: 1
+          numberOfEvaluationPeriods: 1
+        }
+      }]
     }
     actions: [
       {

@@ -22,7 +22,7 @@ param alertsGroupName string
 
 var alertName = '${replace(resourceName, '/', '-')}Unhealthy'
 
-module metricAlertModule '../metricAlert.bicep' = {
+module metricAlertModule '../staticMetricAlert.bicep' = {
   name: alertName
   params: {
     alertName: alertName
@@ -34,8 +34,6 @@ module metricAlertModule '../metricAlert.bicep' = {
     timeAggregation: 'Minimum'
     evaluationFrequency: evaluationFrequency
     windowSize: windowSize
-    staticThresholdSettings: {
-      threshold: 100
-    }
+    threshold: 100
   }
 }

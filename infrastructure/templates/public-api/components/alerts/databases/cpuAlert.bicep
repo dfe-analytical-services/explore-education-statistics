@@ -22,7 +22,7 @@ param alertsGroupName string
 
 var alertName = '${replace(resourceName, '/', '-')}CpuPercent'
 
-module metricAlertModule '../metricAlert.bicep' = {
+module metricAlertModule '../dynamicMetricAlert.bicep' = {
   name: alertName
   params: {
     alertName: alertName
@@ -34,8 +34,6 @@ module metricAlertModule '../metricAlert.bicep' = {
     timeAggregation: 'Average'
     evaluationFrequency: evaluationFrequency
     windowSize: windowSize
-    dynamicThresholdSettings: {
-      alertSensitivity: 'Medium'
-    }
+    alertSensitivity: 'Medium'
   }
 }
