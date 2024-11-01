@@ -8,7 +8,7 @@ It is based on the GOV.UK [Technical Documentation Template](https://tdt-documen
 The following pre-requisite dependencies are required to get started:
 
 - [Node.js](https://nodejs.org/en/) v20+ (can be installed with [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm))
-- [Ruby](https://www.ruby-lang.org/en/) v3.3.5 (can be installed with [rbenv](https://github.com/rbenv/rbenv) or [rvm](https://rvm.io/))
+- [Ruby](https://www.ruby-lang.org/en/) v3.2+ (can be installed with [rbenv](https://github.com/rbenv/rbenv) or [rvm](https://rvm.io/))
 
 As always, it's advisable to install any versions using a version manager to make it easier to upgrade 
 and keep aligned with the project.
