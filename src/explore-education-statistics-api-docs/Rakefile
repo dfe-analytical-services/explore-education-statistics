@@ -4,8 +4,14 @@ require 'chronic'
 task default: ["notify:expired"]
 
 namespace :notify do
+  docs_url = ENV["DOCS_URL"]
+
+  unless docs_url
+    fail "The DOCS_URL variable is required to run this task"
+  end
+
   pages_urls = [
-    "https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/api/pages.json"
+    "#{docs_url}/api/pages.json"
   ]
 
   limits = {
@@ -15,7 +21,7 @@ namespace :notify do
   slack_url = ENV["SLACK_WEBHOOK_URL"]
   slack_token = ENV["SLACK_TOKEN"]
 
-  if live && (!slack_url && !slack_token) then
+  if live && (!slack_url && !slack_token)
     fail "If you want to post to Slack you need to set SLACK_TOKEN or SLACK_WEBHOOK_URL"
   end
 
