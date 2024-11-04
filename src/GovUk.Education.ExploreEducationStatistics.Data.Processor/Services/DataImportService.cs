@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using InterpolatedSql.SqlBuilders.FluentQueryBuilder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
@@ -151,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task WriteDataSetFileMeta(Guid subjectId)
+        public async Task WriteDataSetFileMeta(Guid subjectId) // @MarkFix Add filterHierarchy here?
         {
             await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
             await using var statisticsDbContext = _dbContextSupplier.CreateDbContext<StatisticsDbContext>();
@@ -189,6 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Label = f.Label,
                     Hint = f.Hint,
                     ColumnName = f.Name,
+                    //ParentFilterColumnName = f.GroupCsvColumn, // @MarkFix
                 })
                 .ToListAsync();
 
@@ -203,6 +205,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 })
                 .OrderBy(i => i.Label)
                 .ToListAsync();
+
+            // @MarkFix can figure out filter hierarchy using filters ParentFilter
+            // Get level 0 filters
+            // .Where(filter =>
+            //   filters.Select(f => f.ParentFilter).ToList().Contains(filter.ColumnName)
+            //   && filter.ParentFilter == null)
+            //
+            // Get all child filters - loop
+            // filters.SingleOrDefault(filter => parentFilterColumnName == filter.ColumnName)
+            // until return null
+            //
+            // @MarkFix then fetch all rootFilterItems
+            // _statsDbContext.ObservationFilterItems
+            // .Where(ofi => ofi.FilterId == rootFilterId)
+            // .Select(ofi => { ofi.FilterItem.Id, ofi.FilterItem.Label })
+            // .Distinct();
+
+            // @MarkFix then all relevant filterItems
+            // find any observation where observation.HasFilterItem(childFilterItem) && observation.HasFilterItem(parentFilterItem)
+            // SELECT ofiParent.FilterItemId, fiParent.Label, ofiChild.FilterItemId, fiChild.Label FROM Observation o
+            // JOIN ObservationFilterItem ofiParent ON o.Id == ofiParent.ObservationId AND ofiParent.FilterId == parentFilterId
+            // JOIN FilterItem fiParent ON fiParent.Id == ofiParent.FilterItemId
+            // JOIN ObservationFilterItem ofiChild ON o.Id == ofiChild.ObservationId AND ofiChild.FilterId == childFilterId
+            // JOIN FilterItem fiChild ON fiChild.Id == ofiChild.FilterItemId
+            // @MarkFix then add additional joins to the queryable as necessary?
+            // DISTINCT
 
             var dataSetFileMeta = new DataSetFileMeta
             {
