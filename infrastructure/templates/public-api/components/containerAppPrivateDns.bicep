@@ -1,31 +1,32 @@
-import { appGatewaySiteConfigType } from '../types.bicep'
-
-@description('Specifies the VNet name that the DNS records will be made available to')
+@description('Name of the vnet the private DNS zone should be connected to')
 param vnetName string
 
-@description('Specifies the Key Vault name that this App Gateway will be permitted to get and list certificates from')
-param site appGatewaySiteConfigType
+@description('Domain name to use in the DNS records')
+param domain string
 
-@description('Specifies a set of tags with which to tag the resource in Azure')
+@description('The IP address to use in the DNS A records')
+param ipAddress string
+
+@description('Tags to assign to resources')
 param tagValues object
 
 module privateDnsZoneModule './privateDnsZone.bicep' = {
-  name: '${site.backendDomainName}Deploy'
+  name: '${domain}Deploy'
   params: {
     vnetName: vnetName
     zoneType: 'custom'
-    customName: site.backendDomainName
+    customName: domain
     tagValues: tagValues
   }
 }
 
 resource dnsWildcardARecord 'Microsoft.Network/privateDnsZones/A@2024-06-01' = {
-  name: '${site.backendDomainName}/*'
+  name: '${domain}/*'
   properties: {
     ttl: 3600
     aRecords: [
       {
-        ipv4Address: site.backendIpAddress
+        ipv4Address: ipAddress
       }
     ]
   }
@@ -35,12 +36,12 @@ resource dnsWildcardARecord 'Microsoft.Network/privateDnsZones/A@2024-06-01' = {
 }
 
 resource dnsAtARecord 'Microsoft.Network/privateDnsZones/A@2024-06-01' = {
-  name: '${site.backendDomainName}/@'
+  name: '${domain}/@'
   properties: {
     ttl: 3600
     aRecords: [
       {
-        ipv4Address: site.backendIpAddress
+        ipv4Address: ipAddress
       }
     ]
   }
@@ -50,7 +51,7 @@ resource dnsAtARecord 'Microsoft.Network/privateDnsZones/A@2024-06-01' = {
 }
 
 resource dnsAtSoaRecord 'Microsoft.Network/privateDnsZones/SOA@2024-06-01' = {
-  name: '${site.backendDomainName}/@'
+  name: '${domain}/@'
   properties: {
     ttl: 3600
     soaRecord: {

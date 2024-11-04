@@ -256,6 +256,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     resourceNames: resourceNames
     apiAppRegistrationClientId: apiAppRegistrationClientId
     containerAppEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
+    containerAppEnvironmentIpAddress: containerAppEnvironmentModule.outputs.containerAppEnvironmentIpAddress
     contentApiUrl: publicUrls.contentApi
     publicApiUrl: publicUrls.publicApi
     publicSiteUrl: publicUrls.publicSite
