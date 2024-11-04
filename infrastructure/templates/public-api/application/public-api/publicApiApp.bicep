@@ -6,7 +6,7 @@ param resourceNames resourceNamesType
 @description('Specifies the location for all resources.')
 param location string
 
-@description('The id of the owning Container App Environment.')
+@description('The ID of the owning Container App Environment.')
 param containerAppEnvironmentId string
 
 @description('The IP address of the owning Container App Environment.')
@@ -148,4 +148,4 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
 
 output containerAppFqdn string = apiContainerAppModule.outputs.containerAppFqdn
 output containerAppName string = apiContainerAppModule.outputs.containerAppName
-output containerAppHealthProbeRelativeUrl string = '/health'
+output healthProbePath string = '/health'

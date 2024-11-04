@@ -1,31 +1,45 @@
-import { appGatewaySiteConfigType } from '../types.bicep'
+import {
+  AppGatewayBackend
+  AppGatewayRewriteSet
+  AppGatewayRoute
+  AppGatewaySite
+} from '../types.bicep'
 
-@description('Specifies the Key Vault name that this App Gateway will be permitted to get and list certificates from')
+@description('Name of the Key Vault name that the App Gateway will be permitted to get and list certificates from')
 param keyVaultName string
 
-@description('Specifies the location for all resources')
+@description('Location to create resources in')
 param location string
 
-@description('Specifies the id of a dedicated subnet to which this App Gateway will be connected')
+@description('ID of a dedicated subnet to which this App Gateway will be connected')
 param subnetId string
 
-@description('Specifies the App Gateway name')
+@description('Name of the App Gateway')
 param appGatewayName string = ''
 
-@description('Specifies the App Gateway user-assigned managed identity name')
+@description('Name of the user-assigned managed identity for the App Gateway')
 param managedIdentityName string = ''
 
-@description('Specifies a set of configurations for the App Gateway to use to direct traffic to backend resources')
-param sites appGatewaySiteConfigType[]
+@description('Sites that the App Gateway can accept traffic from')
+param sites AppGatewaySite[]
 
-@description('Specifies a set of Azure availability zones for the region that this resource should be accessible from. Defaults to all zones')
+@description('Backends the App Gateway can direct traffic to')
+param backends AppGatewayBackend[]
+
+@description('Routes the App Gateway should direct traffic through')
+param routes AppGatewayRoute[]
+
+@description('Rules for how the App Gateway should rewrite URLs')
+param rewrites AppGatewayRewriteSet[]
+
+@description('Availability zones in the region that the resource should be accessible from. Defaults to all zones')
 param availabilityZones ('1' | '2' | '3') [] = [
   '1'
   '2'
   '3'
 ]
 
-@description('Specifies a set of tags with which to tag the resource in Azure')
+@description('Tags for the resources')
 param tagValues object
 
 // Create a user-assigned managed identity for the App Gateway. App Gateway does not support system-assigned identities.
@@ -63,7 +77,7 @@ module keyVaultAccessPolicyModule 'keyVaultAccessPolicy.bicep' = {
 
 // Create public IP addresses for every site we will expose through this App Gateway.
 resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for site in sites: {
-  name: '${site.resourceName}-pip'
+  name: '${site.name}-pip'
   location: location
   sku: {
     name: 'Standard'
@@ -73,8 +87,8 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [f
     publicIPAllocationMethod: 'Static'
     idleTimeoutInMinutes: 4
     dnsSettings: {
-      domainNameLabel: replace(site.publicFqdn, '.', '')
-      fqdn: '${replace(site.publicFqdn, '.', '')}.${location}.cloudapp.azure.com'
+      domainNameLabel: replace(site.fqdn, '.', '')
+      fqdn: '${replace(site.fqdn, '.', '')}.${location}.cloudapp.azure.com'
     }
   }
   zones: availabilityZones
@@ -90,8 +104,20 @@ module wafPolicyModule 'wafPolicy.bicep' = {
   }
 }
 
+module pathRulesModule './appGatewayPathRules.bicep' = [for route in routes: {
+  name: '${route.name}-route-paths'
+  params: {
+    appGatewayName: appGatewayName
+    pathRules: route.pathRules
+  }
+}]
+
+var allPathRules = flatten(map(routes, route => route.pathRules))
+
+var allRedirectRules = filter(allPathRules, rule => rule.type == 'redirect')
+
 // Create the App Gateway.
-resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
+resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
   name: appGatewayName
   location: location
   tags: tagValues
@@ -119,17 +145,17 @@ resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
       }
     ]
     sslCertificates: [for site in sites: {
-      name: '${site.resourceName}-cert'
+      name: '${site.name}-cert'
       properties: {
         keyVaultSecretId: 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/secrets/${site.certificateName}'
       }
     }]
     frontendIPConfigurations: [for site in sites: {
-      name: '${site.resourceName}-public-frontend-ip-config'
+      name: '${site.name}-public-frontend-ip-config'
       properties: {
         privateIPAllocationMethod: 'Dynamic'
         publicIPAddress: {
-          id: resourceId('Microsoft.Network/publicIPAddresses', '${site.resourceName}-pip')
+          id: resourceId('Microsoft.Network/publicIPAddresses', '${site.name}-pip')
         }
       }
     }]
@@ -141,18 +167,18 @@ resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
         }
       }
     ]
-    backendAddressPools: [for site in sites: {
-      name: '${site.resourceName}-backend-pool'
+    backendAddressPools: [for backend in backends: {
+      name: '${backend.name}-backend-pool'
       properties: {
         backendAddresses: [
           {
-            fqdn: site.backendFqdn
+            fqdn: backend.fqdn
           }
         ]
       }
     }]
-    backendHttpSettingsCollection: [for site in sites: {
-      name: '${site.resourceName}-backend'
+    backendHttpSettingsCollection: [for backend in backends: {
+      name: '${backend.name}-backend'
       properties: {
         port: 443
         protocol: 'Https'
@@ -160,54 +186,77 @@ resource appGateway 'Microsoft.Network/applicationGateways@2023-11-01' = {
         pickHostNameFromBackendAddress: true
         requestTimeout: 20
         probe: {
-          id: resourceId('Microsoft.Network/applicationGateways/probes', appGatewayName, '${site.resourceName}-health-probe')
+          id: resourceId('Microsoft.Network/applicationGateways/probes', appGatewayName, '${backend.name}-health-probe')
         }
       }
     }]
     httpListeners: [for site in sites: {
-      name: '${site.resourceName}-listener'
+      name: '${site.name}-https-443-listener'
       properties: {
         frontendIPConfiguration: {
-          id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', appGatewayName, '${site.resourceName}-public-frontend-ip-config')
+          id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', appGatewayName, '${site.name}-public-frontend-ip-config')
         }
         frontendPort: {
           id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', appGatewayName, 'port443')
         }
         protocol: 'Https'
         sslCertificate: {
-          id: resourceId('Microsoft.Network/applicationGateways/sslCertificates', appGatewayName, '${site.resourceName}-cert')
+          id: resourceId('Microsoft.Network/applicationGateways/sslCertificates', appGatewayName, '${site.name}-cert')
         }
-        hostName: site.publicFqdn
+        hostName: site.fqdn
         requireServerNameIndication: true
       }
     }]
-    requestRoutingRules: [for site in sites: {
-      name: '${site.resourceName}-routing-rule'
+    requestRoutingRules: [for (route, index) in routes: {
+      name: '${route.name}-rule'
       properties: {
-        ruleType: 'Basic'
-        priority: 1
+        ruleType: 'PathBasedRouting'
+        priority: index + 1
         httpListener: {
-          id: resourceId('Microsoft.Network/applicationGateways/httpListeners', appGatewayName, '${site.resourceName}-listener')
+          id: resourceId('Microsoft.Network/applicationGateways/httpListeners', appGatewayName, '${route.siteName}-https-443-listener')
         }
-        backendAddressPool: {
-          id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', appGatewayName, '${site.resourceName}-backend-pool')
-        }
-        backendHttpSettings: {
-          id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', appGatewayName, '${site.resourceName}-backend')
+        urlPathMap: {
+          id: resourceId('Microsoft.Network/applicationGateways/urlPathMaps', appGatewayName, '${route.name}-url-path-map')
         }
       }
     }]
-    probes: [for site in sites: {
-      name: '${site.resourceName}-health-probe'
+    urlPathMaps: [for (route, index) in routes: {
+      name: '${route.name}-url-path-map'
+      properties: {
+        defaultBackendAddressPool: {
+          id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', appGatewayName, '${route.defaultBackendName}-backend-pool')
+        }
+        defaultBackendHttpSettings: {
+          id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', appGatewayName, '${route.defaultBackendName}-backend')
+        }
+        pathRules: pathRulesModule[index].outputs.rules
+      }
+    }]
+    redirectConfigurations: [for rule in allRedirectRules: {
+      name: rule.name
+      properties: {
+        targetUrl: rule.redirectUrl
+        redirectType: rule.redirectType
+        includePath: rule.includePath != null ? rule.includePath : true
+      }
+    }]
+    probes: [for backend in backends: {
+      name: '${backend.name}-health-probe'
       properties: {
         protocol: 'Https'
-        path: site.healthProbeRelativeUrl
+        path: backend.healthProbePath
         interval: 30
         timeout: 30
         unhealthyThreshold: 3
         pickHostNameFromBackendHttpSettings: true
         minServers: 0
         match: {}
+      }
+    }]
+    rewriteRuleSets: [for rewriteSet in rewrites: {
+      name: rewriteSet.name
+      properties: {
+        rewriteRules: rewriteSet.rules
       }
     }]
     enableHttp2: true
