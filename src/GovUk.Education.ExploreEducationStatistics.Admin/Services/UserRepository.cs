@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AsQueryable()
                 .SingleOrDefaultAsync(u =>
                     u.Email.ToLower().Equals(email.ToLower())
-                    && u.Deleted == null);
+                    && u.SoftDeleted == null);
         }
     }
 }

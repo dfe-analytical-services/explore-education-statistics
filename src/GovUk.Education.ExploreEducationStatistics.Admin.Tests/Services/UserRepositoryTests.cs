@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user = new User
             {
                 Email = "test@test.com",
-                Deleted = DateTime.UtcNow,
+                SoftDeleted = DateTime.UtcNow,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();

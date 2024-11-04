@@ -3,14 +3,13 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
 using Moq;
@@ -130,11 +129,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             [Fact]
             public async Task Success()
             {
+                await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
+                contentDbContext.Users.Add(new User { Email = "ees-test.user@education.gov.uk"} );
+                await contentDbContext.SaveChangesAsync();
+
                 await PolicyCheckBuilder<SecurityPolicies>()
                     .SetupCheck(CanManageUsersOnSystem)
                     .AssertSuccess(async userService =>
                         {
+                            userService.Setup(mock => mock.GetUserId())
+                                .Returns(Guid.NewGuid());
+
                             var service = SetupUserManagementService(
+                                contentDbContext: contentDbContext,
                                 userService: userService.Object);
                             return await service.DeleteUser("ees-test.user@education.gov.uk");
                         }

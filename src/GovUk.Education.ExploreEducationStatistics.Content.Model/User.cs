@@ -12,7 +12,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Email { get; set; }
 
-        public DateTime? Deleted { get; set; }
+        public Guid? DeletedById { get; set; }
+
+        public User DeletedBy { get; set; }
+
+        public DateTime? SoftDeleted { get; set; }
 
         public string DisplayName => $"{FirstName} {LastName}";
     }

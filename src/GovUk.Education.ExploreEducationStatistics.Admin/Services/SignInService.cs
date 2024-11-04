@@ -133,11 +133,11 @@ public class SignInService : ISignInService
 
         // If the user was previously soft deleted, we undo it. When a user is soft deleted, all the user's database
         // entries are removed *except* for the ContentDb's User table entry.
-        if (existingInternalUser?.Deleted != null)
+        if (existingInternalUser?.SoftDeleted != null)
         {
             existingInternalUser.FirstName = newAspNetUser.FirstName;
             existingInternalUser.LastName = newAspNetUser.LastName;
-            existingInternalUser.Deleted = null;
+            existingInternalUser.SoftDeleted = null;
             await HandleReleaseInvites(existingInternalUser.Id, existingInternalUser.Email);
             await HandlePublicationInvites(existingInternalUser.Id, existingInternalUser.Email);
         }

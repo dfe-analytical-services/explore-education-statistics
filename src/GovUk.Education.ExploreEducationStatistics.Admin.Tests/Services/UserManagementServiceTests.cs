@@ -139,18 +139,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var userRoleService = new Mock<IUserRoleService>(Strict);
 
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
-            {
-                var service = SetupUserManagementService(
-                    usersAndRolesDbContext: userAndRolesDbContext,
-                    userRoleService: userRoleService.Object);
+            await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
 
-                var result = await service.GetUser(Guid.NewGuid());
+            var service = SetupUserManagementService(
+                usersAndRolesDbContext: userAndRolesDbContext,
+                userRoleService: userRoleService.Object);
 
-                VerifyAllMocks(userRoleService);
+            var result = await service.GetUser(Guid.NewGuid());
 
-                result.AssertNotFound();
-            }
+            VerifyAllMocks(userRoleService);
+
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -1015,6 +1014,129 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.CancelInvite("test@test.com");
                 var actionResult = result.AssertLeft();
                 actionResult.AssertValidationProblem(ValidationErrorMessages.InviteNotFound);
+        }
+
+        [Fact]
+        public async Task DeleteUser()
+        {
+            var userId = Guid.NewGuid();
+            var email = "test@test.com";
+
+            var invite = new UserInvite
+            {
+                Email = email,
+            };
+
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                // Not adding identity user, as it is deleted via userManager.DeleteAsync
+                usersAndRolesDbContext.UserInvites.Add(invite);
+                await usersAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var internalUser = new User
+            {
+                Id = userId,
+                Email = email,
+            };
+
+            var releaseInvite = new UserReleaseInvite
+            {
+                Email = email,
+            };
+
+            var publicationInvite = new UserPublicationInvite
+            {
+                Email = email,
+            };
+
+            var releaseRole = new UserReleaseRole
+            {
+                UserId = userId,
+            };
+
+            var publicationRole = new UserPublicationRole
+            {
+                UserId = userId,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(internalUser);
+                contentDbContext.UserReleaseInvites.Add(releaseInvite);
+                contentDbContext.UserPublicationInvites.Add(publicationInvite);
+                contentDbContext.UserReleaseRoles.Add(releaseRole);
+                contentDbContext.UserPublicationRoles.Add(publicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userManager = MockUserManager();
+                userManager.Setup(mock => mock.DeleteAsync(
+                        It.Is<ApplicationUser>(user => user.Email == email)))
+                    .ReturnsAsync(new IdentityResult());
+
+                var service = SetupUserManagementService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: usersAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.DeleteUser(email);
+                result.AssertRight();
+            }
+
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                // Mock checks that ApplicationUser has been removed, so no check required here
+
+                var invites = usersAndRolesDbContext.UserInvites.ToList();
+                Assert.Empty(invites);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseInvites = contentDbContext.UserReleaseInvites.ToList();
+                Assert.Empty(releaseInvites);
+
+                var publicationInvites = contentDbContext.UserPublicationInvites.ToList();
+                Assert.Empty(publicationInvites);
+
+                var releaseRoles = contentDbContext.UserReleaseRoles.ToList();
+                Assert.Empty(releaseRoles);
+
+                var publicationRoles = contentDbContext.UserPublicationRoles.ToList();
+                Assert.Empty(publicationRoles);
+
+                var dbInternalUserList = contentDbContext.Users.ToList();
+                var dbInternalUser = Assert.Single(dbInternalUserList);
+                Assert.Equal(email, dbInternalUser.Email);
+                Assert.NotNull(dbInternalUser.SoftDeleted);
+                dbInternalUser.SoftDeleted.AssertUtcNow();
+                Assert.Equal(CreatedById, dbInternalUser.DeletedById);
+            }
+        }
+
+        [Fact]
+        public async Task DeleteUser_NotFound()
+        {
+            var email = "test@test.com";
+
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId);
+            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+
+            var service = SetupUserManagementService(
+                contentDbContext: contentDbContext,
+                usersAndRolesDbContext: usersAndRolesDbContext);
+
+            var result = await service.DeleteUser(email);
+            result.AssertNotFound();
         }
 
         private static UserManagementService SetupUserManagementService(
