@@ -263,6 +263,45 @@ describe('ChartDataGroupingsConfiguration', () => {
     const { user } = render(
       <ChartDataGroupingsConfiguration
         meta={testTable.subjectMeta}
+        map={{
+          dataSetConfigs: [
+            {
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2014_AY',
+              },
+              dataGrouping: {
+                customGroups: [],
+                numberOfGroups: 5,
+                type: 'EqualIntervals',
+              },
+            },
+            {
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+              dataGrouping: {
+                customGroups: [],
+                numberOfGroups: 2,
+                type: 'Quantiles',
+              },
+            },
+            {
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+              dataGrouping: {
+                customGroups: [{ min: 0, max: 50 }],
+                type: 'Custom',
+              },
+            },
+          ],
+        }}
         onSubmit={noop}
         onChange={noop}
       />,
