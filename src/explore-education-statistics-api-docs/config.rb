@@ -27,6 +27,9 @@ helpers Helpers
 helpers ApiReferenceHelpers
 activate :api_reference_pages
 
+activate :relative_assets
+set :relative_links, true
+
 after_build do |builder|
   begin
     HTMLProofer.check_directory(config[:build_dir],
