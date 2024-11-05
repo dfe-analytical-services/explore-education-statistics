@@ -16,6 +16,7 @@ import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { Chart } from '@common/services/types/blocks';
 import { renderHook } from '@testing-library/react';
 import { produce } from 'immer';
+import { testFullTable } from '../../__tests__/__data__/testTableData';
 
 describe('chartBuilderReducer', () => {
   const testChartDefinition: ChartDefinition = {
@@ -100,13 +101,27 @@ describe('chartBuilderReducer', () => {
         payload: testChartDefinition,
       };
 
-      const nextState = produce(chartBuilderReducer)(initialState, action);
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialState, action);
 
       expect(nextState.definition).toEqual(testChartDefinition);
     });
 
     test('sets `options` with defaults from the definition', () => {
-      const nextState = produce(chartBuilderReducer)(initialState, {
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialState, {
         type: 'UPDATE_CHART_DEFINITION',
         payload: testChartDefinition,
       });
@@ -126,7 +141,14 @@ describe('chartBuilderReducer', () => {
         payload: testChartDefinition,
       };
 
-      const nextState = produce(chartBuilderReducer)(initialState, action);
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialState, action);
 
       expect(nextState.legend).toEqual<LegendConfiguration>({
         position: 'top',
@@ -164,10 +186,14 @@ describe('chartBuilderReducer', () => {
         payload: testChartDefinition,
       };
 
-      const nextState = produce(chartBuilderReducer)(
-        initialStateWithOptions,
-        action,
-      );
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialStateWithOptions, action);
 
       expect(nextState.options).toEqual<ChartOptions>({
         // Height is set to the definition default
@@ -198,7 +224,14 @@ describe('chartBuilderReducer', () => {
         payload: testChartDefinition,
       };
 
-      const nextState = produce(chartBuilderReducer)(initialState, action);
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialState, action);
 
       expect(nextState.axes.major).toEqual<AxisConfiguration>({
         dataSets: [],
@@ -257,10 +290,14 @@ describe('chartBuilderReducer', () => {
         payload: testChartDefinition,
       };
 
-      const nextState = produce(chartBuilderReducer)(
-        initialStateWithAxes,
-        action,
-      );
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialStateWithAxes, action);
 
       expect(nextState.axes.major).toMatchObject<Partial<AxisConfiguration>>({
         dataSets: [],
@@ -310,7 +347,14 @@ describe('chartBuilderReducer', () => {
         },
       };
 
-      const nextState = produce(chartBuilderReducer)(initialState, action);
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialState, action);
 
       expect(nextState.axes.major).toEqual<AxisConfiguration>({
         dataSets: [],
@@ -349,7 +393,14 @@ describe('chartBuilderReducer', () => {
           },
         };
 
-        produce(chartBuilderReducer)(initialState, action);
+        produce(
+          chartBuilderReducer({
+            data: [],
+            meta: testFullTable.subjectMeta,
+            tableTitle: undefined,
+            chart: undefined,
+          }),
+        )(initialState, action);
       }).toThrow("Could not find chart axis definition for type 'not valid'");
     });
   });
@@ -380,7 +431,14 @@ describe('chartBuilderReducer', () => {
         },
       };
 
-      const nextState = produce(chartBuilderReducer)(initialState, action);
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialState, action);
 
       expect(nextState.options).toEqual<ChartOptions>({
         height: 500,
@@ -417,10 +475,14 @@ describe('chartBuilderReducer', () => {
         },
       };
 
-      const nextState = produce(chartBuilderReducer)(
-        initialStateWithExistingOptions,
-        action,
-      );
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialStateWithExistingOptions, action);
 
       expect(nextState.options).toEqual<ChartOptions>({
         height: 500,
@@ -458,10 +520,14 @@ describe('chartBuilderReducer', () => {
         },
       };
 
-      const nextState = produce(chartBuilderReducer)(
-        initialStateWithExistingOptions,
-        action,
-      );
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialStateWithExistingOptions, action);
 
       expect(nextState.options).toEqual<ChartOptions>({
         height: 300,
@@ -503,7 +569,14 @@ describe('chartBuilderReducer', () => {
         ],
       };
 
-      const nextState = produce(chartBuilderReducer)(initialState, action);
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialState, action);
 
       expect(nextState.axes.major?.dataSets).toEqual<DataSet[]>([
         {
@@ -534,7 +607,14 @@ describe('chartBuilderReducer', () => {
         },
       };
 
-      const nextState = produce(chartBuilderReducer)(initialState, {
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: undefined,
+        }),
+      )(initialState, {
         type: 'RESET',
       });
 
@@ -548,7 +628,12 @@ describe('chartBuilderReducer', () => {
   describe('useChartBuilderReducer', () => {
     test('has correct state when no initial configuration', () => {
       const { result } = renderHook(() =>
-        useChartBuilderReducer(undefined, 'Table title'),
+        useChartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: 'Table title',
+          chart: undefined,
+        }),
       );
 
       expect(result.current.state).toEqual<ChartBuilderState>({
@@ -612,7 +697,12 @@ describe('chartBuilderReducer', () => {
       };
 
       const { result } = renderHook(() =>
-        useChartBuilderReducer(initialConfiguration, 'Table title'),
+        useChartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: 'Table title',
+          chart: initialConfiguration,
+        }),
       );
 
       expect(result.current.state).toEqual<ChartBuilderState>({
@@ -725,7 +815,12 @@ describe('chartBuilderReducer', () => {
       };
 
       const { result } = renderHook(() =>
-        useChartBuilderReducer(initialConfiguration, 'Table title'),
+        useChartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: 'Table title',
+          chart: initialConfiguration,
+        }),
       );
 
       expect(result.current.state).toEqual<ChartBuilderState>({
@@ -823,7 +918,12 @@ describe('chartBuilderReducer', () => {
       };
 
       const { result } = renderHook(() =>
-        useChartBuilderReducer(initialConfiguration),
+        useChartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: undefined,
+          chart: initialConfiguration,
+        }),
       );
 
       expect(result.current.state.axes.minor).toEqual<AxisConfiguration>({
@@ -897,7 +997,12 @@ describe('chartBuilderReducer', () => {
       };
 
       const { result } = renderHook(() =>
-        useChartBuilderReducer(initialConfiguration, 'Table title'),
+        useChartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+          tableTitle: 'Table title',
+          chart: initialConfiguration,
+        }),
       );
 
       expect(result.current.state).toEqual<ChartBuilderState>({
