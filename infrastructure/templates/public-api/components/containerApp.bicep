@@ -137,7 +137,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
         external: true
         targetPort: containerAppTargetPort
         allowInsecure: false
-        corsPolicy: corsPolicy
+        corsPolicy: any(corsPolicy)
         traffic: [
           {
             latestRevision: true
