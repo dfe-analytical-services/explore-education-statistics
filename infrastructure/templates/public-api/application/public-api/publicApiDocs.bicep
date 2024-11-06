@@ -1,12 +1,12 @@
 import { resourceNamesType, staticWebAppSkuType } from '../../types.bicep'
 
-@description('Common resource naming variables.')
+@description('Common resource naming variables')
 param resourceNames resourceNamesType
 
-@description('Static Web App SKU to use.')
+@description('Static Web App SKU to use')
 param appSku staticWebAppSkuType = 'Free'
 
-@description('A set of tags for the resource.')
+@description('Tags for the resources')
 param tagValues object
 
 module publicApiDocsApp  '../../components/staticWebApp.bicep' = {
@@ -17,3 +17,6 @@ module publicApiDocsApp  '../../components/staticWebApp.bicep' = {
     sku: appSku
   }
 }
+
+output appFqdn string = publicApiDocsApp.outputs.fqdn
+output healthProbePath string = '/'

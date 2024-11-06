@@ -256,6 +256,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     resourceNames: resourceNames
     apiAppRegistrationClientId: apiAppRegistrationClientId
     containerAppEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
+    containerAppEnvironmentIpAddress: containerAppEnvironmentModule.outputs.containerAppEnvironmentIpAddress
     contentApiUrl: publicUrls.contentApi
     publicApiUrl: publicUrls.publicApi
     publicSiteUrl: publicUrls.publicSite
@@ -279,21 +280,82 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = {
   }
 }
 
+var docsRewriteSetName = '${publicApiResourcePrefix}-docs-rewrites'
+
 // Create an Application Gateway to serve public traffic for the Public API Container App.
 module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp) {
-  name: 'appGatewayApplicationModuleDeploy'
+  name: 'appGatewayModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
-    publicApiContainerAppSettings: {
-      resourceName: apiAppModule.outputs.containerAppName
-      backendFqdn: apiAppModule.outputs.containerAppFqdn
-      backendDomainName: substring(apiAppModule.outputs.containerAppFqdn, indexOf(apiAppModule.outputs.containerAppFqdn, '.') + 1)
-      backendIpAddress: containerAppEnvironmentModule.outputs.containerAppEnvironmentIpAddress
-      publicFqdn: replace(publicUrls.publicApi, 'https://', '')
-      certificateName: '${apiAppModule.outputs.containerAppName}-certificate'
-      healthProbeRelativeUrl: apiAppModule.outputs.containerAppHealthProbeRelativeUrl
-    }
+    sites: [
+      {
+        name: publicApiResourcePrefix
+        certificateName: '${publicApiResourcePrefix}-certificate'
+        fqdn: replace(publicUrls.publicApi, 'https://', '')
+      }
+    ]
+    backends: [
+      {
+        name: resourceNames.publicApi.apiApp
+        fqdn: apiAppModule.outputs.containerAppFqdn
+        healthProbePath: apiAppModule.outputs.healthProbePath
+      }
+      {
+        name: resourceNames.publicApi.docsApp
+        fqdn: docsModule.outputs.appFqdn
+        healthProbePath: docsModule.outputs.healthProbePath
+      }
+    ]
+    routes: [
+      {
+        name: publicApiResourcePrefix
+        siteName: publicApiResourcePrefix
+        defaultBackendName: resourceNames.publicApi.apiApp
+        pathRules: [
+          {
+            name: 'docs-backend'
+            paths: ['/docs/*']
+            type: 'backend'
+            backendName: resourceNames.publicApi.docsApp
+            rewriteSetName: docsRewriteSetName
+          }
+          {
+            // Redirect non-rooted URL (has no trailing slash) to the
+            // rooted URL so that relative links in the docs site
+            // can resolve correctly.
+            name: 'docs-root-redirect'
+            paths: ['/docs']
+            type: 'redirect'
+            redirectUrl: '${publicUrls.publicApi}/docs/'
+            redirectType: 'Permanent'
+            includePath: false
+          }
+        ]
+      }
+    ]
+    rewrites: [
+      {
+        name: docsRewriteSetName
+        rules: [
+          {
+            name: 'trim-docs-path-prefix'
+            conditions: [
+              {
+                variable: 'var_uri_path'
+                pattern: '^/docs/(.*)'
+                ignoreCase: true
+              }
+            ]
+            actionSet: {
+              urlConfiguration: {
+                modifiedPath: '/{var_uri_path_1}'
+              }
+            }
+          }
+        ]
+      }
+    ]
     tagValues: tagValues
   }
 }
