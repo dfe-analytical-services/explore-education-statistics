@@ -6,8 +6,11 @@ param resourceNames resourceNamesType
 @description('Specifies the location for all resources.')
 param location string
 
-@description('Specifies the id of the Container App Environment in which to deploy this Container App.')
+@description('The ID of the owning Container App Environment.')
 param containerAppEnvironmentId string
+
+@description('The IP address of the owning Container App Environment.')
+param containerAppEnvironmentIpAddress string
 
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string
@@ -62,7 +65,9 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     dockerPullManagedIdentityClientId: keyVault.getSecret('DOCKER-REGISTRY-SERVER-USERNAME')
     dockerPullManagedIdentitySecretValue: keyVault.getSecret('DOCKER-REGISTRY-SERVER-PASSWORD')
     userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
-    managedEnvironmentId: containerAppEnvironmentId
+    environmentId: containerAppEnvironmentId
+    environmentIpAddress: containerAppEnvironmentIpAddress
+    deployPrivateDns: true
     corsPolicy: {
       allowedOrigins: [
         publicSiteUrl
@@ -70,6 +75,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
         'http://127.0.0.1'
       ]
     }
+    vnetName: resourceNames.existingResources.vNet
     volumeMounts: [
       {
         volumeName: 'public-api-fileshare-mount'
@@ -142,4 +148,4 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
 
 output containerAppFqdn string = apiContainerAppModule.outputs.containerAppFqdn
 output containerAppName string = apiContainerAppModule.outputs.containerAppName
-output containerAppHealthProbeRelativeUrl string = '/health'
+output healthProbePath string = '/health'

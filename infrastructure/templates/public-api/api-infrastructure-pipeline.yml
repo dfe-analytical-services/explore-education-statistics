@@ -7,6 +7,14 @@ parameters:
   - name: updatePsqlFlexibleServer
     displayName: Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.
     default: false
+  - name: forceDeployToEnvironment
+    displayName: Set to either dev or test to force a deploy to that environment from the chosen branch.
+    type: string
+    values:
+      - none
+      - dev
+      - test
+    default: 'none'
 
 resources:
   pipelines:
@@ -17,24 +25,19 @@ resources:
           - dev
           - test
           - master
-    - pipeline: DocsBuild
-      source: EES - Public API - Docs
-      trigger:
-        branches:
-          - dev
-          - test
-          - master
 
 variables:
   - group: Public API Infrastructure - common
+  - name: forceDeployToEnvironment
+    value: ${{parameters.forceDeployToEnvironment}}
   - name: isDev
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
+    value: $[or(eq(variables['forceDeployToEnvironment'], 'dev'), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))]
   - name: isTest
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
+    value: $[or(eq(variables['forceDeployToEnvironment'], 'test'), eq(variables['Build.SourceBranch'], 'refs/heads/test'))]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
-    value: 'ubuntu-latest'
+    value: ubuntu-latest
   - name: templateDirectory
     value: $(Build.SourcesDirectory)/infrastructure/templates/public-api
   - name: templateFile
@@ -62,72 +65,72 @@ pool:
 stages:
   - template: validate-stage-template.yml
     parameters:
-      stageName: 'Validate_Against_Development'
+      stageName: Validate_Against_Development
       condition: eq(variables.isDev, true)
-      environment: 'Development'
+      environment: Development
       serviceConnection: $(serviceConnectionDevelopment)
       parameterFile: $(devParamFile)
 
   - template: deploy-stage-template.yml
     parameters:
-      stageName: 'Deploy_to_Development'
+      stageName: Deploy_to_Development
       condition: and(not(or(failed(), canceled())), eq(variables.isDev, true))
-      dependsOn: 'Validate_Against_Development'
-      environment: 'Development'
+      dependsOn: Validate_Against_Development
+      environment: Development
       serviceConnection: $(serviceConnectionDevelopment)
       subscription: $(subscription)
       parameterFile: $(devParamFile)
 
   - template: validate-stage-template.yml
     parameters:
-      stageName: 'Validate_Against_Test'
+      stageName: Validate_Against_Test
       condition: eq(variables.isTest, true)
-      environment: 'Test'
+      environment: Test
       serviceConnection: $(serviceConnectionTest)
       parameterFile: $(testParamFile)
 
   - template: deploy-stage-template.yml
     parameters:
-      stageName: 'Deploy_to_Test'
-      dependsOn: 'Validate_Against_Test'
+      stageName: Deploy_to_Test
+      dependsOn: Validate_Against_Test
       condition: and(not(or(failed(), canceled())), eq(variables.isTest, true))
-      environment: 'Test'
+      environment: Test
       serviceConnection: $(serviceConnectionTest)
       subscription: $(subscription)
       parameterFile: $(testParamFile)
 
 #  - template: validate-stage-template.yml
 #    parameters:
-#      stageName: 'Validate_Against_PreProduction'
+#      stageName: Validate_Against_PreProduction
 #      condition: eq(variables.isMaster, true)
-#      environment: 'Pre-production'
+#      environment: Pre-production
 #      serviceConnection: $(serviceConnectionPreProduction)
 #      parameterFile: $(preProdParamFile)
 #
 #  - template: deploy-stage-template.yml
 #    parameters:
-#      stageName: 'Deploy_to_PreProduction'
+#      stageName: Deploy_to_PreProduction'
 #      condition: and(not(or(failed('Validate_Against_PreProduction'), canceled('Validate_Against_PreProduction')), eq(variables.isMaster, true))
-#      dependsOn: 'Validate_Against_PreProduction'
-#      environment: 'Pre-production'
+#      dependsOn: Validate_Against_PreProduction
+#      environment: Pre-production
 #      serviceConnection: $(serviceConnectionPreProduction)
 #      subscription: $(subscription)
 #      parameterFile: $(preProdParamFile)
 #
 #  - template: validate-stage-template.yml
 #    parameters:
-#      stageName: 'Validate_Against_Production'
+#      stageName: Validate_Against_Production
 #      condition: and(not(or(failed('Deploy_to_PreProduction'), canceled('Deploy_to_PreProduction')), eq(variables.isMaster, true))
-#      environment: 'Production'
+#      environment: Production
 #      serviceConnection: $(serviceConnectionProduction)
 #      parameterFile: $(prodParamFile)
 #
 #  - template: deploy-stage-template.yml
 #    parameters:
-#      stageName: 'Deploy_to_Production'
+#      stageName: Deploy_to_Production
 #      condition: and(not(or(failed('Validate_Against_Production'), canceled('Validate_Against_Production')), eq(variables.isMaster, true))
-#      dependsOn: 'Validate_Against_Production'
-#      environment: 'Production'
+#      dependsOn: Validate_Against_Production
+#      environment: Production
 #      serviceConnection: $(serviceConnectionProduction)
 #      subscription: $(subscription)
 #      parameterFile: $(prodParamFile)

@@ -6,7 +6,7 @@ schedules:
     include:
     - dev
   always: true
-  
+
 pr: none
 
 name: $(date:yyyyMMdd)$(rev:.r)
@@ -17,7 +17,7 @@ resources:
     ref: refs/heads/dev
 
 jobs:
-- job: 'Public'
+- job: Public
   displayName: Public suite - Robot UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
@@ -38,7 +38,7 @@ jobs:
       versionSpec: 3.10
 
   - task: AzureKeyVault@2
-    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    displayName: Azure Key Vault - s101d01-kv-ees-01
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
@@ -68,7 +68,7 @@ jobs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-public
 
-- job: 'PublishAndAmend'
+- job: PublishAndAmend
   displayName: Publish release and amend suites - Robot UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
@@ -89,7 +89,7 @@ jobs:
       versionSpec: 3.10
 
   - task: AzureKeyVault@2
-    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    displayName: Azure Key Vault - s101d01-kv-ees-01
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
@@ -121,7 +121,7 @@ jobs:
       artifactName: test-results-admin-and-public-2
 
 
-- job: 'Admin'
+- job: Admin
   displayName: Admin suites - Robot UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
@@ -142,7 +142,7 @@ jobs:
       versionSpec: 3.10
 
   - task: AzureKeyVault@2
-    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    displayName: Azure Key Vault - s101d01-kv-ees-01
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
@@ -173,7 +173,7 @@ jobs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-admin
 
-- job: 'AdminAndPublic'
+- job: AdminAndPublic
   displayName: Admin & public suites - Robot UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
@@ -194,7 +194,7 @@ jobs:
       versionSpec: 3.10
 
   - task: AzureKeyVault@2
-    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    displayName: Azure Key Vault - s101d01-kv-ees-01
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
@@ -223,7 +223,7 @@ jobs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-admin-public
 
-- job: 'PublicAPI'
+- job: PublicAPI
   displayName: Public API suite - Robot UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
@@ -244,7 +244,7 @@ jobs:
       versionSpec: 3.10
 
   - task: AzureKeyVault@2
-    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    displayName: Azure Key Vault - s101d01-kv-ees-01
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
@@ -273,7 +273,7 @@ jobs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-admin-public-api
 
-- job: 'PublicPlaywrightUItest'
+- job: PublicPlaywrightUItest
   displayName: Public suite - Playwright UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
@@ -288,28 +288,28 @@ jobs:
     fetchTags: false
 
   - task: NodeTool@0
-    displayName: 'Use Node version 18 or above'
+    displayName: Use Node 18
     timeoutInMinutes: 5
     inputs:
-      versionSpec: "18.18.2"
+      versionSpec: '18.18.2'
 
   - script: |
       node -v
-    displayName: 'Display node version'
+    displayName: Display node version
 
   - script: |
       npm ci
-    displayName: 'Clean and install NPM dependencies'
+    displayName: Clean and install NPM dependencies
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
   - script: |
       npx playwright install --with-deps
-    displayName: 'Install Playwright browsers'
+    displayName: Install Playwright browsers
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
   - script: |
       npx playwright test --project "public"
-    displayName: "Run Playwright tests"
+    displayName: Run Playwright tests
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
       CI: 'true'
@@ -335,7 +335,7 @@ jobs:
       artifactName: test-results-playwright-public
 
 
-- job: 'AdminPlaywrightUItest'
+- job: AdminPlaywrightUITest
   displayName: Admin suite - Playwright UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
@@ -350,13 +350,13 @@ jobs:
     fetchTags: false
 
   - task: NodeTool@0
-    displayName: 'Use Node version 18 or above'
+    displayName: Use Node 18
     timeoutInMinutes: 5
     inputs:
-      versionSpec: "18.18.2"
+      versionSpec: '18.18.2'
 
   - task: AzureKeyVault@2
-    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    displayName: Azure Key Vault - s101d01-kv-ees-01
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
@@ -365,7 +365,7 @@ jobs:
 
   - script: |
       node -v
-    displayName: 'Display node version'
+    displayName: Display node version
 
   - script: |
       npm ci
@@ -401,7 +401,7 @@ jobs:
       path: tests/playwright-tests/test-results/
       artifactName: test-results-playwright-admin
 
-- job: 'AdminAndPublicPlaywrightUItest'
+- job: AdminAndPublicPlaywrightUItest
   displayName: Admin and public suite - Playwright UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
@@ -416,13 +416,13 @@ jobs:
     fetchTags: false
 
   - task: NodeTool@0
-    displayName: 'Use Node version 18 or above'
+    displayName: Use Node 18
     timeoutInMinutes: 5
     inputs:
-      versionSpec: "18.18.2"
+      versionSpec: '18.18.2'
 
   - task: AzureKeyVault@2
-    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    displayName: Azure Key Vault - s101d01-kv-ees-01
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
@@ -431,22 +431,22 @@ jobs:
 
   - script: |
       node -v
-    displayName: 'Display node version'
+    displayName: Display node version
 
   - script: |
       npm ci
-    displayName: 'Clean and install npm dependencies'
+    displayName: Clean and install npm dependencies
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
   - script: |
       npx playwright install --with-deps
-    displayName: 'Install Playwright browsers'
+    displayName: Install Playwright browsers
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
   - script: |
       npx playwright test --project "adminandpublic"  
 
-    displayName: "Run Playwright tests"
+    displayName: Run Playwright tests
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
       CI: 'true'

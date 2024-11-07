@@ -8,6 +8,8 @@ import styles from '@common/modules/table-tool/components/TableHeadersGroupContr
 import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
 import classNames from 'classnames';
 import React from 'react';
+import { useFormContext } from 'react-hook-form';
+import { Filter } from '../types/filters';
 
 interface Props {
   defaultNumberOfItems: number;
@@ -49,6 +51,12 @@ const TableHeadersGroupControls = ({
   const displayItems = isExpanded ? totalItems : defaultNumberOfItems;
   const hasMoreItems = isExpanded || totalItems > displayItems;
   const disableControls = activeGroup && activeGroup !== id;
+  const { getValues, setValue } = useFormContext();
+  const list: Filter[] = getValues(groupName);
+
+  const handleReverse = () => {
+    setValue(groupName, list.toReversed());
+  };
 
   return (
     <div className="govuk-!-padding-top-2">
@@ -149,7 +157,7 @@ const TableHeadersGroupControls = ({
             ) : (
               <>
                 <Button
-                  className="govuk-!-width-one-half"
+                  className="govuk-!-width-one-third"
                   disabled={!!disableControls}
                   onClick={() => {
                     setActiveGroup(id);
@@ -160,13 +168,20 @@ const TableHeadersGroupControls = ({
                   <VisuallyHidden>{` items in ${legend}`}</VisuallyHidden>
                 </Button>
                 <Button
-                  className="govuk-!-width-one-half"
+                  className="govuk-!-width-one-third"
                   disabled={!!disableControls}
                   onClick={() => {
                     toggleMoveControlsActive(id);
                   }}
                 >
                   Move<VisuallyHidden> {legend}</VisuallyHidden>
+                </Button>
+                <Button
+                  className="govuk-!-width-one-third"
+                  disabled={!!disableControls}
+                  onClick={() => handleReverse()}
+                >
+                  Reverse order<VisuallyHidden> {legend}</VisuallyHidden>
                 </Button>
               </>
             )}

@@ -23,3 +23,5 @@ resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
   }
   properties: {}
 }
+
+output fqdn string = staticWebApp.properties.defaultHostname

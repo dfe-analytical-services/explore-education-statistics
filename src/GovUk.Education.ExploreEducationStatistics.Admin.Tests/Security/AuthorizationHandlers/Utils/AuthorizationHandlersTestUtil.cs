@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -43,6 +45,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             where TRequirement : IAuthorizationRequirement
         {
             var scenarios = GetClaimTestScenarios(entity, claimsExpectedToSucceed);
+            await scenarios
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(scenario =>
+                    AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+        }
+
+        public static async Task AssertHandlerSucceedsWithCorrectGlobalRoles<TEntity, TRequirement>(
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+            TEntity entity,
+            params GlobalRoles.Role[] rolesExpectedToSucceed)
+            where TRequirement : IAuthorizationRequirement
+        {
+            var scenarios = GetGlobalRoleTestScenarios(entity, rolesExpectedToSucceed);
             await scenarios
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(scenario =>
@@ -92,6 +107,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             UnexpectedFailMessage =
                                 "Expected claim " + claim + " to have caused the handler to succeed",
                             UnexpectedPassMessage = "Expected claim " + claim + " to have caused the handler to fail"
+                        };
+                    }
+                )
+                .ToList();
+        }
+
+        private static List<HandlerTestScenario> GetGlobalRoleTestScenarios(
+            object entity,
+            GlobalRoles.Role[] rolesExpectedToSucceed)
+        {
+            return GetEnums<GlobalRoles.Role>()
+                .Select(
+                    role =>
+                    {
+                        var user = DataFixture
+                            .AuthenticatedUser()
+                            .WithRole(role.GetEnumLabel());
+
+                        return new HandlerTestScenario
+                        {
+                            User = user,
+                            Entity = entity,
+                            ExpectedToPass = rolesExpectedToSucceed.Contains(role),
+                            UnexpectedFailMessage =
+                                "Expected role " + role + " to have caused the handler to succeed",
+                            UnexpectedPassMessage = "Expected role " + role + " to have caused the handler to fail"
                         };
                     }
                 )

@@ -261,7 +261,7 @@ DEPENDENCIES
   middleman-gh-pages
   rake
   tzinfo-data
-  wdm (~> 0.1.0)
+  wdm (~> 0.2.0)
 
 RUBY VERSION
    ruby 3.2.6

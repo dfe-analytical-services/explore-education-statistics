@@ -342,7 +342,7 @@ describe('ChartDataSetsConfiguration', () => {
       }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Finish reordering' }),
+      screen.getByRole('button', { name: 'Confirm order' }),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Remove' }),

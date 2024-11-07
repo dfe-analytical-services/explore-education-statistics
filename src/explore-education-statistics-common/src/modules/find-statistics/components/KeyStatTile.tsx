@@ -1,11 +1,9 @@
-import React, { ReactNode } from 'react';
-import classNames from 'classnames';
+import styles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import formatPretty from '@common/utils/number/formatPretty';
-import styles from './KeyStatTile.module.scss';
+import React, { ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
-  isReordering?: boolean;
   testId?: string;
   title: string;
   titleTag?: 'h3' | 'h4';
@@ -14,18 +12,13 @@ interface Props {
 
 const KeyStatTile = ({
   children,
-  isReordering = false,
   testId = 'keyStatTile',
   titleTag: TitleElement = 'h3',
   title,
   value,
 }: Props) => {
   return (
-    <div
-      className={classNames(styles.tile, {
-        [styles.reordering]: isReordering,
-      })}
-    >
+    <div className={styles.tile}>
       <TitleElement className="govuk-heading-s" data-testid={`${testId}-title`}>
         {title}
       </TitleElement>

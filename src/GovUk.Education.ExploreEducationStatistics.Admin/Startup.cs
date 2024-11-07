@@ -263,11 +263,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             //
             // TODO EES-4869 - review if we want to keep these features of Identity Framework or not.
             services
-             .AddIdentityCore<ApplicationUser>(options =>
-             {
-                 options.Stores.MaxLengthForKeys = 128;
-             })
-             .AddRoles<IdentityRole>()
+                .AddIdentityCore<ApplicationUser>(options =>
+                {
+                    options.Stores.MaxLengthForKeys = 128;
+                })
+                .AddRoles<IdentityRole>()
                 .AddUserManager<UserManager<ApplicationUser>>()
                 .AddRoleManager<RoleManager<IdentityRole>>()
                 .AddUserStore<UserStore<ApplicationUser, IdentityRole, UsersAndRolesDbContext>>()
@@ -493,6 +493,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddTransient<IDataSetVersionService, DataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
                 services.AddTransient<IPreviewTokenService, PreviewTokenService>();
+                services.AddTransient<IDataSetVersionRepository, DataSetVersionRepository>();
             }
             else
             {
@@ -509,6 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();
                 services.AddTransient<IDataSetVersionMappingService, NoOpDataSetVersionMappingService>();
                 services.AddTransient<IPreviewTokenService, NoOpPreviewTokenService>();
+                services.AddTransient<IDataSetVersionRepository, NoOpDataSetVersionRepository>();
             }
 
             services.AddTransient<INotificationClient>(s =>
@@ -822,6 +824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         public Task<Either<ActionResult, Unit>> BulkDeleteDataSetVersions(
             Guid releaseVersionId,
+            bool forceDeleteAll,
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new Either<ActionResult, Unit>(Unit.Instance));
@@ -948,5 +951,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Guid previewTokenId,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
+    }
+
+    internal class NoOpDataSetVersionRepository : IDataSetVersionRepository
+    {
+        public Task<List<DataSetVersion>> GetDataSetVersions(Guid releaseVersionId)
+        {
+            return Task.FromResult(new List<DataSetVersion>());
+        }
     }
 }
