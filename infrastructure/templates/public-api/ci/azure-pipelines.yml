@@ -78,7 +78,6 @@ stages:
       dependsOn: ValidateDev
       environment: Dev
       serviceConnection: $(serviceConnectionDev)
-      subscription: $(subscription)
       parameterFile: $(devParamFile)
 
   - template: stages/validate.yml
@@ -96,7 +95,6 @@ stages:
       condition: and(not(or(failed(), canceled())), eq(variables.isTest, true))
       environment: Test
       serviceConnection: $(serviceConnectionTest)
-      subscription: $(subscription)
       parameterFile: $(testParamFile)
 
 #  - template: stages/validate.yml
@@ -114,7 +112,6 @@ stages:
 #      dependsOn: ValidatePreProd
 #      environment: Pre-Prod
 #      serviceConnection: $(serviceConnectionPreProd)
-#      subscription: $(subscription)
 #      parameterFile: $(preProdParamFile)
 #
 #  - template: stages/validate.yml
@@ -132,5 +129,4 @@ stages:
 #      dependsOn: ValidateProd
 #      environment: Prod
 #      serviceConnection: $(serviceConnectionProd)
-#      subscription: $(subscription)
 #      parameterFile: $(prodParamFile)

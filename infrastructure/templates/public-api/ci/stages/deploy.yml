@@ -5,8 +5,6 @@ parameters:
     type: string
   - name: serviceConnection
     type: string
-  - name: subscription
-    type: string
   - name: dependsOn
     type: string
     default: ''
@@ -27,9 +25,9 @@ stages:
       - group: Public API Infrastructure - ${{parameters.environment}}
       - group: Public API Infrastructure - ${{parameters.environment}} secrets
       - name: dataProcessorFunctionAppName
-        value: ${{ parameters.subscription }}-ees-papi-fa-processor
+        value: $(subscription)-ees-papi-fa-processor
       - name: docsAppName
-        value: ${{ parameters.subscription }}-ees-papi-stapp-docs
+        value: $(subscription)-ees-papi-stapp-docs
     ${{ if not(eq(parameters.dependsOn, '')) }}:
       dependsOn: ${{parameters.dependsOn}}
     jobs:
@@ -250,5 +248,5 @@ stages:
               #   parameters:
               #     serviceConnection: ${{parameters.serviceConnection}}
               #     appRoleName: Admin.Access
-              #     protectedResourceAppRegName: ${{parameters.subscription}}-ees-papi-ca-api-appreg
-              #     servicePrincipalName: ${{parameters.subscription}}-as-ees-admin
+              #     protectedResourceAppRegName: $(subscription)-ees-papi-ca-api-appreg
+              #     servicePrincipalName: $(subscription)-as-ees-admin
