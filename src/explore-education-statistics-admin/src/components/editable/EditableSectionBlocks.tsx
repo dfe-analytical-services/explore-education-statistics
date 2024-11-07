@@ -2,6 +2,7 @@ import styles from '@admin/components/editable/EditableSectionBlocks.module.scss
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import { EditableBlock } from '@admin/services/types/content';
 import InsetText from '@common/components/InsetText';
+import { ReorderResult } from '@common/components/ReorderableItem';
 import ReorderableList from '@common/components/ReorderableList';
 import reorder from '@common/utils/reorder';
 import React, { ReactNode, useCallback } from 'react';
@@ -26,7 +27,7 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
   const { editingMode } = useEditingContext();
 
   const handleMoveBlock = useCallback(
-    ({ prevIndex, nextIndex }: { prevIndex: number; nextIndex: number }) => {
+    ({ prevIndex, nextIndex }: ReorderResult) => {
       onBlocksChange?.(reorder(blocks, prevIndex, nextIndex));
     },
     [blocks, onBlocksChange],

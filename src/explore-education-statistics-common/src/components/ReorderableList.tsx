@@ -1,6 +1,7 @@
 import styles from '@common/components/ReorderableList.module.scss';
 import ReorderableItem, {
   ReorderableListItem,
+  ReorderResult,
 } from '@common/components/ReorderableItem';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Button from '@common/components/Button';
@@ -15,13 +16,7 @@ interface Props {
   testId?: string;
   onCancel?: () => void;
   onConfirm?: () => void;
-  onMoveItem: ({
-    prevIndex,
-    nextIndex,
-  }: {
-    prevIndex: number;
-    nextIndex: number;
-  }) => void;
+  onMoveItem: ({ prevIndex, nextIndex }: ReorderResult) => void;
   onReverse?: () => void;
 }
 

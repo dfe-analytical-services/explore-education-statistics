@@ -1,10 +1,11 @@
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import Button from '@common/components/Button';
+import ReorderableList from '@common/components/ReorderableList';
+import { ReorderResult } from '@common/components/ReorderableItem';
 import useToggle from '@common/hooks/useToggle';
 import { OmitStrict } from '@common/types';
 import reorder from '@common/utils/reorder';
-import classNames from 'classnames';
 import React, {
   cloneElement,
   isValidElement,
@@ -14,7 +15,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import styles from './EditableAccordion.module.scss';
 import {
   DraggableAccordionSectionProps,
@@ -54,30 +54,26 @@ const EditableAccordion = (props: EditableAccordionProps) => {
   }, [onReorder, sections, toggleReordering]);
 
   const handleDragEnd = useCallback(
-    ({ source, destination }: DropResult) => {
-      if (source && destination) {
-        setSections(reorder(sections, source.index, destination.index));
-      }
+    ({ prevIndex, nextIndex }: ReorderResult) => {
+      setSections(reorder(sections, prevIndex, nextIndex));
     },
     [sections],
   );
 
-  const accordion = useMemo(() => {
-    return (
-      <Accordion {...props} openAll={isReordering ? false : undefined}>
-        {sections.map((child, index) => {
-          const section = child as ReactElement<
-            EditableAccordionSectionProps & DraggableAccordionSectionProps
-          >;
+  const reorderableSections = useMemo(() => {
+    return sections.map(child => {
+      const section = child as ReactElement<
+        EditableAccordionSectionProps & DraggableAccordionSectionProps
+      >;
 
-          return cloneElement(section, {
-            index,
-            isReordering,
-          });
-        })}
-      </Accordion>
-    );
-  }, [isReordering, props, sections]);
+      return {
+        id: section.props.id,
+        label: cloneElement(section, {
+          isReordering,
+        }),
+      };
+    });
+  }, [isReordering, sections]);
 
   return (
     <div className={styles.container}>
@@ -87,48 +83,38 @@ const EditableAccordion = (props: EditableAccordionProps) => {
             {sectionName}
           </h2>
 
-          {sections.length > 1 &&
-            (!isReordering ? (
-              <Button
-                variant="secondary"
-                className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
-                id={`${id}-reorder`}
-                onClick={toggleReordering.on}
-              >
-                Reorder<span className="govuk-visually-hidden"> sections</span>
-              </Button>
-            ) : (
-              <Button
-                className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
-                onClick={saveOrder}
-              >
-                Save order
-              </Button>
-            ))}
+          {sections.length > 1 && (
+            <Button
+              className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
+              id={`${id}-reorder`}
+              variant={isReordering ? 'secondary' : undefined}
+              onClick={() =>
+                isReordering ? saveOrder() : toggleReordering.on()
+              }
+            >
+              {isReordering ? (
+                'Save order'
+              ) : (
+                <>
+                  Reorder
+                  <span className="govuk-visually-hidden"> sections</span>
+                </>
+              )}
+            </Button>
+          )}
         </div>
       )}
 
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable
-          droppableId={id}
-          isDropDisabled={editingMode !== 'edit' || !isReordering}
-          type="accordion"
-        >
-          {(droppableProvided, snapshot) => (
-            <div
-              // eslint-disable-next-line react/jsx-props-no-spreading
-              {...droppableProvided.droppableProps}
-              ref={droppableProvided.innerRef}
-              className={classNames({
-                [styles.dragover]: snapshot.isDraggingOver && isReordering,
-              })}
-            >
-              {accordion}
-              {droppableProvided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      {isReordering ? (
+        <ReorderableList
+          id="reorder-sections"
+          list={reorderableSections}
+          onMoveItem={handleDragEnd}
+        />
+      ) : (
+        <Accordion {...props}>{sections}</Accordion>
+      )}
+
       {editingMode === 'edit' && (
         <div>
           <Button

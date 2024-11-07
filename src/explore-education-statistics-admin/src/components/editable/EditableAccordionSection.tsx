@@ -1,8 +1,5 @@
-import styles from '@admin/components/editable/EditableAccordionSection.module.scss';
-import DraggableItem from '@admin/components/DraggableItem';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import AccordionSection, {
-  accordionSectionClasses,
   AccordionSectionProps,
 } from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
@@ -11,17 +8,9 @@ import { FormTextInput } from '@common/components/form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tooltip from '@common/components/Tooltip';
 import useToggle from '@common/hooks/useToggle';
-import classNames from 'classnames';
-import React, {
-  createElement,
-  ReactNode,
-  useCallback,
-  useMemo,
-  useState,
-} from 'react';
+import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 
 export interface DraggableAccordionSectionProps {
-  index: number;
   isReordering: boolean;
 }
 
@@ -41,14 +30,13 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
     disabledRemoveSectionTooltip,
     heading,
     headerButtons,
-    headingTag = 'h2',
     id,
     onHeadingChange,
     onRemoveSection,
     ...restProps
   } = props;
 
-  const { index, isReordering } = restProps as DraggableAccordionSectionProps;
+  const { isReordering = false } = restProps as DraggableAccordionSectionProps;
 
   const { editingMode } = useEditingContext();
 
@@ -100,40 +88,15 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
       );
     }
 
-    if (isReordering && editingMode === 'edit') {
-      return createElement(
-        headingTag,
-        {
-          className: accordionSectionClasses.sectionHeading,
-        },
-        heading,
-      );
-    }
-
     return undefined;
-  }, [
-    editingMode,
-    heading,
-    headingTag,
-    id,
-    isEditingHeading,
-    isReordering,
-    newHeading,
-    saveHeading,
-    toggleEditingHeading,
-  ]);
+  }, [id, isEditingHeading, newHeading, saveHeading, toggleEditingHeading]);
+
+  if (isReordering) {
+    return <div>{heading}</div>;
+  }
 
   return (
-    <DraggableItem
-      className={classNames({
-        [styles.draggableItem]: isReordering && editingMode === 'edit',
-      })}
-      id={id}
-      index={index}
-      isDisabled={editingMode !== 'edit'}
-      isReordering={isReordering && editingMode === 'edit'}
-      testId="editableAccordionSection"
-    >
+    <div data-testid="editableAccordionSection">
       <AccordionSection
         {...props}
         id={id}
@@ -203,7 +166,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
           </>
         )}
       </AccordionSection>
-    </DraggableItem>
+    </div>
   );
 };
 
