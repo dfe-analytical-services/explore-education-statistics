@@ -97,13 +97,15 @@ export default function RelatedPagesEditModal({
             />
           ) : (
             <>
-              <Button
-                className="govuk-!-margin-bottom-3"
-                variant="secondary"
-                onClick={toggleReordering}
-              >
-                Reorder pages
-              </Button>
+              {relatedPages.length > 1 && (
+                <Button
+                  className="govuk-!-margin-bottom-3"
+                  variant="secondary"
+                  onClick={toggleReordering}
+                >
+                  Reorder pages
+                </Button>
+              )}
               <table>
                 <thead>
                   <tr>
