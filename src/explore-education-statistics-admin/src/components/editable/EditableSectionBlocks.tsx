@@ -61,7 +61,13 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
         id="reorder-sections"
         list={blocks.map(block => ({
           id: block.id,
-          label: <div className={styles.draggable}>{renderBlock(block)}</div>,
+          label: (
+            <div className={styles.draggable}>
+              {block.type === 'HtmlBlock' && block.body
+                ? renderBlock(block)
+                : 'This section is empty'}
+            </div>
+          ),
         }))}
         onMoveItem={handleMoveBlock}
       />
@@ -69,7 +75,7 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
   }
 
   return (
-    <>
+    <div>
       {blocks.map(block => (
         <div
           key={block.id}
@@ -81,7 +87,7 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
           {renderEditableBlock(block)}
         </div>
       ))}
-    </>
+    </div>
   );
 };
 

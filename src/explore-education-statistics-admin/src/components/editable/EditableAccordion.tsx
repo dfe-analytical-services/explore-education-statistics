@@ -16,10 +16,7 @@ import React, {
   useState,
 } from 'react';
 import styles from './EditableAccordion.module.scss';
-import {
-  DraggableAccordionSectionProps,
-  EditableAccordionSectionProps,
-} from './EditableAccordionSection';
+import { EditableAccordionSectionProps } from './EditableAccordionSection';
 
 export interface EditableAccordionProps
   extends OmitStrict<AccordionProps, 'openAll'> {
@@ -62,9 +59,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
 
   const reorderableSections = useMemo(() => {
     return sections.map(child => {
-      const section = child as ReactElement<
-        EditableAccordionSectionProps & DraggableAccordionSectionProps
-      >;
+      const section = child as ReactElement<EditableAccordionSectionProps>;
 
       return {
         id: section.props.id,

@@ -10,15 +10,12 @@ import Tooltip from '@common/components/Tooltip';
 import useToggle from '@common/hooks/useToggle';
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 
-export interface DraggableAccordionSectionProps {
-  isReordering: boolean;
-}
-
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
   id: string;
   headerButtons?: ReactNode;
   disabledHeadingChangeTooltip?: string;
   disabledRemoveSectionTooltip?: string;
+  isReordering?: boolean;
   onHeadingChange: (heading: string) => void;
   onRemoveSection?: () => void;
 }
@@ -31,12 +28,10 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
     heading,
     headerButtons,
     id,
+    isReordering,
     onHeadingChange,
     onRemoveSection,
-    ...restProps
   } = props;
-
-  const { isReordering = false } = restProps as DraggableAccordionSectionProps;
 
   const { editingMode } = useEditingContext();
 
@@ -92,7 +87,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
   }, [id, isEditingHeading, newHeading, saveHeading, toggleEditingHeading]);
 
   if (isReordering) {
-    return <div>{heading}</div>;
+    return heading;
   }
 
   return (
