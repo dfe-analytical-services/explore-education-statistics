@@ -25,7 +25,7 @@ user cannot see edit controls for release content
     user waits until h2 is visible    ${publication}
     user waits until page does not contain button    Change page view
     user waits until page does not contain button    Add note
-    user waits until page does not contain button    Add related page link
+    user waits until page does not contain button    Add related page
     user waits until page does not contain button    Add secondary stats
     user waits until page does not contain button    Add key statistic from data block
     user waits until page does not contain button    Add free text key statistic
