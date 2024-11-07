@@ -28,6 +28,8 @@ stages:
         value: $(subscription)-ees-papi-fa-processor
       - name: docsAppName
         value: $(subscription)-ees-papi-stapp-docs
+      - name: bicepDeployName
+        value: PublicApiInfrastructure$(upstreamPipelineBuildNumber)
     ${{ if not(eq(parameters.dependsOn, '')) }}:
       dependsOn: ${{parameters.dependsOn}}
     jobs:
@@ -59,7 +61,7 @@ stages:
                 - checkout: self
 
                 - task: AzureCLI@2
-                  displayName: Deploy Bicep template to Azure
+                  displayName: Check if Data Processor Function App exists
                   inputs:
                     azureSubscription: ${{parameters.serviceConnection}}
                     scriptType: bash
@@ -72,26 +74,17 @@ stages:
                         echo "Data Processor Function App exists - combining existing appsettings with new ones"
                       fi
                       
-                      az deployment group create \
-                        --name 'PublicApiInfrastructure$(upstreamPipelineBuildNumber)' \
-                        --resource-group $(resourceGroupName) \
-                        --template-file $(templateFile) \
-                        --parameters ${{parameters.parameterFile}} \
-                        --parameters \
-                            subscription='$(subscription)' \
-                            resourceTags='$(resourceTags)' \
-                            postgreSqlAdminName='$(postgreSqlAdminName)' \
-                            postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-                            postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
-                            postgreSqlEntraIdAdminPrincipals='$(postgreSqlEntraIdAdminPrincipals)' \
-                            storageFirewallRules='$(maintenanceFirewallRules)' \
-                            acrResourceGroupName='$(acrResourceGroupName)' \
-                            dockerImagesTag='$(upstreamPipelineBuildNumber)' \
-                            deployContainerApp=$(deployContainerApp) \
-                            updatePsqlFlexibleServer=$(updatePsqlFlexibleServer) \
-                            dataProcessorFunctionAppExists=$dataProcessorExists \
-                            dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
-                            apiAppRegistrationClientId='$(apiAppRegistrationClientId)'
+                      echo "##vso[task.setvariable variable=dataProcessorExists;]$dataProcessorExists"
+
+                - template: ../tasks/deploy-bicep.yml
+                  parameters:
+                    displayName: Deploy Bicep template
+                    action: create
+                    serviceConnection: ${{parameters.serviceConnection}}
+                    parameterFile: ${{parameters.parameterFile}}
+                    deployContainerApp: $(deployContainerApp)
+                    updatePsqlFlexibleServer: $(updatePsqlFlexibleServer)
+                    dataProcessorFunctionAppExists: $(dataProcessorExists)
 
                 - template: ../tasks/bicep-output-variables.yml
                   parameters:
