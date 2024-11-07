@@ -150,6 +150,7 @@ export default function getInvalidContent(
       'visit this',
       'web page',
       'web site',
+      'this link',
     ];
 
     if (
