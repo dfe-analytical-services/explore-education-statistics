@@ -19,8 +19,8 @@ export interface EditableKeyStatDataBlockProps {
   keyStatisticGuidanceTitles?: (string | undefined)[];
   releaseId: string;
   testId?: string;
-  onRemove: () => void;
-  onSubmit: (values: KeyStatDataBlockFormValues) => void;
+  onRemove?: () => void;
+  onSubmit?: (values: KeyStatDataBlockFormValues) => void;
 }
 
 export default function EditableKeyStatDataBlock({
@@ -45,7 +45,7 @@ export default function EditableKeyStatDataBlock({
 
   const handleSubmit = useCallback(
     async (values: KeyStatDataBlockFormValues) => {
-      await onSubmit(values);
+      await onSubmit?.(values);
       toggleShowForm.off();
     },
     [onSubmit, toggleShowForm],
@@ -81,7 +81,6 @@ export default function EditableKeyStatDataBlock({
         )}
         title={title}
         statistic={statistic}
-        isReordering={isReordering}
         testId={testId}
         onSubmit={handleSubmit}
         onCancel={toggleShowForm.off}

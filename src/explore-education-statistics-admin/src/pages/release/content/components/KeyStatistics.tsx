@@ -1,17 +1,15 @@
-import BlockDroppable from '@admin/components/editable/BlockDroppable';
 import EditableKeyStat from '@admin/pages/release/content/components/EditableKeyStat';
-import styles from '@admin/pages/release/content/components/KeyStatistics.module.scss';
+import EditableKeyStatDataBlock from '@admin/pages/release/content/components/EditableKeyStatDataBlock';
+import AddKeyStatistics from '@admin/pages/release/content/components/AddKeyStatistics';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
+import ReorderableList from '@common/components/ReorderableList';
 import useToggle from '@common/hooks/useToggle';
 import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
 import keyStatStyles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import reorder from '@common/utils/reorder';
-import classNames from 'classnames';
-import React, { useCallback, useEffect, useState } from 'react';
-import { DragDropContext, Draggable, DropResult } from '@hello-pangea/dnd';
-import AddKeyStatistics from '@admin/pages/release/content/components/AddKeyStatistics';
+import React, { useEffect, useState } from 'react';
 
 export interface KeyStatisticsProps {
   release: EditableRelease;
@@ -26,43 +24,10 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
     setKeyStatistics(release.keyStatistics);
   }, [release]);
 
-  const [isReordering, toggleReordering] = useToggle(false);
+  const [isReordering, toggleIsReordering] = useToggle(false);
 
   const keyStatisticGuidanceTitles = keyStatistics.map(
     stat => stat.guidanceTitle?.toLowerCase(),
-  );
-
-  const reorderKeyStatisticsButton = () => {
-    return !isReordering ? (
-      <Button variant="secondary" onClick={toggleReordering.on}>
-        Reorder<span className="govuk-visually-hidden"> key statistics</span>
-      </Button>
-    ) : (
-      <Button variant="secondary" onClick={saveOrder}>
-        Save order
-      </Button>
-    );
-  };
-
-  const saveOrder = useCallback(async () => {
-    if (reorderKeyStatistics) {
-      await reorderKeyStatistics({
-        releaseId: release.id,
-        keyStatistics,
-      });
-      toggleReordering.off();
-    }
-  }, [reorderKeyStatistics, release.id, keyStatistics, toggleReordering]);
-
-  const handleDragEnd = useCallback(
-    ({ source, destination }: DropResult) => {
-      if (source && destination) {
-        setKeyStatistics(
-          reorder(keyStatistics, source.index, destination.index),
-        );
-      }
-    },
-    [keyStatistics],
   );
 
   return (
@@ -74,64 +39,77 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
             release={release}
           />
           <hr />
-          {keyStatistics.length > 1 && reorderKeyStatisticsButton()}
+          {keyStatistics.length > 1 && !isReordering && (
+            <Button variant="secondary" onClick={toggleIsReordering.on}>
+              Reorder
+              <span className="govuk-visually-hidden"> key statistics</span>
+            </Button>
+          )}
         </>
       )}
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <BlockDroppable
-          droppable={isReordering}
-          droppableId="keyStatisticsDroppable"
-        >
-          <div className="govuk-!-margin-bottom-9">
-            <KeyStatContainer>
-              {keyStatistics.map((keyStat, index) => {
-                return (
-                  <Draggable
-                    draggableId={keyStat.id}
-                    index={index}
-                    isDragDisabled={!isReordering}
-                    key={keyStat.id}
-                  >
-                    {(draggableProvided, snapshot) => (
-                      <div
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        {...draggableProvided.draggableProps}
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        {...draggableProvided.dragHandleProps}
-                        ref={draggableProvided.innerRef}
-                        className={classNames({
-                          [styles.draggable]: isReordering,
-                          [keyStatStyles.wrapper]: !isReordering,
-                          [styles.isDragging]: snapshot.isDragging,
-                        })}
-                        data-testid="keyStat"
-                      >
-                        {isReordering && (
-                          <span
-                            className={classNames({
-                              [styles.dragHandle]: isReordering,
-                            })}
-                          />
-                        )}
-                        <EditableKeyStat
-                          key={keyStat.id}
-                          keyStat={keyStat}
-                          keyStatisticGuidanceTitles={
-                            keyStatisticGuidanceTitles
-                          }
-                          releaseId={release.id}
-                          isEditing={isEditing}
-                          isReordering={isReordering}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                );
-              })}
-            </KeyStatContainer>
-          </div>
-        </BlockDroppable>
-      </DragDropContext>
+      {isReordering && isEditing ? (
+        <ReorderableList
+          heading="Reorder key statistics"
+          id="reorder-key-statistics"
+          list={keyStatistics.map(keyStat => {
+            if (keyStat.type === 'KeyStatisticText') {
+              return { id: keyStat.id, label: keyStat.title };
+            }
+
+            return {
+              id: keyStat.id,
+              label: (
+                <EditableKeyStatDataBlock
+                  isReordering
+                  keyStat={keyStat}
+                  releaseId={release.id}
+                />
+              ),
+            };
+          })}
+          onCancel={() => {
+            setKeyStatistics(release.keyStatistics);
+            toggleIsReordering.off();
+          }}
+          onConfirm={async () => {
+            await reorderKeyStatistics({
+              releaseId: release.id,
+              keyStatistics,
+            });
+            toggleIsReordering.off();
+          }}
+          onMoveItem={({ prevIndex, nextIndex }) => {
+            const reorderedKeyStatistics = reorder(
+              keyStatistics,
+              prevIndex,
+              nextIndex,
+            );
+            setKeyStatistics(reorderedKeyStatistics);
+          }}
+          onReverse={() => {
+            setKeyStatistics(keyStatistics.toReversed());
+          }}
+        />
+      ) : (
+        <div className="govuk-!-margin-bottom-9">
+          <KeyStatContainer>
+            {keyStatistics.map(keyStat => (
+              <div
+                className={keyStatStyles.wrapper}
+                data-testid="keyStat"
+                key={keyStat.id}
+              >
+                <EditableKeyStat
+                  keyStat={keyStat}
+                  keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
+                  releaseId={release.id}
+                  isEditing={isEditing}
+                />
+              </div>
+            ))}
+          </KeyStatContainer>
+        </div>
+      )}
     </>
   );
 };
