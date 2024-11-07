@@ -1,6 +1,3 @@
-# This is a reusable Deploy stage definition that is parameterised to be reusable
-# to support deployment to different environments
-
 parameters:
   - name: stageName
     type: string
@@ -14,18 +11,19 @@ parameters:
     type: string
 
 stages:
-  - stage: ${{parameters.stageName}}
-    displayName: Validate ${{parameters.environment}} Infrastructure
-    # Prevent this stage from running in parallel with the same deploy stage in other ongoing runs of this pipeline.
-    # Instead, multiple executions of this stage will be queued and run sequentially in the order that their pipelines
-    # were triggered.
+  - stage: ${{ parameters.stageName }}
+    displayName: Validate ${{ parameters.environment }}
+    # Prevent this stage from running in parallel with the same deploy stage in other
+    # ongoing runs of this pipeline. Instead, multiple executions of this stage will
+    # be queued and run sequentially in the order that their pipelines were triggered.
     lockBehavior: sequential
-    condition: ${{parameters.condition}}
+    condition: ${{ parameters.condition }}
     variables:
-      - group: Public API Infrastructure - ${{parameters.environment}}
-      - group: Public API Infrastructure - ${{parameters.environment}} secrets
+      - group: Public API Infrastructure - ${{ parameters.environment }}
+      - group: Public API Infrastructure - ${{ parameters.environment }} secrets
     jobs:
-      - job: Validate_Infrastructure
+      - job: ValidateInfrastructure
+        displayName: Validate infrastructure
         steps:
           - checkout: self
 

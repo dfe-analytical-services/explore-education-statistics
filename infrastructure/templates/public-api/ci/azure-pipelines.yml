@@ -27,7 +27,7 @@ resources:
           - master
 
 variables:
-  - group: Public API Infrastructure - common
+  - group: Public API Infrastructure - Common
   - name: forceDeployToEnvironment
     value: ${{parameters.forceDeployToEnvironment}}
   - name: isDev
@@ -65,25 +65,25 @@ pool:
 stages:
   - template: stages/validate.yml
     parameters:
-      stageName: Validate_Against_Development
+      stageName: ValidateDev
       condition: eq(variables.isDev, true)
-      environment: Development
-      serviceConnection: $(serviceConnectionDevelopment)
+      environment: Dev
+      serviceConnection: $(serviceConnectionDev)
       parameterFile: $(devParamFile)
 
   - template: stages/deploy.yml
     parameters:
-      stageName: Deploy_to_Development
+      stageName: DeployDev
       condition: and(not(or(failed(), canceled())), eq(variables.isDev, true))
-      dependsOn: Validate_Against_Development
-      environment: Development
-      serviceConnection: $(serviceConnectionDevelopment)
+      dependsOn: ValidateDev
+      environment: Dev
+      serviceConnection: $(serviceConnectionDev)
       subscription: $(subscription)
       parameterFile: $(devParamFile)
 
   - template: stages/validate.yml
     parameters:
-      stageName: Validate_Against_Test
+      stageName: ValidateTest
       condition: eq(variables.isTest, true)
       environment: Test
       serviceConnection: $(serviceConnectionTest)
@@ -91,8 +91,8 @@ stages:
 
   - template: stages/deploy.yml
     parameters:
-      stageName: Deploy_to_Test
-      dependsOn: Validate_Against_Test
+      stageName: DeployTest
+      dependsOn: ValidateTest
       condition: and(not(or(failed(), canceled())), eq(variables.isTest, true))
       environment: Test
       serviceConnection: $(serviceConnectionTest)
@@ -101,36 +101,36 @@ stages:
 
 #  - template: stages/validate.yml
 #    parameters:
-#      stageName: Validate_Against_PreProduction
+#      stageName: ValidatePreProd
 #      condition: eq(variables.isMaster, true)
-#      environment: Pre-production
-#      serviceConnection: $(serviceConnectionPreProduction)
+#      environment: Pre-Prod
+#      serviceConnection: $(serviceConnectionPreProd)
 #      parameterFile: $(preProdParamFile)
 #
 #  - template: stages/deploy.yml
 #    parameters:
-#      stageName: Deploy_to_PreProduction'
-#      condition: and(not(or(failed('Validate_Against_PreProduction'), canceled('Validate_Against_PreProduction')), eq(variables.isMaster, true))
-#      dependsOn: Validate_Against_PreProduction
-#      environment: Pre-production
-#      serviceConnection: $(serviceConnectionPreProduction)
+#      stageName: DeployPreProd
+#      condition: and(not(or(failed('ValidatePreProd'), canceled('ValidatePreProd')), eq(variables.isMaster, true))
+#      dependsOn: ValidatePreProd
+#      environment: Pre-Prod
+#      serviceConnection: $(serviceConnectionPreProd)
 #      subscription: $(subscription)
 #      parameterFile: $(preProdParamFile)
 #
 #  - template: stages/validate.yml
 #    parameters:
-#      stageName: Validate_Against_Production
-#      condition: and(not(or(failed('Deploy_to_PreProduction'), canceled('Deploy_to_PreProduction')), eq(variables.isMaster, true))
-#      environment: Production
-#      serviceConnection: $(serviceConnectionProduction)
+#      stageName: ValidateProd
+#      condition: and(not(or(failed('DeployPreProd'), canceled('DeployPreProd')), eq(variables.isMaster, true))
+#      environment: Prod
+#      serviceConnection: $(serviceConnectionProd)
 #      parameterFile: $(prodParamFile)
 #
 #  - template: stages/deploy.yml
 #    parameters:
-#      stageName: Deploy_to_Production
-#      condition: and(not(or(failed('Validate_Against_Production'), canceled('Validate_Against_Production')), eq(variables.isMaster, true))
-#      dependsOn: Validate_Against_Production
-#      environment: Production
-#      serviceConnection: $(serviceConnectionProduction)
+#      stageName: DeployProd
+#      condition: and(not(or(failed('ValidateProd'), canceled('ValidateProd')), eq(variables.isMaster, true))
+#      dependsOn: ValidateProd
+#      environment: Prod
+#      serviceConnection: $(serviceConnectionProd)
 #      subscription: $(subscription)
 #      parameterFile: $(prodParamFile)

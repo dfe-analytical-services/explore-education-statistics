@@ -1,6 +1,3 @@
-# This is a reusable Deploy stage definition that is parameterised to be reusable
-# to support deployment to different environments
-
 parameters:
   - name: stageName
     type: string
@@ -20,10 +17,10 @@ parameters:
 
 stages:
   - stage: ${{parameters.stageName}}
-    displayName: Deploy ${{parameters.environment}} Infrastructure and Applications
-    # Prevent this stage from running in parallel with the same deploy stage in other ongoing runs of this pipeline.
-    # Instead, multiple executions of this stage will be queued and run sequentially in the order that their pipelines
-    # were triggered.
+    displayName: Deploy ${{parameters.environment}}
+    # Prevent this stage from running in parallel with the same deploy stage in other
+    # ongoing runs of this pipeline. Instead, multiple executions of this stage will
+    # be queued and run sequentially in the order that their pipelines were triggered.
     lockBehavior: sequential
     condition: ${{parameters.condition}}
     variables:
@@ -37,7 +34,7 @@ stages:
       dependsOn: ${{parameters.dependsOn}}
     jobs:
       - deployment: Deploy
-        displayName: Deploy ${{parameters.environment}} Infrastructure Bicep template and applications
+        displayName: Deploy infrastructure and apps
         environment: ${{parameters.environment}}
         strategy:
           runOnce:
@@ -78,7 +75,7 @@ stages:
                       fi
                       
                       az deployment group create \
-                        --name 'DeployPublicApiInfrastructure$(upstreamPipelineBuildNumber)' \
+                        --name 'PublicApiInfrastructure$(upstreamPipelineBuildNumber)' \
                         --resource-group $(resourceGroupName) \
                         --template-file $(templateFile) \
                         --parameters ${{parameters.parameterFile}} \
@@ -123,10 +120,9 @@ stages:
                     azure_static_web_apps_api_token: $(docsDeploymentToken)
                     cwd: $(Pipeline.Workspace)/MainBuild/public-api-docs
 
-                # We handle the non-infrastructure appsetting and connection string configuration here rather than directly
-                # in the Bicep files so that we can implement slot swapping.
-                # Configuration changes are firstly deployed to the staging slot and combined with a fresh code deploy prior
-                # to being swapped into production.
+                # We do config updates out of Bicep template so we can implement slot swapping.
+                # Changes are first deployed to the staging slot and combined with a fresh
+                # code deploy prior to being swapped with the production slot.
                 - task: AzureCLI@2
                   displayName: Deploy Data Processor Function App - update staging slot app settings
                   retryCountOnTaskFailure: 1
@@ -163,10 +159,12 @@ stages:
                         --settings \
                           "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
 
-                # TODO EES-5128 - add Private Endpoint to Data Processor Function App into the VMSS VNet to allow DevOps to
-                # deploy the Data Processor Function App without having to temporarily make it publicly accessible.
+                # TODO EES-5128
+                # Add Private Endpoint to Data Processor Function App into the VMSS VNet to allow
+                # DevOps to deploy the Data Processor Function App without having to temporarily
+                # make it publicly accessible.
                 - task: AzureCLI@2
-                  displayName: 'Deploy Data Processor Function App - temporarily enable public network access before deploy'
+                  displayName: Deploy Data Processor Function App - temporarily enable public network access before deploy
                   retryCountOnTaskFailure: 1
                   inputs:
                     azureSubscription: ${{parameters.serviceConnection}}
@@ -183,14 +181,18 @@ stages:
                           publicNetworkAccess=Enabled \
                           siteConfig.publicNetworkAccess=Enabled
 
-                # TODO EES-5128 - we will try several attempts to deploy the Function App in order to allow the staging
-                # slot the time to fully restart after appsettings and network visibility settings have been updated prior to
-                # attempting the deploy. Deploying prematurely results in a 500 from the deployment endpoint until the
-                # endpoint is ready to accept the deployment request. In the future it would be preferable to have a health
-                # check Function that we could call to establish that the site is ready, but this will require adding the
-                # Service Principal to allowed Client IDs / Identities that can access the Function App. The Service Principal
-                # that is performing the deploy can be accessed by using the "addSpnToEnvironment" config option in the task
-                # definition and using the $(servicePrincipalId) variable.
+                # TODO EES-5128
+                # Retry deploying the Function App in order to allow the staging slot the time to
+                # fully restart after config and network settings have been updated prior to deploy.
+                #
+                # Deploying prematurely results in a 500 from the deployment endpoint until the
+                # endpoint is ready to accept the deployment request.
+                #
+                # In the future it would be preferable to have a health check Function that can
+                # check the site is ready, but we need to add the Service Principal to allowed
+                # Client IDs / Identities that can access the Function App. The Service Principal
+                # that is performing the deploy can be accessed by using the `addSpnToEnvironment`
+                # config option in the task definition and using the $(servicePrincipalId) variable.
                 - task: AzureCLI@2
                   displayName: Deploy Data Processor Function App - deploy to staging slot
                   retryCountOnTaskFailure: 10
@@ -206,8 +208,10 @@ stages:
                         --resource-group $(resourceGroupName) \
                         --slot staging
 
-                # TODO EES-5128 - add Private Endpoint to Data Processor Function App into the VMSS VNet to allow DevOps to
-                # deploy the Data Processor Function App without having to temporarily make it publicly accessible.
+                # TODO EES-5128
+                # Add Private Endpoint to Data Processor Function App into the VMSS VNet to allow
+                # DevOps to deploy the Data Processor Function App without having to temporarily
+                # make it publicly accessible.
                 - task: AzureCLI@2
                   displayName: Deploy Data Processor Function App - disable public network access after deploy
                   retryCountOnTaskFailure: 1
