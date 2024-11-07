@@ -1,6 +1,6 @@
-import { resourceNamesType, firewallRuleType } from '../../types.bicep'
+import { ResourceNames, FirewallRule } from '../../types.bicep'
 
-param resourceNames resourceNamesType
+param resourceNames ResourceNames
 
 @description('Specifies the location for all resources.')
 param location string
@@ -9,7 +9,7 @@ param location string
 param publicApiDataFileShareQuota int = 1
 
 @description('Public API Storage : Firewall rules.')
-param storageFirewallRules firewallRuleType[] = []
+param storageFirewallRules FirewallRule[] = []
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
