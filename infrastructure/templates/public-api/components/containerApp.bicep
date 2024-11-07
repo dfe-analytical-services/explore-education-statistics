@@ -1,4 +1,4 @@
-import { entraIdAuthenticationType } from '../types.bicep'
+import { EntraIdAuthentication } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -106,7 +106,7 @@ param volumeMounts {
 }[] = []
 
 @description('An existing App Registration registered with Entra ID that will be used to control access to this Container App')
-param entraIdAuthentication entraIdAuthenticationType?
+param entraIdAuthentication EntraIdAuthentication?
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object

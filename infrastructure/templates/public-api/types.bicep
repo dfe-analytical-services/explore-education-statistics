@@ -1,5 +1,5 @@
 @export()
-type resourceNamesType = {
+type ResourceNames = {
   existingResources: {
     adminApp: string
     publisherFunction: string
@@ -41,13 +41,13 @@ type resourceNamesType = {
 }
 
 @export()
-type firewallRuleType = {
+type FirewallRule = {
   name: string
   cidr: string
 }
 
 @export()
-type azureFileshareMountType = {
+type AzureFileshareMount = {
   storageName: string
   storageAccountKey: string
   storageAccountName: string
@@ -56,7 +56,7 @@ type azureFileshareMountType = {
 }
 
 @export()
-type entraIdAuthenticationType = {
+type EntraIdAuthentication = {
   appRegistrationClientId: string
   allowedClientIds: string[]
   allowedPrincipalIds: string[]
@@ -198,19 +198,19 @@ type AppGatewayRewriteUrlConfig = {
 }
 
 @export()
-type principalNameAndIdType = {
+type PrincipalNameAndId = {
   principalName: string
   objectId: string
 }
 
 @export()
-type privateDnsZoneType = 'sites' | 'postgres' | 'custom'
+type PrivateDnsZone = 'sites' | 'postgres' | 'custom'
 
 @export()
-type containerRegistryRoleType = 'AcrPull'
+type ContainerRegistryRole = 'AcrPull'
 
 @export()
-type keyVaultRoleType = 'Secrets User' | 'Certificate User'
+type KeyVaultRole = 'Secrets User' | 'Certificate User'
 
 @export()
-type staticWebAppSkuType = 'Free' | 'Standard'
+type StaticWebAppSku = 'Free' | 'Standard'

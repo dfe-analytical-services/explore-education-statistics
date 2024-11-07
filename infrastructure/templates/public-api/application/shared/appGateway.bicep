@@ -3,11 +3,11 @@ import {
   AppGatewayRewriteSet
   AppGatewayRoute
   AppGatewaySite
-  resourceNamesType
+  ResourceNames
 } from '../../types.bicep'
 
 @description('Common resource naming variables')
-param resourceNames resourceNamesType
+param resourceNames ResourceNames
 
 @description('The location to create resources in')
 param location string

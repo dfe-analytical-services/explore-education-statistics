@@ -1,10 +1,10 @@
-import { resourceNamesType, staticWebAppSkuType } from '../../types.bicep'
+import { ResourceNames, StaticWebAppSku } from '../../types.bicep'
 
 @description('Common resource naming variables')
-param resourceNames resourceNamesType
+param resourceNames ResourceNames
 
 @description('Static Web App SKU to use')
-param appSku staticWebAppSkuType = 'Free'
+param appSku StaticWebAppSku = 'Free'
 
 @description('Tags for the resources')
 param tagValues object

@@ -1,7 +1,7 @@
-import { resourceNamesType } from '../../types.bicep'
+import { ResourceNames } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
-param resourceNames resourceNamesType
+param resourceNames ResourceNames
 
 var subnets = resourceNames.existingResources.subnets
 

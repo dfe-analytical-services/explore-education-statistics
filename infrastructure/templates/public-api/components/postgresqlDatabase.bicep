@@ -1,4 +1,4 @@
-import { firewallRuleType, principalNameAndIdType } from '../types.bicep'
+import { FirewallRule, PrincipalNameAndId } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -40,10 +40,10 @@ param geoRedundantBackup string = 'Disabled'
 param databaseNames string[]
 
 @description('An array of firewall rules containing IP address ranges')
-param firewallRules firewallRuleType[] = []
+param firewallRules FirewallRule[] = []
 
 @description('An array of Entra ID admin principal names for this resource')
-param entraIdAdminPrincipals principalNameAndIdType[] = []
+param entraIdAdminPrincipals PrincipalNameAndId[] = []
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object

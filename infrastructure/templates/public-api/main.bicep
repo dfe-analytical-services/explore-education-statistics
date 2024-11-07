@@ -1,5 +1,5 @@
 import { abbreviations } from 'abbreviations.bicep'
-import { firewallRuleType, principalNameAndIdType, staticWebAppSkuType } from 'types.bicep'
+import { FirewallRule, PrincipalNameAndId, StaticWebAppSku } from 'types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -11,7 +11,7 @@ param location string = resourceGroup().location
 param publicApiDataFileShareQuota int = 1
 
 @description('Public API Storage : Firewall rules.')
-param storageFirewallRules firewallRuleType[] = []
+param storageFirewallRules FirewallRule[] = []
 
 @description('Database : administrator login name.')
 @minLength(0)
@@ -37,16 +37,16 @@ param postgreSqlStorageSizeGB int = 32
 param postgreSqlAutoGrowStatus string = 'Disabled'
 
 @description('Database : Firewall rules.')
-param postgreSqlFirewallRules firewallRuleType[] = []
+param postgreSqlFirewallRules FirewallRule[] = []
 
 @description('Database : Entra ID admin  principal names for this resource')
-param postgreSqlEntraIdAdminPrincipals principalNameAndIdType[] = []
+param postgreSqlEntraIdAdminPrincipals PrincipalNameAndId[] = []
 
 @description('ACR : Specifies the resource group in which the shared Container Registry lives.')
 param acrResourceGroupName string = ''
 
 @description('Public API docs app : SKU to use.')
-param docsAppSku staticWebAppSkuType = 'Free'
+param docsAppSku StaticWebAppSku = 'Free'
 
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
