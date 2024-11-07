@@ -87,7 +87,8 @@ export default function ContentHtml({
         return !url?.includes('explore-education-statistics.service.gov.uk') &&
           typeof node.attribs['data-featured-table'] === 'undefined' ? (
           <a href={url} target="_blank" rel="noopener noreferrer">
-            {text} (opens in a new tab)
+            {text}
+            {url.startsWith('mailto:') ? '' : ' (opens in a new tab)'}
           </a>
         ) : (
           <a href={url}>{text}</a>
