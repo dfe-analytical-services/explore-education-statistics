@@ -85,10 +85,10 @@ export default function ContentHtml({
         const text = domToReact(node.children);
 
         return !url?.includes('explore-education-statistics.service.gov.uk') &&
+          !url.startsWith('mailto:') &&
           typeof node.attribs['data-featured-table'] === 'undefined' ? (
           <a href={url} target="_blank" rel="noopener noreferrer">
-            {text}
-            {url.startsWith('mailto:') ? '' : ' (opens in a new tab)'}
+            {text} (opens in a new tab)
           </a>
         ) : (
           <a href={url}>{text}</a>
