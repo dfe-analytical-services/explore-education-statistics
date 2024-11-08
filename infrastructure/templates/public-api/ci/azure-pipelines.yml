@@ -40,18 +40,8 @@ variables:
     value: ubuntu-latest
   - name: templateDirectory
     value: $(Build.SourcesDirectory)/infrastructure/templates/public-api
-  - name: templateFile
-    value: $(templateDirectory)/main.bicep
   - name: paramDirectory
     value: $(templateDirectory)/parameters
-  - name: devParamFile
-    value: $(paramDirectory)/main-dev.bicepparam
-  - name: testParamFile
-    value: $(paramDirectory)/main-test.bicepparam
-  - name: preProdParamFile
-    value: $(paramDirectory)/main-preprod.bicepparam
-  - name: prodParamFile
-    value: $(paramDirectory)/main-prod.bicepparam
   - name: upstreamPipelineBuildNumber
     value: $(resources.pipeline.MainBuild.runName)
   - name: deployContainerApp
@@ -63,70 +53,36 @@ pool:
   vmImage: $(vmImageName)
 
 stages:
-  - template: stages/validate.yml
-    parameters:
-      stageName: ValidateDev
-      condition: eq(variables.isDev, true)
-      environment: Dev
-      serviceConnection: $(serviceConnectionDev)
-      parameterFile: $(devParamFile)
-
   - template: stages/deploy.yml
     parameters:
       stageName: DeployDev
-      condition: and(not(or(failed(), canceled())), eq(variables.isDev, true))
-      dependsOn: ValidateDev
+      condition: eq(variables.isDev, true)
       environment: Dev
       serviceConnection: $(serviceConnectionDev)
-      parameterFile: $(devParamFile)
-
-  - template: stages/validate.yml
-    parameters:
-      stageName: ValidateTest
-      condition: eq(variables.isTest, true)
-      environment: Test
-      serviceConnection: $(serviceConnectionTest)
-      parameterFile: $(testParamFile)
+      parameterFile: $(paramDirectory)/main-dev.bicepparam
 
   - template: stages/deploy.yml
     parameters:
       stageName: DeployTest
-      dependsOn: ValidateTest
-      condition: and(not(or(failed(), canceled())), eq(variables.isTest, true))
+      condition: eq(variables.isTest, true)
+      dependsOn: DeployDev
       environment: Test
       serviceConnection: $(serviceConnectionTest)
-      parameterFile: $(testParamFile)
+      parameterFile: $(paramDirectory)/main-test.bicepparam
 
-#  - template: stages/validate.yml
-#    parameters:
-#      stageName: ValidatePreProd
-#      condition: eq(variables.isMaster, true)
-#      environment: Pre-Prod
-#      serviceConnection: $(serviceConnectionPreProd)
-#      parameterFile: $(preProdParamFile)
-#
 #  - template: stages/deploy.yml
 #    parameters:
 #      stageName: DeployPreProd
-#      condition: and(not(or(failed('ValidatePreProd'), canceled('ValidatePreProd')), eq(variables.isMaster, true))
-#      dependsOn: ValidatePreProd
+#      condition: eq(variables.isMaster, true)
 #      environment: Pre-Prod
 #      serviceConnection: $(serviceConnectionPreProd)
-#      parameterFile: $(preProdParamFile)
-#
-#  - template: stages/validate.yml
-#    parameters:
-#      stageName: ValidateProd
-#      condition: and(not(or(failed('DeployPreProd'), canceled('DeployPreProd')), eq(variables.isMaster, true))
-#      environment: Prod
-#      serviceConnection: $(serviceConnectionProd)
-#      parameterFile: $(prodParamFile)
+#      parameterFile: $(paramDirectory)/main-preprod.bicepparam
 #
 #  - template: stages/deploy.yml
 #    parameters:
 #      stageName: DeployProd
-#      condition: and(not(or(failed('ValidateProd'), canceled('ValidateProd')), eq(variables.isMaster, true))
-#      dependsOn: ValidateProd
+#      condition:  and(succeeded(), eq(variables.isMaster, true))
+#      dependsOn: DeployPreProd
 #      environment: Prod
 #      serviceConnection: $(serviceConnectionProd)
-#      parameterFile: $(prodParamFile)
+#      parameterFile: $(paramDirectory)/main-prod.bicepparam

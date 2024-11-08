@@ -17,7 +17,7 @@ parameters:
   - name: updatePsqlFlexibleServer
     type: string
     default: false
-  - name: dataProcessorFunctionAppExists
+  - name: dataProcessorExists
     type: string
     default: true
 
@@ -48,6 +48,6 @@ steps:
               dockerImagesTag='$(upstreamPipelineBuildNumber)' \
               deployContainerApp=${{ parameters.deployContainerApp }} \
               updatePsqlFlexibleServer=${{ parameters.updatePsqlFlexibleServer }} \
-              dataProcessorFunctionAppExists=${{ parameters.dataProcessorFunctionAppExists }} \
+              dataProcessorFunctionAppExists=${{ parameters.dataProcessorExists }} \
               dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
               apiAppRegistrationClientId='$(apiAppRegistrationClientId)'

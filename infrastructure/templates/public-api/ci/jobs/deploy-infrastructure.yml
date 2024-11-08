@@ -1,0 +1,71 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: parameterFile
+    type: string
+
+jobs:
+  - deployment: DeployPublicApiInfrastructure
+    displayName: Deploy Public API infrastructure
+    environment: ${{ parameters.environment }}
+    variables:
+      deployName: PublicApiInfrastructure$(upstreamPipelineBuildNumber)
+      templateFile: $(templateDirectory)/main.bicep
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - task: AzureCLI@2
+              displayName: Install Bicep
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: az bicep install
+
+            - template: ../tasks/deploy-bicep.yml
+              parameters:
+                displayName: Validate Bicep template
+                action: validate
+                serviceConnection: ${{ parameters.serviceConnection }}
+                parameterFile: ${{ parameters.parameterFile }}
+                deployContainerApp: true
+                updatePsqlFlexibleServer: false
+                dataProcessorExists: true
+
+            - task: AzureCLI@2
+              displayName: Check if Data Processor Function App exists
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+                  dataProcessorExists=`az functionapp list --resource-group $(resourceGroupName) --query "[?name=='$(dataProcessorFunctionAppName)']" | jq '. != []'`
+      
+                  if [[ "$dataProcessorExists" == "true" ]]; then
+                    echo "Data Processor Function App exists"
+                  fi
+      
+                  echo "##vso[task.setvariable variable=dataProcessorExists;]$dataProcessorExists"
+
+            - template: ../tasks/deploy-bicep.yml
+              parameters:
+                displayName: Deploy Bicep template
+                action: create
+                serviceConnection: ${{ parameters.serviceConnection }}
+                parameterFile: ${{ parameters.parameterFile }}
+                deployContainerApp: $(deployContainerApp)
+                updatePsqlFlexibleServer: $(updatePsqlFlexibleServer)
+                dataProcessorExists: $(dataProcessorExists)
+
+           # - template: ../tasks/assign-app-role-to-service-principal.yml
+           #   parameters:
+           #     serviceConnection: ${ {parameters.serviceConnection }}
+           #     appRoleName: Admin.Access
+           #     protectedResourceAppRegName: $(subscription)-ees-papi-ca-api-appreg
+           #     servicePrincipalName: $(subscription)-as-ees-admin
