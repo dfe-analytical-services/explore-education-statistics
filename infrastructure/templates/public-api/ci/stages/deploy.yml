@@ -12,11 +12,18 @@ parameters:
   - name: dependsOn
     type: object
     default: []
+  - name: trigger
+    type: string
+    default: automatic
+    values:
+      - automatic
+      - manual
 
 stages:
   - stage: ${{ parameters.stageName }}
     displayName: Deploy ${{ parameters.environment }}
     dependsOn: ${{ parameters.dependsOn }}
+    trigger: ${{ parameters.trigger }}
     # Prevent this stage from running in parallel with the same deploy stage in other
     # ongoing runs of this pipeline. Instead, multiple executions of this stage will
     # be queued and run sequentially in the order that their pipelines were triggered.

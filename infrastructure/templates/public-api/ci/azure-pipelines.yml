@@ -74,6 +74,7 @@ stages:
 #    parameters:
 #      stageName: DeployPreProd
 #      condition: eq(variables.isMaster, true)
+#      trigger: manual
 #      environment: Pre-Prod
 #      serviceConnection: $(serviceConnectionPreProd)
 #      parameterFile: $(paramDirectory)/main-preprod.bicepparam
@@ -82,6 +83,7 @@ stages:
 #    parameters:
 #      stageName: DeployProd
 #      condition:  and(succeeded(), eq(variables.isMaster, true))
+#      trigger: manual
 #      dependsOn: DeployPreProd
 #      environment: Prod
 #      serviceConnection: $(serviceConnectionProd)
