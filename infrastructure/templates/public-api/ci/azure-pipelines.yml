@@ -38,16 +38,12 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
     value: ubuntu-latest
-  - name: templateDirectory
-    value: $(Build.SourcesDirectory)/infrastructure/templates/public-api
-  - name: paramDirectory
-    value: $(templateDirectory)/parameters
   - name: upstreamPipelineBuildNumber
     value: $(resources.pipeline.MainBuild.runName)
   - name: deployContainerApp
-    value: ${{parameters.deployContainerApp}}
+    value: ${{ parameters.deployContainerApp }}
   - name: updatePsqlFlexibleServer
-    value: ${{parameters.updatePsqlFlexibleServer}}
+    value: ${{ parameters.updatePsqlFlexibleServer }}
 
 pool:
   vmImage: $(vmImageName)
@@ -59,7 +55,7 @@ stages:
       condition: eq(variables.isDev, true)
       environment: Dev
       serviceConnection: $(serviceConnectionDev)
-      parameterFile: $(paramDirectory)/main-dev.bicepparam
+      bicepParamFile: dev
 
   - template: stages/deploy.yml
     parameters:
@@ -68,7 +64,7 @@ stages:
       dependsOn: DeployDev
       environment: Test
       serviceConnection: $(serviceConnectionTest)
-      parameterFile: $(paramDirectory)/main-test.bicepparam
+      bicepParamFile: test
 
 #  - template: stages/deploy.yml
 #    parameters:
@@ -77,7 +73,7 @@ stages:
 #      trigger: manual
 #      environment: Pre-Prod
 #      serviceConnection: $(serviceConnectionPreProd)
-#      parameterFile: $(paramDirectory)/main-preprod.bicepparam
+#      bicepParamFile: preprod
 #
 #  - template: stages/deploy.yml
 #    parameters:
@@ -87,4 +83,4 @@ stages:
 #      dependsOn: DeployPreProd
 #      environment: Prod
 #      serviceConnection: $(serviceConnectionProd)
-#      parameterFile: $(paramDirectory)/main-prod.bicepparam
+#      bicepParamFile: prod

@@ -3,7 +3,7 @@ parameters:
     type: string
   - name: environment
     type: string
-  - name: parameterFile
+  - name: bicepParamFile
     type: string
 
 jobs:
@@ -12,7 +12,10 @@ jobs:
     environment: ${{ parameters.environment }}
     variables:
       deployName: PublicApiInfrastructure$(upstreamPipelineBuildNumber)
+      templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/public-api
       templateFile: $(templateDirectory)/main.bicep
+      paramDirectory: $(templateDirectory)/parameters
+      paramFile: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
     strategy:
       runOnce:
         deploy:
@@ -32,7 +35,7 @@ jobs:
                 displayName: Validate Bicep template
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
-                parameterFile: ${{ parameters.parameterFile }}
+                parameterFile: $(paramFile)
                 deployContainerApp: true
                 updatePsqlFlexibleServer: false
                 dataProcessorExists: true
@@ -58,7 +61,7 @@ jobs:
                 displayName: Deploy Bicep template
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
-                parameterFile: ${{ parameters.parameterFile }}
+                parameterFile: $(paramFile)
                 deployContainerApp: $(deployContainerApp)
                 updatePsqlFlexibleServer: $(updatePsqlFlexibleServer)
                 dataProcessorExists: $(dataProcessorExists)

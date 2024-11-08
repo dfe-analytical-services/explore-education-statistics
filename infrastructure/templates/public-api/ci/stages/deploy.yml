@@ -5,8 +5,13 @@ parameters:
     type: string
   - name: serviceConnection
     type: string
-  - name: parameterFile
+  - name: bicepParamFile
     type: string
+    values:
+      - dev
+      - test
+      - preprod
+      - prod
   - name: condition
     type: string
   - name: dependsOn
@@ -36,14 +41,14 @@ stages:
         value: $(subscription)-ees-papi-fa-processor
       - name: docsAppName
         value: $(subscription)-ees-papi-stapp-docs
-      - name: bicepDeployName
+      - name: infraDeployName
         value: PublicApiInfrastructure$(upstreamPipelineBuildNumber)
     jobs:
       - template: ../jobs/deploy-infrastructure.yml
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
-          parameterFile: ${{ parameters.parameterFile }}
+          bicepParamFile: ${{ parameters.bicepParamFile }}
 
       - template: ../jobs/deploy-api-docs.yml
         parameters:

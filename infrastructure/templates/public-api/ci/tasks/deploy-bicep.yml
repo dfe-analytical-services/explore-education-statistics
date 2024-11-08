@@ -32,7 +32,7 @@ steps:
         set -e
         
         az deployment group ${{ parameters.action }} \
-          --name $(bicepDeployName) \
+          --name $(infraDeployName) \
           --resource-group $(resourceGroupName) \
           --template-file $(templateFile) \
           --parameters ${{ parameters.parameterFile }} \

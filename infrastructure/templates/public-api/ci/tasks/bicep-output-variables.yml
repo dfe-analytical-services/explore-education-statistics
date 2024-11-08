@@ -12,7 +12,7 @@ steps:
       inlineScript: |
         deploymentOutputs=$(az deployment group show \
         --resource-group $(resourceGroupName) \
-        --name $(bicepDeployName) \
+        --name $(infraDeployName) \
         --query properties.outputs | jq -c 'to_entries[] | [.key, .value.value]')
         
         echo "$deploymentOutputs" | while IFS=$'\n' read -r c; do
