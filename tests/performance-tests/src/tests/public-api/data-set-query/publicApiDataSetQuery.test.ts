@@ -88,11 +88,24 @@ export function setup(): SetupData {
     publication => {
       const { dataSets } = publicApiService.listDataSets(publication.id);
 
-      const dataSetsFilteredByName = dataSets.filter(
-        dataSet =>
-          !dataSetConfig.limitToTitles ||
-          dataSetConfig.limitToTitles.includes(dataSet.title),
-      );
+      const dataSetsFilteredByName = dataSets.filter(dataSet => {
+        if (dataSetConfig.excludeTitles?.includes(dataSet.title)) {
+          console.log(`Excluding data set "${dataSet.title}" based on title.`);
+          return false;
+        }
+
+        if (!dataSetConfig.includeTitles) {
+          console.log(`Including data set "${dataSet.title}".`);
+          return true;
+        }
+
+        if (dataSetConfig.includeTitles.includes(dataSet.title)) {
+          console.log(`Including data set "${dataSet.title}" based on title.`);
+          return true;
+        }
+
+        return false;
+      });
 
       const dataSetMeta = dataSetsFilteredByName.map(dataSet => {
         const { meta } = publicApiService.getDataSetMeta(dataSet.id);
@@ -104,10 +117,16 @@ export function setup(): SetupData {
         };
       });
 
-      const dataSetsFilteredBySize = dataSetMeta.filter(
-        meta =>
-          !dataSetConfig.maxRows || meta.totalResults <= dataSetConfig.maxRows,
-      );
+      const dataSetsFilteredBySize = dataSetMeta.filter(meta => {
+        if (
+          dataSetConfig.maxRows &&
+          meta.totalResults <= dataSetConfig.maxRows
+        ) {
+          console.log(`Excluding data set "${meta.name}" based on max rows.`);
+          return false;
+        }
+        return true;
+      });
 
       return {
         ...publication,

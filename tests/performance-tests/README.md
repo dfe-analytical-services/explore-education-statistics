@@ -340,10 +340,23 @@ queries that can be generated:
 This test by default targets any data sets that are discoverable via the Public API. The data sets used
 by the tests can be filtered down however using the following parameters:
 
-* DATA_SET_TITLES - a comma-separated list of data set titles, which will cause the test to only use those
+* DATA_SET_TITLES_TO_INCLUDE - a comma-separated list of data set titles, which will cause the test to only use those
   data sets during the run. The default value is undefined, which does not filter data sets by title.
+
+  `pnpm --environment=dev --users=bau1 perftest dist/publicApiDataSetQuery.test.js
+  -e DATA_SET_TITLES_TO_INCLUDE="Data Set 1"`
+
+* DATA_SET_TITLES_TO_EXCLUDE - a comma-separated list of data set titles, which will cause the test to avoid using those
+  data sets during the run. The default value is undefined, which does not filter out any data sets by title.
+
+  `pnpm --environment=dev --users=bau1 perftest dist/publicApiDataSetQuery.test.js
+  -e DATA_SET_TITLES_TO_EXCLUDE="Data Set 1"`  
+
 * DATA_SET_MAX_ROWS - the maximum number of rows for data sets to be used in this run. The default value
   is undefined, which does not filter data sets by their size.
+
+  `pnpm --environment=dev --users=bau1 perftest dist/publicApiDataSetQuery.test.js
+  -e DATA_SET_MAX_ROWS=1000000
 
 ## Transpiling and Bundling
 
