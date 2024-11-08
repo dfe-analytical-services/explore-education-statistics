@@ -20,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
@@ -32,6 +33,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using RequestTimeoutOptions = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options.RequestTimeoutOptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
@@ -151,6 +153,14 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddProblemDetails();
         services.AddApiVersioning().AddMvc().AddApiExplorer();
         services.AddEndpointsApiExplorer();
+
+        // Swagger
+
+        if (_appOptions.EnableSwagger)
+        {
+            services.AddSwaggerGen();
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfig>();
+        }
 
         // Databases
 
@@ -283,6 +293,27 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         });
 
         app.UseHealthChecks("/health");
+
+        // Swagger
+
+        if (!hostEnvironment.IsIntegrationTest())
+        {
+            app.UseSwagger(options =>
+            {
+                options.RouteTemplate = "/swagger/v{documentName}/openapi.json";
+            });
+            app.UseSwaggerUI(options =>
+            {
+                options.RoutePrefix = "swagger";
+
+                foreach (var description in (app as WebApplication)!.DescribeApiVersions())
+                {
+                    options.SwaggerEndpoint(
+                        url: $"/swagger/v{description.GroupName}/openapi.json",
+                        name: $"v{description.GroupName}");
+                }
+            });
+        }
     }
 
     private static void UpdateDatabase(IApplicationBuilder app, IHostEnvironment env)
