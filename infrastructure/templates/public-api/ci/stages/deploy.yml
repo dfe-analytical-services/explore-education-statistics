@@ -42,7 +42,7 @@ stages:
       - name: docsAppName
         value: $(subscription)-ees-papi-stapp-docs
       - name: infraDeployName
-        value: PublicApiInfrastructure$(upstreamPipelineBuildNumber)
+        value: PublicApiInfrastructure$(Build.BuildNumber)
     jobs:
       - template: ../jobs/deploy-infrastructure.yml
         parameters:

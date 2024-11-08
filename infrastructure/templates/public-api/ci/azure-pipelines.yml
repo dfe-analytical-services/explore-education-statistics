@@ -38,8 +38,6 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
     value: ubuntu-latest
-  - name: upstreamPipelineBuildNumber
-    value: $(resources.pipeline.MainBuild.runName)
   - name: deployContainerApp
     value: ${{ parameters.deployContainerApp }}
   - name: updatePsqlFlexibleServer

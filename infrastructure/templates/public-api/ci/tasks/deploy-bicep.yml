@@ -45,7 +45,7 @@ steps:
               postgreSqlEntraIdAdminPrincipals='$(postgreSqlEntraIdAdminPrincipals)' \
               storageFirewallRules='$(maintenanceFirewallRules)' \
               acrResourceGroupName='$(acrResourceGroupName)' \
-              dockerImagesTag='$(upstreamPipelineBuildNumber)' \
+              dockerImagesTag='$(resources.pipeline.MainBuild.runName)' \
               deployContainerApp=${{ parameters.deployContainerApp }} \
               updatePsqlFlexibleServer=${{ parameters.updatePsqlFlexibleServer }} \
               dataProcessorFunctionAppExists=${{ parameters.dataProcessorExists }} \
