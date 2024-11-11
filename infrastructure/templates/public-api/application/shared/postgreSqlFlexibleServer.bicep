@@ -1,7 +1,7 @@
-import { resourceNamesType, firewallRuleType, principalNameAndIdType } from '../../types.bicep'
+import { ResourceNames, FirewallRule, PrincipalNameAndId } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
-param resourceNames resourceNamesType
+param resourceNames ResourceNames
 
 @description('Specifies the location for all resources.')
 param location string
@@ -23,13 +23,13 @@ param storageSizeGB int = 32
 param autoGrowStatus string = 'Disabled'
 
 @description('Firewall rules.')
-param firewallRules firewallRuleType[] = []
+param firewallRules FirewallRule[] = []
 
 @description('Specifies the subnet id that the PostgreSQL private endpoint will be attached to.')
 param privateEndpointSubnetId string
 
 @description('An array of Entra ID admin principal names for this resource')
-param entraIdAdminPrincipals principalNameAndIdType[] = []
+param entraIdAdminPrincipals PrincipalNameAndId[] = []
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object

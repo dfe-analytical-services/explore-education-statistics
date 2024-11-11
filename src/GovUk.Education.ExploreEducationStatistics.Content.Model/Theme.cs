@@ -17,5 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Summary { get; set; }
 
         public List<Publication> Publications { get; set; }
+
+        public bool IsTestOrSeedTheme() => Title.StartsWith("UI test theme") || Title.StartsWith("Seed theme");
     }
 }

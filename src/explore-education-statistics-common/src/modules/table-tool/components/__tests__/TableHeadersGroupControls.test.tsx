@@ -3,6 +3,14 @@ import { TableHeadersContextProvider } from '@common/modules/table-tool/contexts
 import { render as baseRender, screen } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
+import FormProvider from '@common/components/form/FormProvider';
+import { TableHeadersFormValues } from '../TableHeadersForm';
+import {
+  testCategoryFilters,
+  testIndicators,
+  testLocationFilters,
+  testTimePeriodFilters,
+} from './__data__/tableHeadersConfig.data';
 
 describe('TableHeadersGroupControls', () => {
   describe('a list is being reordered', () => {
@@ -147,24 +155,31 @@ function render({
   showMovingControls?: boolean;
   totalItems?: number;
 }) {
+  const testInitialFormValues: TableHeadersFormValues = {
+    columnGroups: [testTimePeriodFilters, testLocationFilters],
+    rowGroups: [testCategoryFilters, testIndicators],
+  };
+
   baseRender(
     <TableHeadersContextProvider
       activeGroup={activeGroup}
       expandedLists={expandedLists}
     >
-      <TableHeadersGroupControls
-        defaultNumberOfItems={2}
-        groupName="rowGroups"
-        id="test-id"
-        index={1}
-        isLastGroup={false}
-        legend="Locations"
-        showMovingControls={showMovingControls}
-        totalItems={totalItems}
-        onMoveAxis={noop}
-        onMoveDown={noop}
-        onMoveUp={noop}
-      />
+      <FormProvider initialValues={testInitialFormValues}>
+        <TableHeadersGroupControls
+          defaultNumberOfItems={2}
+          groupName="rowGroups"
+          id="test-id"
+          index={1}
+          isLastGroup={false}
+          legend="Locations"
+          showMovingControls={showMovingControls}
+          totalItems={totalItems}
+          onMoveAxis={noop}
+          onMoveDown={noop}
+          onMoveUp={noop}
+        />
+      </FormProvider>
     </TableHeadersContextProvider>,
   );
 }

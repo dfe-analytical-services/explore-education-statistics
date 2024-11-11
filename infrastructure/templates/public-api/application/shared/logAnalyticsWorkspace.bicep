@@ -1,7 +1,7 @@
-import { resourceNamesType } from '../../types.bicep'
+import { ResourceNames } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
-param resourceNames resourceNamesType
+param resourceNames ResourceNames
 
 @description('Specifies the location for all resources.')
 param location string

@@ -25,6 +25,7 @@ public interface IProcessorClient
 
     Task<Either<ActionResult, Unit>> BulkDeleteDataSetVersions(
         Guid releaseVersionId,
+        bool forceDeleteAll = false,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, Unit>> DeleteDataSetVersion(

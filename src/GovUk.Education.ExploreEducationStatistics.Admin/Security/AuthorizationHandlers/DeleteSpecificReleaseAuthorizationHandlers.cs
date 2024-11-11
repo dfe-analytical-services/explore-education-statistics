@@ -3,7 +3,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
@@ -37,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             if (!releaseVersion.Amendment)
             {
-                if (context.User.IsInRole(RoleNames.BauUser))
+                if (context.User.IsInRole(GlobalRoles.Role.BauUser.GetEnumLabel()))
                 {
                     context.Succeed(requirement);
                 }

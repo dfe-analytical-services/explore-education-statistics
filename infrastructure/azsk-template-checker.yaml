@@ -9,11 +9,11 @@ pr:
     - infrastructure/
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: windows-latest
 
 steps:
 - task: AzSKARMTemplateChecker@4
   inputs:
-    ARMTemplateFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/templates/'
-    ARMTemplateParameterFilePath: '$(System.DefaultWorkingDirectory)/infrastructure/parameters/'
-    SkipControlsFromFile: '$(System.DefaultWorkingDirectory)/infrastructure/template-checker/skip-controls.csv'
+    ARMTemplateFilePath: $(System.DefaultWorkingDirectory)/infrastructure/templates/
+    ARMTemplateParameterFilePath: $(System.DefaultWorkingDirectory)/infrastructure/parameters/
+    SkipControlsFromFile: $(System.DefaultWorkingDirectory)/infrastructure/template-checker/skip-controls.csv

@@ -1,4 +1,4 @@
-import { entraIdAuthenticationType } from '../types.bicep'
+import { EntraIdAuthentication } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -75,8 +75,17 @@ param dockerPullManagedIdentityClientId string
 @secure()
 param dockerPullManagedIdentitySecretValue string
 
-@description('Id of the owning Container App Environment')
-param managedEnvironmentId string
+@description('The id of the owning Container App Environment')
+param environmentId string
+
+@description('The IP address of the Container App Environment')
+param environmentIpAddress string
+
+@description('Deploy private DNS zone and records so other resources can communicate with Container App over private network using FQDNs')
+param deployPrivateDns bool = true
+
+@description('The vnet that the Container App will be connected to')
+param vnetName string
 
 @description('Volumes to mount within Containers - used in conjunction with "volumeMounts"')
 param volumes {
@@ -97,7 +106,7 @@ param volumeMounts {
 }[] = []
 
 @description('An existing App Registration registered with Entra ID that will be used to control access to this Container App')
-param entraIdAuthentication entraIdAuthenticationType?
+param entraIdAuthentication EntraIdAuthentication?
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -114,7 +123,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
     }
   }
   properties: {
-    managedEnvironmentId: managedEnvironmentId
+    managedEnvironmentId: environmentId
     configuration: {
       secrets: [
         {
@@ -128,7 +137,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
         external: true
         targetPort: containerAppTargetPort
         allowInsecure: false
-        corsPolicy: corsPolicy
+        corsPolicy: any(corsPolicy)
         traffic: [
           {
             latestRevision: true
@@ -189,6 +198,18 @@ module azureAuthentication 'containerAppAzureAuthentication.bicep' = if (entraId
   }
 }
 
-output containerAppFqdn string = containerApp.properties.configuration.ingress.fqdn
+var containerAppFqdn = containerApp.properties.configuration.ingress.fqdn
+
+module privateDns 'containerAppPrivateDns.bicep' = if (deployPrivateDns) {
+  name: '${containerAppName}PrivateDns'
+  params: {
+    domain: substring(containerAppFqdn, indexOf(containerAppFqdn, '.') + 1)
+    ipAddress: environmentIpAddress
+    vnetName: vnetName
+    tagValues: tagValues
+  }
+}
+
+output containerAppFqdn string = containerAppFqdn
 output containerImage string = containerImageName
 output containerAppName string = containerApp.name

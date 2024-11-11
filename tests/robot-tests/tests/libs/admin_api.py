@@ -100,7 +100,14 @@ def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date:
     )
     assert (
         response.status_code < 300
-    ), f"Adding release role to user API request failed with {response.status_code} and {response.text}"
+    ), f"Adding invite for user {user_email} API request failed with {response.status_code} and {response.text}"
+
+
+def delete_user_invite_via_api(user_email: str):
+    response = admin_client.delete(f"/api/user-management/invites/{user_email}")
+    assert (
+        response.status_code < 300
+    ), f"Removing invite for user {user_email} API request failed with {response.status_code} and {response.text}"
 
 
 def user_adds_release_role_to_user_via_api(user_email: str, release_id: str, role_name: str = None):

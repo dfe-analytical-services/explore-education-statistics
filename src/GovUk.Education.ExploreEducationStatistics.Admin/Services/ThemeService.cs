@@ -1,28 +1,25 @@
+#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
@@ -32,46 +29,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ThemeService : IThemeService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly StatisticsDbContext _statisticsDbContext;
+        private readonly IDataSetVersionRepository _dataSetVersionRepository;
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
-        private readonly IReleaseFileService _releaseFileService;
-        private readonly IReleaseSubjectRepository _releaseSubjectRepository;
-        private readonly IReleaseDataFileService _releaseDataFileService;
-        private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
         private readonly IMethodologyService _methodologyService;
         private readonly IPublishingService _publishingService;
-        private readonly IBlobCacheService _cacheService;
+        private readonly IReleaseService _releaseService;
         private readonly bool _themeDeletionAllowed;
 
         public ThemeService(
             IOptions<AppOptions> appOptions,
             ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext,
+            IDataSetVersionRepository dataSetVersionRepository,
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IMethodologyService methodologyService,
-            IReleaseFileService releaseFileService,
-            IReleaseSubjectRepository releaseSubjectRepository,
-            IReleaseDataFileService releaseDataFileService,
-            IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IPublishingService publishingService,
-            IBlobCacheService cacheService)
+            IReleaseService releaseService)
         {
             _contentDbContext = contentDbContext;
-            _statisticsDbContext = statisticsDbContext;
+            _dataSetVersionRepository = dataSetVersionRepository;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _methodologyService = methodologyService;
-            _releaseFileService = releaseFileService;
-            _releaseSubjectRepository = releaseSubjectRepository;
-            _releaseDataFileService = releaseDataFileService;
-            _releasePublishingStatusRepository = releasePublishingStatusRepository;
             _publishingService = publishingService;
-            _cacheService = cacheService;
+            _releaseService = releaseService;
             _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
         }
 
@@ -133,9 +118,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, ThemeViewModel>> GetTheme(Guid id)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Theme>(id)
-                .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
+            return await _userService
+                .CheckCanManageAllTaxonomy()
+                .OnSuccess(() => _persistenceHelper.CheckEntityExists<Theme>(id))
                 .OnSuccess(_mapper.Map<ThemeViewModel>);
         }
 
@@ -165,18 +150,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             CancellationToken cancellationToken = default)
         {
             return await _userService.CheckCanManageAllTaxonomy()
-                .OnSuccess(() => _persistenceHelper.CheckEntityExists<Theme>(themeId, q => q.Include(t => t.Publications)))
+                .OnSuccess(() =>
+                    _persistenceHelper.CheckEntityExists<Theme>(themeId, q => q.Include(t => t.Publications)))
                 .OnSuccessDo(CheckCanDeleteTheme)
-                .OnSuccessDo(async theme =>
-                {
-                    var publicationIdsToDelete = theme.Publications
-                        .Select(p => p.Id)
-                        .ToList();
-
-                    return await DeleteMethodologiesForPublications(publicationIdsToDelete)
-                       .OnSuccess(() => DeleteReleasesForPublications(publicationIdsToDelete))
-                       .OnSuccess(() => DeletePublications(publicationIdsToDelete));
-                })
+                .OnSuccessDo(theme => DeletePublicationsForTheme(theme, cancellationToken))
                 .OnSuccessVoid(async theme =>
                 {
                     _contentDbContext.Themes.Remove(theme);
@@ -186,27 +163,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublications(
-            IEnumerable<Guid> publicationIds)
+        private async Task<Either<List<ActionResult>, Unit>> DeletePublicationsForTheme(
+            Theme theme, CancellationToken cancellationToken)
+        {
+            var publicationIds = theme
+                .Publications
+                .Select(publication => publication.Id)
+                .ToList();
+
+            var deletePublicationResults = await publicationIds
+                .ToAsyncEnumerable()
+                .SelectAwait(async publicationId =>
+                    await DeleteMethodologiesForPublication(publicationId)
+                        .OnSuccess(() => DeleteReleasesForPublication(publicationId))
+                        .OnSuccess(() => DeletePublication(publicationId)))
+                .ToListAsync(cancellationToken);
+
+            return deletePublicationResults
+                .AggregateSuccessesAndFailures()
+                .OnSuccessVoid();
+        }
+
+        private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublication(
+            Guid publicationId)
         {
             var methodologyIdsToDelete = await _contentDbContext
                 .PublicationMethodologies
                 .AsQueryable()
-                .Where(pm => pm.Owner && publicationIds.Contains(pm.PublicationId))
+                .Where(pm => pm.Owner && pm.PublicationId == publicationId)
                 .Select(pm => pm.MethodologyId)
                 .ToListAsync();
 
             return await methodologyIdsToDelete
                 .Select(methodologyId => _methodologyService.DeleteMethodology(methodologyId, true))
-                .OnSuccessAll()
-                .OnSuccessVoid();
+                .OnSuccessAllReturnVoid();
         }
 
-        private async Task<Either<ActionResult, Unit>> DeleteReleasesForPublications(IEnumerable<Guid> publicationIds)
+        private async Task<Either<ActionResult, Unit>> DeleteReleasesForPublication(Guid publicationId)
         {
             var publications = await _contentDbContext
                 .Publications
-                .Where(publication => publicationIds.Contains(publication.Id))
+                .Where(publication => publication.Id == publicationId)
                 .ToListAsync();
 
             publications.ForEach(publication =>
@@ -215,145 +212,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 publication.LatestPublishedReleaseVersionId = null;
             });
 
+            _contentDbContext.UpdateRange(publications);
             await _contentDbContext.SaveChangesAsync();
 
             // Some Content Db Releases may be soft-deleted and therefore not visible.
             // Ignore the query filter to make sure they are found
-            var releaseVersionIdsToDelete = await _contentDbContext
+            var releaseVersionsToDelete = await _contentDbContext
                 .ReleaseVersions
+                .AsNoTracking()
                 .IgnoreQueryFilters()
-                .Where(rv => publicationIds.Contains(rv.PublicationId))
-                .Select(rv => new IdAndPreviousVersionIdPair<string>(rv.Id.ToString(),
-                    rv.PreviousVersionId != null ? rv.PreviousVersionId.ToString() : null))
+                .Include(rv => rv.Release)
+                .Where(rv => rv.PublicationId == publicationId)
                 .ToListAsync();
 
-            var releaseVersionIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
-                .Sort(releaseVersionIdsToDelete)
-                .Select(ids => Guid.Parse(ids.Id))
-                .ToList();
+            var releaseVersionsAndDataSetVersions = await releaseVersionsToDelete
+                .ToAsyncEnumerable()
+                .SelectAwait(async rv =>
+                {
+                    var dataSetVersions = await _dataSetVersionRepository.GetDataSetVersions(rv.Id);
 
-            // Delete release entries in the Azure Storage ReleaseStatus table - if not it will attempt to publish
-            // deleted releases that were left scheduled
-            await _releasePublishingStatusRepository.RemovePublisherReleaseStatuses(releaseVersionIdsInDeleteOrder);
+                    return new ReleaseVersionAndDataSetVersions(
+                        ReleaseVersion: rv,
+                        DataSetVersions: dataSetVersions);
+                })
+                .ToListAsync();
+
+            var releaseVersionIdsInDeleteOrder = releaseVersionsAndDataSetVersions
+                .Order(new DependentReleaseVersionDeleteOrderComparator())
+                .Select(rv => rv.ReleaseVersion.Id)
+                .ToList();
 
             return await releaseVersionIdsInDeleteOrder
-                .Select(DeleteContentAndStatsRelease)
-                .OnSuccessAll()
-                .OnSuccessVoid();
+                .Select(releaseVersionId => _releaseService.DeleteTestReleaseVersion(releaseVersionId))
+                .OnSuccessAllReturnVoid();
         }
 
-        private async Task<Either<ActionResult, Unit>> DeletePublications(IEnumerable<Guid> publicationIds)
+        private async Task<Either<ActionResult, Unit>> DeletePublication(Guid publicationId)
         {
-            var publications = await _contentDbContext
+            var publication = await _contentDbContext
                 .Publications
-                .Where(publication => publicationIds.Contains(publication.Id))
-                .ToListAsync();
+                .Include(publication => publication.Contact)
+                .SingleAsync(publication => publication.Id == publicationId);
 
-            _contentDbContext.Publications.RemoveRange(publications);
+            _contentDbContext.Publications.RemoveRange(publication);
+            _contentDbContext.Contacts.RemoveRange(publication.Contact);
             await _contentDbContext.SaveChangesAsync();
             return Unit.Instance;
-        }
-
-        private async Task<Either<ActionResult, Unit>> DeleteContentAndStatsRelease(Guid releaseVersionId)
-        {
-            var contentReleaseVersion = await _contentDbContext
-                .ReleaseVersions
-                .IgnoreQueryFilters()
-                .SingleAsync(rv => rv.Id == releaseVersionId);
-
-            if (!contentReleaseVersion.SoftDeleted)
-            {
-                var removeReleaseFilesAndCachedContent =
-                    await _releaseDataFileService.DeleteAll(releaseVersionId, forceDelete: true)
-                        .OnSuccessDo(() => _releaseFileService.DeleteAll(releaseVersionId, forceDelete: true))
-                        .OnSuccessDo(() => DeleteCachedReleaseContent(releaseVersionId));
-
-                if (removeReleaseFilesAndCachedContent.IsLeft)
-                {
-                    return removeReleaseFilesAndCachedContent;
-                }
-            }
-
-            await RemoveReleaseDependencies(releaseVersionId);
-            await DeleteStatsDbRelease(releaseVersionId);
-
-            _contentDbContext.ReleaseVersions.Remove(contentReleaseVersion);
-            await _contentDbContext.SaveChangesAsync();
-            return Unit.Instance;
-        }
-
-        private async Task DeleteStatsDbRelease(Guid releaseVersionId)
-        {
-            var statsRelease = await _statisticsDbContext
-                .ReleaseVersion
-                .AsQueryable()
-                .SingleOrDefaultAsync(rv => rv.Id == releaseVersionId);
-
-            if (statsRelease != null)
-            {
-                await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseVersionId: statsRelease.Id,
-                    softDeleteOrphanedSubjects: false);
-                _statisticsDbContext.ReleaseVersion.Remove(statsRelease);
-                await _statisticsDbContext.SaveChangesAsync();
-            }
-        }
-
-        private Task DeleteCachedReleaseContent(Guid releaseVersionId)
-        {
-            return _cacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseVersionId));
-        }
-
-        private async Task RemoveReleaseDependencies(Guid releaseVersionId)
-        {
-            var keyStats = _contentDbContext
-                .KeyStatistics
-                .Where(ks => ks.ReleaseVersionId == releaseVersionId);
-
-            _contentDbContext.KeyStatistics.RemoveRange(keyStats);
-
-            var dataBlockVersions = await _contentDbContext
-                .DataBlockVersions
-                .Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
-                .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId)
-                .ToListAsync();
-
-            var dataBlockParents = dataBlockVersions
-                .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
-                .Distinct()
-                .ToList();
-
-            // Unset the DataBlockVersion references from the DataBlockParent.
-            dataBlockParents.ForEach(dataBlockParent =>
-            {
-                dataBlockParent.LatestDraftVersionId = null;
-                dataBlockParent.LatestPublishedVersionId = null;
-            });
-
-            await _contentDbContext.SaveChangesAsync();
-
-            // Then remove the now-unreferenced DataBlockVersions.
-            _contentDbContext.DataBlockVersions.RemoveRange(dataBlockVersions);
-            await _contentDbContext.SaveChangesAsync();
-
-            // And finally, delete the DataBlockParents if they are now orphaned.
-            var orphanedDataBlockParents = dataBlockParents
-                .Where(dataBlockParent =>
-                    !_contentDbContext
-                        .DataBlockVersions
-                        .Any(dataBlockVersion => dataBlockVersion.DataBlockParentId == dataBlockParent.Id))
-                .ToList();
-
-            _contentDbContext.DataBlockParents.RemoveRange(orphanedDataBlockParents);
-            await _contentDbContext.SaveChangesAsync();
         }
 
         public async Task<Either<ActionResult, Unit>> DeleteUITestThemes(CancellationToken cancellationToken = default)
         {
             return !_themeDeletionAllowed
-                ? (Either<ActionResult, Unit>)new ForbidResult()
+                ? new ForbidResult()
                 : await _userService.CheckCanManageAllTaxonomy()
-                    .OnSuccess(_ => _contentDbContext.Themes
-                        .Where(theme => theme.Title.Contains("UI test")))
+                    .OnSuccess(async _ => (await _contentDbContext
+                            .Themes
+                            .ToListAsync(cancellationToken))
+                        .Where(theme => theme.IsTestOrSeedTheme()))
                     .OnSuccessVoid(async themes =>
                     {
                         foreach (var theme in themes)
@@ -377,7 +292,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // don't really have a mechanism to clean things up
             // properly across the entire application.
             // TODO: EES-1295 ability to completely delete releases
-            if (!theme.Title.StartsWith("UI test theme") && !theme.Title.StartsWith("Seed theme"))
+            if (!theme.IsTestOrSeedTheme())
             {
                 return new ForbidResult();
             }
@@ -406,6 +321,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(publication => publication.Theme)
                 .Distinct()
                 .ToListAsync();
+        }
+    }
+
+    public record ReleaseVersionAndDataSetVersions(
+        ReleaseVersion ReleaseVersion,
+        List<DataSetVersion> DataSetVersions);
+
+    public class DependentReleaseVersionDeleteOrderComparator : IComparer<ReleaseVersionAndDataSetVersions>
+    {
+        public int Compare(ReleaseVersionAndDataSetVersions? version1, ReleaseVersionAndDataSetVersions? version2)
+        {
+            if (version1 == null || version2 == null)
+            {
+                return Comparer<ReleaseVersionAndDataSetVersions>.Default.Compare(version1, version2);
+            }
+
+            var releaseVersion1 = version1.ReleaseVersion;
+            var releaseVersion2 = version2.ReleaseVersion;
+
+            // Compare ReleaseVersions if they both belong to the same Release ancestry.
+            if (releaseVersion1.ReleaseId == releaseVersion2.ReleaseId)
+            {
+                // Delete the most recent version first.
+                if (releaseVersion1.Version != releaseVersion2.Version)
+                {
+                    return -releaseVersion1.Version.CompareTo(releaseVersion2.Version);
+                }
+
+                // Delete non-cancelled ReleaseVersions first.
+                if (releaseVersion1.SoftDeleted != releaseVersion2.SoftDeleted)
+                {
+                    return releaseVersion1.SoftDeleted ? 1 : 0;
+                }
+
+                return -releaseVersion1.Created.CompareTo(releaseVersion2.Created);
+            }
+
+            // If one ReleaseVersion contains a later version of a Public API DataSet than the other, order it
+            // towards the top of the list so that it is deleted prior to a previous version of that DataSet
+            // being deleted.
+            foreach (var dataSetVersion in version1.DataSetVersions)
+            {
+                var matchingDataSetVersion = version2
+                    .DataSetVersions
+                    .SingleOrDefault(dsv2 => dsv2.DataSetId == dataSetVersion.DataSetId);
+
+                if (matchingDataSetVersion == null)
+                {
+                    continue;
+                }
+
+                return -dataSetVersion.SemVersion().ComparePrecedenceTo(matchingDataSetVersion.SemVersion());
+            }
+
+            // Fall back to deleting the ReleaseVersion from the newest Release series first.
+            return -releaseVersion1.Release.Created.CompareTo(releaseVersion2.Release.Created);
         }
     }
 }

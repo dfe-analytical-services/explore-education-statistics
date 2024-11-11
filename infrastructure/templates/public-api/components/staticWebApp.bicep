@@ -1,4 +1,4 @@
-import { staticWebAppSkuType } from '../types.bicep'
+import { StaticWebAppSku } from '../types.bicep'
 
 @description('Name of the resource.')
 param name string
@@ -8,7 +8,7 @@ param name string
 param location string = 'westeurope'
 
 @description('Static Web App SKU to use.')
-param sku staticWebAppSkuType = 'Free'
+param sku StaticWebAppSku = 'Free'
 
 @description('A set of tags for the resource.')
 param tagValues object
@@ -23,3 +23,5 @@ resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
   }
   properties: {}
 }
+
+output fqdn string = staticWebApp.properties.defaultHostname

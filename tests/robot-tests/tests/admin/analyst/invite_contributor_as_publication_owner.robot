@@ -4,7 +4,7 @@ Resource            ../../libs/admin-common.robot
 Resource            ../../libs/tables-common.robot
 
 Suite Setup         user signs in as bau1
-Suite Teardown      user closes the browser
+Suite Teardown      do suite teardown
 Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
@@ -12,6 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - invite contributor %{RUN_IDENTIFIER}
+${INVITEE_EMAIL}        ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
 
 
 *** Test Cases ***
@@ -53,7 +54,7 @@ Assign various release access permissions to analysts
     ...    ${PUBLICATION_NAME}
     ...    Academic year 2000/01
     ...    Contributor
-    ...    EES-test.analyst3@dfedevelopment.onmicrosoft.com
+    ...    EES-test.ANALYST3@dfedevelopment.onmicrosoft.com
 
     user gives release access to analyst
     ...    ${PUBLICATION_NAME}
@@ -110,13 +111,13 @@ Add new contributors to release
 
     user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks checkbox is checked    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
-    user checks checkbox is not checked    Analyst3 User3 (EES-test.analyst3@dfedevelopment.onmicrosoft.com)
+    user checks checkbox is not checked    Analyst3 User3 (ees-test.analyst3@dfedevelopment.onmicrosoft.com)
 
     user clicks checkbox    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
-    user clicks checkbox    Analyst3 User3 (EES-test.analyst3@dfedevelopment.onmicrosoft.com)
+    user clicks checkbox    Analyst3 User3 (ees-test.analyst3@dfedevelopment.onmicrosoft.com)
 
     user checks checkbox is not checked    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
-    user checks checkbox is checked    Analyst3 User3 (EES-test.analyst3@dfedevelopment.onmicrosoft.com)
+    user checks checkbox is checked    Analyst3 User3 (ees-test.analyst3@dfedevelopment.onmicrosoft.com)
 
     user clicks button    Update contributors
     user waits until page contains    Update release access
@@ -124,7 +125,7 @@ Add new contributors to release
 Validate contributors for 2002/03 release again
     user checks table body has x rows    1    testid:releaseContributors
     user checks table cell contains    1    1    Analyst3 User3    testid:releaseContributors
-    user checks table cell contains    1    2    EES-test.analyst3@dfedevelopment.onmicrosoft.com
+    user checks table cell contains    1    2    ees-test.analyst3@dfedevelopment.onmicrosoft.com
     ...    testid:releaseContributors
 
 Remove all analyst3 contributor access to publication
@@ -155,7 +156,7 @@ Validate contributors for 2000/01 release
 Invite brand new user
     user clicks link    Invite new contributors
     user waits until page contains    Invite a user to edit this publication
-    user enters text into element    id:inviteContributorForm-email    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
+    user enters text into element    id:inviteContributorForm-email    ${INVITEE_EMAIL}
 
     user clicks button    Invite user
     user waits until page contains    Update release access
@@ -166,7 +167,7 @@ Validate contributors for 2000/01 release again
 
     user checks table body has x rows    1    testid:releaseContributors
     user checks table cell contains    1    1    ${EMPTY}    testid:releaseContributors
-    user checks table cell contains    1    2    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
+    user checks table cell contains    1    2    ${INVITEE_EMAIL}
     ...    testid:releaseContributors
     user checks table cell contains    1    2    Pending invite    testid:releaseContributors
     user checks table cell contains    1    3    Cancel invite    testid:releaseContributors
@@ -174,7 +175,7 @@ Validate contributors for 2000/01 release again
 Cancel contributor invite
     user clicks button in table cell    1    3    Cancel invite    testid:releaseContributors
     user waits until modal is visible    Confirm cancelling of user invites
-    ...    Are you sure you want to cancel all invites to releases under this publication for email address ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk?
+    ...    Are you sure you want to cancel all invites to releases under this publication for email address ${INVITEE_EMAIL}?
     user clicks button    Confirm
     user waits until modal is not visible    Confirm cancelling of user invites
     user waits until page does not contain element    testid:releaseContributors
@@ -186,3 +187,7 @@ user clicks remove user button for row
     [Arguments]    ${text}
     ${row}=    get webelement    xpath://tbody/tr/td[.="${text}"]/..
     user clicks button    Remove    ${row}
+
+do suite teardown
+    user closes the browser
+    delete user invite via api    ${INVITEE_EMAIL}

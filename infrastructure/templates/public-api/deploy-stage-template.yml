@@ -20,7 +20,7 @@ parameters:
 
 stages:
   - stage: ${{parameters.stageName}}
-    displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
+    displayName: Deploy ${{parameters.environment}} Infrastructure and Applications
     # Prevent this stage from running in parallel with the same deploy stage in other ongoing runs of this pipeline.
     # Instead, multiple executions of this stage will be queued and run sequentially in the order that their pipelines
     # were triggered.
@@ -29,31 +29,42 @@ stages:
     variables:
       - group: Public API Infrastructure - ${{parameters.environment}}
       - group: Public API Infrastructure - ${{parameters.environment}} secrets
+      - name: dataProcessorFunctionAppName
+        value: ${{ parameters.subscription }}-ees-papi-fa-processor
+      - name: docsAppName
+        value: ${{ parameters.subscription }}-ees-papi-stapp-docs
     ${{ if not(eq(parameters.dependsOn, '')) }}:
       dependsOn: ${{parameters.dependsOn}}
     jobs:
       - deployment: Deploy
-        displayName: 'Deploy ${{parameters.environment}} Infrastructure Bicep template and applications'
-        environment: '${{parameters.environment}}'
+        displayName: Deploy ${{parameters.environment}} Infrastructure Bicep template and applications
+        environment: ${{parameters.environment}}
         strategy:
           runOnce:
             deploy:
               steps:
-                - task: Bash@3
-                  displayName: 'Set additional pipeline variables'
-                  inputs:
-                    targetType: 'inline'
-                    script: |
-                      echo "##vso[task.setvariable variable=dataProcessorFunctionAppName;]$(subscription)-ees-papi-fa-processor"
+                - download: MainBuild
+                  displayName: Download Data Processor Function App artifact
+                  artifact: public-api-data-processor
 
-                - download: EESBuildPipeline
-                  displayName: 'Download Data Processor Function App ZIP file'
-                  artifact: 'public-api-data-processor-$(upstreamPipelineBuildNumber)'
+                - download: MainBuild
+                  displayName: Download API docs artifact
+                  artifact: public-api-docs
+
+                # Workaround for deprecation warning preventing deployment token for
+                # API docs from being fetched: https://github.com/Azure/azure-cli/issues/30048
+                - task: Bash@3
+                  name: InstallAzureCLI
+                  displayName: Install Azure CLI 2.64.0 as workaround
+                  inputs:
+                    targetType: inline
+                    script: |
+                      pip install --force-reinstall azure-cli==2.64.0
 
                 - checkout: self
 
                 - task: AzureCLI@2
-                  displayName: 'Deploy bicep template to Azure'
+                  displayName: Deploy Bicep template to Azure
                   inputs:
                     azureSubscription: ${{parameters.serviceConnection}}
                     scriptType: bash
@@ -91,12 +102,33 @@ stages:
                   parameters:
                     serviceConnection: ${{parameters.serviceConnection}}
 
+                - task: AzureCLI@2
+                  displayName: Get API docs deployment token
+                  inputs:
+                    azureSubscription: ${{parameters.serviceConnection}}
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      set -e
+                      deploymentToken=`az staticwebapp secrets list -n $(docsAppName) --query "properties.apiKey" -o tsv`
+                      echo "##vso[task.setvariable variable=docsDeploymentToken;]$deploymentToken"
+
+                - task: AzureStaticWebApp@0
+                  displayName: Deploy API docs
+                  inputs:
+                    app_location: /
+                    output_location: '' # Leave this empty
+                    skip_app_build: true
+                    skip_api_build: true
+                    azure_static_web_apps_api_token: $(docsDeploymentToken)
+                    cwd: $(Pipeline.Workspace)/MainBuild/public-api-docs
+
                 # We handle the non-infrastructure appsetting and connection string configuration here rather than directly
                 # in the Bicep files so that we can implement slot swapping.
                 # Configuration changes are firstly deployed to the staging slot and combined with a fresh code deploy prior
                 # to being swapped into production.
                 - task: AzureCLI@2
-                  displayName: 'Deploy Data Processor Function App - update staging slot app settings'
+                  displayName: Deploy Data Processor Function App - update staging slot app settings
                   retryCountOnTaskFailure: 1
                   inputs:
                     azureSubscription: ${{parameters.serviceConnection}}
@@ -111,6 +143,7 @@ stages:
                         --slot staging \
                         --settings \
                           "App__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
+                          "App__EnableThemeDeletion=$(enableThemeDeletion)" \
                           "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
                           "DataFiles__BasePath=$(dataProcessorPublicApiDataFileShareMountPath)"
                       
@@ -159,7 +192,7 @@ stages:
                 # that is performing the deploy can be accessed by using the "addSpnToEnvironment" config option in the task
                 # definition and using the $(servicePrincipalId) variable.
                 - task: AzureCLI@2
-                  displayName: 'Deploy Data Processor Function App - deploy to staging slot'
+                  displayName: Deploy Data Processor Function App - deploy to staging slot
                   retryCountOnTaskFailure: 10
                   inputs:
                     azureSubscription: ${{parameters.serviceConnection}}
@@ -168,7 +201,7 @@ stages:
                     inlineScript: |
                       set -e
                       az functionapp deployment source config-zip \
-                        --src '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor-$(upstreamPipelineBuildNumber)/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
+                        --src '$(Pipeline.Workspace)/MainBuild/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
                         --name $(dataProcessorFunctionAppName) \
                         --resource-group $(resourceGroupName) \
                         --slot staging
@@ -176,7 +209,7 @@ stages:
                 # TODO EES-5128 - add Private Endpoint to Data Processor Function App into the VMSS VNet to allow DevOps to
                 # deploy the Data Processor Function App without having to temporarily make it publicly accessible.
                 - task: AzureCLI@2
-                  displayName: 'Deploy Data Processor Function App - disable public network access after deploy'
+                  displayName: Deploy Data Processor Function App - disable public network access after deploy
                   retryCountOnTaskFailure: 1
                   condition: always()
                   inputs:
@@ -195,7 +228,7 @@ stages:
                           siteConfig.publicNetworkAccess=Disabled
 
                 - task: AzureCLI@2
-                  displayName: 'Deploy Data Processor Function App - swap slots'
+                  displayName: Deploy Data Processor Function App - swap slots
                   retryCountOnTaskFailure: 1
                   inputs:
                     azureSubscription: ${{parameters.serviceConnection}}

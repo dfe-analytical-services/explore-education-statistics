@@ -192,7 +192,8 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         VerifyAllMocks(PublicBlobCacheService);
 
-        result.AssertRight([]);
+        var viewModels = result.AssertRight();
+        Assert.Empty(viewModels);
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-import { containerRegistryRoleType } from '../types.bicep'
+import { ContainerRegistryRole } from '../types.bicep'
 
 @description('Specifies the name of an existing Container Registry to be use as the scope of the role assignment')
 param containerRegistryName string
@@ -11,7 +11,7 @@ param principalIds string[]
 // roles to support here, in conjunction with the limited set of roles that the deploying service
 // principal is allowed to assign.
 @description('The Container Registry-specific role to assign')
-param role containerRegistryRoleType
+param role ContainerRegistryRole
 
 // See https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#containers for Container-specific built in role ids.
 var rolesToRoleIds = {

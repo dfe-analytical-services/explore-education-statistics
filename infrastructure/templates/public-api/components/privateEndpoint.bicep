@@ -1,4 +1,4 @@
-import { privateDnsZoneType } from '../types.bicep'
+import { PrivateDnsZone } from '../types.bicep'
 
 @description('Specifies the name of the service being connected via private endpoint')
 @minLength(0)
@@ -16,7 +16,7 @@ param subnetId string
 param location string
 
 @description('Specifies the type of service being attached to the private endpoint')
-param serviceType privateDnsZoneType
+param serviceType PrivateDnsZone
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -34,8 +34,8 @@ var serviceTypeToGroupIds = {
 var privateEndpointName = '${serviceName}-pep'
 var privateDnsZoneName = serviceTypeToDnsZoneNames[serviceType]
 
-// A private endpoint that establishes a link between a VNet and an Azure service 
-// that supports Private Link. This takes the form of an IP address that is 
+// A private endpoint that establishes a link between a VNet and an Azure service
+// that supports Private Link. This takes the form of an IP address that is
 // resolvable by a private DNS zone.
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-01-01' = {
   name: privateEndpointName
@@ -67,7 +67,7 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' existing 
   name: privateDnsZoneName
 }
 
-// The private DNS zone group establishes a hard connection between the service being 
+// The private DNS zone group establishes a hard connection between the service being
 // connected and the DNS records in the private DNS zone. It handles updates to DNS
 // records automatically.
 resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {

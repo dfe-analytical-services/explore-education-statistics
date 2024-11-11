@@ -6,7 +6,7 @@ Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../libs/tables-common.robot
 
 Suite Setup         user signs in as bau1
-Suite Teardown      user closes the browser
+Suite Teardown      do suite teardown
 Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
@@ -169,7 +169,7 @@ Check the invite emails field is invalid for invalid email addresses
 
 Invite users to the prerelease
     ${emails}=    Catenate    SEPARATOR=\n
-    ...    simulate-delivered@notifications.service.gov.uk
+    ...    simulate-delivered-prerelease-1@notifications.service.gov.uk
     ...    EES-test.ANALYST1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
@@ -177,12 +177,12 @@ Invite users to the prerelease
     user waits until element contains    ${modal}    Email notifications will be sent immediately
 
     user checks list has x items    testid:invitableList    2    ${modal}
-    user checks list item contains    testid:invitableList    1    simulate-delivered@notifications.service.gov.uk
-    ...    ${modal}
+    user checks list item contains    testid:invitableList    1
+    ...    simulate-delivered-prerelease-1@notifications.service.gov.uk    ${modal}
     user checks list item contains    testid:invitableList    2    EES-test.ANALYST1@education.gov.uk    ${modal}
     user clicks button    Confirm
     user checks table column heading contains    1    1    User email
-    user checks table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
+    user checks table cell contains    1    1    simulate-delivered-prerelease-1@notifications.service.gov.uk
     user checks table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
 
 Refresh page and check prerelease user list isn't duplicated
@@ -191,11 +191,12 @@ Refresh page and check prerelease user list isn't duplicated
     user waits until table is visible
     user checks table body has x rows    2
     user checks table cell in offset row contains    1    0    1    ees-test.analyst1@education.gov.uk
-    user checks table cell in offset row contains    2    0    1    simulate-delivered@notifications.service.gov.uk
+    user checks table cell in offset row contains    2    0    1
+    ...    simulate-delivered-prerelease-1@notifications.service.gov.uk
 
 Check the invite emails field is invalid for addresses that are all already invited or accepted
     ${emails}=    Catenate    SEPARATOR=\n
-    ...    simulate-delivered@notifications.service.gov.uk
+    ...    simulate-delivered-prerelease-1@notifications.service.gov.uk
     ...    EES-test.ANALYST1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
@@ -204,9 +205,9 @@ Check the invite emails field is invalid for addresses that are all already invi
 
 Invite a further list of new users but mixed with existing invitees and accepted users
     ${emails}=    Catenate    SEPARATOR=\n
-    ...    simulate-delivered@notifications.service.gov.uk
-    ...    simulate-delivered-2@notifications.service.gov.uk
-    ...    simulate-delivered-3@notifications.service.gov.uk
+    ...    simulate-delivered-prerelease-1@notifications.service.gov.uk
+    ...    simulate-delivered-prerelease-2@notifications.service.gov.uk
+    ...    simulate-delivered-prerelease-3@notifications.service.gov.uk
     ...    EES-test.ANALYST1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
@@ -215,17 +216,17 @@ Invite a further list of new users but mixed with existing invitees and accepted
 
     user checks list has x items    testid:invitableList    2    ${modal}
 
-    user checks list item contains    testid:invitableList    1    simulate-delivered-2@notifications.service.gov.uk
-    ...    ${modal}
-    user checks list item contains    testid:invitableList    2    simulate-delivered-3@notifications.service.gov.uk
-    ...    ${modal}
+    user checks list item contains    testid:invitableList    1
+    ...    simulate-delivered-prerelease-2@notifications.service.gov.uk    ${modal}
+    user checks list item contains    testid:invitableList    2
+    ...    simulate-delivered-prerelease-3@notifications.service.gov.uk    ${modal}
 
     user checks list has x items    testid:acceptedList    1    ${modal}
     user checks list item contains    testid:acceptedList    1    EES-test.ANALYST1@education.gov.uk    ${modal}
 
     user checks list has x items    testid:invitedList    1    ${modal}
-    user checks list item contains    testid:invitedList    1    simulate-delivered@notifications.service.gov.uk
-    ...    ${modal}
+    user checks list item contains    testid:invitedList    1
+    ...    simulate-delivered-prerelease-1@notifications.service.gov.uk    ${modal}
 
     user waits until button is enabled    Confirm    10
     user clicks button    Confirm
@@ -233,9 +234,9 @@ Invite a further list of new users but mixed with existing invitees and accepted
     user checks table column heading contains    1    1    User email
 
     user checks table cell contains    1    1    ees-test.analyst1@education.gov.uk
-    user checks table cell contains    2    1    simulate-delivered@notifications.service.gov.uk
-    user checks table cell contains    3    1    simulate-delivered-2@notifications.service.gov.uk
-    user checks table cell contains    4    1    simulate-delivered-3@notifications.service.gov.uk
+    user checks table cell contains    2    1    simulate-delivered-prerelease-1@notifications.service.gov.uk
+    user checks table cell contains    3    1    simulate-delivered-prerelease-2@notifications.service.gov.uk
+    user checks table cell contains    4    1    simulate-delivered-prerelease-3@notifications.service.gov.uk
 
 Validate prerelease has not started for Analyst user
     user changes to analyst1
@@ -579,3 +580,9 @@ user validates table rows
     user checks table cell in offset row contains    ${row}    2    1    6,060
     user checks table cell in offset row contains    ${row}    3    1    1,109
     user checks table cell in offset row contains    ${row}    4    1    1,959
+
+do suite teardown
+    user closes the browser
+    delete user invite via api    simulate-delivered-prerelease-1@notifications.service.gov.uk
+    delete user invite via api    simulate-delivered-prerelease-2@notifications.service.gov.uk
+    delete user invite via api    simulate-delivered-prerelease-3@notifications.service.gov.uk

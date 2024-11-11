@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
@@ -8,9 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class ImportStatusBauServicePermissionTests
     {
         [Fact]
-        public void GetAllIncompleteImports()
+        public async Task GetAllIncompleteImports()
         {
-            PolicyCheckBuilder()
+            await PolicyCheckBuilder()
                 .SetupCheck(SecurityPolicies.CanAccessAllImports)
                 .AssertSuccess(
                     async userService =>

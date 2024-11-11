@@ -1,4 +1,4 @@
-import { firewallRuleType, azureFileshareMountType, entraIdAuthenticationType } from '../types.bicep'
+import { FirewallRule, AzureFileshareMount, EntraIdAuthentication } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -47,7 +47,7 @@ param userAssignedManagedIdentityParams {
 }?
 
 @description('An existing App Registration registered with Entra ID that will be used to control access to this Function App')
-param entraIdAuthentication entraIdAuthenticationType?
+param entraIdAuthentication EntraIdAuthentication?
 
 @description('Specifies the SKU for the Function App hosting plan')
 param sku object
@@ -71,10 +71,10 @@ param healthCheck {
 }?
 
 @description('Specifies additional Azure Storage Accounts to make available to this Function App')
-param azureFileShares azureFileshareMountType[] = []
+param azureFileShares AzureFileshareMount[] = []
 
 @description('Specifies firewall rules for the various storage accounts in use by the Function App')
-param storageFirewallRules firewallRuleType[] = []
+param storageFirewallRules FirewallRule[] = []
 
 var reserved = appServicePlanOS == 'Linux'
 
@@ -182,10 +182,10 @@ var commonSiteProperties = {
   enabled: true
   httpsOnly: true
   serverFarmId: appServicePlan.id
-  
+
   // This property integrates the Function App into a VNet given the supplied subnet id.
   virtualNetworkSubnetId: subnetId
-  
+
   clientAffinityEnabled: true
   reserved: reserved
   siteConfig: {
@@ -396,7 +396,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     stagingOnlySettings: {
       SLOT_NAME: 'staging'
       DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
-      
+
       // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
       // resides in the specified Storage account.
       WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
@@ -404,7 +404,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     prodOnlySettings: {
       SLOT_NAME: 'production'
       DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
-      
+
       // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
       // resides in the specified Storage account.
       WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'

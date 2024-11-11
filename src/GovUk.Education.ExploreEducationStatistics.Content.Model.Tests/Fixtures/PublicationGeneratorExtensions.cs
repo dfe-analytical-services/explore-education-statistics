@@ -20,7 +20,15 @@ public static class PublicationGeneratorExtensions
             .SetDefault(p => p.Id)
             .SetDefault(p => p.Slug)
             .SetDefault(p => p.Summary)
-            .SetDefault(p => p.Title);
+            .SetDefault(p => p.Title)
+            .Set((_, p) => p.Contact = new Contact
+            {
+                Id = p.Id,
+                ContactName = $"Contact name for {p.Id}",
+                TeamEmail = "test@example.com",
+                TeamName = $"Team name for {p.Id}",
+                ContactTelNo = "01234 567890"
+            });
 
     public static Generator<Publication> WithId(
         this Generator<Publication> generator,

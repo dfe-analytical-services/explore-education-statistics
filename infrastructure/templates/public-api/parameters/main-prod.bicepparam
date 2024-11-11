@@ -15,3 +15,5 @@ param postgreSqlStorageSizeGB = 32
 param postgreSqlAutoGrowStatus = 'Disabled'
 
 param docsAppSku = 'Standard'
+
+param enableThemeDeletion = false

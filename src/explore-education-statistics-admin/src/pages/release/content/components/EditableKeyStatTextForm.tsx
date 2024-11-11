@@ -21,7 +21,6 @@ export interface KeyStatTextFormValues {
 interface EditableKeyStatTextFormProps {
   keyStat?: KeyStatisticText;
   keyStatisticGuidanceTitles?: (string | undefined)[];
-  isReordering?: boolean;
   onSubmit: (values: KeyStatTextFormValues) => void;
   onCancel: () => void;
   testId: string;
@@ -30,7 +29,6 @@ interface EditableKeyStatTextFormProps {
 export default function EditableKeyStatTextForm({
   keyStat,
   keyStatisticGuidanceTitles,
-  isReordering = false,
   onSubmit,
   onCancel,
   testId,
@@ -89,23 +87,14 @@ export default function EditableKeyStatTextForm({
               <div className={styles.textTile}>
                 <FormFieldTextInput<KeyStatTextFormValues>
                   name="title"
-                  className={classNames({
-                    'govuk-!-width-one-third': isReordering,
-                  })}
                   label={<span>Title</span>}
                 />
                 <FormFieldTextInput<KeyStatTextFormValues>
                   name="statistic"
-                  className={classNames({
-                    'govuk-!-width-one-third': isReordering,
-                  })}
                   label={<span>Statistic</span>}
                 />
                 <FormFieldTextInput<KeyStatTextFormValues>
                   name="trend"
-                  className={classNames({
-                    'govuk-!-width-one-third': isReordering,
-                  })}
                   label={<span>Trend</span>}
                 />
               </div>
@@ -113,9 +102,6 @@ export default function EditableKeyStatTextForm({
               <FormFieldTextInput<KeyStatTextFormValues>
                 formGroupClass="govuk-!-margin-top-2"
                 name="guidanceTitle"
-                className={classNames({
-                  'govuk-!-width-one-third': isReordering,
-                })}
                 label="Guidance title"
               />
 

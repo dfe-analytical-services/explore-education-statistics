@@ -1,5 +1,5 @@
 import { abbreviations } from 'abbreviations.bicep'
-import { firewallRuleType, principalNameAndIdType, staticWebAppSkuType } from 'types.bicep'
+import { FirewallRule, PrincipalNameAndId, StaticWebAppSku } from 'types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -11,7 +11,7 @@ param location string = resourceGroup().location
 param publicApiDataFileShareQuota int = 1
 
 @description('Public API Storage : Firewall rules.')
-param storageFirewallRules firewallRuleType[] = []
+param storageFirewallRules FirewallRule[] = []
 
 @description('Database : administrator login name.')
 @minLength(0)
@@ -37,16 +37,16 @@ param postgreSqlStorageSizeGB int = 32
 param postgreSqlAutoGrowStatus string = 'Disabled'
 
 @description('Database : Firewall rules.')
-param postgreSqlFirewallRules firewallRuleType[] = []
+param postgreSqlFirewallRules FirewallRule[] = []
 
 @description('Database : Entra ID admin  principal names for this resource')
-param postgreSqlEntraIdAdminPrincipals principalNameAndIdType[] = []
+param postgreSqlEntraIdAdminPrincipals PrincipalNameAndId[] = []
 
 @description('ACR : Specifies the resource group in which the shared Container Registry lives.')
 param acrResourceGroupName string = ''
 
 @description('Public API docs app : SKU to use.')
-param docsAppSku staticWebAppSkuType = 'Free'
+param docsAppSku StaticWebAppSku = 'Free'
 
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
@@ -90,6 +90,9 @@ param dataProcessorAppRegistrationClientId string = ''
 
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the API Container App.')
 param apiAppRegistrationClientId string = ''
+
+@description('Specifies whether or not test Themes can be deleted in the environment.')
+param enableThemeDeletion bool = false
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -253,6 +256,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     resourceNames: resourceNames
     apiAppRegistrationClientId: apiAppRegistrationClientId
     containerAppEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
+    containerAppEnvironmentIpAddress: containerAppEnvironmentModule.outputs.containerAppEnvironmentIpAddress
     contentApiUrl: publicUrls.contentApi
     publicApiUrl: publicUrls.publicApi
     publicSiteUrl: publicUrls.publicSite
@@ -276,21 +280,82 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = {
   }
 }
 
+var docsRewriteSetName = '${publicApiResourcePrefix}-docs-rewrites'
+
 // Create an Application Gateway to serve public traffic for the Public API Container App.
 module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp) {
-  name: 'appGatewayApplicationModuleDeploy'
+  name: 'appGatewayModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
-    publicApiContainerAppSettings: {
-      resourceName: apiAppModule.outputs.containerAppName
-      backendFqdn: apiAppModule.outputs.containerAppFqdn
-      backendDomainName: substring(apiAppModule.outputs.containerAppFqdn, indexOf(apiAppModule.outputs.containerAppFqdn, '.') + 1)
-      backendIpAddress: containerAppEnvironmentModule.outputs.containerAppEnvironmentIpAddress
-      publicFqdn: replace(publicUrls.publicApi, 'https://', '')
-      certificateName: '${apiAppModule.outputs.containerAppName}-certificate'
-      healthProbeRelativeUrl: apiAppModule.outputs.containerAppHealthProbeRelativeUrl
-    }
+    sites: [
+      {
+        name: publicApiResourcePrefix
+        certificateName: '${publicApiResourcePrefix}-certificate'
+        fqdn: replace(publicUrls.publicApi, 'https://', '')
+      }
+    ]
+    backends: [
+      {
+        name: resourceNames.publicApi.apiApp
+        fqdn: apiAppModule.outputs.containerAppFqdn
+        healthProbePath: apiAppModule.outputs.healthProbePath
+      }
+      {
+        name: resourceNames.publicApi.docsApp
+        fqdn: docsModule.outputs.appFqdn
+        healthProbePath: docsModule.outputs.healthProbePath
+      }
+    ]
+    routes: [
+      {
+        name: publicApiResourcePrefix
+        siteName: publicApiResourcePrefix
+        defaultBackendName: resourceNames.publicApi.apiApp
+        pathRules: [
+          {
+            name: 'docs-backend'
+            paths: ['/docs/*']
+            type: 'backend'
+            backendName: resourceNames.publicApi.docsApp
+            rewriteSetName: docsRewriteSetName
+          }
+          {
+            // Redirect non-rooted URL (has no trailing slash) to the
+            // rooted URL so that relative links in the docs site
+            // can resolve correctly.
+            name: 'docs-root-redirect'
+            paths: ['/docs']
+            type: 'redirect'
+            redirectUrl: '${publicUrls.publicApi}/docs/'
+            redirectType: 'Permanent'
+            includePath: false
+          }
+        ]
+      }
+    ]
+    rewrites: [
+      {
+        name: docsRewriteSetName
+        rules: [
+          {
+            name: 'trim-docs-path-prefix'
+            conditions: [
+              {
+                variable: 'var_uri_path'
+                pattern: '^/docs/(.*)'
+                ignoreCase: true
+              }
+            ]
+            actionSet: {
+              urlConfiguration: {
+                modifiedPath: '/{var_uri_path_1}'
+              }
+            }
+          }
+        ]
+      }
+    ]
     tagValues: tagValues
   }
 }
@@ -321,3 +386,5 @@ output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreSto
 output keyVaultName string = resourceNames.existingResources.keyVault
 
 output dataProcessorPublicApiDataFileShareMountPath string = dataProcessorModule.outputs.publicApiDataFileShareMountPath
+
+output enableThemeDeletion bool = enableThemeDeletion
