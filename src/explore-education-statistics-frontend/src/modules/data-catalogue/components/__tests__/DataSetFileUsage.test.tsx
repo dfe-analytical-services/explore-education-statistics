@@ -60,7 +60,7 @@ describe('DataSetFileUsage', () => {
       }),
     ).toHaveAttribute(
       'href',
-      'https://dfe-analytical-services.github.io/explore-education-statistics-api-docs',
+      'https://dev.statistics.api.education.gov.uk/docs',
     );
   });
 
