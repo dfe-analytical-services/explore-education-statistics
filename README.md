@@ -193,7 +193,7 @@ The service can be started against a set of non-existent database. If no pre-exi
 1. Start the SQL Server Docker container:
 
    ```
-   docker-compose up -d db
+   docker compose up -d db
    ```
 
 2. Create empty `content` and `statistics` databases.
@@ -252,7 +252,7 @@ The Azurite Docker container can be started by one of the following methods:
 3. Directly via Docker Compose
 
     ```bash
-    docker-compose up data-storage
+    docker compose up data-storage
     ```
 
 ### Setting up an Identity Provider (IdP)
@@ -284,7 +284,7 @@ The Keycloak Docker container can be started by one of the following methods:
 
    ```bash
    src
-   docker-compose up idp
+   docker compose up idp
    ```
 
 All the standard seed data users can be supported with Keycloak, and use their standard email addresses and the
@@ -316,7 +316,7 @@ To do this, you can run one of the following:
 pnpm start idp --rebuild-docker
 
 # Using Docker
-docker-compose up --build --force-recreate idp
+docker compose up --build --force-recreate idp
 ```
 
 #### Using a custom Identity Provider
@@ -735,7 +735,7 @@ blobs, queues and tables. This is typically done at the same time as resetting t
 To delete all data in Azurite simply delete the Azurite docker container, remove the Azurite volume and recreate it:
 
 ```bash
-docker-compose up data-storage
+docker compose up data-storage
 ```
 
 
