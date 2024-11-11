@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Assert.Equal("http://localhost:3000", viewModel.PublicAppUrl);
             Assert.Equal("http://localhost:5050", viewModel.PublicApiUrl);
             Assert.Equal(
-                "https://dfe-analytical-services.github.io/explore-education-statistics-api-docs",
+                "https://dev.statistics.api.education.gov.uk/docs",
                 viewModel.PublicApiDocsUrl
             );
             Assert.Equal(
