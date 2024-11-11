@@ -7,6 +7,7 @@ import Yup from '@common/validation/yup';
 import render from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
+import FormFieldTextInput from '../FormFieldTextInput';
 
 describe('Form', () => {
   test('renders error summary from form errors when form is submitted', async () => {
@@ -139,6 +140,37 @@ describe('Form', () => {
         screen.queryByText('Line 2 of address is required'),
       ).toBeInTheDocument();
     });
+  });
+
+  test('calls `onChange` handler as form values are updated', async () => {
+    const handleChange = jest.fn();
+
+    const { user } = render(
+      <FormProvider
+        initialValues={{
+          firstName: '',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+      >
+        <Form id="test-form" onChange={handleChange} onSubmit={jest.fn()}>
+          The form
+          <FormFieldTextInput label="First name" name="firstName" />
+          <button type="submit">Submit</button>
+        </Form>
+      </FormProvider>,
+    );
+
+    const firstName = 'first name';
+
+    await user.type(screen.getByLabelText('First name'), firstName);
+
+    await waitFor(() => {
+      expect(handleChange).toHaveBeenCalledTimes(firstName.length);
+    });
+
+    expect(handleChange).toHaveBeenCalledWith({ firstName });
   });
 
   test('calls `onSubmit` handler when form is submitted successfully', async () => {

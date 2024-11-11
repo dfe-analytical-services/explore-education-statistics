@@ -143,11 +143,11 @@ export default function ChartBoundaryLevelsForm({
             {hasDataSetBoundaryLevels && dataSetRows.length > 1 && (
               <>
                 <h4>Set boundary levels per data set</h4>
-                <table data-testid="chart-dataset-boundary-levels">
+                <table data-testid="data-set-boundary-levels">
                   <thead>
                     <tr>
                       <th>Data set</th>
-                      <th>Boundary</th>
+                      <th>Boundary level</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -157,7 +157,7 @@ export default function ChartBoundaryLevelsForm({
                           <td>{label}</td>
                           <td>
                             <FormFieldSelect
-                              label={`Boundary level for dataset: ${label}`}
+                              label={`Boundary level for data set: ${label}`}
                               hideLabel
                               name={`dataSetConfigs[${index}].boundaryLevel`}
                               order={[]}
