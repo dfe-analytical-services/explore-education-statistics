@@ -6,7 +6,7 @@ import {
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import baseRender from '@common-test/render';
 import { defaultDataGrouping } from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React, { ReactElement } from 'react';
 
@@ -320,5 +320,78 @@ describe('ChartDataGroupingsConfiguration', () => {
 
     expect(await screen.findByText('Cannot save chart')).toBeInTheDocument();
     expect(screen.getByText('Options tab is invalid')).toBeInTheDocument();
+  });
+
+  test('making a data grouping change and submitting the form', async () => {
+    const handleChange = jest.fn();
+    const handleSubmit = jest.fn();
+
+    const { user } = render(
+      <ChartDataGroupingsConfiguration
+        meta={testTable.subjectMeta}
+        map={{
+          dataSetConfigs: [
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2014_AY',
+              },
+            },
+            {
+              dataGrouping: defaultDataGrouping,
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+            },
+          ],
+        }}
+        onSubmit={handleSubmit}
+        onChange={handleChange}
+      />,
+    );
+
+    await user.click(screen.getAllByRole('button', { name: 'Edit' })[0]);
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText('Edit groupings')).toBeInTheDocument();
+
+    await user.click(screen.getByLabelText('Quantiles'));
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+
+    await waitFor(() => {
+      expect(handleChange).toHaveBeenCalledTimes(1);
+      expect(handleChange).toHaveBeenCalledWith({
+        dataSetConfigs: [
+          {
+            dataGrouping: { ...defaultDataGrouping, type: 'Quantiles' },
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2014_AY',
+            },
+          },
+          {
+            dataGrouping: defaultDataGrouping,
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2015_AY',
+            },
+          },
+        ],
+      });
+    });
+
+    await user.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
+
+    await waitFor(() => {
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+    });
   });
 });

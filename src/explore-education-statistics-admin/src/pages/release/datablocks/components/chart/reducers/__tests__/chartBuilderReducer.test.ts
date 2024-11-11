@@ -6,10 +6,12 @@ import {
   useChartBuilderReducer,
 } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
+import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
 import {
   AxisConfiguration,
   AxisType,
   ChartDefinition,
+  DataGroupingConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
@@ -105,8 +107,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialState, action);
 
@@ -118,8 +118,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialState, {
         type: 'UPDATE_CHART_DEFINITION',
@@ -145,8 +143,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialState, action);
 
@@ -190,8 +186,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialStateWithOptions, action);
 
@@ -228,8 +222,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialState, action);
 
@@ -294,8 +286,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialStateWithAxes, action);
 
@@ -351,8 +341,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialState, action);
 
@@ -397,8 +385,6 @@ describe('chartBuilderReducer', () => {
           chartBuilderReducer({
             data: [],
             meta: testFullTable.subjectMeta,
-            tableTitle: undefined,
-            chart: undefined,
           }),
         )(initialState, action);
       }).toThrow("Could not find chart axis definition for type 'not valid'");
@@ -435,8 +421,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialState, action);
 
@@ -479,8 +463,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialStateWithExistingOptions, action);
 
@@ -524,8 +506,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialStateWithExistingOptions, action);
 
@@ -573,8 +553,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialState, action);
 
@@ -611,8 +589,6 @@ describe('chartBuilderReducer', () => {
         chartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
-          chart: undefined,
         }),
       )(initialState, {
         type: 'RESET',
@@ -625,6 +601,97 @@ describe('chartBuilderReducer', () => {
     });
   });
 
+  describe('UPDATE_MAP_BOUNDARY_LEVELS', () => {
+    const initialState: ChartBuilderState = {
+      axes: {},
+      options: {
+        height: 300,
+        subtitle: '',
+        title: '',
+        titleType: 'default',
+        alt: '',
+      },
+      map: {
+        dataSetConfigs: [
+          {
+            dataSet: { filters: [] },
+            dataGrouping: { type: 'EqualIntervals', customGroups: [] },
+          },
+        ],
+      },
+    };
+
+    test('sets the boundary level to the payload boundaryLevel', () => {
+      const action: ChartBuilderActions = {
+        type: 'UPDATE_MAP_BOUNDARY_LEVELS',
+        payload: {
+          boundaryLevel: 2,
+          dataSetConfigs: [{ dataSet: { filters: [] }, boundaryLevel: 1 }],
+        },
+      };
+
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+        }),
+      )(initialState, action);
+
+      expect(nextState.options?.boundaryLevel).toEqual(2);
+      expect(nextState.map?.dataSetConfigs[0]?.boundaryLevel).toEqual(1);
+    });
+  });
+
+  describe('UPDATE_MAP_DATA_GROUPINGS', () => {
+    const initialState: ChartBuilderState = {
+      axes: {},
+      options: {
+        height: 300,
+        subtitle: '',
+        title: '',
+        titleType: 'default',
+        alt: '',
+      },
+      map: {
+        dataSetConfigs: [
+          {
+            dataSet: { filters: [] },
+            dataGrouping: { type: 'EqualIntervals', customGroups: [] },
+          },
+        ],
+      },
+    };
+    test('sets the dataGrouping to the payload dataGrouping', () => {
+      const testDataGrouping: DataGroupingConfig = {
+        type: 'Custom',
+        customGroups: [{ min: 0, max: 999 }],
+        numberOfGroups: 1,
+      };
+      const action: ChartBuilderActions = {
+        type: 'UPDATE_MAP_DATA_GROUPINGS',
+        payload: {
+          dataSetConfigs: [
+            {
+              dataSet: { filters: [] },
+              dataGrouping: testDataGrouping,
+            },
+          ],
+        },
+      };
+
+      const nextState = produce(
+        chartBuilderReducer({
+          data: [],
+          meta: testFullTable.subjectMeta,
+        }),
+      )(initialState, action);
+
+      expect(nextState.map?.dataSetConfigs[0]?.dataGrouping).toEqual(
+        testDataGrouping,
+      );
+    });
+  });
+
   describe('useChartBuilderReducer', () => {
     test('has correct state when no initial configuration', () => {
       const { result } = renderHook(() =>
@@ -632,7 +699,6 @@ describe('chartBuilderReducer', () => {
           data: [],
           meta: testFullTable.subjectMeta,
           tableTitle: 'Table title',
-          chart: undefined,
         }),
       );
 
@@ -921,7 +987,7 @@ describe('chartBuilderReducer', () => {
         useChartBuilderReducer({
           data: [],
           meta: testFullTable.subjectMeta,
-          tableTitle: undefined,
+
           chart: initialConfiguration,
         }),
       );
@@ -1069,6 +1135,331 @@ describe('chartBuilderReducer', () => {
           position: 'top',
           items: [],
         },
+      });
+    });
+
+    test('has correct state with initial configuration for a map', () => {
+      const initialConfiguration: Chart = {
+        legend: {
+          position: 'top',
+          items: [],
+        },
+        axes: {
+          major: {
+            type: 'major',
+            dataSets: [
+              {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+              {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2014_AY',
+              },
+            ],
+            referenceLines: [],
+          },
+        },
+        type: 'map',
+        height: 300,
+        title: 'Chart title',
+        alt: '',
+        boundaryLevel: 1,
+      };
+
+      const { result } = renderHook(() =>
+        useChartBuilderReducer({
+          data: testFullTable.results,
+          meta: testFullTable.subjectMeta,
+          tableTitle: 'Table title',
+          chart: initialConfiguration,
+        }),
+      );
+
+      expect(result.current.state).toEqual<ChartBuilderState>({
+        axes: {
+          major: {
+            type: 'major',
+            groupBy: 'locations',
+            dataSets: [
+              {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+              {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2014_AY',
+              },
+            ],
+            referenceLines: [],
+            visible: true,
+            label: {
+              text: '',
+            },
+          },
+        },
+        definition: mapBlockDefinition,
+        map: {
+          dataSetConfigs: [
+            {
+              dataGrouping: {
+                customGroups: [],
+                numberOfGroups: 5,
+                type: 'EqualIntervals',
+              },
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+            },
+            {
+              dataGrouping: {
+                customGroups: [],
+                numberOfGroups: 5,
+                type: 'EqualIntervals',
+              },
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2014_AY',
+              },
+            },
+          ],
+        },
+        options: {
+          alt: '',
+          height: 300,
+          subtitle: '',
+          title: 'Chart title',
+          titleType: 'alternative',
+          boundaryLevel: 1,
+        },
+        legend: {
+          position: 'top',
+          items: [],
+        },
+      });
+    });
+
+    test('setting boundary levels does not change data groupings', () => {
+      const initialConfiguration: Chart = {
+        legend: {
+          position: 'top',
+          items: [],
+        },
+        axes: {
+          major: {
+            type: 'major',
+            dataSets: [
+              {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+              {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2014_AY',
+              },
+            ],
+            referenceLines: [],
+          },
+        },
+        type: 'map',
+        height: 300,
+        title: 'Chart title',
+        alt: '',
+        boundaryLevel: 1,
+        map: {
+          dataSetConfigs: [
+            {
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+              dataGrouping: { type: 'EqualIntervals', customGroups: [] },
+              boundaryLevel: 2,
+            },
+            {
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2014_AY',
+              },
+              dataGrouping: { type: 'Custom', customGroups: [] },
+              boundaryLevel: 3,
+            },
+          ],
+        },
+      };
+
+      const { result, rerender } = renderHook(() =>
+        useChartBuilderReducer({
+          data: testFullTable.results,
+          meta: testFullTable.subjectMeta,
+          tableTitle: 'Table title',
+          chart: initialConfiguration,
+        }),
+      );
+
+      result.current.actions.updateMapBoundaryLevels({
+        boundaryLevel: 10,
+        dataSetConfigs: [
+          {
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2015_AY',
+            },
+            boundaryLevel: 20,
+          },
+          {
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2014_AY',
+            },
+            boundaryLevel: 30,
+          },
+        ],
+      });
+      rerender();
+
+      expect(result.current.state.map).toEqual<ChartBuilderState['map']>({
+        dataSetConfigs: [
+          {
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2015_AY',
+            },
+            dataGrouping: { type: 'EqualIntervals', customGroups: [] },
+            boundaryLevel: 20,
+          },
+          {
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2014_AY',
+            },
+            dataGrouping: { type: 'Custom', customGroups: [] },
+            boundaryLevel: 30,
+          },
+        ],
+      });
+    });
+
+    test('setting data groupings does not change boundary levels', () => {
+      const initialConfiguration: Chart = {
+        legend: {
+          position: 'top',
+          items: [],
+        },
+        axes: {
+          major: {
+            type: 'major',
+            dataSets: [
+              {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+              {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2014_AY',
+              },
+            ],
+            referenceLines: [],
+          },
+        },
+        type: 'map',
+        height: 300,
+        title: 'Chart title',
+        alt: '',
+        boundaryLevel: 1,
+        map: {
+          dataSetConfigs: [
+            {
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2015_AY',
+              },
+              dataGrouping: { type: 'EqualIntervals', customGroups: [] },
+              boundaryLevel: 2,
+            },
+            {
+              dataSet: {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+                timePeriod: '2014_AY',
+              },
+              dataGrouping: { type: 'Custom', customGroups: [] },
+              boundaryLevel: 3,
+            },
+          ],
+        },
+      };
+
+      const { result, rerender } = renderHook(() =>
+        useChartBuilderReducer({
+          data: testFullTable.results,
+          meta: testFullTable.subjectMeta,
+          tableTitle: 'Table title',
+          chart: initialConfiguration,
+        }),
+      );
+
+      result.current.actions.updateMapDataGroupings({
+        dataSetConfigs: [
+          {
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2015_AY',
+            },
+            dataGrouping: { type: 'Quantiles', customGroups: [] },
+          },
+          {
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2014_AY',
+            },
+            dataGrouping: { type: 'Quantiles', customGroups: [] },
+          },
+        ],
+      });
+      rerender();
+
+      expect(result.current.state.map).toEqual<ChartBuilderState['map']>({
+        dataSetConfigs: [
+          {
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2015_AY',
+            },
+            dataGrouping: { type: 'Quantiles', customGroups: [] },
+            boundaryLevel: 2,
+          },
+          {
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2014_AY',
+            },
+            dataGrouping: { type: 'Quantiles', customGroups: [] },
+            boundaryLevel: 3,
+          },
+        ],
       });
     });
   });
