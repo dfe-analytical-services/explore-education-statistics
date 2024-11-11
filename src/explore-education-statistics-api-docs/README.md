@@ -19,7 +19,7 @@ If you are using Ubuntu, you may need to install the following dependencies befo
 Ruby and its required gems:
 
 ```shell
-sudo apt install libssl-dev libyaml-dev
+sudo apt install build-essential zlib1g-dev libssl-dev libyaml-dev
 ```
 
 ## Getting started
