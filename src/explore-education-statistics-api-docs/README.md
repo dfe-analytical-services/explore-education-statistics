@@ -40,9 +40,33 @@ Once the pre-requisites have been installed, follow these steps:
 
     This will start the Middleman development server on [https://localhost:4567](https://localhost:4567).
 
-3. Optional. To automatically refresh the browser upon code changes, install the [LiveReload browser extension](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei?hl=en).
+3. **Optional** - To automatically refresh the browser upon code changes, install the [LiveReload browser extension](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei?hl=en).
 
 For further guidance on how to develop this documentation, please visit the [Technical Documentation Template](https://tdt-documentation.london.cloudapps.digital/) website.
+
+## Configuration
+
+The project is configured via the `config/tech_docs.yml` file, which should contain the base defaults.
+Some parts of the project config can be changed on a per-environment basis using a `.env` file, 
+system environment variables or both.
+
+The environment variables permitted and the config options they affect can be found in `config.rb`.
+
+### Using `.env` file
+
+For convenience during local development, an `.env` file can be used to set environment variables. 
+Simply create a `.env` file in the project root and add any environment variables you want to set.
+
+Environment variables will only override default config options if they are present in `.env`.
+Omit any variables you aren't interested in changing.
+
+### Using system environment variables
+
+Simply add environment variables to your task runner or CLI command e.g.
+
+```shell
+TECH_DOCS_HOST=https://some-other-site bundle exec middleman 
+```
 
 ## Notifications for expired pages
 

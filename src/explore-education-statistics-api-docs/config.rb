@@ -1,3 +1,4 @@
+require 'dotenv'
 require 'govuk_tech_docs'
 require 'lib/api_reference_pages_extension'
 require 'lib/helpers'
@@ -6,6 +7,8 @@ require 'lib/govuk_tech_docs/path_helpers'
 
 # Check for broken links
 require 'html-proofer'
+
+Dotenv.load('.env')
 
 GovukTechDocs.configure(self, livereload: { js_host: "localhost", host: "127.0.0.1" })
 
