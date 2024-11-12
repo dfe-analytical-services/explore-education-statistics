@@ -4,7 +4,11 @@ import _userService, {
 } from '@admin/services/userService';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import { render } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import userEvent from '@testing-library/user-event';
+import { waitFor } from '@testing-library/dom';
 import BauUsersPage from '../BauUsersPage';
 
 jest.mock('@admin/services/userService');
@@ -30,23 +34,29 @@ describe('BauUsersPage', () => {
 
     renderPage();
 
-    // await waitFor(() => { // EES-5573
-    //   expect(screen.getByText('Delete')).toBeInTheDocument();
-    // });
+    await waitFor(() => {
+      expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
   });
 
   test('calls user service when delete user button is clicked', async () => {
     userService.getUsers.mockResolvedValue(user);
     userService.deleteUser.mockResolvedValue(Promise.resolve(removedUser));
-
     renderPage();
 
-    // await waitFor(() => { // EES-5573
-    //   expect(screen.getByText('Delete')).toBeInTheDocument();
-    // });
-    // await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
-    //
-    // expect(userService.deleteUser).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Confirm you want to delete this user'),
+      ).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+    expect(userService.deleteUser).toHaveBeenCalled();
   });
 
   function renderPage() {
