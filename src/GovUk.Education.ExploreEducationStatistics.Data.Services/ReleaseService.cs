@@ -173,6 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .ContentBlocks
                     .Where(block => block.ReleaseVersionId == releaseVersionId)
                     .OfType<DataBlock>()
+                    .Select(db => new { db.Id, db.Query })
                     .ToListAsync()) // we need to materialise the list access `dataBlock.Query.SubjectId` as `Query` is json
                 .Where(dataBlock => publishedSubjectIds.Contains(dataBlock.Query.SubjectId))
                 .ToList();
