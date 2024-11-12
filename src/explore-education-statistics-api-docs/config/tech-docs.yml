@@ -1,5 +1,5 @@
 # Host to use for canonical URL generation (without trailing slash)
-host: https://docs.statistics.api.education.gov.uk
+host: https://statistics.api.education.gov.uk/docs
 contact_email: explore.statistics@education.gov.uk
 
 # Header-related options
