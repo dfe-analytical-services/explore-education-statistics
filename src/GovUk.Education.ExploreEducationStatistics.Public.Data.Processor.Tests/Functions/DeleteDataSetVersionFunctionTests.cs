@@ -1,5 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -20,6 +22,12 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
 {
     public class DeleteDataSetVersionTests : DeleteDataSetVersionFunctionTests
     {
+        public static readonly TheoryData<Tuple<DataSetVersionStatus, DataSetVersionType>>
+            DeletableStatusesAndVersionTypes = new(
+                DataSetVersionStatusTheoryData
+                    .DeletableStatusList
+                    .Cartesian(EnumUtil.GetEnums<DataSetVersionType>()));
+        
         private readonly IDataSetVersionPathResolver _dataSetVersionPathResolver;
 
         public DeleteDataSetVersionTests(ProcessorFunctionsIntegrationTestFixture fixture) : base(fixture)
@@ -121,10 +129,12 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
         }
 
         [Theory]
-        [MemberData(nameof(DataSetVersionStatusTheoryData.DeletableStatuses),
-            MemberType = typeof(DataSetVersionStatusTheoryData))]
-        public async Task Success_SubsequentDataSetVersion(DataSetVersionStatus dataSetVersionStatus)
+        [MemberData(nameof(DeletableStatusesAndVersionTypes))]
+        public async Task Success_SubsequentDataSetVersion(
+            Tuple<DataSetVersionStatus, DataSetVersionType> statusAndVersionType)
         {
+            var (status, versionType) = statusAndVersionType;
+            
             var releaseFiles = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
                     .WithPublication(DataFixture.DefaultPublication()))
@@ -161,8 +171,11 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
 
             DataSetVersion draftDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .WithVersionNumber(major: 2, minor: 0, patch: 1)
-                .WithStatus(dataSetVersionStatus)
+                .WithVersionNumber(
+                    major: versionType == DataSetVersionType.Major ? 2 : 1,
+                    minor: versionType == DataSetVersionType.Major ? 0 : 1,
+                    patch: 0)
+                .WithStatus(status)
                 .WithDataSet(dataSet)
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease()
                     .WithReleaseFileId(draftReleaseFile.Id))
@@ -186,7 +199,9 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 context.ReleaseFiles.UpdateRange(liveReleaseFile, draftReleaseFile));
 
             var liveDataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(liveDataSetVersion);
-            var draftDataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(draftDataSetVersion);
+            var draftDataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(
+                dataSetVersion: draftDataSetVersion,
+                versionNumber: liveDataSetVersion.DefaultNextVersion());
 
             Directory.CreateDirectory(liveDataSetVersionDirectory);
             Directory.CreateDirectory(draftDataSetVersionDirectory);

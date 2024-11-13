@@ -466,6 +466,41 @@ public class EnumerableExtensionsTests
         Assert.True(containsAll);
     }
 
+    public class CartesianTests
+    {
+        [Fact]
+        public void Cartesian()
+        {
+            List<int> list1 = [1, 2];
+            List<string> list2 = ["3", "4"];
+
+            List<Tuple<int, string>> expected =
+            [
+                new Tuple<int, string>(1, "3"),
+                new Tuple<int, string>(1, "4"),
+                new Tuple<int, string>(2, "3"),
+                new Tuple<int, string>(2, "4")
+            ];
+
+            var actual = list1.Cartesian(list2);
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void EmptyList()
+        {
+            List<int> list1 = [1, 2];
+            Assert.Empty(list1.Cartesian(new List<string>()));
+        }
+        
+        [Fact]
+        public void NullList()
+        {
+            List<int> list1 = [1, 2];
+            Assert.Empty(list1.Cartesian((List<string>?) null));
+        }
+    }
+
     private static async Task<Either<Unit, int>> GetSuccessfulEither(int value)
     {
         await Task.Delay(5);

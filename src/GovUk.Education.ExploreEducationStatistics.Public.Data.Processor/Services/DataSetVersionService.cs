@@ -78,7 +78,7 @@ internal class DataSetVersionService(
                 .OnSuccessDo(async releaseFilesAndDataSetVersions =>
                     await DeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, cancellationToken))
                 .OnSuccessVoid(releaseFilesAndDataSetVersions =>
-                    DeleteDuckDbFiles(releaseFilesAndDataSetVersions.dataSetVersions)));
+                    DeleteDataSetVersionsFiles(releaseFilesAndDataSetVersions.dataSetVersions)));
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteVersion(
@@ -92,7 +92,7 @@ internal class DataSetVersionService(
                     forceDeleteAll: false))
                 .OnSuccessDo(async dataSetVersion => await UpdateReleaseFiles(dataSetVersion, cancellationToken))
                 .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
-                .OnSuccessVoid(DeleteDuckDbFiles));
+                .OnSuccessVoid(async dataSetVersion => await DeleteDataSetVersionFiles(dataSetVersion, cancellationToken)));
     }
 
     private async Task<Either<ActionResult, IReadOnlyList<DataSetVersion>>> GetDataSetVersions(
@@ -256,24 +256,28 @@ internal class DataSetVersionService(
         releaseFile.PublicApiDataSetVersion = null;
     }
 
-    private void DeleteDuckDbFiles(IReadOnlyList<DataSetVersion> dataSetVersions)
+    private async Task DeleteDataSetVersionsFiles(
+        IReadOnlyList<DataSetVersion> dataSetVersions,
+        CancellationToken cancellationToken = default)
     {
-        foreach (var dataSetVersion in dataSetVersions)
-        {
-            DeleteDuckDbFiles(dataSetVersion);
-        }
+        await dataSetVersions
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(
+                dataSetVersion => DeleteDataSetVersionFiles(dataSetVersion, cancellationToken), 
+                cancellationToken);
     }
 
-    private void DeleteDuckDbFiles(DataSetVersion dataSetVersion)
+    private async Task DeleteDataSetVersionFiles(
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken = default)
     {
         if (dataSetVersion.IsFirstVersion)
         {
             DeleteDataSetDirectory(dataSetVersion);
-
             return;
         }
 
-        DeleteDataSetVersionDirectory(dataSetVersion);
+        await DeleteDataSetVersionDirectory(dataSetVersion, cancellationToken);
     }
 
     private void DeleteDataSetDirectory(DataSetVersion dataSetVersion)
@@ -283,11 +287,21 @@ internal class DataSetVersionService(
         DeleteDirectoryIfExists(dataSetDirectory);
     }
 
-    private void DeleteDataSetVersionDirectory(DataSetVersion dataSetVersion)
+    private async Task DeleteDataSetVersionDirectory(
+        DataSetVersion dataSetVersion,
+        CancellationToken cancellationToken = default)
     {
-        var directory = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
+        var currentLiveVersion = await publicDataDbContext
+            .DataSets
+            .Where(dataSet => dataSet.Id == dataSetVersion.DataSetId)
+            .Select(dataSet => dataSet.LatestLiveVersion!)
+            .SingleAsync(cancellationToken);
 
-        DeleteDirectoryIfExists(directory);
+        var originalPath = dataSetVersionPathResolver.DirectoryPath(
+            dataSetVersion: dataSetVersion,
+            versionNumber: currentLiveVersion.DefaultNextVersion());
+        
+        DeleteDirectoryIfExists(originalPath);
     }
 
     private string GetDataSetDirectory(DataSetVersion dataSetVersion)

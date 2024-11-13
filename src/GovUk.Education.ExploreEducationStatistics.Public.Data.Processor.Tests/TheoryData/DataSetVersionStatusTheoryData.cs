@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests
 
 public static class DataSetVersionStatusTheoryData
 {
-    private static readonly List<DataSetVersionStatus> DeletableStatusList =
+    public static readonly List<DataSetVersionStatus> DeletableStatusList =
     [
         DataSetVersionStatus.Failed,
         DataSetVersionStatus.Mapping,
