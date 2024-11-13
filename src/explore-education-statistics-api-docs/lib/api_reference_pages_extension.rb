@@ -33,8 +33,6 @@ class ApiReferencePagesExtension < Middleman::Extension
 
     new_resources = []
 
-    @base_url = document.servers[0]&.url || ""
-
     document.paths.each do |uri, http_methods|
       get_operations(http_methods).each do |http_method, operation|
         new_resources << create_endpoint_page(uri, http_method, operation)
@@ -77,7 +75,7 @@ class ApiReferencePagesExtension < Middleman::Extension
   # @param [String] uri
   # @return [String]
   def api_url(uri = "")
-    @base_url.chomp("/") + uri
+    @config[:api_url].chomp("/") + uri
   end
 
   private

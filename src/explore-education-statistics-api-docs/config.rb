@@ -15,11 +15,15 @@ GovukTechDocs.configure(self, livereload: { js_host: "localhost", host: "127.0.0
 # Override config from environment variables
 
 if ENV.has_key?("TECH_DOCS_HOST")
-  config[:tech_docs][:host] = ENV["TECH_DOCS_HOST"] || config[:tech_docs][:host]
+  config[:tech_docs][:host] = ENV["TECH_DOCS_HOST"]
 end
 
 if ENV.has_key?("TECH_DOCS_PREVENT_INDEXING")
   config[:tech_docs][:prevent_indexing] = ENV["TECH_DOCS_PREVENT_INDEXING"]
+end
+
+if ENV.has_key?("TECH_DOCS_API_URL")
+  config[:tech_docs][:api_url] = ENV["TECH_DOCS_API_URL"]
 end
 
 if ENV.has_key?("TECH_DOCS_API_DOCS_PATH")
