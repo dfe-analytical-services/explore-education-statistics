@@ -75,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<Contact> Contacts { get; set; }
         public virtual DbSet<Update> Update { get; set; }
         public virtual DbSet<PublicationRedirect> PublicationRedirects { get; set; }
+        public virtual DbSet<ReleaseRedirect> ReleaseRedirects { get; set; }
         public virtual DbSet<MethodologyRedirect> MethodologyRedirects { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
@@ -635,6 +636,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         {
             modelBuilder.Entity<PublicationRedirect>()
                 .HasKey(pr => new { pr.PublicationId, pr.Slug });
+
+            modelBuilder.Entity<ReleaseRedirect>()
+                .HasKey(rr => new { rr.ReleaseId, rr.Slug });
 
             modelBuilder.Entity<MethodologyRedirect>()
                 .HasKey(mr => new { mr.MethodologyVersionId, mr.Slug });
