@@ -297,11 +297,20 @@ internal class DataSetVersionService(
             .Select(dataSet => dataSet.LatestLiveVersion!)
             .SingleAsync(cancellationToken);
 
-        var originalPath = dataSetVersionPathResolver.DirectoryPath(
-            dataSetVersion: dataSetVersion,
-            versionNumber: currentLiveVersion.DefaultNextVersion());
+        var originalNextMinorVersion = currentLiveVersion.DefaultNextVersion();
         
-        DeleteDirectoryIfExists(originalPath);
+        var originalDraftFolderName = dataSetVersionPathResolver.DirectoryPath(
+            dataSetVersion: dataSetVersion,
+            versionNumber: originalNextMinorVersion);
+        
+        DeleteDirectoryIfExists(originalDraftFolderName);
+
+        var currentVersionFolderName = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
+
+        if (currentVersionFolderName != originalDraftFolderName)
+        {
+            DeleteDirectoryIfExists(currentVersionFolderName);
+        }
     }
 
     private string GetDataSetDirectory(DataSetVersion dataSetVersion)

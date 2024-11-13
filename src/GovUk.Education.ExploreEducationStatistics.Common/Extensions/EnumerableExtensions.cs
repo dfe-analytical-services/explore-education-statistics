@@ -328,5 +328,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 ? [] 
                 : list1.Join(list2, _ => true, _ => true,(t1, t2) => new Tuple<T1, T2>(t1, t2));
         }
+        
+        public static IEnumerable<Tuple<T1, T2, T3>> Cartesian<T1, T2, T3>(
+            this IEnumerable<T1> list1,
+            IEnumerable<T2>? list2,
+            IEnumerable<T3>? list3)
+        {
+            return list2 == null || list3 == null
+                ? [] 
+                : list1
+                    .Join(list2, _ => true, _ => true, (t1, t2) => new Tuple<T1, T2>(t1, t2))
+                    .Join(list3, _ => true, _ => true, (tuple, t3) => new Tuple<T1, T2, T3>(tuple.Item1, tuple.Item2, t3));
+        }
     }
 }

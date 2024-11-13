@@ -22,12 +22,6 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
 {
     public class DeleteDataSetVersionTests : DeleteDataSetVersionFunctionTests
     {
-        public static readonly TheoryData<Tuple<DataSetVersionStatus, DataSetVersionType>>
-            DeletableStatusesAndVersionTypes = new(
-                DataSetVersionStatusTheoryData
-                    .DeletableStatusList
-                    .Cartesian(EnumUtil.GetEnums<DataSetVersionType>()));
-        
         private readonly IDataSetVersionPathResolver _dataSetVersionPathResolver;
 
         public DeleteDataSetVersionTests(ProcessorFunctionsIntegrationTestFixture fixture) : base(fixture)
@@ -127,13 +121,21 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
             Assert.Null(updatedReleaseFile.PublicApiDataSetId);
             Assert.Null(updatedReleaseFile.PublicApiDataSetVersion);
         }
+        
+        // Combine all permutations of deletable statuses, major or minor version types, and a
+        // boolean indicating whether the draft version has completed mapping and importing. 
+        public static readonly TheoryData<Tuple<DataSetVersionStatus, DataSetVersionType, bool>>
+            DeletableStatusesVersionTypesAndCompletedImport = new(
+                DataSetVersionStatusTheoryData
+                    .DeletableStatusList
+                    .Cartesian(EnumUtil.GetEnums<DataSetVersionType>(), new List<bool> { false, true }));
 
         [Theory]
-        [MemberData(nameof(DeletableStatusesAndVersionTypes))]
+        [MemberData(nameof(DeletableStatusesVersionTypesAndCompletedImport))]
         public async Task Success_SubsequentDataSetVersion(
-            Tuple<DataSetVersionStatus, DataSetVersionType> statusAndVersionType)
+            Tuple<DataSetVersionStatus, DataSetVersionType, bool> statusVersionTypeAndCompletedImport)
         {
-            var (status, versionType) = statusAndVersionType;
+            var (status, versionType, completedImport) = statusVersionTypeAndCompletedImport;
             
             var releaseFiles = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
@@ -199,9 +201,18 @@ public abstract class DeleteDataSetVersionFunctionTests(ProcessorFunctionsIntegr
                 context.ReleaseFiles.UpdateRange(liveReleaseFile, draftReleaseFile));
 
             var liveDataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(liveDataSetVersion);
-            var draftDataSetVersionDirectory = _dataSetVersionPathResolver.DirectoryPath(
-                dataSetVersion: draftDataSetVersion,
-                versionNumber: liveDataSetVersion.DefaultNextVersion());
+            
+            // If the draft DataSetVersion has been successfully mapped and import completed, we will
+            // have a folder name that reflects the draft DataSetVersion's final version number.
+            //
+            // If the draft DataSetVersion not yet completed import, we will still have the original
+            // folder that was created when the draft was created, which is the next minor version
+            // on from the current live version.
+            var draftDataSetVersionDirectory = completedImport 
+                ? _dataSetVersionPathResolver.DirectoryPath(draftDataSetVersion)
+                : _dataSetVersionPathResolver.DirectoryPath(
+                    dataSetVersion: draftDataSetVersion,
+                    versionNumber: liveDataSetVersion.DefaultNextVersion());
 
             Directory.CreateDirectory(liveDataSetVersionDirectory);
             Directory.CreateDirectory(draftDataSetVersionDirectory);
