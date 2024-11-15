@@ -24,33 +24,6 @@ public class ProcessCompletionOfNextDataSetVersionFunctions(
         await dataSetVersionChangeService.CreateChanges(dataSetVersionImport.DataSetVersionId, cancellationToken);
     }
 
-    [Function(ActivityNames.UpdateFileStoragePath)]
-    public async Task UpdateFileStoragePath(
-        [ActivityTrigger] Guid instanceId,
-        CancellationToken cancellationToken)
-    {
-        var dataSetVersionImport = await GetDataSetVersionImport(instanceId, cancellationToken);
-
-        var dataSetVersion = dataSetVersionImport.DataSetVersion;
-
-        var currentLiveVersion = await publicDataDbContext
-            .DataSets
-            .Where(dataSet => dataSet.Id == dataSetVersion.DataSetId)
-            .Select(dataSet => dataSet.LatestLiveVersion!)
-            .SingleAsync(cancellationToken);
-
-        var originalPath = dataSetVersionPathResolver.DirectoryPath(
-            dataSetVersion: dataSetVersion,
-            versionNumber: currentLiveVersion.DefaultNextVersion());
-
-        var newPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
-
-        if (originalPath != newPath)
-        {
-            Directory.Move(sourceDirName: originalPath, destDirName: newPath);
-        }
-    }
-
     [Function(ActivityNames.CompleteNextDataSetVersionImportProcessing)]
     public async Task CompleteNextDataSetVersionImportProcessing(
         [ActivityTrigger] Guid instanceId,

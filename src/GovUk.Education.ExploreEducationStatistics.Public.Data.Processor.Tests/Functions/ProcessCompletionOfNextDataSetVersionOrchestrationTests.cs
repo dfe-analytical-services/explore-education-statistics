@@ -27,7 +27,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionOrchestrationTests
 
             string[] expectedActivitySequence =
             [
-                ActivityNames.UpdateFileStoragePath,
                 ActivityNames.ImportMetadata,
                 ActivityNames.CreateChanges,
                 ActivityNames.ImportData,
@@ -60,7 +59,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionOrchestrationTests
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.UpdateFileStoragePath,
+                    context.CallActivityAsync(ActivityNames.ImportMetadata,
                         mockOrchestrationContext.Object.InstanceId,
                         null))
                 .Throws<Exception>();

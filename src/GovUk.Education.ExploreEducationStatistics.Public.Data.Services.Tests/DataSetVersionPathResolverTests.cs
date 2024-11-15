@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Moq;
 using Semver;
 
@@ -39,12 +38,20 @@ public abstract class DataSetVersionPathResolverTests
 
     public class PathTests : DataSetVersionPathResolverTests
     {
-        public static readonly TheoryData<string> GetEnvironmentNames = new()
-        {
+        private static readonly string[] EnvironmentNames =
+        [
             Environments.Development,
             HostEnvironmentExtensions.IntegrationTestEnvironment,
             Environments.Production
-        };
+        ];
+        
+        public static readonly TheoryData<string> GetEnvironmentNames = new(EnvironmentNames);
+        
+        public static readonly TheoryData<Tuple<string, DataSetVersionStatus>> GetEnvironmentNamesAndPublicStatuses = 
+            new(EnvironmentNames.Cartesian(DataSetVersionStatusConstants.PublicStatuses));
+
+        public static readonly TheoryData<Tuple<string, DataSetVersionStatus>> GetEnvironmentNamesAndPrivateStatuses = 
+            new(EnvironmentNames.Cartesian(DataSetVersionStatusConstants.PrivateStatuses));
 
         [Fact]
         public void DevelopmentEnv_ValidBasePath()
@@ -116,10 +123,14 @@ public abstract class DataSetVersionPathResolverTests
         }
 
         [Theory]
-        [MemberData(nameof(GetEnvironmentNames))]
-        public void ValidDirectoryPath(string environmentName)
+        [MemberData(nameof(GetEnvironmentNamesAndPublicStatuses))]
+        public void ValidDirectoryPath_PublicVersion(Tuple<string, DataSetVersionStatus> environmentNameAndStatus)
         {
-            DataSetVersion version = _dataFixture.DefaultDataSetVersion();
+            var (environmentName, status) = environmentNameAndStatus;
+            
+            DataSetVersion version = _dataFixture
+                .DefaultDataSetVersion()
+                .WithStatus(status);
 
             _webHostEnvironmentMock
                 .SetupGet(s => s.EnvironmentName)
@@ -140,8 +151,36 @@ public abstract class DataSetVersionPathResolverTests
         }
 
         [Theory]
+        [MemberData(nameof(GetEnvironmentNamesAndPrivateStatuses))]
+        public void ValidDirectoryPath_PrivateVersion(Tuple<string, DataSetVersionStatus> environmentNameAndStatus)
+        {
+            var (environmentName, status) = environmentNameAndStatus;
+            
+            DataSetVersion version = _dataFixture
+                .DefaultDataSetVersion()
+                .WithStatus(status);
+            
+            _webHostEnvironmentMock
+                .SetupGet(s => s.EnvironmentName)
+                .Returns(environmentName);
+
+            var resolver = BuildService(options: new DataFilesOptions
+            {
+                BasePath = Path.Combine("data", "data-files")
+            });
+
+            Assert.Equal(
+                Path.Combine(
+                    resolver.DataSetsPath(),
+                    version.DataSetId.ToString(),
+                    "draft"
+                ),
+                resolver.DirectoryPath(version));
+        }
+
+        [Theory]
         [MemberData(nameof(GetEnvironmentNames))]
-        public void ValidDirectoryPath_OptionalVersionArgument(string environmentName)
+        public void ValidDirectoryPath_VersionArgument(string environmentName)
         {
             DataSetVersion version = _dataFixture.DefaultDataSetVersion();
 

@@ -18,7 +18,12 @@ public class TestDataSetVersionPathResolver : IDataSetVersionPathResolver
 
     public string Directory { get; set; } = string.Empty;
 
-    public string DirectoryPath(DataSetVersion dataSetVersion, SemVersion? versionNumber = null)
+    public string DirectoryPath(DataSetVersion dataSetVersion)
+    {
+        return Path.Combine(_basePath, Directory);
+    }
+
+    public string DirectoryPath(DataSetVersion dataSetVersion, SemVersion versionNumber)
     {
         return Path.Combine(_basePath, Directory);
     }
