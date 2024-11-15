@@ -11,7 +11,7 @@ using System.Net.Mime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers;
 
-[ApiVersion(1.0)]
+[ApiVersion("1")]
 [ApiController]
 [Route("api/v{version:apiVersion}/data-sets")]
 public class DataSetsController(
