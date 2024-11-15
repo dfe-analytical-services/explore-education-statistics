@@ -169,7 +169,7 @@ Verify that the methodology is publicly accessible
     ${METHODOLOGY_URL}=    get location
     set suite variable    ${METHODOLOGY_URL}
 
-Verify that methodology hash links open accoridon sections correctly
+Verify that methodology hash links open accordion sections correctly
     [Documentation]    EES-3877
     user navigates to public frontend    ${METHODOLOGY_URL}#content-section-3-test-title-3
     user waits until h1 is visible    ${PUBLICATION_NAME}
@@ -255,11 +255,6 @@ Update the methodology amendment's content
 
 Reorder amendment content sections
     user clicks element    id:methodologyAccordion-content-reorder
-
-    user sets focus to element
-    ...    xpath:(.//*[@data-testid="editableAccordionSection"])[1]
-    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
@@ -274,11 +269,6 @@ Check the new order of amendment content sections
 
 Reorder amendment annexe sections
     user clicks element    id:methodologyAccordion-annexes-reorder
-
-    user sets focus to element
-    ...    xpath:(.//*[@data-testid="editableAccordionSection"])[1]
-    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
-
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}

@@ -1,6 +1,7 @@
 import styles from '@common/components/ReorderableList.module.scss';
 import ReorderableItem, {
   ReorderableListItem,
+  ReorderResult,
 } from '@common/components/ReorderableItem';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Button from '@common/components/Button';
@@ -14,14 +15,8 @@ interface Props {
   list: ReorderableListItem[];
   testId?: string;
   onCancel?: () => void;
-  onConfirm: () => void;
-  onMoveItem: ({
-    prevIndex,
-    nextIndex,
-  }: {
-    prevIndex: number;
-    nextIndex: number;
-  }) => void;
+  onConfirm?: () => void;
+  onMoveItem: ({ prevIndex, nextIndex }: ReorderResult) => void;
   onReverse?: () => void;
 }
 
@@ -91,19 +86,21 @@ export default function ReorderableList({
           )}
         </Droppable>
       </DragDropContext>
-      <ButtonGroup>
-        <Button onClick={onConfirm}>Confirm order</Button>
-        {onReverse && (
-          <Button variant="secondary" onClick={onReverse}>
-            Reverse order
-          </Button>
-        )}
-        {onCancel && (
-          <Button variant="secondary" onClick={onCancel}>
-            Cancel reordering
-          </Button>
-        )}
-      </ButtonGroup>
+      {(onCancel || onConfirm || onReverse) && (
+        <ButtonGroup>
+          {onConfirm && <Button onClick={onConfirm}>Confirm order</Button>}
+          {onReverse && (
+            <Button variant="secondary" onClick={onReverse}>
+              Reverse order
+            </Button>
+          )}
+          {onCancel && (
+            <Button variant="secondary" onClick={onCancel}>
+              Cancel reordering
+            </Button>
+          )}
+        </ButtonGroup>
+      )}
     </>
   );
 }

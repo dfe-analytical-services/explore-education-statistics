@@ -42,7 +42,7 @@ const ReleaseContentAccordionSection = ({
 
   const { user } = useAuthContext();
 
-  const [isReordering, setIsReordering] = useState(false);
+  const [isReordering, toggleIsReordering] = useToggle(false);
   const [showDataBlockForm, toggleDataBlockForm] = useToggle(false);
   const [showEmbedDashboardForm, toggleEmbedDashboardForm] = useToggle(false);
 
@@ -170,9 +170,9 @@ const ReleaseContentAccordionSection = ({
               onClick={async () => {
                 if (isReordering) {
                   await reorderBlocks();
-                  setIsReordering(false);
+                  toggleIsReordering.off();
                 } else {
-                  setIsReordering(true);
+                  toggleIsReordering.on();
                 }
               }}
             >
@@ -187,7 +187,6 @@ const ReleaseContentAccordionSection = ({
           <EditableSectionBlocks
             blocks={blocks}
             isReordering={isReordering && editingMode === 'edit'}
-            sectionId={sectionId}
             onBlocksChange={setBlocks}
             renderBlock={block => (
               <ReleaseBlock

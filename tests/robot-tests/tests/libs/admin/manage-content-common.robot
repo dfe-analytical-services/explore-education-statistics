@@ -10,8 +10,8 @@ Library     ../admin-utilities.py
 # between different "Add new section" buttons (as an example) when more than one set of content accordions appears
 # on the page, for instance with Methodologies where Content and Annex areas are available.
 ${RELEASE_CONTENT_EDITABLE_ACCORDION}=          id:releaseMainContent
-${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}=      xpath://div[div[div[@id="methodologyAccordion-content"]]]
-${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}=      xpath://div[div[div[@id="methodologyAccordion-annexes"]]]
+${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}=      xpath://div[div[@id="methodologyAccordion-content"]]
+${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}=      xpath://div[div[@id="methodologyAccordion-annexes"]]
 ${METHODOLOGY_CONTENT_READONLY_ACCORDION}=      id:methodologyAccordion-content
 ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}=      id:methodologyAccordion-annexes
 
