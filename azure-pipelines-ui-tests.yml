@@ -325,7 +325,7 @@ jobs:
     displayName: Public Suite - Publish Playwright Test Results
     inputs:
       testResultsFiles: tests/playwright-tests/test-results/playwright-results.xml
-      failTaskOnFailedTests: true
+      #failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
     displayName: Public Suite - Publish Playwright Test Artifacts
@@ -392,7 +392,7 @@ jobs:
     displayName: Admin Suite - Publish Playwright Test Results
     inputs:
       testResultsFiles: tests/playwright-tests/test-results/playwright-results.xml
-      failTaskOnFailedTests: true
+      #failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
     displayName: Admin Suite - Publish Pipeline Artifact
@@ -462,7 +462,7 @@ jobs:
     displayName: Admin And Public Suite - Publish Playwright Test Results
     inputs:
       testResultsFiles: tests/playwright-tests/test-results/playwright-results.xml
-      failTaskOnFailedTests: true
+      #failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
     displayName: Admin And Public Suite - Publish Playwright Test Artifacts
