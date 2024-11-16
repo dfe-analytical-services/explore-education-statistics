@@ -68,6 +68,14 @@ Simply add environment variables to your task runner or CLI command e.g.
 TECH_DOCS_HOST=https://some-other-site bundle exec middleman 
 ```
 
+## Generating API reference docs
+
+API reference documentation is generated at build time using any `openapi-v*.json` documents that 
+are found in the `source` directory. For example, to create the reference docs for a v2 API, add
+a `openapi-v2.json`.
+
+Refer to `lib/api_reference_pages_extension.rb` for how we implement this.
+
 ## Notifications for expired pages
 
 All pages are configured with expiry dates so that they can be re-reviewed. We have automated the

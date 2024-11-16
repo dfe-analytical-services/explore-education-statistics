@@ -21,7 +21,6 @@ max_toc_heading_level: 1
 
 # URL of the public API
 api_url: https://localhost:5051
-api_docs_path: https://dev.statistics.api.education.gov.uk/swagger/1.0/openapi.json
 
 # Multi-page options
 multipage_nav: true

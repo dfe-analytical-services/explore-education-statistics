@@ -26,9 +26,10 @@ if ENV.has_key?("TECH_DOCS_API_URL")
   config[:tech_docs][:api_url] = ENV["TECH_DOCS_API_URL"]
 end
 
-if ENV.has_key?("TECH_DOCS_API_DOCS_PATH")
-  config[:tech_docs][:api_docs_path] = ENV["TECH_DOCS_API_DOCS_PATH"]
-end
+ignore "**/template.html"
+ignore "partials/*"
+ignore "endpoints/*"
+ignore "templates/*"
 
 helpers Helpers
 helpers ApiReferenceHelpers

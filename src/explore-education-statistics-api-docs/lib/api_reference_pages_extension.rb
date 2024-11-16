@@ -6,71 +6,76 @@ class ApiReferencePagesExtension < Middleman::Extension
 
     @sitemap = app.sitemap
     @config = app.config[:tech_docs]
-    @endpoint_template = Middleman::Util.normalize_path("/endpoints/template.html")
-    @schema_template = Middleman::Util.normalize_path("/schemas/template.html")
-
-    app.ignore @endpoint_template
-    app.ignore @schema_template
+    @base_template_path = "/templates/reference"
   end
 
   # @param [List<Middleman::Sitemap::Resource>] resources
   # @return [List<Middleman::Sitemap::Resource>]
   def manipulate_resource_list(resources)
-    api_docs_path = @config[:api_docs_path]
+    FileList.glob("source/openapi-v*.json").each do |path|
+      document = Openapi3Parser.load_file(path)
+      version = "v#{document.info.version}"
 
-    if api_docs_path.nil?
-      return resources
-    end
+      if path != "source/openapi-#{version}.json"
+        raise "OpenAPI document path '#{path}' does not match its version, expected 'source/openapi-#{version}.json'"
+      end
 
-    document = if uri?(api_docs_path)
-                 Openapi3Parser.load_url(api_docs_path)
-               elsif File.exist?(api_docs_path)
-                 # Load api file and set existence flag.
-                 Openapi3Parser.load_file(api_docs_path)
-               else
-                 raise "Unable to load `api_docs_path` from config/tech-docs.yml"
-               end
+      base_path = "/reference-#{version}"
 
-    new_resources = []
+      resources << Middleman::Sitemap::ProxyResource.new(
+        @sitemap,
+        Middleman::Util.normalize_path("#{base_path}/index.html"),
+        Middleman::Util.normalize_path("#{@base_template_path}/index.html")
+      ).tap do |p|
+        p.add_metadata locals: {
+          title: "API #{version} reference",
+          version: version,
+        }, page: {
+          title: "API #{version} reference",
+        }
+      end
 
-    document.paths.each do |uri, http_methods|
-      get_operations(http_methods).each do |http_method, operation|
-        new_resources << create_endpoint_page(uri, http_method, operation)
+      resources << Middleman::Sitemap::ProxyResource.new(
+        @sitemap,
+        Middleman::Util.normalize_path("#{base_path}/endpoints/index.html"),
+        Middleman::Util.normalize_path("#{@base_template_path}/endpoint_index.html")
+      ).tap do |p|
+        p.add_metadata locals: {
+          title: "API #{version} endpoints",
+          version: version,
+        }, page: {
+          title: "Endpoints",
+        }
+      end
+
+      resources << Middleman::Sitemap::ProxyResource.new(
+        @sitemap,
+        Middleman::Util.normalize_path("#{base_path}/schemas/index.html"),
+        Middleman::Util.normalize_path("#{@base_template_path}/schema_index.html")
+      ).tap do |p|
+        p.add_metadata locals: {
+          title: "API #{version} schemas",
+          version: version,
+        }, page: {
+          title: "Schemas"
+        }
+      end
+
+      document.paths.each do |uri, http_methods|
+        get_operations(http_methods).each do |http_method, operation|
+          resources << create_endpoint_page(uri, http_method, operation, version, base_path)
+        end
+      end
+
+      document.components.schemas.each do |_, schema|
+        resources << create_schema_page(schema, version, base_path)
       end
     end
 
-    document.components.schemas.each do |_, schema|
-      new_resources << create_schema_page(schema)
-    end
-
-    resources + new_resources
+    resources
   end
 
   private
-
-  # @param [String] uri
-  # @param [String] http_method
-  # @param [Openapi3Parser::Node::Operation] operation
-  # @return [Middleman::Sitemap::ProxyResource]
-  def create_endpoint_page(uri, http_method, operation)
-    id = operation.operation_id
-
-    Middleman::Sitemap::ProxyResource.new(
-      @sitemap,
-      Middleman::Util.normalize_path("/endpoints/#{id}/index.html"),
-      @endpoint_template
-    ).tap do |p|
-      p.add_metadata locals: {
-        title: operation.summary,
-        url: api_url(uri),
-        http_method: http_method.upcase,
-        description: operation.description,
-        parameters: operation.parameters,
-        request_body: operation.request_body,
-        responses: operation.responses
-      }
-    end
-  end
 
   # @param [String] uri
   # @return [String]
@@ -78,20 +83,49 @@ class ApiReferencePagesExtension < Middleman::Extension
     @config[:api_url].chomp("/") + uri
   end
 
-  private
+  # @param [String] uri
+  # @param [String] http_method
+  # @param [Openapi3Parser::Node::Operation] operation
+  # @param [String] version
+  # @param [String] base_path
+  # @return [Middleman::Sitemap::ProxyResource]
+  def create_endpoint_page(uri, http_method, operation, version, base_path)
+    id = operation.operation_id
+
+    Middleman::Sitemap::ProxyResource.new(
+      @sitemap,
+      Middleman::Util.normalize_path("#{base_path}/endpoints/#{id}/index.html"),
+      Middleman::Util.normalize_path("#{@base_template_path}/endpoint.html")
+    ).tap do |p|
+      p.add_metadata locals: {
+        title: operation.summary,
+        version: version,
+        url: api_url(uri),
+        http_method: http_method.upcase,
+        endpoint_description: operation.description,
+        parameters: operation.parameters,
+        request_body: operation.request_body,
+        responses: operation.responses
+      }
+    end
+  end
+
 
   # @param [Openapi3Parser::Node::Schema] schema
+  # @param [String] version
+  # @param [String] base_path
   # @return [Middleman::Sitemap::ProxyResource]
-  def create_schema_page(schema)
+  def create_schema_page(schema, version, base_path)
     name = schema.name
 
     Middleman::Sitemap::ProxyResource.new(
       @sitemap,
-      Middleman::Util.normalize_path("/schemas/#{name}/index.html"),
-      @schema_template
+      Middleman::Util.normalize_path("#{base_path}/schemas/#{name}/index.html"),
+      Middleman::Util.normalize_path("#{@base_template_path}/schema.html")
     ).tap do |p|
       p.add_metadata locals: {
         title: name,
+        version: version,
         schema: schema,
       }
     end
