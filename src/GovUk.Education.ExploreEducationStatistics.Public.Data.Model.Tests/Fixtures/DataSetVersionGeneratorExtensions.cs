@@ -32,6 +32,11 @@ public static class DataSetVersionGeneratorExtensions
     public static Generator<DataSetVersion> WithDefaults(this Generator<DataSetVersion> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
+    public static Generator<DataSetVersion> WithId(
+        this Generator<DataSetVersion> generator,
+        Guid id)
+        => generator.ForInstance(s => s.SetId(id));
+
     public static Generator<DataSetVersion> WithDataSet(
         this Generator<DataSetVersion> generator,
         DataSet dataSet)
@@ -211,6 +216,11 @@ public static class DataSetVersionGeneratorExtensions
             .Set(dsv => dsv.VersionPatch, 0)
             .Set(dsv => dsv.TotalResults, f => f.Random.Long(min: 10000, max: 10_000_000))
             .Set(dsv => dsv.Status, DataSetVersionStatus.Draft);
+
+    public static InstanceSetters<DataSetVersion> SetId(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Guid id)
+        => instanceSetter.Set(dsv => dsv.Id, id);
 
     public static InstanceSetters<DataSetVersion> SetDataSet(
         this InstanceSetters<DataSetVersion> instanceSetter,

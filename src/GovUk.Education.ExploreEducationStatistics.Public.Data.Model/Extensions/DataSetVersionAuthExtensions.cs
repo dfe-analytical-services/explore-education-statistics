@@ -12,4 +12,13 @@ public static class DataSetVersionAuthExtensions
 
     private static Expression<Func<DataSetVersion, bool>> IsPublicStatus()
         => dataSetVersion => DataSetVersionStatusConstants.PublicStatuses.Contains(dataSetVersion.Status);
+
+    public static bool IsPrivateStatus(this DataSetVersion dataSetVersion)
+        => IsPrivateStatus().Compile()(dataSetVersion);
+
+    public static IQueryable<DataSetVersion> WherePrivateStatus(this IQueryable<DataSetVersion> queryable)
+        => queryable.Where(IsPrivateStatus());
+
+    private static Expression<Func<DataSetVersion, bool>> IsPrivateStatus()
+        => dataSetVersion => DataSetVersionStatusConstants.PrivateStatuses.Contains(dataSetVersion.Status);
 }

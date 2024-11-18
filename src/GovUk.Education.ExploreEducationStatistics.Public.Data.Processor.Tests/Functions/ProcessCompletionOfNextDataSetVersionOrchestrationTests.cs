@@ -56,6 +56,11 @@ public abstract class ProcessCompletionOfNextDataSetVersionOrchestrationTests
 
             var activitySequence = new MockSequence();
 
+            var mockEntityFeature = new Mock<TaskOrchestrationEntityFeature>(MockBehavior.Strict);
+            mockEntityFeature.SetupLockForActivity(ActivityNames.ImportMetadata);
+            mockOrchestrationContext.SetupGet(context => context.Entities)
+                .Returns(mockEntityFeature.Object);
+                
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
