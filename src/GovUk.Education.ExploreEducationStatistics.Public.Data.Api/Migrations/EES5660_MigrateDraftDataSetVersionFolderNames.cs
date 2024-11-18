@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Migrations;
 
+// TODO EES-5660 - remove this migration after it has been run against each Public API-enabled environment.
 public class EES5660_MigrateDraftDataSetVersionFolderNames(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver pathResolver) : ICustomMigration
@@ -18,7 +19,7 @@ public class EES5660_MigrateDraftDataSetVersionFolderNames(
             .WherePrivateStatus()
             .ToList();
 
-        var failureDataSetVersionIds = new List<Guid>();
+        var failedDataSetVersionIds = new List<Guid>();
         
         draftDataSetVersions.ForEach(dataSetVersion =>
         {
@@ -30,7 +31,7 @@ public class EES5660_MigrateDraftDataSetVersionFolderNames(
 
                 if (Directory.Exists(newDraftFolder))
                 {
-                    failureDataSetVersionIds.Add(dataSetVersion.Id);
+                    failedDataSetVersionIds.Add(dataSetVersion.Id);
                 }
                 else
                 {
@@ -39,10 +40,10 @@ public class EES5660_MigrateDraftDataSetVersionFolderNames(
             }
         });
 
-        if (failureDataSetVersionIds.Count > 0)
+        if (failedDataSetVersionIds.Count > 0)
         {
             throw new Exception($"The following DataSetVersions have both a versioned " +
-                                $"and a draft folder: {failureDataSetVersionIds.JoinToString(",")}");
+                                $"and a draft folder: {failedDataSetVersionIds.JoinToString(",")}");
         }
     }
 }

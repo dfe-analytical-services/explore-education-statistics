@@ -6,22 +6,24 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Migrations;
 
+// TODO EES-5660 - remove this migration after it has been run against each Public API-enabled environment.
 public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationFactory testApp) 
     : IntegrationTestFixture(testApp)
 {
     public static readonly TheoryData<Tuple<DataSetVersionStatus, DataSetVersionType>>
-        PrivateDataSetVersionStatusAndTypes = new(DataSetVersionStatusConstants
+        PrivateDataSetVersionStatusAndTypes = new(DataSetVersionAuthExtensions
             .PrivateStatuses
             .Cartesian(EnumUtil.GetEnums<DataSetVersionType>()));
     
     public static readonly TheoryData<Tuple<DataSetVersionStatus, DataSetVersionType>>
-        PublicDataSetVersionStatusAndTypes = new(DataSetVersionStatusConstants
+        PublicDataSetVersionStatusAndTypes = new(DataSetVersionAuthExtensions
             .PublicStatuses
             .Cartesian(EnumUtil.GetEnums<DataSetVersionType>()));
     

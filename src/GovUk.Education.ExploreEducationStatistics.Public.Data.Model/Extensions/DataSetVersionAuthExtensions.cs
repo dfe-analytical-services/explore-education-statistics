@@ -1,9 +1,23 @@
 using System.Linq.Expressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 
 public static class DataSetVersionAuthExtensions
 {
+    public static readonly IReadOnlyList<DataSetVersionStatus> PublicStatuses = new List<DataSetVersionStatus>(
+        [
+            DataSetVersionStatus.Published,
+            DataSetVersionStatus.Withdrawn,
+            DataSetVersionStatus.Deprecated
+        ]
+    );
+
+    public static readonly IReadOnlyList<DataSetVersionStatus> PrivateStatuses = EnumUtil
+        .GetEnums<DataSetVersionStatus>()
+        .Except(PublicStatuses)
+        .ToList();
+
     public static bool IsPublicStatus(this DataSetVersion dataSetVersion)
         => IsPublicStatus().Compile()(dataSetVersion);
 
@@ -11,7 +25,7 @@ public static class DataSetVersionAuthExtensions
         => queryable.Where(IsPublicStatus());
 
     private static Expression<Func<DataSetVersion, bool>> IsPublicStatus()
-        => dataSetVersion => DataSetVersionStatusConstants.PublicStatuses.Contains(dataSetVersion.Status);
+        => dataSetVersion => PublicStatuses.Contains(dataSetVersion.Status);
 
     public static bool IsPrivateStatus(this DataSetVersion dataSetVersion)
         => IsPrivateStatus().Compile()(dataSetVersion);
@@ -20,5 +34,5 @@ public static class DataSetVersionAuthExtensions
         => queryable.Where(IsPrivateStatus());
 
     private static Expression<Func<DataSetVersion, bool>> IsPrivateStatus()
-        => dataSetVersion => DataSetVersionStatusConstants.PrivateStatuses.Contains(dataSetVersion.Status);
+        => dataSetVersion => PrivateStatuses.Contains(dataSetVersion.Status);
 }

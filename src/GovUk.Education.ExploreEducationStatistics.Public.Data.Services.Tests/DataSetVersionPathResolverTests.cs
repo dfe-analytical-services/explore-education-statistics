@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
@@ -48,10 +49,10 @@ public abstract class DataSetVersionPathResolverTests
         public static readonly TheoryData<string> GetEnvironmentNames = new(EnvironmentNames);
         
         public static readonly TheoryData<Tuple<string, DataSetVersionStatus>> GetEnvironmentNamesAndPublicStatuses = 
-            new(EnvironmentNames.Cartesian(DataSetVersionStatusConstants.PublicStatuses));
+            new(EnvironmentNames.Cartesian(DataSetVersionAuthExtensions.PublicStatuses));
 
         public static readonly TheoryData<Tuple<string, DataSetVersionStatus>> GetEnvironmentNamesAndPrivateStatuses = 
-            new(EnvironmentNames.Cartesian(DataSetVersionStatusConstants.PrivateStatuses));
+            new(EnvironmentNames.Cartesian(DataSetVersionAuthExtensions.PrivateStatuses));
 
         [Fact]
         public void DevelopmentEnv_ValidBasePath()
@@ -178,6 +179,8 @@ public abstract class DataSetVersionPathResolverTests
                 resolver.DirectoryPath(version));
         }
 
+        // TODO EES-5660 - remove once draft DataSetVersions have had their folders migrated
+        // on each Public API-enabled environment.
         [Theory]
         [MemberData(nameof(GetEnvironmentNames))]
         public void ValidDirectoryPath_VersionArgument(string environmentName)
