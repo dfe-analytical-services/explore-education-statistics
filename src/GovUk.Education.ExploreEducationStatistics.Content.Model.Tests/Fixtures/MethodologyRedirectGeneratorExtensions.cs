@@ -16,6 +16,11 @@ public static class MethodologyRedirectGeneratorExtensions
             .SetDefault(p => p.Slug)
             .SetDefault(p => p.Created);
 
+    public static Generator<MethodologyRedirect> WithSlug(
+        this Generator<MethodologyRedirect> generator,
+        string slug)
+        => generator.ForInstance(s => s.SetSlug(slug));
+
     public static Generator<MethodologyRedirect> WithMethodologyVersion(
         this Generator<MethodologyRedirect> generator,
         MethodologyVersion methodologyVersion)
@@ -25,6 +30,11 @@ public static class MethodologyRedirectGeneratorExtensions
         this Generator<MethodologyRedirect> generator,
         Guid methodologyVersionId)
         => generator.ForInstance(s => s.SetMethodologyVersionId(methodologyVersionId));
+
+    public static InstanceSetters<MethodologyRedirect> SetSlug(
+        this InstanceSetters<MethodologyRedirect> setters,
+        string slug)
+        => setters.Set(mr => mr.Slug, slug);
 
     public static InstanceSetters<MethodologyRedirect> SetMethodologyVersion(
         this InstanceSetters<MethodologyRedirect> setters,

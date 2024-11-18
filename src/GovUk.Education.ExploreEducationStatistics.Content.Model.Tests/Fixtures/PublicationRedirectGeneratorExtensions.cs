@@ -16,6 +16,11 @@ public static class PublicationRedirectGeneratorExtensions
             .SetDefault(p => p.Slug)
             .SetDefault(p => p.Created);
 
+    public static Generator<PublicationRedirect> WithSlug(
+        this Generator<PublicationRedirect> generator,
+        string slug)
+        => generator.ForInstance(s => s.SetSlug(slug));
+
     public static Generator<PublicationRedirect> WithPublication(
         this Generator<PublicationRedirect> generator,
         Publication publication)
@@ -26,6 +31,11 @@ public static class PublicationRedirectGeneratorExtensions
         Guid publicationId)
         => generator.ForInstance(s => s.SetPublicationId(publicationId));
 
+    public static InstanceSetters<PublicationRedirect> SetSlug(
+        this InstanceSetters<PublicationRedirect> setters,
+        string slug)
+        => setters.Set(pr => pr.Slug, slug);
+
     public static InstanceSetters<PublicationRedirect> SetPublication(
         this InstanceSetters<PublicationRedirect> setters,
         Publication publication)
@@ -35,5 +45,5 @@ public static class PublicationRedirectGeneratorExtensions
     public static InstanceSetters<PublicationRedirect> SetPublicationId(
         this InstanceSetters<PublicationRedirect> setters,
         Guid publicationId)
-        => setters.Set(rr => rr.PublicationId, publicationId);
+        => setters.Set(pr => pr.PublicationId, publicationId);
 }

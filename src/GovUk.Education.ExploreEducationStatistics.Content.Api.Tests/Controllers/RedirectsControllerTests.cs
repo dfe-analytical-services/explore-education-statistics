@@ -14,8 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using MockQueryable.Moq;
-using Moq;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
@@ -51,14 +49,14 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                 .ForIndex(2, s => s.SetMethodologyVersion(methodologyVersions[2]))
                 .GenerateList(3);
 
-            var contentDbContext = ContentDbContextMock(
-                publicationRedirects: publicationRedirects,
-                releaseRedirects: releaseRedirects,
-                methodologiesRedirects: methodologyRedirects);
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.PublicationRedirects.AddRange(publicationRedirects);
+                context.ReleaseRedirects.AddRange(releaseRedirects);
+                context.MethodologyRedirects.AddRange(methodologyRedirects);
+            });
 
-            var client = BuildApp(contentDbContext.Object).CreateClient();
-
-            var response = await ListRedirects(client);
+            var response = await ListRedirects();
 
             var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -104,12 +102,14 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                 .ForIndex(2, s => s.SetMethodologyVersion(methodologyVersions[2]))
                 .GenerateList(3);
 
-            var contentDbContext = ContentDbContextMock(
-                publicationRedirects: publicationRedirects,
-                releaseRedirects: releaseRedirects,
-                methodologiesRedirects: methodologyRedirects);
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.PublicationRedirects.AddRange(publicationRedirects);
+                context.ReleaseRedirects.AddRange(releaseRedirects);
+                context.MethodologyRedirects.AddRange(methodologyRedirects);
+            });
 
-            var app = BuildApp(contentDbContext.Object);
+            var app = BuildApp();
             var client = app.CreateClient();
 
             await ListRedirects(client);
@@ -196,36 +196,13 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
         [Fact]
         public async Task NoRedirectsExist_Returns200WithNoRedirects()
         {
-            var contentDbContext = ContentDbContextMock();
-
-            var client = BuildApp(contentDbContext.Object).CreateClient();
-
-            var response = await ListRedirects(client);
+            var response = await ListRedirects();
 
             var viewModel = response.AssertOk<RedirectsViewModel>();
 
             Assert.Empty(viewModel.Publications);
             Assert.Empty(viewModel.Releases);
             Assert.Empty(viewModel.Methodologies);
-        }
-
-        private static Mock<ContentDbContext> ContentDbContextMock(
-            IEnumerable<PublicationRedirect>? publicationRedirects = null,
-            IEnumerable<ReleaseRedirect>? releaseRedirects = null,
-            IEnumerable<MethodologyRedirect>? methodologiesRedirects = null)
-        {
-            var contentDbContext = new Mock<ContentDbContext>();
-
-            contentDbContext.Setup(context => context.PublicationRedirects)
-                .Returns((publicationRedirects ?? Array.Empty<PublicationRedirect>()).AsQueryable().BuildMockDbSet().Object);
-
-            contentDbContext.Setup(context => context.ReleaseRedirects)
-                .Returns((releaseRedirects ?? Array.Empty<ReleaseRedirect>()).AsQueryable().BuildMockDbSet().Object);
-
-            contentDbContext.Setup(context => context.MethodologyRedirects)
-                .Returns((methodologiesRedirects ?? Array.Empty<MethodologyRedirect>()).AsQueryable().BuildMockDbSet().Object);
-
-            return contentDbContext;
         }
 
         private async Task<HttpResponseMessage> ListRedirects(
@@ -237,16 +214,9 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
         }
     }
 
-    private WebApplicationFactory<Startup> BuildApp(ContentDbContext? contentDbContext = null)
+    private WebApplicationFactory<Startup> BuildApp()
     {
         return TestApp
-            .WithAzurite(enabled: true)
-            .ConfigureServices(services =>
-            {
-                if (contentDbContext is not null)
-                {
-                    services.ReplaceService(contentDbContext);
-                }
-            });
+            .WithAzurite(enabled: true);
     }
 }

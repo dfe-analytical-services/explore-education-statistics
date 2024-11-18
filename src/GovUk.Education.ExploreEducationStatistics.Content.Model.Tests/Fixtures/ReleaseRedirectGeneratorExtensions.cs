@@ -16,6 +16,11 @@ public static class ReleaseRedirectGeneratorExtensions
             .SetDefault(p => p.Slug)
             .SetDefault(p => p.Created);
 
+    public static Generator<ReleaseRedirect> WithSlug(
+        this Generator<ReleaseRedirect> generator,
+        string slug)
+        => generator.ForInstance(s => s.SetSlug(slug));
+
     public static Generator<ReleaseRedirect> WithRelease(
         this Generator<ReleaseRedirect> generator,
         Release release)
@@ -25,6 +30,11 @@ public static class ReleaseRedirectGeneratorExtensions
         this Generator<ReleaseRedirect> generator,
         Guid releaseId)
         => generator.ForInstance(s => s.SetReleaseId(releaseId));
+
+    public static InstanceSetters<ReleaseRedirect> SetSlug(
+        this InstanceSetters<ReleaseRedirect> setters,
+        string slug)
+        => setters.Set(rr => rr.Slug, slug);
 
     public static InstanceSetters<ReleaseRedirect> SetRelease(
         this InstanceSetters<ReleaseRedirect> setters,
