@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 
 [ApiVersion("1")]
 [ApiController]
-[Route("api/v{version:apiVersion}/publications")]
+[Route("v{version:apiVersion}/publications")]
 public class PublicationsController(IPublicationService publicationService, IDataSetService dataSetService)
     : ControllerBase
 {

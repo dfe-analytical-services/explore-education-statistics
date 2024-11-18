@@ -35,7 +35,7 @@ public class PublicDataApiClient(
     {
         return await SendRequest(
             () => httpClient.GetAsync(
-                $"api/v1/data-sets/{dataSetId}/versions/{dataSetVersion}/changes",
+                $"v1/data-sets/{dataSetId}/versions/{dataSetVersion}/changes",
                 cancellationToken
             ),
             cancellationToken

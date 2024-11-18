@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 
 [ApiVersion("1")]
 [ApiController]
-[Route("api/v{version:apiVersion}/data-sets")]
+[Route("v{version:apiVersion}/data-sets")]
 public class DataSetsController(
     IDataSetService dataSetService,
     IDataSetQueryService dataSetQueryService)
