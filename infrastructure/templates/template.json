@@ -1197,7 +1197,10 @@
       "[concat('Microsoft.Web/sites/', variables('importerAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('contentAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('dataAppName'))]"
-    ]
+    ],
+    "publicDataFileshareMountPath": "/data/public-api-data",
+    "publicDataFileshareName": "[concat(parameters('subscription'), '-ees-papi-fs-data')]",
+    "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]"
   },
   "resources": [
     {
@@ -3283,7 +3286,30 @@
         "App:NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App:PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "App:PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "DataFiles:BasePath": "[parameters('publicDataFileshareMountPath')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]"
+      }
+    },
+    {
+      "condition": "[parameters('publicDataDbExists')]",
+      "name": "[concat(variables('publisherAppName'), '/azurestorageaccounts')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
+        "[variables('publicDataFileshareMountPath')]",
+        "[variables('publicDataFileshareName')]",
+        "[variables('publicDataStorageAccountName')]"
+      ],
+      "properties": {
+        "[variables('publicDataFileshareName')]": {
+          "type": "AzureFiles",
+          "accountName": "[variables('publicDataStorageAccountName')]",
+          "shareName": "[variables('publicDataFileshareName')]",
+          "mountPath": "[variables('publicDataFileshareMountPath')]",
+          "protocol": "Smb"
+        }
       }
     },
     {

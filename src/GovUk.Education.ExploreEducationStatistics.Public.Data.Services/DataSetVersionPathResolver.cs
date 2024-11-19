@@ -39,7 +39,7 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 
     public string DirectoryPath(DataSetVersion dataSetVersion)
     {
-        var folderName = !dataSetVersion.IsPublicStatus() 
+        var folderName = dataSetVersion.IsPrivateStatus() 
             ? DraftVersionFolderName
             : $"v{dataSetVersion.SemVersion()}";
         

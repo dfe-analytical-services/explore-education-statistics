@@ -224,7 +224,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
 
         // TODO EES-5660 - remove this migration after it has been run against each Public API-enabled environment.
-        services.AddScoped<EES5660_MigrateDraftDataSetVersionFolderNames>();
+        services.AddScoped<ICustomMigration, EES5660_MigrateDraftDataSetVersionFolderNames>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -307,9 +307,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         var migrations = serviceScope.ServiceProvider.GetServices<ICustomMigration>();
 
-        foreach (var migration in migrations)
-        {
-            migration.Apply();
-        }
+        migrations.ForEach(migration => migration.Apply());
     }
 }
