@@ -665,5 +665,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
             return result;
         }
+
+        public static Task<Either<TFailure, Unit>> OnSuccessAllReturnVoid<TFailure, TSuccess>(
+            this IEnumerable<Task<Either<TFailure, TSuccess>>> tasks)
+        {
+            return tasks.OnSuccessAll().OnSuccessVoid();
+        }
     }
 }

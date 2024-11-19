@@ -67,16 +67,15 @@ Validate order of subjects after refreshing Data and files page
 Order subjects
     user clicks button    Reorder
     user waits until page contains button    Save order
-    user waits until page contains element    id:uploadedDataFiles
 
-    click element    xpath://h3[text()="Four"]    CTRL
+    click element    xpath://div[text()="Four"]    CTRL
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
 
-    click element    xpath://h3[text()="Three"]    CTRL
+    click element    xpath://div[text()="Three"]    CTRL
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
@@ -122,9 +121,8 @@ Reorder subject that is being replaced
 
     user clicks button    Reorder
     user waits until page contains button    Save order
-    user waits until page contains element    id:uploadedDataFiles
 
-    click element    xpath://h3[text()="Three"]    CTRL
+    click element    xpath://div[text()="Three"]    CTRL
     user presses keys    ${SPACE}
     user presses keys    ARROW_UP
     user presses keys    ${SPACE}

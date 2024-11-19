@@ -5,8 +5,8 @@ Library     String
 
 
 *** Variables ***
-${BAU1_BROWSER}=        bau1
-${ANALYST1_BROWSER}=    analyst1
+${BAU1_BROWSER}         bau1
+${ANALYST1_BROWSER}     analyst1
 
 
 *** Keywords ***
@@ -1021,3 +1021,11 @@ user checks checklist errors contains link
     [Arguments]    ${text}
     user waits until page contains testid    releaseChecklist-errors
     user waits until parent contains element    testid:releaseChecklist-errors    link:${text}
+
+user moves item of draggable list down
+    [Arguments]    ${locator}    ${item_num}
+    ${item}=    user gets list item element    ${locator}    ${item_num}
+    set focus to element    ${item}
+    user presses keys    ${SPACE}
+    user presses keys    ARROW_DOWN
+    user presses keys    ${SPACE}

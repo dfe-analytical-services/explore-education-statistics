@@ -305,5 +305,25 @@ describe('ContentHtml', () => {
       expect(externalLink).not.toHaveAttribute('target', '_blank');
       expect(externalLink).not.toHaveAttribute('rel', 'noopener noreferrer');
     });
+
+    test("appends '(opens in a new tab)' to the name for external links", () => {
+      render(
+        <ContentHtml html='<a href="https://gov.uk/">External link</a>' />,
+      );
+
+      const link = screen.getByRole('link');
+
+      expect(link.textContent).toBe('External link (opens in a new tab)');
+    });
+
+    test("does not append '(opens in a new tab)' to any 'mailto:' links", () => {
+      render(
+        <ContentHtml html='<a href="mailto:explore.statistics@education.gov.uk">Mailto link</a>' />,
+      );
+
+      const link = screen.getByRole('link');
+
+      expect(link.textContent).toBe('Mailto link');
+    });
   });
 });

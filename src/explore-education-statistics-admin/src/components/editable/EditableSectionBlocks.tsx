@@ -1,10 +1,10 @@
-import BlockDraggable from '@admin/components/editable/BlockDraggable';
-import BlockDroppable from '@admin/components/editable/BlockDroppable';
+import styles from '@admin/components/editable/EditableSectionBlocks.module.scss';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import { EditableBlock } from '@admin/services/types/content';
 import InsetText from '@common/components/InsetText';
+import { ReorderResult } from '@common/components/ReorderableItem';
+import ReorderableList from '@common/components/ReorderableList';
 import reorder from '@common/utils/reorder';
-import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 import React, { ReactNode, useCallback } from 'react';
 
 export interface EditableSectionBlockProps<
@@ -12,7 +12,6 @@ export interface EditableSectionBlockProps<
 > {
   blocks: T[];
   isReordering?: boolean;
-  sectionId: string;
   onBlocksChange?: (nextBlocks: T[]) => void;
   renderBlock: (block: T) => ReactNode;
   renderEditableBlock: (block: T) => ReactNode;
@@ -21,18 +20,15 @@ export interface EditableSectionBlockProps<
 const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
   blocks = [],
   isReordering = false,
-  sectionId,
   renderBlock,
   renderEditableBlock,
   onBlocksChange,
 }: EditableSectionBlockProps<T>) => {
   const { editingMode } = useEditingContext();
 
-  const handleDragEnd = useCallback(
-    ({ source, destination }: DropResult) => {
-      if (destination && onBlocksChange) {
-        onBlocksChange(reorder(blocks, source.index, destination.index));
-      }
+  const handleMoveBlock = useCallback(
+    ({ prevIndex, nextIndex }: ReorderResult) => {
+      onBlocksChange?.(reorder(blocks, prevIndex, nextIndex));
     },
     [blocks, onBlocksChange],
   );
@@ -59,32 +55,39 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
     return <InsetText>There is no content for this section.</InsetText>;
   }
 
+  if (isReordering) {
+    return (
+      <ReorderableList
+        id="reorder-sections"
+        list={blocks.map(block => ({
+          id: block.id,
+          label: (
+            <div className={styles.draggable}>
+              {block.type === 'HtmlBlock' && block.body
+                ? renderBlock(block)
+                : 'This section is empty'}
+            </div>
+          ),
+        }))}
+        onMoveItem={handleMoveBlock}
+      />
+    );
+  }
+
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <BlockDroppable
-        droppable={isReordering && editingMode === 'edit'}
-        droppableId={sectionId}
-      >
-        {blocks.map((block, index) => (
-          <div
-            key={block.id}
-            id={`editableSectionBlocks-${block.id}`}
-            className="govuk-!-margin-bottom-9"
-            data-scroll
-            data-testid="editableSectionBlock"
-          >
-            <BlockDraggable
-              draggable={isReordering && editingMode === 'edit'}
-              draggableId={block.id}
-              key={block.id}
-              index={index}
-            >
-              {renderEditableBlock(block)}
-            </BlockDraggable>
-          </div>
-        ))}
-      </BlockDroppable>
-    </DragDropContext>
+    <div>
+      {blocks.map(block => (
+        <div
+          key={block.id}
+          id={`editableSectionBlocks-${block.id}`}
+          className="govuk-!-margin-bottom-9"
+          data-scroll
+          data-testid="editableSectionBlock"
+        >
+          {renderEditableBlock(block)}
+        </div>
+      ))}
+    </div>
   );
 };
 

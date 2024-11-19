@@ -44,8 +44,8 @@ The performance test suite is built using [k6](https://k6.io/) and visualised us
 
 ## How it works
 
-* We run InfluxDB (for collecting data) and Grafana (for visualising the collected data) using docker-compose.
-* We run the K6 tests using docker-compose. We can choose specific tests to run from the CLI.
+* We run InfluxDB (for collecting data) and Grafana (for visualising the collected data) using Docker Compose.
+* We run the K6 tests using Docker Compose. We can choose specific tests to run from the CLI.
 * The K6 tests run and post data to InfluxDB.
 * Grafana is set up with a Dashboard that consumes and visualises data from the InfluxDB data source.
 

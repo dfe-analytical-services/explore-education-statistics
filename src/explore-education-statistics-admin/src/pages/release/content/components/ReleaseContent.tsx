@@ -204,7 +204,6 @@ const ReleaseContent = ({
               <>
                 <EditableSectionBlocks
                   blocks={release.summarySection.content}
-                  sectionId={release.summarySection.id}
                   renderBlock={block => (
                     <ReleaseBlock
                       block={block}
@@ -463,7 +462,6 @@ const ReleaseContent = ({
             release.relatedDashboardsSection?.content.length ? (
               <EditableSectionBlocks
                 blocks={release.relatedDashboardsSection.content}
-                sectionId={release.relatedDashboardsSection.id}
                 renderBlock={block => (
                   <ReleaseBlock block={block} releaseId={release.id} />
                 )}

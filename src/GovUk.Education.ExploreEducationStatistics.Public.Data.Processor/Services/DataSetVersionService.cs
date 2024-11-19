@@ -8,11 +8,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Semver;
 using Release = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Release;
 using ValidationMessages =
@@ -24,8 +26,8 @@ internal class DataSetVersionService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
     IReleaseFileRepository releaseFileRepository,
-    IDataSetVersionPathResolver dataSetVersionPathResolver
-) : IDataSetVersionService
+    IDataSetVersionPathResolver dataSetVersionPathResolver,
+    IOptions<AppOptions> options) : IDataSetVersionService
 {
     public async Task<Either<ActionResult, Guid>> CreateInitialVersion(
         Guid dataSetId,
@@ -61,21 +63,18 @@ internal class DataSetVersionService(
 
     public async Task<Either<ActionResult, Unit>> BulkDeleteVersions(
         Guid releaseVersionId,
+        bool forceDeleteAll = false,
         CancellationToken cancellationToken = default)
     {
         return await publicDataDbContext.RequireTransaction(() =>
             GetReleaseFiles(releaseVersionId, cancellationToken)
                 .OnSuccessCombineWith(async releaseFiles => await GetDataSetVersions(releaseFiles, cancellationToken))
-                .OnSuccess(releaseFilesAndDataSetVersions =>
-                {
-                    var (releaseFiles, dataSetVersions) = releaseFilesAndDataSetVersions;
-
-                    return CheckCanDeleteDataSetVersions(dataSetVersions)
-                        .OnSuccess(() => (releaseFiles, dataSetVersions));
-                })
+                .OnSuccess(releaseFilesAndDataSetVersions => 
+                    (releaseFiles: releaseFilesAndDataSetVersions.Item1, dataSetVersions: releaseFilesAndDataSetVersions.Item2))
+                .OnSuccessDo(releaseFilesAndDataSetVersions =>
+                    CheckCanDeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, forceDeleteAll))
                 .OnSuccessDo(async releaseFilesAndDataSetVersions =>
-                    await UnlinkReleaseFilesFromApiDataSets(releaseFilesAndDataSetVersions.releaseFiles,
-                        cancellationToken))
+                    await UnlinkReleaseFilesFromApiDataSets(releaseFilesAndDataSetVersions.releaseFiles, cancellationToken))
                 .OnSuccessDo(async releaseFilesAndDataSetVersions =>
                     await DeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, cancellationToken))
                 .OnSuccessVoid(releaseFilesAndDataSetVersions =>
@@ -88,7 +87,9 @@ internal class DataSetVersionService(
     {
         return await publicDataDbContext.RequireTransaction(() =>
             GetDataSetVersion(dataSetVersionId, cancellationToken)
-                .OnSuccessDo(CheckCanDeleteDataSetVersion)
+                .OnSuccessDo(dataSetVersion => CheckCanDeleteDataSetVersion(
+                    dataSetVersion: dataSetVersion,
+                    forceDeleteAll: false))
                 .OnSuccessDo(async dataSetVersion => await UpdateReleaseFiles(dataSetVersion, cancellationToken))
                 .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
                 .OnSuccessVoid(DeleteDuckDbFiles));
@@ -120,13 +121,17 @@ internal class DataSetVersionService(
             .SingleOrNotFoundAsync(cancellationToken);
     }
 
-    private static Either<ActionResult, Unit> CheckCanDeleteDataSetVersions(
-        IReadOnlyList<DataSetVersion> dataSetVersions)
+    private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataSetVersions(
+        IReadOnlyList<DataSetVersion> dataSetVersions,
+        bool forceDeleteAll = false)
     {
-        var versionsWhichCanNotBeDeleted = dataSetVersions
-            .Where(dsv => !dsv.CanBeDeleted)
+        var versionsWhichCanNotBeDeleted = await dataSetVersions
+            .ToAsyncEnumerable()
+            .WhereAwait(async dsv => !await CanDeleteDataSetVersion(
+                dataSetVersion: dsv, 
+                forceDeleteAll: forceDeleteAll))
             .Select(dsv => dsv.Id)
-            .ToList();
+            .ToListAsync();
 
         if (!versionsWhichCanNotBeDeleted.Any())
         {
@@ -142,9 +147,38 @@ internal class DataSetVersionService(
         });
     }
 
-    private static Either<ActionResult, Unit> CheckCanDeleteDataSetVersion(DataSetVersion dataSetVersion)
+    private async Task<bool> CanDeleteDataSetVersion(
+        DataSetVersion dataSetVersion,
+        bool forceDeleteAll = false)
     {
         if (dataSetVersion.CanBeDeleted)
+        {
+            return true;
+        }
+
+        if (!forceDeleteAll || !options.Value.EnableThemeDeletion)
+        {
+            return false;
+        }
+        
+        var releaseFile = await contentDbContext
+            .ReleaseFiles
+            .AsNoTracking()
+            .Include(releaseFile => releaseFile.ReleaseVersion.Publication.Theme)
+            .SingleAsync(releaseFile => releaseFile.Id == dataSetVersion.Release.ReleaseFileId);
+
+        return releaseFile.ReleaseVersion.Publication.Theme.IsTestOrSeedTheme();
+    }
+
+    private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataSetVersion(
+        DataSetVersion dataSetVersion,
+        bool forceDeleteAll = false)
+    {
+        var canDelete = await CanDeleteDataSetVersion(
+            dataSetVersion: dataSetVersion,
+            forceDeleteAll);
+        
+        if (canDelete)
         {
             return Unit.Instance;
         }

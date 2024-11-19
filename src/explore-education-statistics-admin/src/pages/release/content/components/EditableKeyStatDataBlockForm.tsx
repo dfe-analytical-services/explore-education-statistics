@@ -17,7 +17,6 @@ export interface KeyStatDataBlockFormValues {
 }
 
 export interface EditableKeyStatDataBlockFormProps {
-  isReordering?: boolean;
   keyStat: KeyStatisticDataBlock;
   keyStatisticGuidanceTitles?: (string | undefined)[];
   statistic: string;
@@ -28,7 +27,6 @@ export interface EditableKeyStatDataBlockFormProps {
 }
 
 export default function EditableKeyStatDataBlockForm({
-  isReordering = false,
   keyStat,
   keyStatisticGuidanceTitles,
   statistic,
@@ -84,7 +82,6 @@ export default function EditableKeyStatDataBlockForm({
               titleTag="h4"
               testId={testId}
               value={statistic}
-              isReordering={isReordering}
             >
               <FormFieldTextInput<KeyStatDataBlockFormValues>
                 name="trend"

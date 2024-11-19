@@ -1,7 +1,7 @@
-import { resourceNamesType } from '../../types.bicep'
+import { ResourceNames } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
-param resourceNames resourceNamesType
+param resourceNames ResourceNames
 
 var subnets = resourceNames.existingResources.subnets
 
@@ -44,8 +44,11 @@ resource appGatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01'
   parent: vNet
 }
 
-@description('The fully qualified Azure resource ID of the Network.')
+@description('The fully qualified Azure resource ID of the virtual network')
 output vnetId string = resourceId('Microsoft.Network/VirtualNetworks', resourceNames.existingResources.vNet)
+
+@description('The name of the virtual network')
+output vnetName string = vNet.name
 
 @description('The fully qualified Azure resource ID of the Data Processor Function App Subnet.')
 output dataProcessorSubnetRef string = dataProcessorSubnet.id

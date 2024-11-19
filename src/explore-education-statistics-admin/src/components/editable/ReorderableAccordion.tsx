@@ -1,7 +1,8 @@
-import DroppableArea from '@admin/components/DroppableArea';
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import Button from '@common/components/Button';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import { ReorderResult } from '@common/components/ReorderableItem';
+import ReorderableList from '@common/components/ReorderableList';
 import useToggle from '@common/hooks/useToggle';
 import { OmitStrict } from '@common/types';
 import reorder from '@common/utils/reorder';
@@ -14,12 +15,8 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import styles from './ReorderableAccordion.module.scss';
-import {
-  DraggableAccordionSectionProps,
-  ReorderableAccordionSectionProps,
-} from './ReorderableAccordionSection';
+import { ReorderableAccordionSectionProps } from './ReorderableAccordionSection';
 
 export interface ReorderableAccordionProps
   extends OmitStrict<AccordionProps, 'openAll'> {
@@ -29,7 +26,7 @@ export interface ReorderableAccordionProps
   reorderHiddenText?: string;
 }
 
-const ReorderableAccordion = (props: ReorderableAccordionProps) => {
+export default function ReorderableAccordion(props: ReorderableAccordionProps) {
   const {
     children,
     id,
@@ -39,7 +36,7 @@ const ReorderableAccordion = (props: ReorderableAccordionProps) => {
     reorderHiddenText = 'sections',
   } = props;
 
-  const [isReordering, toggleReordering] = useToggle(false);
+  const [isReordering, toggleIsReordering] = useToggle(false);
 
   const [sections, setSections] = useState<
     ReactElement<ReorderableAccordionSectionProps>[]
@@ -56,81 +53,64 @@ const ReorderableAccordion = (props: ReorderableAccordionProps) => {
   const saveOrder = useCallback(async () => {
     if (onReorder) {
       await onReorder(sections.map(section => section.props.id));
-      toggleReordering.off();
+      toggleIsReordering.off();
     }
-  }, [onReorder, sections, toggleReordering]);
+  }, [onReorder, sections, toggleIsReordering]);
 
   const handleDragEnd = useCallback(
-    ({ source, destination }: DropResult) => {
-      if (source && destination) {
-        setSections(reorder(sections, source.index, destination.index));
-      }
+    ({ prevIndex, nextIndex }: ReorderResult) => {
+      setSections(reorder(sections, prevIndex, nextIndex));
     },
     [sections],
   );
 
-  const accordion = useMemo(() => {
-    return (
-      <Accordion {...props} openAll={isReordering ? false : undefined}>
-        {sections.map((child, index) => {
-          const section = child as ReactElement<
-            ReorderableAccordionSectionProps & DraggableAccordionSectionProps
-          >;
+  const reorderableSections = useMemo(() => {
+    return sections.map(child => {
+      const section = child as ReactElement<ReorderableAccordionSectionProps>;
 
-          return cloneElement(section, {
-            index,
-            isReordering,
-          });
-        })}
-      </Accordion>
-    );
-  }, [isReordering, props, sections]);
+      return {
+        id: section.props.id,
+        label: cloneElement(section, {
+          isReordering,
+        }),
+      };
+    });
+  }, [isReordering, sections]);
 
   return (
     <div className={styles.container}>
       <div className="dfe-flex dfe-justify-content--space-between govuk-!-margin-bottom-3">
         <h2 className="govuk-heading-l govuk-!-margin-bottom-0">{heading}</h2>
 
-        {sections.length > 1 &&
-          canReorder &&
-          (!isReordering ? (
-            <Button
-              variant="secondary"
-              className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
-              onClick={toggleReordering.on}
-              data-testid="reorder-files"
-            >
-              Reorder
-              <VisuallyHidden> {reorderHiddenText}</VisuallyHidden>
-            </Button>
-          ) : (
-            <Button
-              className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
-              onClick={saveOrder}
-            >
-              Save order
-            </Button>
-          ))}
+        {sections.length > 1 && canReorder && (
+          <Button
+            className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
+            variant={isReordering ? 'secondary' : undefined}
+            onClick={() =>
+              isReordering ? saveOrder() : toggleIsReordering.on()
+            }
+          >
+            {isReordering ? (
+              'Save order'
+            ) : (
+              <>
+                Reorder
+                <VisuallyHidden> {reorderHiddenText}</VisuallyHidden>
+              </>
+            )}
+          </Button>
+        )}
       </div>
 
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable
-          droppableId={id}
-          isDropDisabled={!isReordering}
-          type="accordion"
-        >
-          {(droppableProvided, droppableSnapshot) => (
-            <DroppableArea
-              droppableProvided={droppableProvided}
-              droppableSnapshot={droppableSnapshot}
-            >
-              {accordion}
-            </DroppableArea>
-          )}
-        </Droppable>
-      </DragDropContext>
+      {isReordering ? (
+        <ReorderableList
+          id={id}
+          list={reorderableSections}
+          onMoveItem={handleDragEnd}
+        />
+      ) : (
+        <Accordion {...props}>{sections}</Accordion>
+      )}
     </div>
   );
-};
-
-export default ReorderableAccordion;
+}

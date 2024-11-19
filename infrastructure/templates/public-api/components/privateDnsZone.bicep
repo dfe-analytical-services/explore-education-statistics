@@ -1,7 +1,7 @@
-import { privateDnsZoneType } from '../types.bicep'
+import { PrivateDnsZone } from '../types.bicep'
 
 @description('Specifies the type of zone to create')
-param zoneType privateDnsZoneType
+param zoneType PrivateDnsZone
 
 @description('Specifies an optional name for the zone, if "custom" zoneType was chosen')
 param customName string?

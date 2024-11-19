@@ -953,6 +953,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.ToTable("ReleaseFiles");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRedirect", b =>
+                {
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ReleaseId", "Slug");
+
+                    b.ToTable("ReleaseRedirects");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1131,6 +1147,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("DeletedById")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -1140,7 +1159,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("SoftDeleted")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("DeletedById");
 
                     b.ToTable("Users");
                 });
@@ -1872,6 +1896,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("ReleaseVersion");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRedirect", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
+                        .WithMany()
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Release");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
@@ -1939,6 +1974,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ReleaseVersion");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.User", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById");
+
+                    b.Navigation("DeletedBy");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.UserPublicationInvite", b =>

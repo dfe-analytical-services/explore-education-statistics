@@ -59,6 +59,9 @@
     "publicApiUrl": {
       "value": "dev.statistics.api.education.gov.uk"
     },
+    "publicApiDocsUrl": {
+      "value": "dev.statistics.api.education.gov.uk/docs"
+    },
     "detailedErrors": {
       "value": true
     },
