@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -37,7 +38,8 @@ public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationF
             .DefaultDataSetVersion()
             .WithId(Guid.NewGuid())
             .WithDataSet(DataFixture
-                .DefaultDataSet())
+                .DefaultDataSet()
+                .WithId(Guid.NewGuid()))
             .WithStatus(status)
             .WithVersionNumber(
                 major: type == DataSetVersionType.Major ? 2 : 1,
@@ -51,9 +53,7 @@ public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationF
         Directory.CreateDirectory(versionedFolder);
         File.Create(Path.Combine(versionedFolder, "test.txt"));
         
-        var migration = TestApp.Services.GetRequiredService<EES5660_MigrateDraftDataSetVersionFolderNames>();
-
-        migration.Apply();
+        GetMigration().Apply();
 
         // Assert that the original folder that used the draft's version in its name no longer exists.
         Assert.False(Directory.Exists(versionedFolder));
@@ -63,7 +63,7 @@ public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationF
         Assert.True(Directory.Exists(expectedDraftFolder));
         Assert.True(File.Exists(Path.Combine(expectedDraftFolder, "test.txt")));
     }
-    
+
     [Theory]
     [MemberData(nameof(PrivateDataSetVersionStatusAndTypes))]
     public async Task Success_AlreadyMigratedDraft(Tuple<DataSetVersionStatus, DataSetVersionType> statusAndType)
@@ -89,9 +89,7 @@ public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationF
         Directory.CreateDirectory(draftFolder);
         File.Create(Path.Combine(draftFolder, "test.txt"));
         
-        var migration = TestApp.Services.GetRequiredService<EES5660_MigrateDraftDataSetVersionFolderNames>();
-
-        migration.Apply();
+        GetMigration().Apply();
 
         // Assert that the existing draft folder is left untouched.
         Assert.True(Directory.Exists(draftFolder));
@@ -106,7 +104,7 @@ public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationF
             .WithDataSet(DataFixture.DefaultDataSet())
             .WithStatus(DataSetVersionStatus.Draft)
             .WithVersionNumber(major: 2, minor: 0);
-        
+     
         await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
         var pathResolver = TestApp.Services.GetRequiredService<IDataSetVersionPathResolver>();
@@ -119,17 +117,15 @@ public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationF
         Directory.CreateDirectory(draftFolder);
         File.Create(Path.Combine(draftFolder, "draft.txt"));
 
-        var migration = TestApp.Services.GetRequiredService<EES5660_MigrateDraftDataSetVersionFolderNames>();
+        var exception = Assert.Throws<Exception>(GetMigration().Apply);
 
-        var exception = Assert.Throws<Exception>(migration.Apply);
-        
         Assert.Equal("The following DataSetVersions have both a versioned " +
                      "and a draft folder: " + dataSetVersion.Id, exception.Message);
 
         // Assert that the versioned folder still exists.
         Assert.True(Directory.Exists(versionedFolder));
         Assert.True(File.Exists(Path.Combine(versionedFolder, "versioned.txt")));
-        
+
         // Assert that the draft folder still exists.
         Assert.True(Directory.Exists(draftFolder));
         Assert.True(File.Exists(Path.Combine(draftFolder, "draft.txt")));
@@ -160,9 +156,7 @@ public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationF
         Directory.CreateDirectory(versionedFolder);
         File.Create(Path.Combine(versionedFolder, "test.txt"));
         
-        var migration = TestApp.Services.GetRequiredService<EES5660_MigrateDraftDataSetVersionFolderNames>();
-
-        migration.Apply();
+        GetMigration().Apply();
 
         // Assert that the original folder has been left unaffected.
         Assert.True(Directory.Exists(versionedFolder));
@@ -172,5 +166,15 @@ public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationF
         dataSetVersion.Status = DataSetVersionStatus.Draft;
         var draftFolder = pathResolver.DirectoryPath(dataSetVersion);
         Assert.False(Directory.Exists(draftFolder));
+    }
+
+    private EES5660_MigrateDraftDataSetVersionFolderNames GetMigration()
+    {
+        return TestApp
+            .Services
+            .GetServices<ICustomMigration>()
+            .Where(migration => migration.GetType() == typeof(EES5660_MigrateDraftDataSetVersionFolderNames))
+            .Cast<EES5660_MigrateDraftDataSetVersionFolderNames>()
+            .Single();
     }
 }

@@ -783,7 +783,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     context.Database.Migrate();
                 }
 
-                ApplyCustomMigrations(app);
+                if (!env.IsIntegrationTest())
+                {
+                    ApplyCustomMigrations(app);
+                }
             }
 
             if (env.IsDevelopment())

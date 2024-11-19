@@ -230,7 +230,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        UpdateDatabase(app);
+        UpdateDatabase(app, env);
 
         if (_miniProfilerOptions.Enabled)
         {
@@ -285,7 +285,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         app.UseHealthChecks("/health");
     }
 
-    private static void UpdateDatabase(IApplicationBuilder app)
+    private static void UpdateDatabase(IApplicationBuilder app, IHostEnvironment env)
     {
         using var serviceScope = app.ApplicationServices
             .GetRequiredService<IServiceScopeFactory>()
@@ -296,7 +296,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         context.Database.SetCommandTimeout(300);
         context.Database.Migrate();
 
-        ApplyCustomMigrations(app);
+        if (!env.IsIntegrationTest())
+        {
+            ApplyCustomMigrations(app);
+        }
     }
 
     private static void ApplyCustomMigrations(IApplicationBuilder app)
