@@ -594,8 +594,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         // Expect the ReleaseVersions from the more recent Release to be deleted first. 
                         release1Version3.Id,
-                        release1Version2Cancelled.Id,
                         release1Version2.Id,
+                        release1Version2Cancelled.Id,
                         release1Version1.Id,
                         release2Version2.Id,
                         release2Version1.Id,
