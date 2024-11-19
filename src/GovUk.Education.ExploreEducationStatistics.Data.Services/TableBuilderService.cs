@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             CancellationToken cancellationToken = default)
         {
             return await FindLatestPublishedReleaseVersionId(query.SubjectId)
-                .OnSuccessVoid(releaseId => QueryToCsvStream(releaseId, query, stream, cancellationToken));
+                .OnSuccessVoid(releaseVersionId => QueryToCsvStream(releaseVersionId, query, stream, cancellationToken));
         }
 
         public async Task<Either<ActionResult, Unit>> QueryToCsvStream(

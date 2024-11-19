@@ -290,8 +290,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 ReleaseVersion releaseVersion = _fixture
                     .DefaultReleaseVersion()
-                    .WithPublication(_fixture
-                        .DefaultPublication());
+                    .WithRelease(_fixture.DefaultRelease()
+                        .WithPublication(_fixture
+                            .DefaultPublication()));
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -328,8 +329,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 ReleaseVersion releaseVersion = _fixture
                     .DefaultReleaseVersion()
-                    .WithPublication(_fixture
-                        .DefaultPublication());
+                    .WithRelease(_fixture.DefaultRelease()
+                        .WithPublication(_fixture
+                            .DefaultPublication()));
 
                 Data.Model.ReleaseVersion existingStatsReleaseVersion = _fixture
                     .DefaultStatsReleaseVersion()

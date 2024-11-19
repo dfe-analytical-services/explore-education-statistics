@@ -141,16 +141,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
                 .OnSuccess(async publication =>
                 {
+                    var release = new Release
+                    {
+                        PublicationId = releaseCreate.PublicationId,
+                        Year = releaseCreate.Year,
+                        TimePeriodCoverage = releaseCreate.TimePeriodCoverage,
+                        Slug = releaseCreate.Slug
+                    };
+
                     var newReleaseVersion = new ReleaseVersion
                     {
                         Id = _guidGenerator.NewGuid(),
-                        Release = new Release(),
-                        PublicationId = releaseCreate.PublicationId,
-                        Slug = releaseCreate.Slug,
-                        TimePeriodCoverage = releaseCreate.TimePeriodCoverage,
-                        ReleaseName = releaseCreate.Year.ToString(),
+                        Release = release,
                         Type = releaseCreate.Type,
-                        ApprovalStatus = ReleaseApprovalStatus.Draft
+                        ApprovalStatus = ReleaseApprovalStatus.Draft,
+
+                        // TODO Remove the following in EES-5659
+                        PublicationId = release.PublicationId,
+                        TimePeriodCoverage = release.TimePeriodCoverage,
+                        ReleaseName = release.Year.ToString(),
+                        Slug = release.Slug
                     };
 
                     if (releaseCreate.TemplateReleaseId.HasValue)
@@ -499,7 +509,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId, ReleaseUpdateRequest request)
         {
             return await ReleaseUpdateRequestValidator.Validate(request)
-                .OnSuccess(async () => await CheckReleaseVersionExists(releaseVersionId))
+                .OnSuccess(async () =>
+                    await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId,
+                        queryable => queryable.Include(rv => rv.Release)))
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccessDo(async releaseVersion =>
                     await ValidateReleaseSlugUniqueToPublication(request.Slug,
@@ -509,10 +521,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await _context.RequireTransaction(async () =>
                     {
-                        releaseVersion.Slug = request.Slug;
+                        if (releaseVersion.Version > 0)
+                        {
+                            var yearChanged = releaseVersion.Year != request.Year;
+                            var timePeriodCoverageChanged =
+                                releaseVersion.TimePeriodCoverage != request.TimePeriodCoverage;
+
+                            if (yearChanged || timePeriodCoverageChanged)
+                            {
+                                throw new ArgumentException(
+                                    $"Cannot update {nameof(request.Year)} or {nameof(request.TimePeriodCoverage)} for a release that has already been published",
+                                    nameof(request));
+                            }
+                        }
+
+                        releaseVersion.Release.Year = request.Year;
+                        releaseVersion.Release.TimePeriodCoverage = request.TimePeriodCoverage;
+                        releaseVersion.Release.Slug = request.Slug;
+
+                        // TODO The following will be removed in EES-5659
+                        releaseVersion.ReleaseName = releaseVersion.Release.Year.ToString();
+                        releaseVersion.TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage;
+                        releaseVersion.Slug = releaseVersion.Release.Slug;
+
                         releaseVersion.Type = request.Type;
-                        releaseVersion.ReleaseName = request.Year.ToString();
-                        releaseVersion.TimePeriodCoverage = request.TimePeriodCoverage;
                         releaseVersion.PreReleaseAccessList = request.PreReleaseAccessList;
 
                         await _dataSetVersionService.UpdateVersionsForReleaseVersion(

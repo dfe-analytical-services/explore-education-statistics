@@ -350,7 +350,8 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(
                 .DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture
                     .DefaultReleaseVersion()
-                    .WithPublicationId(publicationId))
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublicationId(publicationId)))
                 .WithFiles([
                     DataFixture
                         .DefaultFile(FileType.Data)

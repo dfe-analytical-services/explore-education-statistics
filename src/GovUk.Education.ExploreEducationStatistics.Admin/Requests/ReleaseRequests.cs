@@ -37,7 +37,7 @@ public record ReleaseUpdateRequest
     [Required]
     public TimeIdentifier TimePeriodCoverage { get; init; }
 
-    public string PreReleaseAccessList { get; init; } = String.Empty;
+    public string PreReleaseAccessList { get; init; } = string.Empty;
 
     public string Slug => SlugFromTitle(Title);
 

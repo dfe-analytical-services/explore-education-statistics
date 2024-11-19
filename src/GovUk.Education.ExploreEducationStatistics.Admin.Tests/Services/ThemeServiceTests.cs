@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Theme = GovUk.Education.ExploreEducationStatistics.Content.Model.Theme;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -312,21 +314,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "UI test theme to delete"
             };
 
-            var releaseVersion = _fixture
+            ReleaseVersion releaseVersion = _fixture
                 .DefaultReleaseVersion()
                 .WithId(releaseVersionId)
-                .WithRelease(_fixture.DefaultRelease())
-                .WithPublication(
-                    _fixture
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture
                         .DefaultPublication()
-                        .WithTheme(theme)
-                        .Generate())
-                .Generate();
+                        .WithTheme(theme)));
 
-            var methodology = _fixture
+            Methodology methodology = _fixture
                 .DefaultMethodology()
-                .WithOwningPublication(releaseVersion.Publication)
-                .Generate();
+                .WithOwningPublication(releaseVersion.Publication);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -390,45 +388,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "UI test theme to delete"
             };
 
-            var publication = _fixture
+            Publication publication = _fixture
                 .DefaultPublication()
-                .WithTheme(theme)
-                .Generate();
+                .WithTheme(theme);
 
-            var releaseVersion1 = _fixture
+            ReleaseVersion releaseVersion1 = _fixture
                 .DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease())
-                .WithPublication(publication)
-                .Generate();
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(publication));
 
-            var releaseVersion1ReleaseFile = _fixture
+            ReleaseFile releaseVersion1ReleaseFile = _fixture
                 .DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion1)
-                .Generate();
+                .WithReleaseVersion(releaseVersion1);
 
-            var releaseVersion2 = _fixture
+            ReleaseVersion releaseVersion2 = _fixture
                 .DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease())
-                .WithPublication(publication)
-                .Generate();
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(publication));
 
-            var releaseVersion2ReleaseFile = _fixture
+            ReleaseFile releaseVersion2ReleaseFile = _fixture
                 .DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion2)
-                .Generate();
+                .WithReleaseVersion(releaseVersion2);
 
-            var releaseVersion3 = _fixture
+            ReleaseVersion releaseVersion3 = _fixture
                 .DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease())
-                .WithPublication(publication)
-                .Generate();
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(publication));
 
-            var releaseVersion3ReleaseFile = _fixture
+            ReleaseFile releaseVersion3ReleaseFile = _fixture
                 .DefaultReleaseFile()
-                .WithReleaseVersion(releaseVersion3)
-                .Generate();
+                .WithReleaseVersion(releaseVersion3);
 
-            var dataSet = _fixture.DefaultDataSet().Generate();
+            DataSet dataSet = _fixture.DefaultDataSet();
 
             var dataSetVersions = _fixture
                 .DefaultDataSetVersion()
@@ -507,63 +498,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "UI test theme to delete"
             };
 
-            var publication = _fixture
+            Publication publication = _fixture
                 .DefaultPublication()
-                .WithTheme(theme)
-                .Generate();
+                .WithTheme(theme);
 
-            var release1 = _fixture
+            Release release1 = _fixture
                 .DefaultRelease()
-                .WithCreated(DateTime.UtcNow.AddDays(-1))
-                .Generate();
+                .WithPublication(publication)
+                .WithCreated(DateTime.UtcNow.AddDays(-1));
 
-            var release2 = _fixture
+            Release release2 = _fixture
                 .DefaultRelease()
-                .WithCreated(DateTime.UtcNow.AddDays(-2))
-                .Generate();
+                .WithPublication(publication)
+                .WithCreated(DateTime.UtcNow.AddDays(-2));
 
-            var release1Version1 = _fixture
+            ReleaseVersion release1Version1 = _fixture
                 .DefaultReleaseVersion()
                 .WithVersion(0)
-                .WithRelease(release1)
-                .WithPublication(publication)
-                .Generate();
+                .WithRelease(release1);
 
-            var release1Version2 = _fixture
+            ReleaseVersion release1Version2 = _fixture
                 .DefaultReleaseVersion()
                 .WithVersion(1)
-                .WithRelease(release1)
-                .WithPublication(publication)
-                .Generate();
+                .WithRelease(release1);
 
-            var release1Version2Cancelled = _fixture
+            ReleaseVersion release1Version2Cancelled = _fixture
                 .DefaultReleaseVersion()
                 .WithVersion(1)
                 .WithSoftDeleted()
-                .WithRelease(release1)
-                .WithPublication(publication)
-                .Generate();
+                .WithRelease(release1);
 
-            var release1Version3 = _fixture
+            ReleaseVersion release1Version3 = _fixture
                 .DefaultReleaseVersion()
                 .WithVersion(2)
-                .WithRelease(release1)
-                .WithPublication(publication)
-                .Generate();
+                .WithRelease(release1);
 
-            var release2Version1 = _fixture
+            ReleaseVersion release2Version1 = _fixture
                 .DefaultReleaseVersion()
                 .WithVersion(0)
-                .WithRelease(release2)
-                .WithPublication(publication)
-                .Generate();
+                .WithRelease(release2);
 
-            var release2Version2 = _fixture
+            ReleaseVersion release2Version2 = _fixture
                 .DefaultReleaseVersion()
                 .WithVersion(1)
-                .WithRelease(release2)
-                .WithPublication(publication)
-                .Generate();
+                .WithRelease(release2);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -787,21 +765,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "UI test theme to delete"
             };
 
-            var releaseVersion = _fixture
+            ReleaseVersion releaseVersion = _fixture
                 .DefaultReleaseVersion()
                 .WithId(releaseVersionId)
-                .WithRelease(_fixture.DefaultRelease())
-                .WithPublication(
-                    _fixture
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture
                         .DefaultPublication()
-                        .WithTheme(theme)
-                        .Generate())
-                .Generate();
+                        .WithTheme(theme)));
 
-            var methodology = _fixture
+            Methodology methodology = _fixture
                 .DefaultMethodology()
-                .WithOwningPublication(releaseVersion.Publication)
-                .Generate();
+                .WithOwningPublication(releaseVersion.Publication);
 
             var otherReleaseVersionId = Guid.NewGuid();
 
@@ -811,21 +785,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "UI test theme to retain"
             };
 
-            var otherReleaseVersion = _fixture
+            ReleaseVersion otherReleaseVersion = _fixture
                 .DefaultReleaseVersion()
                 .WithId(otherReleaseVersionId)
-                .WithRelease(_fixture.DefaultRelease())
-                .WithPublication(
-                    _fixture
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture
                         .DefaultPublication()
-                        .WithTheme(otherTheme)
-                        .Generate())
-                .Generate();
+                        .WithTheme(otherTheme)));
 
-            var otherMethodology = _fixture
+            Methodology otherMethodology = _fixture
                 .DefaultMethodology()
-                .WithOwningPublication(otherReleaseVersion.Publication)
-                .Generate();
+                .WithOwningPublication(otherReleaseVersion.Publication);
 
             var contextId = Guid.NewGuid().ToString();
 
