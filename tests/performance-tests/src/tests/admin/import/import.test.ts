@@ -84,7 +84,7 @@ const processingStages: {
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
-const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
+const { adminUrl } = environmentAndUsers.environment;
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
@@ -114,12 +114,7 @@ export function setup(): SetupData {
 }
 
 const performTest = ({ themeId, publicationId }: SetupData) => {
-  const accessToken = getOrRefreshAccessTokens(
-    supportsRefreshTokens,
-    userName,
-    adminUrl,
-    authTokens,
-  );
+  const accessToken = getOrRefreshAccessTokens(userName, authTokens);
 
   const uniqueId = Date.now();
   const subjectName = `subject-${uniqueId}`;
@@ -222,12 +217,7 @@ const performTest = ({ themeId, publicationId }: SetupData) => {
 
 export const teardown = ({ themeId }: SetupData) => {
   if (tearDownData) {
-    const accessToken = getOrRefreshAccessTokens(
-      supportsRefreshTokens,
-      userName,
-      adminUrl,
-      authTokens,
-    );
+    const accessToken = getOrRefreshAccessTokens(userName, authTokens);
 
     const adminService = createAdminService(adminUrl, accessToken);
 
@@ -242,4 +232,5 @@ export function handleSummary(data: unknown) {
     'import.html': htmlReport(data),
   };
 }
+
 export default performTest;

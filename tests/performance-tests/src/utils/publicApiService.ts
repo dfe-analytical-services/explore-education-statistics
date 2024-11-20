@@ -1,4 +1,3 @@
-import { RefinedResponse } from 'k6/http';
 import HttpClient from './httpClient';
 
 const applicationJsonHeaders = {
@@ -36,12 +35,15 @@ export interface Publication {
 interface DataSet {
   id: string;
   title: string;
-  description: string;
-  timePeriods: {
-    start: string;
-    end: string;
+  summary: string;
+  latestVersion: {
+    totalResults: number;
+    timePeriods: {
+      start: string;
+      end: string;
+    };
+    geographicLevels: string[];
   };
-  geographicLevels: string[];
 }
 
 export interface Paged<T> {
@@ -54,16 +56,14 @@ export interface Paged<T> {
   results: T[];
 }
 
-interface Location {
-  id: string;
-  level: string;
-  options: GeographicLevelLocations[];
-  label: string;
-  code: string;
-}
-
 interface GeographicLevelLocations {
-  [level: string]: Location[];
+  level: {
+    code: string;
+    label: string;
+  };
+  options: {
+    id: string;
+  }[];
 }
 
 export interface DataSetMeta {
@@ -92,8 +92,8 @@ export interface DataSetMeta {
       decimalPlaces: 0;
     },
   ];
-  locations: GeographicLevelLocations;
-  timePeriods: (TimePeriod & { label: string })[];
+  locations: GeographicLevelLocations[];
+  timePeriods: TimePeriod[];
 }
 
 export interface DataSetQueryIdPredicate {
@@ -141,11 +141,11 @@ export type DataSetQueryNode =
 
 interface TimePeriod {
   code: string;
-  year: number;
+  period: string;
 }
 
 export interface DataSetQueryRequest {
-  facets: DataSetQueryNode;
+  criteria: DataSetQueryNode;
   indicators?: string[];
   sort?: [
     {
@@ -173,33 +173,6 @@ export interface DataSetQueryResponse {
   }[];
 }
 
-// Some Publications and their data sets are currently not discoverable via
-// the API, so we can include them manually here.
-const hiddenPublications: Publication[] = [
-  {
-    id: '1681557f-510f-446e-bc9a-f2c7a59d1cfa',
-    slug: 'benchmark-publication',
-    title: 'Benchmark Publication',
-  },
-];
-
-const hiddenDataSets: { [publicationId: string]: { dataSets: DataSet[] } } = {
-  '1681557f-510f-446e-bc9a-f2c7a59d1cfa': {
-    dataSets: [
-      {
-        id: 'a96044e5-2310-4890-a601-8ca0b67d2964',
-        title: 'QUA01',
-        description: '',
-        geographicLevels: ['National'],
-        timePeriods: {
-          start: '2013/14',
-          end: '2018/19',
-        },
-      },
-    ],
-  },
-};
-
 class PublicApiService {
   private readonly client: HttpClient;
 
@@ -214,36 +187,23 @@ class PublicApiService {
     const { response, json } = this.client.get<Paged<Publication>>(
       '/v1/publications?pageSize=40',
     );
-    const publications: Publication[] = [
-      ...json.results,
-      ...hiddenPublications,
-    ];
     return {
-      publications,
+      publications: json.results,
       response,
     };
   }
 
   listDataSets(publicationId: string) {
-    let response: RefinedResponse<'text'> | undefined;
-    let json: DataSet[];
-
-    if (Object.keys(hiddenDataSets).includes(publicationId)) {
-      json = hiddenDataSets[publicationId].dataSets;
-    } else {
-      const result = this.client.get<DataSet[]>(
-        `/v1/publications/${publicationId}/data-sets`,
-      );
-      response = result.response;
-      json = result.json;
-    }
+    const { response, json } = this.client.get<Paged<DataSet>>(
+      `/v1/publications/${publicationId}/data-sets`,
+    );
     return {
-      dataSets: json,
+      dataSets: json.results,
       response,
     };
   }
 
-  getDataSetsMeta(dataSetId: string) {
+  getDataSetMeta(dataSetId: string) {
     const { response, json } = this.client.get<DataSetMeta>(
       `/v1/data-sets/${dataSetId}/meta`,
     );
@@ -253,25 +213,15 @@ class PublicApiService {
     };
   }
 
-  getDataSetQueryUrl({ dataSetId, page }: { dataSetId: string; page: number }) {
-    return `/v1/data-sets/${dataSetId}/query?page=${page}&pageSize=10000`;
-  }
-
   queryDataSet({
     dataSetId,
     query,
-    page = 1,
   }: {
     dataSetId: string;
     query: DataSetQueryRequest;
-    page?: number;
   }) {
-    const url = this.getDataSetQueryUrl({
-      dataSetId,
-      page,
-    });
     const { response, json } = this.client.post<Paged<DataSetQueryResponse>>(
-      url,
+      `/v1/data-sets/${dataSetId}/query`,
       JSON.stringify(query),
       applicationJsonHeaders,
     );

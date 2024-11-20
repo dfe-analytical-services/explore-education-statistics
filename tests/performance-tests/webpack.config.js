@@ -37,6 +37,11 @@ module.exports = {
           from: '**/*.(csv|zip)',
           to: path.join(__dirname, 'dist'),
         },
+        {
+          context: __dirname,
+          from: '.env.*.json',
+          to: path.join(__dirname, 'dist'),
+        },
       ],
     }),
   ],

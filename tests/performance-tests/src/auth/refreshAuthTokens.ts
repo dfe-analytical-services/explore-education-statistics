@@ -1,41 +1,44 @@
 /* eslint-disable no-console */
 /* eslint-disable camelcase */
 import http from 'k6/http';
-import { AuthDetails } from './getAuthDetails';
+import { AuthDetails } from './getAuthTokens';
+import getEnvironmentAndUsersFromFile from '../utils/environmentAndUsers';
+
+const environmentAndUsers = getEnvironmentAndUsersFromFile(
+  __ENV.TEST_ENVIRONMENT,
+);
 
 interface RefreshTokenParams {
   userName: string;
-  adminUrl: string;
-  clientId: string;
-  clientSecret: string;
   refreshToken: string;
-  supportsRefreshTokens: boolean;
 }
 
 export default function refreshAuthTokens({
   userName,
-  adminUrl,
-  clientId,
-  clientSecret,
   refreshToken,
-  supportsRefreshTokens,
 }: RefreshTokenParams): AuthDetails | undefined {
-  if (!supportsRefreshTokens) {
-    throw new Error(`Environment ${adminUrl} does not support refresh tokens`);
-  }
+  const { openIdConnect, adminUrl } = environmentAndUsers.environment;
+  const { refreshTokenUrl, clientId } = openIdConnect;
 
   const requestBody = {
     client_id: clientId,
-    client_secret: clientSecret,
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
   };
 
-  const response = http.post(`${adminUrl}/connect/token`, requestBody);
+  const params = {
+    headers: {
+      Origin: adminUrl,
+    },
+  };
+
+  const response = http.post(refreshTokenUrl, requestBody, params);
 
   if (response.status !== 200) {
     console.log(
-      `Unable to refresh access token. Got response ${response.json()}`,
+      `Unable to refresh access token. Got response ${JSON.stringify(
+        response.json(),
+      )}`,
     );
     return undefined;
   }

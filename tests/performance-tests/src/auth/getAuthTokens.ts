@@ -17,33 +17,28 @@ export interface AuthDetails {
 
 export type IdpOption = 'azure' | 'keycloak';
 
-export const getAuthTokens = async (
+const getAuthTokens = async (
+  userName: string,
   email: string,
   password: string,
   adminUrl: string,
   idp: IdpOption,
-): Promise<{
-  id_token: string;
-  access_token: string;
-  refresh_token: string;
-  expires_at: Date;
-}> => {
+): Promise<AuthDetails> => {
   console.log(`Getting authentication details for user ${email}`);
 
   const browser = await puppeteer.launch({
     headless: true,
-    ignoreHTTPSErrors: true,
-    product: 'chrome',
+    acceptInsecureCerts: true,
+    browser: 'chrome',
     executablePath: getChromePath(),
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
   const page = await browser.newPage();
-
   await page.goto(adminUrl);
 
-  await page.waitForXPath('//*[.="Sign in"]', {
-    timeout: 5000,
+  await page.waitForSelector('xpath///*[.="Sign in"]', {
+    timeout: 10000,
   });
 
   await page.click('button[class="govuk-button govuk-button--start"]');
@@ -60,17 +55,46 @@ export const getAuthTokens = async (
         throw new Error(`No login strategy for IDP ${idp}`);
     }
 
-    return await page.evaluate(() => {
+    const authTokens = await page.evaluate(() => {
+      let idToken = '';
+      let accessToken = '';
+      let refreshToken = '';
+      let expiry = 0;
+
       for (let i = 0; i < localStorage.length; i += 1) {
         const key = localStorage.key(i) as string;
-        const value = localStorage.getItem(key) as string;
-        const json = JSON.parse(value);
-        if (json.access_token) {
-          return json;
+        const json = JSON.parse(localStorage.getItem(key) as string);
+
+        if (key.includes('-accesstoken-')) {
+          accessToken = json.secret;
+          expiry = json.expiresOn;
+        }
+
+        if (key.includes('-refreshtoken-')) {
+          refreshToken = json.secret;
+        }
+
+        if (key.includes('-idtoken-')) {
+          idToken = json.secret;
         }
       }
-      return null;
+
+      return {
+        id_token: idToken,
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        expires_at: new Date(expiry * 1000),
+      };
     });
+
+    return {
+      userName,
+      authTokens: {
+        accessToken: authTokens.access_token,
+        refreshToken: authTokens.refresh_token,
+        expiryDate: authTokens.expires_at,
+      },
+    };
   } finally {
     await browser.close();
   }
@@ -81,22 +105,21 @@ const getAuthTokensAzure = async (
   email: string,
   password: string,
 ) => {
-  await page.waitForXPath("//*[.='Sign in']", {
+  await page.waitForSelector("xpath///*[.='Sign in']", {
     visible: true,
-    timeout: 5000,
+    timeout: 10000,
   });
 
-  const emailInput = await page.$x("//*[@name='loginfmt']");
-  await emailInput[0].type(email);
+  const emailInput = await page.$("xpath///*[@name='loginfmt']");
+  await emailInput!.type(email);
 
-  const btn = await page.$x("//*[@type='submit']");
-
-  await btn[0].click();
+  const btn = await page.$("xpath///*[@type='submit']");
+  await btn!.click();
 
   try {
-    await page.waitForXPath("//*[.='Enter password']", {
+    await page.waitForSelector("xpath///*[.='Enter password']", {
       visible: true,
-      timeout: 5000,
+      timeout: 10000,
     });
   } catch (e) {
     const content = await page.content();
@@ -110,18 +133,19 @@ const getAuthTokensAzure = async (
         `User with email ${email} not recognized - received message 'This username may be incorrect'`,
       );
     }
+    throw e;
   }
 
-  const pwdInput = await page.$x("//*[@name='passwd']");
-  await pwdInput[0].type(password);
+  const pwdInput = await page.$("xpath///*[@name='passwd']");
+  await pwdInput!.type(password);
 
-  const signInBtn = await page.$x("//*[@type='submit']");
-  await signInBtn[0].click();
+  const signInBtn = await page.$("xpath///*[@type='submit']");
+  await signInBtn!.click();
 
   try {
-    await page.waitForXPath("//*[.='Stay signed in?']", {
+    await page.waitForSelector("xpath///*[.='Stay signed in?']", {
       visible: true,
-      timeout: 5000,
+      timeout: 10000,
     });
   } catch (e) {
     const content = await page.content();
@@ -139,7 +163,7 @@ const getAuthTokensAzure = async (
 
   await page.click('#idBtn_Back');
 
-  await page.waitForXPath("//*[.='Dashboard']", {
+  await page.waitForSelector("xpath///*[.='Dashboard']", {
     visible: true,
     timeout: 10000,
   });
@@ -150,43 +174,27 @@ const getAuthTokensKeycloak = async (
   email: string,
   password: string,
 ) => {
-  await page.waitForXPath("//*[contains(text(), 'Sign in to your account')]", {
-    visible: true,
-    timeout: 5000,
-  });
-
-  const emailInput = await page.$x("//*[@id='username']");
-  await emailInput[0].type(email);
-
-  const pwdInput = await page.$x("//*[@name='password']");
-  await pwdInput[0].type(password);
-
-  const signInBtn = await page.$x("//*[@type='submit']");
-  await signInBtn[0].click();
-
-  await page.waitForXPath("//*[.='Dashboard']", {
-    visible: true,
-    timeout: 5000,
-  });
-};
-
-const getAuthDetails = async (
-  userName: string,
-  email: string,
-  password: string,
-  adminUrl: string,
-  idp: IdpOption,
-): Promise<AuthDetails> => {
-  const authTokens = await getAuthTokens(email, password, adminUrl, idp);
-
-  return {
-    userName,
-    authTokens: {
-      accessToken: authTokens.access_token,
-      refreshToken: authTokens.refresh_token,
-      expiryDate: authTokens.expires_at,
+  await page.waitForSelector(
+    "xpath///*[contains(text(), 'Sign in to your account')]",
+    {
+      visible: true,
+      timeout: 10000,
     },
-  };
+  );
+
+  const emailInput = await page.$("xpath///*[@id='username']");
+  await emailInput!.type(email);
+
+  const pwdInput = await page.$("xpath///*[@name='password']");
+  await pwdInput!.type(password);
+
+  const signInBtn = await page.$("xpath///*[@type='submit']");
+  await signInBtn!.click();
+
+  await page.waitForSelector("xpath///*[.='Dashboard']", {
+    visible: true,
+    timeout: 10000,
+  });
 };
 
-export default getAuthDetails;
+export default getAuthTokens;
