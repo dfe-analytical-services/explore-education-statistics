@@ -45,7 +45,6 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
       <section id="releaseHeadlines-headlines">
         <EditableSectionBlocks
           blocks={release.headlinesSection.content}
-          sectionId={release.headlinesSection.id}
           renderBlock={block => (
             <ReleaseBlock
               block={block}

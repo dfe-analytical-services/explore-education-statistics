@@ -15,8 +15,7 @@
       "type": "string"
     },
     "publicApiDocsUrl": {
-      "type": "string",
-      "defaultValue": "dfe-analytical-services.github.io/explore-education-statistics-api-docs"
+      "type": "string"
     },
     "subscription": {
       "type": "string",

@@ -53,6 +53,9 @@
     "publicApiUrl": {
       "value": "statistics.api.education.gov.uk"
     },
+    "publicApiDocsUrl": {
+      "value": "statistics.api.education.gov.uk/docs"
+    },
     "publicAppGATrackingId": {
       "value": "G-9YG8ESXR5Y"
     },

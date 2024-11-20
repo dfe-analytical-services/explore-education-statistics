@@ -187,7 +187,6 @@ const ReleaseContentAccordionSection = ({
           <EditableSectionBlocks
             blocks={blocks}
             isReordering={isReordering}
-            sectionId={sectionId}
             onBlocksChange={setBlocks}
             renderBlock={block => (
               <ReleaseBlock

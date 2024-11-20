@@ -14,6 +14,11 @@ export interface ReorderableListItem {
   label: ReactNode | string;
 }
 
+export interface ReorderResult {
+  prevIndex: number;
+  nextIndex: number;
+}
+
 interface Props {
   draggableProvided: DraggableProvided;
   draggableSnapshot: DraggableStateSnapshot;
@@ -22,13 +27,7 @@ interface Props {
   index: number;
   isLastItem: boolean;
   item: ReorderableListItem;
-  onMoveItem: ({
-    prevIndex,
-    nextIndex,
-  }: {
-    prevIndex: number;
-    nextIndex: number;
-  }) => void;
+  onMoveItem: ({ prevIndex, nextIndex }: ReorderResult) => void;
 }
 
 export default function ReorderableItem({
@@ -67,7 +66,7 @@ export default function ReorderableItem({
       >
         <div className={styles.itemLabel}>
           <DragIcon className={styles.dragIcon} />
-          <span>{item.label}</span>
+          <div className={styles.labelInner}>{item.label}</div>
         </div>
       </div>
       {!dropAreaActive && !draggableSnapshot.isDragging && (

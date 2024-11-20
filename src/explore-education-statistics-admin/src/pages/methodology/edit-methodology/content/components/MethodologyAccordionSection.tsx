@@ -156,7 +156,6 @@ const MethodologyAccordionSection = ({
       <EditableSectionBlocks<EditableContentBlock>
         blocks={blocks}
         isReordering={isReordering}
-        sectionId={sectionId}
         onBlocksChange={setBlocks}
         renderBlock={block => (
           <MethodologyBlock methodologyId={methodologyId} block={block} />
