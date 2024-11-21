@@ -23,6 +23,10 @@ describe('redirectPages', () => {
       { fromSlug: 'original-slug-3', toSlug: 'updated-slug-3' },
       { fromSlug: 'original-slug-4', toSlug: 'updated-slug-4' },
     ],
+    releases: [
+      { fromSlug: 'original-slug-5', toSlug: 'updated-slug-5' },
+      { fromSlug: 'original-slug-6', toSlug: 'updated-slug-6' },
+    ],
   };
 
   test('does not re-request the list of redirects once it has been fetched', async () => {

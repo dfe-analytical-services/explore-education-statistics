@@ -10,14 +10,66 @@ interface CachedRedirects {
   fetchedAt: number;
 }
 
+interface RedirectPattern {
+  redirectTypes: RedirectType[];
+  urlPattern: URLPattern;
+}
+
+interface MatchedRedirectSlug {
+  redirectType: RedirectType;
+  slug: string;
+}
+
+const methodologySlugKey = 'methodologySlug';
+const publicationSlugKey = 'publicationSlug';
+const releaseSlugKey = 'releaseSlug';
 const cacheTime = getCacheTime();
 
 let cachedRedirects: CachedRedirects | undefined;
 
-const redirectPaths = {
-  methodologyRedirects: '/methodology',
-  publicationRedirects: '/find-statistics',
-};
+// POSSIBLE REDIRECT ROUTES FOR PUBLICATIONS AND RELEASES:
+// find-statistics/{publication-slug}
+// find-statistics/{publication-slug}/data-guidance
+// find-statistics/{publication-slug}/prerelease-access-list
+// find-statistics/{publication-slug}/{release-slug}
+// find-statistics/{publication-slug}/{release-slug}/data-guidance
+// find-statistics/{publication-slug}/{release-slug}/prerelease-access-list
+// data-tables/{publication-slug}
+// data-tables/{publication-slug}/{release-slug}
+// data-tables/{publication-slug}/fast-track/{data-block-parent-id}
+// data-tables/{publication-slug}/permalink/{permalink}
+const redirectPatterns: RedirectPattern[] = [
+  {
+    redirectTypes: ['methodologies'],
+    urlPattern: new URLPattern({
+      pathname: `/methodology/:${methodologySlugKey}{/*}?`,
+    }),
+  },
+  {
+    redirectTypes: ['publications'],
+    urlPattern: new URLPattern({
+      pathname: `/find-statistics/:${publicationSlugKey}{/(data-guidance|prerelease-access-list)}?`,
+    }),
+  },
+  {
+    redirectTypes: ['publications', 'releases'],
+    urlPattern: new URLPattern({
+      pathname: `/find-statistics/:${publicationSlugKey}/:${releaseSlugKey}{/(data-guidance|prerelease-access-list)}?`,
+    }),
+  },
+  {
+    redirectTypes: ['publications'],
+    urlPattern: new URLPattern({
+      pathname: `/data-tables/:${publicationSlugKey}{/(\\(fast-track|permalink\\)\\(/.*\\))}?`,
+    }),
+  },
+  {
+    redirectTypes: ['publications', 'releases'],
+    urlPattern: new URLPattern({
+      pathname: `/data-tables/:${publicationSlugKey}/:${releaseSlugKey}`,
+    }),
+  },
+];
 
 export default async function redirectPages(
   request: NextRequest,
@@ -26,49 +78,20 @@ export default async function redirectPages(
 ) {
   const { nextUrl } = request;
   const decodedPathname = decodeURIComponent(nextUrl.pathname);
+  const lowerCasedPathname = decodedPathname.toLowerCase();
 
-  // Check for redirects for release and methodology pages
-  if (
-    Object.values(redirectPaths).find(path =>
-      decodedPathname.toLowerCase().startsWith(path),
-    ) &&
-    decodedPathname.split('/').length > 2
-  ) {
-    const shouldRefetch =
-      !cachedRedirects || cachedRedirects.fetchedAt + cacheTime < Date.now();
+  // Check for redirects for publication, release, and methodology pages
+  const matchedRedirectSlugs = findMatchedRedirectSlugs(lowerCasedPathname);
 
-    if (shouldRefetch) {
-      cachedRedirects = {
-        redirects: await redirectService.list(),
-        fetchedAt: Date.now(),
-      };
-    }
+  if (matchedRedirectSlugs.length > 0) {
+    await refreshCache();
 
-    const redirectPath = Object.keys(redirectPaths).reduce((acc, key) => {
-      const redirectType = key as RedirectType;
-      if (
-        decodedPathname.toLowerCase().startsWith(redirectPaths[redirectType])
-      ) {
-        const pathSegments = decodedPathname.split('/');
+    const redirectPath = determineRedirectPath(
+      lowerCasedPathname,
+      matchedRedirectSlugs,
+    );
 
-        const rewriteRule = cachedRedirects?.redirects[redirectType]?.find(
-          ({ fromSlug }) => pathSegments[2].toLowerCase() === fromSlug,
-        );
-
-        if (rewriteRule) {
-          return pathSegments
-            .map(segment =>
-              segment.toLowerCase() === rewriteRule?.fromSlug
-                ? rewriteRule?.toSlug
-                : segment.toLowerCase(),
-            )
-            .join('/');
-        }
-      }
-      return acc;
-    }, '');
-
-    if (redirectPath) {
+    if (redirectPath !== lowerCasedPathname) {
       const redirectUrl = nextUrl.clone();
       redirectUrl.pathname = redirectPath;
       return NextResponse.redirect(redirectUrl, 301);
@@ -76,13 +99,89 @@ export default async function redirectPages(
   }
 
   // Redirect any URLs with uppercase characters to lowercase.
-  if (decodedPathname !== decodedPathname.toLowerCase()) {
+  if (decodedPathname !== lowerCasedPathname) {
     const url = nextUrl.clone();
-    url.pathname = decodedPathname.toLowerCase();
+    url.pathname = lowerCasedPathname;
     return NextResponse.redirect(url, 301);
   }
 
   return middleware(request, event);
+}
+
+function findMatchedRedirectSlugs(
+  lowerCasedPathname: string,
+): MatchedRedirectSlug[] {
+  for (let i = 0; i < redirectPatterns.length; i += 1) {
+    const redirectPattern = redirectPatterns[i];
+
+    const urlPatternMatch = redirectPattern.urlPattern.exec({
+      pathname: lowerCasedPathname,
+    });
+
+    if (urlPatternMatch) {
+      return redirectPattern.redirectTypes.map(
+        (redirectType): MatchedRedirectSlug => {
+          switch (redirectType) {
+            case 'methodologies':
+              return {
+                redirectType,
+                slug: urlPatternMatch.pathname.groups[methodologySlugKey]!,
+              };
+            case 'publications':
+              return {
+                redirectType,
+                slug: urlPatternMatch.pathname.groups[publicationSlugKey]!,
+              };
+            case 'releases':
+              return {
+                redirectType,
+                slug: urlPatternMatch.pathname.groups[releaseSlugKey]!,
+              };
+            default:
+              throw new Error(
+                `'${redirectType}' is not a valid redirect type.`,
+              );
+          }
+        },
+      );
+    }
+  }
+
+  return [];
+}
+
+async function refreshCache() {
+  const shouldRefetch =
+    !cachedRedirects || cachedRedirects.fetchedAt + cacheTime < Date.now();
+
+  if (shouldRefetch) {
+    cachedRedirects = {
+      redirects: await redirectService.list(),
+      fetchedAt: Date.now(),
+    };
+  }
+}
+
+function determineRedirectPath(
+  originalPath: string,
+  matchedRedirectSlugs: MatchedRedirectSlug[],
+): string {
+  let redirectPath = originalPath;
+
+  matchedRedirectSlugs.forEach(matchedRedirectSlug => {
+    const redirect = cachedRedirects?.redirects[
+      matchedRedirectSlug.redirectType
+    ]?.find(({ fromSlug }) => matchedRedirectSlug.slug === fromSlug);
+
+    if (redirect) {
+      redirectPath = redirectPath.replace(
+        matchedRedirectSlug.slug,
+        redirect.toSlug,
+      );
+    }
+  });
+
+  return redirectPath;
 }
 
 // Cache the redirect paths for 2 seconds on Local,
