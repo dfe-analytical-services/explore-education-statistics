@@ -42,11 +42,7 @@ const performTest = () => {
 
   const refreshedTokens1 = refreshAuthTokens({
     userName,
-    adminUrl,
-    clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
-    clientSecret: '',
     refreshToken: authTokens.refreshToken,
-    supportsRefreshTokens: true,
   });
 
   if (
@@ -93,11 +89,7 @@ const performTest = () => {
 
   const refreshedTokens2 = refreshAuthTokens({
     userName,
-    adminUrl,
-    clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
-    clientSecret: '',
     refreshToken: refreshedTokens1.authTokens.refreshToken,
-    supportsRefreshTokens: true,
   });
 
   if (

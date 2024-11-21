@@ -648,14 +648,6 @@ Validate table cells again
 
 
 *** Keywords ***
-user moves item of draggable list down
-    [Arguments]    ${locator}    ${item_num}
-    ${item}    user gets list item element    ${locator}    ${item_num}
-    set focus to element    ${item}
-    user presses keys    ${SPACE}
-    user presses keys    ARROW_DOWN
-    user presses keys    ${SPACE}
-
 user clicks button in reorder list
     [Arguments]    ${button_text}    ${item_num}    ${list_test_id}=reorder-list
     user clicks button    ${button_text}    xpath://ol[@data-testid="${list_test_id}"]/li[position()=${item_num}]

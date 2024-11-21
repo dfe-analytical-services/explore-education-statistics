@@ -23,15 +23,3 @@
     margin-bottom: govuk-spacing(4);
   }
 }
-
-.labelReordering {
-  display: flex;
-  justify-content: space-between;
-}
-
-.dragHandle {
-  color: govuk-colour('dark-grey');
-  font-size: 1.6rem;
-  line-height: 1;
-  margin-right: govuk-spacing(1);
-}

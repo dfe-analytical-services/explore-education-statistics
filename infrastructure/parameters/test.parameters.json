@@ -15,7 +15,7 @@
       "value": "S1 Standard"
     },
     "skuImporter": {
-      "value": "B1 Basic"
+      "value": "P1V2 PremiumV2"
     },
     "skuNotifier": {
       "value": "B1 Basic"
@@ -50,6 +50,9 @@
     "publicApiUrl": {
       "value": "test.statistics.api.education.gov.uk"
     },
+    "publicApiDocsUrl": {
+      "value": "test.statistics.api.education.gov.uk/docs"
+    },
     "detailedErrors": {
       "value": true
     },
@@ -75,13 +78,13 @@
       "value": 10
     },
     "skuStatisticsDb": {
-      "value": "Standard"
+      "value": "GP_Gen5"
     },
     "tierStatisticsDb": {
-      "value": "Standard"
+      "value": "GeneralPurpose"
     },
     "capacityStatisticsDb": {
-      "value": 50
+      "value": 2
     },
     "maxContentDbSizeBytes": {
       "value": 1073741824

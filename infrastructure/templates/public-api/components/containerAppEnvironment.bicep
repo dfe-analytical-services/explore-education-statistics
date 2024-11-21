@@ -60,7 +60,7 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' 
     workloadProfiles: workloadProfiles
   }
   tags: tagValues
-  
+
   resource azureFileStorage 'storages@2022-03-01' = [for storage in azureFileStorages: {
       name: storage.storageName
       properties: {

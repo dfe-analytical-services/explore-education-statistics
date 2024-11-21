@@ -76,6 +76,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Null(result);
         }
 
+        [Fact]
+        public async Task FindByEmail_SoftDeletedUser()
+        {
+            var user = new User
+            {
+                Email = "test@test.com",
+                SoftDeleted = DateTime.UtcNow,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserReleaseRoleRepository(contentDbContext);
+                var result = await repository.FindByEmail("test@test.com");
+                Assert.Null(result);
+            }
+        }
+
         private static UserRepository SetupUserReleaseRoleRepository(
             ContentDbContext contentDbContext)
         {

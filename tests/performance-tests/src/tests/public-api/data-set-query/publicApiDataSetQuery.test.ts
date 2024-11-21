@@ -25,6 +25,10 @@ export const individualQuerySpeedTrend = new Trend(
   'ees_public_api_individual_query_speed',
   true,
 );
+export const individualQueryResponseRowsTrend = new Trend(
+  'ees_public_api_individual_query_response_rows',
+  false,
+);
 export const individualQueryRequestCount = new Counter(
   'ees_public_api_individual_query_request_count',
 );
@@ -84,25 +88,45 @@ export function setup(): SetupData {
     publication => {
       const { dataSets } = publicApiService.listDataSets(publication.id);
 
-      const dataSetsFilteredByName = dataSets.filter(
-        dataSet =>
-          !dataSetConfig.limitToTitles ||
-          dataSetConfig.limitToTitles.includes(dataSet.title),
-      );
+      const dataSetsFilteredByName = dataSets.filter(dataSet => {
+        if (dataSetConfig.excludeTitles?.includes(dataSet.title)) {
+          console.log(`Excluding data set "${dataSet.title}" based on title.`);
+          return false;
+        }
+
+        if (!dataSetConfig.includeTitles) {
+          console.log(`Including data set "${dataSet.title}".`);
+          return true;
+        }
+
+        if (dataSetConfig.includeTitles.includes(dataSet.title)) {
+          console.log(`Including data set "${dataSet.title}" based on title.`);
+          return true;
+        }
+
+        return false;
+      });
 
       const dataSetMeta = dataSetsFilteredByName.map(dataSet => {
-        const { meta } = publicApiService.getDataSetsMeta(dataSet.id);
+        const { meta } = publicApiService.getDataSetMeta(dataSet.id);
         return {
           ...meta,
           id: dataSet.id,
           name: dataSet.title,
+          totalResults: dataSet.latestVersion.totalResults,
         };
       });
 
-      const dataSetsFilteredBySize = dataSetMeta.filter(
-        meta =>
-          !dataSetConfig.maxRows || meta.totalResults <= dataSetConfig.maxRows,
-      );
+      const dataSetsFilteredBySize = dataSetMeta.filter(meta => {
+        if (
+          dataSetConfig.maxRows &&
+          meta.totalResults <= dataSetConfig.maxRows
+        ) {
+          console.log(`Excluding data set "${meta.name}" based on max rows.`);
+          return false;
+        }
+        return true;
+      });
 
       return {
         ...publication,
@@ -139,44 +163,34 @@ const performTest = ({ publications }: SetupData) => {
 
   const query = queryGenerator.generateQuery(dataSetMeta);
 
-  let totalResultsReturned = 0;
-  let totalPagesReturned = 0;
-  let allResultsFound = false;
-  let currentPage = 1;
-
   const startTime = Date.now();
 
   try {
-    while (!allResultsFound) {
-      individualQueryRequestCount.add(1);
+    individualQueryRequestCount.add(1);
 
-      const { results } = publicApiService.queryDataSet({
-        dataSetId: dataSetMeta.id,
-        query,
-        page: currentPage,
-      });
+    const { results } = publicApiService.queryDataSet({
+      dataSetId: dataSetMeta.id,
+      query,
+    });
 
-      const requestTime = Date.now() - startTime;
+    const requestTime = Date.now() - startTime;
 
-      individualQuerySpeedTrend.add(requestTime);
-      individualQueryCompleteCount.add(1);
+    console.log(`Query completed in ${requestTime} ms`);
 
-      totalPagesReturned += 1;
-      totalResultsReturned += results.results.length;
+    individualQuerySpeedTrend.add(requestTime);
+    individualQueryCompleteCount.add(1);
+    individualQueryResponseRowsTrend.add(results.results.length);
 
-      if (results.paging.totalResults === 0) {
-        allResultsFound = true;
-      } else if (results.paging.page === results.paging.totalPages) {
-        allResultsFound = true;
-      } else if (
-        dataSetConfig.maxResultsPerDataSet &&
-        totalResultsReturned >= dataSetConfig.maxResultsPerDataSet
-      ) {
-        allResultsFound = true;
-      } else {
-        currentPage += 1;
-      }
-    }
+    const totalResponsesTimeMillis = Date.now() - startTime;
+
+    logQueryResponse({
+      publication,
+      dataSetName: dataSetMeta.name,
+      query,
+      totalResultsReturned: results.results.length,
+      totalPagesReturned: 1,
+      totalResponsesTimeMillis,
+    });
   } catch (error: unknown) {
     if (isRefinedResponse(error)) {
       if (error.error_code === 1211) {
@@ -198,6 +212,16 @@ const performTest = ({ publications }: SetupData) => {
         http2StreamErrorRate.add(1);
       }
 
+      if (error.status === 400 || error.status === 500) {
+        console.log('Error from query endpoint.\n');
+        console.log('Metadata was:\n');
+        console.log(JSON.stringify(dataSetMeta, null, 2));
+        console.log('Query was:\n');
+        console.log(JSON.stringify(query, null, 2));
+        console.log('Error was:\n');
+        console.log(JSON.stringify(error, null, 2));
+      }
+
       queryFailureCount.add(1);
       errorRate.add(1);
 
@@ -208,10 +232,7 @@ const performTest = ({ publications }: SetupData) => {
     } else {
       logErrorObject(error);
 
-      const url = publicApiService.getDataSetQueryUrl({
-        dataSetId: dataSetMeta.id,
-        page: currentPage,
-      });
+      const url = `/v1/data-sets/${dataSetMeta.id}/query`;
 
       queryFailureCount.add(1);
       errorRate.add(1);
@@ -223,20 +244,7 @@ const performTest = ({ publications }: SetupData) => {
         requestBody: query,
       });
     }
-
-    return;
   }
-
-  const totalResponsesTimeMillis = Date.now() - startTime;
-
-  logQueryResponse({
-    publication,
-    dataSetName: dataSetMeta.name,
-    query,
-    totalResultsReturned,
-    totalPagesReturned,
-    totalResponsesTimeMillis,
-  });
 };
 
 export const teardown = ({ testConfig }: SetupData) => {

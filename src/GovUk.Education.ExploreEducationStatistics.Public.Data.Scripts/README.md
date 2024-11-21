@@ -24,7 +24,7 @@ Once you have done this, ensure the public API Docker database is running:
 
 ```bash
 # Via Docker Compose
-docker-compose up -d public-api-db
+docker compose up -d public-api-db
 
 # Via project start script
 pnpm start publicApiDb

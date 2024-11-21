@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
-import { AuthDetails } from '../auth/getAuthDetails';
-import { Environment } from '../auth/storeEnvironmentDetails';
+import { AuthDetails } from '../auth/getAuthTokens';
+import { Environment } from '../auth/storeAuthTokens';
 
 export interface EnvironmentAndUsers {
   environment: Environment;
@@ -10,6 +10,21 @@ export interface EnvironmentAndUsers {
 export default function getEnvironmentAndUsersFromFile(
   environmentName: string,
 ): EnvironmentAndUsers {
-  const environmentAndUsersFilePath = `.environment-details.${environmentName}.json`;
-  return JSON.parse(open(environmentAndUsersFilePath)) as EnvironmentAndUsers;
+  const environmentFilePath = `.env.${environmentName}.json`;
+  const environment = JSON.parse(open(environmentFilePath))
+    .environment as Environment;
+
+  let loginCredentials: AuthDetails[];
+
+  try {
+    const loginCredentialsPath = `.auth-tokens.${environmentName}.json`;
+    loginCredentials = JSON.parse(open(loginCredentialsPath)) as AuthDetails[];
+  } catch {
+    loginCredentials = [];
+  }
+
+  return {
+    environment,
+    users: loginCredentials,
+  };
 }

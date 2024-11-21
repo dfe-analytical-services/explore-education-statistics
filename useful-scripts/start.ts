@@ -308,7 +308,7 @@ async function startDockerServices() {
     if (programOpts.restartDocker) {
       logInfo('Stopping Docker services...');
 
-      await $$`docker-compose stop ${[...dockerServicesToStart]}`;
+      await $$`docker compose stop ${[...dockerServicesToStart]}`;
     }
 
     logInfo('Starting Docker services...');
@@ -319,7 +319,7 @@ async function startDockerServices() {
       args.push('--build', '--force-recreate');
     }
 
-    await $$`docker-compose up ${[...args, ...dockerServicesToStart]}`;
+    await $$`docker compose up ${[...args, ...dockerServicesToStart]}`;
 
     await delay(1000);
   }
@@ -392,7 +392,7 @@ async function startService(service: ServiceName): Promise<void> {
       break;
     }
     case 'docker': {
-      command = 'docker-compose logs';
+      command = 'docker compose logs';
       args = ['-f', '--no-log-prefix'];
 
       if (programOpts.rebuildDocker) {

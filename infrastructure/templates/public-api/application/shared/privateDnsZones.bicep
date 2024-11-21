@@ -1,7 +1,7 @@
-import { resourceNamesType } from '../../types.bicep'
+import { ResourceNames } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
-param resourceNames resourceNamesType
+param resourceNames ResourceNames
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object

@@ -39,16 +39,16 @@ startup.Configure(app, app.Environment);
 
 app.UseSwagger(options =>
 {
-    options.RouteTemplate = "/docs/{documentName}/openapi.json";
+    options.RouteTemplate = "/swagger/{documentName}/openapi.json";
 });
 app.UseSwaggerUI(options =>
 {
-    options.RoutePrefix = "docs";
+    options.RoutePrefix = "swagger";
 
     foreach (var description in app.DescribeApiVersions())
     {
         options.SwaggerEndpoint(
-            url: $"/docs/{description.GroupName}/openapi.json",
+            url: $"/swagger/{description.GroupName}/openapi.json",
             name: $"v{description.GroupName}");
     }
 });

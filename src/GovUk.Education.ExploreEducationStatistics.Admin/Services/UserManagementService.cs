@@ -417,7 +417,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccessDo(async () =>
+                .OnSuccess(async () =>
                 {
                     // Delete the Identity Framework user, if found.
                     var identityUser = await _usersAndRolesDbContext
@@ -432,6 +432,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var internalUser = await _contentDbContext
                         .Users
                         .SingleOrDefaultAsync(user => user.Email.ToLower() == email.ToLower());
+
+                    if (identityUser == null && internalUser == null)
+                    {
+                        return new Either<ActionResult, Unit>(new NotFoundResult());
+                    }
 
                     var globalInvites = await _usersAndRolesDbContext
                         .UserInvites
@@ -448,19 +453,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Where(invite => invite.Email.ToLower() == email.ToLower())
                         .ToListAsync();
 
-                    // Delete the internal EES user, if found.
-                    if (internalUser != null)
+                    var userReleaseRoles = await _contentDbContext
+                        .UserReleaseRoles
+                        .Where(urr => internalUser != null && urr.UserId == internalUser.Id)
+                        .ToListAsync();
+
+                    var userPublicationRoles = await _contentDbContext
+                        .UserPublicationRoles
+                        .Where(upr => internalUser != null && upr.UserId == internalUser.Id)
+                        .ToListAsync();
+
+                    if (internalUser is { SoftDeleted: null })
                     {
-                        _contentDbContext.Users.Remove(internalUser);
+                        internalUser.SoftDeleted = DateTime.UtcNow;
+                        internalUser.DeletedById = _userService.GetUserId();
                     }
 
                     // Delete any invites that they may have had.
                     _usersAndRolesDbContext.UserInvites.RemoveRange(globalInvites);
                     _contentDbContext.UserReleaseInvites.RemoveRange(releaseInvites);
                     _contentDbContext.UserPublicationInvites.RemoveRange(publicationInvites);
+                    _contentDbContext.UserReleaseRoles.RemoveRange(userReleaseRoles);
+                    _contentDbContext.UserPublicationRoles.RemoveRange(userPublicationRoles);
 
                     await _contentDbContext.SaveChangesAsync();
                     await _usersAndRolesDbContext.SaveChangesAsync();
+
+                    return Unit.Instance;
                 });
         }
 

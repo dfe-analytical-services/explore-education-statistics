@@ -1,0 +1,413 @@
+---
+title: Debugging data set queries
+last_reviewed_on: 2024-09-16
+review_in: 12 months
+weight: 5
+---
+
+# Debugging data set queries
+
+In this guide, you'll learn various techniques to help debug potential issues with data set queries
+when using the explore education statistics (EES) API.
+
+## What you'll need
+
+You should already be familiar with the EES API. If not, you should read the [Quick start](/getting-started/quick-start/index.html)
+first as this guide will presume some prior knowledge.
+
+You should already be familiar with the basic usages of the following endpoints to proceed:
+
+- [Query a data set](/endpoints/QueryDataSetPost/index.html)
+- [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html)
+
+## Diagnosing error responses
+
+In most cases, if the API is unable to process a request successfully, it will return an error
+response. The success or failure of a request is primarily indicated by its HTTP status code,
+where:
+
+- 2xx status codes (e.g. 200, 204) indicate a success
+- 4xx status codes (e.g. 400, 404) indicate an error with the request itself, such as a validation issue
+- 5xx status codes (e.g. 500, 503) indicate an error that occurred within the API whilst processing
+
+When there is an error response, the body will typically look like:
+
+```json
+{
+  "title": "There was a problem processing the request.",
+  "type": "Internal Server Error",
+  "status": 500
+}
+```
+
+The response body is modelled by the [ProblemDetailsViewModel](/schemas/ProblemDetailsViewModel/index.html) schema,
+which attempts to detail the reason(s) why the request failed. The following fields are always
+included:
+
+| Property | Type   | Description                                                    |
+|----------|--------|----------------------------------------------------------------|
+| `title`  | string | The title of the error. Typically summarises the error.        |
+| `type`   | string | The error type. Usually corresponds with the HTTP status code. |
+| `status` | number | The HTTP status code.                                          |
+
+If there are validation issues with the request, the response body will also contain an `errors`
+field which looks like:
+
+```json
+{
+  "title": "There are validation errors with the request.",
+  "type": "Bad Request",
+  "status": 400,
+  "errors": [
+    {
+      "message": "Error message",
+      "code": "error.code",
+      "path": "theField"
+    }
+  ]
+}
+```
+
+The `errors` property contains a list of errors. Each error corresponds to a specific problem and
+will at least contain a `message` (describing the issue) and a `code` (for further debugging and
+parsing).
+
+If the error relates to a specific part of the request, the `path` property is used to describe the
+path to request property that caused the error. If this is omitted or empty, it means the error is
+'global' and relates to the entire request.
+
+Where possible, errors may also contain a `detail` field that provides more detailed information
+about the problem.
+
+Validation errors and error responses in general are covered in much more detail in the section on
+[Error handling](/overview/error-handling/index.html).
+
+## Validation errors for data set queries
+
+The [Query a data set](/endpoints/QueryDataSetPost/index.html) endpoint will usually try to process a
+query as much as possible before a validation error response is sent (instead of failing early).
+Consequently, the response typically aggregates as many validation errors as possible.
+
+Common validation errors will be discussed in more detail in the following sections.
+
+### Incompatible comparator values
+
+Validation errors are commonly caused by some data set query criteria containing comparators that
+use the wrong data type for their values. For example, a query with the following criteria:
+
+```json
+{
+  "criteria": {
+    "filters": {
+      "eq": ["filter-1"]
+    }
+  }
+}
+```
+
+Will result in an error response like:
+
+```json
+{
+  "errors": [
+    {
+      "message": "Must be a valid value. Check that the type and format are correct.",
+      "path": "criteria.filters.eq",
+      "code": "InvalidValue"
+    }
+  ]
+}
+```
+
+The above query is using a `eq` comparator with an array. Arrays are typically only used with
+comparators that can accept **multiple values** like `in` and `notIn`.
+
+#### Solution
+
+To correct the error, you can simply change `eq` to `in`:
+
+```json
+{
+  "criteria": {
+    "filters": {
+      "in": ["filter-1"]
+    }
+  }
+}
+```
+
+Alternatively, the array can be replaced with a single filter item ID string:
+
+```json
+{
+  "criteria": {
+    "filters": {
+      "eq": "filter-1"
+    }
+  }
+}
+```
+
+It is recommended that you read the guide on [Creating advanced data set queries](/getting-started/creating-advanced-data-set-queries/index.html#facet-comparators)
+as it contains far more detail about each comparator, and how they are used with different facet types.
+
+### Incorrect use of condition clauses
+
+Validation errors can commonly occur when writing more complex queries using condition clauses
+such as `and`, `or` and `not`. For example:
+
+```json
+{
+  "criteria": {
+    "not": [
+      {
+        "filters": {
+          "eq": "..."
+        }
+      }
+    ]
+  }
+}
+```
+
+In the above example, an array is used as the `not` clause value. Unfortunately, arrays are
+incompatible and will result in an error response like:
+
+```json
+{
+  "errors": [
+    {
+      "message": "Must be a valid value. Check that the type and format are correct.",
+      "path": "criteria.not",
+      "code": "InvalidValue"
+    }
+  ]
+}
+```
+
+#### Solution
+
+Check that your query correctly follows the [DataSetQueryRequest](/schemas/DataSetQueryRequest/index.html)
+schema. Pay close attention to any usages of condition clauses.
+
+The `and` / `or` clauses accept **multiple** criteria or condition clauses in an array:
+
+```json
+{
+  "criteria": {
+    "and": [
+      {
+        "filters": { "eq": "..." }
+      },
+      {
+        "locations": { "eq": "..." }
+      }
+    ]
+  }
+}
+```
+
+The `not` clause only accepts a **single** condition clause:
+
+```json
+{
+  "criteria": {
+    "not": {
+      "filters": { "eq": "..." }
+    }
+  }
+}
+```
+
+For a better understanding of condition clauses, the guide on [Creating advanced data set queries](/getting-started/creating-advanced-data-set-queries/index.html#queries-with-condition-clauses)
+goes into much greater detail on this topic.
+
+## Warnings in successful data set query responses
+
+In certain cases, a successful data set query may include warnings that indicate something is
+potentially wrong with the request. Whilst these are not critical errors, it is advisable that you
+double-check that your query to ensure that is functioning as expected.
+
+Warnings in the response typically look like the following:
+
+```json
+{
+  "paging": {
+    "page": 1,
+    "pageSize": 100,
+    "totalResults": 150,
+    "totalPages": 2
+  },
+  "warnings": [
+    {
+      "message": "The query did not match any results. You may need to refine your criteria.",
+      "code": "QueryNoResults"
+    }
+  ],
+  "results": [...]
+}
+```
+
+The format of a warning is the same as an error (see section on [Error handling](/overview/error-handling/index.html)
+for more details) and will include at least a `message` and `code`.
+
+### No query results
+
+If a query does not return any results, you'll receive a warning like:
+
+```json
+{
+  "warnings": [
+    {
+      "message": "The query did not match any results. You may need to refine your criteria.",
+      "code": "QueryNoResults"
+    }
+  ]
+}
+```
+
+Depending on the use-case, this may be correct behaviour, however, it may also indicate that there
+is an issue with the query.
+
+#### Solution
+
+In most cases, the query is likely using criteria that is too specific and the matching data does
+not exist within the data set. Some tweaking of your query may be required to make the criteria
+less specific
+
+If your query previously worked but begins to return no results, this may be due to the data set
+itself changing in a backwards incompatible way e.g. the removal of data, or a major change in the
+data set's facets.
+
+The EES API makes every effort to avoid publishing backwards incompatible data that may disrupt
+existing queries, however, these types of changes may still occur from time to time (deliberately
+or otherwise).
+
+The versioning policy is outlined in more detail in the [Versioning](/overview/versioning/index.html)
+overview.
+
+### Missing facets
+
+Before a data set query is executed by the API, the facets in the query are pre-validated to ensure
+that they exist in the data set. If some facets are missing, this may cause queries to have zero
+results (as they cannot be matched).
+
+When there are missing facets, a response will look like:
+
+```json
+{
+  "warnings": [
+    {
+      "message": "One or more filters could not be found.",
+      "path": "criteria.filters.in",
+      "code": "FiltersNotFound",
+      "details": {
+        "items": ["invalid-filter-1", "invalid-filter-2"]
+      }
+    }
+  ]
+}
+```
+
+In these types of responses, the `notFound` warning informs you about the specific items that are
+missing (e.g. `invalid-filter-1`) in the `details` property.
+
+#### Solution
+
+Ensure that all facets in the data set query exist in the corresponding data set metadata.
+You should check this by cross-referencing the missing facets with the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html)
+endpoint.
+
+Facets are not usually removed from existing data sets, so there may be a typo (or similar) in
+the missing facets.
+
+## Documenting queries with comments
+
+Data set queries can be documented with comments in the JSON body using forward slashes (`//`). You
+can add comments to any part of the query as long as it doesn't result in a malformed JSON structure.
+
+For example, the following is a **valid** query with comments:
+
+```jsonc
+{
+  "criteria": {
+    "filters": {
+      "in": [
+        "n0WqP", // State-funded secondary
+        "hUfBQ" // Gender male
+      ]
+    }
+  }
+}
+```
+
+The following is an **invalid** query with comments:
+
+```jsonc
+{
+  "criteria": {
+    "filters": {
+      "in": [
+        "n0WqP" // State-funded secondary,
+        "hUfBQ" // Gender male
+      ]
+    }
+  }
+}
+```
+
+In the invalid query, the comma needed after `"n0WqP"` has been accidentally placed within the
+adjacent comment causing the JSON to be syntactically invalid.
+
+## Debug mode
+
+To assist in debugging unexpected results for a data set query, the [Query a data set](/endpoints/QueryDataSetPost/index.html)
+endpoint also accepts a `debug` query parameter that enables debug mode. This can be set in the
+request's query string like so:
+
+```
+<%= api_url %>/api/v1/data-sets/{dataSetId}/query?debug=true
+```
+
+The response will then be modified to return results that look like the following:
+
+```json
+{
+  "filters": {
+    "Z3PMP :: ethnicity": "bqJZ4 :: Asian - Chinese",
+    "eW168 :: language": "LVRpO :: Total",
+    "b0yZ4 :: phase_type_grouping": "RXIeh :: State-funded secondary"
+  },
+  "timePeriod": {
+    "code": "AY",
+    "period": "2021/2022"
+  },
+  "geographicLevel": "LA",
+  "locations": {
+    "NAT": "dv84z :: England :: E92000001",
+    "REG": "T4Y1o :: East Midlands :: E12000004",
+    "LA": "vNVmD :: Derby :: E06000015"
+  },
+  "values": {
+    "dv84z :: headcount": "79",
+    "vNVmD :: percent_of_pupils": "0.429161234"
+  }
+}
+```
+
+The keys and values of `filters`, `locations` and `values` are changed to display human-readable
+labels and facet IDs in the format `{facet ID} :: {label}`.
+
+Enabling debug mode is useful to avoid having to cross-reference the facets of each result with the
+data set's metadata (using the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html) endpoint).
+
+However, it is important to note that debug mode **should not** be used outside of development / debugging
+purposes. When your query's issues have been resolved, you should disable debug mode before pushing
+your query to production.
+
+Using debug mode in production comes with significant issues such as:
+
+- much larger (~2-3x) responses that consume more bandwidth
+- slower responses due to extra server-side processing needed
+- being subject to lower rate limits
+- needing additional client-side parsing of the human-readable labels and facet IDs

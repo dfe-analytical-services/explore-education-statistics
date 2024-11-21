@@ -128,6 +128,10 @@ public static class ReleaseVersionGeneratorExtensions
         int year)
         => generator.ForInstance(releaseVersion => releaseVersion.SetYear(year));
 
+    public static Generator<ReleaseVersion> WithSoftDeleted(
+        this Generator<ReleaseVersion> generator)
+        => generator.ForInstance(releaseVersion => releaseVersion.SetSoftDeleted());
+
     public static Generator<ReleaseVersion> WithType(
         this Generator<ReleaseVersion> generator,
         ReleaseType type)
@@ -325,6 +329,10 @@ public static class ReleaseVersionGeneratorExtensions
         this InstanceSetters<ReleaseVersion> setters,
         int year)
         => setters.Set(releaseVersion => releaseVersion.ReleaseName, year.ToString());
+
+    public static InstanceSetters<ReleaseVersion> SetSoftDeleted(
+        this InstanceSetters<ReleaseVersion> setters)
+        => setters.Set(releaseVersion => releaseVersion.SoftDeleted, true);
 
     public static InstanceSetters<ReleaseVersion> SetType(
         this InstanceSetters<ReleaseVersion> setters,

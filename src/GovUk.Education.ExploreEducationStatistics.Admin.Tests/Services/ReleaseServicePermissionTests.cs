@@ -23,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
@@ -115,12 +116,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildReleaseService(userService.Object);
+                        using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.ReleaseVersions.Add(_releaseVersion);
+                        contextDbContext.SaveChangesAsync();
+
+                        var service = BuildReleaseService(
+                            context: contextDbContext,
+                            userService: userService.Object);
+                        
                         return service.DeleteReleaseVersion(_releaseVersion.Id);
                     }
                 );
         }
 
+        [Fact]
+        public async Task DeleteTestRelease()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_releaseVersion, CanDeleteTestRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.ReleaseVersions.Add(_releaseVersion);
+                        contextDbContext.SaveChangesAsync();
+
+                        var service = BuildReleaseService(
+                            context: contextDbContext,
+                            userService: userService.Object);
+                        
+                        return service.DeleteTestReleaseVersion(_releaseVersion.Id);
+                    }
+                );
+        }
+        
         [Fact]
         public async Task ListReleasesWithStatuses_CanViewAllReleases()
         {
@@ -313,6 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IDataImportService>(),
                 Mock.Of<IFootnoteRepository>(),
                 Mock.Of<IDataBlockService>(),
+                Mock.Of<IReleasePublishingStatusRepository>(),
                 Mock.Of<IReleaseSubjectRepository>(),
                 Mock.Of<IDataSetVersionService>(),
                 Mock.Of<IProcessorClient>(),

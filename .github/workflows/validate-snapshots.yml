@@ -4,13 +4,16 @@ on:
   schedule:
     # Actions are scheduled in UTC
     # Until Actions supports timezones, we need to update this cron
-    # twice a year (at the start and end of daylight saving time) 
-    # to account for daylight saving time in the UK
+    # twice a year (at the start and end of daylight saving time)
+    # to account for daylight saving time in the UK.
+    # Set a new reminder in the slack channel for next time to
+    # change this
     # This action is intended to run at 9:35AM, 12:35PM & 4:35PM
-    - cron: '35 8,11,15 * * 1-5'
+    # March to October - cron: '35 8,11,15 * * 1-5'
+    - cron: '35 9,12,16 * * 1-5'
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SNAPSHOTS_WEBHOOK_URL }}
   PYTHON_VERSION: 3.10.10
 
 jobs:
@@ -76,7 +79,7 @@ jobs:
     if: ${{ always() && (needs.test.result == 'failure' || needs.test.result == 'timed_out') }}
     needs:
       - test
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -84,7 +87,7 @@ jobs:
           token: ${{ env.GH_TOKEN }}
 
       - name: Slack Notification
-        uses: slackapi/slack-github-action@v1.27.0
+        uses: slackapi/slack-github-action@v1.27.1
         with:
           payload: |
             {

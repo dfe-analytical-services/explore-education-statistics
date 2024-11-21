@@ -20,14 +20,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseVersionId,
             CancellationToken cancellationToken = default);
 
-        Task<Either<ActionResult, Unit>> DeleteReleaseVersion(Guid releaseVersionId, CancellationToken cancellationToken = default);
+        Task<Either<ActionResult, Unit>> DeleteReleaseVersion(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken = default);
+
+        Task<Either<ActionResult, Unit>> DeleteTestReleaseVersion(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId);
 
         Task<Either<ActionResult, ReleasePublicationStatusViewModel>>
             GetReleasePublicationStatus(Guid releaseVersionId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseVersion(Guid releaseVersionId, ReleaseUpdateRequest request);
+        Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseVersion(Guid releaseVersionId,
+            ReleaseUpdateRequest request);
 
         Task<Either<ActionResult, Unit>> UpdateReleasePublished(Guid releaseVersionId,
             ReleasePublishedUpdateRequest request);

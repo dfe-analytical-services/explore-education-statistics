@@ -17,19 +17,14 @@ const environmentAndUsers = getEnvironmentAndUsersFromFile(
 const performTest = () => {};
 
 export const teardown = () => {
-  const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
+  const { adminUrl } = environmentAndUsers.environment;
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const { authTokens, userName } = environmentAndUsers.users.find(
     user => user.userName === 'bau1',
   )!;
 
-  const accessToken = getOrRefreshAccessTokens(
-    supportsRefreshTokens,
-    userName,
-    adminUrl,
-    authTokens,
-  );
+  const accessToken = getOrRefreshAccessTokens(userName, authTokens);
 
   const adminService = createAdminService(adminUrl, accessToken);
 

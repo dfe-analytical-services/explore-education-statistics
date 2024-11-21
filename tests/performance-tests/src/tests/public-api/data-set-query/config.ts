@@ -18,10 +18,9 @@ const profile = (__ENV.PROFILE ?? 'sequential') as
 
 const queries = (__ENV.QUERIES ?? 'simple') as 'simple' | 'complex';
 
-const limitToDataSetTitles = __ENV.DATA_SET_TITLES?.split(',');
+const dataSetTitlesToInclude = __ENV.DATA_SET_TITLES_TO_INCLUDE?.split(',');
+const dataSetTitlesToExclude = __ENV.DATA_SET_TITLES_TO_EXCLUDE?.split(',');
 const maxDataSetRows = parseIntOptional(__ENV.DATA_SET_MAX_ROWS);
-const maxResultsToReturnPerDataSet =
-  parseIntOptional(__ENV.MAX_RESULTS_PER_DATA_SET) || 10000;
 
 function getOptions(): Options {
   switch (profile) {
@@ -82,9 +81,9 @@ function getQueryConfig(): QueryGeneratorConfig {
 }
 
 export interface DataSetConfig {
-  limitToTitles?: string[];
+  includeTitles?: string[];
+  excludeTitles?: string[];
   maxRows?: number;
-  maxResultsPerDataSet?: number;
 }
 
 export interface Config {
@@ -97,9 +96,9 @@ const config: Config = {
   options: getOptions(),
   queryConfig: getQueryConfig(),
   dataSetConfig: {
-    limitToTitles: limitToDataSetTitles,
+    includeTitles: dataSetTitlesToInclude,
+    excludeTitles: dataSetTitlesToExclude,
     maxRows: maxDataSetRows,
-    maxResultsPerDataSet: maxResultsToReturnPerDataSet,
   },
 };
 
