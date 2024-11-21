@@ -28,7 +28,7 @@ import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
@@ -58,6 +58,7 @@ export interface MapBlockProps extends ChartProps {
   legend: LegendConfiguration;
   map?: MapConfig;
   position?: { lat: number; lng: number };
+  // boundaryLevel: number;
 }
 
 export const mapBlockDefinition: ChartDefinition = {
@@ -122,6 +123,9 @@ export default function MapBlock({
   axes,
   title,
 }: MapBlockProps) {
+  // to be replaces with const {isLoading} = useQuery(someservice.fetchGeoJson(releaseId, dataBlockParentId, boundaryLevel, ))
+  const [isLoading, setIsLoading] = useState(false);
+
   const axisMajor = useMemo<AxisConfiguration>(
     () => ({
       ...axes.major,
@@ -132,7 +136,7 @@ export default function MapBlock({
   );
 
   const dataSetCategories = useMemo<MapDataSetCategory[]>(
-    () => createMapDataSetCategories(axisMajor, data, meta),
+    () => createMapDataSetCategories(axisMajor, data, meta, meta.locations),
     [axisMajor, data, meta],
   );
 
@@ -197,14 +201,19 @@ export default function MapBlock({
       setFeatures(newFeatures);
       setLegendDataGroups(newDataGroups);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dataSetCategories,
     dataSetCategoryConfigs,
-    meta,
     selectedDataSetConfig,
     selectedDataSetKey,
   ]);
+
+  const handleLocationChange = useCallback(
+    (value: string) => {
+      setSelectedFeature(features?.features.find(feat => feat.id === value));
+    },
+    [setSelectedFeature, features],
+  );
 
   if (
     data === undefined ||
@@ -224,12 +233,7 @@ export default function MapBlock({
         selectedLocation={selectedFeature?.id?.toString()}
         title={title}
         onChangeDataSet={setSelectedDataSetKey}
-        onChangeLocation={value => {
-          const feature = features?.features.find(feat => feat.id === value);
-          return feature
-            ? setSelectedFeature(feature)
-            : setSelectedFeature(undefined);
-        }}
+        onChangeLocation={handleLocationChange}
       />
 
       <div className="govuk-grid-row govuk-!-margin-bottom-4">
@@ -252,6 +256,7 @@ export default function MapBlock({
               selectedDataSetKey={selectedDataSetKey}
               selectedFeature={selectedFeature}
               onSelectFeature={setSelectedFeature}
+              isLoading={isLoading}
             />
           </MapContainer>
         </div>
