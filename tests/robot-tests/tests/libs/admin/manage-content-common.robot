@@ -467,7 +467,6 @@ user adds image to accordion section text block with retry
     ...    xpath://button[span[.="Upload image from computer"]]/input[@type="file"]
     ...    ${FILES_DIR}${filename}
 
-    user scrolls up    300
     wait until keyword succeeds    ${timeout}    %{WAIT_SMALL} sec    user clicks button
     ...    Change image text alternative
     user enters text into element    label:Text alternative    ${alt_text}
