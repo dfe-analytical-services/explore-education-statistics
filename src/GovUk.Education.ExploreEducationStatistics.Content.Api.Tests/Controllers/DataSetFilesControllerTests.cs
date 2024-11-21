@@ -167,6 +167,53 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 AssertResultsForExpectedReleaseFiles(publication1Release1Version1Files, pagedResult.Results);
             }
 
+            [Fact]
+            public async Task FilterByGeographicLevel_Success()
+            {
+                var publication = _fixture
+                    .DefaultPublication()
+                    // Publications each have a published release version
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                    .WithTheme(_fixture.DefaultTheme())
+                    .Generate();
+
+                var releaseFiles = _fixture.DefaultReleaseFile()
+                    .WithReleaseVersion(publication.ReleaseVersions[0])
+                    .WithFiles([
+                        _fixture.DefaultFile(FileType.Data)
+                            .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                                .WithGeographicLevels([GeographicLevel.LocalAuthority, GeographicLevel.Country])),
+                        _fixture.DefaultFile(FileType.Data)
+                            .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                                .WithGeographicLevels([GeographicLevel.Institution, GeographicLevel.LocalAuthority])),
+                        _fixture.DefaultFile(FileType.Data)
+                            .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                                .WithGeographicLevels([GeographicLevel.Institution, GeographicLevel.Country]))
+                     ])
+                    .GenerateList();
+
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.Publications.AddRange(publication);
+                    context.ReleaseFiles.AddRange(releaseFiles);
+                });
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                var query = new DataSetFileListRequest(GeographicLevel: GeographicLevel.Country.GetEnumValue());
+                var response = await ListDataSetFiles(query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(
+                    expectedTotalResults: 2);
+                AssertResultsForExpectedReleaseFiles([releaseFiles[0], releaseFiles[2]], pagedResult.Results);
+            }
+
             [Theory]
             [InlineData(false)]
             [InlineData(null)]
@@ -1581,9 +1628,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var originalMeta = releaseFile.File.DataSetFileMeta;
 
-                Assert.Equal(originalMeta!.GeographicLevels
-                        .Select(gl => gl.GetEnumLabel())
-                        .ToList(),
+                Assert.Equal(originalMeta!.GeographicLevels,
                     dataSetFileMetaViewModel.GeographicLevels);
 
                 Assert.Equal(new DataSetFileTimePeriodRangeViewModel
@@ -1675,6 +1720,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 { "themeId", request.ThemeId?.ToString() },
                 { "publicationId", request.PublicationId?.ToString() },
                 { "releaseId", request.ReleaseId?.ToString() },
+                { "geographicLevel", request.GeographicLevel ?? null },
                 { "latestOnly", request.LatestOnly?.ToString() },
                 { "searchTerm", request.SearchTerm },
                 { "sort", request.Sort?.ToString() },
@@ -2030,9 +2076,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
             var dataSetFileMeta = file.DataSetFileMeta;
 
-            Assert.Equal(dataSetFileMeta!.GeographicLevels
-                    .Select(gl => gl.GetEnumLabel())
-                    .ToList(),
+            Assert.Equal(dataSetFileMeta!.GeographicLevels,
                 viewModel.File.Meta.GeographicLevels);
 
             Assert.Equal(new DataSetFileTimePeriodRangeViewModel

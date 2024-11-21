@@ -7,6 +7,7 @@ public record DataSetFileListRequest(
     Guid? ThemeId = null,
     Guid? PublicationId = null,
     Guid? ReleaseId = null,
+    string? GeographicLevel = null,
     bool? LatestOnly = null,
     DataSetType? DataSetType = null,
     string? SearchTerm = null,

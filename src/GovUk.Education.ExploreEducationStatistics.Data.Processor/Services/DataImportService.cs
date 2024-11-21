@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -206,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var dataSetFileMeta = new DataSetFileMeta
             {
-                GeographicLevels = geographicLevels,
+                GeographicLevels = geographicLevels.Select(gl => gl.GetEnumValue()).ToList(),
                 TimePeriodRange = new TimePeriodRangeMeta
                 {
                     Start = timePeriods.First(),

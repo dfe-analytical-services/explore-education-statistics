@@ -3,15 +3,14 @@ using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class DataSetFileMeta
 {
-    [JsonConverter(typeof(GeographicLevelsListJsonConverter))]
-    public required List<GeographicLevel> GeographicLevels { get; set; }
+    // Use string here to make DataSetFileMeta JSON queryable solely in SQL
+    public required List<string> GeographicLevels { get; set; }
 
     public required TimePeriodRangeMeta TimePeriodRange { get; set; }
 

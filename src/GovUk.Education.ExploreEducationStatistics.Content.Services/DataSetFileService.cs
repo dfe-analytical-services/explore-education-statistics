@@ -55,6 +55,7 @@ public class DataSetFileService : IDataSetFileService
         Guid? themeId,
         Guid? publicationId,
         Guid? releaseVersionId,
+        string? geographicLevel,
         bool? latestOnly,
         DataSetType? dataSetType,
         string? searchTerm,
@@ -75,6 +76,10 @@ public class DataSetFileService : IDataSetFileService
         var latestPublishedReleaseVersions =
             _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
 
+        var files = _contentDbContext.ReleaseFiles
+            .Include(rf => rf.File)
+            .ToList();
+
         var query = _contentDbContext.ReleaseFiles
             .AsNoTracking()
             .OfFileType(FileType.Data)
@@ -82,6 +87,7 @@ public class DataSetFileService : IDataSetFileService
             .HavingThemeId(themeId)
             .HavingPublicationIdOrNoSupersededPublication(publicationId)
             .HavingReleaseVersionId(releaseVersionId)
+            .HavingGeographicLevel(geographicLevel)
             .OfDataSetType(dataSetType.Value)
             .HavingLatestPublishedReleaseVersions(latestPublishedReleaseVersions, latestOnly.Value)
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
@@ -287,9 +293,7 @@ public class DataSetFileService : IDataSetFileService
 
         return new DataSetFileMetaViewModel
         {
-            GeographicLevels = meta.GeographicLevels
-                .Select(gl => gl.GetEnumLabel())
-                .ToList(),
+            GeographicLevels = meta.GeographicLevels,
             TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
             {
                 From = TimePeriodLabelFormatter.Format(
@@ -474,6 +478,18 @@ internal static class ReleaseFileQueryableExtensions
     {
         return publicationId.HasValue
             ? query.Where(rf => rf.ReleaseVersion.PublicationId == publicationId.Value)
+            : query;
+    }
+
+    internal static IQueryable<ReleaseFile> HavingGeographicLevel(
+        this IQueryable<ReleaseFile> query,
+        string? geographicLevel)
+    {
+        return geographicLevel != null
+            ? query
+                .Include(rf => rf.File)
+                .Where(rf => rf.File.DataSetFileMeta!.GeographicLevels
+                    .Contains(geographicLevel))
             : query;
     }
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -294,9 +295,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 var meta = updatedFile.DataSetFileMeta;
                 Assert.Equal(3, meta.GeographicLevels.Count);
-                Assert.Contains(GeographicLevel.Country, meta.GeographicLevels);
-                Assert.Contains(GeographicLevel.LocalAuthority, meta.GeographicLevels);
-                Assert.Contains(GeographicLevel.Region, meta.GeographicLevels);
+                Assert.Contains(GeographicLevel.Country.GetEnumValue(), meta.GeographicLevels);
+                Assert.Contains(GeographicLevel.LocalAuthority.GetEnumValue(), meta.GeographicLevels);
+                Assert.Contains(GeographicLevel.Region.GetEnumValue(), meta.GeographicLevels);
 
                 Assert.Equal("2000", meta.TimePeriodRange.Start.Period);
                 Assert.Equal(TimeIdentifier.April, meta.TimePeriodRange.Start.TimeIdentifier);

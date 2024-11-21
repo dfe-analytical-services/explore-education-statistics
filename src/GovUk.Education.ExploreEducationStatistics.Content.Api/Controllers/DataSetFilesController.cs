@@ -39,6 +39,7 @@ public class DataSetFilesController : ControllerBase
                 themeId: request.ThemeId,
                 publicationId: request.PublicationId,
                 releaseVersionId: request.ReleaseId,
+                geographicLevel: request.GeographicLevel,
                 latestOnly: request.LatestOnly,
                 dataSetType: request.DataSetType,
                 searchTerm: request.SearchTerm,

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -60,7 +62,8 @@ public static class DataSetFileMetaGeneratorExtensions
     public static InstanceSetters<DataSetFileMeta> SetGeographicLevels(
         this InstanceSetters<DataSetFileMeta> setters,
         List<GeographicLevel> geographicLevels)
-        => setters.Set(s => s.GeographicLevels, geographicLevels);
+        => setters.Set(s => s.GeographicLevels,
+            geographicLevels.Select(gl => gl.GetEnumValue()).ToList());
 
     public static InstanceSetters<DataSetFileMeta> SetTimePeriodRange(
         this InstanceSetters<DataSetFileMeta> setters,
