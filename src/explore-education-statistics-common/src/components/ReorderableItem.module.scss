@@ -41,8 +41,9 @@
 }
 
 .controls {
+  min-height: 38px; // to make correct height if arrow buttons not present.
   position: absolute;
-  right: 5px;
+  right: govuk-spacing(1);
   top: govuk-spacing(2);
 }
 

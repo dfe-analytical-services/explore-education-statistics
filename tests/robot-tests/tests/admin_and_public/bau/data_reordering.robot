@@ -48,56 +48,56 @@ Check reordering table contains subject row
 Check the initial order of filters
     user clicks button in table cell    1    2    Reorder filters    id:reordering
     user waits until h3 is visible    Reorder filters for ${SUBJECT_NAME}
-    user checks list contains exact items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-filters
     ...    Filter 1
     ...    Filter 2
 
 Reorder filters
-    user moves item of draggable list down    testid:reorder-list    1
-    user checks list contains exact items in order    testid:reorder-list
+    user clicks button to move reorderable option down    1    reorder-filters
+    user checks list contains exact items in order    testid:reorder-filters
     ...    Filter 2
     ...    Filter 1
 
 Check the initial order of filter 1's filter groups
     user clicks button to reorder options within list    2
-    user checks list contains exact items in order    testid:Filter 1-reorder-list
+    user checks list contains exact items in order    testid:reorder-filters-children
     ...    Total
     ...    Filter 1 group 1
     ...    Filter 1 group 2
 
 Reorder filter 1's filter groups
-    user moves item of draggable list down    testid:Filter 1-reorder-list    2
-    user checks list contains exact items in order    testid:Filter 1-reorder-list
+    user clicks button to move reorderable option down    2    reorder-filters-children
+    user checks list contains exact items in order    testid:reorder-filters-children
     ...    Total
     ...    Filter 1 group 2
     ...    Filter 1 group 1
 
 Check the initial order of filter 1 group 1's filter items
-    user clicks button to reorder options within list    3    Filter 1-reorder-list
-    user checks list contains exact items in order    testid:Filter 1 group 1-reorder-list
+    user clicks button to reorder options within list    3    reorder-filters-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F1G1-1
     ...    F1G1-2
 
 Reorder filter 1 group 1's filter items
-    user moves item of draggable list down    testid:Filter 1 group 1-reorder-list    1
-    user checks list contains exact items in order    testid:Filter 1 group 1-reorder-list
+    user clicks button to move reorderable option down    1    reorder-filters-children-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F1G1-2
     ...    F1G1-1
-    user clicks done button to collapse reorder list    3    Filter 1-reorder-list
+    user clicks close button to collapse reorder list    3    reorder-filters-children
 
 Check the initial order of filter 1 group 2's filter items
-    user clicks button to reorder options within list    2    Filter 1-reorder-list
-    user checks list contains exact items in order    testid:Filter 1 group 2-reorder-list
+    user clicks button to reorder options within list    2    reorder-filters-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F1G2-1
     ...    F1G2-2
 
 Reorder filter 1 group 2's filter items
-    user moves item of draggable list down    testid:Filter 1 group 2-reorder-list    1
-    user checks list contains exact items in order    testid:Filter 1 group 2-reorder-list
+    user clicks button to move reorderable option down    1    reorder-filters-children-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F1G2-2
     ...    F1G2-1
-    user clicks done button to collapse reorder list    2    Filter 1-reorder-list
-    user clicks done button to collapse reorder list    2
+    user clicks close button to collapse reorder list    2    reorder-filters-children
+    user clicks close button to collapse reorder list    2
 
 Save reordered filters, filter groups and filter items
     user clicks button    Save order
@@ -106,61 +106,61 @@ Save reordered filters, filter groups and filter items
 Check the saved order of filters
     user clicks button in table cell    1    2    Reorder filters    id:reordering
     user waits until h3 is visible    Reorder filters for ${SUBJECT_NAME}
-    user checks list contains exact items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-filters
     ...    Filter 2
     ...    Filter 1
 
 Check the saved order of filter 1's filter groups
     user clicks button to reorder options within list    2
-    user checks list contains exact items in order    testid:Filter 1-reorder-list
+    user checks list contains exact items in order    testid:reorder-filters-children
     ...    Total
     ...    Filter 1 group 2
     ...    Filter 1 group 1
 
 Check no reordering is possible for filter 1's Total group
     # Filter 1's 'Total' group only has one filter item which can't be reordered alone
-    user checks reorder list has no reorder options button    1    Filter 1-reorder-list
+    user checks reorder list has no reorder options button    1    reorder-filters-children
 
 Check the saved order of filter 1 group 1's filter items
-    user clicks button to reorder options within list    3    Filter 1-reorder-list
-    user checks list contains exact items in order    testid:Filter 1 group 1-reorder-list
+    user clicks button to reorder options within list    3    reorder-filters-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F1G1-2
     ...    F1G1-1
-    user clicks done button to collapse reorder list    3    Filter 1-reorder-list
+    user clicks close button to collapse reorder list    3    reorder-filters-children
 
 Check the saved order of filter 1 group 2's filter items
-    user clicks button to reorder options within list    2    Filter 1-reorder-list
-    user checks list contains exact items in order    testid:Filter 1 group 2-reorder-list
+    user clicks button to reorder options within list    2    reorder-filters-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F1G2-2
     ...    F1G2-1
-    user clicks done button to collapse reorder list    2    Filter 1-reorder-list
-    user clicks done button to collapse reorder list    2
+    user clicks close button to collapse reorder list    2    reorder-filters-children
+    user clicks close button to collapse reorder list    2
 
 Check the saved order of filter 2's filter groups remains untouched
     user clicks button to reorder options within list    1
-    user checks list contains exact items in order    testid:Filter 2-reorder-list
+    user checks list contains exact items in order    testid:reorder-filters-children
     ...    Total
     ...    Filter 2 group 1
     ...    Filter 2 group 2
 
 Check no reordering is possible for filter 2's Total group
     # Filter 2's 'Total' group only has one filter item which can't be reordered alone
-    user checks reorder list has no reorder options button    1    Filter 2-reorder-list
+    user checks reorder list has no reorder options button    1    reorder-filters-children
 
 Check the saved order of filter 2 group 1's filter items remains untouched
-    user clicks button to reorder options within list    2    Filter 2-reorder-list
-    user checks list contains exact items in order    testid:Filter 2 group 1-reorder-list
+    user clicks button to reorder options within list    2    reorder-filters-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F2G1-1
     ...    F2G1-2
-    user clicks done button to collapse reorder list    2    Filter 2-reorder-list
+    user clicks close button to collapse reorder list    2    reorder-filters-children
 
 Check the saved order of filter 2 group 2's filter items remains untouched
-    user clicks button to reorder options within list    3    Filter 2-reorder-list
-    user checks list contains exact items in order    testid:Filter 2 group 2-reorder-list
+    user clicks button to reorder options within list    3    reorder-filters-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F2G2-1
     ...    F2G2-2
-    user clicks done button to collapse reorder list    3    Filter 2-reorder-list
-    user clicks done button to collapse reorder list    1
+    user clicks close button to collapse reorder list    3    reorder-filters-children
+    user clicks close button to collapse reorder list    1
 
 Cancel reordering filters
     user clicks button    Cancel    id:reordering
@@ -169,28 +169,28 @@ Cancel reordering filters
 Check the initial order of indicator groups
     user clicks button in table cell    1    2    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
-    user checks list contains exact items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-indicators
     ...    Indicator group 1
     ...    Indicator group 2
 
 Reorder indicator groups
-    user moves item of draggable list down    testid:reorder-list    1
-    user checks list contains exact items in order    testid:reorder-list
+    user clicks button to move reorderable option down    1    reorder-indicators
+    user checks list contains exact items in order    testid:reorder-indicators
     ...    Indicator group 2
     ...    Indicator group 1
 
 Check the initial order of indicator group 1's indicators
-    user clicks button to reorder options within list    2
-    user checks list contains exact items in order    testid:Indicator group 1-reorder-list
+    user clicks button to reorder options within list    2    reorder-indicators
+    user checks list contains exact items in order    testid:reorder-indicators-children
     ...    Indicator 1
     ...    Indicator 2
 
 Reorder indicator group 1's indicators
-    user moves item of draggable list down    testid:Indicator group 1-reorder-list    1
-    user checks list contains exact items in order    testid:Indicator group 1-reorder-list
+    user clicks button to move reorderable option down    1    reorder-indicators-children
+    user checks list contains exact items in order    testid:reorder-indicators-children
     ...    Indicator 2
     ...    Indicator 1
-    user clicks done button to collapse reorder list    2
+    user clicks close button to collapse reorder list    2    reorder-indicators
 
 Save reordered indicator groups and indicators
     user clicks button    Save order
@@ -199,23 +199,23 @@ Save reordered indicator groups and indicators
 Check the saved order of indicator groups
     user clicks button in table cell    1    2    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
-    user checks list contains exact items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-indicators
     ...    Indicator group 2
     ...    Indicator group 1
 
 Check the saved order of indicator group 1's indicators
-    user clicks button to reorder options within list    2
-    user checks list contains exact items in order    testid:Indicator group 1-reorder-list
+    user clicks button to reorder options within list    2    reorder-indicators
+    user checks list contains exact items in order    testid:reorder-indicators-children
     ...    Indicator 2
     ...    Indicator 1
-    user clicks done button to collapse reorder list    2
+    user clicks close button to collapse reorder list    2    reorder-indicators
 
 Check the saved order of indicator group 2's indicators remains untouched
-    user clicks button to reorder options within list    1
-    user checks list contains exact items in order    testid:Indicator group 2-reorder-list
+    user clicks button to reorder options within list    1    reorder-indicators
+    user checks list contains exact items in order    testid:reorder-indicators-children
     ...    Indicator 3
     ...    Indicator 4
-    user clicks done button to collapse reorder list    1
+    user clicks close button to collapse reorder list    1    reorder-indicators
 
 Cancel reordering indicators
     user clicks button    Cancel    id:reordering
@@ -274,14 +274,14 @@ Check the order of filters after data replacement
     # Filters are identical in the replacement so the previous order should be retained
     user clicks button in table cell    1    2    Reorder filters    id:reordering
     user waits until h3 is visible    Reorder filters for ${SUBJECT_NAME}
-    user checks list contains exact items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-filters
     ...    Filter 2
     ...    Filter 1
 
 Check the order of filter 1's filter groups after data replacement
     # 'Filter 1 group 3' is new in the replacement so should be appended
     user clicks button to reorder options within list    2
-    user checks list contains exact items in order    testid:Filter 1-reorder-list
+    user checks list contains exact items in order    testid:reorder-filters-children
     ...    Total
     ...    Filter 1 group 2
     ...    Filter 1 group 1
@@ -289,58 +289,58 @@ Check the order of filter 1's filter groups after data replacement
 
 Check no reordering is possible for filter 1's Total group after data replacement
     # Filter 1's 'Total' group only has one filter item which can't be reordered alone
-    user checks reorder list has no reorder options button    1    Filter 1-reorder-list
+    user checks reorder list has no reorder options button    1    reorder-filters-children
 
 Check the order of filter 1 group 1's filter items after data replacement
     # 'F1G1-3' is new in the replacement so should be appended
-    user clicks button to reorder options within list    3    Filter 1-reorder-list
-    user checks list contains exact items in order    testid:Filter 1 group 1-reorder-list
+    user clicks button to reorder options within list    3    reorder-filters-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F1G1-2
     ...    F1G1-1
     ...    F1G1-3
-    user clicks done button to collapse reorder list    3    Filter 1-reorder-list
+    user clicks close button to collapse reorder list    3    reorder-filters-children
 
 Check no reordering is possible for filter 1 group 2's filter items after data replacement
     # 'F1G2-1' is removed in the replacement leaving only 'F1G2-2' which can't be reordered alone
-    user checks reorder list has no reorder options button    2    Filter 1-reorder-list
+    user checks reorder list has no reorder options button    2    reorder-filters-children
 
 Check the order of filter 1 group 3's filter items after data replacement
     # 'Filter 1 group 3' is new in the replacement so the filter items should be ordered by label
-    user clicks button to reorder options within list    4    Filter 1-reorder-list
-    user checks list contains exact items in order    testid:Filter 1 group 3-reorder-list
+    user clicks button to reorder options within list    4    reorder-filters-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F1G3-1
     ...    F1G3-2
-    user clicks done button to collapse reorder list    4    Filter 1-reorder-list
-    user clicks done button to collapse reorder list    2
+    user clicks close button to collapse reorder list    4    reorder-filters-children
+    user clicks close button to collapse reorder list    2
 
 Check the order of filter 2's filter groups after data replacement
     # Filter 2's filter groups are identical in the replacement so the previous order should be retained
     user clicks button to reorder options within list    1
-    user checks list contains exact items in order    testid:Filter 2-reorder-list
+    user checks list contains exact items in order    testid:reorder-filters-children
     ...    Total
     ...    Filter 2 group 1
     ...    Filter 2 group 2
 
 Check no reordering is possible for filter 2's Total group after data replacement
     # Filter 2's 'Total' group only has one filter item which can't be reordered alone
-    user checks reorder list has no reorder options button    1    Filter 2-reorder-list
+    user checks reorder list has no reorder options button    1    reorder-filters-children
 
 Check the order of filter 2 group 1's filter items after data replacement
     # Filter 2 group 1's filter items are identical in the replacement so the previous order should be retained
-    user clicks button to reorder options within list    2    Filter 2-reorder-list
-    user checks list contains exact items in order    testid:Filter 2 group 1-reorder-list
+    user clicks button to reorder options within list    2    reorder-filters-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F2G1-1
     ...    F2G1-2
-    user clicks done button to collapse reorder list    2    Filter 2-reorder-list
+    user clicks close button to collapse reorder list    2    reorder-filters-children
 
 Check the order of filter 2 group 2's filter items after data replacement
     # Filter 2 group 2's filter items are identical in the replacement so the previous order should be retained
-    user clicks button to reorder options within list    3    Filter 2-reorder-list
-    user checks list contains exact items in order    testid:Filter 2 group 2-reorder-list
+    user clicks button to reorder options within list    3    reorder-filters-children
+    user checks list contains exact items in order    testid:reorder-filters-children-children
     ...    F2G2-1
     ...    F2G2-2
-    user clicks done button to collapse reorder list    3    Filter 2-reorder-list
-    user clicks done button to collapse reorder list    1
+    user clicks close button to collapse reorder list    3    reorder-filters-children
+    user clicks close button to collapse reorder list    1
 
 Cancel reordering filters after data replacement
     user clicks button    Cancel    id:reordering
@@ -350,30 +350,30 @@ Check the order of indicator groups after data replacement
     # 'Indicator group 3' is new in the replacement so should be appended
     user clicks button in table cell    1    2    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
-    user checks list contains exact items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-indicators
     ...    Indicator group 2
     ...    Indicator group 1
     ...    Indicator group 3
 
 Check the order of indicator group 1's indicators after data replacement
     # Indicator group 1's indicators are identical in the replacement so the previous order should be retained
-    user clicks button to reorder options within list    2
-    user checks list contains exact items in order    testid:Indicator group 1-reorder-list
+    user clicks button to reorder options within list    2    reorder-indicators
+    user checks list contains exact items in order    testid:reorder-indicators-children
     ...    Indicator 2
     ...    Indicator 1
-    user clicks done button to collapse reorder list    2
+    user clicks close button to collapse reorder list    2    reorder-indicators
 
 Check no reordering is possible for indicator group 2's indicators after data replacement
     # 'Indicator 3' is removed in the replacement leaving only 'Indicator 4' which can't be reordered alone
-    user checks reorder list has no reorder options button    1
+    user checks reorder list has no reorder options button    1    testid:reorder-indicators
 
 Check the order of indicator group 3's indicators after data replacement
     # 'Indicator group 3' is new in the replacement so the indicators should be ordered by label
-    user clicks button to reorder options within list    3
-    user checks list contains exact items in order    testid:Indicator group 3-reorder-list
+    user clicks button to reorder options within list    3    reorder-indicators
+    user checks list contains exact items in order    testid:reorder-indicators-children
     ...    Indicator 5
     ...    Indicator 6
-    user clicks done button to collapse reorder list    3
+    user clicks close button to collapse reorder list    3    reorder-indicators
 
 Cancel reordering indicators after data replacement
     user clicks button    Cancel    id:reordering
@@ -649,22 +649,27 @@ Validate table cells again
 
 *** Keywords ***
 user clicks button in reorder list
-    [Arguments]    ${button_text}    ${item_num}    ${list_test_id}=reorder-list
+    [Arguments]    ${button_text}    ${item_num}    ${list_test_id}=reorder-filters
     user clicks button    ${button_text}    xpath://ol[@data-testid="${list_test_id}"]/li[position()=${item_num}]
 
 user checks button is not in reorder list
-    [Arguments]    ${button_text}    ${item_num}    ${list_test_id}=reorder-list
+    [Arguments]    ${button_text}    ${item_num}    ${list_test_id}=reorder-filters
     user checks page does not contain element
     ...    xpath://ol[@data-testid="${list_test_id}"]/li[position()=${item_num}]//button[text()="${button_text}"]
 
 user checks reorder list has no reorder options button
-    [Arguments]    ${item_num}    ${list_test_id}=reorder-list
-    user checks button is not in reorder list    Reorder options within this group    ${item_num}    ${list_test_id}
+    [Arguments]    ${item_num}    ${list_test_id}=reorder-filters
+    user checks button is not in reorder list    Reorder options    ${item_num}    ${list_test_id}
 
 user clicks button to reorder options within list
-    [Arguments]    ${item_num}    ${list_test_id}=reorder-list
-    user clicks button in reorder list    Reorder options within this group    ${item_num}    ${list_test_id}
+    [Arguments]    ${item_num}    ${list_test_id}=reorder-filters
+    user clicks button in reorder list    Reorder options    ${item_num}    ${list_test_id}
 
-user clicks done button to collapse reorder list
-    [Arguments]    ${item_num}    ${list_test_id}=reorder-list
-    user clicks button in reorder list    Done    ${item_num}    ${list_test_id}
+user clicks close button to collapse reorder list
+    [Arguments]    ${item_num}    ${list_test_id}=reorder-filters
+    user clicks button in reorder list    Close    ${item_num}    ${list_test_id}
+
+user clicks button to move reorderable option down
+    [Arguments]    ${item_num}    ${list_test_id}=reorder-filters
+    user clicks element    testid:move-down
+    ...    xpath://ol[@data-testid="${list_test_id}"]/li[position()=${item_num}]/div[2]
