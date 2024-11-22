@@ -33,7 +33,7 @@ examples.
 
 ## The basic query syntax
 
-Data set queries can be made using a POST request to the [Query a data set](/endpoints/QueryDataSetPost/index.html)
+Data set queries can be made using a POST request to the [Query a data set](/reference-v1/endpoints/QueryDataSetPost/index.html)
 endpoint. At its most basic, such a request would look like the following:
 
 ```
@@ -46,7 +46,7 @@ POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
 
 The request body must contain `facets` and `indicators` properties. These filter the result data that
 can be in the response and must be populated using the IDs of facets from the data set metadata
-(see the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html) endpoint).
+(see the [Get a data set's metadata](/reference-v1/endpoints/GetDataSetMeta/index.html) endpoint).
 
 The `indicators` property controls what data values are shown in the results. This should simply
 contain a list of indicator IDs. For example, using the following indicators:
@@ -120,8 +120,8 @@ The full list of comparators permitted is as follows:
 | `gt`       | Greater than             | No               | `"gt": { "period": "2022/2023", "code": "AY" }`  |
 
 Note that facet properties may only permit certain comparators to be used. Consult the
-[schema documentation](/schemas/DataSetQueryCriteriaFacets/index.html) for each facet property to see if a
-comparator is allowed.
+[schema documentation](/reference-v1/schemas/DataSetQueryCriteriaFacets/index.html) for each facet property
+to see if a comparator is allowed.
 
 Using all the above information, you could write a query that looks like the following:
 

@@ -1,0 +1,4057 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Explore education statistics - Public Data API",
+    "contact": {
+      "name": "Explore education statistics",
+      "url": "https://explore-education-statistics.service.gov.uk",
+      "email": "explore.statistics@education.gov.uk"
+    },
+    "version": "1"
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "API server"
+    }
+  ],
+  "paths": {
+    "/api/v1/data-sets/{dataSetId}": {
+      "get": {
+        "tags": [
+          "DataSets"
+        ],
+        "summary": "Get a data set’s summary",
+        "description": "Gets a specific data set’s summary details.",
+        "operationId": "GetDataSet",
+        "parameters": [
+          {
+            "name": "dataSetId",
+            "in": "path",
+            "description": "The ID of the data set.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested data set summary.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataSetViewModel"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        }
+      }
+    },
+    "/api/v1/data-sets/{dataSetId}/meta": {
+      "get": {
+        "tags": [
+          "DataSets"
+        ],
+        "summary": "Get a data set’s metadata",
+        "description": "Get the metadata about a data set. Use this to create data set queries.",
+        "operationId": "GetDataSetMeta",
+        "parameters": [
+          {
+            "name": "types",
+            "in": "query",
+            "description": "The types of meta to get for the requested data set version.\r\n\r\nCan be any combination of the following:\r\n\r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
+            "schema": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "Filters",
+                  "Indicators",
+                  "Locations",
+                  "TimePeriods"
+                ],
+                "type": "string"
+              },
+              "description": "The types of meta to get for the requested data set version.\r\n\r\nCan be any combination of the following:\r\n\r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
+              "nullable": true,
+              "example": [
+                "Filters",
+                "Locations"
+              ]
+            },
+            "example": [
+              "Filters",
+              "Locations"
+            ]
+          },
+          {
+            "name": "dataSetVersion",
+            "in": "query",
+            "description": "The version of the data set to use e.g. 2.0, 1.1, etc.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataSetId",
+            "in": "path",
+            "description": "The ID of the data set.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested data set version metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataSetMetaViewModel"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        }
+      }
+    },
+    "/api/v1/data-sets/{dataSetId}/query": {
+      "get": {
+        "tags": [
+          "DataSets"
+        ],
+        "summary": "Query a data set (GET)",
+        "description": "Query a data set using a `GET` request, returning the filtered results.\r\n            \r\nNote that there is a `POST` variant of this endpoint which provides a more complete set\r\nof querying functionality. The `GET` variant is only recommended for initial exploratory\r\ntesting or simple queries that do not need advanced functionality.\r\n            \r\nUnlike the `POST` variant, this endpoint does not allow condition clauses (`and`, `or`, `not`)\r\nand consequently cannot express more complex queries. Use the `POST` variant instead for these\r\ntypes of queries.\r\n            \r\n## Indicators\r\n            \r\nThe `indicators` query parameter is required and **at least one** indicator must be specified.\r\n            \r\nEach indicator should be a string containing the indicator ID e.g. `4xbOu`, `8g1RI`.\r\n            \r\n## Filters\r\n            \r\nThe `filters` query parameter is used to filter by other filter options (not locations,\r\ngeographic levels or time periods).\r\n            \r\nEach filter should be a string containing the required filter option ID e.g. `z4FQE`, `DcQeg`.\r\n            \r\n## Geographic levels\r\n            \r\nThe `geographicLevels` query parameter is used to filter results by geographic level.\r\n            \r\nThe geographic levels are specified as codes, and can be one of the following:\r\n            \r\n- `EDA` - English devolved area\r\n- `INST` - Institution\r\n- `LA` - Local authority\r\n- `LAD` - Local authority district\r\n- `LEP` - Local enterprise partnership\r\n- `LSIP` - Local skills improvement plan area\r\n- `MCA` - Mayoral combined authority\r\n- `MAT` - MAT\r\n- `NAT` - National\r\n- `OA` - Opportunity area\r\n- `PA` - Planning area\r\n- `PCON` - Parliamentary constituency\r\n- `PROV` - Provider\r\n- `REG` - Regional\r\n- `RSC` - RSC region\r\n- `SCH` - School\r\n- `SPON` - Sponsor\r\n- `WARD` - Ward\r\n            \r\n## Locations\r\n            \r\nThe `locations` query parameter is used to filter results by location.\r\n            \r\nThe locations should be strings formatted like `{level}|{property}|{value}` where:\r\n            \r\n- `{level}` is the location's level code (e.g. `NAT`, `REG`, `LA`)\r\n- `{property}` is the name of the identifying property to match on (e.g. `id, `code`, `urn`)\r\n- `{value}` is the value for the property to match\r\n            \r\nAn ID or a code can be used to identify a location, with the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be used for multiple locations.\r\nThis may match more results than you expect so it's recommended to use IDs where possible.\r\n            \r\n### Examples\r\n            \r\n- `LA|code|E08000019` matches any local authority with code `E08000019`\r\n- `REG|id|6bQgZ` matches any region with ID `6bQgZ`\r\n- `SCH|urn|140821` matches any school with URN `140821`\r\n            \r\n## Time periods\r\n            \r\nThe `timePeriods` query parameter is used to filter results by time period.\r\n            \r\nThe time periods should be strings formatted like `{period}|{code}` where:\r\n            \r\n- `period` is the time period or range (e.g. `2020` or `2020/2021`)\r\n- `code` is the code identifying the time period type (e.g. `AY`, `CY`, `M1`, `W20`)\r\n            \r\nThe `period` should be a single year like `2020`, or a range like `2020/2021`.\r\nCurrently, only years (or year ranges) are supported.\r\n            \r\nSome time period types span two years e.g. financial year part 2 (`P2`), or may fall in a\r\nlatter year e.g. academic year summer term (`T3`). For these types, a singular year `period`\r\nlike `2020` is considered as `2020/2021`.\r\n            \r\nFor example, a `period` value of `2020` is applicable to the following time periods:\r\n            \r\n- 2020 calendar year\r\n- 2020/2021 academic year\r\n- 2020/2021 financial year part 2 (October to March)\r\n- 2020/2021 academic year's summer term\r\n            \r\nIf you wish to be more explicit, you may use a range for the `period` e.g. `2020/2021`.\r\nHowever, a range cannot be used with time period types which only span a single year,\r\nfor example, `2020/21` cannot be used with `CY`, `M` or `W` codes.\r\n            \r\n### Examples\r\n            \r\n- `2020|AY` is the 2020/21 academic year\r\n- `2021|FY` is the 2021/22 financial year\r\n- `2020|T3` is the 2020/21 academic year's summer term\r\n- `2020|P2` is the 2020/21 financial year part 2 (October to March)\r\n- `2020|CY` is the 2020 calendar year\r\n- `2020|W32` is 2020 week 32\r\n- `2020/2021|AY` is the 2020/21 academic year\r\n- `2021/2022|FY` is the 2021/22 financial year\r\n            \r\n## Sorts\r\n            \r\nThe `sorts` query parameter is used to sort the results.\r\n            \r\nSorts are applied in the order they are provided and should be strings\r\nformatted like `{field}|{direction}` where:\r\n            \r\n- `field` is the name of the field to sort e.g. `timePeriod`\r\n- `direction` is the direction to sort in e.g. ascending (`Asc`) or descending (`Desc`)\r\n            \r\nThe `field` can be one of the following:\r\n            \r\n- `timePeriod` to sort by time period\r\n- `geographicLevel` to sort by the geographic level of the data\r\n- `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)\r\n- `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)\r\n- `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)\r\n            \r\n### Examples\r\n            \r\n- `timePeriod|Desc` sorts by time period in descending order\r\n- `geographicLevel|Asc` sorts by geographic level in ascending order\r\n- `location|REG|Asc` sorts by regions in ascending order\r\n- `filter|3RxWP|Desc` sorts by options in filter `3RxWP` in descending order\r\n- `indicator|7a1dk|Asc` sorts by values in indicator `7a1dk` in ascending order",
+        "operationId": "QueryDataSetGet",
+        "parameters": [
+          {
+            "name": "dataSetId",
+            "in": "path",
+            "description": "The ID of the data set.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "dataSetVersion",
+            "in": "query",
+            "description": "The version of the data set to use e.g. 2.0, 1.1, etc.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filters.in",
+            "in": "query",
+            "description": "Filter the results to have a filter option matching at least one of these IDs.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": [
+                "n0WqP",
+                "3dCWP"
+              ]
+            },
+            "example": [
+              "n0WqP",
+              "3dCWP"
+            ]
+          },
+          {
+            "name": "filters.notIn",
+            "in": "query",
+            "description": "Filter the results to not have a filter option matching any of these IDs.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": [
+                "RMxeh",
+                "wUzft"
+              ]
+            },
+            "example": [
+              "RMxeh",
+              "wUzft"
+            ]
+          },
+          {
+            "name": "filters.eq",
+            "in": "query",
+            "description": "Filter the results to have a filter option matching this ID.",
+            "schema": {
+              "type": "string",
+              "example": "pVAkV"
+            },
+            "example": "pVAkV"
+          },
+          {
+            "name": "filters.notEq",
+            "in": "query",
+            "description": "Filter the results to not have a filter option matching this ID.",
+            "schema": {
+              "type": "string",
+              "example": "wUzft"
+            },
+            "example": "wUzft"
+          },
+          {
+            "name": "geographicLevels.in",
+            "in": "query",
+            "description": "Filter the results to be in one of these geographic levels.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              },
+              "example": [
+                "NAT",
+                "LA"
+              ]
+            },
+            "example": [
+              "NAT",
+              "LA"
+            ]
+          },
+          {
+            "name": "geographicLevels.notIn",
+            "in": "query",
+            "description": "Filter the results to not be in one of these geographic levels.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              },
+              "example": [
+                "REG",
+                "LAD"
+              ]
+            },
+            "example": [
+              "REG",
+              "LAD"
+            ]
+          },
+          {
+            "name": "geographicLevels.eq",
+            "in": "query",
+            "description": "Filter the results to be in this geographic level.",
+            "schema": {
+              "type": "string",
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/GeographicLevelCode"
+                }
+              ],
+              "example": "NAT"
+            },
+            "example": "NAT"
+          },
+          {
+            "name": "geographicLevels.notEq",
+            "in": "query",
+            "description": "Filter the results to not be in this geographic level.",
+            "schema": {
+              "type": "string",
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/GeographicLevelCode"
+                }
+              ],
+              "example": "PROV"
+            },
+            "example": "PROV"
+          },
+          {
+            "name": "locations.eq",
+            "in": "query",
+            "description": "Filter the results to be in this location.",
+            "schema": {
+              "type": "string",
+              "example": "NAT|id|3dCWP"
+            },
+            "example": "NAT|id|3dCWP"
+          },
+          {
+            "name": "locations.notEq",
+            "in": "query",
+            "description": "Filter the results to not be in this location.",
+            "schema": {
+              "type": "string",
+              "example": "REG|code|E12000003"
+            },
+            "example": "REG|code|E12000003"
+          },
+          {
+            "name": "locations.in",
+            "in": "query",
+            "description": "Filter the results to be in one of these locations.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": [
+                "LA|code|E08000003",
+                "LA|oldCode|373"
+              ]
+            },
+            "example": [
+              "LA|code|E08000003",
+              "LA|oldCode|373"
+            ]
+          },
+          {
+            "name": "locations.notIn",
+            "in": "query",
+            "description": "Filter the results not to be in one of these locations.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": [
+                "SCH|urn|123456",
+                "SCH|laEstab|1234567"
+              ]
+            },
+            "example": [
+              "SCH|urn|123456",
+              "SCH|laEstab|1234567"
+            ]
+          },
+          {
+            "name": "timePeriods.eq",
+            "in": "query",
+            "description": "Filter the results to be in this time period.",
+            "schema": {
+              "type": "string",
+              "example": "2024|CY"
+            },
+            "example": "2024|CY"
+          },
+          {
+            "name": "timePeriods.notEq",
+            "in": "query",
+            "description": "Filter the results to not be in this time period.",
+            "schema": {
+              "type": "string",
+              "example": "2024/2025|AY"
+            },
+            "example": "2024/2025|AY"
+          },
+          {
+            "name": "timePeriods.in",
+            "in": "query",
+            "description": "Filter the results to be in one of these time periods.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": [
+                "2022|CY",
+                "2023|CY",
+                "2024|CY"
+              ]
+            },
+            "example": [
+              "2022|CY",
+              "2023|CY",
+              "2024|CY"
+            ]
+          },
+          {
+            "name": "timePeriods.notIn",
+            "in": "query",
+            "description": "Filter the results to not be in one of these time periods.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": [
+                "2020|M1",
+                "2020|M2",
+                "2020|M3"
+              ]
+            },
+            "example": [
+              "2020|M1",
+              "2020|M2",
+              "2020|M3"
+            ]
+          },
+          {
+            "name": "timePeriods.gt",
+            "in": "query",
+            "description": "Filter the results to be in a time period that is\r\nchronologically greater than the one specified.",
+            "schema": {
+              "type": "string",
+              "example": "2017/2018|AY"
+            },
+            "example": "2017/2018|AY"
+          },
+          {
+            "name": "timePeriods.gte",
+            "in": "query",
+            "description": "Filter the results to be in a time period that is\r\nchronologically greater than or equal to the one specified.",
+            "schema": {
+              "type": "string",
+              "example": "2017|CY"
+            },
+            "example": "2017|CY"
+          },
+          {
+            "name": "timePeriods.lt",
+            "in": "query",
+            "description": "Filter the results to be in a time period that is\r\nchronologically less than the one specified.",
+            "schema": {
+              "type": "string",
+              "example": "2023/2024|AY"
+            },
+            "example": "2023/2024|AY"
+          },
+          {
+            "name": "timePeriods.lte",
+            "in": "query",
+            "description": "Filter the results to be in a time period that is\r\nchronologically less than or equal to the one specified.",
+            "schema": {
+              "type": "string",
+              "example": "2023|CY"
+            },
+            "example": "2023|CY"
+          },
+          {
+            "name": "indicators",
+            "in": "query",
+            "description": "The IDs of indicators to return values for.",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The IDs of indicators to return values for."
+            }
+          },
+          {
+            "name": "sorts",
+            "in": "query",
+            "description": "The sorts to apply to the results. Sorts at the start of the\r\nlist will be applied first.\r\n            \r\nBy default, results are sorted by time period in descending order.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The sorts to apply to the results. Sorts at the start of the\r\nlist will be applied first.\r\n            \r\nBy default, results are sorted by time period in descending order.",
+              "nullable": true
+            }
+          },
+          {
+            "name": "debug",
+            "in": "query",
+            "description": "Enable debug mode. Results will be formatted with human-readable\r\nlabels to assist in identification.\r\n            \r\nThis **should not** be enabled in a production environment.",
+            "schema": {
+              "type": "boolean",
+              "description": "Enable debug mode. Results will be formatted with human-readable\r\nlabels to assist in identification.\r\n            \r\nThis **should not** be enabled in a production environment."
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page of results to fetch.",
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "description": "The page of results to fetch.",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "The maximum number of results per page.",
+            "schema": {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer",
+              "description": "The maximum number of results per page.",
+              "format": "int32",
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The paginated list of query results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataSetQueryPaginatedResultsViewModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemViewModel"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "DataSets"
+        ],
+        "summary": "Query a data set (POST)",
+        "description": "Query a data set using a `POST` request, returning the filtered results.\r\n            \r\nNote that for simpler queries or exploratory testing, there is also GET variant of this endpoint\r\nonly handles a smaller subset of querying functionality. However, for most use-cases,\r\nthis endpoint is recommended as it provides the complete set of functionality.\r\n            \r\nUnlike the `GET` endpoint, the `POST` endpoint allows condition criteria (`and`, `or`, `not`)\r\nand consequently can express more complex queries.",
+        "operationId": "QueryDataSetPost",
+        "parameters": [
+          {
+            "name": "dataSetId",
+            "in": "path",
+            "description": "The ID of the data set.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "dataSetVersion",
+            "in": "query",
+            "description": "The version of the data set to use e.g. 2.0, 1.1, etc.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DataSetQueryRequest"
+                  }
+                ],
+                "description": "A data set query to match results against."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The paginated list of query results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataSetQueryPaginatedResultsViewModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemViewModel"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        }
+      }
+    },
+    "/api/v1/data-sets/{dataSetId}/csv": {
+      "get": {
+        "tags": [
+          "DataSets"
+        ],
+        "summary": "Download a data set as CSV",
+        "description": "The CSV response will render its metadata in a human-readable format (instead of\r\nmachine-readable IDs). The CSV is not subject to the same backward compatibility\r\nguarantees as the data set's JSON representation in other endpoints.",
+        "operationId": "DownloadDataSetCsv",
+        "parameters": [
+          {
+            "name": "dataSetId",
+            "in": "path",
+            "description": "The ID of the data set.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "dataSetVersion",
+            "in": "query",
+            "description": "The version of the data set to use e.g. 2.0, 1.1, etc.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data set CSV file.",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        }
+      }
+    },
+    "/api/v1/data-sets/{dataSetId}/versions": {
+      "get": {
+        "tags": [
+          "DataSetVersions"
+        ],
+        "summary": "List a data set’s versions",
+        "description": "List a data set’s versions. Only provides summary information of each version.",
+        "operationId": "ListDataSetVersions",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page of results to fetch.",
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "description": "The page of results to fetch.",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "The maximum number of results per page.",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "description": "The maximum number of results per page.",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "dataSetId",
+            "in": "path",
+            "description": "The ID of the data set.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The paginated list of data set versions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataSetVersionPaginatedListViewModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemViewModel"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        }
+      }
+    },
+    "/api/v1/data-sets/{dataSetId}/versions/{dataSetVersion}": {
+      "get": {
+        "tags": [
+          "DataSetVersions"
+        ],
+        "summary": "Get a data set version",
+        "description": "Get a data set version's summary details.",
+        "operationId": "GetDataSetVersion",
+        "parameters": [
+          {
+            "name": "dataSetId",
+            "in": "path",
+            "description": "The ID of the data set.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "dataSetVersion",
+            "in": "path",
+            "description": "The data set version e.g. 1.0, 1.1, 2.0, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested data set version.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataSetVersionViewModel"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        }
+      }
+    },
+    "/api/v1/data-sets/{dataSetId}/versions/{dataSetVersion}/changes": {
+      "get": {
+        "tags": [
+          "DataSetVersions"
+        ],
+        "summary": "Get a data set version's changes",
+        "description": "Lists the changes made by a data set version relative to the version prior to it.",
+        "operationId": "GetDataSetVersionChanges",
+        "parameters": [
+          {
+            "name": "dataSetId",
+            "in": "path",
+            "description": "The ID of the data set.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "dataSetVersion",
+            "in": "path",
+            "description": "The data set version e.g. 1.0, 1.1, 2.0, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The changes for the data set version.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataSetVersionChangesViewModel"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        }
+      }
+    },
+    "/api/v1/publications": {
+      "get": {
+        "tags": [
+          "Publications"
+        ],
+        "summary": "List publications",
+        "description": "Lists details about publications with data available for querying.",
+        "operationId": "ListPublications",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "A search term to find matching publications.",
+            "schema": {
+              "minLength": 3,
+              "type": "string",
+              "description": "A search term to find matching publications.",
+              "nullable": true,
+              "example": "Pupil absence"
+            },
+            "example": "Pupil absence"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page of results to fetch.",
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "description": "The page of results to fetch.",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "The maximum number of results per page.",
+            "schema": {
+              "maximum": 40,
+              "minimum": 1,
+              "type": "integer",
+              "description": "The maximum number of results per page.",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The paginated list of publications.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationPaginatedListViewModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemViewModel"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        }
+      }
+    },
+    "/api/v1/publications/{publicationId}": {
+      "get": {
+        "tags": [
+          "Publications"
+        ],
+        "summary": "Get a publication’s details",
+        "description": "Get a specific publication's summary details.",
+        "operationId": "GetPublication",
+        "parameters": [
+          {
+            "name": "publicationId",
+            "in": "path",
+            "description": "The ID of the publication.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested publication summary.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationSummaryViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsViewModel"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        }
+      }
+    },
+    "/api/v1/publications/{publicationId}/data-sets": {
+      "get": {
+        "tags": [
+          "Publications"
+        ],
+        "summary": "List a publication’s data sets",
+        "description": "Lists summary details of all the data sets related to a publication.",
+        "operationId": "ListPublicationDataSets",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page of results to fetch.",
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "description": "The page of results to fetch.",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "The maximum number of results per page.",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "description": "The maximum number of results per page.",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "publicationId",
+            "in": "path",
+            "description": "The ID of the publication.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The paginated list of data sets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataSetPaginatedListViewModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemViewModel"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChangeSetViewModel": {
+        "type": "object",
+        "properties": {
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterChangeViewModel"
+            },
+            "description": "A list of any filter changes made to the data set.",
+            "nullable": true
+          },
+          "filterOptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionChangesViewModel"
+            },
+            "description": "A list of any filter option changes made to the data set.",
+            "nullable": true
+          },
+          "geographicLevels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeographicLevelChangeViewModel"
+            },
+            "description": "A list of any geographic level changes made to the data set.",
+            "nullable": true
+          },
+          "indicators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IndicatorChangeViewModel"
+            },
+            "description": "A list of any indicator changes made to the data set.",
+            "nullable": true
+          },
+          "locationGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationGroupChangeViewModel"
+            },
+            "description": "A list of any location group changes made to the data set.",
+            "nullable": true
+          },
+          "locationOptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationOptionChangesViewModel"
+            },
+            "description": "A list of any location option changes made to the data set.",
+            "nullable": true
+          },
+          "timePeriods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimePeriodOptionChangeViewModel"
+            },
+            "description": "A list of any time period changes made to the data set.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A set of changes grouped by their type (major or minor)."
+      },
+      "DataSetGetQueryFilters": {
+        "type": "object",
+        "properties": {
+          "eq": {
+            "type": "string",
+            "description": "Filter the results to have a filter option matching this ID.",
+            "nullable": true,
+            "example": "pVAkV"
+          },
+          "notEq": {
+            "type": "string",
+            "description": "Filter the results to not have a filter option matching this ID.",
+            "nullable": true,
+            "example": "wUzft"
+          },
+          "in": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter the results to have a filter option matching at least one of these IDs.",
+            "nullable": true,
+            "example": [
+              "n0WqP",
+              "3dCWP"
+            ]
+          },
+          "notIn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter the results to not have a filter option matching any of these IDs.",
+            "nullable": true,
+            "example": [
+              "RMxeh",
+              "wUzft"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "The filter option criteria to filter results by in a data set GET query."
+      },
+      "DataSetGetQueryGeographicLevels": {
+        "type": "object",
+        "properties": {
+          "eq": {
+            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "Filter the results to be in this geographic level.",
+            "nullable": true,
+            "example": "NAT"
+          },
+          "notEq": {
+            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "Filter the results to not be in this geographic level.",
+            "nullable": true,
+            "example": "PROV"
+          },
+          "in": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeographicLevelCode"
+            },
+            "description": "Filter the results to be in one of these geographic levels.",
+            "nullable": true,
+            "example": [
+              "NAT",
+              "LA"
+            ]
+          },
+          "notIn": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeographicLevelCode"
+            },
+            "description": "Filter the results to not be in one of these geographic levels.",
+            "nullable": true,
+            "example": [
+              "REG",
+              "LAD"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "The geographic levels criteria to filter results by in a data set GET query."
+      },
+      "DataSetGetQueryLocations": {
+        "type": "object",
+        "properties": {
+          "eq": {
+            "type": "string",
+            "description": "Filter the results to be in this location.",
+            "nullable": true,
+            "example": "NAT|id|3dCWP"
+          },
+          "notEq": {
+            "type": "string",
+            "description": "Filter the results to not be in this location.",
+            "nullable": true,
+            "example": "REG|code|E12000003"
+          },
+          "in": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter the results to be in one of these locations.",
+            "nullable": true,
+            "example": [
+              "LA|code|E08000003",
+              "LA|oldCode|373"
+            ]
+          },
+          "notIn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter the results not to be in one of these locations.",
+            "nullable": true,
+            "example": [
+              "SCH|urn|123456",
+              "SCH|laEstab|1234567"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "The location option criteria to filter results by in a data set GET query.\r\n            \r\nThe results can be matched by either the location option's ID or a code.\r\nNote the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be\r\nused for multiple locations. This may match more results than you\r\nexpect so it's recommended to use IDs where possible."
+      },
+      "DataSetGetQueryRequest": {
+        "required": [
+          "indicators"
+        ],
+        "type": "object",
+        "properties": {
+          "filters": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetGetQueryFilters"
+              }
+            ],
+            "description": "Query criteria relating to filter options.",
+            "nullable": true
+          },
+          "geographicLevels": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetGetQueryGeographicLevels"
+              }
+            ],
+            "description": "Query criteria relating to geographic levels.",
+            "nullable": true
+          },
+          "locations": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetGetQueryLocations"
+              }
+            ],
+            "description": "Query criteria relating to location options.",
+            "nullable": true
+          },
+          "timePeriods": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetGetQueryTimePeriods"
+              }
+            ],
+            "description": "Query criteria relating to time periods.",
+            "nullable": true
+          },
+          "indicators": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "maxLength": 40,
+              "minLength": 1,
+              "type": "string"
+            },
+            "description": "The IDs of indicators to return values for."
+          },
+          "sorts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The sorts to apply to the results. Sorts at the start of the\r\nlist will be applied first.\r\n            \r\nBy default, results are sorted by time period in descending order.",
+            "nullable": true
+          },
+          "debug": {
+            "type": "boolean",
+            "description": "Enable debug mode. Results will be formatted with human-readable\r\nlabels to assist in identification.\r\n            \r\nThis **should not** be enabled in a production environment."
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "The page of results to fetch.",
+            "format": "int32",
+            "default": 1
+          },
+          "pageSize": {
+            "maximum": 10000,
+            "minimum": 1,
+            "type": "integer",
+            "description": "The maximum number of results per page.",
+            "format": "int32",
+            "default": 1000
+          }
+        },
+        "additionalProperties": false,
+        "description": "A data set GET query request."
+      },
+      "DataSetGetQueryTimePeriods": {
+        "type": "object",
+        "properties": {
+          "eq": {
+            "type": "string",
+            "description": "Filter the results to be in this time period.",
+            "nullable": true,
+            "example": "2024|CY"
+          },
+          "notEq": {
+            "type": "string",
+            "description": "Filter the results to not be in this time period.",
+            "nullable": true,
+            "example": "2024/2025|AY"
+          },
+          "in": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter the results to be in one of these time periods.",
+            "nullable": true,
+            "example": [
+              "2022|CY",
+              "2023|CY",
+              "2024|CY"
+            ]
+          },
+          "notIn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter the results to not be in one of these time periods.",
+            "nullable": true,
+            "example": [
+              "2020|M1",
+              "2020|M2",
+              "2020|M3"
+            ]
+          },
+          "gt": {
+            "type": "string",
+            "description": "Filter the results to be in a time period that is\r\nchronologically greater than the one specified.",
+            "nullable": true,
+            "example": "2017/2018|AY"
+          },
+          "gte": {
+            "type": "string",
+            "description": "Filter the results to be in a time period that is\r\nchronologically greater than or equal to the one specified.",
+            "nullable": true,
+            "example": "2017|CY"
+          },
+          "lt": {
+            "type": "string",
+            "description": "Filter the results to be in a time period that is\r\nchronologically less than the one specified.",
+            "nullable": true,
+            "example": "2023/2024|AY"
+          },
+          "lte": {
+            "type": "string",
+            "description": "Filter the results to be in a time period that is\r\nchronologically less than or equal to the one specified.",
+            "nullable": true,
+            "example": "2023|CY"
+          }
+        },
+        "additionalProperties": false,
+        "description": "The time period criteria to filter results by in a data set GET query."
+      },
+      "DataSetLatestVersionViewModel": {
+        "required": [
+          "file",
+          "filters",
+          "geographicLevels",
+          "indicators",
+          "published",
+          "timePeriods",
+          "totalResults",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "description": "The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor).",
+            "example": "2.0"
+          },
+          "published": {
+            "type": "string",
+            "description": "When the version was published.",
+            "format": "date-time",
+            "example": "2024-03-01T09:30:00+00:00"
+          },
+          "totalResults": {
+            "type": "integer",
+            "description": "The total number of results available to query in the data set.",
+            "format": "int64",
+            "example": 1000000
+          },
+          "file": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetVersionFileViewModel"
+              }
+            ],
+            "description": "The file that this data set version is based on."
+          },
+          "timePeriods": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TimePeriodRangeViewModel"
+              }
+            ],
+            "description": "The time period range covered by the data set."
+          },
+          "geographicLevels": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "English devolved area",
+                "Local authority",
+                "Local authority district",
+                "Local enterprise partnership",
+                "Local skills improvement plan area",
+                "Institution",
+                "Mayoral combined authority",
+                "MAT",
+                "National",
+                "Opportunity area",
+                "Parliamentary constituency",
+                "Provider",
+                "Regional",
+                "RSC region",
+                "School",
+                "Sponsor",
+                "Ward",
+                "Planning area"
+              ],
+              "type": "string"
+            },
+            "description": "The geographic levels available in the data set.",
+            "example": [
+              "National",
+              "Regional",
+              "Local authority"
+            ]
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The filters available in the data set.",
+            "example": [
+              "Characteristic",
+              "School type"
+            ]
+          },
+          "indicators": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The indicators available in the data set."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provides high-level information about the latest version of a data set."
+      },
+      "DataSetListRequest": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "The page of results to fetch.",
+            "format": "int32",
+            "default": 1
+          },
+          "pageSize": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": "integer",
+            "description": "The maximum number of results per page.",
+            "format": "int32",
+            "default": 10
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataSetMetaRequest": {
+        "type": "object",
+        "properties": {
+          "types": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "Filters",
+                "Indicators",
+                "Locations",
+                "TimePeriods"
+              ],
+              "type": "string"
+            },
+            "description": "The types of meta to get for the requested data set version.\r\n\r\nCan be any combination of the following:\r\n\r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
+            "nullable": true,
+            "example": [
+              "Filters",
+              "Locations"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataSetMetaViewModel": {
+        "required": [
+          "filters",
+          "geographicLevels",
+          "indicators",
+          "locations",
+          "timePeriods"
+        ],
+        "type": "object",
+        "properties": {
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionsViewModel"
+            },
+            "description": "All the filters associated with the data set."
+          },
+          "indicators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IndicatorViewModel"
+            },
+            "description": "All the indicators associated with the data set."
+          },
+          "geographicLevels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeographicLevelViewModel"
+            },
+            "description": "All the geographic levels associated with the data set."
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationGroupOptionsViewModel"
+            },
+            "description": "All the locations associated with the data set, grouped by geographic level."
+          },
+          "timePeriods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimePeriodOptionViewModel"
+            },
+            "description": "All the time periods associated with the data set."
+          }
+        },
+        "additionalProperties": false,
+        "description": "All the metadata associated with a data set."
+      },
+      "DataSetPaginatedListViewModel": {
+        "required": [
+          "paging",
+          "results"
+        ],
+        "type": "object",
+        "properties": {
+          "paging": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PagingViewModel"
+              }
+            ],
+            "description": "Provides metadata for use in pagination."
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataSetViewModel"
+            },
+            "description": "The list of results for this page."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A paginated list of data sets."
+      },
+      "DataSetQueryCriteriaAnd": {
+        "required": [
+          "and"
+        ],
+        "type": "object",
+        "properties": {
+          "and": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataSetQueryCriteriaAnd"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryCriteriaOr"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryCriteriaNot"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryCriteriaFacets"
+                }
+              ]
+            },
+            "description": "The sub-criteria which all must resolve to true.",
+            "example": [
+              {
+                "filters": {
+                  "eq": "pVAkV"
+                }
+              },
+              {
+                "locations": {
+                  "eq": {
+                    "level": "LA",
+                    "code": "E08000019"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "A condition criteria where one or more sub-criteria must all resolve\r\nto true for the overall query to match any results.\r\n            \r\nThis is equivalent to the `AND` operator in SQL."
+      },
+      "DataSetQueryCriteriaFacets": {
+        "type": "object",
+        "properties": {
+          "filters": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaFilters"
+              }
+            ],
+            "description": "Query criteria relating to filter options.",
+            "nullable": true
+          },
+          "geographicLevels": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaGeographicLevels"
+              }
+            ],
+            "description": "Query criteria relating to geographic levels.",
+            "nullable": true
+          },
+          "locations": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaLocations"
+              }
+            ],
+            "description": "Query criteria relating to location options.",
+            "nullable": true
+          },
+          "timePeriods": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaTimePeriods"
+              }
+            ],
+            "description": "Query criteria relating to time periods.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A set of criteria specifying which facets the query should match results with.\r\n            \r\nAll parts of the criteria must resolve to true to match a result."
+      },
+      "DataSetQueryCriteriaFilters": {
+        "type": "object",
+        "properties": {
+          "eq": {
+            "type": "string",
+            "description": "Filter the results to have a filter option matching this ID.",
+            "nullable": true,
+            "example": "pVAkV"
+          },
+          "notEq": {
+            "type": "string",
+            "description": "Filter the results to not have a filter option matching this ID.",
+            "nullable": true,
+            "example": "wUzft"
+          },
+          "in": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter the results to have a filter option matching at least one of these IDs.",
+            "nullable": true,
+            "example": [
+              "q1g3J",
+              "ufp2K"
+            ]
+          },
+          "notIn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter the results to not have a filter option matching any of these IDs.",
+            "nullable": true,
+            "example": [
+              "ksrK9",
+              "s1J8a"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "The filter option criteria to filter results by in a data set query."
+      },
+      "DataSetQueryCriteriaGeographicLevels": {
+        "type": "object",
+        "properties": {
+          "eq": {
+            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "Filter the results to be in this geographic level.",
+            "nullable": true,
+            "example": "NAT"
+          },
+          "notEq": {
+            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "Filter the results to not be in this geographic level.",
+            "nullable": true,
+            "example": "PROV"
+          },
+          "in": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeographicLevelCode"
+            },
+            "description": "Filter the results to be in one of these geographic levels.",
+            "nullable": true,
+            "example": [
+              "REG",
+              "LA"
+            ]
+          },
+          "notIn": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeographicLevelCode"
+            },
+            "description": "Filter the results to not be in one of these geographic levels.",
+            "nullable": true,
+            "example": [
+              "LAD",
+              "SCH"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "The geographic levels criteria to filter results by in a data set query."
+      },
+      "DataSetQueryCriteriaLocations": {
+        "type": "object",
+        "properties": {
+          "eq": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationId"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationCode"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationLocalAuthorityCode"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationLocalAuthorityOldCode"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationProviderUkprn"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationSchoolLaEstab"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationSchoolUrn"
+              }
+            ],
+            "description": "Filter the results to be in this location.",
+            "nullable": true
+          },
+          "notEq": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationId"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationCode"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationLocalAuthorityCode"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationLocalAuthorityOldCode"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationProviderUkprn"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationSchoolLaEstab"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryLocationSchoolUrn"
+              }
+            ],
+            "description": "Filter the results to not be in this location.",
+            "nullable": true
+          },
+          "in": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationId"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationCode"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationLocalAuthorityCode"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationLocalAuthorityOldCode"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationProviderUkprn"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationSchoolLaEstab"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationSchoolUrn"
+                }
+              ]
+            },
+            "description": "Filter the results to be in one of these locations.",
+            "nullable": true
+          },
+          "notIn": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationId"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationCode"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationLocalAuthorityCode"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationLocalAuthorityOldCode"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationProviderUkprn"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationSchoolLaEstab"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryLocationSchoolUrn"
+                }
+              ]
+            },
+            "description": "Filter the results to not be in one of these locations.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The location option criteria to filter results by in a data set query.\r\n            \r\nThe results can be matched by either the location option's ID or a code.\r\nNote the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be\r\nused for multiple locations. This may match more results than you\r\nexpect so it's recommended to use IDs where possible."
+      },
+      "DataSetQueryCriteriaNot": {
+        "required": [
+          "not"
+        ],
+        "type": "object",
+        "properties": {
+          "not": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaAnd"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaOr"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaNot"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaFacets"
+              }
+            ],
+            "description": "The sub-criteria which must resolve to false.",
+            "example": {
+              "filters": {
+                "eq": "pVAkV"
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "description": "A condition criteria where its sub-criteria must resolve\r\nto *false* for the overall query to match any results.\r\n            \r\nThis is equivalent to the `NOT` operator in SQL."
+      },
+      "DataSetQueryCriteriaOr": {
+        "required": [
+          "or"
+        ],
+        "type": "object",
+        "properties": {
+          "or": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataSetQueryCriteriaAnd"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryCriteriaOr"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryCriteriaNot"
+                },
+                {
+                  "$ref": "#/components/schemas/DataSetQueryCriteriaFacets"
+                }
+              ]
+            },
+            "description": "The sub-criteria where one must resolve to true.",
+            "example": [
+              {
+                "filters": {
+                  "eq": "pVAkV"
+                }
+              },
+              {
+                "locations": {
+                  "eq": {
+                    "level": "LA",
+                    "code": "E08000019"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "A condition criteria where at least one sub-criteria must resolve\r\nto true for the overall query to match any results.\r\n            \r\nThis is equivalent to the `OR` operator in SQL."
+      },
+      "DataSetQueryCriteriaTimePeriods": {
+        "type": "object",
+        "properties": {
+          "eq": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryTimePeriod"
+              }
+            ],
+            "description": "Filter the results to be in this time period.",
+            "nullable": true
+          },
+          "notEq": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryTimePeriod"
+              }
+            ],
+            "description": "Filter the results to not be in this time period.",
+            "nullable": true
+          },
+          "in": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataSetQueryTimePeriod"
+            },
+            "description": "Filter the results to be in one of these time periods.",
+            "nullable": true
+          },
+          "notIn": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataSetQueryTimePeriod"
+            },
+            "description": "Filter the results to not be in one of these time periods.",
+            "nullable": true
+          },
+          "gt": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryTimePeriod"
+              }
+            ],
+            "description": "Filter the results to be in a time period that is\r\nchronologically greater than the one specified.",
+            "nullable": true
+          },
+          "gte": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryTimePeriod"
+              }
+            ],
+            "description": "Filter the results to be in a time period that is\r\nchronologically greater than or equal to the one specified.",
+            "nullable": true
+          },
+          "lt": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryTimePeriod"
+              }
+            ],
+            "description": "Filter the results to be in a time period that is\r\nchronologically less than the one specified.",
+            "nullable": true
+          },
+          "lte": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryTimePeriod"
+              }
+            ],
+            "description": "Filter the results to be in a time period that is\r\nchronologically less than or equal to the one specified.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The time period criteria to filter results by in a data set query."
+      },
+      "DataSetQueryLocationCode": {
+        "required": [
+          "code",
+          "level"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "maxLength": 30,
+            "minLength": 1,
+            "type": "string",
+            "description": "The code of the location. This may be an ONS code, or some\r\nother code that identifies the location.",
+            "example": "E12000003"
+          },
+          "level": {
+            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "The geographic level of the location.\r\n            \r\nThis should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.",
+            "example": "NAT"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A location (identified by a code) to filter results by.\r\n            \r\nNote that location codes may correspond to multiple locations in the same geographic level."
+      },
+      "DataSetQueryLocationId": {
+        "required": [
+          "id",
+          "level"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "maxLength": 10,
+            "minLength": 1,
+            "type": "string",
+            "description": "The ID of the location. If specified, this will be used\r\ninstead of any codes or other types of identifier.",
+            "example": "2tYX"
+          },
+          "level": {
+            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "The geographic level of the location.\r\n            \r\nThis should be a valid geographic level code e.g. `NAT`, `REG`, `LA`.",
+            "example": "NAT"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A location (identified by an ID) to filter results by.\r\n            \r\nNote that location IDs are guaranteed to be unique to a single location\r\nunlike location codes (which may correspond to multiple locations)."
+      },
+      "DataSetQueryLocationLocalAuthorityCode": {
+        "required": [
+          "code",
+          "level"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "maxLength": 30,
+            "minLength": 1,
+            "type": "string",
+            "description": "The ONS code of the local authority. This is typically 9 characters\r\nin the standard ONS format for local authorities e.g. `E08000019`,\r\nbut may be a combination of multiple codes e.g. `E08000019 / E08000020`.",
+            "example": "E08000019"
+          },
+          "level": {
+            "minLength": 1,
+            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "The geographic level of the local authority. Must be set to `LA`.",
+            "example": "LA"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A local authority (identified by its ONS code) to filter results by."
+      },
+      "DataSetQueryLocationLocalAuthorityOldCode": {
+        "required": [
+          "oldCode"
+        ],
+        "type": "object",
+        "properties": {
+          "oldCode": {
+            "maxLength": 20,
+            "minLength": 1,
+            "type": "string",
+            "description": "The old code (previously the LEA code) of the local authority.\r\nThis is typically a 3-digit number e.g. `318`, but may be a\r\ncombination of multiple codes e.g. `318 / 319`.",
+            "example": "373"
+          },
+          "level": {
+            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "The geographic level of the local authority. Must be set to `LA`.",
+            "example": "LA"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A local authority (identified by its old code) to filter results by."
+      },
+      "DataSetQueryLocationProviderUkprn": {
+        "required": [
+          "level",
+          "ukprn"
+        ],
+        "type": "object",
+        "properties": {
+          "ukprn": {
+            "maxLength": 20,
+            "minLength": 1,
+            "type": "string",
+            "description": "The UKPRN (UK provider reference number) of the provider.\r\nThis is typically an 8-digit number.",
+            "example": "123454678"
+          },
+          "level": {
+            "minLength": 1,
+            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "The geographic level of the provider. Must be set to `PROV`.",
+            "example": "PROV"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A provider (identified by its UKPRN) to filter results by."
+      },
+      "DataSetQueryLocationSchoolLaEstab": {
+        "required": [
+          "laEstab",
+          "level"
+        ],
+        "type": "object",
+        "properties": {
+          "laEstab": {
+            "maxLength": 20,
+            "minLength": 1,
+            "type": "string",
+            "description": "The LAESTAB (local authority establishment number) of the school.\r\nThis is typically a 7-digit number.",
+            "example": "1234567"
+          },
+          "level": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The geographic level of the location. Must be set to `SCH`.",
+            "example": "SCH"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A school (identified by its LAESTAB) to filter results by."
+      },
+      "DataSetQueryLocationSchoolUrn": {
+        "required": [
+          "level",
+          "urn"
+        ],
+        "type": "object",
+        "properties": {
+          "urn": {
+            "maxLength": 20,
+            "minLength": 1,
+            "type": "string",
+            "description": "The URN (unique reference number) of the school.\r\nThis is typically a 6-digit number.",
+            "example": "123456"
+          },
+          "level": {
+            "minLength": 1,
+            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "The geographic level of the school. Must be set to `SCH`.",
+            "example": "SCH"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A school (identified by its URN) to filter results by."
+      },
+      "DataSetQueryPaginatedResultsViewModel": {
+        "required": [
+          "paging",
+          "results",
+          "warnings"
+        ],
+        "type": "object",
+        "properties": {
+          "paging": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PagingViewModel"
+              }
+            ],
+            "description": "Provides metadata for use in pagination."
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataSetQueryResultViewModel"
+            },
+            "description": "The list of results for this page."
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WarningViewModel"
+            },
+            "description": "A list of warnings, highlighting any potential issues with the request."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A paginated list of results from a data set query."
+      },
+      "DataSetQueryRequest": {
+        "required": [
+          "indicators"
+        ],
+        "type": "object",
+        "properties": {
+          "criteria": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaAnd"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaOr"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaNot"
+              },
+              {
+                "$ref": "#/components/schemas/DataSetQueryCriteriaFacets"
+              }
+            ],
+            "description": "The criteria to match.",
+            "nullable": true
+          },
+          "indicators": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "maxLength": 40,
+              "minLength": 1,
+              "type": "string"
+            },
+            "description": "The IDs of indicators in the data set to return values for.",
+            "example": [
+              "C2ySJ",
+              "q4X3J"
+            ]
+          },
+          "sorts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataSetQuerySort"
+            },
+            "description": "The sorts to sort the results by. Sorts at the start of the\r\nlist will be applied first.\r\n            \r\nBy default, results are sorted by time period in descending order.",
+            "nullable": true
+          },
+          "debug": {
+            "type": "boolean",
+            "description": "Enable debug mode. Results will be formatted with human-readable\r\nlabels to assist in identification.\r\n            \r\nThis **should not** be enabled in a production environment."
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "The page of results to fetch.",
+            "format": "int32",
+            "default": 1
+          },
+          "pageSize": {
+            "maximum": 10000,
+            "minimum": 1,
+            "type": "integer",
+            "description": "The maximum number of results per page.",
+            "format": "int32",
+            "default": 1000
+          }
+        },
+        "additionalProperties": false,
+        "description": "A data set query to match results against."
+      },
+      "DataSetQueryResultViewModel": {
+        "required": [
+          "filters",
+          "geographicLevel",
+          "locations",
+          "timePeriod",
+          "values"
+        ],
+        "type": "object",
+        "properties": {
+          "timePeriod": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TimePeriodViewModel"
+              }
+            ],
+            "description": "The time period relevant to this result's data."
+          },
+          "geographicLevel": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "The geographic level relevant to this result's data."
+          },
+          "locations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The locations relevant to this result's data.\r\n            \r\nThis is a dictionary where the key is the location's geographic\r\nlevel and the value is the location's ID.",
+            "example": {
+              "NAT": "04bTr",
+              "REG": "4veOu",
+              "LA": "owqlK"
+            }
+          },
+          "filters": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The filters associated with this result.\r\n            \r\nThis is a dictionary where the key is the filter ID and\r\nthe value is the specific filter option ID.",
+            "example": {
+              "ups2K": "n0WqP",
+              "j51wV": "AnZsi",
+              "hAkBQ": "dvB4z"
+            }
+          },
+          "values": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The data values for the result's indicators.\r\n            \r\nThis is a dictionary where the key is the indicator ID\r\nand the value is the data value.",
+            "example": {
+              "wLcft": "23593018",
+              "4S8Ou": "50.342",
+              "9kVFg": "25369172"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "description": "A result from a data set query containing its values and any facets relevant to it."
+      },
+      "DataSetQuerySort": {
+        "required": [
+          "direction",
+          "field"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "maxLength": 40,
+            "minLength": 1,
+            "type": "string",
+            "description": "The name of the field to sort by. This can be one of the following:\r\n            \r\n- `timePeriod` to sort by time period\r\n- `geographicLevel` to sort by the geographic level of the data\r\n- `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)\r\n- `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)\r\n- `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)",
+            "example": "timePeriod"
+          },
+          "direction": {
+            "enum": [
+              "Asc",
+              "Desc"
+            ],
+            "type": "string",
+            "description": "The direction to sort by. This can be one of the following:\r\n            \r\n- `Asc` - sort by ascending order\r\n- `Desc` - sort by descending order",
+            "example": "Asc"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Specifies how the results from a data set query should be sorted.\r\n            \r\nThis consists of a field in the data set and a direction to sort by."
+      },
+      "DataSetQueryTimePeriod": {
+        "required": [
+          "code",
+          "period"
+        ],
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "description": "The time period to match results by.\r\n            \r\nThis should be a single year like `2020` or a range like `2020/2021`.",
+            "example": "2020/2021"
+          },
+          "code": {
+            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TimePeriodCode"
+              }
+            ],
+            "description": "The code identifying the time period type to match results by.\r\n            \r\nThis should be a valid time period code e.g. `AY`, `CY`, `M1`, `W20`.",
+            "example": "AY"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A time period to filter results by.\r\n            \r\n- `period` is the time period or range (e.g. `2020` or `2020/2021`)\r\n- `code` is the code identifying the time period type (e.g. `AY`, `CY`, `M1`, `W20`)\r\n            \r\nThe `period` should be a single year like `2020`, or a range like `2020/2021`.\r\nCurrently, only years (or year ranges) are supported.\r\n            \r\nSome time period types span two years e.g. financial year part 2 (`P2`), or may fall in a\r\nlatter year e.g. academic year summer term (`T3`). For these types, a singular year `period`\r\nlike `2020` is considered as `2020/2021`.\r\n            \r\nFor example, a `period` value of `2020` is applicable to the following time periods:\r\n            \r\n- 2020 calendar year\r\n- 2020/2021 academic year\r\n- 2020/2021 financial year part 2 (October to March)\r\n- 2020/2021 academic year's summer term\r\n            \r\nIf you wish to be more explicit, you may use a range for the `period` e.g. `2020/2021`.\r\nHowever, a range cannot be used with time period types which only span a single year,\r\nfor example, `2020/21` cannot be used with `CY`, `M` or `W` codes.\r\n            \r\nSome examples:\r\n            \r\n- `2020|AY` is the 2020/21 academic year\r\n- `2021|FY` is the 2021/22 financial year\r\n- `2020|T3` is the 2020/21 academic year's summer term\r\n- `2020|P2` is the 2020/21 financial year part 2 (October to March)\r\n- `2020|CY` is the 2020 calendar year\r\n- `2020|W32` is 2020 week 32\r\n- `2020/2021|AY` is the 2020/21 academic year\r\n- `2021/2022|FY` is the 2021/22 financial year"
+      },
+      "DataSetStatus": {
+        "enum": [
+          "Published",
+          "Deprecated",
+          "Withdrawn"
+        ],
+        "type": "string"
+      },
+      "DataSetVersionChangesViewModel": {
+        "required": [
+          "majorChanges",
+          "minorChanges"
+        ],
+        "type": "object",
+        "properties": {
+          "majorChanges": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ChangeSetViewModel"
+              }
+            ],
+            "description": "Any major changes that were made to the data set."
+          },
+          "minorChanges": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ChangeSetViewModel"
+              }
+            ],
+            "description": "Any minor changes that were made to the data set."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A set of changes made to a data set version."
+      },
+      "DataSetVersionFileViewModel": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the file.",
+            "format": "uuid",
+            "example": "e0754872-3206-4918-aad4-029eaaae191f"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Details about the file a data set version is based on."
+      },
+      "DataSetVersionListRequest": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "The page of results to fetch.",
+            "format": "int32",
+            "default": 1
+          },
+          "pageSize": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": "integer",
+            "description": "The maximum number of results per page.",
+            "format": "int32",
+            "default": 10
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataSetVersionPaginatedListViewModel": {
+        "required": [
+          "paging",
+          "results"
+        ],
+        "type": "object",
+        "properties": {
+          "paging": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PagingViewModel"
+              }
+            ],
+            "description": "Provides metadata for use in pagination."
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataSetVersionViewModel"
+            },
+            "description": "The list of results for this page."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A paginated list of data set versions."
+      },
+      "DataSetVersionReleaseViewModel": {
+        "required": [
+          "slug",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "The title of the release.",
+            "example": "Spring term 2023/24"
+          },
+          "slug": {
+            "type": "string",
+            "description": "The slug of the release.",
+            "example": "2023-24-spring-term"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Details about the statistical release a data set version was published with."
+      },
+      "DataSetVersionStatus": {
+        "enum": [
+          "Published",
+          "Deprecated",
+          "Withdrawn"
+        ],
+        "type": "string"
+      },
+      "DataSetVersionType": {
+        "enum": [
+          "Major",
+          "Minor"
+        ],
+        "type": "string"
+      },
+      "DataSetVersionViewModel": {
+        "required": [
+          "file",
+          "filters",
+          "geographicLevels",
+          "indicators",
+          "notes",
+          "release",
+          "status",
+          "timePeriods",
+          "totalResults",
+          "type",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "description": "The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor).",
+            "example": "1.0"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetVersionType"
+              }
+            ],
+            "description": "The version type. Can be one of the following:\r\n            \r\n- `Major` - backwards incompatible changes are being introduced\r\n- `Minor` - backwards compatible changes are being introduced\r\n            \r\nMajor versions typically indicate that some action may be required\r\nto ensure code that consumes the data set continues to work.\r\n            \r\nMinor versions should not cause issues in the functionality of existing code.",
+            "example": "Major"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetVersionStatus"
+              }
+            ],
+            "description": "The version’s status. Can be one of the following:\r\n            \r\n- `Published` - the version is published and can be used\r\n- `Deprecated` - the version is being deprecated and will not be usable in the future\r\n- `Withdrawn` - the version has been withdrawn and can no longer be used",
+            "example": "Published"
+          },
+          "published": {
+            "type": "string",
+            "description": "When the version was published.",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2024-03-01T09:30:00+00:00"
+          },
+          "withdrawn": {
+            "type": "string",
+            "description": "When the version was withdrawn.",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2024-06-01T12:00:00+00:00"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Any notes about this version and its changes.",
+            "example": "Some notes about the version."
+          },
+          "totalResults": {
+            "type": "integer",
+            "description": "The total number of results available to query in the data set.",
+            "format": "int64",
+            "example": 1000000
+          },
+          "file": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetVersionFileViewModel"
+              }
+            ],
+            "description": "The file that this data set version is based on."
+          },
+          "release": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetVersionReleaseViewModel"
+              }
+            ],
+            "description": "The statistical release that this version was published with."
+          },
+          "timePeriods": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TimePeriodRangeViewModel"
+              }
+            ],
+            "description": "The time period range covered by the data set."
+          },
+          "geographicLevels": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "English devolved area",
+                "Local authority",
+                "Local authority district",
+                "Local enterprise partnership",
+                "Local skills improvement plan area",
+                "Institution",
+                "Mayoral combined authority",
+                "MAT",
+                "National",
+                "Opportunity area",
+                "Parliamentary constituency",
+                "Provider",
+                "Regional",
+                "RSC region",
+                "School",
+                "Sponsor",
+                "Ward",
+                "Planning area"
+              ],
+              "type": "string"
+            },
+            "description": "The geographic levels available in the data set.",
+            "example": [
+              "National",
+              "Regional",
+              "Local authority"
+            ]
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The filters available in the data set.",
+            "example": [
+              "Characteristic",
+              "School type"
+            ]
+          },
+          "indicators": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The indicators available in the data set.",
+            "example": [
+              "Authorised absence rate",
+              "Overall absence rate"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provides high-level information about a data set version."
+      },
+      "DataSetViewModel": {
+        "required": [
+          "id",
+          "latestVersion",
+          "status",
+          "summary",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the data set.",
+            "format": "uuid",
+            "example": "7588c2d6-9e8a-4d84-8f19-6b8d52a01fbd"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the data set.",
+            "example": "Absence rates by geographic level"
+          },
+          "summary": {
+            "type": "string",
+            "description": "A summary of the data set’s contents.",
+            "example": "Absence information for all enrolments in schools."
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetStatus"
+              }
+            ],
+            "description": "The status of the data set. Can be one of the following:\r\n            \r\n- `Published` - the data set has been published and will receive updates\r\n- `Deprecated` - the data set is being discontinued and will no longer receive updates\r\n- `Withdrawn` - the data set has been withdrawn and can no longer be used",
+            "example": "Published"
+          },
+          "supersedingDataSetId": {
+            "type": "string",
+            "description": "The ID of the data set that supersedes this data set (if it has been deprecated).",
+            "format": "uuid",
+            "nullable": true,
+            "example": "2118a6df-4934-4a1f-ad2e-4589d2b9ccaf"
+          },
+          "latestVersion": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataSetLatestVersionViewModel"
+              }
+            ],
+            "description": "The latest published data set version."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provides high-level information about a data set."
+      },
+      "ErrorViewModel": {
+        "required": [
+          "code",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "The error message.",
+            "example": "Must be 50 characters or fewer."
+          },
+          "path": {
+            "type": "string",
+            "description": "The path to the property on the request that the error relates to.\r\nMay be omitted or empty if no specific property of the\r\nrequest relates to the error (it is a 'global' error).",
+            "nullable": true,
+            "example": "person.name"
+          },
+          "code": {
+            "type": "string",
+            "description": "The error's machine-readable code. Can be used for further\r\nprocessing of the error before presenting to users.\r\nMay be omitted if there is none.",
+            "example": "MaximumLength"
+          },
+          "detail": {
+            "description": "Additional detail about the error that can be used to provide\r\nmore context to users. May be omitted if there is none.",
+            "nullable": true,
+            "example": {
+              "maxLength": 50
+            }
+          }
+        },
+        "additionalProperties": false,
+        "description": "Describes an error that occurred with the request. This will typically\r\nneed to be rectified before the request can be fully processed."
+      },
+      "FilterChangeViewModel": {
+        "type": "object",
+        "properties": {
+          "currentState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FilterViewModel"
+              }
+            ],
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "nullable": true
+          },
+          "previousState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FilterViewModel"
+              }
+            ],
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A change to a filter in a data set."
+      },
+      "FilterOptionChangeViewModel": {
+        "type": "object",
+        "properties": {
+          "currentState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FilterOptionViewModel"
+              }
+            ],
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "nullable": true
+          },
+          "previousState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FilterOptionViewModel"
+              }
+            ],
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A change to a filter option in a data set."
+      },
+      "FilterOptionChangesViewModel": {
+        "required": [
+          "filter",
+          "options"
+        ],
+        "type": "object",
+        "properties": {
+          "filter": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FilterViewModel"
+              }
+            ],
+            "description": "The filter the option changes belong to."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionChangeViewModel"
+            },
+            "description": "The list of filter option changes."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A set of filter option changes and details of the filter they belong to."
+      },
+      "FilterOptionViewModel": {
+        "required": [
+          "id",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the filter option.",
+            "example": "q1g3J"
+          },
+          "label": {
+            "type": "string",
+            "description": "The human-readable label describing the filter option.",
+            "example": "State-funded primary"
+          },
+          "isAggregate": {
+            "type": "boolean",
+            "description": "Whether the filter option is an aggregate (i.e. ‘all’ or a ‘total’) of the other filter options.",
+            "nullable": true,
+            "example": false
+          }
+        },
+        "additionalProperties": false,
+        "description": "A filterable option that can be used to filter a data set."
+      },
+      "FilterOptionsViewModel": {
+        "required": [
+          "column",
+          "id",
+          "label",
+          "options"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the filter.",
+            "example": "BRlj4"
+          },
+          "column": {
+            "type": "string",
+            "description": "The name of the filter CSV column.",
+            "example": "school_type"
+          },
+          "label": {
+            "type": "string",
+            "description": "The human-readable label describing the filter.",
+            "example": "School type"
+          },
+          "hint": {
+            "type": "string",
+            "description": "A hint to assist in describing the filter.",
+            "example": "Additional detail about the filter."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterOptionViewModel"
+            },
+            "description": "The filter options belonging to this filter."
+          }
+        },
+        "additionalProperties": false,
+        "description": "The options available for a filterable characteristic about the data set\r\n(excluding geography or time)."
+      },
+      "FilterViewModel": {
+        "required": [
+          "column",
+          "id",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the filter.",
+            "example": "BRlj4"
+          },
+          "column": {
+            "type": "string",
+            "description": "The name of the filter CSV column.",
+            "example": "school_type"
+          },
+          "label": {
+            "type": "string",
+            "description": "The human-readable label describing the filter.",
+            "example": "School type"
+          },
+          "hint": {
+            "type": "string",
+            "description": "A hint to assist in describing the filter.",
+            "example": "Additional detail about the filter."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A filterable characteristic (excluding geography or time) of a data set."
+      },
+      "GeographicLevelChangeViewModel": {
+        "type": "object",
+        "properties": {
+          "currentState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelViewModel"
+              }
+            ],
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "nullable": true
+          },
+          "previousState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelViewModel"
+              }
+            ],
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A change to a geographic level option in a data set."
+      },
+      "GeographicLevelCode": {
+        "enum": [
+          "EDA",
+          "INST",
+          "LA",
+          "LAD",
+          "LEP",
+          "LSIP",
+          "MAT",
+          "MCA",
+          "NAT",
+          "OA",
+          "PA",
+          "PCON",
+          "PROV",
+          "REG",
+          "RSC",
+          "SCH",
+          "SPON",
+          "WARD"
+        ],
+        "type": "string",
+        "description": "The code for a geographic level that locations are grouped by.\n\nThe allowed values are:\n\n- `EDA` - English devolved area\n- `INST` - Institution\n- `LA` - Local authority\n- `LAD` - Local authority district\n- `LEP` - Local enterprise partnership\n- `LSIP` - Local skills improvement plan area\n- `MCA` - Mayoral combined authority\n- `MAT` - MAT\n- `NAT` - National\n- `OA` - Opportunity area\n- `PA` - Planning area\n- `PCON` - Parliamentary constituency\n- `PROV` - Provider\n- `REG` - Regional\n- `RSC` - RSC region\n- `SCH` - School\n- `SPON` - Sponsor\n- `WARD` - Ward",
+        "example": "NAT"
+      },
+      "GeographicLevelViewModel": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelCode"
+              }
+            ],
+            "description": "The code for the geographic level.",
+            "example": "NAT"
+          },
+          "label": {
+            "type": "string",
+            "description": "The human-readable label for the geographic level.",
+            "readOnly": true,
+            "example": "National"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A geographic level (e.g. national, regional) covered by a data set."
+      },
+      "IndicatorChangeViewModel": {
+        "type": "object",
+        "properties": {
+          "currentState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IndicatorViewModel"
+              }
+            ],
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "nullable": true
+          },
+          "previousState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IndicatorViewModel"
+              }
+            ],
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A change to an indicator in a data set."
+      },
+      "IndicatorUnit": {
+        "enum": [
+          "",
+          "%",
+          "£",
+          "£m",
+          "pp",
+          "string"
+        ],
+        "type": "string",
+        "description": "The recommended unit to format an indicator with.\n\nThe allowed values are:\n\n- `\"\"` - No units with numeric formatting where possible e.g. `123,500,600`\n- `£` - Pound sterling with numeric formatting e.g. `£1,234,500`\n- `£m` - Pound sterling in millions with numeric formatting e.g. `£1,234m`\n- `%` - Percentage with numeric formatting e.g. `1,234.56%`\n- `pp` - Percentage points with numeric formatting e.g. `1,234pp`\n- `string` - String with no units and no numeric formatting e.g. `123500600`",
+        "format": "int32",
+        "example": "%"
+      },
+      "IndicatorViewModel": {
+        "required": [
+          "column",
+          "id",
+          "label",
+          "unit"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the indicator.",
+            "example": "enW68"
+          },
+          "column": {
+            "type": "string",
+            "description": "The name of the indicator CSV column.",
+            "example": "sess_authorised"
+          },
+          "label": {
+            "type": "string",
+            "description": "The human-readable label of the indicator.",
+            "example": "Percentage of authorised sessions"
+          },
+          "unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IndicatorUnit"
+              }
+            ],
+            "description": "The type of unit that should be used when formatting the indicator.",
+            "nullable": true,
+            "example": "%"
+          },
+          "decimalPlaces": {
+            "type": "integer",
+            "description": "The recommended number of decimal places to use when formatting the indicator.",
+            "format": "int32",
+            "nullable": true,
+            "example": 2
+          }
+        },
+        "additionalProperties": false,
+        "description": "A type of data point measured by a data set."
+      },
+      "LocationCodedOptionViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LocationOptionViewModel"
+          },
+          {
+            "required": [
+              "code"
+            ],
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "The code of the location.",
+                "example": "E12000003"
+              }
+            },
+            "additionalProperties": false
+          }
+        ],
+        "description": "A location option that can be identified by code and used to filter a data set."
+      },
+      "LocationGroupChangeViewModel": {
+        "type": "object",
+        "properties": {
+          "currentState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LocationGroupViewModel"
+              }
+            ],
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "nullable": true
+          },
+          "previousState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LocationGroupViewModel"
+              }
+            ],
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A change to a location group in a data set."
+      },
+      "LocationGroupOptionsViewModel": {
+        "required": [
+          "level",
+          "options"
+        ],
+        "type": "object",
+        "properties": {
+          "level": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelViewModel"
+              }
+            ],
+            "description": "The geographic level of the locations in this group."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/LocationCodedOptionViewModel"
+                },
+                {
+                  "$ref": "#/components/schemas/LocationLocalAuthorityOptionViewModel"
+                },
+                {
+                  "$ref": "#/components/schemas/LocationProviderOptionViewModel"
+                },
+                {
+                  "$ref": "#/components/schemas/LocationRscRegionOptionViewModel"
+                },
+                {
+                  "$ref": "#/components/schemas/LocationSchoolOptionViewModel"
+                }
+              ],
+              "description": "A location option that can be used to filter a data set."
+            },
+            "description": "The locations belonging to this level."
+          }
+        },
+        "additionalProperties": false,
+        "description": "The options available for a location group in the data set."
+      },
+      "LocationGroupViewModel": {
+        "required": [
+          "level"
+        ],
+        "type": "object",
+        "properties": {
+          "level": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelViewModel"
+              }
+            ],
+            "description": "The geographic level of the locations in this group."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A group of locations in a data set based on their geographic level."
+      },
+      "LocationLocalAuthorityOptionViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LocationOptionViewModel"
+          },
+          {
+            "required": [
+              "code",
+              "oldCode"
+            ],
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "The ONS code of the local authority.",
+                "example": "E08000019"
+              },
+              "oldCode": {
+                "type": "string",
+                "description": "The old code (previously the LEA code) of the local authority.",
+                "example": "373"
+              }
+            },
+            "additionalProperties": false
+          }
+        ],
+        "description": "A location option for a local authority that can be used to filter a data set."
+      },
+      "LocationOptionChangeViewModel": {
+        "type": "object",
+        "properties": {
+          "currentState": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationCodedOptionViewModel"
+              },
+              {
+                "$ref": "#/components/schemas/LocationLocalAuthorityOptionViewModel"
+              },
+              {
+                "$ref": "#/components/schemas/LocationProviderOptionViewModel"
+              },
+              {
+                "$ref": "#/components/schemas/LocationRscRegionOptionViewModel"
+              },
+              {
+                "$ref": "#/components/schemas/LocationSchoolOptionViewModel"
+              }
+            ],
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "nullable": true
+          },
+          "previousState": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LocationCodedOptionViewModel"
+              },
+              {
+                "$ref": "#/components/schemas/LocationLocalAuthorityOptionViewModel"
+              },
+              {
+                "$ref": "#/components/schemas/LocationProviderOptionViewModel"
+              },
+              {
+                "$ref": "#/components/schemas/LocationRscRegionOptionViewModel"
+              },
+              {
+                "$ref": "#/components/schemas/LocationSchoolOptionViewModel"
+              }
+            ],
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A change to a location option in a data set."
+      },
+      "LocationOptionChangesViewModel": {
+        "required": [
+          "level",
+          "options"
+        ],
+        "type": "object",
+        "properties": {
+          "level": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicLevelViewModel"
+              }
+            ],
+            "description": "The geographic level the changes belong to."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationOptionChangeViewModel"
+            },
+            "description": "The list of location option changes."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A set of location option changes and details of the geographic level they belong to."
+      },
+      "LocationOptionViewModel": {
+        "required": [
+          "id",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the location.",
+            "example": "bOmZ4"
+          },
+          "label": {
+            "type": "string",
+            "description": "The human-readable label of the location.",
+            "example": "Sheffield"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A location option that can be used to filter a data set."
+      },
+      "LocationProviderOptionViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LocationOptionViewModel"
+          },
+          {
+            "required": [
+              "ukprn"
+            ],
+            "type": "object",
+            "properties": {
+              "ukprn": {
+                "type": "string",
+                "description": "The UKPRN (UK provider reference number) of the provider.",
+                "example": "12345678"
+              }
+            },
+            "additionalProperties": false
+          }
+        ],
+        "description": "A location option for a provider that can be used to filter a data set."
+      },
+      "LocationRscRegionOptionViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LocationOptionViewModel"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ],
+        "description": "A location option for an RSC region that can be used to filter a data set."
+      },
+      "LocationSchoolOptionViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LocationOptionViewModel"
+          },
+          {
+            "required": [
+              "laEstab",
+              "urn"
+            ],
+            "type": "object",
+            "properties": {
+              "urn": {
+                "type": "string",
+                "description": "The URN (unique reference number) of the school.",
+                "example": "123456"
+              },
+              "laEstab": {
+                "type": "string",
+                "description": "The LAESTAB (local authority establishment number) of the school.",
+                "example": "1234567"
+              }
+            },
+            "additionalProperties": false
+          }
+        ],
+        "description": "A location option for a school that can be used to filter a data set."
+      },
+      "PagingViewModel": {
+        "required": [
+          "page",
+          "pageSize",
+          "totalPages",
+          "totalResults"
+        ],
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "The current page number.",
+            "format": "int32",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "The maximum number of results per page.",
+            "format": "int32",
+            "example": 20
+          },
+          "totalResults": {
+            "type": "integer",
+            "description": "The total number of results across all pages.",
+            "format": "int32",
+            "example": 60
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "The total number of pages.",
+            "format": "int32",
+            "readOnly": true,
+            "example": 3
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProblemDetailsViewModel": {
+        "required": [
+          "status",
+          "title",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "minLength": 1,
+            "type": "string",
+            "description": "A URI reference (RFC3986) that identifies the problem type. It should\r\nprovide human-readable documentation for the problem type.",
+            "example": "https://tools.ietf.org/html/rfc9110#section-15.5.1"
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string",
+            "description": "A short, human-readable summary of the problem type.",
+            "example": "One or more validation errors occurred."
+          },
+          "status": {
+            "type": "integer",
+            "description": "The HTTP status code generated by the origin server for the problem.",
+            "format": "int32",
+            "example": 400
+          },
+          "detail": {
+            "type": "string",
+            "description": "A human-readable explanation specific to the problem.",
+            "nullable": true,
+            "example": "More detail about the problem."
+          },
+          "instance": {
+            "type": "string",
+            "description": "A URI reference that identifies the specific occurrence of the problem.\r\nIt may or may not yield further information about the problem.",
+            "nullable": true,
+            "example": "https://example.com"
+          }
+        },
+        "additionalProperties": { },
+        "description": "Describes a problem that occurred whilst processing the request.\r\nThe format is based on RFC7807."
+      },
+      "PublicationListRequest": {
+        "type": "object",
+        "properties": {
+          "search": {
+            "minLength": 3,
+            "type": "string",
+            "description": "A search term to find matching publications.",
+            "nullable": true,
+            "example": "Pupil absence"
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "The page of results to fetch.",
+            "format": "int32",
+            "default": 1
+          },
+          "pageSize": {
+            "maximum": 40,
+            "minimum": 1,
+            "type": "integer",
+            "description": "The maximum number of results per page.",
+            "format": "int32",
+            "default": 20
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicationPaginatedListViewModel": {
+        "required": [
+          "paging",
+          "results"
+        ],
+        "type": "object",
+        "properties": {
+          "paging": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PagingViewModel"
+              }
+            ],
+            "description": "Provides metadata for use in pagination."
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicationSummaryViewModel"
+            },
+            "description": "The list of results for this page."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A paginated list of publication summaries."
+      },
+      "PublicationSummaryViewModel": {
+        "required": [
+          "id",
+          "lastPublished",
+          "slug",
+          "summary",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the publication.",
+            "format": "uuid",
+            "example": "d851c09e-7f5a-4750-9191-ed67ba5e8f8b"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the publication.",
+            "example": "Pupil absence in schools in England"
+          },
+          "slug": {
+            "type": "string",
+            "description": "The URL slug of the publication.",
+            "example": "pupil-absence-in-schools-in-england"
+          },
+          "summary": {
+            "type": "string",
+            "description": "The summary of the publication.",
+            "example": "Summary of the publication."
+          },
+          "lastPublished": {
+            "type": "string",
+            "description": "When the publication was last published.",
+            "format": "date-time",
+            "example": "2024-06-01T09:30:00+00:00"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provides summary information about a publication."
+      },
+      "TimePeriodCode": {
+        "enum": [
+          "AY",
+          "AYQ1",
+          "AYQ2",
+          "AYQ3",
+          "AYQ4",
+          "CY",
+          "CYQ1",
+          "CYQ2",
+          "CYQ3",
+          "CYQ4",
+          "FY",
+          "FYQ1",
+          "FYQ2",
+          "FYQ3",
+          "FYQ4",
+          "M1",
+          "M2",
+          "M3",
+          "M4",
+          "M5",
+          "M6",
+          "M7",
+          "M8",
+          "M9",
+          "M10",
+          "M11",
+          "M12",
+          "P1",
+          "P2",
+          "RY",
+          "T1",
+          "T1T2",
+          "T2",
+          "T3",
+          "TY",
+          "TYQ1",
+          "TYQ2",
+          "TYQ3",
+          "TYQ4",
+          "W1",
+          "W2",
+          "W3",
+          "W4",
+          "W5",
+          "W6",
+          "W7",
+          "W8",
+          "W9",
+          "W10",
+          "W11",
+          "W12",
+          "W13",
+          "W14",
+          "W15",
+          "W16",
+          "W17",
+          "W18",
+          "W19",
+          "W20",
+          "W21",
+          "W22",
+          "W23",
+          "W24",
+          "W25",
+          "W26",
+          "W27",
+          "W28",
+          "W29",
+          "W30",
+          "W31",
+          "W32",
+          "W33",
+          "W34",
+          "W35",
+          "W36",
+          "W37",
+          "W38",
+          "W39",
+          "W40",
+          "W41",
+          "W42",
+          "W43",
+          "W44",
+          "W45",
+          "W46",
+          "W47",
+          "W48",
+          "W49",
+          "W50",
+          "W51",
+          "W52"
+        ],
+        "type": "string",
+        "description": "The code identifying the time period's type.\n\nThe allowed values are:\n\n- `AY` - academic year\n- `AYQ1 - AYQ4` - academic year quarter 1 to 4\n- `T1` - academic year's autumn term\n- `T2` - academic year's spring term\n- `T3` - academic year's summer term\n- `T1T2` - academic year's autumn and spring term\n- `CY` - calendar year\n- `CYQ1 - CYQ4` - calendar year quarter 1 to 4\n- `RY` - reporting year\n- `P1` - financial year part 1 (April to September)\n- `P2` - financial year part 2 (October to March)\n- `FY` - financial year\n- `FYQ1 - FYQ4` - financial year quarter 1 to 4\n- `TY` - tax year\n- `TYQ1 - FYQ4` - tax year quarter 1 to 4\n- `W1 - W52` - week 1 to 52\n- `M1 - M12` - month 1 to 12",
+        "example": "CY"
+      },
+      "TimePeriodOptionChangeViewModel": {
+        "type": "object",
+        "properties": {
+          "currentState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TimePeriodOptionViewModel"
+              }
+            ],
+            "description": "The current state after the change was made.\r\nIf the change is an addition, this will be null.",
+            "nullable": true
+          },
+          "previousState": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TimePeriodOptionViewModel"
+              }
+            ],
+            "description": "The previous state before the change was made.\r\nIf the change is a deletion, this will be null.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A change to a time period option in a data set."
+      },
+      "TimePeriodOptionViewModel": {
+        "required": [
+          "code",
+          "label",
+          "period"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TimePeriodCode"
+              }
+            ],
+            "description": "The code identifying the time period's type.",
+            "example": "AYQ1"
+          },
+          "period": {
+            "type": "string",
+            "description": "The period covered by the data e.g. '2020' or '2020/2021'.",
+            "example": "2020/2021"
+          },
+          "label": {
+            "type": "string",
+            "description": "The time period in human-readable format.",
+            "example": "2020/21 Q1"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A time period option that can be used to filter a data set."
+      },
+      "TimePeriodRangeViewModel": {
+        "required": [
+          "end",
+          "start"
+        ],
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string",
+            "description": "The starting time period in human-readable format.",
+            "example": "2024 January"
+          },
+          "end": {
+            "type": "string",
+            "description": "The ending time period in human-readable format.",
+            "example": "2024 December"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Describes a time period range in human-readable format."
+      },
+      "TimePeriodViewModel": {
+        "required": [
+          "code",
+          "period"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TimePeriodCode"
+              }
+            ],
+            "description": "The code identifying the time period's type.",
+            "example": "AYQ1"
+          },
+          "period": {
+            "type": "string",
+            "description": "The period covered by the data e.g. '2020' or '2020/2021'.",
+            "example": "2020/2021"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A time period relating to some data."
+      },
+      "ValidationProblemViewModel": {
+        "required": [
+          "title",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "minLength": 1,
+            "type": "string",
+            "description": "A URI reference (RFC3986) that identifies the problem type. It should\r\nprovide human-readable documentation for the problem type.",
+            "example": "https://tools.ietf.org/html/rfc9110#section-15.5.1"
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string",
+            "description": "A short, human-readable summary of the problem type.",
+            "example": "One or more validation errors occurred."
+          },
+          "detail": {
+            "type": "string",
+            "description": "A human-readable explanation specific to the problem.",
+            "nullable": true,
+            "example": "More detail about the problem."
+          },
+          "instance": {
+            "type": "string",
+            "description": "A URI reference that identifies the specific occurrence of the problem.\r\nIt may or may not yield further information about the problem.",
+            "nullable": true,
+            "example": "https://example.com"
+          },
+          "status": {
+            "type": "integer",
+            "description": "The HTTP status code generated by the origin server for the problem.",
+            "format": "int32",
+            "example": 400
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ErrorViewModel"
+            },
+            "description": "The errors relating to the validation problem."
+          }
+        },
+        "additionalProperties": { },
+        "description": "A validation problem that has occurred with the API request.\r\nThis type of response will be composed of one or more errors\r\nrelating to the request and its properties."
+      },
+      "WarningViewModel": {
+        "required": [
+          "code",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "The warning message.",
+            "example": "There are no results."
+          },
+          "path": {
+            "type": "string",
+            "description": "The path to the property on the request that the warning relates to.\r\nMay be omitted or be empty if no specific property of the\r\nrequest relates to the warning (it is a 'global' warning).",
+            "nullable": true,
+            "example": "results"
+          },
+          "code": {
+            "type": "string",
+            "description": "The warning's machine-readable code. Can be used for further\r\nprocessing of the warning before presenting to users.",
+            "example": "NoResults"
+          },
+          "detail": {
+            "description": "Additional detail about the warning that can be used to provide\r\nmore context to users. May be omitted if there is none.",
+            "nullable": true,
+            "example": {
+              "total": 0
+            }
+          }
+        },
+        "additionalProperties": false,
+        "description": "A warning that points to a potential issue. This is not a critical error,\r\nbut may require attention to get the desired response."
+      }
+    }
+  }
+}

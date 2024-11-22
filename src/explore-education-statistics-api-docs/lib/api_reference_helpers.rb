@@ -1,4 +1,15 @@
 module ApiReferenceHelpers
+
+  # @return [Array<Hash{Symbol->String}>]
+  def get_openapi_links
+    FileList.glob("source/openapi-v*.json").map do |path|
+      url = path.split("source/")[1]
+      version = url.split("openapi-v")[1].split(".json")[0]
+
+      { name: "v#{version}", url: url }
+    end
+  end
+
   # @param [Openapi3Parser::Node::Schema] schema_data
   # @param [Array<Openapi3Parser::Node::Schema>] references
   # @return [*]
@@ -95,7 +106,7 @@ module ApiReferenceHelpers
         return "object"
       end
 
-      href = ::Middleman::Util::url_for(@app, "/schemas/#{schema.name}/index.html", {
+      href = ::Middleman::Util::url_for(@app, "../../schemas/#{schema.name}/index.html", {
         current_resource: current_resource
       })
 
@@ -110,7 +121,7 @@ module ApiReferenceHelpers
       "array (#{render_schema_type(items)})"
     else
       if schema.name
-        href = ::Middleman::Util::url_for(@app, "/schemas/#{schema.name}/index.html", {
+        href = ::Middleman::Util::url_for(@app, "../../schemas/#{schema.name}/index.html", {
           current_resource: current_resource
         })
 

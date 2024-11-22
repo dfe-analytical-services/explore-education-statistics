@@ -255,6 +255,7 @@ PLATFORMS
 
 DEPENDENCIES
   chronic
+  dotenv
   govuk_tech_docs
   html-proofer
   http

@@ -20,3 +20,5 @@ gem 'chronic'
 gem 'http'
 
 gem 'rake'
+
+gem "dotenv", groups: [:development, :test]
