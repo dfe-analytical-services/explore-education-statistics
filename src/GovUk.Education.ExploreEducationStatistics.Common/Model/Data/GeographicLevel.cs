@@ -1,8 +1,5 @@
 #nullable enable
-using System;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 {

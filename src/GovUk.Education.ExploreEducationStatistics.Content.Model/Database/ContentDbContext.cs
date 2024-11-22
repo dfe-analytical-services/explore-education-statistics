@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 // ReSharper disable StringLiteralTypo
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
@@ -452,10 +453,70 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         v => v.HasValue
                             ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
                             : null);
-                entity.Property(p => p.DataSetFileMeta)
-                    .HasConversion( // You might want to use EF8 JSON support instead of this
-                        v => JsonConvert.SerializeObject(v),
-                        v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
+                entity.OwnsOne(f => f.DataSetFileMeta, dsfm =>
+                {
+                    dsfm.ToJson();
+                    dsfm.OwnsMany(e => e.Filters);
+                    dsfm.OwnsMany(e => e.Indicators);
+                    dsfm.OwnsOne(e => e.TimePeriodRange, e =>
+                    {
+                        e.OwnsOne(tprm => tprm.Start, tprm =>
+                        {
+                            tprm.Property(tprb => tprb.TimeIdentifier)
+                                .HasConversion(new EnumToEnumLabelConverter<TimeIdentifier>());
+                        });
+                        e.OwnsOne(tprm => tprm.End, tprm =>
+                        {
+                            tprm.Property(tprb => tprb.TimeIdentifier)
+                                .HasConversion(new EnumToEnumLabelConverter<TimeIdentifier>());
+                        });
+                    });
+                   // // https://github.com/dotnet/efcore/issues/32682
+                   // dsfm.Property(m => m.GeographicLevels)
+                   //     .HasConversion(
+                   //         value => value
+                   //             .Select(EnumToEnumValueConverter<GeographicLevel>.ToProvider)
+                   //             .ToList(),
+                   //         value => value
+                   //             .Select(EnumToEnumValueConverter<GeographicLevel>.FromProvider)
+                   //             .ToList(),
+                   //         new ValueComparer<List<GeographicLevel>>(
+                   //             (c1, c2) => c1!.SequenceEqual(c2!),
+                   //             c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                   //             c => c.ToList()));
+
+                    //dsfm.OwnsOne(msb => msb.GeographicLevels, msb =>
+                    //{
+                    //    msb.Property(gl => gl)
+                    //        .HasConversion(
+                    //            value => value
+                    //                .Select(EnumToEnumValueConverter<GeographicLevel>.ToProvider)
+                    //                .ToList(),
+                    //            value => value
+                    //                .Select(EnumToEnumValueConverter<GeographicLevel>.FromProvider)
+                    //                .ToList());
+
+                    //});
+                    //dsfm.Property(msb => msb.GeographicLevels)
+                    //    .HasColumnType("text[]")
+                    //    .HasConversion(
+                    //        value => value
+                    //            .Select(EnumToEnumValueConverter<GeographicLevel>.ToProvider)
+                    //            .ToList(),
+                    //        value => value
+                    //            .Select(EnumToEnumValueConverter<GeographicLevel>.FromProvider)
+                    //            .ToList(),
+                    //        new ValueComparer<List<GeographicLevel>>(
+                    //            (c1, c2) => c1!.SequenceEqual(c2!),
+                    //            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    //            c => c.ToList())
+                    //        );
+                });
+
+                //entity.Property(p => p.DataSetFileMeta)
+                //    .HasConversion( // You might want to use EF8 JSON support instead of this
+                //        v => JsonConvert.SerializeObject(v),
+                //        v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
             });
         }
 

@@ -1,3 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record DataSetFileMetaViewModel

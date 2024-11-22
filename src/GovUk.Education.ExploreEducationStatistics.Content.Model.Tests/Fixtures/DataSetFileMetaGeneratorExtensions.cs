@@ -64,6 +64,8 @@ public static class DataSetFileMetaGeneratorExtensions
         List<GeographicLevel> geographicLevels)
         => setters.Set(s => s.GeographicLevels,
             geographicLevels.Select(gl => gl.GetEnumValue()).ToList());
+            //geographicLevels);
+
 
     public static InstanceSetters<DataSetFileMeta> SetTimePeriodRange(
         this InstanceSetters<DataSetFileMeta> setters,

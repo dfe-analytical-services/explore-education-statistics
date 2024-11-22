@@ -104,7 +104,7 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
             builder.OwnsOne(v => v.MetaSummary, ms =>
             {
-                ms.ToJson();
+                ms.ToJson(); // @MarkFix
                 ms.OwnsOne(msb => msb.TimePeriodRange, msb =>
                 {
                     msb.OwnsOne(tpr => tpr.Start, tpr =>

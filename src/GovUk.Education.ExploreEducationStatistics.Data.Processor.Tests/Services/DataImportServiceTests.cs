@@ -294,10 +294,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.NotNull(updatedFile.DataSetFileMeta);
 
                 var meta = updatedFile.DataSetFileMeta;
-                Assert.Equal(3, meta.GeographicLevels.Count);
-                Assert.Contains(GeographicLevel.Country.GetEnumValue(), meta.GeographicLevels);
-                Assert.Contains(GeographicLevel.LocalAuthority.GetEnumValue(), meta.GeographicLevels);
-                Assert.Contains(GeographicLevel.Region.GetEnumValue(), meta.GeographicLevels);
+                Assert.Equal(3, meta.GeographicLevels.ToList().Count);
+                Assert.Contains(GeographicLevel.Country, meta.GeographicLevels);
+                Assert.Contains(GeographicLevel.LocalAuthority, meta.GeographicLevels);
+                Assert.Contains(GeographicLevel.Region, meta.GeographicLevels);
 
                 Assert.Equal("2000", meta.TimePeriodRange.Start.Period);
                 Assert.Equal(TimeIdentifier.April, meta.TimePeriodRange.Start.TimeIdentifier);

@@ -1,5 +1,6 @@
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Requests;
 

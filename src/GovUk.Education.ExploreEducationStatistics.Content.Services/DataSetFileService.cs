@@ -26,6 +26,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -75,10 +76,6 @@ public class DataSetFileService : IDataSetFileService
 
         var latestPublishedReleaseVersions =
             _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
-
-        var files = _contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
-            .ToList();
 
         var query = _contentDbContext.ReleaseFiles
             .AsNoTracking()
@@ -293,6 +290,7 @@ public class DataSetFileService : IDataSetFileService
 
         return new DataSetFileMetaViewModel
         {
+            //GeographicLevels = meta.GeographicLevels.Select(gl => gl.GetEnumLabel()).ToList(),
             GeographicLevels = meta.GeographicLevels,
             TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
             {
@@ -487,9 +485,7 @@ internal static class ReleaseFileQueryableExtensions
     {
         return geographicLevel != null
             ? query
-                .Include(rf => rf.File)
-                .Where(rf => rf.File.DataSetFileMeta!.GeographicLevels
-                    .Contains(geographicLevel))
+                .Where(rf => rf.File.DataSetFileMeta!.GeographicLevels.Contains(geographicLevel))
             : query;
     }
 

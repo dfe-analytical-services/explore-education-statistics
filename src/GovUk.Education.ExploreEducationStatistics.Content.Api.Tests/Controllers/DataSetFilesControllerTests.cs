@@ -195,7 +195,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 await TestApp.AddTestData<ContentDbContext>(context =>
                 {
-                    context.Publications.AddRange(publication);
                     context.ReleaseFiles.AddRange(releaseFiles);
                 });
 
@@ -1629,6 +1628,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 var originalMeta = releaseFile.File.DataSetFileMeta;
 
                 Assert.Equal(originalMeta!.GeographicLevels,
+                        //.Select(gl => gl.GetEnumLabel())
+                        //.ToList(),
                     dataSetFileMetaViewModel.GeographicLevels);
 
                 Assert.Equal(new DataSetFileTimePeriodRangeViewModel
@@ -1720,7 +1721,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 { "themeId", request.ThemeId?.ToString() },
                 { "publicationId", request.PublicationId?.ToString() },
                 { "releaseId", request.ReleaseId?.ToString() },
-                { "geographicLevel", request.GeographicLevel ?? null },
+                { "geographicLevel", request.GeographicLevel }, // @MarkFix
                 { "latestOnly", request.LatestOnly?.ToString() },
                 { "searchTerm", request.SearchTerm },
                 { "sort", request.Sort?.ToString() },
@@ -2077,6 +2078,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             var dataSetFileMeta = file.DataSetFileMeta;
 
             Assert.Equal(dataSetFileMeta!.GeographicLevels,
+                    //.Select(gl => gl.GetEnumLabel())
+                    //.ToList(),
                 viewModel.File.Meta.GeographicLevels);
 
             Assert.Equal(new DataSetFileTimePeriodRangeViewModel
