@@ -68,6 +68,7 @@ param alwaysOn bool?
 param healthCheck {
   path: string
   unhealthyMetricName: string
+  includeStaging: bool
 }?
 
 @description('Specifies additional Azure Storage Accounts to make available to this Function App')
@@ -278,7 +279,7 @@ resource functionAppUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@20
   })
 }
 
-resource stagingSlotUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = if (healthCheck != null) {
+resource stagingSlotUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = if (healthCheck != null && healthCheck!.includeStaging) {
   name: '${healthCheck!.unhealthyMetricName}Staging'
   location: 'Global'
   properties: union(commonUnhealthyMetricAlertRuleProperties, {

@@ -101,6 +101,7 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
     healthCheck: {
       path: '/api/HealthCheck'
       unhealthyMetricName: '${metricsNamePrefix}Unhealthy'
+      includeStaging: false
     }
     appSettings: {
       App__MetaInsertBatchSize: 1000
