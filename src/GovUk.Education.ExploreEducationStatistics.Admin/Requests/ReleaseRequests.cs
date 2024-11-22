@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -13,7 +14,8 @@ public record ReleaseCreateRequest
 {
     public Guid PublicationId { get; set; }
 
-    [Required] public ReleaseType Type { get; set; }
+    [Required]
+    public ReleaseType? Type { get; init; }
 
     [Required]
     [JsonConverter(typeof(TimeIdentifierJsonConverter))]
@@ -31,7 +33,8 @@ public record ReleaseCreateRequest
 
 public record ReleaseUpdateRequest
 {
-    [Required] public ReleaseType Type { get; init; }
+    [Required]
+    public ReleaseType? Type { get; init; }
 
     [JsonConverter(typeof(TimeIdentifierJsonConverter))]
     [Required]

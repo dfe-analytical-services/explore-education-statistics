@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         Id = _guidGenerator.NewGuid(),
                         Release = release,
-                        Type = releaseCreate.Type,
+                        Type = releaseCreate.Type!.Value,
                         ApprovalStatus = ReleaseApprovalStatus.Draft,
 
                         // TODO Remove the following in EES-5659
@@ -544,7 +544,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         releaseVersion.TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage;
                         releaseVersion.Slug = releaseVersion.Release.Slug;
 
-                        releaseVersion.Type = request.Type;
+                        releaseVersion.Type = request.Type!.Value;
                         releaseVersion.PreReleaseAccessList = request.PreReleaseAccessList;
 
                         await _dataSetVersionService.UpdateVersionsForReleaseVersion(
