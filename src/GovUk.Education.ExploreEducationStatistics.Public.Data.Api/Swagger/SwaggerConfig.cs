@@ -16,8 +16,11 @@ public class SwaggerConfig(
 {
     public void Configure(SwaggerGenOptions options)
     {
+        options.DocumentFilter<VersionedPathsDocumentFilter>();
+
         options.OperationFilter<DefaultValuesOperationFilter>();
         options.OperationFilter<GeneralResponseOperationFilter>();
+
         options.SchemaFilter<JsonConverterSchemaFilter>();
         options.SchemaFilter<RequiredPropertySchemaFilter>();
         options.SchemaFilter<SwaggerEnumSchemaFilter>();
