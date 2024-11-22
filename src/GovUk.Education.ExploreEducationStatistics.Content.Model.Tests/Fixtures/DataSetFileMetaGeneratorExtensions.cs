@@ -26,14 +26,14 @@ public static class DataSetFileMetaGeneratorExtensions
             })
             .SetFilters([ new()
                 {
-                    Id = Guid.NewGuid(),
+                    Key = Guid.NewGuid(),
                     Label = "Filter 1",
                     ColumnName = "filter_1",
                 },
             ])
             .SetIndicators([ new()
                 {
-                    Id = Guid.NewGuid(),
+                    Key = Guid.NewGuid(),
                     Label = "Indicator 1",
                     ColumnName = "indicator_1",
                 },

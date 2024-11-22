@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -35,7 +36,8 @@ public class TimePeriodRangeBoundMeta
 
 public class FilterMeta
 {
-    public required Guid Id { get; set; }
+    [JsonPropertyName("Id")]
+    public required Guid Key { get; set; } // https://github.com/dotnet/efcore/issues/29380 maybe? @MarkFix
 
     public required string Label { get; set; }
 
@@ -46,7 +48,8 @@ public class FilterMeta
 
 public class IndicatorMeta
 {
-    public required Guid Id { get; set; }
+    [JsonPropertyName("Id")]
+    public required Guid Key { get; set; }
 
     public required string Label { get; set; }
 

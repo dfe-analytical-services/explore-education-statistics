@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -185,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .OrderBy(f => f.Label)
                 .Select(f => new FilterMeta
                 {
-                    Id = f.Id,
+                    Key = f.Id,
                     Label = f.Label,
                     Hint = f.Hint,
                     ColumnName = f.Name,
@@ -197,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Where(i => i.IndicatorGroup.SubjectId == subjectId)
                 .Select(i => new IndicatorMeta
                 {
-                    Id = i.Id,
+                    Key = i.Id,
                     Label = i.Label,
                     ColumnName = i.Name,
                 })
@@ -206,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var dataSetFileMeta = new DataSetFileMeta
             {
-                GeographicLevels = geographicLevels,
+                GeographicLevels = geographicLevels.Select(gl => gl.GetEnumValue()).ToList(),
                 TimePeriodRange = new TimePeriodRangeMeta
                 {
                     Start = timePeriods.First(),

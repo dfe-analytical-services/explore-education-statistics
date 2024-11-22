@@ -369,7 +369,7 @@ public class DataSetFileService : IDataSetFileService
         var filters = filterSequence == null
             ? metaFilters.OrderBy(f => f.Label)
             : metaFilters
-                .OrderBy(f => Array.IndexOf(filterSequence, f.Id));
+                .OrderBy(f => Array.IndexOf(filterSequence, f.Key));
 
         return filters.Select(f => f.Label).ToList();
     }
@@ -384,7 +384,7 @@ public class DataSetFileService : IDataSetFileService
         var indicators = indicatorSequence == null
             ? metaIndicators.OrderBy(i => i.Label)
             : metaIndicators
-                .OrderBy(i => Array.IndexOf(indicatorSequence, i.Id));
+                .OrderBy(i => Array.IndexOf(indicatorSequence, i.Key));
 
         return indicators.Select(i => i.Label).ToList();
     }

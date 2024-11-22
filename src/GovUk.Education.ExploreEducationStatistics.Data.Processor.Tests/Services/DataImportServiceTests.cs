@@ -295,9 +295,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 var meta = updatedFile.DataSetFileMeta;
                 Assert.Equal(3, meta.GeographicLevels.ToList().Count);
-                Assert.Contains(GeographicLevel.Country, meta.GeographicLevels);
-                Assert.Contains(GeographicLevel.LocalAuthority, meta.GeographicLevels);
-                Assert.Contains(GeographicLevel.Region, meta.GeographicLevels);
+                Assert.Contains(GeographicLevel.Country.GetEnumValue(), meta.GeographicLevels);
+                Assert.Contains(GeographicLevel.LocalAuthority.GetEnumValue(), meta.GeographicLevels);
+                Assert.Contains(GeographicLevel.Region.GetEnumValue(), meta.GeographicLevels);
 
                 Assert.Equal("2000", meta.TimePeriodRange.Start.Period);
                 Assert.Equal(TimeIdentifier.April, meta.TimePeriodRange.Start.TimeIdentifier);
@@ -305,12 +305,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(TimeIdentifier.June, meta.TimePeriodRange.End.TimeIdentifier);
 
                 var dbFilter = Assert.Single(meta.Filters);
-                Assert.Equal(filter.Id, dbFilter.Id);
+                Assert.Equal(filter.Id, dbFilter.Key);
                 Assert.Equal(filter.Label, dbFilter.Label);
                 Assert.Equal(filter.Name, dbFilter.ColumnName);
 
                 var dbIndicator = Assert.Single(meta.Indicators);
-                Assert.Equal(indicatorGroup.Indicators[0].Id, dbIndicator.Id);
+                Assert.Equal(indicatorGroup.Indicators[0].Id, dbIndicator.Key);
                 Assert.Equal(indicatorGroup.Indicators[0].Label, dbIndicator.Label);
                 Assert.Equal(indicatorGroup.Indicators[0].Name, dbIndicator.ColumnName);
             }

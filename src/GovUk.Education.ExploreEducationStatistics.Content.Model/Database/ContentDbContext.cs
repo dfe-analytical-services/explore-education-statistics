@@ -456,8 +456,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 entity.OwnsOne(f => f.DataSetFileMeta, dsfm =>
                 {
                     dsfm.ToJson();
-                    dsfm.OwnsMany(e => e.Filters);
-                    dsfm.OwnsMany(e => e.Indicators);
+                    dsfm.OwnsMany(e => e.Filters, b =>
+                    {
+                        b.Property(e => e.Key).HasJsonPropertyName("Id");
+                    });
+                    dsfm.OwnsMany(e => e.Indicators, b =>
+                    {
+                        b.Property(e => e.Key).HasJsonPropertyName("Id");
+                    });
                     dsfm.OwnsOne(e => e.TimePeriodRange, e =>
                     {
                         e.OwnsOne(tprm => tprm.Start, tprm =>
