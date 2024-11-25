@@ -363,6 +363,6 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnet
 }
 
 output functionAppName string = functionApp.name
-output managementStorageAccountName string = sharedStorageAccountName
+output url string = 'https://${functionApp.properties.defaultHostName}'output managementStorageAccountName string = sharedStorageAccountName
 output slot1StorageAccountName string = slot1StorageAccountName
 output slot2StorageAccountName string = slot2StorageAccountName

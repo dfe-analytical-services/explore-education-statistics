@@ -136,6 +136,38 @@ jobs:
                       siteConfig.publicNetworkAccess=Disabled
 
             - task: AzureCLI@2
+              displayName: Wait for active orchestrations to complete
+              retryCountOnTaskFailure: 1
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+
+                  pollingTimeSeconds=5
+                  maxAttempts=24
+                  attempts=1
+                  
+                  while [ "$attempts" -le "$maxAttempts" ]; do
+                  
+                    echo "Attempt number $attempts to check if the Data Processor is ready for deployment"
+                      
+                    activeOrchestrations=`curl -s $dataProcessorFunctionAppUrl/api/StatusCheck | jq -r '.activeOrchestrations != 0'`
+
+                    if [[ "$activeOrchestrations" == "false2" ]]; then
+                      echo "No active orchestrations running on the Data Processor - slot swapping can proceed"
+                      exit 0
+                    fi
+  
+                    attempts=$((attempts + 1))
+                  
+                  done
+
+                  echo "Timed out waiting for active Data processor orchestrations to complete."
+                  exit 1
+
+            - task: AzureCLI@2
               displayName: Swap slots
               retryCountOnTaskFailure: 1
               inputs:

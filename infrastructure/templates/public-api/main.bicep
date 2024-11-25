@@ -73,7 +73,7 @@ param deployContainerApp bool = true
 // TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL
 // will redeploy even if no changes exist in this deploy from the previous one.
 @description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
-param updatePsqlFlexibleServer bool = false
+param deployPsqlFlexibleServer bool = false
 
 param deployAlerts bool = false
 
@@ -208,7 +208,7 @@ module logAnalyticsWorkspaceModule 'application/shared/logAnalyticsWorkspace.bic
   }
 }
 
-module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep' = if (updatePsqlFlexibleServer) {
+module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep' = if (deployPsqlFlexibleServer) {
   name: 'postgreSqlFlexibleServerApplicationModuleDeploy'
   params: {
     location: location
@@ -387,6 +387,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
 output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorModule.outputs.managedIdentityClientId
+output dataProcessorFunctionAppUrl string = dataProcessorModule.outputs.url
 
 output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreStorageConnectionStringSecretKey
 output keyVaultName string = resourceNames.existingResources.keyVault
