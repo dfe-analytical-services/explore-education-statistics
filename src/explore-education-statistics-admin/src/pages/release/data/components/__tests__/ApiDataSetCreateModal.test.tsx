@@ -29,6 +29,8 @@ describe('ApiDataSetCreateModal', () => {
   ];
 
   test('renders warning message in modal when no candidates', async () => {
+    const history = createMemoryHistory();
+
     apiDataSetCandidateService.listCandidates.mockResolvedValue([]);
 
     const { user } = render(
@@ -37,19 +39,37 @@ describe('ApiDataSetCreateModal', () => {
         releaseId="release-id"
         onSubmit={noop}
       />,
+      { history },
     );
+
+    expect(await screen.findByText('Create API data set')).toBeInTheDocument();
 
     await user.click(
       await screen.findByRole('button', { name: 'Create API data set' }),
     );
 
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+
     expect(
-      await screen.findByText(
+      screen.getByText(
         /No API data sets can be created as there are no candidate data files available/,
       ),
     ).toBeInTheDocument();
 
-    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('link', { name: 'Data and files' }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('link', { name: 'Data and files' }));
+
+    expect(
+      screen.queryByRole('link', { name: 'Data and files' }),
+    ).not.toBeInTheDocument();
+
+    expect(history.location.pathname).toEqual(
+      '/publication/publication-id/release/release-id/data',
+    );
+    expect(history.location.hash).toEqual('#data-uploads');
   });
 
   test('renders form in modal when there are candidates', async () => {
@@ -98,7 +118,6 @@ describe('ApiDataSetCreateModal', () => {
       previousReleaseIds: [],
     });
 
-    const history = createMemoryHistory();
     const handleSubmit = jest.fn();
 
     const { user } = render(
@@ -107,7 +126,6 @@ describe('ApiDataSetCreateModal', () => {
         releaseId="release-id"
         onSubmit={handleSubmit}
       />,
-      { history },
     );
 
     expect(await screen.findByText('Create API data set')).toBeInTheDocument();
