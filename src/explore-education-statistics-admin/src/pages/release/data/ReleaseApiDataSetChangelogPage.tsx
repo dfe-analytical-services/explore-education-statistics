@@ -19,6 +19,7 @@ import Tag from '@common/components/Tag';
 import { useQuery } from '@tanstack/react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import React, { useEffect } from 'react';
+import WarningMessage from '@common/components/WarningMessage';
 
 export default function ReleaseApiDataSetChangelogPage() {
   const { dataSetId, dataSetVersionId, releaseId, publicationId } =
@@ -28,11 +29,14 @@ export default function ReleaseApiDataSetChangelogPage() {
     data: dataSet,
     isLoading: isLoadingDataSet,
     refetch: refetchDataSet,
+    isError: errorFetchingDataSet,
   } = useQuery(apiDataSetQueries.get(dataSetId));
 
-  const { data: changes, isLoading: isLoadingChanges } = useQuery(
-    apiDataSetVersionQueries.getChanges(dataSetVersionId),
-  );
+  const {
+    data: changes,
+    isLoading: isLoadingChanges,
+    isError: errorFetchingChanges,
+  } = useQuery(apiDataSetVersionQueries.getChanges(dataSetVersionId));
 
   const isDraft = dataSet?.draftVersion?.id === dataSetVersionId;
 
@@ -74,49 +78,55 @@ export default function ReleaseApiDataSetChangelogPage() {
       >
         Back to API data set details
       </Link>
+
       <LoadingSpinner loading={isLoadingDataSet || isLoadingChanges}>
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-three-quarters">
-            <span className="govuk-caption-l">API data set changelog</span>
-            <h2>{dataSet?.title}</h2>
-          </div>
-        </div>
-
-        <TagGroup className="govuk-!-margin-bottom-7">
-          <Tag colour={isDraft ? 'green' : 'blue'}>{`${
-            isDraft ? 'Draft' : 'Published'
-          } v${dataSetVersion?.version}`}</Tag>
-          <Tag
-            colour={dataSetVersion?.type === 'Major' ? 'blue' : 'grey'}
-          >{`${dataSetVersion?.type} update`}</Tag>
-        </TagGroup>
-
-        {isDraft && showForm ? (
-          <ApiDataSetGuidanceNotesForm
-            notes={dataSetVersion?.notes}
-            onSubmit={handleUpdateNotes}
-          />
-        ) : (
+        {!errorFetchingDataSet && !errorFetchingChanges ? (
           <>
-            <h3>Public guidance notes</h3>
-            <p>
-              {dataSetVersion?.notes ||
-                'No notes have been added for this API data set.'}
-            </p>
-            {isDraft && (
-              <Button onClick={toggleShowForm.on}>
-                Edit public guidance notes
-              </Button>
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-three-quarters">
+                <span className="govuk-caption-l">API data set changelog</span>
+                <h2>{dataSet?.title}</h2>
+              </div>
+            </div>
+            <TagGroup className="govuk-!-margin-bottom-7">
+              <Tag colour={isDraft ? 'green' : 'blue'}>{`${
+                isDraft ? 'Draft' : 'Published'
+              } v${dataSetVersion?.version}`}</Tag>
+              <Tag
+                colour={dataSetVersion?.type === 'Major' ? 'blue' : 'grey'}
+              >{`${dataSetVersion?.type} update`}</Tag>
+            </TagGroup>
+
+            {isDraft && showForm ? (
+              <ApiDataSetGuidanceNotesForm
+                notes={dataSetVersion?.notes}
+                onSubmit={handleUpdateNotes}
+              />
+            ) : (
+              <>
+                <h3>Public guidance notes</h3>
+                <p>
+                  {dataSetVersion?.notes ||
+                    'No notes have been added for this API data set.'}
+                </p>
+                {isDraft && (
+                  <Button onClick={toggleShowForm.on}>
+                    Edit public guidance notes
+                  </Button>
+                )}
+              </>
+            )}
+
+            {changes && dataSetVersion && (
+              <ApiDataSetChangelog
+                majorChanges={changes.majorChanges}
+                minorChanges={changes.minorChanges}
+                version={dataSetVersion.version}
+              />
             )}
           </>
-        )}
-
-        {changes && dataSetVersion && (
-          <ApiDataSetChangelog
-            majorChanges={changes.majorChanges}
-            minorChanges={changes.minorChanges}
-            version={dataSetVersion.version}
-          />
+        ) : (
+          <WarningMessage>Could not load changelog</WarningMessage>
         )}
       </LoadingSpinner>
     </>
