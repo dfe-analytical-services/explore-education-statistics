@@ -13,6 +13,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Namotion.Reflection;
 
 // ReSharper disable StringLiteralTypo
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
@@ -456,6 +460,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     .HasConversion( // You might want to use EF8 JSON support instead of this
                         v => JsonConvert.SerializeObject(v),
                         v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
+                entity.OwnsOne(f => f.DataSetFileMetaNew, dsfm =>
+                {
+                    dsfm.ToJson();
+
+                    dsfm.OwnsOne(msb => msb.TimePeriodRange, msb =>
+                    {
+                        msb.OwnsOne(tpr => tpr.Start, tpr =>
+                        {
+                            tpr.Property(tpm => tpm.TimeIdentifier)
+                                .HasColumnType("text")
+                                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
+                        });
+                        msb.OwnsOne(tpr => tpr.End, tpr =>
+                        {
+                            tpr.Property(tpm => tpm.TimeIdentifier)
+                                .HasColumnType("text")
+                                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
+                        });
+                    });
+                    dsfm.OwnsMany(meta => meta.GeographicLevels, gl =>
+                    {
+                        gl.Property(gl => gl.Code)
+                            .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
+                    });
+                    //dsfm.Property(e => e.GeographicLevels)
+                    //    //.HasColumnType("text[]")
+                    //    .HasConversion(
+                    //        v => v
+                    //            .Select(EnumToEnumValueConverter<GeographicLevel>.ToProvider),
+                    //        v => v
+                    //            .Select(EnumToEnumValueConverter<GeographicLevel>.FromProvider),
+                    //        //v => EnumToEnumValueConverter<GeographicLevel>.EnumValueListToJsonStr(v),
+                    //        //v => EnumToEnumValueConverter<GeographicLevel>.JsonStrToEnumList(v),
+                    //        new ValueComparer<IEnumerable<GeographicLevel>>(
+                    //            (c1, c2) => c1!.SequenceEqual(c2!),
+                    //            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    //            c => c.ToList())
+                    //    );
+                    //dsfm.Property(e => e.GeographicLevels)
+                    //    .HasColumnType("text")
+                    //    .HasConversion(
+                    //        v => EnumToEnumValueConverter<GeographicLevel>.EnumValueListToJsonStr(v),
+                    //        //v => v.Select(gl => gl.GetEnumValue()).JoinToString(","),
+                    //        v => EnumToEnumValueConverter<GeographicLevel>.JsonStrToEnumList(v),
+                    //        new ValueComparer<List<GeographicLevel>>(
+                    //            (c1, c2) => c1!.SequenceEqual(c2!),
+                    //            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    //            c => c.ToList())
+                    //    );
+                    dsfm.OwnsMany(e => e.Filters);
+                    dsfm.OwnsMany(e => e.Indicators);
+                });
             });
         }
 

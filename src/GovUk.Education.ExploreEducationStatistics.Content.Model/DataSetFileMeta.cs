@@ -8,6 +8,56 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
+public class DataSetFileMetaNew
+{
+    public required List<GeographicLevelMeta> GeographicLevels { get; set; } = [];
+
+    public required TimePeriodRangeMetaNew TimePeriodRange { get; set; }
+
+    public required List<FilterMetaNew> Filters { get; set; }
+
+    public required List<IndicatorMetaNew> Indicators { get; set; }
+}
+
+public class GeographicLevelMeta
+{
+    public required GeographicLevel Code { get; set; }
+}
+
+public class TimePeriodRangeMetaNew
+{
+    public required TimePeriodRangeBoundMetaNew Start { get; set; }
+
+    public required TimePeriodRangeBoundMetaNew End { get; set; }
+}
+
+public class TimePeriodRangeBoundMetaNew
+{
+    public required TimeIdentifier TimeIdentifier { get; set; }
+
+    public required string Period { get; set; }
+}
+
+public class FilterMetaNew
+{
+    public required Guid FilterId { get; set; }
+
+    public required string Label { get; set; }
+
+    public string? Hint { get; set; }
+
+    public required string ColumnName { get; set; }
+}
+
+public class IndicatorMetaNew
+{
+    public required Guid IndicatorId { get; set; }
+
+    public required string Label { get; set; }
+
+    public required string ColumnName { get; set; }
+}
+
 public class DataSetFileMeta
 {
     [JsonConverter(typeof(GeographicLevelsListJsonConverter))]

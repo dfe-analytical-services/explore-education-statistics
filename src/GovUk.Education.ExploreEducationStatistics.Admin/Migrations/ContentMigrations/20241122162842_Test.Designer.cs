@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241122162842_Test")]
+    partial class Test
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1645,70 +1648,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                             b1.WithOwner()
                                 .HasForeignKey("FileId");
-
-                            b1.OwnsOne("GovUk.Education.ExploreEducationStatistics.Content.Model.TimePeriodRangeMetaNew", "TimePeriodRange", b2 =>
-                                {
-                                    b2.Property<Guid>("DataSetFileMetaNewFileId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.HasKey("DataSetFileMetaNewFileId");
-
-                                    b2.ToTable("Files");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("DataSetFileMetaNewFileId");
-
-                                    b2.OwnsOne("GovUk.Education.ExploreEducationStatistics.Content.Model.TimePeriodRangeBoundMetaNew", "End", b3 =>
-                                        {
-                                            b3.Property<Guid>("TimePeriodRangeMetaNewDataSetFileMetaNewFileId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<string>("Period")
-                                                .IsRequired()
-                                                .HasColumnType("nvarchar(max)");
-
-                                            b3.Property<string>("TimeIdentifier")
-                                                .IsRequired()
-                                                .HasColumnType("nvarchar(max)");
-
-                                            b3.HasKey("TimePeriodRangeMetaNewDataSetFileMetaNewFileId");
-
-                                            b3.ToTable("Files");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("TimePeriodRangeMetaNewDataSetFileMetaNewFileId");
-                                        });
-
-                                    b2.OwnsOne("GovUk.Education.ExploreEducationStatistics.Content.Model.TimePeriodRangeBoundMetaNew", "Start", b3 =>
-                                        {
-                                            b3.Property<Guid>("TimePeriodRangeMetaNewDataSetFileMetaNewFileId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<string>("Period")
-                                                .IsRequired()
-                                                .HasColumnType("nvarchar(max)");
-
-                                            b3.Property<string>("TimeIdentifier")
-                                                .IsRequired()
-                                                .HasColumnType("nvarchar(max)");
-
-                                            b3.HasKey("TimePeriodRangeMetaNewDataSetFileMetaNewFileId");
-
-                                            b3.ToTable("Files");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("TimePeriodRangeMetaNewDataSetFileMetaNewFileId");
-                                        });
-
-                                    b2.Navigation("End")
-                                        .IsRequired();
-
-                                    b2.Navigation("Start")
-                                        .IsRequired();
-                                });
-
-                            b1.Navigation("TimePeriodRange")
-                                .IsRequired();
                         });
 
                     b.Navigation("CreatedBy");
