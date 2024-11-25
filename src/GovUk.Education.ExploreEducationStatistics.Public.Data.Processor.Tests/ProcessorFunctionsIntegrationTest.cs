@@ -301,6 +301,7 @@ public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             typeof(HandleProcessingFailureFunction),
             typeof(HealthCheckFunctions),
             typeof(BulkDeleteDataSetVersionsFunction),
+            typeof(StatusCheckFunction),
         ];
     }
 }
