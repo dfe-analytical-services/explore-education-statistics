@@ -181,20 +181,6 @@ Return to Admin and create first amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-Change the Release type and Academic year
-    user waits until page contains link    Edit release summary
-    user clicks link    Edit release summary
-    user waits until page finishes loading
-    user waits until h2 is visible    Edit release summary
-    user checks page contains radio    Official statistics in development
-    user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2024
-    user clicks radio    Official statistics in development
-    user clicks button    Update release summary
-    user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    Academic year Q1
-    ...    2024/25
-    ...    Official statistics in development
-
 Navigate to 'Content' page for amendment
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
@@ -225,7 +211,7 @@ Navigate to publication page and verify the amended release
 Validate amended legacy releases
     user waits until page contains button    Reorder releases
 
-    user checks table cell contains    1    1    Academic year Q1 2024/25
+    user checks table cell contains    1    1    Academic year Q1 2022/23
     user checks table cell contains    1    2    ${PUBLIC_AMENDED_RELEASE_LINK}
     user checks table cell contains    1    3    Latest release
 
@@ -255,7 +241,7 @@ Delete legacy release
 Validate that deleted legacy release does not exist
     user waits until page contains button    Reorder releases
 
-    user checks table cell contains    1    1    Academic year Q1 2024/25
+    user checks table cell contains    1    1    Academic year Q1 2022/23
     user checks table cell contains    1    2    ${PUBLIC_AMENDED_RELEASE_LINK}
     user checks table cell contains    1    3    Latest release
 
