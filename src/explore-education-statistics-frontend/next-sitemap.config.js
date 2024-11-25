@@ -38,7 +38,6 @@ module.exports = {
       '/contact-us',
       '/cookies',
       '/cookies/details',
-      '/privacy-notice',
       '/help-support',
     ];
     if (lowerPriorityPages.includes(path)) {
