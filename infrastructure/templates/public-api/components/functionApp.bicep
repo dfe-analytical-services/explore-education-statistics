@@ -36,6 +36,9 @@ param privateEndpointSubnetId string?
 @description('Specifies whether this Function App is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
 
+@description('IP address ranges that are allowed to access the Function App endpoints. Dependent on "publicNetworkAccessEnabled" being true.')
+param functionAppEndpointFirewallRules FirewallRule[] = []
+
 @description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
 param userAssignedManagedIdentityParams {
   id: string
@@ -172,6 +175,15 @@ resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2
   ]
 }
 
+var firewallRules = [for firewallRule in functionAppEndpointFirewallRules: {
+  ipAddress: firewallRule.cidr
+  action: 'Allow'
+  tag: 'Default'
+  priority: 100
+  name: firewallRule.name
+  description: firewallRule.description
+}]
+
 var commonSiteProperties = {
   enabled: true
   httpsOnly: true
@@ -192,6 +204,17 @@ var commonSiteProperties = {
   }
   keyVaultReferenceIdentity: keyVaultReferenceIdentity
   publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
+  // ipSecurityRestrictions: firewallRules
+  ipSecurityRestrictionsDefaultAction: 'Deny'
+  scmIpSecurityRestrictions: [
+    {
+      ipAddress: 'Any'
+      action: 'Allow'
+      priority: 2147483647
+      name: 'Allow all'
+      description: 'Allow all access'
+    }
+  ]
 }
 
 // Create the main production deploy slot.

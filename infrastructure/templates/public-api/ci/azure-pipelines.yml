@@ -1,12 +1,18 @@
 trigger: none
 
 parameters:
-  - name: deployContainerApp
-    displayName: Can we deploy the Container App yet? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.
-    default: true
-  - name: updatePsqlFlexibleServer
+  - name: deploySharedPrivateDnsZones
+    displayName: Do the shared Private DNS Zones need creating or updating?
+    default: false
+  - name: deployPsqlFlexibleServer
     displayName: Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.
     default: false
+  - name: deployContainerApp
+    displayName: Does the Public API Container App need creating or updating? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.
+    default: true
+  - name: deployDataProcessor
+    displayName: Does the Data Processor need creating or updating?
+    default: true
   - name: deployAlerts
     displayName: Whether to create or update Azure Monitor alerts during this deploy.
     default: false
@@ -41,10 +47,14 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
     value: ubuntu-latest
+  - name: deploySharedPrivateDnsZones
+    value: ${{ parameters.deploySharedPrivateDnsZones }}
+  - name: deployPsqlFlexibleServer
+    value: ${{ parameters.deployPsqlFlexibleServer }}
   - name: deployContainerApp
     value: ${{ parameters.deployContainerApp }}
-  - name: updatePsqlFlexibleServer
-    value: ${{ parameters.updatePsqlFlexibleServer }}
+  - name: deployDataProcessor
+    value: ${{ parameters.deployDataProcessor }}
   - name: deployAlerts
     value: ${{ parameters.deployAlerts }}
 

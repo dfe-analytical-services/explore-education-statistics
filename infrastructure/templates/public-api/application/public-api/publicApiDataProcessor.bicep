@@ -18,8 +18,11 @@ param dataProcessorFunctionAppExists bool
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string
 
-@description('Public API Storage : Firewall rules.')
-param storageFirewallRules FirewallRule[] = []
+@description('The IP address ranges that can access the Data Processor storage accounts.')
+param storageFirewallRules FirewallRule[]
+
+@description('The IP address ranges that can access the Data Processor Function App endpoints.')
+param functionAppFirewallRules FirewallRule[] = []
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
@@ -75,7 +78,8 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
     applicationInsightsKey: applicationInsightsKey
     subnetId: outboundVnetSubnet.id
     privateEndpointSubnetId: inboundVnetSubnet.id
-    publicNetworkAccessEnabled: false
+    publicNetworkAccessEnabled: true
+    functionAppEndpointFirewallRules: functionAppFirewallRules
     entraIdAuthentication: {
       appRegistrationClientId: dataProcessorAppRegistrationClientId
       allowedClientIds: [

@@ -67,23 +67,23 @@ jobs:
             # Add Private Endpoint to Data Processor Function App into the VMSS VNet to allow
             # DevOps to deploy the Data Processor Function App without having to temporarily
             # make it publicly accessible.
-            - task: AzureCLI@2
-              displayName: Temporarily enable public network access before deploy
-              retryCountOnTaskFailure: 1
-              inputs:
-                azureSubscription: ${{ parameters.serviceConnection }}
-                scriptType: bash
-                scriptLocation: inlineScript
-                inlineScript: |
-                  set -e
+            # - task: AzureCLI@2
+            #   displayName: Temporarily enable public network access before deploy
+            #   retryCountOnTaskFailure: 1
+            #   inputs:
+            #     azureSubscription: ${{ parameters.serviceConnection }}
+            #     scriptType: bash
+            #     scriptLocation: inlineScript
+            #     inlineScript: |
+            #       set -e
           
-                  az functionapp update \
-                    --name $(dataProcessorFunctionAppName) \
-                    --resource-group $(resourceGroupName) \
-                    --slot staging \
-                    --set \
-                      publicNetworkAccess=Enabled \
-                      siteConfig.publicNetworkAccess=Enabled
+            #       az functionapp update \
+            #         --name $(dataProcessorFunctionAppName) \
+            #         --resource-group $(resourceGroupName) \
+            #         --slot staging \
+            #         --set \
+            #           publicNetworkAccess=Enabled \
+            #           siteConfig.publicNetworkAccess=Enabled
 
             # TODO EES-5128
             # Retry deploying the Function App in order to allow the staging slot the time to
@@ -116,24 +116,24 @@ jobs:
             # Add Private Endpoint to Data Processor Function App into the VMSS VNet to allow
             # DevOps to deploy the Data Processor Function App without having to temporarily
             # make it publicly accessible.
-            - task: AzureCLI@2
-              displayName: Disable public network access after deploy
-              retryCountOnTaskFailure: 1
-              condition: always()
-              inputs:
-                azureSubscription: ${{ parameters.serviceConnection }}
-                scriptType: bash
-                scriptLocation: inlineScript
-                inlineScript: |
-                  set -e
+            # - task: AzureCLI@2
+            #   displayName: Disable public network access after deploy
+            #   retryCountOnTaskFailure: 1
+            #   condition: always()
+            #   inputs:
+            #     azureSubscription: ${{ parameters.serviceConnection }}
+            #     scriptType: bash
+            #     scriptLocation: inlineScript
+            #     inlineScript: |
+            #       set -e
           
-                  az functionapp update \
-                    --name $(dataProcessorFunctionAppName) \
-                    --resource-group $(resourceGroupName) \
-                    --slot staging \
-                    --set \
-                      publicNetworkAccess=Disabled \
-                      siteConfig.publicNetworkAccess=Disabled
+            #       az functionapp update \
+            #         --name $(dataProcessorFunctionAppName) \
+            #         --resource-group $(resourceGroupName) \
+            #         --slot staging \
+            #         --set \
+            #           publicNetworkAccess=Disabled \
+            #           siteConfig.publicNetworkAccess=Disabled
 
             - task: AzureCLI@2
               displayName: Wait for active orchestrations to complete
