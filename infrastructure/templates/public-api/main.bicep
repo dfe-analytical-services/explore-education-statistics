@@ -97,6 +97,10 @@ param dataProcessorAppRegistrationClientId string = ''
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the API Container App.')
 param apiAppRegistrationClientId string = ''
 
+@description('Specifies the principal id of the Azure DevOps SPN.')
+@secure()
+param devopsServicePrincipalId string = ''
+
 @description('Specifies whether or not test Themes can be deleted in the environment.')
 param enableThemeDeletion bool = false
 
@@ -375,6 +379,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
     metricsNamePrefix: '${subscription}PublicDataProcessor'
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
+    devopsServicePrincipalId: devopsServicePrincipalId
     storageFirewallRules: storageFirewallRules
     dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
     tagValues: tagValues
@@ -390,6 +395,10 @@ output dataProcessorPsqlConnectionStringSecretKey string = 'ees-publicapi-data-p
 
 output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor 
   ? dataProcessorModule.outputs.managedIdentityClientId
+  : ''
+
+output dataProcessorFunctionAppUrl string = deployDataProcessor
+  ? dataProcessorModule.outputs.url
   : ''
 output dataProcessorFunctionAppStagingUrl string = deployDataProcessor
   ? dataProcessorModule.outputs.stagingUrl

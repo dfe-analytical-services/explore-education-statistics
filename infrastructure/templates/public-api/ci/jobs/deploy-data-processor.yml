@@ -17,9 +17,9 @@ jobs:
       runOnce:
         deploy:
           steps:
-            # - download: MainBuild
-            #   displayName: Download Public API Data Processor artifact
-            #   artifact: public-api-data-processor
+            - download: MainBuild
+              displayName: Download Public API Data Processor artifact
+              artifact: public-api-data-processor
 
             - template: ../tasks/bicep-output-variables.yml
               parameters:
@@ -28,41 +28,41 @@ jobs:
             # We do config updates out of Bicep template so we can implement slot swapping.
             # Changes are first deployed to the staging slot and combined with a fresh
             # code deploy prior to being swapped with the production slot.
-            # - task: AzureCLI@2
-            #   displayName: Update staging slot app settings
-            #   retryCountOnTaskFailure: 1
-            #   inputs:
-            #     azureSubscription: ${{ parameters.serviceConnection }}
-            #     scriptType: bash
-            #     scriptLocation: inlineScript
-            #     inlineScript: |
-            #       set -e
+            - task: AzureCLI@2
+              displayName: Update staging slot app settings
+              retryCountOnTaskFailure: 1
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
                   
-            #       az functionapp config appsettings set \
-            #         --name $(dataProcessorFunctionAppName) \
-            #         --resource-group $(resourceGroupName) \
-            #         --slot staging \
-            #         --settings \
-            #           "App__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
-            #           "App__EnableThemeDeletion=$(enableThemeDeletion)" \
-            #           "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
-            #           "DataFiles__BasePath=$(dataProcessorPublicApiDataFileShareMountPath)"
+                  az functionapp config appsettings set \
+                    --name $(dataProcessorFunctionAppName) \
+                    --resource-group $(resourceGroupName) \
+                    --slot staging \
+                    --settings \
+                      "App__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
+                      "App__EnableThemeDeletion=$(enableThemeDeletion)" \
+                      "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
+                      "DataFiles__BasePath=$(dataProcessorPublicApiDataFileShareMountPath)"
                   
-            #       az webapp config connection-string set \
-            #         --name $(dataProcessorFunctionAppName) \
-            #         --resource-group $(resourceGroupName) \
-            #         --connection-string-type SQLAzure \
-            #         --slot staging \
-            #         --settings \
-            #           "ContentDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorContentDbConnectionStringSecretKey))"
+                  az webapp config connection-string set \
+                    --name $(dataProcessorFunctionAppName) \
+                    --resource-group $(resourceGroupName) \
+                    --connection-string-type SQLAzure \
+                    --slot staging \
+                    --settings \
+                      "ContentDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorContentDbConnectionStringSecretKey))"
                   
-            #       az webapp config connection-string set \
-            #         --name $(dataProcessorFunctionAppName) \
-            #         --resource-group $(resourceGroupName) \
-            #         --connection-string-type PostgreSQL \
-            #         --slot staging \
-            #         --settings \
-            #           "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
+                  az webapp config connection-string set \
+                    --name $(dataProcessorFunctionAppName) \
+                    --resource-group $(resourceGroupName) \
+                    --connection-string-type PostgreSQL \
+                    --slot staging \
+                    --settings \
+                      "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
 
             # TODO EES-5128
             # Add Private Endpoint to Data Processor Function App into the VMSS VNet to allow
@@ -98,20 +98,20 @@ jobs:
             # Client IDs / Identities that can access the Function App. The Service Principal
             # that is performing the deploy can be accessed by using the `addSpnToEnvironment`
             # config option in the task definition and using the $(servicePrincipalId) variable.
-            # - task: AzureCLI@2
-            #   displayName: Deploy to staging slot
-            #   retryCountOnTaskFailure: 10
-            #   inputs:
-            #     azureSubscription: ${{ parameters.serviceConnection }}
-            #     scriptType: bash
-            #     scriptLocation: inlineScript
-            #     inlineScript: |
-            #       set -e
-            #       az functionapp deployment source config-zip \
-            #         --src '$(Pipeline.Workspace)/MainBuild/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
-            #         --name $(dataProcessorFunctionAppName) \
-            #         --resource-group $(resourceGroupName) \
-            #         --slot staging
+            - task: AzureCLI@2
+              displayName: Deploy to staging slot
+              retryCountOnTaskFailure: 10
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+                  az functionapp deployment source config-zip \
+                    --src '$(Pipeline.Workspace)/MainBuild/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
+                    --name $(dataProcessorFunctionAppName) \
+                    --resource-group $(resourceGroupName) \
+                    --slot staging
 
             # TODO EES-5128
             # Add Private Endpoint to Data Processor Function App into the VMSS VNet to allow
@@ -137,6 +137,43 @@ jobs:
             #           siteConfig.publicNetworkAccess=Disabled
 
             - task: AzureCLI@2
+              displayName: Wait for Data Processor to start up
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+
+                  accessToken=`az account get-access-token \
+                    --resource $(dataProcessorAppRegistrationClientId) \
+                    --query "accessToken" \
+                    -o tsv`
+
+                  pollingTimeSeconds=5
+                  maxAttempts=50
+                  attempt=1
+                  
+                  while [ "$attempt" -le "$maxAttempts" ]; do
+                  
+                    httpStatusCode=`curl --write-out '%{http_code}' -H "Authorization: Bearer $accessToken" -s --output /dev/null $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck`
+                    
+                    echo "Attempt number $attempt - calling $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck to check for Data Processor staging slot to be healthy - got HTTP Status Code $httpStatusCode."
+                    
+                    if [[ "$httpStatusCode" == "200" ]]; then
+                      echo "Data Processor staging slot has started successfully and is healthy - deployment can continue."
+                      exit 0
+                    fi
+  
+                    attempt=$((attempt + 1))
+                    sleep $pollingTimeSeconds
+                  
+                  done
+
+                  echo "Timed out waiting for Data processor to start up."
+                  exit 1
+
+            - task: AzureCLI@2
               displayName: Wait for active orchestrations to complete
               inputs:
                 azureSubscription: ${{ parameters.serviceConnection }}
@@ -144,33 +181,33 @@ jobs:
                 scriptLocation: inlineScript
                 inlineScript: |
                   set -e
-                  set -x
+                  
+                  accessToken=`az account get-access-token \
+                    --resource $(dataProcessorAppRegistrationClientId) \
+                    --query "accessToken" \
+                    -o tsv`
 
                   pollingTimeSeconds=5
                   maxAttempts=50
-                  attempts=1
+                  attempt=1
                   
-                  while [ "$attempts" -le "$maxAttempts" ]; do
+                  while [ "$attempt" -le "$maxAttempts" ]; do
                   
-                    echo "Attempt number $attempts to check if the Data Processor is ready for deployment"
-                    echo "Calling $(dataProcessorFunctionAppStagingUrl)/api/StatusCheck to check for active orchestrations"
-                      
-                    activeOrchestrations=`curl -s $(dataProcessorFunctionAppStagingUrl)/api/StatusCheck | jq -r '.activeOrchestrations != 0'`
+                    activeOrchestrations=`curl -H "Authorization: Bearer $accessToken" -s $(dataProcessorFunctionAppUrl)/api/StatusCheck | jq -r '.activeOrchestrations != 0'`
                     
-                    echo "Orchestration results are $activeOrchestrations"
+                    echo "Attempt number $attempt - called $(dataProcessorFunctionAppUrl)/api/StatusCheck to check for active orchestrations - currently $activeOrchestrations active orchestrations running."
                     
                     if [[ "$activeOrchestrations" == "false" ]]; then
-                      echo "No active orchestrations running on the Data Processor - slot swapping can proceed"
+                      echo "No active orchestrations running on the Data Processor - slot swapping can proceed."
                       exit 0
                     fi
   
-                    attempts=$((attempts + 1))
-
+                    attempt=$((attempt + 1))
                     sleep $pollingTimeSeconds
                   
                   done
 
-                  echo "Timed out waiting for active Data processor orchestrations to complete."
+                  echo "Timed out waiting for active Data Processor orchestrations to complete."
                   exit 1
 
             - task: AzureCLI@2
@@ -182,6 +219,7 @@ jobs:
                 scriptLocation: inlineScript
                 inlineScript: |
                   set -e
+
                   az functionapp deployment slot swap \
                     --name $(dataProcessorFunctionAppName) \
                     --resource-group $(resourceGroupName) \

@@ -455,4 +455,5 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnet
 }
 
 output functionAppName string = functionApp.name
+output url string = 'https://${functionApp.name}.azurewebsites.net'
 output stagingUrl string = 'https://${functionApp.name}-staging.azurewebsites.net'

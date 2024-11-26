@@ -11,7 +11,7 @@ param stagingSlotName string = 'none'
 param allowedClientIds string[] = []
 
 @description('Specifies an optional set of Principal Ids of Managed Identities that are allowed to access this resource')
-param allowedPrincipalIds string[] = []
+param allowedPrincipalIds string[]
 
 @description('Specifies whether all calls to this resource should be authenticated or not.  Defaults to true')
 param requireAuthentication bool = true
@@ -35,15 +35,14 @@ var properties = {
         allowedAudiences: [
           'api://${clientId}'
         ]
-        defaultAuthorizationPolicy: {
+        defaultAuthorizationPolicy: union({
           allowedApplications: union(
             [clientId],
             allowedClientIds
           )
-          allowedPrincipals: {
-            identities: allowedPrincipalIds
-          }
-        }
+        }, length(allowedPrincipalIds) > 0 ? {
+          identities: allowedPrincipalIds
+        } : {})
       }
     }
   }

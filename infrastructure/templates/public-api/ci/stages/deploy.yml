@@ -50,11 +50,11 @@ stages:
           environment: ${{ parameters.environment }}
           bicepParamFile: ${{ parameters.bicepParamFile }}
 
-      - template: ../jobs/deploy-api-docs.yml
-        parameters:
-          serviceConnection: ${{ parameters.serviceConnection }}
-          environment: ${{ parameters.environment }}
-          dependsOn: DeployPublicApiInfrastructure
+      # - template: ../jobs/deploy-api-docs.yml
+      #   parameters:
+      #     serviceConnection: ${{ parameters.serviceConnection }}
+      #     environment: ${{ parameters.environment }}
+      #     dependsOn: DeployPublicApiInfrastructure
 
       - template: ../jobs/deploy-data-processor.yml
         parameters:
