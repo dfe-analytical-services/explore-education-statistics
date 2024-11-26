@@ -26,6 +26,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -55,6 +56,7 @@ public class DataSetFileService : IDataSetFileService
         Guid? themeId,
         Guid? publicationId,
         Guid? releaseVersionId,
+        GeographicLevel? geographicLevel,
         bool? latestOnly,
         DataSetType? dataSetType,
         string? searchTerm,
@@ -82,7 +84,7 @@ public class DataSetFileService : IDataSetFileService
             .HavingThemeId(themeId)
             .HavingPublicationIdOrNoSupersededPublication(publicationId)
             .HavingReleaseVersionId(releaseVersionId)
-            //.HavingGeographicLevel(GeographicLevel.LocalAuthority) // EES-5598
+            .HavingGeographicLevel(geographicLevel)
             .OfDataSetType(dataSetType.Value)
             .HavingLatestPublishedReleaseVersions(latestPublishedReleaseVersions, latestOnly.Value)
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
@@ -492,14 +494,14 @@ internal static class ReleaseFileQueryableExtensions
         return releaseVersionId.HasValue ? query.Where(rf => rf.ReleaseVersionId == releaseVersionId.Value) : query;
     }
 
-    //internal static IQueryable<ReleaseFile> HavingGeographicLevel( // EES-5598
-    //    this IQueryable<ReleaseFile> query,
-    //    GeographicLevel? geographicLevel)
-    //{
-    //    return geographicLevel.HasValue
-    //        ? query.Where(rf => rf.File.DataSetFileMeta!.GeographicLevels.Any(gl => gl.Code == geographicLevel))
-    //        : query;
-    //}
+    internal static IQueryable<ReleaseFile> HavingGeographicLevel(
+        this IQueryable<ReleaseFile> query,
+        GeographicLevel? geographicLevel)
+    {
+        return geographicLevel.HasValue
+            ? query.Where(rf => rf.File.DataSetFileMeta!.GeographicLevels.Any(gl => gl.Code == geographicLevel))
+            : query;
+    }
 
     internal static IQueryable<ReleaseFile> OfDataSetType(
         this IQueryable<ReleaseFile> query,

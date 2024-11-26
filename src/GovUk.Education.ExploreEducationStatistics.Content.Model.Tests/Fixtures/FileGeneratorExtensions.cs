@@ -1,8 +1,6 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
@@ -79,9 +77,14 @@ public static class FileGeneratorExtensions
         Guid dataSetFileId)
         => generator.ForInstance(s => s.SetDataSetFileId(dataSetFileId));
 
-    public static Generator<File> WithDataSetFileMeta(
+    public static Generator<File> WithDataSetFileMetaOld(
         this Generator<File> generator,
         DataSetFileMetaOld? dataSetFileMeta)
+        => generator.ForInstance(s => s.SetDataSetFileMetaOld(dataSetFileMeta));
+
+    public static Generator<File> WithDataSetFileMeta(
+        this Generator<File> generator,
+        DataSetFileMeta? dataSetFileMeta)
         => generator.ForInstance(s => s.SetDataSetFileMeta(dataSetFileMeta));
 
     public static InstanceSetters<File> SetDefaults(this InstanceSetters<File> setters, FileType? fileType)
@@ -110,7 +113,8 @@ public static class FileGeneratorExtensions
             .SetDefault(f => f.SubjectId)
             .SetContentType("text/csv")
             .SetDefault(f => f.DataSetFileId)
-            .Set(f => f.DataSetFileMetaOld, (_, _, context) => context.Fixture.DefaultDataSetFileMeta());
+            .Set(f => f.DataSetFileMetaOld, (_, _, context) => context.Fixture.DefaultDataSetFileMetaOld())
+            .Set(f => f.DataSetFileMeta, (_, _, _) => null); // InMemory DB doesn't support JSON Columns, so this avoids issues saving Files
 
     public static InstanceSetters<File> SetMetaFileDefaults(this InstanceSetters<File> setters)
         => setters
@@ -196,8 +200,13 @@ public static class FileGeneratorExtensions
         Guid dataSetFileId)
         => setters.Set(f => f.DataSetFileId, dataSetFileId);
 
-    public static InstanceSetters<File> SetDataSetFileMeta(
+    public static InstanceSetters<File> SetDataSetFileMetaOld(
         this InstanceSetters<File> setters,
         DataSetFileMetaOld? dataSetFileMeta)
         => setters.Set(f => f.DataSetFileMetaOld, dataSetFileMeta);
+    
+    public static InstanceSetters<File> SetDataSetFileMeta(
+        this InstanceSetters<File> setters,
+        DataSetFileMeta? dataSetFileMeta)
+        => setters.Set(f => f.DataSetFileMeta, dataSetFileMeta);
 }

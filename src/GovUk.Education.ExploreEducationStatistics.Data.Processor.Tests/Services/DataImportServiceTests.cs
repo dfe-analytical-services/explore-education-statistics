@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 .Generate();
 
             var file = _fixture.DefaultFile(FileType.Data)
-                .WithDataSetFileMeta(null)
+                .WithDataSetFileMetaOld(null)
                 .WithSubjectId(subject.Id)
                 .Generate();
 

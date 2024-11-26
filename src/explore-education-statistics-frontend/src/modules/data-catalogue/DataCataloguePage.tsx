@@ -52,6 +52,7 @@ import omit from 'lodash/omit';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
+import { GeographicLevelCode } from '@common/utils/locationLevelsMap';
 
 const defaultPageTitle = 'Data catalogue';
 
@@ -61,6 +62,7 @@ export interface DataCataloguePageQuery {
   page?: number;
   publicationId?: string;
   releaseId?: string;
+  geographicLevel?: GeographicLevelCode;
   searchTerm?: string;
   sortBy?: DataSetFileSortOption;
   sortDirection?: SortDirection;
@@ -85,6 +87,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
     sortBy,
     publicationId,
     releaseId,
+    geographicLevel,
     searchTerm,
     themeId,
   } = getParamsFromQuery(router.query);
@@ -131,6 +134,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
     searchTerm,
     selectedTheme?.title,
     selectedPublication?.title,
+    geographicLevel,
   ]).join(', ');
 
   const updateQueryParams = async (nextQuery: DataCataloguePageQuery) => {

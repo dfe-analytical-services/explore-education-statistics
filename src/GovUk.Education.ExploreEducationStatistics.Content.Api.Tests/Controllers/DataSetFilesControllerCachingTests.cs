@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Moq;
 using NCrontab;
 using Newtonsoft.Json;
@@ -31,6 +32,7 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
             ThemeId: Guid.NewGuid(),
             PublicationId: Guid.NewGuid(),
             ReleaseId: Guid.NewGuid(),
+            GeographicLevel: GeographicLevel.Country.GetEnumValue(),
             LatestOnly: true,
             DataSetType: DataSetType.Api,
             SearchTerm: "term",
@@ -116,6 +118,7 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
                     _query.ThemeId,
                     _query.PublicationId,
                     _query.ReleaseId,
+                    _query.GeographicLevelEnum,
                     _query.LatestOnly,
                     _query.DataSetType,
                     _query.SearchTerm,

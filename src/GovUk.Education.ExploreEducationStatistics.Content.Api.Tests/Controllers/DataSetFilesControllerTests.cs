@@ -96,6 +96,52 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             }
 
             [Fact]
+            public async Task FilterByGeographicLevel_Success()
+            {
+                var (publication1, publication2) = _fixture
+                    .DefaultPublication()
+                    // Publications each have a published release version
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                    .WithTheme(_fixture.DefaultTheme())
+                    .GenerateTuple2();
+
+                var publication1Release1Version1Files = _fixture.DefaultReleaseFile()
+                    .WithReleaseVersion(publication1.ReleaseVersions[0])
+                    .WithFiles(_fixture.DefaultFile(FileType.Data)
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                        .WithGeographicLevels(
+                            [GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.Institution]))
+                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
+                        .WithGeographicLevels(
+                            [GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.Institution]))
+                    .GenerateList(1))
+                    .GenerateList();
+
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
+
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                });
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                var query = new DataSetFileListRequest(GeographicLevel: GeographicLevel.LocalAuthority.GetEnumValue());
+                var response = await ListDataSetFiles(query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(
+                    expectedTotalResults: 1);
+                AssertResultsForExpectedReleaseFiles(publication1Release1Version1Files, pagedResult.Results);
+            }
+
+            [Fact]
             public async Task FilterByPublicationId_Success()
             {
                 var (publication1, publication2) = _fixture
@@ -1540,7 +1586,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .WithReleaseVersion(publication.ReleaseVersions[0])
                     .WithFile(_fixture.DefaultFile(FileType.Data)
                         .WithType(FileType.Data)
-                        .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                        .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
                             .WithGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority])
                             .WithTimePeriodRange(
                                 _fixture.DefaultTimePeriodRangeMeta()
@@ -1675,6 +1721,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 { "themeId", request.ThemeId?.ToString() },
                 { "publicationId", request.PublicationId?.ToString() },
                 { "releaseId", request.ReleaseId?.ToString() },
+                { "geographicLevel", request.GeographicLevel },
                 { "latestOnly", request.LatestOnly?.ToString() },
                 { "searchTerm", request.SearchTerm },
                 { "sort", request.Sort?.ToString() },
@@ -1737,6 +1784,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithReleaseVersion(releaseVersion)
                 .WithFiles(_fixture.DefaultFile(FileType.Data)
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta())
+                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld())
                     .GenerateList(numberOfDataSets))
                 .GenerateList();
         }
@@ -1896,7 +1944,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithPublicApiDataSetId(Guid.NewGuid())
                 .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
                         .WithTimePeriodRange(
                         _fixture.DefaultTimePeriodRangeMeta()
                             .WithStart("2000", TimeIdentifier.CalendarYear)
@@ -1962,7 +2010,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithPublicApiDataSetId(Guid.NewGuid())
                 .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
                         .WithTimePeriodRange(
                         _fixture.DefaultTimePeriodRangeMeta()
                             .WithStart("2000", TimeIdentifier.CalendarYear)
@@ -2091,7 +2139,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()));
+                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
@@ -2151,7 +2199,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     new FilterSequenceEntry(filter3Id, []),
                 ])
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
                         .WithFilters([
                             new FilterMetaOld { Id = filter3Id, Label = "Filter 3", ColumnName = "filter_3", },
                             new FilterMetaOld { Id = filter1Id, Label = "Filter 1", ColumnName = "filter_1", },
@@ -2211,7 +2259,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator3Id, indicator4Id])
                 ])
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
                         .WithIndicators([
                             new IndicatorMetaOld { Id = indicator3Id, Label = "Indicator 3", ColumnName = "indicator_3", },
                             new IndicatorMetaOld { Id = indicator2Id, Label = "Indicator 2", ColumnName = "indicator_2", },
@@ -2263,7 +2311,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
                         .WithFilters([
                             new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "A_filter_1", Hint = "hint", },
                             new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 2", ColumnName = "G_filter_2", },
@@ -2447,7 +2495,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .WithTheme(_fixture.DefaultTheme());
 
             File file = _fixture.DefaultFile(FileType.Data)
-                .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta());
+                .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld());
 
             ReleaseFile releaseFile0 = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0]) // the previous published version
