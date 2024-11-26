@@ -372,8 +372,11 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
 
             ReleaseVersion releaseAmendment = DataFixture
                 .DefaultReleaseVersion()
-                .WithReleaseId(releaseVersion.ReleaseId)
-                .WithPublicationId(dataSet.PublicationId);
+                .WithReleaseId(releaseVersion.ReleaseId);
+
+            // Need to set this to override the default value assigned by the test data generator,
+            // until ReleaseVersion.PublicationId is removed.
+            releaseAmendment.PublicationId = dataSet.PublicationId;
 
             var subjectId = Guid.NewGuid();
 
@@ -452,7 +455,8 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 .DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture
                     .DefaultReleaseVersion()
-                    .WithPublicationId(publicationId))
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublicationId(publicationId)))
                 .WithFiles([
                     DataFixture
                         .DefaultFile(FileType.Data)

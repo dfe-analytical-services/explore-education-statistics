@@ -65,7 +65,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
         private static readonly Release Release1 = new()
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            PublicationId = Guid.NewGuid(),
+            Year = 2018,
+            TimePeriodCoverage = AcademicYearQ1,
+            Slug = "2018-19-q1"
         };
 
         private static readonly ReleaseVersion Release1V1 = new()

@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureFile(modelBuilder);
             ConfigureContentBlock(modelBuilder);
             ConfigureContentSection(modelBuilder);
-            ConfigureRelease(modelBuilder);
+            ConfigureReleaseVersion(modelBuilder);
             ConfigureDataBlock(modelBuilder);
             ConfigureHtmlBlock(modelBuilder);
             ConfigureEmbedBlockLink(modelBuilder);
@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureDataBlockVersion(modelBuilder);
 
             // Apply model configuration for types which implement IEntityTypeConfiguration
-
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
             new FreeTextRank.Config().Configure(modelBuilder.Entity<FreeTextRank>());
         }
 
@@ -490,8 +490,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             });
         }
 
-        private static void ConfigureRelease(ModelBuilder modelBuilder)
+        private static void ConfigureReleaseVersion(ModelBuilder modelBuilder)
         {
+            // TODO This will be removed in EES-5659. It's been added to prevent multiple delete cascade paths
+            modelBuilder.Entity<ReleaseVersion>()
+                .HasOne(rv => rv.Publication)
+                .WithMany(p => p.ReleaseVersions)
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<ReleaseVersion>()
                 .Property(rv => rv.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
