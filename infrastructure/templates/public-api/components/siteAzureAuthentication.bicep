@@ -19,7 +19,7 @@ param requireAuthentication bool = true
 var properties = {
   globalValidation: {
     requireAuthentication: requireAuthentication
-    unauthenticatedClientAction: requireAuthentication ? 'Return401' : null
+    unauthenticatedClientAction: requireAuthentication ? 'Return401' : 'AllowAnonymous'
   }
   httpSettings: {
     requireHttps: true

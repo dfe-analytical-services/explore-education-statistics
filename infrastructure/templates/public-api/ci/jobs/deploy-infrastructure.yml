@@ -35,8 +35,10 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deploySharedPrivateDnsZones: false
+                deployPsqlFlexibleServer: false
                 deployContainerApp: true
-                updatePsqlFlexibleServer: false
+                deployDataProcessor: true
                 dataProcessorExists: true
 
             - task: AzureCLI@2
@@ -61,8 +63,10 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deploySharedPrivateDnsZones: $(deploySharedPrivateDnsZones)
+                deployPsqlFlexibleServer: $(deployPsqlFlexibleServer)
                 deployContainerApp: $(deployContainerApp)
-                updatePsqlFlexibleServer: $(updatePsqlFlexibleServer)
+                deployDataProcessor: $(deployDataProcessor)
                 dataProcessorExists: $(dataProcessorExists)
 
            # - template: ../tasks/assign-app-role-to-service-principal.yml

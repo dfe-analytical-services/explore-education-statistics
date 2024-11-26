@@ -11,12 +11,18 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: deploySharedPrivateDnsZones
+    type: string
+    default: false
+  - name: deployPsqlFlexibleServer
+    type: string
+    default: false
   - name: deployContainerApp
     type: string
     default: true
-  - name: updatePsqlFlexibleServer
+  - name: deployDataProcessor
     type: string
-    default: false
+    default: true
   - name: dataProcessorExists
     type: string
     default: true
@@ -46,8 +52,10 @@ steps:
               storageFirewallRules='$(maintenanceFirewallRules)' \
               acrResourceGroupName='$(acrResourceGroupName)' \
               dockerImagesTag='$(resources.pipeline.MainBuild.runName)' \
+              deploySharedPrivateDnsZones=${{ parameters.deploySharedPrivateDnsZones }} \
+              deployPsqlFlexibleServer=${{ parameters.deployPsqlFlexibleServer }} \
               deployContainerApp=${{ parameters.deployContainerApp }} \
-              updatePsqlFlexibleServer=${{ parameters.updatePsqlFlexibleServer }} \
+              deployDataProcessor=${{ parameters.deployDataProcessor }} \
               dataProcessorFunctionAppExists=${{ parameters.dataProcessorExists }} \
               dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
               apiAppRegistrationClientId='$(apiAppRegistrationClientId)'

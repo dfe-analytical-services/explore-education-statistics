@@ -125,4 +125,4 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
 output managedIdentityName string = dataProcessorFunctionAppManagedIdentity.name
 output managedIdentityClientId string = dataProcessorFunctionAppManagedIdentity.properties.clientId
 output publicApiDataFileShareMountPath string = publicApiDataFileShareMountPath
-output url string = dataProcessorFunctionAppModule.outputs.url
+output stagingUrl string = dataProcessorFunctionAppModule.outputs.stagingUrl
