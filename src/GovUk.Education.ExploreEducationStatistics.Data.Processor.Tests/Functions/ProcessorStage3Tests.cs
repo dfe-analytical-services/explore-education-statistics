@@ -289,28 +289,28 @@ public class ProcessorStage3Tests
                 .Single(f => f.Type == FileType.Data
                              && f.SubjectId == import.File.SubjectId);
 
-            Assert.NotNull(file.DataSetFileMeta);
+            Assert.NotNull(file.DataSetFileMetaOld);
 
             // Checking against contents of small-csv.csv in Resources directory / _subject
-            var geographicLevel = Assert.Single(file.DataSetFileMeta.GeographicLevels);
+            var geographicLevel = Assert.Single(file.DataSetFileMetaOld.GeographicLevels);
             Assert.Equal(GeographicLevel.LocalAuthority, geographicLevel);
 
             Assert.Equal(TimeIdentifier.CalendarYear,
-                file.DataSetFileMeta.TimePeriodRange.Start.TimeIdentifier);
+                file.DataSetFileMetaOld.TimePeriodRange.Start.TimeIdentifier);
             Assert.Equal(TimeIdentifier.CalendarYear,
-                file.DataSetFileMeta.TimePeriodRange.End.TimeIdentifier);
-            Assert.Equal("2018", file.DataSetFileMeta.TimePeriodRange.Start.Period);
-            Assert.Equal("2025", file.DataSetFileMeta.TimePeriodRange.End.Period);
+                file.DataSetFileMetaOld.TimePeriodRange.End.TimeIdentifier);
+            Assert.Equal("2018", file.DataSetFileMetaOld.TimePeriodRange.Start.Period);
+            Assert.Equal("2025", file.DataSetFileMetaOld.TimePeriodRange.End.Period);
 
             // Checking against contents of small-csv.meta.csv / _subject
-            file.DataSetFileMeta.Filters
+            file.DataSetFileMetaOld.Filters
                 .Select(f => (f.Label, f.Hint, f.ColumnName)).ToList()
                 .AssertDeepEqualTo([
                     ("Filter one", "Hint 1", "filter_one"),
                     ("Filter two", null, "filter_two")
                 ]);
 
-            file.DataSetFileMeta.Indicators
+            file.DataSetFileMetaOld.Indicators
                 .Select(i => (i.Label, i.ColumnName)).ToList()
                 .AssertDeepEqualTo([
                     ("Indicator one", "indicator_one"),

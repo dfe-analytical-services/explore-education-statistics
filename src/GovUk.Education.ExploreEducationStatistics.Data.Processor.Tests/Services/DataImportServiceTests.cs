@@ -290,9 +290,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             {
                 var updatedFile = contentDbContext.Files.Single(f => f.SubjectId == subject.Id);
 
-                Assert.NotNull(updatedFile.DataSetFileMeta);
+                Assert.NotNull(updatedFile.DataSetFileMetaOld);
 
-                var meta = updatedFile.DataSetFileMeta;
+                var meta = updatedFile.DataSetFileMetaOld;
                 Assert.Equal(3, meta.GeographicLevels.Count);
                 Assert.Contains(GeographicLevel.Country, meta.GeographicLevels);
                 Assert.Contains(GeographicLevel.LocalAuthority, meta.GeographicLevels);

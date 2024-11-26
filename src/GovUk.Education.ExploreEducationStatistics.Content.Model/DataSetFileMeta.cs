@@ -8,26 +8,26 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public class DataSetFileMeta
+public class DataSetFileMetaOld
 {
     [JsonConverter(typeof(GeographicLevelsListJsonConverter))]
     public required List<GeographicLevel> GeographicLevels { get; set; }
 
-    public required TimePeriodRangeMeta TimePeriodRange { get; set; }
+    public required TimePeriodRangeMetaOld TimePeriodRange { get; set; }
 
-    public required List<FilterMeta> Filters { get; set; }
+    public required List<FilterMetaOld> Filters { get; set; }
 
-    public required List<IndicatorMeta> Indicators { get; set; }
+    public required List<IndicatorMetaOld> Indicators { get; set; }
 }
 
-public class TimePeriodRangeMeta
+public class TimePeriodRangeMetaOld
 {
-    public required TimePeriodRangeBoundMeta Start { get; set; }
+    public required TimePeriodRangeBoundMetaOld Start { get; set; }
 
-    public required TimePeriodRangeBoundMeta End { get; set; }
+    public required TimePeriodRangeBoundMetaOld End { get; set; }
 }
 
-public class TimePeriodRangeBoundMeta
+public class TimePeriodRangeBoundMetaOld
 {
     [JsonConverter(typeof(TimeIdentifierJsonConverter))]
     public required TimeIdentifier TimeIdentifier { get; set; }
@@ -35,7 +35,7 @@ public class TimePeriodRangeBoundMeta
     public required string Period { get; set; }
 }
 
-public class FilterMeta
+public class FilterMetaOld
 {
     public required Guid Id { get; set; }
 
@@ -46,7 +46,7 @@ public class FilterMeta
     public required string ColumnName { get; set; }
 }
 
-public class IndicatorMeta
+public class IndicatorMetaOld
 {
     public required Guid Id { get; set; }
 

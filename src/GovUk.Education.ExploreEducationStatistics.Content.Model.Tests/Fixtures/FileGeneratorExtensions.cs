@@ -81,7 +81,7 @@ public static class FileGeneratorExtensions
 
     public static Generator<File> WithDataSetFileMeta(
         this Generator<File> generator,
-        DataSetFileMeta? dataSetFileMeta)
+        DataSetFileMetaOld? dataSetFileMeta)
         => generator.ForInstance(s => s.SetDataSetFileMeta(dataSetFileMeta));
 
     public static InstanceSetters<File> SetDefaults(this InstanceSetters<File> setters, FileType? fileType)
@@ -110,7 +110,7 @@ public static class FileGeneratorExtensions
             .SetDefault(f => f.SubjectId)
             .SetContentType("text/csv")
             .SetDefault(f => f.DataSetFileId)
-            .Set(f => f.DataSetFileMeta, (_, _, context) => context.Fixture.DefaultDataSetFileMeta());
+            .Set(f => f.DataSetFileMetaOld, (_, _, context) => context.Fixture.DefaultDataSetFileMeta());
 
     public static InstanceSetters<File> SetMetaFileDefaults(this InstanceSetters<File> setters)
         => setters
@@ -198,6 +198,6 @@ public static class FileGeneratorExtensions
 
     public static InstanceSetters<File> SetDataSetFileMeta(
         this InstanceSetters<File> setters,
-        DataSetFileMeta? dataSetFileMeta)
-        => setters.Set(f => f.DataSetFileMeta, dataSetFileMeta);
+        DataSetFileMetaOld? dataSetFileMeta)
+        => setters.Set(f => f.DataSetFileMetaOld, dataSetFileMeta);
 }

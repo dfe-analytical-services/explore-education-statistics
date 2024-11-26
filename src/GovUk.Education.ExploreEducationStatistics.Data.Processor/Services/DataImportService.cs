@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .OrderBy(o => o.Year)
                 .ThenBy(o => o.TimeIdentifier)
                 .ToList()
-                .Select(tp => new TimePeriodRangeBoundMeta
+                .Select(tp => new TimePeriodRangeBoundMetaOld
                 {
                     Period = tp.Year.ToString(),
                     TimeIdentifier = tp.TimeIdentifier,
@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .AsNoTracking()
                 .Where(f => f.SubjectId == subjectId)
                 .OrderBy(f => f.Label)
-                .Select(f => new FilterMeta
+                .Select(f => new FilterMetaOld
                 {
                     Id = f.Id,
                     Label = f.Label,
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var indicators = await statisticsDbContext.Indicator
                 .AsNoTracking()
                 .Where(i => i.IndicatorGroup.SubjectId == subjectId)
-                .Select(i => new IndicatorMeta
+                .Select(i => new IndicatorMetaOld
                 {
                     Id = i.Id,
                     Label = i.Label,
@@ -204,10 +204,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .OrderBy(i => i.Label)
                 .ToListAsync();
 
-            var dataSetFileMeta = new DataSetFileMeta
+            var dataSetFileMeta = new DataSetFileMetaOld
             {
                 GeographicLevels = geographicLevels,
-                TimePeriodRange = new TimePeriodRangeMeta
+                TimePeriodRange = new TimePeriodRangeMetaOld
                 {
                     Start = timePeriods.First(),
                     End = timePeriods.Last(),
@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var file = contentDbContext.Files
                 .Single(f => f.Type == FileType.Data
                              && f.SubjectId == subjectId);
-            file.DataSetFileMeta = dataSetFileMeta;
+            file.DataSetFileMetaOld = dataSetFileMeta;
             await contentDbContext.SaveChangesAsync();
         }
     }
