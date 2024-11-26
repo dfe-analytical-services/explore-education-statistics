@@ -48,41 +48,37 @@ public class DataSetFilesController : ControllerBase
         {
             file.DataSetFileMetaNew = new DataSetFileMetaNew
             {
-                //GeographicLevels = ["test", "test"],
-                //GeographicLevels = [GeographicLevel.Country, GeographicLevel.LocalAuthority],
-                GeographicLevels = [new GeographicLevelMeta { Code = GeographicLevel.Country}, new GeographicLevelMeta { Code = GeographicLevel.LocalAuthority}],
+                GeographicLevels = file.DataSetFileMeta.GeographicLevels
+                    .Select(gl => new GeographicLevelMeta { Code = gl })
+                    .ToList(),
                 TimePeriodRange = new TimePeriodRangeMetaNew
                 {
                     Start = new TimePeriodRangeBoundMetaNew
                     {
-                        Period = "2000",
-                        TimeIdentifier = TimeIdentifier.April,
+                        Period = file.DataSetFileMeta.TimePeriodRange.Start.Period,
+                        TimeIdentifier = file.DataSetFileMeta.TimePeriodRange.Start.TimeIdentifier,
                     },
                     End = new TimePeriodRangeBoundMetaNew
                     {
-                        Period = "2001",
-                        TimeIdentifier = TimeIdentifier.May,
+                        Period = file.DataSetFileMeta.TimePeriodRange.End.Period,
+                        TimeIdentifier = file.DataSetFileMeta.TimePeriodRange.End.TimeIdentifier,
                     }
                 },
-                Filters = new List<FilterMetaNew>
-                {
-                    new FilterMetaNew
+                Filters = file.DataSetFileMeta.Filters
+                    .Select(filter => new FilterMetaNew
                     {
-                        FilterId = Guid.NewGuid(),
-                        Label = "label",
-                        ColumnName = "column_name",
-                        Hint = "hint",
-                    },
-                },
-                Indicators = new List<IndicatorMetaNew>
-                {
-                    new IndicatorMetaNew
+                        FilterId = filter.Id,
+                        Label = filter.Label,
+                        ColumnName = filter.ColumnName,
+                        Hint = filter.Hint,
+                    }).ToList(),
+                Indicators = file.DataSetFileMeta.Indicators
+                    .Select(i => new IndicatorMetaNew
                     {
-                        IndicatorId = Guid.NewGuid(),
-                        Label = "label",
-                        ColumnName = "column_name",
-                    },
-                },
+                        IndicatorId = i.Id,
+                        Label = i.Label,
+                        ColumnName = i.ColumnName,
+                    }).ToList(),
             };
         }
 

@@ -484,31 +484,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         gl.Property(gl => gl.Code)
                             .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
                     });
-                    //dsfm.Property(e => e.GeographicLevels)
-                    //    //.HasColumnType("text[]")
-                    //    .HasConversion(
-                    //        v => v
-                    //            .Select(EnumToEnumValueConverter<GeographicLevel>.ToProvider),
-                    //        v => v
-                    //            .Select(EnumToEnumValueConverter<GeographicLevel>.FromProvider),
-                    //        //v => EnumToEnumValueConverter<GeographicLevel>.EnumValueListToJsonStr(v),
-                    //        //v => EnumToEnumValueConverter<GeographicLevel>.JsonStrToEnumList(v),
-                    //        new ValueComparer<IEnumerable<GeographicLevel>>(
-                    //            (c1, c2) => c1!.SequenceEqual(c2!),
-                    //            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                    //            c => c.ToList())
-                    //    );
-                    //dsfm.Property(e => e.GeographicLevels)
-                    //    .HasColumnType("text")
-                    //    .HasConversion(
-                    //        v => EnumToEnumValueConverter<GeographicLevel>.EnumValueListToJsonStr(v),
-                    //        //v => v.Select(gl => gl.GetEnumValue()).JoinToString(","),
-                    //        v => EnumToEnumValueConverter<GeographicLevel>.JsonStrToEnumList(v),
-                    //        new ValueComparer<List<GeographicLevel>>(
-                    //            (c1, c2) => c1!.SequenceEqual(c2!),
-                    //            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                    //            c => c.ToList())
-                    //    );
                     dsfm.OwnsMany(e => e.Filters);
                     dsfm.OwnsMany(e => e.Indicators);
                 });
