@@ -452,6 +452,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         v => v.HasValue
                             ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
                             : null);
+                entity.OwnsOne(f => f.DataSetFileMeta, dsfm =>
+                {
+                    dsfm.ToJson();
+
+                    dsfm.OwnsMany(meta => meta.GeographicLevels, gl =>
+                    {
+                        gl.Property(geogLvl => geogLvl.Code)
+                            .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
+                    });
+                    dsfm.OwnsOne(meta => meta.TimePeriodRange, tpr =>
+                    {
+                        tpr.OwnsOne(range => range.Start, start =>
+                        {
+                            start.Property(s => s.TimeIdentifier)
+                                .HasColumnType("text")
+                                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
+                        });
+                        tpr.OwnsOne(range => range.End, end =>
+                        {
+                            end.Property(s => s.TimeIdentifier)
+                                .HasColumnType("text")
+                                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
+                        });
+                    });
+                    dsfm.OwnsMany(meta => meta.Filters);
+                    dsfm.OwnsMany(meta => meta.Indicators);
+                });
                 entity.Property(p => p.DataSetFileMetaOld)
                     .HasConversion( // You might want to use EF8 JSON support instead of this
                         v => JsonConvert.SerializeObject(v),
