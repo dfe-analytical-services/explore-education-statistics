@@ -135,7 +135,7 @@ public class DataSetFileService : IDataSetFileService
                 LastUpdated = result.Value.Published!.Value,
                 Api = BuildDataSetFileApiViewModel(result.Value),
                 Meta = BuildDataSetFileMetaViewModel(
-                    result.Value.File.DataSetFileMeta,
+                    result.Value.File.DataSetFileMetaOld,
                     result.Value.FilterSequence,
                     result.Value.IndicatorSequence),
             };
@@ -196,7 +196,7 @@ public class DataSetFileService : IDataSetFileService
 
         var dataCsvPreview = await GetDataCsvPreview(releaseFile);
 
-        var variables = GetVariables(releaseFile.File.DataSetFileMeta!);
+        var variables = GetVariables(releaseFile.File.DataSetFileMetaOld!);
 
         var footnotes = await _footnoteRepository.GetFootnotes(
             releaseFile.ReleaseVersionId,
@@ -234,7 +234,7 @@ public class DataSetFileService : IDataSetFileService
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
                 Meta = BuildDataSetFileMetaViewModel(
-                    releaseFile.File.DataSetFileMeta,
+                    releaseFile.File.DataSetFileMetaOld,
                     releaseFile.FilterSequence,
                     releaseFile.IndicatorSequence),
                 DataCsvPreview = dataCsvPreview,
@@ -276,7 +276,7 @@ public class DataSetFileService : IDataSetFileService
     }
 
     private static DataSetFileMetaViewModel BuildDataSetFileMetaViewModel(
-        DataSetFileMeta? meta,
+        DataSetFileMetaOld? meta,
         List<FilterSequenceEntry>? filterSequence,
         List<IndicatorGroupSequenceEntry>? indicatorGroupSequence)
     {
@@ -343,14 +343,14 @@ public class DataSetFileService : IDataSetFileService
         };
     }
 
-    private List<LabelValue> GetVariables(DataSetFileMeta meta)
+    private List<LabelValue> GetVariables(DataSetFileMetaOld metaOld)
     {
-        var filterVariables = meta.Filters
+        var filterVariables = metaOld.Filters
             .Select(filter => new LabelValue(
                 string.IsNullOrWhiteSpace(filter.Hint) ? filter.Label : $"{filter.Label} - {filter.Hint}",
                 filter.ColumnName))
             .ToList();
-        var indicatorVariables = meta.Indicators
+        var indicatorVariables = metaOld.Indicators
             .Select(indicator => new LabelValue(indicator.Label, indicator.ColumnName));
         return filterVariables.Concat(indicatorVariables)
             .OrderBy(variable => variable.Value)
@@ -358,7 +358,7 @@ public class DataSetFileService : IDataSetFileService
     }
 
     private static List<string> GetOrderedFilters(
-        List<FilterMeta> metaFilters, List<FilterSequenceEntry>? filterSequenceEntries)
+        List<FilterMetaOld> metaFilters, List<FilterSequenceEntry>? filterSequenceEntries)
     {
         var filterSequence = filterSequenceEntries?
             .Select(fs => fs.Id)
@@ -373,7 +373,7 @@ public class DataSetFileService : IDataSetFileService
     }
 
     private static List<string> GetOrderedIndicators(
-        List<IndicatorMeta> metaIndicators, List<IndicatorGroupSequenceEntry>? indicatorGroupSequenceEntries)
+        List<IndicatorMetaOld> metaIndicators, List<IndicatorGroupSequenceEntry>? indicatorGroupSequenceEntries)
     {
         var indicatorSequence = indicatorGroupSequenceEntries?
             .SelectMany(seq => seq.ChildSequence)

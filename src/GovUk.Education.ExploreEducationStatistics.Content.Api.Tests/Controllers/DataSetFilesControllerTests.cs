@@ -1548,14 +1548,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                                     .WithEnd("2002", TimeIdentifier.AcademicYear)
                             )
                             .WithFilters([
-                                new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "filter_1", },
-                                new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 2", ColumnName = "filter_2", },
-                                new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 3", ColumnName = "filter_3", },
+                                new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "filter_1", },
+                                new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 2", ColumnName = "filter_2", },
+                                new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 3", ColumnName = "filter_3", },
                             ])
                             .WithIndicators([
-                                new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "indicator_1", },
-                                new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 2", ColumnName = "indicator_2", },
-                                new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 3", ColumnName = "indicator_3", },
+                                new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "indicator_1", },
+                                new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 2", ColumnName = "indicator_2", },
+                                new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 3", ColumnName = "indicator_3", },
                             ])
                         ))
                     .Generate();
@@ -1579,7 +1579,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 var dataSetFileSummaryViewModel = Assert.Single(pagedResult.Results);
                 var dataSetFileMetaViewModel = dataSetFileSummaryViewModel.Meta;
 
-                var originalMeta = releaseFile.File.DataSetFileMeta;
+                var originalMeta = releaseFile.File.DataSetFileMetaOld;
 
                 Assert.Equal(originalMeta!.GeographicLevels
                         .Select(gl => gl.GetEnumLabel())
@@ -2028,7 +2028,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 $"{releaseFile.PublicApiDataSetVersion!.Major}.{releaseFile.PublicApiDataSetVersion.Minor}",
                 viewModel.Api.Version);
 
-            var dataSetFileMeta = file.DataSetFileMeta;
+            var dataSetFileMeta = file.DataSetFileMetaOld;
 
             Assert.Equal(dataSetFileMeta!.GeographicLevels
                     .Select(gl => gl.GetEnumLabel())
@@ -2153,9 +2153,9 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithFile(_fixture.DefaultFile(FileType.Data)
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithFilters([
-                            new FilterMeta { Id = filter3Id, Label = "Filter 3", ColumnName = "filter_3", },
-                            new FilterMeta { Id = filter1Id, Label = "Filter 1", ColumnName = "filter_1", },
-                            new FilterMeta { Id = filter2Id, Label = "Filter 2", ColumnName = "filter_2", },
+                            new FilterMetaOld { Id = filter3Id, Label = "Filter 3", ColumnName = "filter_3", },
+                            new FilterMetaOld { Id = filter1Id, Label = "Filter 1", ColumnName = "filter_1", },
+                            new FilterMetaOld { Id = filter2Id, Label = "Filter 2", ColumnName = "filter_2", },
                         ])));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -2213,10 +2213,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithFile(_fixture.DefaultFile(FileType.Data)
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithIndicators([
-                            new IndicatorMeta { Id = indicator3Id, Label = "Indicator 3", ColumnName = "indicator_3", },
-                            new IndicatorMeta { Id = indicator2Id, Label = "Indicator 2", ColumnName = "indicator_2", },
-                            new IndicatorMeta { Id = indicator1Id, Label = "Indicator 1", ColumnName = "indicator_1", },
-                            new IndicatorMeta { Id = indicator4Id, Label = "Indicator 4", ColumnName = "indicator_4", },
+                            new IndicatorMetaOld { Id = indicator3Id, Label = "Indicator 3", ColumnName = "indicator_3", },
+                            new IndicatorMetaOld { Id = indicator2Id, Label = "Indicator 2", ColumnName = "indicator_2", },
+                            new IndicatorMetaOld { Id = indicator1Id, Label = "Indicator 1", ColumnName = "indicator_1", },
+                            new IndicatorMetaOld { Id = indicator4Id, Label = "Indicator 4", ColumnName = "indicator_4", },
                         ])));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -2265,15 +2265,15 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithFile(_fixture.DefaultFile(FileType.Data)
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithFilters([
-                            new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "A_filter_1", Hint = "hint", },
-                            new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 2", ColumnName = "G_filter_2", },
-                            new FilterMeta { Id = Guid.NewGuid(), Label = "Filter 3", ColumnName = "C_filter_3", Hint = "Another hint", },
+                            new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "A_filter_1", Hint = "hint", },
+                            new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 2", ColumnName = "G_filter_2", },
+                            new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 3", ColumnName = "C_filter_3", Hint = "Another hint", },
                         ])
                         .WithIndicators([
-                            new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 3", ColumnName = "B_indicator_3", },
-                            new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 2", ColumnName = "E_indicator_2", },
-                            new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "D_indicator_1", },
-                            new IndicatorMeta { Id = Guid.NewGuid(), Label = "Indicator 4", ColumnName = "F_indicator_4", },
+                            new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 3", ColumnName = "B_indicator_3", },
+                            new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 2", ColumnName = "E_indicator_2", },
+                            new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "D_indicator_1", },
+                            new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 4", ColumnName = "F_indicator_4", },
                         ])));
 
             await TestApp.AddTestData<ContentDbContext>(context =>

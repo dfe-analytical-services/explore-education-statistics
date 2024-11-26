@@ -452,10 +452,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         v => v.HasValue
                             ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
                             : null);
-                entity.Property(p => p.DataSetFileMeta)
+                entity.Property(p => p.DataSetFileMetaOld)
                     .HasConversion( // You might want to use EF8 JSON support instead of this
                         v => JsonConvert.SerializeObject(v),
-                        v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
+                        v => JsonConvert.DeserializeObject<DataSetFileMetaOld>(v));
             });
         }
 
