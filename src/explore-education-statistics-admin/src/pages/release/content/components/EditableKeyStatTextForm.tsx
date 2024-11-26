@@ -7,7 +7,6 @@ import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import { KeyStatisticText } from '@common/services/publicationService';
 import React from 'react';
-import classNames from 'classnames';
 import Yup from '@common/validation/yup';
 
 export interface KeyStatTextFormValues {

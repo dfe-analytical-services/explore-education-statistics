@@ -29,7 +29,7 @@ const PageFooter = ({ wide }: Props) => (
             <li className="govuk-footer__inline-list-item">
               <Link
                 className="govuk-footer__link"
-                to="/privacy-notice"
+                to="https://www.gov.uk/government/organisations/department-for-education/about/personal-information-charter"
                 data-testid="footer--privacy-notice-link"
               >
                 Privacy notice
