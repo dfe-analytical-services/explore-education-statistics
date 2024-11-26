@@ -58,7 +58,7 @@ public class IndicatorMeta
     public required string ColumnName { get; set; }
 }
 
-public class DataSetFileMetaOld
+public class DataSetFileMetaOld // EES-5693 remove
 {
     [JsonConverter(typeof(GeographicLevelsListJsonConverter))]
     public required List<GeographicLevel> GeographicLevels { get; set; }
@@ -70,14 +70,14 @@ public class DataSetFileMetaOld
     public required List<IndicatorMetaOld> Indicators { get; set; }
 }
 
-public class TimePeriodRangeMetaOld
+public class TimePeriodRangeMetaOld // EES-5693 remove
 {
     public required TimePeriodRangeBoundMetaOld Start { get; set; }
 
     public required TimePeriodRangeBoundMetaOld End { get; set; }
 }
 
-public class TimePeriodRangeBoundMetaOld
+public class TimePeriodRangeBoundMetaOld // EES-5693 remove
 {
     [JsonConverter(typeof(TimeIdentifierJsonConverter))]
     public required TimeIdentifier TimeIdentifier { get; set; }
@@ -85,7 +85,7 @@ public class TimePeriodRangeBoundMetaOld
     public required string Period { get; set; }
 }
 
-public class FilterMetaOld
+public class FilterMetaOld // EES-5693 remove
 {
     public required Guid Id { get; set; }
 
@@ -96,7 +96,7 @@ public class FilterMetaOld
     public required string ColumnName { get; set; }
 }
 
-public class IndicatorMetaOld
+public class IndicatorMetaOld // EES-5693 remove
 {
     public required Guid Id { get; set; }
 

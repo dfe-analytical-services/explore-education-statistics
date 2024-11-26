@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .OrderBy(o => o.Year)
                 .ThenBy(o => o.TimeIdentifier)
                 .ToList()
-                .Select(tp => new TimePeriodRangeBoundMetaOld
+                .Select(tp => new TimePeriodRangeBoundMeta
                 {
                     Period = tp.Year.ToString(),
                     TimeIdentifier = tp.TimeIdentifier,
@@ -183,9 +183,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .AsNoTracking()
                 .Where(f => f.SubjectId == subjectId)
                 .OrderBy(f => f.Label)
-                .Select(f => new FilterMetaOld
+                .Select(f => new FilterMeta
                 {
-                    Id = f.Id,
+                    FilterId = f.Id,
                     Label = f.Label,
                     Hint = f.Hint,
                     ColumnName = f.Name,
@@ -195,19 +195,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var indicators = await statisticsDbContext.Indicator
                 .AsNoTracking()
                 .Where(i => i.IndicatorGroup.SubjectId == subjectId)
-                .Select(i => new IndicatorMetaOld
+                .Select(i => new IndicatorMeta
                 {
-                    Id = i.Id,
+                    IndicatorId = i.Id,
                     Label = i.Label,
                     ColumnName = i.Name,
                 })
                 .OrderBy(i => i.Label)
                 .ToListAsync();
 
-            var dataSetFileMeta = new DataSetFileMetaOld
+            var dataSetFileMeta = new DataSetFileMeta
             {
-                GeographicLevels = geographicLevels,
-                TimePeriodRange = new TimePeriodRangeMetaOld
+                GeographicLevels = geographicLevels
+                    .Select(gl => new GeographicLevelMeta { Code = gl })
+                    .ToList(),
+                TimePeriodRange = new TimePeriodRangeMeta
                 {
                     Start = timePeriods.First(),
                     End = timePeriods.Last(),
@@ -216,10 +218,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 Indicators = indicators,
             };
 
+            var dataSetFileMetaOld = new DataSetFileMetaOld
+            {
+                GeographicLevels = geographicLevels,
+                TimePeriodRange = new TimePeriodRangeMetaOld
+                {
+                    Start = new TimePeriodRangeBoundMetaOld
+                    {
+                        Period = timePeriods.First().Period,
+                        TimeIdentifier = timePeriods.First().TimeIdentifier,
+                    },
+                    End = new TimePeriodRangeBoundMetaOld
+                    {
+                        Period = timePeriods.Last().Period,
+                        TimeIdentifier = timePeriods.Last().TimeIdentifier,
+                    },
+                },
+                Filters = filters
+                    .Select(f => new FilterMetaOld
+                    {
+                        Id = f.FilterId,
+                        Label = f.Label,
+                        ColumnName = f.ColumnName,
+                        Hint = f.Hint,
+                    }).ToList(),
+                Indicators = indicators
+                    .Select(i => new IndicatorMetaOld
+                    {
+                        Id = i.IndicatorId,
+                        Label = i.Label,
+                        ColumnName = i.ColumnName,
+                    }).ToList(),
+            };
+
+
             var file = contentDbContext.Files
                 .Single(f => f.Type == FileType.Data
                              && f.SubjectId == subjectId);
-            file.DataSetFileMetaOld = dataSetFileMeta;
+            file.DataSetFileMeta = dataSetFileMeta;
+            file.DataSetFileMetaOld = dataSetFileMetaOld;
             await contentDbContext.SaveChangesAsync();
         }
     }

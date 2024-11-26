@@ -82,6 +82,7 @@ public class DataSetFileService : IDataSetFileService
             .HavingThemeId(themeId)
             .HavingPublicationIdOrNoSupersededPublication(publicationId)
             .HavingReleaseVersionId(releaseVersionId)
+            //.HavingGeographicLevel(GeographicLevel.LocalAuthority) // EES-5598
             .OfDataSetType(dataSetType.Value)
             .HavingLatestPublishedReleaseVersions(latestPublishedReleaseVersions, latestOnly.Value)
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
@@ -490,6 +491,15 @@ internal static class ReleaseFileQueryableExtensions
     {
         return releaseVersionId.HasValue ? query.Where(rf => rf.ReleaseVersionId == releaseVersionId.Value) : query;
     }
+
+    //internal static IQueryable<ReleaseFile> HavingGeographicLevel( // EES-5598
+    //    this IQueryable<ReleaseFile> query,
+    //    GeographicLevel? geographicLevel)
+    //{
+    //    return geographicLevel.HasValue
+    //        ? query.Where(rf => rf.File.DataSetFileMeta!.GeographicLevels.Any(gl => gl.Code == geographicLevel))
+    //        : query;
+    //}
 
     internal static IQueryable<ReleaseFile> OfDataSetType(
         this IQueryable<ReleaseFile> query,
