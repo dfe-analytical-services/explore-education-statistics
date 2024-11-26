@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -32,6 +33,11 @@ public static class MethodologyVersionGeneratorExtensions
         return generator;
     }
 
+    public static Generator<MethodologyVersion> WithPublished(
+        this Generator<MethodologyVersion> generator,
+        DateTime published)
+        => generator.ForInstance(d => d.SetPublished(published));
+
     public static InstanceSetters<MethodologyVersion> SetDefaults(this InstanceSetters<MethodologyVersion> setters)
         => setters
             .SetDefault(p => p.Id)
@@ -49,4 +55,9 @@ public static class MethodologyVersionGeneratorExtensions
         this InstanceSetters<MethodologyVersion> setters,
         MethodologyApprovalStatus approvalStatus)
         => setters.Set(mv => mv.Status, approvalStatus);
+
+    public static InstanceSetters<MethodologyVersion> SetPublished(
+        this InstanceSetters<MethodologyVersion> setters,
+        DateTime published)
+        => setters.Set(mv => mv.Published, published);
 }
