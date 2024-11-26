@@ -67,13 +67,19 @@ param dateProvisioned string = utcNow('u')
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string = ''
 
-@description('Can we deploy the Container App yet? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.')
-param deployContainerApp bool = true
+@description('Do the shared Private DNS Zones need creating or updating?')
+param deploySharedPrivateDnsZones bool = false
 
 // TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL
 // will redeploy even if no changes exist in this deploy from the previous one.
 @description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
 param deployPsqlFlexibleServer bool = false
+
+@description('Does the Public API Container App need creating or updating? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.')
+param deployContainerApp bool = true
+
+@description('Does the Data Processor need creating or updating?')
+param deployDataProcessor bool = true
 
 @description('Public URLs of other components in the service.')
 param publicUrls {
@@ -168,7 +174,8 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
-module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = {
+module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = 
+  if (deploySharedPrivateDnsZones || deployPsqlFlexibleServer || deployDataProcessor) {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
@@ -360,7 +367,7 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
   }
 }
 
-module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = {
+module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = if (deployDataProcessor) {
   name: 'publicApiDataProcessorApplicationModuleDeploy'
   params: {
     location: location
@@ -380,12 +387,19 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
 
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
-output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorModule.outputs.managedIdentityClientId
-output dataProcessorFunctionAppUrl string = dataProcessorModule.outputs.url
+
+output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor 
+  ? dataProcessorModule.outputs.managedIdentityClientId
+  : ''
+output dataProcessorFunctionAppUrl string = deployDataProcessor
+  ? dataProcessorModule.outputs.url
+  : ''
+
+output dataProcessorPublicApiDataFileShareMountPath string = deployDataProcessor
+  ? dataProcessorModule.outputs.publicApiDataFileShareMountPath
+  : ''
 
 output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreStorageConnectionStringSecretKey
 output keyVaultName string = resourceNames.existingResources.keyVault
-
-output dataProcessorPublicApiDataFileShareMountPath string = dataProcessorModule.outputs.publicApiDataFileShareMountPath
 
 output enableThemeDeletion bool = enableThemeDeletion
