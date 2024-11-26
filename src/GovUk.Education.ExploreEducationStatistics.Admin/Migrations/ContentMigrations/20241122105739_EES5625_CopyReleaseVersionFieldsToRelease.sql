@@ -11,7 +11,8 @@ FROM Releases
          INNER JOIN
      (SELECT RV2.ReleaseId, MAX(RV2.Version) AS Version
       FROM ReleaseVersions RV2
-      WHERE RV2.Published IS NOT NULL
-         OR (RV2.Published IS NULL AND RV2.Version = 0)
+      WHERE RV2.SoftDeleted = 0
+         AND (RV2.Published IS NOT NULL OR (RV2.Published IS NULL AND RV2.Version = 0))
       GROUP BY ReleaseId) LatestVersion
      ON ReleaseVersions.ReleaseId = LatestVersion.ReleaseId AND ReleaseVersions.Version = LatestVersion.Version
+WHERE ReleaseVersions.SoftDeleted = 0
