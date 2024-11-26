@@ -33,9 +33,10 @@ steps:
       azureSubscription: ${{ parameters.serviceConnection }}
       scriptType: bash
       scriptLocation: inlineScript
+      addSpnToEnvironment: true
       inlineScript: |
         set -e
-        
+
         az deployment group ${{ parameters.action }} \
           --name $(infraDeployName) \
           --resource-group $(resourceGroupName) \
@@ -58,4 +59,5 @@ steps:
               deployAlerts=${{ parameters.deployAlerts }} \
               dataProcessorFunctionAppExists=${{ parameters.dataProcessorExists }} \
               dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
-              apiAppRegistrationClientId='$(apiAppRegistrationClientId)'
+              apiAppRegistrationClientId='$(apiAppRegistrationClientId)' \
+              devopsServicePrincipalId="$servicePrincipalId"

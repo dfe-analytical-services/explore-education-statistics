@@ -18,6 +18,10 @@ param dataProcessorFunctionAppExists bool
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string
 
+@description('Specifies the principal id of the Azure DevOps SPN.')
+@secure()
+param devopsServicePrincipalId string
+
 @description('The IP address ranges that can access the Data Processor storage accounts.')
 param storageFirewallRules FirewallRule[]
 
@@ -42,7 +46,6 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
 }
 
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
-var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
 
 resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: resourceNames.publicApi.publicApiStorageAccount
@@ -84,10 +87,9 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       appRegistrationClientId: dataProcessorAppRegistrationClientId
       allowedClientIds: [
         adminAppClientId
+        devopsServicePrincipalId
       ]
-      allowedPrincipalIds: [
-        adminAppPrincipalId
-      ]
+      allowedPrincipalIds: []
       requireAuthentication: true
     }
     userAssignedManagedIdentityParams: {
@@ -123,4 +125,5 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
 output managedIdentityName string = dataProcessorFunctionAppManagedIdentity.name
 output managedIdentityClientId string = dataProcessorFunctionAppManagedIdentity.properties.clientId
 output publicApiDataFileShareMountPath string = publicApiDataFileShareMountPath
+output url string = dataProcessorFunctionAppModule.outputs.url
 output stagingUrl string = dataProcessorFunctionAppModule.outputs.stagingUrl
