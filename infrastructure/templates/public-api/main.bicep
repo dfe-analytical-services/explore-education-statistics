@@ -395,8 +395,8 @@ output dataProcessorPsqlConnectionStringSecretKey string = 'ees-publicapi-data-p
 output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor 
   ? dataProcessorModule.outputs.managedIdentityClientId
   : ''
-output dataProcessorFunctionAppUrl string = deployDataProcessor
-  ? dataProcessorModule.outputs.url
+output dataProcessorFunctionAppStagingUrl string = deployDataProcessor
+  ? dataProcessorModule.outputs.stagingUrl
   : ''
 
 output dataProcessorPublicApiDataFileShareMountPath string = deployDataProcessor

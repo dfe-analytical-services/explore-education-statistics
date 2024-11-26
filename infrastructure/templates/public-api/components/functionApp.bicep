@@ -201,20 +201,20 @@ var commonSiteProperties = {
     netFrameworkVersion: '8.0'
     linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
+    publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
+    // ipSecurityRestrictions: firewallRules
+    ipSecurityRestrictionsDefaultAction: 'Allow' // TODO Deny!
+    scmIpSecurityRestrictions: [
+      {
+        ipAddress: 'Any'
+        action: 'Allow'
+        priority: 2147483647
+        name: 'Allow all'
+        description: 'Allow all access'
+      }
+    ]
   }
   keyVaultReferenceIdentity: keyVaultReferenceIdentity
-  publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
-  // ipSecurityRestrictions: firewallRules
-  ipSecurityRestrictionsDefaultAction: 'Deny'
-  scmIpSecurityRestrictions: [
-    {
-      ipAddress: 'Any'
-      action: 'Allow'
-      priority: 2147483647
-      name: 'Allow all'
-      description: 'Allow all access'
-    }
-  ]
 }
 
 // Create the main production deploy slot.
@@ -386,6 +386,8 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnet
 }
 
 output functionAppName string = functionApp.name
-output url string = 'https://${functionApp.properties.defaultHostName}'output managementStorageAccountName string = sharedStorageAccountName
+output url string = 'https://${functionApp.properties.defaultHostName}'
+output stagingUrl string = 'https://${functionApp.name}-staging.azurewebsites.net'
+output managementStorageAccountName string = sharedStorageAccountName
 output slot1StorageAccountName string = slot1StorageAccountName
 output slot2StorageAccountName string = slot2StorageAccountName

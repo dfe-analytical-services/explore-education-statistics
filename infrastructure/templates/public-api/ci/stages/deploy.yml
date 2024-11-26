@@ -60,5 +60,4 @@ stages:
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
-          condition: eq(variables.deployDataProcessor, true)
           dependsOn: DeployPublicApiInfrastructure
