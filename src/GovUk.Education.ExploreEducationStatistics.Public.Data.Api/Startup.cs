@@ -274,6 +274,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // Routing / endpoints
 
+        app.UseStaticFiles();
         app.UseRouting();
 
         // Authentication and authorization
