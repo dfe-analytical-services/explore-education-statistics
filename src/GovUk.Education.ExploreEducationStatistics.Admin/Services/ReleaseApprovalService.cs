@@ -110,6 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(releaseVersion =>
                     _userService.CheckCanUpdateReleaseVersionStatus(releaseVersion, request.ApprovalStatus))
                 .OnSuccessDo(() => ValidatePublishDate(request))
+                .OnSuccessDo(() => RemoveUnusedImages(releaseVersionId))
                 .OnSuccess(async releaseVersion =>
                 {
                     if (request.ApprovalStatus != ReleaseApprovalStatus.Approved && releaseVersion.Published.HasValue)
@@ -141,7 +142,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return await
                         ValidateReleaseWithChecklist(releaseVersion)
-                        .OnSuccess(() => RemoveUnusedImages(releaseVersion.Id))
                         .OnSuccess(() =>
                             SendEmailNotificationsAndInvites(request, releaseVersion)
                             .OnSuccess(() => NotifyPublisher(releasePublishingKey, request, oldStatus))
@@ -247,14 +247,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(Guid releaseVersionId)
         {
-            return await _contentService.GetContentBlocks<HtmlBlock>(releaseVersionId)
+            return await _contentService
+                .GetContentBlocks<HtmlBlock>(releaseVersionId)
                 .OnSuccess(async contentBlocks =>
                 {
                     var contentImageIds = contentBlocks.SelectMany(contentBlock =>
                             HtmlImageUtil.GetReleaseImages(contentBlock.Body))
                         .Distinct();
 
-                    var imageFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, types: FileType.Image);
+                    var imageFiles = await _releaseFileRepository
+                        .GetByFileType(releaseVersionId, types: FileType.Image);
 
                     var unusedImages = imageFiles
                         .Where(file => !contentImageIds.Contains(file.File.Id))
@@ -263,7 +265,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (unusedImages.Any())
                     {
-                        return await _releaseFileService.Delete(releaseVersionId, unusedImages);
+                        return await _releaseFileService.Delete(
+                            releaseVersionId: releaseVersionId,
+                            fileIds: unusedImages,
+                            forceDelete: true);
                     }
 
                     return Unit.Instance;
