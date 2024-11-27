@@ -31,3 +31,4 @@ param publicApiContainerAppWorkloadProfiles = [{
 }]
 
 param enableThemeDeletion = true
+param enableSwagger = true

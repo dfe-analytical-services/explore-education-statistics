@@ -41,6 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 [ExcludeFromCodeCoverage]
 public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
 {
+    private readonly AppOptions _appOptions = configuration
+        .GetRequiredSection(AppOptions.Section)
+        .Get<AppOptions>()!;
+
     private readonly MiniProfilerOptions _miniProfilerOptions = configuration
         .GetRequiredSection(MiniProfilerOptions.Section)
         .Get<MiniProfilerOptions>()!;
@@ -297,7 +301,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // Swagger
 
-        if (!hostEnvironment.IsIntegrationTest())
+        if (_appOptions.EnableSwagger)
         {
             app.UseSwagger(options =>
             {
