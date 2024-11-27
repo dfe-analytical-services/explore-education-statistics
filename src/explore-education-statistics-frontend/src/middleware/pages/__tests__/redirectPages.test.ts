@@ -134,6 +134,45 @@ describe('redirectPages', () => {
       },
     ];
 
+  const testRedirectDataWithChildRoute: TestDataWithoutRedirect[] = [
+    {
+      routePattern: `methodology/${slugPlaceholder}/child-route`,
+      fromSlug: testRedirects.methodologies[0].fromSlug,
+    },
+    {
+      routePattern: `find-statistics/${slugPlaceholder}/data-guidance/child-route`,
+      fromSlug: testRedirects.publications[0].fromSlug,
+    },
+    {
+      routePattern: `find-statistics/${slugPlaceholder}/prerelease-access-list/child-route`,
+      fromSlug: testRedirects.publications[0].fromSlug,
+    },
+    {
+      routePattern: `find-statistics/publication-slug/${slugPlaceholder}/child-route`,
+      fromSlug: testRedirects.releases[0].fromSlug,
+    },
+    {
+      routePattern: `find-statistics/publication-slug/${slugPlaceholder}/data-guidance/child-route`,
+      fromSlug: testRedirects.releases[0].fromSlug,
+    },
+    {
+      routePattern: `find-statistics/publication-slug/${slugPlaceholder}/prerelease-access-list/child-route`,
+      fromSlug: testRedirects.releases[0].fromSlug,
+    },
+    {
+      routePattern: `data-tables/${slugPlaceholder}/fast-track/child-route/child-route`,
+      fromSlug: testRedirects.publications[0].fromSlug,
+    },
+    {
+      routePattern: `data-tables/${slugPlaceholder}/permalink/child-route/child-route`,
+      fromSlug: testRedirects.publications[0].fromSlug,
+    },
+    {
+      routePattern: `data-tables/publication-slug/${slugPlaceholder}/child-route`,
+      fromSlug: testRedirects.releases[0].fromSlug,
+    },
+  ];
+
   let redirectSpy: jest.SpyInstance;
   const nextSpy = jest.spyOn(NextResponse, 'next');
 
@@ -155,251 +194,274 @@ describe('redirectPages', () => {
     });
   });
 
-  test('does not check for redirects for non release or methodology pages', async () => {
-    await runMiddleware(redirectPages, 'https://my-env/find-statistics');
+  describe('General Checks', () => {
+    it.each(testRedirectData)(
+      'does not re-request the list of redirects once it has been fetched',
+      async redirectData => {
+        redirectService.list.mockResolvedValue(testRedirects);
 
-    expect(redirectService.list).not.toHaveBeenCalled();
-    expect(redirectSpy).not.toHaveBeenCalled();
-    expect(nextSpy).toHaveBeenCalledTimes(1);
+        const route = buildRoute(redirectData.routePattern, 'original-slug');
 
-    await runMiddleware(redirectPages, 'https://my-env/methodology');
+        await runMiddleware(redirectPages, `https://my-env/${route}`);
 
-    expect(redirectService.list).not.toHaveBeenCalled();
-    expect(redirectSpy).not.toHaveBeenCalled();
-    expect(nextSpy).toHaveBeenCalledTimes(2);
+        expect(redirectService.list).toHaveBeenCalledTimes(1);
 
-    await runMiddleware(redirectPages, 'https://my-env/data-tables');
+        const anotherRoute = buildRoute(
+          redirectData.routePattern,
+          'another-slug',
+        );
 
-    expect(redirectService.list).not.toHaveBeenCalled();
-    expect(redirectSpy).not.toHaveBeenCalled();
-    expect(nextSpy).toHaveBeenCalledTimes(3);
-  });
+        await runMiddleware(redirectPages, `https://my-env/${anotherRoute}`);
 
-  test('redirects urls with uppercase characters to lowercase', async () => {
-    redirectService.list.mockResolvedValue(testRedirects);
-    await runMiddleware(redirectPages, 'https://my-env/Find-Statistics');
-
-    expect(redirectSpy).toHaveBeenCalledTimes(1);
-    expect(redirectSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        href: 'https://my-env/find-statistics',
-      }),
-      301,
-    );
-    expect(nextSpy).not.toHaveBeenCalled();
-
-    await runMiddleware(
-      redirectPages,
-      'https://my-env/find-statistics/RELEASE-NAME?testParam=Something',
+        expect(redirectService.list).toHaveBeenCalledTimes(1);
+      },
     );
 
-    expect(redirectSpy).toHaveBeenCalledTimes(2);
-    expect(redirectSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        href: 'https://my-env/find-statistics/release-name?testParam=Something',
-      }),
-      301,
-    );
-    expect(nextSpy).not.toHaveBeenCalled();
-  });
+    test('does not check for redirects for non release/publication/methodology pages', async () => {
+      await runMiddleware(redirectPages, 'https://my-env/find-statistics');
 
-  it.each(testRedirectData)(
-    'does not re-request the list of redirects once it has been fetched',
-    async redirectData => {
-      redirectService.list.mockResolvedValue(testRedirects);
-
-      const route = buildRoute(redirectData.routePattern, 'original-slug');
-
-      await runMiddleware(redirectPages, `https://my-env/${route}`);
-
-      expect(redirectService.list).toHaveBeenCalledTimes(1);
-
-      const anotherRoute = buildRoute(
-        redirectData.routePattern,
-        'another-slug',
-      );
-
-      await runMiddleware(redirectPages, `https://my-env/${anotherRoute}`);
-
-      expect(redirectService.list).toHaveBeenCalledTimes(1);
-    },
-  );
-
-  it.each(testRedirectData)(
-    'redirects the request when the slug for the requested page has changed',
-    async redirectData => {
-      redirectService.list.mockResolvedValue(testRedirects);
-
-      const fromRoute = buildRoute(
-        redirectData.routePattern,
-        redirectData.fromSlug,
-      );
-      const toRoute = buildRoute(
-        redirectData.routePattern,
-        redirectData.toSlug,
-      );
-
-      await runMiddleware(redirectPages, `https://my-env/${fromRoute}`);
-
-      expect(redirectSpy).toHaveBeenCalledTimes(1);
-      expect(redirectSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          href: `https://my-env/${toRoute}`,
-        }),
-        301,
-      );
-      expect(nextSpy).not.toHaveBeenCalled();
-    },
-  );
-
-  it.each(testRedirectData)(
-    'redirects the request when the slug for the requested page has changed, and the url has a trailing slash',
-    async redirectData => {
-      redirectService.list.mockResolvedValue(testRedirects);
-
-      const fromRoute = buildRoute(
-        redirectData.routePattern,
-        redirectData.fromSlug,
-      );
-      const toRoute = buildRoute(
-        redirectData.routePattern,
-        redirectData.toSlug,
-      );
-
-      await runMiddleware(redirectPages, `https://my-env/${fromRoute}/`);
-
-      expect(redirectSpy).toHaveBeenCalledTimes(1);
-      expect(redirectSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          href: `https://my-env/${toRoute}/`,
-        }),
-        301,
-      );
-      expect(nextSpy).not.toHaveBeenCalled();
-    },
-  );
-
-  it.each(testRedirectData)(
-    'does not redirect when the slug for the requested page has not changed',
-    async redirectData => {
-      redirectService.list.mockResolvedValue(testRedirects);
-
-      const route = buildRoute(
-        redirectData.routePattern,
-        'slug-with-no-redirect',
-      );
-
-      await runMiddleware(redirectPages, `https://my-env/${route}`);
-
-      expect(redirectSpy).not.toHaveBeenCalled();
-      expect(nextSpy).toHaveBeenCalledTimes(1);
-    },
-  );
-
-  it.each(testRedirectData)(
-    'does not redirect if the `fromSlug` only partially matches',
-    async redirectData => {
-      redirectService.list.mockResolvedValue(testRedirects);
-
-      const routeWithRedirectSlugSubstring = buildRoute(
-        redirectData.routePattern,
-        redirectData.fromSlug.substring(0, redirectData.fromSlug.length - 1),
-      );
-
-      await runMiddleware(
-        redirectPages,
-        `https://my-env/${routeWithRedirectSlugSubstring}`,
-      );
-
+      expect(redirectService.list).not.toHaveBeenCalled();
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(1);
 
-      const routeWithRedirectSlugWithSuffix = buildRoute(
-        redirectData.routePattern,
-        `${redirectData.fromSlug}-extra-suffix`,
-      );
+      await runMiddleware(redirectPages, 'https://my-env/methodology');
 
-      await runMiddleware(
-        redirectPages,
-        `https://my-env/${routeWithRedirectSlugWithSuffix}`,
-      );
-
+      expect(redirectService.list).not.toHaveBeenCalled();
       expect(redirectSpy).not.toHaveBeenCalled();
       expect(nextSpy).toHaveBeenCalledTimes(2);
-    },
-  );
 
-  it.each(testRedirectData)(
-    'redirects with query params',
-    async redirectData => {
+      await runMiddleware(redirectPages, 'https://my-env/data-tables');
+
+      expect(redirectService.list).not.toHaveBeenCalled();
+      expect(redirectSpy).not.toHaveBeenCalled();
+      expect(nextSpy).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe('Does Redirect', () => {
+    test('redirects non-redirect urls with uppercase characters to lowercase', async () => {
       redirectService.list.mockResolvedValue(testRedirects);
+      await runMiddleware(redirectPages, 'https://my-env/Find-Statistics');
 
-      const fromRoute = buildRoute(
-        redirectData.routePattern,
-        redirectData.fromSlug,
+      expect(redirectSpy).toHaveBeenCalledTimes(1);
+      expect(redirectSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          href: 'https://my-env/find-statistics',
+        }),
+        301,
       );
-      const toRoute = buildRoute(
-        redirectData.routePattern,
-        redirectData.toSlug,
-      );
+      expect(nextSpy).not.toHaveBeenCalled();
 
       await runMiddleware(
         redirectPages,
-        `https://my-env/${fromRoute}?search=something`,
+        'https://my-env/find-statistics/RELEASE-NAME?testParam=Something',
       );
 
-      expect(redirectSpy).toHaveBeenCalledTimes(1);
+      expect(redirectSpy).toHaveBeenCalledTimes(2);
       expect(redirectSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          href: `https://my-env/${toRoute}?search=something`,
+          href: 'https://my-env/find-statistics/release-name?testParam=Something',
         }),
         301,
       );
       expect(nextSpy).not.toHaveBeenCalled();
-    },
-  );
+    });
 
-  it.each(testRedirectDataWithFromSlugMatchingAnotherRedirectType)(
-    'does not redirect when the slug matches a `fromSlug` in a different redirect type',
-    async redirectData => {
-      redirectService.list.mockResolvedValue(testRedirects);
+    it.each(testRedirectData)(
+      'redirects the request when the slug for the requested page has changed',
+      async redirectData => {
+        redirectService.list.mockResolvedValue(testRedirects);
 
-      const route = buildRoute(
-        redirectData.routePattern,
-        redirectData.fromSlug,
-      );
+        const fromRoute = buildRoute(
+          redirectData.routePattern,
+          redirectData.fromSlug,
+        );
+        const toRoute = buildRoute(
+          redirectData.routePattern,
+          redirectData.toSlug,
+        );
 
-      await runMiddleware(redirectPages, `https://my-env/${route}`);
+        await runMiddleware(redirectPages, `https://my-env/${fromRoute}`);
 
-      expect(redirectSpy).not.toHaveBeenCalled();
-      expect(nextSpy).toHaveBeenCalledTimes(1);
-    },
-  );
+        expect(redirectSpy).toHaveBeenCalledTimes(1);
+        expect(redirectSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            href: `https://my-env/${toRoute}`,
+          }),
+          301,
+        );
+        expect(nextSpy).not.toHaveBeenCalled();
+      },
+    );
 
-  it.each(testRedirectData)(
-    'redirects with uppercase characters',
-    async redirectData => {
-      redirectService.list.mockResolvedValue(testRedirects);
+    it.each(testRedirectData)(
+      'redirects the request when the slug for the requested page has changed, and the url has a trailing slash',
+      async redirectData => {
+        redirectService.list.mockResolvedValue(testRedirects);
 
-      const fromRoute = buildRoute(
-        redirectData.routePattern,
-        redirectData.fromSlug.toUpperCase(),
-      );
-      const toRoute = buildRoute(
-        redirectData.routePattern,
-        redirectData.toSlug,
-      );
+        const fromRoute = buildRoute(
+          redirectData.routePattern,
+          redirectData.fromSlug,
+        );
+        const toRoute = buildRoute(
+          redirectData.routePattern,
+          redirectData.toSlug,
+        );
 
-      await runMiddleware(redirectPages, `https://my-env/${fromRoute}`);
+        await runMiddleware(redirectPages, `https://my-env/${fromRoute}/`);
 
-      expect(redirectSpy).toHaveBeenCalledTimes(1);
-      expect(redirectSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          href: `https://my-env/${toRoute}`,
-        }),
-        301,
-      );
-      expect(nextSpy).not.toHaveBeenCalled();
-    },
-  );
+        expect(redirectSpy).toHaveBeenCalledTimes(1);
+        expect(redirectSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            href: `https://my-env/${toRoute}/`,
+          }),
+          301,
+        );
+        expect(nextSpy).not.toHaveBeenCalled();
+      },
+    );
+
+    it.each(testRedirectData)(
+      'redirects with query params',
+      async redirectData => {
+        redirectService.list.mockResolvedValue(testRedirects);
+
+        const fromRoute = buildRoute(
+          redirectData.routePattern,
+          redirectData.fromSlug,
+        );
+        const toRoute = buildRoute(
+          redirectData.routePattern,
+          redirectData.toSlug,
+        );
+
+        await runMiddleware(
+          redirectPages,
+          `https://my-env/${fromRoute}?search=something`,
+        );
+
+        expect(redirectSpy).toHaveBeenCalledTimes(1);
+        expect(redirectSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            href: `https://my-env/${toRoute}?search=something`,
+          }),
+          301,
+        );
+        expect(nextSpy).not.toHaveBeenCalled();
+      },
+    );
+
+    it.each(testRedirectData)(
+      'redirects with uppercase characters',
+      async redirectData => {
+        redirectService.list.mockResolvedValue(testRedirects);
+
+        const fromRoute = buildRoute(
+          redirectData.routePattern,
+          redirectData.fromSlug,
+        ).toUpperCase();
+        const toRoute = buildRoute(
+          redirectData.routePattern,
+          redirectData.toSlug,
+        );
+
+        await runMiddleware(redirectPages, `https://my-env/${fromRoute}`);
+
+        expect(redirectSpy).toHaveBeenCalledTimes(1);
+        expect(redirectSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            href: `https://my-env/${toRoute}`,
+          }),
+          301,
+        );
+        expect(nextSpy).not.toHaveBeenCalled();
+      },
+    );
+  });
+
+  describe('Does Not Redirect', () => {
+    it.each(testRedirectData)(
+      'does not redirect when the slug for the requested page has not changed',
+      async redirectData => {
+        redirectService.list.mockResolvedValue(testRedirects);
+
+        const route = buildRoute(
+          redirectData.routePattern,
+          'slug-with-no-redirect',
+        );
+
+        await runMiddleware(redirectPages, `https://my-env/${route}`);
+
+        expect(redirectSpy).not.toHaveBeenCalled();
+        expect(nextSpy).toHaveBeenCalledTimes(1);
+      },
+    );
+
+    it.each(testRedirectDataWithChildRoute)(
+      'does not redirect the request for child-routes not explicitly accounted for, when the slug has changed',
+      async redirectData => {
+        redirectService.list.mockResolvedValue(testRedirects);
+
+        const route = buildRoute(
+          redirectData.routePattern,
+          redirectData.fromSlug,
+        );
+
+        await runMiddleware(redirectPages, `https://my-env/${route}`);
+
+        expect(redirectSpy).not.toHaveBeenCalled();
+        expect(nextSpy).toHaveBeenCalledTimes(1);
+      },
+    );
+
+    it.each(testRedirectData)(
+      'does not redirect if the `fromSlug` only partially matches',
+      async redirectData => {
+        redirectService.list.mockResolvedValue(testRedirects);
+
+        const routeWithRedirectSlugSubstring = buildRoute(
+          redirectData.routePattern,
+          redirectData.fromSlug.substring(0, redirectData.fromSlug.length - 1),
+        );
+
+        await runMiddleware(
+          redirectPages,
+          `https://my-env/${routeWithRedirectSlugSubstring}`,
+        );
+
+        expect(redirectSpy).not.toHaveBeenCalled();
+        expect(nextSpy).toHaveBeenCalledTimes(1);
+
+        const routeWithRedirectSlugWithSuffix = buildRoute(
+          redirectData.routePattern,
+          `${redirectData.fromSlug}-extra-suffix`,
+        );
+
+        await runMiddleware(
+          redirectPages,
+          `https://my-env/${routeWithRedirectSlugWithSuffix}`,
+        );
+
+        expect(redirectSpy).not.toHaveBeenCalled();
+        expect(nextSpy).toHaveBeenCalledTimes(2);
+      },
+    );
+
+    it.each(testRedirectDataWithFromSlugMatchingAnotherRedirectType)(
+      'does not redirect when the slug matches a `fromSlug` in a different redirect type',
+      async redirectData => {
+        redirectService.list.mockResolvedValue(testRedirects);
+
+        const route = buildRoute(
+          redirectData.routePattern,
+          redirectData.fromSlug,
+        );
+
+        await runMiddleware(redirectPages, `https://my-env/${route}`);
+
+        expect(redirectSpy).not.toHaveBeenCalled();
+        expect(nextSpy).toHaveBeenCalledTimes(1);
+      },
+    );
+  });
 });
