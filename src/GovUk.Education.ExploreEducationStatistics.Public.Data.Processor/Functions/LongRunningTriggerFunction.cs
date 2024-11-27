@@ -9,8 +9,8 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class LogRunningTriggerFunction(
-    ILogger<LogRunningTriggerFunction> logger)
+public class LongRunningTriggerFunction(
+    ILogger<LongRunningTriggerFunction> logger)
 {
     [Function(nameof(TriggerLongRunningOrchestration))]
     public async Task<IActionResult> TriggerLongRunningOrchestration(

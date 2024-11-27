@@ -6,6 +6,7 @@ parameters:
       - master
       - dev
       - test
+      - EES-5446-prevent-function-app-slot-swap-until-orchestrations-complete
 
 variables:
   BuildConfiguration: Release
@@ -59,64 +60,64 @@ jobs:
       #     custom: format whitespace src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error
       #     arguments: --verify-no-changes --verbosity diagnostic
 
-      - task: DotNetCoreCLI@2
-        displayName: Verify Formatting and Style
-        inputs:
-          command: custom
-          custom: format
-          ## TODO: Remove "--severity error" once style formatter has been run across project
-          arguments: style --verify-no-changes --verbosity diagnostic --severity error
-          projects: src/GovUk.Education.ExploreEducationStatistics.sln
-
-      - task: DotNetCoreCLI@2
-        displayName: Verify Formatting and Style
-        inputs:
-          command: custom
-          custom: format
-          ## TODO: Remove "--severity error" once work has been done to resolve build warnings (https://dfedigital.atlassian.net/browse/EES-4594).
-          arguments: analyzers --verify-no-changes --verbosity diagnostic --severity error
-          projects: src/GovUk.Education.ExploreEducationStatistics.sln
+#      - task: DotNetCoreCLI@2
+#        displayName: Verify Formatting and Style
+#        inputs:
+#          command: custom
+#          custom: format
+#          ## TODO: Remove "--severity error" once style formatter has been run across project
+#          arguments: style --verify-no-changes --verbosity diagnostic --severity error
+#          projects: src/GovUk.Education.ExploreEducationStatistics.sln
+#
+#      - task: DotNetCoreCLI@2
+#        displayName: Verify Formatting and Style
+#        inputs:
+#          command: custom
+#          custom: format
+#          ## TODO: Remove "--severity error" once work has been done to resolve build warnings (https://dfedigital.atlassian.net/browse/EES-4594).
+#          arguments: analyzers --verify-no-changes --verbosity diagnostic --severity error
+#          projects: src/GovUk.Education.ExploreEducationStatistics.sln
 
       # TODO: Wrap these ^ three tasks up into a single `dotnet format` task once all 3 above TODOs are TO-DONE ;)
 
-      - task: DotNetCoreCLI@2
-        displayName: Test
-        inputs:
-          command: test
-          projects: |
-            **/GovUk.*[Tt]ests/*.csproj
-            !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
-          arguments: --configuration $(BuildConfiguration)
-
-      - task: DotNetCoreCLI@2
-        displayName: Package Data API
-        inputs:
-          command: publish
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
-          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/data-api
-          zipAfterPublish: True
-
-      - task: PublishPipelineArtifact@0
-        displayName: Publish Data API artifact
-        inputs:
-          artifactName: data-api
-          targetPath: $(Build.ArtifactStagingDirectory)/data-api
-
-      - task: DotNetCoreCLI@2
-        displayName: Package Content API
-        inputs:
-          command: publish
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
-          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/content-api
-          zipAfterPublish: True
-
-      - task: PublishPipelineArtifact@0
-        displayName: Publish Content API artifact
-        inputs:
-          artifactName: content-api
-          targetPath: $(Build.ArtifactStagingDirectory)/content-api
+#      - task: DotNetCoreCLI@2
+#        displayName: Test
+#        inputs:
+#          command: test
+#          projects: |
+#            **/GovUk.*[Tt]ests/*.csproj
+#            !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
+#          arguments: --configuration $(BuildConfiguration)
+#
+#      - task: DotNetCoreCLI@2
+#        displayName: Package Data API
+#        inputs:
+#          command: publish
+#          publishWebProjects: false
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
+#          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/data-api
+#          zipAfterPublish: True
+#
+#      - task: PublishPipelineArtifact@0
+#        displayName: Publish Data API artifact
+#        inputs:
+#          artifactName: data-api
+#          targetPath: $(Build.ArtifactStagingDirectory)/data-api
+#
+#      - task: DotNetCoreCLI@2
+#        displayName: Package Content API
+#        inputs:
+#          command: publish
+#          publishWebProjects: false
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
+#          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/content-api
+#          zipAfterPublish: True
+#
+#      - task: PublishPipelineArtifact@0
+#        displayName: Publish Content API artifact
+#        inputs:
+#          artifactName: content-api
+#          targetPath: $(Build.ArtifactStagingDirectory)/content-api
 
       - task: DotNetCoreCLI@2
         displayName: Package Public API
@@ -166,260 +167,260 @@ jobs:
           artifactName: public-api-data-processor
           targetPath: $(Build.ArtifactStagingDirectory)/public-api-data-processor
 
-      - task: DotNetCoreCLI@2
-        displayName: Package Notifier Function
-        inputs:
-          command: publish
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
-          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/notifier
-          zipAfterPublish: True
+#      - task: DotNetCoreCLI@2
+#        displayName: Package Notifier Function
+#        inputs:
+#          command: publish
+#          publishWebProjects: false
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
+#          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/notifier
+#          zipAfterPublish: True
+#
+#      - task: PublishPipelineArtifact@0
+#        displayName: Publish Notifier artifact
+#        inputs:
+#          artifactName: notifier
+#          targetPath: $(Build.ArtifactStagingDirectory)/notifier
+#
+#      - task: DotNetCoreCLI@2
+#        displayName: Package Publisher Function
+#        inputs:
+#          command: publish
+#          publishWebProjects: false
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
+#          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/publisher
+#          zipAfterPublish: True
+#
+#      - task: PublishPipelineArtifact@0
+#        displayName: Publish Publisher artifact
+#        inputs:
+#          artifactName: publisher
+#          targetPath: $(Build.ArtifactStagingDirectory)/publisher
+#
+#      - task: DotNetCoreCLI@2
+#        displayName: Package Processor Function
+#        inputs:
+#          command: publish
+#          publishWebProjects: false
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
+#          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/processor
+#          zipAfterPublish: True
+#
+#      - task: PublishPipelineArtifact@0
+#        displayName: Publish Processor artifact
+#        inputs:
+#          artifactName: processor
+#          targetPath: $(Build.ArtifactStagingDirectory)/processor
 
-      - task: PublishPipelineArtifact@0
-        displayName: Publish Notifier artifact
-        inputs:
-          artifactName: notifier
-          targetPath: $(Build.ArtifactStagingDirectory)/notifier
+#  - job: Admin
+#    pool: ees-ubuntu2204-xlarge
+#    workspace:
+#      clean: all
+#    steps:
+#      - task: UseNode@1
+#        displayName: Install Node.js $(NodeVersion)
+#        inputs:
+#          version: $(NodeVersion)
+#
+#      - task: Bash@3
+#        displayName: corepack enable
+#        inputs:
+#          workingDir: .
+#          targetType: inline
+#          script: corepack enable
+#
+#      - task: UseDotNet@2
+#        displayName: Install .NET 8.0 SDK
+#        inputs:
+#          version: 8.0.x
+#          performMultiLevelLookup: true
+#
+#      - task: DotNetCoreCLI@2
+#        displayName: Build
+#        inputs:
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
+#          arguments: --configuration $(BuildConfiguration)
+#
+#      - task: DotNetCoreCLI@2
+#        displayName: Test
+#        inputs:
+#          command: test
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
+#          arguments: --configuration $(BuildConfiguration) --collect "Code coverage"
+#
+#      - task: Bash@3
+#        displayName: pnpm i
+#        inputs:
+#          targetType: inline
+#          script: pnpm i
+#
+#      - task: Bash@3
+#        displayName: pnpm run build
+#        inputs:
+#          targetType: inline
+#          script: pnpm --filter=explore-education-statistics-admin run build
+#
+#      - task: CopyFiles@2
+#        displayName: Copy files to wwwroot
+#        inputs:
+#          SourceFolder: src/explore-education-statistics-admin/build
+#          TargetFolder: src/GovUk.Education.ExploreEducationStatistics.Admin/wwwroot
+#
+#      - task: DotNetCoreCLI@2
+#        displayName: Package Admin app
+#        inputs:
+#          command: publish
+#          publishWebProjects: false
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
+#          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
+#
+#      - task: PublishPipelineArtifact@0
+#        displayName: Publish Admin artifact
+#        inputs:
+#          artifactName: admin
+#          targetPath: $(Build.ArtifactStagingDirectory)
+#
+#  - job: Frontend
+#    pool: ees-ubuntu2204-xlarge
+#    workspace:
+#      clean: all
+#    steps:
+#      - task: UseNode@1
+#        displayName: Install Node.js $(NodeVersion)
+#        inputs:
+#          version: $(NodeVersion)
+#
+#      - task: Bash@3
+#        displayName: corepack enable
+#        inputs:
+#          workingDir: .
+#          targetType: inline
+#          script: corepack enable
+#
+#      - task: Bash@3
+#        displayName: pnpm i
+#        inputs:
+#          workingDir: .
+#          targetType: inline
+#          script: pnpm i
+#
+#      - task: Bash@3
+#        displayName: pnpm tsc
+#        inputs:
+#          workingDir: .
+#          targetType: inline
+#          script: pnpm tsc
+#
+#      - task: Bash@3
+#        displayName: pnpm lint
+#        inputs:
+#          workingDir: .
+#          targetType: inline
+#          script: pnpm lint
+#
+#      - task: Bash@3
+#        displayName: pnpm format:check
+#        inputs:
+#          workingDir: .
+#          targetType: inline
+#          script: pnpm format:check
+#
+#      - task: Bash@3
+#        displayName: pnpm test:ci
+#        inputs:
+#          workingDir: .
+#          targetType: inline
+#          script: pnpm test:ci
+#
+#      - task: PublishTestResults@2
+#        displayName: Publish frontend test results
+#        inputs:
+#          testResultsFormat: JUnit
+#          testResultsFiles: explore-education-statistics-*/junit-*.xml
+#          searchFolder: ./src
+#          testRunTitle: Release Jest tests
+#          mergeTestResults: true
+#
+#      - task: Bash@3
+#        displayName: pnpm run build
+#        inputs:
+#          targetType: inline
+#          script: pnpm --filter=explore-education-statistics-frontend run build
+#
+#      - task: Docker@2
+#        displayName: Build Public frontend Docker image
+#        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
+#        inputs:
+#          containerRegistry: $(AcrServiceConnection)
+#          repository: ees-public-frontend
+#          command: build
+#          Dockerfile: docker/public-frontend/Dockerfile
+#          buildContext: $(System.DefaultWorkingDirectory)
+#          tags: $(Build.BuildNumber)
+#          arguments: --build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)
+#        env:
+#          DOCKER_BUILDKIT: 1
+#
+#      - task: Docker@2
+#        displayName: Push Public frontend Docker image
+#        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
+#        inputs:
+#          containerRegistry: $(AcrServiceConnection)
+#          repository: ees-public-frontend
+#          command: push
+#          tags: $(Build.BuildNumber)
 
-      - task: DotNetCoreCLI@2
-        displayName: Package Publisher Function
-        inputs:
-          command: publish
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
-          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/publisher
-          zipAfterPublish: True
-
-      - task: PublishPipelineArtifact@0
-        displayName: Publish Publisher artifact
-        inputs:
-          artifactName: publisher
-          targetPath: $(Build.ArtifactStagingDirectory)/publisher
-
-      - task: DotNetCoreCLI@2
-        displayName: Package Processor Function
-        inputs:
-          command: publish
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
-          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/processor
-          zipAfterPublish: True
-
-      - task: PublishPipelineArtifact@0
-        displayName: Publish Processor artifact
-        inputs:
-          artifactName: processor
-          targetPath: $(Build.ArtifactStagingDirectory)/processor
-
-  - job: Admin
-    pool: ees-ubuntu2204-xlarge
-    workspace:
-      clean: all
-    steps:
-      - task: UseNode@1
-        displayName: Install Node.js $(NodeVersion)
-        inputs:
-          version: $(NodeVersion)
-
-      - task: Bash@3
-        displayName: corepack enable
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: corepack enable
-
-      - task: UseDotNet@2
-        displayName: Install .NET 8.0 SDK
-        inputs:
-          version: 8.0.x
-          performMultiLevelLookup: true
-
-      - task: DotNetCoreCLI@2
-        displayName: Build
-        inputs:
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          arguments: --configuration $(BuildConfiguration)
-
-      - task: DotNetCoreCLI@2
-        displayName: Test
-        inputs:
-          command: test
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
-          arguments: --configuration $(BuildConfiguration) --collect "Code coverage"
-
-      - task: Bash@3
-        displayName: pnpm i
-        inputs:
-          targetType: inline
-          script: pnpm i
-
-      - task: Bash@3
-        displayName: pnpm run build
-        inputs:
-          targetType: inline
-          script: pnpm --filter=explore-education-statistics-admin run build
-
-      - task: CopyFiles@2
-        displayName: Copy files to wwwroot
-        inputs:
-          SourceFolder: src/explore-education-statistics-admin/build
-          TargetFolder: src/GovUk.Education.ExploreEducationStatistics.Admin/wwwroot
-
-      - task: DotNetCoreCLI@2
-        displayName: Package Admin app
-        inputs:
-          command: publish
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
-
-      - task: PublishPipelineArtifact@0
-        displayName: Publish Admin artifact
-        inputs:
-          artifactName: admin
-          targetPath: $(Build.ArtifactStagingDirectory)
-
-  - job: Frontend
-    pool: ees-ubuntu2204-xlarge
-    workspace:
-      clean: all
-    steps:
-      - task: UseNode@1
-        displayName: Install Node.js $(NodeVersion)
-        inputs:
-          version: $(NodeVersion)
-
-      - task: Bash@3
-        displayName: corepack enable
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: corepack enable
-
-      - task: Bash@3
-        displayName: pnpm i
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: pnpm i
-
-      - task: Bash@3
-        displayName: pnpm tsc
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: pnpm tsc
-
-      - task: Bash@3
-        displayName: pnpm lint
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: pnpm lint
-
-      - task: Bash@3
-        displayName: pnpm format:check
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: pnpm format:check
-
-      - task: Bash@3
-        displayName: pnpm test:ci
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: pnpm test:ci
-
-      - task: PublishTestResults@2
-        displayName: Publish frontend test results
-        inputs:
-          testResultsFormat: JUnit
-          testResultsFiles: explore-education-statistics-*/junit-*.xml
-          searchFolder: ./src
-          testRunTitle: Release Jest tests
-          mergeTestResults: true
-
-      - task: Bash@3
-        displayName: pnpm run build
-        inputs:
-          targetType: inline
-          script: pnpm --filter=explore-education-statistics-frontend run build
-
-      - task: Docker@2
-        displayName: Build Public frontend Docker image
-        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
-        inputs:
-          containerRegistry: $(AcrServiceConnection)
-          repository: ees-public-frontend
-          command: build
-          Dockerfile: docker/public-frontend/Dockerfile
-          buildContext: $(System.DefaultWorkingDirectory)
-          tags: $(Build.BuildNumber)
-          arguments: --build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)
-        env:
-          DOCKER_BUILDKIT: 1
-
-      - task: Docker@2
-        displayName: Push Public frontend Docker image
-        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
-        inputs:
-          containerRegistry: $(AcrServiceConnection)
-          repository: ees-public-frontend
-          command: push
-          tags: $(Build.BuildNumber)
-
-  - job: ApiDocs
-    pool:
-      vmImage: ubuntu-22.04
-    workspace:
-      clean: all
-    variables:
-      WorkingDirectory: src/explore-education-statistics-api-docs
-    steps:
-      - task: UseNode@1
-        displayName: Install Node.js $(NodeVersion)
-        inputs:
-          version: $(NodeVersion)
-
-      - task: UseRubyVersion@0
-        displayName: Install Ruby $(RubyVersion)
-        inputs:
-          versionSpec: '>= $(RubyVersion)'
-
-      - task: Bash@3
-        displayName: Build
-        env:
-          TECH_DOCS_API_URL: https://dev.statistics.api.education.gov.uk
-        inputs:
-          workingDirectory: $(WorkingDirectory)
-          targetType: inline
-          script: |
-            bundle install
-            bundle exec middleman build
-
-      - task: PublishPipelineArtifact@1
-        displayName: Publish artifact
-        inputs:
-          artifactName: public-api-docs
-          targetPath: $(WorkingDirectory)/build
-
-  - job: MiscellaneousArtifacts
-    pool:
-      vmImage: ubuntu-22.04
-    workspace:
-      clean: all
-    steps:
-      - task: CopyFiles@2
-        displayName: Copy Pipfiles to tests
-        inputs:
-          Contents: |
-            Pipfile
-            Pipfile.lock
-          TargetFolder: tests
-
-      - task: PublishPipelineArtifact@0
-        displayName: Publish test files
-        inputs:
-          artifactName: tests
-          targetPath: tests
+#  - job: ApiDocs
+#    pool:
+#      vmImage: ubuntu-22.04
+#    workspace:
+#      clean: all
+#    variables:
+#      WorkingDirectory: src/explore-education-statistics-api-docs
+#    steps:
+#      - task: UseNode@1
+#        displayName: Install Node.js $(NodeVersion)
+#        inputs:
+#          version: $(NodeVersion)
+#
+#      - task: UseRubyVersion@0
+#        displayName: Install Ruby $(RubyVersion)
+#        inputs:
+#          versionSpec: '>= $(RubyVersion)'
+#
+#      - task: Bash@3
+#        displayName: Build
+#        env:
+#          TECH_DOCS_API_URL: https://dev.statistics.api.education.gov.uk
+#        inputs:
+#          workingDirectory: $(WorkingDirectory)
+#          targetType: inline
+#          script: |
+#            bundle install
+#            bundle exec middleman build
+#
+#      - task: PublishPipelineArtifact@1
+#        displayName: Publish artifact
+#        inputs:
+#          artifactName: public-api-docs
+#          targetPath: $(WorkingDirectory)/build
+#
+#  - job: MiscellaneousArtifacts
+#    pool:
+#      vmImage: ubuntu-22.04
+#    workspace:
+#      clean: all
+#    steps:
+#      - task: CopyFiles@2
+#        displayName: Copy Pipfiles to tests
+#        inputs:
+#          Contents: |
+#            Pipfile
+#            Pipfile.lock
+#          TargetFolder: tests
+#
+#      - task: PublishPipelineArtifact@0
+#        displayName: Publish test files
+#        inputs:
+#          artifactName: tests
+#          targetPath: tests

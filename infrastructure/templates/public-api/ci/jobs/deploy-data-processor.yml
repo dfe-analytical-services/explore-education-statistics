@@ -137,14 +137,13 @@ jobs:
             #           siteConfig.publicNetworkAccess=Disabled
 
             - task: AzureCLI@2
-              displayName: Wait for Data Processor to start up
+              displayName: Wait for Data Processor staging slot to start up
               inputs:
                 azureSubscription: ${{ parameters.serviceConnection }}
                 scriptType: bash
                 scriptLocation: inlineScript
                 inlineScript: |
-                  set -e
-
+                
                   accessToken=`az account get-access-token \
                     --resource $(dataProcessorAppRegistrationClientId) \
                     --query "accessToken" \
@@ -180,7 +179,6 @@ jobs:
                 scriptType: bash
                 scriptLocation: inlineScript
                 inlineScript: |
-                  set -e
                   
                   accessToken=`az account get-access-token \
                     --resource $(dataProcessorAppRegistrationClientId) \
@@ -193,9 +191,13 @@ jobs:
                   
                   while [ "$attempt" -le "$maxAttempts" ]; do
                   
-                    activeOrchestrations=`curl -H "Authorization: Bearer $accessToken" -s $(dataProcessorFunctionAppUrl)/api/StatusCheck | jq -r '.activeOrchestrations != 0'`
+                    activeOrchestrationResults=`curl -H "Authorization: Bearer $accessToken" -s $(dataProcessorFunctionAppUrl)/api/StatusCheck`
+                    activeOrchestrationCount=`echo $activeOrchestrationResults | jq -r '.activeOrchestrations'`
+                    activeOrchestrations=`echo $activeOrchestrationResults | jq -r '.activeOrchestrations != 0'`
                     
-                    echo "Attempt number $attempt - called $(dataProcessorFunctionAppUrl)/api/StatusCheck to check for active orchestrations - currently $activeOrchestrations active orchestrations running."
+                    echo $activeOrchestrationResults
+
+                    echo "Attempt number $attempt - called $(dataProcessorFunctionAppUrl)/api/StatusCheck to check for active orchestrations - currently $activeOrchestrationCount active orchestrations running."
                     
                     if [[ "$activeOrchestrations" == "false" ]]; then
                       echo "No active orchestrations running on the Data Processor - slot swapping can proceed."
@@ -225,3 +227,40 @@ jobs:
                     --resource-group $(resourceGroupName) \
                     --slot staging \
                     --target-slot production
+
+            - task: AzureCLI@2
+              displayName: Check that Data Processor is ready to serve new requests
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -x
+
+                  accessToken=`az account get-access-token \
+                    --resource $(dataProcessorAppRegistrationClientId) \
+                    --query "accessToken" \
+                    -o tsv`
+
+                  pollingTimeSeconds=5
+                  maxAttempts=50
+                  attempt=1
+                  
+                  while [ "$attempt" -le "$maxAttempts" ]; do
+                  
+                    httpStatusCode=`curl --write-out '%{http_code}' -H "Authorization: Bearer $accessToken" -s --output /dev/null $(dataProcessorFunctionAppUrl)/api/HealthCheck`
+                    
+                    echo "Attempt number $attempt - calling $(dataProcessorFunctionAppUrl)/api/HealthCheck to check for Data Processor to be healthy - got HTTP Status Code $httpStatusCode."
+                    
+                    if [[ "$httpStatusCode" == "200" ]]; then
+                      echo "Data Processor has started successfully and is healthy - ready to serve new requests."
+                      exit 0
+                    fi
+  
+                    attempt=$((attempt + 1))
+                    sleep $pollingTimeSeconds
+                  
+                  done
+
+                  echo "Timed out waiting for Data processor to start up."
+                  exit 1
