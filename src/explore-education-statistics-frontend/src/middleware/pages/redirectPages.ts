@@ -42,31 +42,31 @@ const redirectPatterns: RedirectPattern[] = [
   {
     redirectTypes: ['methodologies'],
     urlPattern: new URLPattern({
-      pathname: `/methodology/:${methodologySlugKey}{/*}?`,
+      pathname: `/methodology/:${methodologySlugKey}{/}?`,
     }),
   },
   {
     redirectTypes: ['publications'],
     urlPattern: new URLPattern({
-      pathname: `/find-statistics/:${publicationSlugKey}{/(data-guidance|prerelease-access-list)}?`,
+      pathname: `/find-statistics/:${publicationSlugKey}/(data-guidance/?|prerelease-access-list/?|.{0})?`,
     }),
   },
   {
     redirectTypes: ['publications', 'releases'],
     urlPattern: new URLPattern({
-      pathname: `/find-statistics/:${publicationSlugKey}/:${releaseSlugKey}{/(data-guidance|prerelease-access-list)}?`,
+      pathname: `/find-statistics/:${publicationSlugKey}/:${releaseSlugKey}/(data-guidance/?|prerelease-access-list/?|.{0})?`,
     }),
   },
   {
     redirectTypes: ['publications'],
     urlPattern: new URLPattern({
-      pathname: `/data-tables/:${publicationSlugKey}{/(\\(fast-track|permalink\\)\\(/.*\\))}?`,
+      pathname: `/data-tables/:${publicationSlugKey}/(fast-track/[^/]*/?|permalink/[^/]*/?|.{0})?`,
     }),
   },
   {
     redirectTypes: ['publications', 'releases'],
     urlPattern: new URLPattern({
-      pathname: `/data-tables/:${publicationSlugKey}/:${releaseSlugKey}`,
+      pathname: `/data-tables/:${publicationSlugKey}/:${releaseSlugKey}{/}?`,
     }),
   },
 ];
