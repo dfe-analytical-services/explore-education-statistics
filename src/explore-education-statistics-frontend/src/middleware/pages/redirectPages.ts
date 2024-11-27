@@ -27,17 +27,6 @@ const cacheTime = getCacheTime();
 
 let cachedRedirects: CachedRedirects | undefined;
 
-// POSSIBLE REDIRECT ROUTES FOR PUBLICATIONS AND RELEASES:
-// find-statistics/{publication-slug}
-// find-statistics/{publication-slug}/data-guidance
-// find-statistics/{publication-slug}/prerelease-access-list
-// find-statistics/{publication-slug}/{release-slug}
-// find-statistics/{publication-slug}/{release-slug}/data-guidance
-// find-statistics/{publication-slug}/{release-slug}/prerelease-access-list
-// data-tables/{publication-slug}
-// data-tables/{publication-slug}/{release-slug}
-// data-tables/{publication-slug}/fast-track/{data-block-parent-id}
-// data-tables/{publication-slug}/permalink/{permalink}
 const redirectPatterns: RedirectPattern[] = [
   {
     redirectTypes: ['methodologies'],
