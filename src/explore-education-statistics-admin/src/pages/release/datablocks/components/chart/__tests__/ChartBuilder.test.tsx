@@ -448,7 +448,7 @@ describe('ChartBuilder', () => {
     expect(handleUpdate).toHaveBeenCalledWith({ boundaryLevel: 1 });
   });
 
-  describe('data gorupings tab', () => {
+  describe('data groupings tab', () => {
     const testInitialChart: Chart = {
       type: 'map',
       boundaryLevel: 2,
@@ -557,10 +557,11 @@ describe('ChartBuilder', () => {
             symbol: undefined,
           },
         ],
+        position: 'bottom',
       },
     };
 
-    test('save chart with updates data groupings', async () => {
+    test('save chart with updated data groupings', async () => {
       const handleSubmit = jest.fn();
 
       const { user } = render(
