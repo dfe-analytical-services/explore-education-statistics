@@ -10,8 +10,8 @@ param location string = resourceGroup().location
 @description('Public API Storage : Size of the file share in GB.')
 param publicApiDataFileShareQuota int = 1
 
-@description('Public API Storage : Firewall rules.')
-param storageFirewallRules FirewallRule[] = []
+@description('Firewall rules for maintenance of the service by allowing key IP ranges access to resources.')
+param maintenanceFirewallRules FirewallRule[] = []
 
 @description('Database : administrator login name.')
 @minLength(0)
@@ -35,9 +35,6 @@ param postgreSqlStorageSizeGB int = 32
 
 @description('Database : Azure Database for PostgreSQL Autogrow setting.')
 param postgreSqlAutoGrowStatus string = 'Disabled'
-
-@description('Database : Firewall rules.')
-param postgreSqlFirewallRules FirewallRule[] = []
 
 @description('Database : Entra ID admin  principal names for this resource')
 param postgreSqlEntraIdAdminPrincipals PrincipalNameAndId[] = []
@@ -70,13 +67,16 @@ param dockerImagesTag string = ''
 @description('Do the shared Private DNS Zones need creating or updating?')
 param deploySharedPrivateDnsZones bool = false
 
-@description('Can we deploy the Container App yet? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.')
-param deployContainerApp bool = true
-
 // TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL
 // will redeploy even if no changes exist in this deploy from the previous one.
 @description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
 param deployPsqlFlexibleServer bool = false
+
+@description('Does the Public API Container App need creating or updating? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.')
+param deployContainerApp bool = true
+
+@description('Does the Data Processor need creating or updating?')
+param deployDataProcessor bool = true
 
 param deployAlerts bool = false
 
@@ -99,6 +99,9 @@ param apiAppRegistrationClientId string = ''
 @description('Specifies the principal id of the Azure DevOps SPN.')
 @secure()
 param devopsServicePrincipalId string = ''
+
+@description('Specifies the IP address range of the pipeline runners.')
+param pipelineRunnerCidr string = ''
 
 @description('Specifies whether or not test Themes can be deleted in the environment.')
 param enableThemeDeletion bool = false
@@ -192,7 +195,7 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
     location: location
     resourceNames: resourceNames
     publicApiDataFileShareQuota: publicApiDataFileShareQuota
-    storageFirewallRules: storageFirewallRules
+    storageFirewallRules: maintenanceFirewallRules
     deployAlerts: deployAlerts
     tagValues: tagValues
   }
@@ -226,7 +229,7 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     entraIdAdminPrincipals: postgreSqlEntraIdAdminPrincipals
     privateEndpointSubnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
     autoGrowStatus: postgreSqlAutoGrowStatus
-    firewallRules: postgreSqlFirewallRules
+    firewallRules: maintenanceFirewallRules
     sku: postgreSqlSkuName
     storageSizeGB: postgreSqlStorageSizeGB
     deployAlerts: deployAlerts
@@ -374,6 +377,11 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
   }
 }
 
+var adminSubnetFirewallRule = {
+  name: 'Admin App Service subnet range'
+  cidr: vNetModule.outputs.adminAppServiceSubnetCidr
+}
+
 module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = if (deployDataProcessor) {
   name: 'publicApiDataProcessorApplicationModuleDeploy'
   params: {
@@ -383,7 +391,21 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
     devopsServicePrincipalId: devopsServicePrincipalId
-    storageFirewallRules: storageFirewallRules
+    storageFirewallRules: maintenanceFirewallRules
+    functionAppFirewallRules: union([
+      adminSubnetFirewallRule
+      // TODO EES-5446 - add in when static IP range available for runner scale sets
+      // {
+      //   name: 'Pipeline runner IP address range'
+      //   cidr: pipelineRunnerCidr
+      // }
+      {
+        cidr: 'AzureCloud'
+        tag: 'ServiceTag'
+        priority: 100
+        name: 'AzureCloud'
+      }
+    ], maintenanceFirewallRules)
     dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
     deployAlerts: deployAlerts
     tagValues: tagValues

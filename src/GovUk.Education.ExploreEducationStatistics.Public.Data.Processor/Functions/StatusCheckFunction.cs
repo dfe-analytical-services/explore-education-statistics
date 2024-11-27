@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask.Client;
@@ -14,20 +15,19 @@ public class StatusCheckFunction
             OrchestrationRuntimeStatus.Running
         }
     };
-    
+
     [Function("StatusCheck")]
     [Produces("application/json")]
     public static async Task<IActionResult> StatusCheck(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
 #pragma warning disable IDE0060
-        HttpRequestMessage request,
+        HttpRequest request,
 #pragma warning restore IDE0060
         [DurableClient] DurableTaskClient client)
     {
         var activeOrchestrations = await client
             .GetAllInstancesAsync(filter: ActiveOrchestrationsQuery)
             .ToListAsync();
-
         return new OkObjectResult(new { ActiveOrchestrations = activeOrchestrations.Count });
     }
 }

@@ -175,13 +175,12 @@ resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2
   ]
 }
 
-var firewallRules = [for firewallRule in functionAppEndpointFirewallRules: {
+var firewallRules = [for (firewallRule, index) in functionAppEndpointFirewallRules: {
+  name: firewallRule.name
   ipAddress: firewallRule.cidr
   action: 'Allow'
-  tag: 'Default'
-  priority: 100
-  name: firewallRule.name
-  description: firewallRule.description
+  tag: firewallRule.tag ?? 'Default'
+  priority: firewallRule.priority ?? (100 + index)
 }]
 
 var commonSiteProperties = {
@@ -202,8 +201,8 @@ var commonSiteProperties = {
     linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
     publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
-    // ipSecurityRestrictions: firewallRules
-    ipSecurityRestrictionsDefaultAction: 'Allow' // TODO Deny!
+    ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
+    ipSecurityRestrictionsDefaultAction: publicNetworkAccessEnabled && length(firewallRules) > 0 ? 'Deny' : 'Allow'
     scmIpSecurityRestrictions: [
       {
         ipAddress: 'Any'

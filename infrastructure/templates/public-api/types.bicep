@@ -43,8 +43,9 @@ type ResourceNames = {
 @export()
 type FirewallRule = {
   name: string
-  description: string?
   cidr: string
+  priority: int?
+  tag: string?
 }
 
 @export()

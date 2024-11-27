@@ -47,9 +47,8 @@ steps:
               resourceTags='$(resourceTags)' \
               postgreSqlAdminName='$(postgreSqlAdminName)' \
               postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-              postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
               postgreSqlEntraIdAdminPrincipals='$(postgreSqlEntraIdAdminPrincipals)' \
-              storageFirewallRules='$(maintenanceFirewallRules)' \
+              maintenanceFirewallRules='$(maintenanceFirewallRules)' \
               acrResourceGroupName='$(acrResourceGroupName)' \
               dockerImagesTag='$(resources.pipeline.MainBuild.runName)' \
               deploySharedPrivateDnsZones=${{ parameters.deploySharedPrivateDnsZones }} \
@@ -60,4 +59,5 @@ steps:
               dataProcessorFunctionAppExists=${{ parameters.dataProcessorExists }} \
               dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
               apiAppRegistrationClientId='$(apiAppRegistrationClientId)' \
-              devopsServicePrincipalId="$servicePrincipalId"
+              devopsServicePrincipalId="$servicePrincipalId" \
+              pipelineRunnerCidr="$(pipelineRunnerCidr)"
