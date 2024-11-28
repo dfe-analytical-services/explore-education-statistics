@@ -142,13 +142,12 @@ function HomePage() {
             educational organisations and governors in England.
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <a href="https://schools-financial-benchmarking.service.gov.uk/">
-              Schools financial benchmarking
+            <a href="https://financial-benchmarking-and-insights-tool.education.gov.uk/">
+              Financial Benchmarking and Insights Tool
             </a>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            Compare your school&apos;s income and expenditure with other schools
-            in England.
+            Compare your school&apos;s expenditure with other schools in England.
           </p>
         </div>
       </div>
