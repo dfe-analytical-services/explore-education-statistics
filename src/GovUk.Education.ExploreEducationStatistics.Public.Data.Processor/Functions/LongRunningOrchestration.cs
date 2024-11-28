@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using Microsoft.Azure.Functions.Worker;
@@ -7,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class LogRunningOrchestration(ILogger<LogRunningOrchestration> logger)
+public static class LogRunningOrchestration
 {
     [Function(nameof(ProcessLongRunningOrchestration))]
     public static async Task ProcessLongRunningOrchestration(
@@ -23,7 +22,7 @@ public class LogRunningOrchestration(ILogger<LogRunningOrchestration> logger)
 
         try
         {
-            await context.CallActivity(nameof(LongRunningActivity), logger, context.InstanceId);
+            await context.CallActivity(nameof(LongRunningFunctions.LongRunningActivity), logger, input);
         }
         catch (Exception e)
         {
@@ -33,23 +32,6 @@ public class LogRunningOrchestration(ILogger<LogRunningOrchestration> logger)
                 input.DurationSeconds);
 
             await context.CallActivity(ActivityNames.HandleProcessingFailure, logger, context.InstanceId);
-        }
-    }
-    
-    [Function(nameof(LongRunningActivity))]
-    public async Task LongRunningActivity(
-        [ActivityTrigger] Guid instanceId,
-        int durationSeconds,
-        CancellationToken cancellationToken)
-    {
-        var stopwatch = Stopwatch.StartNew();
-
-        while (stopwatch.Elapsed.Seconds < durationSeconds)
-        {
-            await Task.Delay(10000, cancellationToken);
-            
-            logger.LogInformation($"Long-running orchestration running for {stopwatch.Elapsed.Seconds} " +
-                                  $"out of {durationSeconds} seconds");
         }
     }
 }
