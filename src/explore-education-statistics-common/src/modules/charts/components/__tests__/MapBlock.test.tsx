@@ -9,10 +9,10 @@ import MapBlock, {
 } from '@common/modules/charts/components/MapBlock';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import _tableBuilderService from '@common/services/tableBuilderService';
 import { within } from '@testing-library/dom';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import _tableBuilderService from '@common/services/tableBuilderService';
 import { produce } from 'immer';
 
 jest.mock('@common/services/tableBuilderService');
@@ -25,6 +25,9 @@ describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
   const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
+    releaseId: 'releaseId',
+    dataBlockParentId: 'dataBlockParentId',
+    boundaryLevel: 1,
     id: 'testMap',
     axes: testMapConfiguration.axes as MapBlockProps['axes'],
     legend: testMapConfiguration.legend as LegendConfiguration,

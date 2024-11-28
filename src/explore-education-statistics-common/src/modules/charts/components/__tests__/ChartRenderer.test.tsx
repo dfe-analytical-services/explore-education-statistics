@@ -41,6 +41,8 @@ describe('ChartRenderer', () => {
   const testFullTableMeta = mapFullTable(testChartTableData);
   const testMapChartRenderer: ChartRendererProps = {
     type: 'map',
+    releaseId: 'releaseId',
+    dataBlockParentId: 'dataBlockParentId',
     meta: testFullTableMeta.subjectMeta,
     data: testFullTableMeta.results,
     alt: '',

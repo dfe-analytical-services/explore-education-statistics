@@ -18,7 +18,12 @@ import React, { memo, useMemo } from 'react';
 
 export type ChartRendererProps = {
   source?: string;
+  releaseId?: string;
+  dataBlockParentId?: string;
 } & (
+  | ({
+      type: 'map';
+    } & Omit<MapBlockProps, 'id'>)
   | ({
       type: 'line';
     } & LineChartProps)
@@ -28,11 +33,6 @@ export type ChartRendererProps = {
   | ({
       type: 'horizontalbar';
     } & HorizontalBarProps)
-  | ({
-      type: 'map';
-    } & Omit<MapBlockProps, 'id'> & {
-        boundaryLevel: number;
-      })
   | ({
       type: 'infographic';
     } & InfographicChartProps)

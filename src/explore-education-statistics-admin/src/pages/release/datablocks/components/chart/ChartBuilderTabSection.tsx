@@ -117,6 +117,7 @@ const ChartBuilderTabSection = ({
       releaseId={releaseId}
       data={table.results}
       meta={meta}
+      dataBlockParentId={dataBlock.dataBlockParentId}
       initialChart={dataBlock.charts[0]}
       tableTitle={dataBlock.heading}
       onChartSave={handleChartSave}

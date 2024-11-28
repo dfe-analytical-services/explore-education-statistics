@@ -13,6 +13,7 @@ import { FeatureCollection } from 'geojson';
 import Leaflet, { Layer, PathOptions } from 'leaflet';
 import React, { useEffect, useRef, useState } from 'react';
 import { GeoJSON, useMap } from 'react-leaflet';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Props {
   dataSetCategoryConfigs: Dictionary<MapDataSetCategoryConfig>;
@@ -22,6 +23,7 @@ interface Props {
   height: number;
   width?: number;
   onSelectFeature: (feature: MapFeature) => void;
+  isLoading: boolean;
 }
 
 export default function MapGeoJSON({
@@ -32,6 +34,7 @@ export default function MapGeoJSON({
   selectedDataSetKey,
   dataSetCategoryConfigs,
   onSelectFeature,
+  isLoading = false,
 }: Props) {
   const map = useMap();
   const container = useRef<HTMLDivElement>(null);
@@ -167,7 +170,7 @@ export default function MapGeoJSON({
             return {
               color: '#cfdce3',
               fillColor: '#003078',
-              fillOpacity: 0.1,
+              fillOpacity: isLoading ? 0.05 : 0.1,
               stroke: false,
               weight: 1,
             };
@@ -175,6 +178,13 @@ export default function MapGeoJSON({
           ref={ukRef}
         />
       )}
+      <LoadingSpinner
+        className="govuk-!-margin-top-8"
+        loading={isLoading}
+        text="fetching geometry for data selection"
+        size="lg"
+        hideText
+      />
       {features && (
         <GeoJSON
           ref={geometryRef}
