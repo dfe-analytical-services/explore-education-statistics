@@ -17,6 +17,7 @@ export default function createMapDataSetCategories(
   axis: AxisConfiguration,
   data: TableDataResult[],
   meta: FullTableMeta,
+  locations: LocationFilter[],
 ): MapDataSetCategory[] {
   return createDataSetCategories({
     axisConfiguration: axis,
@@ -27,9 +28,8 @@ export default function createMapDataSetCategories(
     .map(category => {
       return {
         ...category,
-        geoJson: meta.locations.find(
-          location => location.id === category.filter.id,
-        )?.geoJson,
+        geoJson: locations.find(location => location.id === category.filter.id)
+          ?.geoJson,
       };
     })
     .filter(category => !!category?.geoJson) as MapDataSetCategory[];

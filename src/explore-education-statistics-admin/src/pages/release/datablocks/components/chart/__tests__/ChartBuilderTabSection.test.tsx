@@ -41,6 +41,8 @@ describe('ChartBuilderTabSection', () => {
 
   const testChart: Chart = {
     type: 'map',
+    releaseId: 'releaseId',
+    dataBlockParentId: 'dataBlockParentId',
     boundaryLevel: 2,
     map: {
       dataSetConfigs: [],

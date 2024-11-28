@@ -45,7 +45,7 @@ import {
   ReleaseTableDataQuery,
   TableDataResult,
 } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
+import { Chart, DataBlock } from '@common/services/types/blocks';
 import { ValidationProblemDetails } from '@common/services/types/problemDetails';
 import parseNumber from '@common/utils/number/parseNumber';
 import { isServerValidationError } from '@common/validation/serverValidations';
@@ -100,6 +100,7 @@ interface Props {
   data: TableDataResult[];
   meta: FullTableMeta;
   releaseId: string;
+  dataBlockParentId: DataBlock['dataBlockParentId'];
   initialChart?: Chart;
   tableTitle: string;
   onChartSave: (chart: Chart, file?: File) => Promise<void>;
@@ -111,6 +112,7 @@ export default function ChartBuilder({
   data,
   meta,
   releaseId,
+  dataBlockParentId,
   initialChart,
   tableTitle,
   onChartSave,
@@ -198,11 +200,24 @@ export default function ChartBuilder({
           },
           boundaryLevel: options.boundaryLevel ?? 0,
           type: 'map',
+          releaseId,
+          dataBlockParentId,
         };
       default:
         return undefined;
     }
-  }, [axes, data, definition, getChartFile, legend, meta, options, map]);
+  }, [
+    axes,
+    data,
+    definition,
+    getChartFile,
+    legend,
+    meta,
+    options,
+    map,
+    releaseId,
+    dataBlockParentId,
+  ]);
 
   const handleSubmit = useCallback(async () => {
     if (!chartProps) {

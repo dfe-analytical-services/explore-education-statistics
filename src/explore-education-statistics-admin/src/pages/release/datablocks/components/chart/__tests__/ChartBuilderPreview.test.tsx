@@ -94,6 +94,8 @@ describe('ChartBuilderPreview', () => {
 
   const testMapChartRenderer: ChartRendererProps = {
     type: 'map',
+    releaseId: 'releaseId',
+    dataBlockParentId: 'dataBlockParentId',
     data: [],
     meta: testFullTableMeta.subjectMeta,
     alt: '',
