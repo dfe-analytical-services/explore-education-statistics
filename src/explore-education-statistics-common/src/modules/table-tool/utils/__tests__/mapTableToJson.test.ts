@@ -56,7 +56,7 @@ import {
 } from '@common/modules/table-tool/utils/__data__/testTableDataWithDuplicateLabels';
 
 describe('mapTableToJson', () => {
-  test.only('returns the correct JSON for a table with one level of row and column headers', () => {
+  test('returns the correct JSON for a table with one level of row and column headers', () => {
     const result = mapTableToJson({
       tableHeadersConfig: testTableWithOneLevelOfRowAndColHeadersConfig,
       subjectMeta: testTableWithOneLevelOfRowAndColHeaders.subjectMeta,
