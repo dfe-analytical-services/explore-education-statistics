@@ -111,6 +111,8 @@ const DataBlockTabs = ({
                   return (
                     <ChartRenderer
                       {...chart}
+                      releaseId={releaseId}
+                      dataBlockParentId={dataBlock.dataBlockParentId}
                       id={`${id}-chart`}
                       key={key}
                       axes={axes}

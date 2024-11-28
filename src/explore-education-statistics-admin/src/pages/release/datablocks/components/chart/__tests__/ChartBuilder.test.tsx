@@ -32,6 +32,7 @@ describe('ChartBuilder', () => {
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilder
           releaseId="release-1"
+          dataBlockParentId="dataBlockParent-1"
           data={testFullTable.results}
           meta={testFullTable.subjectMeta}
           tableTitle="Table title"
@@ -70,6 +71,7 @@ describe('ChartBuilder', () => {
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilder
           releaseId="release-1"
+          dataBlockParentId="dataBlockParent-1"
           data={testFullTable.results}
           meta={testFullTable.subjectMeta}
           tableTitle="Table title"
@@ -116,6 +118,7 @@ describe('ChartBuilder', () => {
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
             releaseId="release-1"
+            dataBlockParentId="dataBlockParent-1"
             data={testFullTable.results}
             meta={testFullTable.subjectMeta}
             tableTitle="Table title"
@@ -194,6 +197,7 @@ describe('ChartBuilder', () => {
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
             releaseId="release-1"
+            dataBlockParentId="dataBlockParent-1"
             data={testFullTable.results}
             meta={testFullTable.subjectMeta}
             tableTitle="Table title"
@@ -271,6 +275,7 @@ describe('ChartBuilder', () => {
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
             releaseId="release-1"
+            dataBlockParentId="dataBlockParent-1"
             data={testFullTable.results}
             meta={testFullTable.subjectMeta}
             tableTitle="Table title"
@@ -361,6 +366,8 @@ describe('ChartBuilder', () => {
 
   test('calls `onTableQueryUpdate` when change boundary level', async () => {
     const testInitialChart: Chart = {
+      releaseId: 'releaseId',
+      dataBlockParentId: 'dataBlockParentId',
       type: 'map',
       boundaryLevel: 2,
       map: {
@@ -410,6 +417,7 @@ describe('ChartBuilder', () => {
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilder
           releaseId="release-1"
+          dataBlockParentId="dataBlockParent-1"
           data={testFullTable.results}
           initialChart={testInitialChart}
           meta={{
@@ -451,6 +459,8 @@ describe('ChartBuilder', () => {
   describe('data groupings tab', () => {
     const testInitialChart: Chart = {
       type: 'map',
+      releaseId: 'releaseId',
+      dataBlockParentId: 'dataBlockParentId',
       boundaryLevel: 2,
       map: {
         dataSetConfigs: [
@@ -568,6 +578,7 @@ describe('ChartBuilder', () => {
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
             releaseId="release-1"
+            dataBlockParentId="dataBlockParent-1"
             data={testFullTable.results}
             initialChart={testInitialChart}
             meta={{

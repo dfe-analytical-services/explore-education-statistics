@@ -16,6 +16,9 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 
 export const testMapConfiguration: Chart = {
+  type: 'map',
+  releaseId: 'releaseId',
+  dataBlockParentId: 'dataBlockParentId',
   boundaryLevel: 1,
   axes: {
     major: {
@@ -72,8 +75,6 @@ export const testMapConfiguration: Chart = {
       },
     ],
   },
-
-  type: 'map',
   title: '',
   alt: '',
   height: 600,

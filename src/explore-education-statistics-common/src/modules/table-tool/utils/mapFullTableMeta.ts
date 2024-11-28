@@ -32,7 +32,25 @@ export default function mapFullTableMeta(
     return acc;
   }, {});
 
-  const locationEntries = Object.entries(subjectMeta.locations);
+  const locations = mapFullTableMetaLocations(subjectMeta.locations);
+
+  return {
+    ...subjectMeta,
+    filters,
+    indicators: subjectMeta.indicators.map(
+      indicator => new Indicator(indicator),
+    ),
+    locations,
+    timePeriodRange: subjectMeta.timePeriodRange.map(
+      (timePeriod, order) => new TimePeriodFilter({ ...timePeriod, order }),
+    ),
+  };
+}
+
+export const mapFullTableMetaLocations = (
+  subjectMetaLocations: TableDataSubjectMeta['locations'],
+) => {
+  const locationEntries = Object.entries(subjectMetaLocations);
 
   //  The location hierarchy expects grouping, for example the LAD attribute
   //  is grouped by Region. However, the data screener
@@ -74,15 +92,5 @@ export default function mapFullTableMeta(
     }),
   );
 
-  return {
-    ...subjectMeta,
-    filters,
-    indicators: subjectMeta.indicators.map(
-      indicator => new Indicator(indicator),
-    ),
-    locations,
-    timePeriodRange: subjectMeta.timePeriodRange.map(
-      (timePeriod, order) => new TimePeriodFilter({ ...timePeriod, order }),
-    ),
-  };
-}
+  return locations;
+};
