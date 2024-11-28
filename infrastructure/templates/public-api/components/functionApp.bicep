@@ -1,4 +1,4 @@
-import { FirewallRule, AzureFileShareMount, EntraIdAuthentication } from '../types.bicep'
+import { FirewallRule, IpRange, AzureFileshareMount, EntraIdAuthentication } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -71,7 +71,7 @@ param healthCheckPath string?
 param azureFileShares AzureFileShareMount[] = []
 
 @description('Specifies firewall rules for the various storage accounts in use by the Function App')
-param storageFirewallRules FirewallRule[] = []
+param storageFirewallRules IpRange[] = []
 
 var reserved = appServicePlanOS == 'Linux'
 
@@ -179,8 +179,8 @@ var firewallRules = [for (firewallRule, index) in functionAppEndpointFirewallRul
   name: firewallRule.name
   ipAddress: firewallRule.cidr
   action: 'Allow'
-  tag: firewallRule.tag ?? 'Default'
-  priority: firewallRule.priority ?? (100 + index)
+  tag: firewallRule.tag != null ? firewallRule.tag : 'Default'
+  priority: firewallRule.priority != null ? firewallRule.priority : 100 + index
 }]
 
 var commonSiteProperties = {

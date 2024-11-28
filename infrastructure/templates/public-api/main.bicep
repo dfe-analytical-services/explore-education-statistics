@@ -1,5 +1,5 @@
 import { abbreviations } from 'abbreviations.bicep'
-import { FirewallRule, PrincipalNameAndId, StaticWebAppSku } from 'types.bicep'
+import { IpRange, PrincipalNameAndId, StaticWebAppSku } from 'types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -11,7 +11,7 @@ param location string = resourceGroup().location
 param publicApiDataFileShareQuota int = 1
 
 @description('Firewall rules for maintenance of the service by allowing key IP ranges access to resources.')
-param maintenanceFirewallRules FirewallRule[] = []
+param maintenanceIpRanges IpRange[] = []
 
 @description('Database : administrator login name.')
 @minLength(0)
@@ -166,6 +166,13 @@ var resourceNames = {
   }
 }
 
+var maintenanceFirewallRules = [for maintenanceIpRange in maintenanceIpRanges: {
+  name: maintenanceIpRange.name
+  cidr: maintenanceIpRange.cidr
+  tag: 'Default'
+  priority: 100
+}]
+
 module vNetModule 'application/shared/virtualNetwork.bicep' = {
   name: 'virtualNetworkApplicationModuleDeploy'
   params: {
@@ -195,7 +202,7 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
     location: location
     resourceNames: resourceNames
     publicApiDataFileShareQuota: publicApiDataFileShareQuota
-    storageFirewallRules: maintenanceFirewallRules
+    storageFirewallRules: maintenanceIpRanges
     deployAlerts: deployAlerts
     tagValues: tagValues
   }
@@ -229,7 +236,7 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     entraIdAdminPrincipals: postgreSqlEntraIdAdminPrincipals
     privateEndpointSubnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
     autoGrowStatus: postgreSqlAutoGrowStatus
-    firewallRules: maintenanceFirewallRules
+    firewallRules: maintenanceIpRanges
     sku: postgreSqlSkuName
     storageSizeGB: postgreSqlStorageSizeGB
     deployAlerts: deployAlerts
@@ -380,6 +387,8 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
 var adminSubnetFirewallRule = {
   name: 'Admin App Service subnet range'
   cidr: vNetModule.outputs.adminAppServiceSubnetCidr
+  tag: 'Default'
+  priority: 100
 }
 
 module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = if (deployDataProcessor) {
@@ -391,7 +400,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
     devopsServicePrincipalId: devopsServicePrincipalId
-    storageFirewallRules: maintenanceFirewallRules
+    storageFirewallRules: maintenanceIpRanges
     functionAppFirewallRules: union([
       adminSubnetFirewallRule
       // TODO EES-5446 - add in when static IP range available for runner scale sets
@@ -402,7 +411,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
       {
         cidr: 'AzureCloud'
         tag: 'ServiceTag'
-        priority: 100
+        priority: 101
         name: 'AzureCloud'
       }
     ], maintenanceFirewallRules)

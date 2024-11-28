@@ -143,7 +143,7 @@ jobs:
                 scriptType: bash
                 scriptLocation: inlineScript
                 inlineScript: |
-                
+
                   accessToken=`az account get-access-token \
                     --resource $(dataProcessorAppRegistrationClientId) \
                     --query "accessToken" \
@@ -155,9 +155,11 @@ jobs:
                   
                   while [ "$attempt" -le "$maxAttempts" ]; do
                   
+                    echo "Attempt number $attempt of $maxAttempts- calling $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck to check for Data Processor staging being healthy."
+                    
                     httpStatusCode=`curl --write-out '%{http_code}' -H "Authorization: Bearer $accessToken" -s --output /dev/null $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck`
                     
-                    echo "Attempt number $attempt - calling $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck to check for Data Processor staging slot to be healthy - got HTTP Status Code $httpStatusCode."
+                    echo "Got HTTP status code $httpStatusCode."
                     
                     if [[ "$httpStatusCode" == "200" ]]; then
                       echo "Data Processor staging slot has started successfully and is healthy - deployment can continue."
@@ -188,17 +190,17 @@ jobs:
                   pollingTimeSeconds=5
                   maxAttempts=50
                   attempt=1
-                  
+
                   while [ "$attempt" -le "$maxAttempts" ]; do
                   
+                    echo "Attempt number $attempt of $maxAttempts - callinf $(dataProcessorFunctionAppUrl)/api/StatusCheck to check for active orchestrations."
+                    
                     activeOrchestrationResults=`curl -H "Authorization: Bearer $accessToken" -s $(dataProcessorFunctionAppUrl)/api/StatusCheck`
                     activeOrchestrationCount=`echo $activeOrchestrationResults | jq -r '.activeOrchestrations'`
                     activeOrchestrations=`echo $activeOrchestrationResults | jq -r '.activeOrchestrations != 0'`
                     
-                    echo $activeOrchestrationResults
+                    echo "Currently $activeOrchestrationCount active orchestrations running."
 
-                    echo "Attempt number $attempt - called $(dataProcessorFunctionAppUrl)/api/StatusCheck to check for active orchestrations - currently $activeOrchestrationCount active orchestrations running."
-                    
                     if [[ "$activeOrchestrations" == "false" ]]; then
                       echo "No active orchestrations running on the Data Processor - slot swapping can proceed."
                       exit 0
@@ -248,9 +250,11 @@ jobs:
                   
                   while [ "$attempt" -le "$maxAttempts" ]; do
                   
+                    echo "Attempt number $attempt of $maxAttempts - calling $(dataProcessorFunctionAppUrl)/api/HealthCheck to check for Data Processor being healthy."
+                    
                     httpStatusCode=`curl --write-out '%{http_code}' -H "Authorization: Bearer $accessToken" -s --output /dev/null $(dataProcessorFunctionAppUrl)/api/HealthCheck`
                     
-                    echo "Attempt number $attempt - calling $(dataProcessorFunctionAppUrl)/api/HealthCheck to check for Data Processor to be healthy - got HTTP Status Code $httpStatusCode."
+                    echo "Got HTTP status code $httpStatusCode."
                     
                     if [[ "$httpStatusCode" == "200" ]]; then
                       echo "Data Processor has started successfully and is healthy - ready to serve new requests."

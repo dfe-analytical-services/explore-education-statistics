@@ -48,7 +48,7 @@ steps:
               postgreSqlAdminName='$(postgreSqlAdminName)' \
               postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
               postgreSqlEntraIdAdminPrincipals='$(postgreSqlEntraIdAdminPrincipals)' \
-              maintenanceFirewallRules='$(maintenanceFirewallRules)' \
+              maintenanceIpRanges='$(maintenanceFirewallRules)' \
               acrResourceGroupName='$(acrResourceGroupName)' \
               dockerImagesTag='$(resources.pipeline.MainBuild.runName)' \
               deploySharedPrivateDnsZones=${{ parameters.deploySharedPrivateDnsZones }} \

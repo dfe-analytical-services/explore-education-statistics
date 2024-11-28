@@ -1,4 +1,4 @@
-import { ResourceNames, FirewallRule } from '../../types.bicep'
+import { ResourceNames, FirewallRule, IpRange } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -23,7 +23,7 @@ param dataProcessorAppRegistrationClientId string
 param devopsServicePrincipalId string
 
 @description('The IP address ranges that can access the Data Processor storage accounts.')
-param storageFirewallRules FirewallRule[]
+param storageFirewallRules IpRange[]
 
 @description('The IP address ranges that can access the Data Processor Function App endpoints.')
 param functionAppFirewallRules FirewallRule[] = []
