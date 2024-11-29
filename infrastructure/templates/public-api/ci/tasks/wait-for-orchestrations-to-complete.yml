@@ -1,0 +1,74 @@
+parameters:
+
+  - name: serviceConnection
+    type: string
+
+  - name: displayName
+    type: string
+    default: Waiting for active orchestrations to complete
+
+  - name: condition
+    type: string
+
+  - name: accessTokenScope
+    type: string
+    default: null
+
+  - name: pollingDelaySeconds
+    type: number
+    default: 5
+
+  - name: maxAttempts
+    type: number
+    default: 50
+
+  - name: endpoint
+    type: string
+  
+  - name: dependsOn
+    type: object
+    default: []
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayName }}
+    condition: ${{ parameters.condition}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        
+        if [ -n "${{ parameters.accessTokenScope }}" ]; then
+          accessToken=`az account get-access-token \
+            --resource ${{ parameters.accessTokenScope }} \
+            --query "accessToken" \
+            -o tsv`
+        fi
+
+        for attempt in $(seq 1 ${{ parameters.maxAttempts }});
+        do
+        
+          echo "Attempt number $attempt of ${{ parameters.maxAttempts }} - calling ${{ parameters.endpoint }} to check for active orchestrations."
+          
+          if [ -n "$accessToken" ]; then
+            activeOrchestrationResults=`curl -H "Authorization: Bearer $accessToken" -s ${{ parameters.endpoint }}`
+          else
+            activeOrchestrationResults=`curl -s ${{ parameters.endpoint }}`
+          fi
+
+          activeOrchestrationCount=`echo $activeOrchestrationResults | jq -r '.activeOrchestrations'`
+          activeOrchestrations=`echo $activeOrchestrationResults | jq -r '.activeOrchestrations != 0'`
+          
+          if [[ "$activeOrchestrations" == "false" ]]; then
+            echo "No active orchestrations are running."
+            exit 0
+          fi
+
+          echo "$activeOrchestrationCount active orchestrations are still running. Retrying in ${{ parameters.pollingDelaySeconds }} seconds."
+          sleep ${{ parameters.pollingDelaySeconds }}
+        
+        done
+
+        echo "Timed out waiting for active orchestrations to complete."
+        exit 1

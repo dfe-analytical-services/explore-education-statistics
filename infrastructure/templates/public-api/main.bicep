@@ -100,8 +100,9 @@ param apiAppRegistrationClientId string = ''
 @secure()
 param devopsServicePrincipalId string = ''
 
-@description('Specifies the IP address range of the pipeline runners.')
-param pipelineRunnerCidr string = ''
+// TODO EES-5446 - reinstate pipelineRunnerCidr when the DevOps runners have a static IP range available. 
+// @description('Specifies the IP address range of the pipeline runners.')
+// param pipelineRunnerCidr string = ''
 
 @description('Specifies whether or not test Themes can be deleted in the environment.')
 param enableThemeDeletion bool = false
@@ -403,11 +404,12 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
     storageFirewallRules: maintenanceIpRanges
     functionAppFirewallRules: union([
       adminSubnetFirewallRule
-      // TODO EES-5446 - add in when static IP range available for runner scale sets
+      // TODO EES-5446 - reinstate when static IP range available for runner scale sets
       // {
       //   name: 'Pipeline runner IP address range'
       //   cidr: pipelineRunnerCidr
       // }
+      // TODO EES-5446 - remove service tag whitelisting when runner scale set IP range reinstated 
       {
         cidr: 'AzureCloud'
         tag: 'ServiceTag'

@@ -59,5 +59,4 @@ steps:
               dataProcessorFunctionAppExists=${{ parameters.dataProcessorExists }} \
               dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
               apiAppRegistrationClientId='$(apiAppRegistrationClientId)' \
-              devopsServicePrincipalId="$servicePrincipalId" \
-              pipelineRunnerCidr="$(pipelineRunnerCidr)"
+              devopsServicePrincipalId="$servicePrincipalId"

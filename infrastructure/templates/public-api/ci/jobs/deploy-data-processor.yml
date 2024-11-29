@@ -65,28 +65,6 @@ jobs:
                       "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
 
             # TODO EES-5128
-            # Add Private Endpoint to Data Processor Function App into the VMSS VNet to allow
-            # DevOps to deploy the Data Processor Function App without having to temporarily
-            # make it publicly accessible.
-            # - task: AzureCLI@2
-            #   displayName: Temporarily enable public network access before deploy
-            #   retryCountOnTaskFailure: 1
-            #   inputs:
-            #     azureSubscription: ${{ parameters.serviceConnection }}
-            #     scriptType: bash
-            #     scriptLocation: inlineScript
-            #     inlineScript: |
-            #       set -e
-          
-            #       az functionapp update \
-            #         --name $(dataProcessorFunctionAppName) \
-            #         --resource-group $(resourceGroupName) \
-            #         --slot staging \
-            #         --set \
-            #           publicNetworkAccess=Enabled \
-            #           siteConfig.publicNetworkAccess=Enabled
-
-            # TODO EES-5128
             # Retry deploying the Function App in order to allow the staging slot the time to
             # fully restart after config and network settings have been updated prior to deploy.
             #
@@ -113,107 +91,21 @@ jobs:
                     --resource-group $(resourceGroupName) \
                     --slot staging
 
-            # TODO EES-5128
-            # Add Private Endpoint to Data Processor Function App into the VMSS VNet to allow
-            # DevOps to deploy the Data Processor Function App without having to temporarily
-            # make it publicly accessible.
-            # - task: AzureCLI@2
-            #   displayName: Disable public network access after deploy
-            #   retryCountOnTaskFailure: 1
-            #   condition: always()
-            #   inputs:
-            #     azureSubscription: ${{ parameters.serviceConnection }}
-            #     scriptType: bash
-            #     scriptLocation: inlineScript
-            #     inlineScript: |
-            #       set -e
-          
-            #       az functionapp update \
-            #         --name $(dataProcessorFunctionAppName) \
-            #         --resource-group $(resourceGroupName) \
-            #         --slot staging \
-            #         --set \
-            #           publicNetworkAccess=Disabled \
-            #           siteConfig.publicNetworkAccess=Disabled
+            - template: ../tasks/wait-for-endpoint-success.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Waiting for staging slot to start successfully
+                accessTokenScope: $(dataProcessorAppRegistrationClientId)
+                endpoint: $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck
 
-            - task: AzureCLI@2
-              displayName: Wait for Data Processor staging slot to start up
-              inputs:
-                azureSubscription: ${{ parameters.serviceConnection }}
-                scriptType: bash
-                scriptLocation: inlineScript
-                inlineScript: |
-
-                  accessToken=`az account get-access-token \
-                    --resource $(dataProcessorAppRegistrationClientId) \
-                    --query "accessToken" \
-                    -o tsv`
-
-                  pollingTimeSeconds=5
-                  maxAttempts=50
-                  attempt=1
-                  
-                  while [ "$attempt" -le "$maxAttempts" ]; do
-                  
-                    echo "Attempt number $attempt of $maxAttempts- calling $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck to check for Data Processor staging being healthy."
-                    
-                    httpStatusCode=`curl --write-out '%{http_code}' -H "Authorization: Bearer $accessToken" -s --output /dev/null $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck`
-                    
-                    echo "Got HTTP status code $httpStatusCode."
-                    
-                    if [[ "$httpStatusCode" == "200" ]]; then
-                      echo "Data Processor staging slot has started successfully and is healthy - deployment can continue."
-                      exit 0
-                    fi
-  
-                    attempt=$((attempt + 1))
-                    sleep $pollingTimeSeconds
-                  
-                  done
-
-                  echo "Timed out waiting for Data processor to start up."
-                  exit 1
-
-            - task: AzureCLI@2
-              displayName: Wait for active orchestrations to complete
-              inputs:
-                azureSubscription: ${{ parameters.serviceConnection }}
-                scriptType: bash
-                scriptLocation: inlineScript
-                inlineScript: |
-                  
-                  accessToken=`az account get-access-token \
-                    --resource $(dataProcessorAppRegistrationClientId) \
-                    --query "accessToken" \
-                    -o tsv`
-
-                  pollingTimeSeconds=5
-                  maxAttempts=50
-                  attempt=1
-
-                  while [ "$attempt" -le "$maxAttempts" ]; do
-                  
-                    echo "Attempt number $attempt of $maxAttempts - callinf $(dataProcessorFunctionAppUrl)/api/StatusCheck to check for active orchestrations."
-                    
-                    activeOrchestrationResults=`curl -H "Authorization: Bearer $accessToken" -s $(dataProcessorFunctionAppUrl)/api/StatusCheck`
-                    activeOrchestrationCount=`echo $activeOrchestrationResults | jq -r '.activeOrchestrations'`
-                    activeOrchestrations=`echo $activeOrchestrationResults | jq -r '.activeOrchestrations != 0'`
-                    
-                    echo "Currently $activeOrchestrationCount active orchestrations running."
-
-                    if [[ "$activeOrchestrations" == "false" ]]; then
-                      echo "No active orchestrations running on the Data Processor - slot swapping can proceed."
-                      exit 0
-                    fi
-  
-                    attempt=$((attempt + 1))
-                    sleep $pollingTimeSeconds
-                  
-                  done
-
-                  echo "Timed out waiting for active Data Processor orchestrations to complete."
-                  exit 1
-
+            - template: ../tasks/wait-for-orchestrations-to-complete.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Waiting for active orchestrations in the production slot to complete
+                accessTokenScope: $(dataProcessorAppRegistrationClientId)
+                endpoint: $(dataProcessorFunctionAppUrl)/api/StatusCheck
+                condition: eq(variables.awaitActiveOrchestrations, true)
+              
             - task: AzureCLI@2
               displayName: Swap slots
               retryCountOnTaskFailure: 1
@@ -223,48 +115,15 @@ jobs:
                 scriptLocation: inlineScript
                 inlineScript: |
                   set -e
-
                   az functionapp deployment slot swap \
                     --name $(dataProcessorFunctionAppName) \
                     --resource-group $(resourceGroupName) \
                     --slot staging \
                     --target-slot production
 
-            - task: AzureCLI@2
-              displayName: Check that Data Processor is ready to serve new requests
-              inputs:
-                azureSubscription: ${{ parameters.serviceConnection }}
-                scriptType: bash
-                scriptLocation: inlineScript
-                inlineScript: |
-                  set -x
-
-                  accessToken=`az account get-access-token \
-                    --resource $(dataProcessorAppRegistrationClientId) \
-                    --query "accessToken" \
-                    -o tsv`
-
-                  pollingTimeSeconds=5
-                  maxAttempts=50
-                  attempt=1
-                  
-                  while [ "$attempt" -le "$maxAttempts" ]; do
-                  
-                    echo "Attempt number $attempt of $maxAttempts - calling $(dataProcessorFunctionAppUrl)/api/HealthCheck to check for Data Processor being healthy."
-                    
-                    httpStatusCode=`curl --write-out '%{http_code}' -H "Authorization: Bearer $accessToken" -s --output /dev/null $(dataProcessorFunctionAppUrl)/api/HealthCheck`
-                    
-                    echo "Got HTTP status code $httpStatusCode."
-                    
-                    if [[ "$httpStatusCode" == "200" ]]; then
-                      echo "Data Processor has started successfully and is healthy - ready to serve new requests."
-                      exit 0
-                    fi
-  
-                    attempt=$((attempt + 1))
-                    sleep $pollingTimeSeconds
-                  
-                  done
-
-                  echo "Timed out waiting for Data processor to start up."
-                  exit 1
+            - template: ../tasks/wait-for-endpoint-success.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Checking that production slot is healthy after slot swap
+                accessTokenScope: $(dataProcessorAppRegistrationClientId)
+                endpoint: $(dataProcessorFunctionAppUrl)/api/HealthCheck

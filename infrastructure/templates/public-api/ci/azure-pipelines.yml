@@ -16,6 +16,9 @@ parameters:
   - name: deployAlerts
     displayName: Whether to create or update Azure Monitor alerts during this deploy.
     default: false
+  - name: awaitActiveOrchestrations
+    displayName: Should this deploy wait for active orchestrations in Function Apps to complete prior to deploying?
+    default: true
   - name: forceDeployToEnvironment
     displayName: Set to either dev or test to force a deploy to that environment from the chosen branch.
     type: string
@@ -57,6 +60,8 @@ variables:
     value: ${{ parameters.deployDataProcessor }}
   - name: deployAlerts
     value: ${{ parameters.deployAlerts }}
+  - name: awaitActiveOrchestrations
+    value: ${{ parameters.awaitActiveOrchestrations }}
 
 pool:
   vmImage: $(vmImageName)
