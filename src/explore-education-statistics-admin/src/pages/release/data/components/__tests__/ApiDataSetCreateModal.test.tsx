@@ -4,7 +4,7 @@ import _apiDataSetCandidateService, {
 } from '@admin/services/apiDataSetCandidateService';
 import _apiDataSetService from '@admin/services/apiDataSetService';
 import baseRender from '@common-test/render';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { createMemoryHistory, History } from 'history';
 import noop from 'lodash/noop';
 import { ReactElement } from 'react';
@@ -29,8 +29,6 @@ describe('ApiDataSetCreateModal', () => {
   ];
 
   test('renders warning message in modal when no candidates', async () => {
-    const history = createMemoryHistory();
-
     apiDataSetCandidateService.listCandidates.mockResolvedValue([]);
 
     const { user } = render(
@@ -39,7 +37,6 @@ describe('ApiDataSetCreateModal', () => {
         releaseId="release-id"
         onSubmit={noop}
       />,
-      { history },
     );
 
     expect(await screen.findByText('Create API data set')).toBeInTheDocument();
@@ -50,26 +47,22 @@ describe('ApiDataSetCreateModal', () => {
 
     expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
 
+    const modal = within(screen.getByRole('dialog'));
+
     expect(
-      screen.getByText(
+      modal.getByText(
         /No API data sets can be created as there are no candidate data files available/,
       ),
     ).toBeInTheDocument();
 
-    expect(
-      await screen.findByRole('link', { name: 'Data and files' }),
-    ).toBeInTheDocument();
+    expect(modal.getByRole('link', { name: 'Data and files' })).toHaveAttribute(
+      'href',
+      '/publication/publication-id/release/release-id/data#data-uploads',
+    );
 
     await user.click(screen.getByRole('link', { name: 'Data and files' }));
 
-    expect(
-      screen.queryByRole('link', { name: 'Data and files' }),
-    ).not.toBeInTheDocument();
-
-    expect(history.location.pathname).toEqual(
-      '/publication/publication-id/release/release-id/data',
-    );
-    expect(history.location.hash).toEqual('#data-uploads');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   test('renders form in modal when there are candidates', async () => {
