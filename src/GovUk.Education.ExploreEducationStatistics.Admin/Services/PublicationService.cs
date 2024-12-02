@@ -22,11 +22,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
-using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
-using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
@@ -435,11 +434,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(Guid publicationId)
+        public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(
+            Guid publicationId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
+            return await _context.Publications
+                .FirstOrNotFoundAsync(p => p.Id == publicationId)
+                .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(async publication =>
                 {
                     var result = new List<ReleaseSeriesTableEntryViewModel>();
@@ -512,13 +512,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         LegacyLinkUrl = newLegacyLink.Url,
                     });
 
-                    _context.Publications.Update(publication);
                     await _context.SaveChangesAsync();
 
                     await _publicationCacheService.UpdatePublication(publication.Slug);
 
-                    return await GetReleaseSeries(publication.Id)
-                        .OnSuccess(releaseSeries => releaseSeries);
+                    return await GetReleaseSeries(publication.Id);
                 });
         }
 
@@ -527,7 +525,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems)
         {
             return await _context.Publications
-                .Include(p => p.ReleaseVersions)
                 .FirstOrNotFoundAsync(p => p.Id == publicationId)
                 .OnSuccess(_userService.CheckCanManageReleaseSeries)
                 .OnSuccess(async publication =>
@@ -551,13 +548,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
 
                     // Check all publication releases are included in updatedReleaseSeriesItems
-                    var publicationReleaseIds = publication.ReleaseVersions
-                        .Select(rv => rv.ReleaseId)
-                        .Distinct()
-                        .ToList();
+                    var publicationReleaseIds = await _context.Releases
+                        .Where(r => r.PublicationId == publicationId)
+                        .Select(r => r.Id)
+                        .ToListAsync();
 
                     var updatedSeriesReleaseIds = updatedReleaseSeriesItems
-                        .Where(rsi => rsi.ReleaseId != null)
+                        .Where(rsi => rsi.ReleaseId.HasValue)
                         .Select(rsi => rsi.ReleaseId!.Value)
                         .ToList();
 
@@ -570,7 +567,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     // NOTE: A malicious user could change the release series items' Ids, but we don't care
 
-                    var newReleaseSeries = updatedReleaseSeriesItems
+                    publication.ReleaseSeries = updatedReleaseSeriesItems
                         .Select(request => new ReleaseSeriesItem
                         {
                             Id = request.Id,
@@ -579,15 +576,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             LegacyLinkUrl = request.LegacyLinkUrl,
                         }).ToList();
 
-                    publication.ReleaseSeries = newReleaseSeries;
-                    _context.Publications.Update(publication);
-
                     await _context.SaveChangesAsync();
 
                     await _publicationCacheService.UpdatePublication(publication.Slug);
 
-                    return await GetReleaseSeries(publication.Id)
-                        .OnSuccess(releaseSeries => releaseSeries);
+                    return await GetReleaseSeries(publication.Id);
                 });
         }
 
