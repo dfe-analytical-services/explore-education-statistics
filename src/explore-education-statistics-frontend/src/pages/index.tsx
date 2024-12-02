@@ -147,7 +147,8 @@ function HomePage() {
             </a>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            Compare your school&apos;s expenditure with other schools in England.
+            Compare your school&apos;s expenditure with other schools in
+            England.
           </p>
         </div>
       </div>
