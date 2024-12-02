@@ -14,14 +14,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using IReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -31,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<UsersAndRolesDbContext> _usersAndRolesPersistenceHelper;
         private readonly IEmailTemplateService _emailTemplateService;
-        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IUserRoleService _userRoleService;
         private readonly IUserService _userService;
         private readonly IUserInviteRepository _userInviteRepository;
@@ -44,7 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ContentDbContext contentDbContext,
             IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
             IEmailTemplateService emailTemplateService,
-            IReleaseVersionRepository releaseVersionRepository,
             IUserRoleService userRoleService,
             IUserService userService,
             IUserInviteRepository userInviteRepository,
@@ -56,7 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
             _usersAndRolesPersistenceHelper = usersAndRolesPersistenceHelper;
             _emailTemplateService = emailTemplateService;
-            _releaseVersionRepository = releaseVersionRepository;
             _userRoleService = userRoleService;
             _userService = userService;
             _userInviteRepository = userInviteRepository;
@@ -109,26 +105,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccess(async () =>
-                {
-                    var releaseVersions = await _releaseVersionRepository.ListLatestReleaseVersions();
-                    return await releaseVersions
-                        .ToAsyncEnumerable()
-                        .SelectAwait(async releaseVersion =>
-                        {
-                            var publicationTitle = await _contentDbContext.Publications
-                                .Where(p => p.Id == releaseVersion.PublicationId)
-                                .Select(p => p.Title)
-                                .FirstAsync();
-
-                            return new IdTitleViewModel
-                            {
-                                Id = releaseVersion.Id,
-                                Title = $"{publicationTitle} - {releaseVersion.Title}"
-                            };
-                        })
-                        .ToListAsync();
-                });
+                .OnSuccess(async () => await _contentDbContext.Releases
+                    .Select(r => new IdTitleViewModel
+                    {
+                        Id = r.Id,
+                        Title = $"{r.Publication.Title} - {r.Title}"
+                    })
+                    .ToListAsync());
         }
 
         public async Task<Either<ActionResult, List<RoleViewModel>>> ListRoles()
@@ -324,8 +307,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     foreach (var userReleaseRole in request.UserReleaseRoles)
                     {
+                        var latestReleaseVersion = await _contentDbContext.ReleaseVersions
+                            .LatestReleaseVersion(releaseId: userReleaseRole.ReleaseId)
+                            .SingleAsync();
+
                         await _userReleaseInviteRepository.Create(
-                            releaseVersionId: userReleaseRole.ReleaseId,
+                            releaseVersionId: latestReleaseVersion!.Id,
                             email: sanitisedEmail,
                             releaseRole: userReleaseRole.ReleaseRole,
                             emailSent: true,

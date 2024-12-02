@@ -8,7 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
 public interface IReleaseVersionRepository
 {
-    Task<DateTime> GetPublishedDate(Guid releaseVersionId,
+    Task<DateTime> GetPublishedDate(
+        Guid releaseVersionId,
         DateTime actualPublishedDate);
 
     /// <summary>
@@ -100,13 +101,6 @@ public interface IReleaseVersionRepository
     Task<List<Guid>> ListLatestReleaseVersionIds(
         Guid publicationId,
         CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Retrieves the latest versions of all releases in reverse chronological order.
-    /// </summary>
-    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-    /// <returns>A collection of the latest versions of all releases.</returns>
-    Task<List<ReleaseVersion>> ListLatestReleaseVersions(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieves the latest versions of all releases associated with a given publication in reverse chronological order.
