@@ -80,6 +80,8 @@ function baseErrorMappings(
             'DatasetNamesCsvFilenamesShouldBeUnique',
           FileNotFoundInZip: 'FileNotFoundInZip',
           ZipContainsUnusedFiles: 'ZipContainsUnusedFiles',
+          DataReplacementAlreadyInProgress:
+            'Data replacement already in progress',
         },
       }),
     ];
@@ -218,6 +220,7 @@ export default function DataFileUploadForm({
     >
       {({ formState, reset, getValues }) => {
         const uploadType = getValues('uploadType');
+
         return (
           <Form id="dataFileUploadForm" onSubmit={onSubmit}>
             <div style={{ position: 'relative' }}>
