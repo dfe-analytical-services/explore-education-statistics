@@ -816,7 +816,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
     });
 
-    test('successful submit with CSV files renders with uploaded data file appended to list', async () => {
+    test('successful submit with CSV files refetches data files', async () => {
       releaseDataFileService.uploadDataFiles.mockResolvedValue(
         testUploadedDataFile,
       );
@@ -863,59 +863,13 @@ describe('ReleaseDataUploadsSection', () => {
           } as UploadDataFilesRequest,
         );
 
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(3);
+        expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+          'release-1',
+        );
       });
-
-      const sections = screen.getAllByTestId('accordionSection');
-
-      const section1 = within(sections[0]);
-
-      expect(
-        section1.getByRole('button', { name: /Test data 1/ }),
-      ).toBeInTheDocument();
-
-      const section2 = within(sections[1]);
-
-      expect(
-        section2.getByRole('button', { name: /Test data 2/ }),
-      ).toBeInTheDocument();
-
-      expect(section2.getByTestId('Subject title')).toHaveTextContent(
-        'Test data 2',
-      );
-
-      const section3 = within(sections[2]);
-
-      expect(
-        section3.getByRole('button', { name: /Test title/ }),
-      ).toBeInTheDocument();
-
-      expect(section3.getByTestId('Subject title')).toHaveTextContent(
-        'Test title',
-      );
-
-      expect(section3.getByTestId('Data file')).toHaveTextContent(
-        'test-data.csv',
-      );
-      expect(section3.getByTestId('Metadata file')).toHaveTextContent(
-        'test-data.meta.csv',
-      );
-      expect(section3.getByTestId('Data file size')).toHaveTextContent(
-        '150 Kb',
-      );
-      expect(section3.getByTestId('Number of rows')).toHaveTextContent(
-        'Unknown',
-      );
-      expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
-      expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
-        'user1@test.com',
-      );
-      expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
-        '18 August 2020 12:00',
-      );
     });
 
-    test('successful submit with ZIP file renders with uploaded data file appended to list', async () => {
+    test('successful submit with zip file refetches data files', async () => {
       releaseDataFileService.uploadZipDataFile.mockResolvedValue({
         ...testUploadedZipFile,
       });
@@ -956,68 +910,14 @@ describe('ReleaseDataUploadsSection', () => {
             zipFile,
           } as UploadZipDataFileRequest,
         );
+
+        expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+          'release-1',
+        );
       });
-
-      const sections = screen.getAllByTestId('accordionSection');
-      const section1 = within(sections[0]);
-      const section2 = within(sections[1]);
-      const section3 = within(sections[2]);
-
-      expect(sections).toHaveLength(3);
-
-      expect(
-        section1.getByRole('button', { name: /Test data 1/ }),
-      ).toBeInTheDocument();
-
-      expect(
-        section2.getByRole('button', { name: /Test data 2/ }),
-      ).toBeInTheDocument();
-
-      expect(section2.getByTestId('Subject title')).toHaveTextContent(
-        'Test data 2',
-      );
-
-      expect(
-        section3.getByRole('button', { name: /Test zip title/ }),
-      ).toBeInTheDocument();
-
-      expect(section3.getByTestId('Subject title')).toHaveTextContent(
-        'Test zip title',
-      );
-
-      expect(section3.getByTestId('Data file')).toHaveTextContent(
-        'test-data.zip',
-      );
-      expect(section3.getByTestId('Metadata file')).toHaveTextContent(
-        'test-data.meta.zip',
-      );
-      expect(section3.getByTestId('Data file size')).toHaveTextContent(
-        '150 Kb',
-      );
-      expect(section3.getByTestId('Number of rows')).toHaveTextContent(
-        'Unknown',
-      );
-      expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
-      expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
-        'user1@test.com',
-      );
-      expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
-        '18 August 2020 12:00',
-      );
     });
 
-    test('successful submit with ZIP file renders with uploaded data file appended to list', async () => {
-      releaseDataFileService.uploadBulkZipDataFile.mockResolvedValue([
-        testUploadedZipFile,
-        {
-          ...testUploadedZipFile,
-          id: 'zip-file-2',
-          title: 'Test zip title 2',
-          fileName: 'test-data-2.zip',
-          metaFileId: 'file-2-meta',
-          metaFileName: 'test-data-2.meta.zip',
-        },
-      ]);
+    test('successful submit with bulk zip file refetches data files', async () => {
       releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
         testQueuedImportStatus,
       );
@@ -1044,80 +944,17 @@ describe('ReleaseDataUploadsSection', () => {
           name: 'Upload data files',
         }),
       );
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Confirm',
+        }),
+      );
 
       await waitFor(() => {
-        expect(
-          releaseDataFileService.uploadBulkZipDataFile,
-        ).toHaveBeenCalledWith('release-1', zipFile);
+        expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+          'release-1',
+        );
       });
-
-      const sections = screen.getAllByTestId('accordionSection');
-      const section1 = within(sections[0]);
-      const section2 = within(sections[1]);
-      const section3 = within(sections[2]);
-      const section4 = within(sections[3]);
-
-      expect(sections).toHaveLength(4);
-
-      expect(
-        section1.getByRole('button', { name: /Test data 1/ }),
-      ).toBeInTheDocument();
-
-      expect(
-        section2.getByRole('button', { name: /Test data 2/ }),
-      ).toBeInTheDocument();
-
-      expect(
-        section3.getByRole('button', { name: /Test zip title/ }),
-      ).toBeInTheDocument();
-      expect(section3.getByTestId('Subject title')).toHaveTextContent(
-        'Test zip title',
-      );
-      expect(section3.getByTestId('Data file')).toHaveTextContent(
-        'test-data.zip',
-      );
-      expect(section3.getByTestId('Metadata file')).toHaveTextContent(
-        'test-data.meta.zip',
-      );
-      expect(section3.getByTestId('Data file size')).toHaveTextContent(
-        '150 Kb',
-      );
-      expect(section3.getByTestId('Number of rows')).toHaveTextContent(
-        'Unknown',
-      );
-      expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
-      expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
-        'user1@test.com',
-      );
-      expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
-        '18 August 2020 12:00',
-      );
-
-      expect(
-        section4.getByRole('button', { name: /Test zip title 2/ }),
-      ).toBeInTheDocument();
-      expect(section4.getByTestId('Subject title')).toHaveTextContent(
-        'Test zip title 2',
-      );
-      expect(section4.getByTestId('Data file')).toHaveTextContent(
-        'test-data-2.zip',
-      );
-      expect(section4.getByTestId('Metadata file')).toHaveTextContent(
-        'test-data-2.meta.zip',
-      );
-      expect(section4.getByTestId('Data file size')).toHaveTextContent(
-        '150 Kb',
-      );
-      expect(section4.getByTestId('Number of rows')).toHaveTextContent(
-        'Unknown',
-      );
-      expect(section4.getByTestId('Status')).toHaveTextContent('Queued');
-      expect(section4.getByTestId('Uploaded by')).toHaveTextContent(
-        'user1@test.com',
-      );
-      expect(section4.getByTestId('Date uploaded')).toHaveTextContent(
-        '18 August 2020 12:00',
-      );
     });
 
     test('updates the number of rows after uploading CSV file when status changes', async () => {
@@ -1127,6 +964,16 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.getDataFileImportStatus
         .mockResolvedValue(testQueuedImportStatus)
         .mockResolvedValueOnce(testImportingImportStatus);
+
+      const testUploadedDataFile2 = {
+        ...testUploadedDataFile,
+        title: 'Test title 2',
+      };
+
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        ...testDataFiles,
+        testUploadedDataFile2,
+      ]);
 
       permissionService.getDataFilePermissions.mockResolvedValue(
         {} as DataFilePermissions,
@@ -1171,6 +1018,10 @@ describe('ReleaseDataUploadsSection', () => {
             metadataFile,
           } as UploadDataFilesRequest,
         );
+
+        expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+          'release-1',
+        );
       });
 
       const sections = screen.getAllByTestId('accordionSection');
@@ -1179,7 +1030,7 @@ describe('ReleaseDataUploadsSection', () => {
       await waitFor(() =>
         expect(
           releaseDataFileService.getDataFileImportStatus,
-        ).toHaveBeenCalledWith('release-1', testUploadedDataFile),
+        ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
       );
       await waitFor(() => {
         expect(section3.getByTestId('Number of rows')).toHaveTextContent('100');
@@ -1194,6 +1045,16 @@ describe('ReleaseDataUploadsSection', () => {
       releaseDataFileService.getDataFileImportStatus
         .mockResolvedValue(testQueuedImportStatus)
         .mockResolvedValueOnce(testImportingImportStatus);
+
+      const testUploadedDataFile2 = {
+        ...testUploadedDataFile,
+        title: 'Test title 2',
+      };
+
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        ...testDataFiles,
+        testUploadedDataFile2,
+      ]);
 
       permissionService.getDataFilePermissions.mockResolvedValue(
         {} as DataFilePermissions,
@@ -1240,7 +1101,7 @@ describe('ReleaseDataUploadsSection', () => {
       await waitFor(() =>
         expect(
           releaseDataFileService.getDataFileImportStatus,
-        ).toHaveBeenCalledWith('release-1', testUploadedZipFile),
+        ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
       );
       await waitFor(() => {
         expect(section3.getByTestId('Number of rows')).toHaveTextContent('100');

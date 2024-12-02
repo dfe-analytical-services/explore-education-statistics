@@ -448,6 +448,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             result.AssertOkResult(amendmentCreatedResponse);
         }
 
+        [Fact]
+        public async Task UploadBulkZipDataSetsToTempStorage()
+        {
+            // Arrange
+            var dataSetFiles = new List<ArchiveDataSetFileViewModel>();
+
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+
+            releaseDataFileService
+                .Setup(s => s.ValidateAndUploadBulkZip(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IFormFile>(),
+                    default))
+                .ReturnsAsync(dataSetFiles);
+
+            var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+
+            // Act
+            var result = await controller.UploadBulkZipDataSetsToTempStorage(
+                Guid.NewGuid(),
+                MockFile("bulk.zip"),
+                default);
+
+            // Assert
+            VerifyAllMocks(releaseDataFileService);
+
+            result.AssertOkResult(dataSetFiles);
+        }
+
+        [Fact]
+        public async Task ImportBulkZipDataSetsFromTempStorage()
+        {
+            // Arrange
+            var dataFileInfo = new List<DataFileInfo>
+            {
+                new() { FileName = "one.csv", Name = "Data set title", Size = "1024" },
+            };
+
+            var importRequests = new List<ArchiveDataSetFileViewModel>
+            {
+                new(){ DataFileId = Guid.NewGuid(), MetaFileId = Guid.NewGuid(), Title = "Data set title", DataFilename = "one.csv", MetaFilename = "one.meta.csv", DataFileSize = 1024, MetaFileSize = 128 }
+            };
+
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+
+            releaseDataFileService
+                .Setup(s => s.SaveDataSetsFromTemporaryBlobStorage(
+                    It.IsAny<Guid>(),
+                    It.IsAny<List<ArchiveDataSetFileViewModel>>(),
+                    default))
+                .ReturnsAsync(dataFileInfo);
+
+            var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+
+            // Act
+            var result = await controller.ImportBulkZipDataSetsFromTempStorage(
+                Guid.NewGuid(),
+                importRequests,
+                default);
+
+            // Assert
+            VerifyAllMocks(releaseDataFileService);
+
+            result.AssertOkResult(dataFileInfo);
+        }
+
         private static IFormFile MockFile(string fileName)
         {
             var fileMock = new Mock<IFormFile>(Strict);

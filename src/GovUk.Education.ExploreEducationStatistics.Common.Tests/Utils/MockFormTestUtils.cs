@@ -1,6 +1,8 @@
-﻿#nullable enable
+#nullable enable
 using Microsoft.AspNetCore.Http;
 using Moq;
+using System.IO;
+using System.Reflection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
 {
@@ -33,6 +35,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                 .Returns(size);
 
             return formFile;
+        }
+
+        public static IFormFile CreateFormFileFromResource(string fileName, string? newFileName = null)
+        {
+            var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                "Resources" + Path.DirectorySeparatorChar + fileName);
+
+            return CreateFormFileFromResourceWithPath(filePath, newFileName ?? fileName);
+        }
+
+        public static IFormFile CreateFormFileFromResourceWithPath(string filePath, string fileName)
+        {
+            var formFile = new Mock<IFormFile>();
+            formFile
+                .Setup(f => f.OpenReadStream())
+                .Returns(() => System.IO.File.OpenRead(filePath));
+
+            formFile
+                .Setup(f => f.FileName)
+                .Returns(() => fileName);
+
+            return formFile.Object;
         }
     }
 }

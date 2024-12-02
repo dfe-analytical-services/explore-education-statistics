@@ -1,8 +1,17 @@
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 import render from '@common-test/render';
+import _releaseDataFileService, {
+  ArchiveDataSetFile,
+} from '@admin/services/releaseDataFileService';
+
+jest.mock('@admin/services/releaseDataFileService');
+
+const releaseDataFileService = _releaseDataFileService as jest.Mocked<
+  typeof _releaseDataFileService
+>;
 
 describe('DataFileUploadForm', () => {
   test('shows validation message when no data file selected', async () => {
@@ -146,6 +155,41 @@ describe('DataFileUploadForm', () => {
           selector: '#dataFileUploadForm-bulkZipFile-error',
         }),
       ).toBeInTheDocument();
+    });
+  });
+
+  test('shows bulk upload plan modal when upload button is clicked', async () => {
+    const data: ArchiveDataSetFile = {
+      dataFileId: 'data-file-1',
+      dataFilename: 'test.csv',
+      dataFileSize: 1024,
+      metaFileId: 'meta-file-1',
+      metaFilename: 'test.meta.csv',
+      metaFileSize: 128,
+      title: 'Data set 1',
+    };
+
+    releaseDataFileService.getUploadBulkZipDataFilePlan.mockResolvedValue([
+      data,
+    ]);
+
+    const { user } = render(<DataFileUploadForm onSubmit={noop} />);
+
+    const file = new File(['hello, world!'], 'test.zip', {
+      type: 'application/zip',
+    });
+
+    await user.click(screen.getByLabelText('Bulk ZIP upload'));
+    await user.upload(screen.getByLabelText('Upload bulk ZIP file'), file);
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Upload data files',
+      }),
+    );
+
+    await waitFor(() => {
+      const modal = within(screen.getByRole('dialog'));
+      expect(modal.getByText('Upload summary')).toBeInTheDocument();
     });
   });
 
