@@ -48,10 +48,10 @@ public abstract class DataSetVersionPathResolverTests
         
         public static readonly TheoryData<string> GetEnvironmentNames = new(EnvironmentNames);
         
-        public static readonly TheoryData<Tuple<string, DataSetVersionStatus>> GetEnvironmentNamesAndPublicStatuses = 
+        public static readonly TheoryData<(string, DataSetVersionStatus)> GetEnvironmentNamesAndPublicStatuses = 
             new(EnvironmentNames.Cartesian(DataSetVersionAuthExtensions.PublicStatuses));
 
-        public static readonly TheoryData<Tuple<string, DataSetVersionStatus>> GetEnvironmentNamesAndPrivateStatuses = 
+        public static readonly TheoryData<(string, DataSetVersionStatus)> GetEnvironmentNamesAndPrivateStatuses = 
             new(EnvironmentNames.Cartesian(DataSetVersionAuthExtensions.PrivateStatuses));
 
         [Fact]
@@ -125,7 +125,7 @@ public abstract class DataSetVersionPathResolverTests
 
         [Theory]
         [MemberData(nameof(GetEnvironmentNamesAndPublicStatuses))]
-        public void ValidDirectoryPath_PublicVersion(Tuple<string, DataSetVersionStatus> environmentNameAndStatus)
+        public void ValidDirectoryPath_PublicVersion((string, DataSetVersionStatus) environmentNameAndStatus)
         {
             var (environmentName, status) = environmentNameAndStatus;
             
@@ -153,7 +153,7 @@ public abstract class DataSetVersionPathResolverTests
 
         [Theory]
         [MemberData(nameof(GetEnvironmentNamesAndPrivateStatuses))]
-        public void ValidDirectoryPath_PrivateVersion(Tuple<string, DataSetVersionStatus> environmentNameAndStatus)
+        public void ValidDirectoryPath_PrivateVersion((string, DataSetVersionStatus) environmentNameAndStatus)
         {
             var (environmentName, status) = environmentNameAndStatus;
             

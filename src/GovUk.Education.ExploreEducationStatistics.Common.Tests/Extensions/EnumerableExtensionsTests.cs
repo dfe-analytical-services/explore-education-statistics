@@ -474,12 +474,12 @@ public class EnumerableExtensionsTests
             List<int> list1 = [1, 2];
             List<string> list2 = ["3", "4"];
 
-            List<Tuple<int, string>> expected =
+            List<(int, string)> expected =
             [
-                new Tuple<int, string>(1, "3"),
-                new Tuple<int, string>(1, "4"),
-                new Tuple<int, string>(2, "3"),
-                new Tuple<int, string>(2, "4")
+                new(1, "3"),
+                new(1, "4"),
+                new(2, "3"),
+                new(2, "4")
             ];
 
             var actual = list1.Cartesian(list2);
@@ -507,16 +507,16 @@ public class EnumerableExtensionsTests
             List<string> list2 = ["3", "4"];
             List<char> list3 = ['5', '6'];
 
-            List<Tuple<int, string, char>> expected =
+            List<(int, string, char)> expected =
             [
-                new Tuple<int, string, char>(1, "3", '5'),
-                new Tuple<int, string, char>(1, "3", '6'),
-                new Tuple<int, string, char>(1, "4", '5'),
-                new Tuple<int, string, char>(1, "4", '6'),
-                new Tuple<int, string, char>(2, "3", '5'),
-                new Tuple<int, string, char>(2, "3", '6'),
-                new Tuple<int, string, char>(2, "4", '5'),
-                new Tuple<int, string, char>(2, "4", '6'),
+                new(1, "3", '5'),
+                new(1, "3", '6'),
+                new(1, "4", '5'),
+                new(1, "4", '6'),
+                new(2, "3", '5'),
+                new(2, "3", '6'),
+                new(2, "4", '5'),
+                new(2, "4", '6'),
             ];
 
             var actual = list1.Cartesian(list2, list3);

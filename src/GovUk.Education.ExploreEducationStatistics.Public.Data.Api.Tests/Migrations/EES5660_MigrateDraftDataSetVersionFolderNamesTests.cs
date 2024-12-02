@@ -18,19 +18,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Migra
 public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationFactory testApp) 
     : IntegrationTestFixture(testApp)
 {
-    public static readonly TheoryData<Tuple<DataSetVersionStatus, DataSetVersionType>>
+    public static readonly TheoryData<(DataSetVersionStatus, DataSetVersionType)>
         PrivateDataSetVersionStatusAndTypes = new(DataSetVersionAuthExtensions
             .PrivateStatuses
             .Cartesian(EnumUtil.GetEnums<DataSetVersionType>()));
     
-    public static readonly TheoryData<Tuple<DataSetVersionStatus, DataSetVersionType>>
+    public static readonly TheoryData<(DataSetVersionStatus, DataSetVersionType)>
         PublicDataSetVersionStatusAndTypes = new(DataSetVersionAuthExtensions
             .PublicStatuses
             .Cartesian(EnumUtil.GetEnums<DataSetVersionType>()));
     
     [Theory]
     [MemberData(nameof(PrivateDataSetVersionStatusAndTypes))]
-    public async Task Success_NonMigratedDraft(Tuple<DataSetVersionStatus, DataSetVersionType> statusAndType)
+    public async Task Success_NonMigratedDraft((DataSetVersionStatus, DataSetVersionType) statusAndType)
     {
         var (status, type) = statusAndType;
 
@@ -66,7 +66,7 @@ public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationF
 
     [Theory]
     [MemberData(nameof(PrivateDataSetVersionStatusAndTypes))]
-    public async Task Success_AlreadyMigratedDraft(Tuple<DataSetVersionStatus, DataSetVersionType> statusAndType)
+    public async Task Success_AlreadyMigratedDraft((DataSetVersionStatus, DataSetVersionType) statusAndType)
     {
         var (status, type) = statusAndType;
         
@@ -133,7 +133,7 @@ public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationF
         
     [Theory]
     [MemberData(nameof(PublicDataSetVersionStatusAndTypes))]
-    public async Task Success_PublicVersionsNotMigrated(Tuple<DataSetVersionStatus, DataSetVersionType> statusAndType)
+    public async Task Success_PublicVersionsNotMigrated((DataSetVersionStatus, DataSetVersionType) statusAndType)
     {
         var (status, type) = statusAndType;
         

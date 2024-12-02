@@ -320,18 +320,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return source.ThenBy(keySelector, comparison.WithNaturalSort());
         }
 
-        public static List<Tuple<T1, T2>> Cartesian<T1, T2>(
+        public static List<(T1, T2)> Cartesian<T1, T2>(
             this IEnumerable<T1> list1,
             IEnumerable<T2>? list2)
         {
             return list2 == null
                 ? []
                 : list1
-                    .Join(list2, _ => true, _ => true, (t1, t2) => new Tuple<T1, T2>(t1, t2))
+                    .Join(list2, _ => true, _ => true, (t1, t2) => (t1, t2))
                     .ToList();
         }
 
-        public static List<Tuple<T1, T2, T3>> Cartesian<T1, T2, T3>(
+        public static List<(T1, T2, T3)> Cartesian<T1, T2, T3>(
             this IEnumerable<T1> list1,
             IEnumerable<T2>? list2,
             IEnumerable<T3>? list3)
@@ -339,9 +339,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return list2 == null || list3 == null
                 ? []
                 : list1
-                    .Join(list2, _ => true, _ => true, (t1, t2) => new Tuple<T1, T2>(t1, t2))
+                    .Join(list2, _ => true, _ => true, (t1, t2) => (t1, t2))
                     .Join(list3, _ => true, _ => true,
-                        (tuple, t3) => new Tuple<T1, T2, T3>(tuple.Item1, tuple.Item2, t3))
+                        (tuple, t3) => (tuple.t1, tuple.t2, t3))
                     .ToList();
         }
     }
