@@ -29,14 +29,11 @@ export default function ReleaseApiDataSetChangelogPage() {
     data: dataSet,
     isLoading: isLoadingDataSet,
     refetch: refetchDataSet,
-    isError: errorFetchingDataSet,
   } = useQuery(apiDataSetQueries.get(dataSetId));
 
-  const {
-    data: changes,
-    isLoading: isLoadingChanges,
-    isError: errorFetchingChanges,
-  } = useQuery(apiDataSetVersionQueries.getChanges(dataSetVersionId));
+  const { data: changes, isLoading: isLoadingChanges } = useQuery(
+    apiDataSetVersionQueries.getChanges(dataSetVersionId),
+  );
 
   const isDraft = dataSet?.draftVersion?.id === dataSetVersionId;
 
@@ -80,26 +77,26 @@ export default function ReleaseApiDataSetChangelogPage() {
       </Link>
 
       <LoadingSpinner loading={isLoadingDataSet || isLoadingChanges}>
-        {!errorFetchingDataSet && !errorFetchingChanges ? (
+        {dataSet && dataSetVersion ? (
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-three-quarters">
                 <span className="govuk-caption-l">API data set changelog</span>
-                <h2>{dataSet?.title}</h2>
+                <h2>{dataSet.title}</h2>
               </div>
             </div>
             <TagGroup className="govuk-!-margin-bottom-7">
               <Tag colour={isDraft ? 'green' : 'blue'}>{`${
                 isDraft ? 'Draft' : 'Published'
-              } v${dataSetVersion?.version}`}</Tag>
+              } v${dataSetVersion.version}`}</Tag>
               <Tag
                 colour={dataSetVersion?.type === 'Major' ? 'blue' : 'grey'}
-              >{`${dataSetVersion?.type} update`}</Tag>
+              >{`${dataSetVersion.type} update`}</Tag>
             </TagGroup>
 
             {isDraft && showForm ? (
               <ApiDataSetGuidanceNotesForm
-                notes={dataSetVersion?.notes}
+                notes={dataSetVersion.notes}
                 onSubmit={handleUpdateNotes}
               />
             ) : (
@@ -117,16 +114,18 @@ export default function ReleaseApiDataSetChangelogPage() {
               </>
             )}
 
-            {changes && dataSetVersion && (
+            {changes ? (
               <ApiDataSetChangelog
                 majorChanges={changes.majorChanges}
                 minorChanges={changes.minorChanges}
-                version={dataSetVersion.version}
+                version={dataSetVersion?.version ?? 'unknown'}
               />
+            ) : (
+              <WarningMessage>Could not load changelog</WarningMessage>
             )}
           </>
         ) : (
-          <WarningMessage>Could not load changelog</WarningMessage>
+          <WarningMessage>Could not load API data set</WarningMessage>
         )}
       </LoadingSpinner>
     </>

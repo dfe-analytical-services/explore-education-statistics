@@ -205,7 +205,7 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     expect(screen.queryByText('Data set title')).not.toBeInTheDocument();
 
     expect(
-      await screen.findByText('Could not load changelog'),
+      await screen.findByText('Could not load API data set'),
     ).toBeInTheDocument();
   });
 
@@ -217,11 +217,9 @@ describe('ReleaseApiDataSetChangelogPage', () => {
 
     renderPage('draft-version-id');
 
-    expect(screen.queryByText('Data set title')).not.toBeInTheDocument();
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
 
-    expect(
-      await screen.findByText('Could not load changelog'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Could not load changelog')).toBeInTheDocument();
   });
 
   function renderPage(dataSetVersionId: string) {
