@@ -1326,7 +1326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async void UpdatePublication_NoTitleOrSupersededByChange()
+        public async Task UpdatePublication_NoTitleOrSupersededByChange()
         {
             var theme = new Theme
             {
@@ -2648,26 +2648,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReleaseSeries()
         {
-            var legacyLinks = new List<ReleaseSeriesItem>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    LegacyLinkDescription = "legacy link 1",
-                    LegacyLinkUrl = "https://test.com/1",
-                },
-            };
+            ReleaseSeriesItem legacyLink = _dataFixture.DefaultLegacyReleaseSeriesItem();
 
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(ListOf<Release>(
+                .WithReleases([
                     _dataFixture
                         .DefaultRelease(publishedVersions: 1, year: 2020),
                     _dataFixture
                         .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
-                .WithLegacyLinks(legacyLinks)
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)
+                ])
+                .WithLegacyLinks([legacyLink])
                 .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -2686,7 +2679,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(4, viewModels.Count);
 
-                var expectedReleaseVersion1 = publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
+                var expectedReleaseVersion1 =
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
                 Assert.Equal(publication.ReleaseSeries[0].Id, viewModels[0].Id);
                 Assert.False(viewModels[0].IsLegacyLink);
                 Assert.Equal(expectedReleaseVersion1.Title, viewModels[0].Description);
@@ -2696,7 +2690,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(viewModels[0].IsPublished);
                 Assert.Null(viewModels[0].LegacyLinkUrl);
 
-                var expectedReleaseVersion2 = publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 });
+                var expectedReleaseVersion2 =
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 });
                 Assert.Equal(publication.ReleaseSeries[1].Id, viewModels[1].Id);
                 Assert.False(viewModels[1].IsLegacyLink);
                 Assert.Equal(expectedReleaseVersion2.Title, viewModels[1].Description);
@@ -2706,7 +2701,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(viewModels[1].IsPublished);
                 Assert.Null(viewModels[1].LegacyLinkUrl);
 
-                var expectedReleaseVersion3 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
+                var expectedReleaseVersion3 =
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
                 Assert.Equal(publication.ReleaseSeries[2].Id, viewModels[2].Id);
                 Assert.False(viewModels[2].IsLegacyLink);
                 Assert.Equal(expectedReleaseVersion3.Title, viewModels[2].Description);
@@ -2718,12 +2714,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication.ReleaseSeries[3].Id, viewModels[3].Id);
                 Assert.True(viewModels[3].IsLegacyLink);
-                Assert.Equal(legacyLinks[0].LegacyLinkDescription, viewModels[3].Description);
+                Assert.Equal(legacyLink.LegacyLinkDescription, viewModels[3].Description);
                 Assert.Null(viewModels[3].ReleaseId);
                 Assert.Null(viewModels[3].ReleaseSlug);
                 Assert.Null(viewModels[3].IsLatest);
                 Assert.Null(viewModels[3].IsPublished);
-                Assert.Equal(legacyLinks[0].LegacyLinkUrl, viewModels[3].LegacyLinkUrl);
+                Assert.Equal(legacyLink.LegacyLinkUrl, viewModels[3].LegacyLinkUrl);
             }
         }
 
@@ -2732,13 +2728,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(ListOf<Release>(
+                .WithReleases([
                     _dataFixture
                         .DefaultRelease(publishedVersions: 1, year: 2020),
                     _dataFixture
                         .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)
+                ])
                 .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -2757,7 +2754,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(3, viewModels.Count);
 
-                var expectedReleaseVersion1 = publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
+                var expectedReleaseVersion1 =
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
                 Assert.Equal(publication.ReleaseSeries[0].Id, viewModels[0].Id);
                 Assert.False(viewModels[0].IsLegacyLink);
                 Assert.Equal(expectedReleaseVersion1.Title, viewModels[0].Description);
@@ -2767,7 +2765,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(viewModels[0].IsPublished);
                 Assert.Null(viewModels[0].LegacyLinkUrl);
 
-                var expectedReleaseVersion2 = publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 });
+                var expectedReleaseVersion2 =
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 });
                 Assert.Equal(publication.ReleaseSeries[1].Id, viewModels[1].Id);
                 Assert.False(viewModels[1].IsLegacyLink);
                 Assert.Equal(expectedReleaseVersion2.Title, viewModels[1].Description);
@@ -2777,7 +2776,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(viewModels[1].IsPublished);
                 Assert.Null(viewModels[1].LegacyLinkUrl);
 
-                var expectedReleaseVersion3 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
+                var expectedReleaseVersion3 =
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
                 Assert.Equal(publication.ReleaseSeries[2].Id, viewModels[2].Id);
                 Assert.False(viewModels[2].IsLegacyLink);
                 Assert.Equal(expectedReleaseVersion3.Title, viewModels[2].Description);
@@ -2792,21 +2792,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReleaseSeries_NoReleases()
         {
-            var legacyLinks = new List<ReleaseSeriesItem>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    LegacyLinkDescription = "legacy link 1",
-                    LegacyLinkUrl = "https://test.com/1",
-                },
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    LegacyLinkDescription = "legacy link 2",
-                    LegacyLinkUrl = "https://test.com/2",
-                },
-            };
+            var legacyLinks = _dataFixture.DefaultLegacyReleaseSeriesItem()
+                .GenerateList(2);
 
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -2877,22 +2864,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task AddReleaseSeriesLegacyLink()
         {
-            var legacyLinks = new List<ReleaseSeriesItem>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    LegacyLinkDescription = "legacy link 1",
-                    LegacyLinkUrl = "https://test.com/1",
-                },
-            };
+            ReleaseSeriesItem legacyLink = _dataFixture.DefaultLegacyReleaseSeriesItem();
 
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(ListOf<Release>(
+                .WithReleases([
                     _dataFixture
-                        .DefaultRelease(publishedVersions: 1, year: 2020)))
-                .WithLegacyLinks(legacyLinks)
+                        .DefaultRelease(publishedVersions: 1, year: 2020)
+                ])
+                .WithLegacyLinks([legacyLink])
                 .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -2920,11 +2900,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Description = "New legacy link",
                         Url = "https://test.com/new"
                     });
+
                 var viewModels = result.AssertRight();
+                VerifyAllMocks(publicationCacheService);
 
                 Assert.Equal(3, viewModels.Count);
 
-                var expectedReleaseVersion1 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
+                var expectedReleaseVersion1 =
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
                 Assert.Equal(publication.ReleaseSeries[0].Id, viewModels[0].Id);
                 Assert.False(viewModels[0].IsLegacyLink);
                 Assert.Equal(expectedReleaseVersion1.Title, viewModels[0].Description);
@@ -2936,12 +2919,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication.ReleaseSeries[1].Id, viewModels[1].Id);
                 Assert.True(viewModels[1].IsLegacyLink);
-                Assert.Equal(legacyLinks[0].LegacyLinkDescription, viewModels[1].Description);
+                Assert.Equal(legacyLink.LegacyLinkDescription, viewModels[1].Description);
                 Assert.Null(viewModels[1].ReleaseId);
                 Assert.Null(viewModels[1].ReleaseSlug);
                 Assert.Null(viewModels[1].IsLatest);
                 Assert.Null(viewModels[1].IsPublished);
-                Assert.Equal(legacyLinks[0].LegacyLinkUrl, viewModels[1].LegacyLinkUrl);
+                Assert.Equal(legacyLink.LegacyLinkUrl, viewModels[1].LegacyLinkUrl);
 
                 Assert.True(viewModels[2].IsLegacyLink);
                 Assert.Equal("New legacy link", viewModels[2].Description);
@@ -2995,6 +2978,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Description = "New legacy link",
                         Url = "https://test.com/new"
                     });
+                VerifyAllMocks(publicationCacheService);
                 var viewModels = result.AssertRight();
 
                 var newSeriesItem = Assert.Single(viewModels);
@@ -3019,26 +3003,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateReleaseSeries()
         {
-            var legacyLinks = new List<ReleaseSeriesItem>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    LegacyLinkDescription = "legacy link 1",
-                    LegacyLinkUrl = "https://test.com/1",
-                },
-            };
-
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(ListOf<Release>(
+                .WithReleases([
                     _dataFixture
                         .DefaultRelease(publishedVersions: 1, year: 2020),
                     _dataFixture
                         .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
-                .WithLegacyLinks(legacyLinks)
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)
+                ])
+                .WithLegacyLinks([_dataFixture.DefaultLegacyReleaseSeriesItem()])
                 .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -3059,36 +3034,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext,
                     publicationCacheService: publicationCacheService.Object);
 
-                var expectedReleaseVersion2022 = publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
-                var expectedReleaseVersion2021 = publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 });
-                var expectedReleaseVersion2020 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
+                var expectedReleaseVersion2022 =
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
+                var expectedReleaseVersion2021 =
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 });
+                var expectedReleaseVersion2020 =
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
 
                 var result = await publicationService.UpdateReleaseSeries(
                     publication.Id,
-                    new List<ReleaseSeriesItemUpdateRequest>
-                    {
-                        new()
+                    updatedReleaseSeriesItems:
+                    [
+                        new ReleaseSeriesItemUpdateRequest
                         {
                             Id = Guid.NewGuid(),
                             LegacyLinkDescription = "Legacy link new",
                             LegacyLinkUrl = "https://test.com/new",
                         },
-                        new()
+
+                        new ReleaseSeriesItemUpdateRequest
                         {
                             Id = Guid.NewGuid(),
                             ReleaseId = expectedReleaseVersion2021.ReleaseId,
                         },
-                        new()
+
+                        new ReleaseSeriesItemUpdateRequest
                         {
                             Id = Guid.NewGuid(),
                             ReleaseId = expectedReleaseVersion2020.ReleaseId,
                         },
-                        new()
+
+                        new ReleaseSeriesItemUpdateRequest
                         {
                             Id = Guid.NewGuid(),
                             ReleaseId = expectedReleaseVersion2022.ReleaseId,
-                        },
-                    });
+                        }
+                    ]);
+
+                VerifyAllMocks(publicationCacheService);
+
                 var viewModels = result.AssertRight();
 
                 Assert.Equal(4, viewModels.Count);
@@ -3130,19 +3114,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateReleaseSeries_SetEmpty()
         {
-            var legacyLinks = new List<ReleaseSeriesItem>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    LegacyLinkDescription = "legacy link 1",
-                    LegacyLinkUrl = "https://test.com/1",
-                },
-            };
-
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithLegacyLinks(legacyLinks)
+                .WithLegacyLinks([_dataFixture.DefaultLegacyReleaseSeriesItem()])
                 .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -3165,7 +3139,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await publicationService.UpdateReleaseSeries(
                     publication.Id,
-                    new List<ReleaseSeriesItemUpdateRequest>());
+                    updatedReleaseSeriesItems: []);
+
+                VerifyAllMocks(publicationCacheService);
+
                 var viewModels = result.AssertRight();
 
                 Assert.Empty(viewModels);
@@ -3177,9 +3154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(ListOf<Release>(
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 1, year: 2020)))
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1, year: 2020)])
                 .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -3200,10 +3175,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext,
                     publicationCacheService: publicationCacheService.Object);
 
-                var exception = await Assert.ThrowsAsync<ArgumentException>(() => publicationService.UpdateReleaseSeries(
-                    publication.Id,
-                    new List<ReleaseSeriesItemUpdateRequest>()));
-                Assert.Equal("Missing or duplicate release in new release series. Expected ReleaseIds: " + publication.ReleaseVersions[0].ReleaseId, exception.Message);
+                var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+                    publicationService.UpdateReleaseSeries(
+                        publication.Id,
+                        updatedReleaseSeriesItems: []));
+
+                VerifyAllMocks(publicationCacheService);
+
+                Assert.Equal("Missing or duplicate release in new release series. Expected ReleaseIds: " +
+                             publication.ReleaseVersions[0].ReleaseId,
+                    exception.Message);
             }
         }
 
@@ -3212,9 +3193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(ListOf<Release>(
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 1, year: 2020)))
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1, year: 2020)])
                 .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -3235,22 +3214,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext,
                     publicationCacheService: publicationCacheService.Object);
 
-                var exception = await Assert.ThrowsAsync<ArgumentException>(() => publicationService.UpdateReleaseSeries(
-                    publication.Id,
-                    new List<ReleaseSeriesItemUpdateRequest>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            ReleaseId = publication.ReleaseVersions[0].ReleaseId,
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            ReleaseId = publication.ReleaseVersions[0].ReleaseId,
-                        },
-                    }));
-                Assert.Equal("Missing or duplicate release in new release series. Expected ReleaseIds: " + publication.ReleaseVersions[0].ReleaseId, exception.Message);
+                var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+                    publicationService.UpdateReleaseSeries(
+                        publication.Id,
+                        updatedReleaseSeriesItems:
+                        [
+                            new ReleaseSeriesItemUpdateRequest
+                            {
+                                Id = Guid.NewGuid(),
+                                ReleaseId = publication.ReleaseVersions[0].ReleaseId,
+                            },
+
+                            new ReleaseSeriesItemUpdateRequest
+                            {
+                                Id = Guid.NewGuid(),
+                                ReleaseId = publication.ReleaseVersions[0].ReleaseId,
+                            }
+                        ]));
+
+                VerifyAllMocks(publicationCacheService);
+
+                Assert.Equal("Missing or duplicate release in new release series. Expected ReleaseIds: " +
+                             publication.ReleaseVersions[0].ReleaseId,
+                    exception.Message);
             }
         }
 
@@ -3259,9 +3245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(ListOf<Release>(
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 1, year: 2020)))
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1, year: 2020)])
                 .WithTheme(_dataFixture.DefaultTheme());
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -3282,20 +3266,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext,
                     publicationCacheService: publicationCacheService.Object);
 
-                var seriesItemId = Guid.NewGuid();
-                var exception = await Assert.ThrowsAsync<ArgumentException>(() => publicationService.UpdateReleaseSeries(
-                    publication.Id,
-                    new List<ReleaseSeriesItemUpdateRequest>
-                    {
-                        new()
-                        {
-                            Id = seriesItemId,
-                            ReleaseId = publication.ReleaseVersions[0].ReleaseId,
-                            LegacyLinkDescription = "this should be null",
-                            LegacyLinkUrl = "https://should.be/null",
-                        },
-                    }));
-                Assert.Equal($"LegacyLink details shouldn't be set if ReleaseId is set. ReleaseSeriesItem: {seriesItemId}", exception.Message);
+                var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+                    publicationService.UpdateReleaseSeries(
+                        publication.Id,
+                        [
+                            new ReleaseSeriesItemUpdateRequest
+                            {
+                                Id = Guid.NewGuid(),
+                                ReleaseId = publication.ReleaseVersions[0].ReleaseId,
+                                LegacyLinkDescription = "this should be null",
+                                LegacyLinkUrl = "https://should.be/null",
+                            }
+                        ]));
+
+                VerifyAllMocks(publicationCacheService);
+
+                Assert.Equal(
+                    $"LegacyLink details shouldn't be set if ReleaseId is set. ReleaseSeriesItem: {Guid.NewGuid()}",
+                    exception.Message);
             }
         }
 
@@ -3324,20 +3312,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext,
                     publicationCacheService: publicationCacheService.Object);
 
-                var seriesItemId = Guid.NewGuid();
-                var exception = await Assert.ThrowsAsync<ArgumentException>(() => publicationService.UpdateReleaseSeries(
-                    publication.Id,
-                    new List<ReleaseSeriesItemUpdateRequest>
-                    {
-                        new()
-                        {
-                            Id = seriesItemId,
-                            ReleaseId = null,
-                            LegacyLinkDescription = null,
-                            LegacyLinkUrl = null,
-                        },
-                    }));
-                Assert.Equal($"LegacyLink details should be set if ReleaseId is null. ReleaseSeriesItem: {seriesItemId}", exception.Message);
+                var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+                    publicationService.UpdateReleaseSeries(
+                        publication.Id,
+                        [
+                            new ReleaseSeriesItemUpdateRequest
+                            {
+                                Id = Guid.NewGuid(),
+                                ReleaseId = null,
+                                LegacyLinkDescription = null,
+                                LegacyLinkUrl = null,
+                            }
+                        ]));
+
+                VerifyAllMocks(publicationCacheService);
+
+                Assert.Equal(
+                    $"LegacyLink details should be set if ReleaseId is null. ReleaseSeriesItem: {Guid.NewGuid()}",
+                    exception.Message);
             }
         }
 
