@@ -199,8 +199,11 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
         [Fact]
         public async Task Success()
         {
-            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion()
-                .WithPublication(DataFixture.DefaultPublication());
+            Publication publication = DataFixture.DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1)
+                    .GenerateList(1));
+
+            var releaseVersion = publication.Releases.Single().Versions.Single();
 
             await using var stream = "Test file".ToStream();
 
@@ -208,7 +211,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
-                context.ReleaseVersions.Add(releaseVersion);
+                context.Publications.Add(publication);
             });
 
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
@@ -240,12 +243,15 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
         [Fact]
         public async Task Success()
         {
-            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion()
-                .WithPublication(DataFixture.DefaultPublication());
+            Publication publication = DataFixture.DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1)
+                    .GenerateList(1));
+
+            var releaseVersion = publication.Releases.Single().Versions.Single();
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
-                context.ReleaseVersions.Add(releaseVersion);
+                context.Publications.Add(publication);
             });
 
             var fileId1 = Guid.NewGuid();
@@ -281,12 +287,15 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
         [Fact]
         public async Task Success_NoFileIds()
         {
-            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion()
-                .WithPublication(DataFixture.DefaultPublication());
+            Publication publication = DataFixture.DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1)
+                    .GenerateList(1));
+
+            var releaseVersion = publication.Releases.Single().Versions.Single();
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
-                context.ReleaseVersions.Add(releaseVersion);
+                context.Publications.Add(publication);
             });
 
             var releaseFileService = new Mock<IReleaseFileService>(Strict);

@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
@@ -31,30 +32,17 @@ public static class ReleaseVersionGeneratorExtensions
         return generator;
     }
 
+    [Obsolete("Provide relationship with Publication via Release. This will be removed in EES-5658/EES-5659")]
     public static Generator<ReleaseVersion> WithPublication(
         this Generator<ReleaseVersion> generator,
         Publication publication)
         => generator.ForInstance(s => s.SetPublication(publication));
-    
-    public static Generator<ReleaseVersion> WithPublicationId(
-        this Generator<ReleaseVersion> generator,
-        Guid publicationId)
-        => generator.ForInstance(s => s.SetPublicationId(publicationId));
-
-    public static Generator<ReleaseVersion> WithPublications(this Generator<ReleaseVersion> generator,
-        IEnumerable<Publication> publications)
-    {
-        publications.ForEach((publication, index) =>
-            generator.ForIndex(index, releaseVersion => releaseVersion.SetPublication(publication)));
-
-        return generator;
-    }
 
     public static Generator<ReleaseVersion> WithRelease(
         this Generator<ReleaseVersion> generator,
         Release release)
         => generator.ForInstance(s => s.SetRelease(release));
-    
+
     public static Generator<ReleaseVersion> WithReleaseId(
         this Generator<ReleaseVersion> generator,
         Guid releaseId)
@@ -128,8 +116,7 @@ public static class ReleaseVersionGeneratorExtensions
         int year)
         => generator.ForInstance(releaseVersion => releaseVersion.SetYear(year));
 
-    public static Generator<ReleaseVersion> WithSoftDeleted(
-        this Generator<ReleaseVersion> generator)
+    public static Generator<ReleaseVersion> WithSoftDeleted(this Generator<ReleaseVersion> generator)
         => generator.ForInstance(releaseVersion => releaseVersion.SetSoftDeleted());
 
     public static Generator<ReleaseVersion> WithType(
@@ -207,11 +194,13 @@ public static class ReleaseVersionGeneratorExtensions
             .SetDefault(p => p.Id)
             .SetDefault(p => p.Slug)
             .SetDefault(p => p.DataGuidance)
-            .SetDefault(p => p.Type)
+            .Set(p => p.Type,
+                f => f.PickRandom(EnumUtil.GetEnums<ReleaseType>().Except([ReleaseType.ExperimentalStatistics])))
             .SetDefault(p => p.PublicationId)
             .SetDefault(p => p.ReleaseId)
             .SetApprovalStatus(ReleaseApprovalStatus.Draft)
             .SetTimePeriodCoverage(TimeIdentifier.AcademicYear)
+            .SetDefault(p => p.PreReleaseAccessList)
             .Set(p => p.ReleaseName, (_, _, context) => $"{2000 + context.Index}")
             .Set(p => p.NextReleaseDate, (_, _, context) => new PartialDate
             {
@@ -223,13 +212,21 @@ public static class ReleaseVersionGeneratorExtensions
         Guid id)
         => setters.Set(releaseVersion => releaseVersion.Id, id);
 
+    [Obsolete("Set relationship with Publication via Release. This will be removed in EES-5658/EES-5659")]
     public static InstanceSetters<ReleaseVersion> SetPublication(
         this InstanceSetters<ReleaseVersion> setters,
         Publication publication)
         => setters
-            .Set(releaseVersion => releaseVersion.Publication, publication)
+            .Set(releaseVersion => releaseVersion.Publication,
+                (_, releaseVersion) =>
+                {
+                    publication.ReleaseVersions.Add(releaseVersion);
+
+                    return publication;
+                })
             .SetPublicationId(publication.Id);
 
+    [Obsolete("Set relationship with Publication via Release. This will be removed in EES-5658/EES-5659")]
     public static InstanceSetters<ReleaseVersion> SetPublicationId(
         this InstanceSetters<ReleaseVersion> setters,
         Guid publicationId)
@@ -238,7 +235,19 @@ public static class ReleaseVersionGeneratorExtensions
     public static InstanceSetters<ReleaseVersion> SetRelease(
         this InstanceSetters<ReleaseVersion> setters,
         Release release)
-        => setters.Set(releaseVersion => releaseVersion.Release, release)
+        => setters.Set(releaseVersion => releaseVersion.Release,
+                (_, releaseVersion) =>
+                {
+                    release.Versions.Add(releaseVersion);
+
+                    releaseVersion.Publication = release.Publication;
+                    releaseVersion.PublicationId = release.PublicationId;
+                    releaseVersion.ReleaseName = release.Year.ToString();
+                    releaseVersion.TimePeriodCoverage = release.TimePeriodCoverage;
+                    releaseVersion.Slug = release.Slug;
+
+                    return release;
+                })
             .SetReleaseId(release.Id);
 
     public static InstanceSetters<ReleaseVersion> SetReleaseId(
@@ -330,8 +339,7 @@ public static class ReleaseVersionGeneratorExtensions
         int year)
         => setters.Set(releaseVersion => releaseVersion.ReleaseName, year.ToString());
 
-    public static InstanceSetters<ReleaseVersion> SetSoftDeleted(
-        this InstanceSetters<ReleaseVersion> setters)
+    public static InstanceSetters<ReleaseVersion> SetSoftDeleted(this InstanceSetters<ReleaseVersion> setters)
         => setters.Set(releaseVersion => releaseVersion.SoftDeleted, true);
 
     public static InstanceSetters<ReleaseVersion> SetType(

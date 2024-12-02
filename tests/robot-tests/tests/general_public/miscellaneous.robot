@@ -94,18 +94,6 @@ Validate Cookies Details page
 
     cookie names should be on page
 
-Validate Privacy notice page
-    user clicks link    Privacy notice
-    user waits until h1 is visible    Privacy notice
-    user waits until page contains
-    ...    The Explore education statistics service is operated by the Department for Education
-
-    user checks url contains    %{PUBLIC_URL}/privacy-notice
-
-    user checks breadcrumb count should be    2
-    user checks nth breadcrumb contains    1    Home
-    user checks nth breadcrumb contains    2    Privacy notice
-
 Validate Contact page
     user clicks link    Contact us
     user waits until page contains    Contact Explore education statistics

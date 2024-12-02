@@ -214,6 +214,7 @@ Add content blocks to Test section one
     user adds content to autosaving accordion section text block    Test section one    1    block one test text
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
+    user scrolls up    100
     user adds text block to editable accordion section    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test section one    2    block two test text
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
@@ -237,6 +238,7 @@ Validate two remaining content blocks
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Verify that validation prevents adding an image without alt text
+    user scrolls up    100
     user adds image without alt text to accordion section text block    Test section one    1
     ...    test-infographic.png    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 

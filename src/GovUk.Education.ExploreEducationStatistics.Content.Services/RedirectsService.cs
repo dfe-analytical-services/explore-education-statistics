@@ -64,8 +64,18 @@ public class RedirectsService : IRedirectsService
             .Distinct()
             .ToList();
 
+        var releaseRedirectViewModels = await _contentDbContext.ReleaseRedirects
+            .Where(rr => rr.Slug != rr.Release.Slug) // don't use redirects to the current live slug
+            .Distinct()
+            .Select(rr => new RedirectViewModel(
+                rr.Slug,
+                rr.Release.Slug
+            ))
+            .ToListAsync();
+
         return new RedirectsViewModel(
             publicationRedirectViewModels,
-            methodologyRedirectViewModels);
+            methodologyRedirectViewModels,
+            releaseRedirectViewModels);
     }
 }

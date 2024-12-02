@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { check } from 'k6';
 import exec from 'k6/execution';
-import { Counter, Rate, Trend } from 'k6/metrics';
+import { Counter, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import createAdminService, {
@@ -45,7 +45,6 @@ interface SetupData {
   subjectMeta: SubjectMeta;
 }
 
-export const errorRate = new Rate('ees_errors');
 export const tableQuerySpeedTrend = new Trend(
   'ees_public_table_query_speed',
   true,
@@ -60,8 +59,7 @@ export const tableQueryFailureCount = new Counter(
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
-const { adminUrl, dataApiUrl, supportsRefreshTokens } =
-  environmentAndUsers.environment;
+const { adminUrl, dataApiUrl } = environmentAndUsers.environment;
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
@@ -196,12 +194,7 @@ const performTest = ({ subjectId, subjectMeta }: SetupData) => {
 
 export const teardown = ({ themeId }: SetupData) => {
   if (tearDownData) {
-    const accessToken = getOrRefreshAccessTokens(
-      supportsRefreshTokens,
-      userName,
-      adminUrl,
-      authTokens,
-    );
+    const accessToken = getOrRefreshAccessTokens(userName, authTokens);
 
     const adminService = createAdminService(adminUrl, accessToken);
 

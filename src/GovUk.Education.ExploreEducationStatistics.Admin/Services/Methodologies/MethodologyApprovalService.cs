@@ -243,7 +243,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     if (unusedImages.Any())
                     {
-                        return await _methodologyImageService.Delete(methodologyVersion.Id, unusedImages);
+                        return await _methodologyImageService.Delete(
+                            methodologyVersionId: methodologyVersion.Id,
+                            fileIds: unusedImages,
+                            forceDelete: true);
                     }
 
                     return Unit.Instance;

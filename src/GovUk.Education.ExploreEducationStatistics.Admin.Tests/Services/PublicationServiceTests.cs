@@ -1127,7 +1127,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                     .ReturnsAsync(new RedirectsViewModel(
-                        new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                        Publications: [],
+                        Methodologies: [],
+                        Releases: []));
 
                 var publicationService = BuildPublicationService(context,
                     methodologyService: methodologyService.Object,
@@ -1270,7 +1272,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                     .ReturnsAsync(new RedirectsViewModel(
-                        new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                        Publications: [],
+                        Methodologies: [],
+                        Releases: []));
 
                 var publicationService = BuildPublicationService(context,
                     methodologyService: methodologyService.Object,
@@ -1575,7 +1579,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                     .ReturnsAsync(new RedirectsViewModel(
-                        new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                        Publications: [],
+                        Methodologies: [],
+                        Releases: []));
 
                 var publicationService = BuildPublicationService(context,
                     methodologyService: methodologyService.Object,
@@ -1672,7 +1678,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                     .ReturnsAsync(new RedirectsViewModel(
-                        new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                        Publications: [],
+                        Methodologies: [],
+                        Releases: []));
 
                 var publicationService = BuildPublicationService(context,
                     methodologyService: methodologyService.Object,

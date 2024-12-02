@@ -61,7 +61,7 @@ export const tableQueryFailureCount = new Counter(
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
-const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
+const { adminUrl } = environmentAndUsers.environment;
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
@@ -133,12 +133,7 @@ export function setup(): SetupData {
 }
 
 const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
-  const accessToken = getOrRefreshAccessTokens(
-    supportsRefreshTokens,
-    userName,
-    adminUrl,
-    authTokens,
-  );
+  const accessToken = getOrRefreshAccessTokens(userName, authTokens);
 
   const adminService = createAdminService(adminUrl, accessToken);
 
@@ -176,12 +171,7 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
 
 export const teardown = ({ themeId }: SetupData) => {
   if (tearDownData) {
-    const accessToken = getOrRefreshAccessTokens(
-      supportsRefreshTokens,
-      userName,
-      adminUrl,
-      authTokens,
-    );
+    const accessToken = getOrRefreshAccessTokens(userName, authTokens);
 
     const adminService = createAdminService(adminUrl, accessToken);
 
@@ -190,9 +180,11 @@ export const teardown = ({ themeId }: SetupData) => {
     console.log(`Deleted Theme ${themeId}`);
   }
 };
+
 export function handleSummary(data: unknown) {
   return {
     'adminTableBuilderQuery.html': htmlReport(data),
   };
 }
+
 export default performTest;

@@ -10,9 +10,9 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers;
 
-[ApiVersion(1.0)]
+[ApiVersion("1")]
 [ApiController]
-[Route("api/v{version:apiVersion}/data-sets/{dataSetId:guid}/versions")]
+[Route("v{version:apiVersion}/data-sets/{dataSetId:guid}/versions")]
 public class DataSetVersionsController(
     IDataSetService dataSetService,
     IDataSetVersionChangeService dataSetVersionChangeService)

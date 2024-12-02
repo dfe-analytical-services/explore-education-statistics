@@ -45,6 +45,7 @@ export default class HttpClient {
       (this.checkResponseStatus && response.status < 200) ||
       response.status > 204
     ) {
+      this.logErrorResponse(response);
       throw response;
     }
 
@@ -77,6 +78,7 @@ export default class HttpClient {
       this.checkResponseStatus &&
       (response.status < 200 || response.status > 204)
     ) {
+      this.logErrorResponse(response);
       throw response;
     }
 
@@ -107,6 +109,7 @@ export default class HttpClient {
       (this.checkResponseStatus && response.status < 200) ||
       response.status > 204
     ) {
+      this.logErrorResponse(response);
       throw response;
     }
 
@@ -131,6 +134,7 @@ export default class HttpClient {
     });
 
     if (this.checkResponseStatus && response.status !== 204) {
+      this.logErrorResponse(response);
       throw response;
     }
 
@@ -148,5 +152,23 @@ export default class HttpClient {
           : {}),
       },
     };
+  }
+
+  private logErrorResponse(response: RefinedResponse<'text'>) {
+    if (response.headers['Www-Authenticate']) {
+      console.log(
+        `Got response with status "${
+          response.status
+        }" and message "${JSON.stringify(
+          response.headers['Www-Authenticate'],
+        )}"`,
+      );
+    } else {
+      console.log(
+        `Got response with status "${response.status}" - "${JSON.stringify(
+          response,
+        )}"`,
+      );
+    }
   }
 }

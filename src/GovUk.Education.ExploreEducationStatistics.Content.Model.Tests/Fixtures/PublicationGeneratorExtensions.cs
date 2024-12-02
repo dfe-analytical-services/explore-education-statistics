@@ -50,16 +50,6 @@ public static class PublicationGeneratorExtensions
         Func<SetterContext, IEnumerable<Release>> releases)
         => generator.ForInstance(s => s.SetReleases(releases.Invoke));
 
-    public static Generator<Publication> WithReleaseVersions(
-        this Generator<Publication> generator,
-        IEnumerable<ReleaseVersion> releaseVersions)
-        => generator.ForInstance(s => s.SetReleaseVersions(releaseVersions));
-
-    public static Generator<Publication> WithReleaseVersions(
-        this Generator<Publication> generator,
-        Func<SetterContext, IEnumerable<ReleaseVersion>> releaseVersions)
-        => generator.ForInstance(s => s.SetReleaseVersions(releaseVersions.Invoke));
-
     public static Generator<Publication> WithContact(
         this Generator<Publication> generator,
         Contact contact)
@@ -106,7 +96,8 @@ public static class PublicationGeneratorExtensions
         Guid? latestPublishedReleaseVersionId)
         => setters.Set(p => p.LatestPublishedReleaseVersionId, latestPublishedReleaseVersionId);
 
-    public static Generator<Publication> WithThemes(this Generator<Publication> generator,
+    public static Generator<Publication> WithThemes(
+        this Generator<Publication> generator,
         IEnumerable<Theme> themes)
     {
         themes.ForEach((theme, index) =>
@@ -123,22 +114,34 @@ public static class PublicationGeneratorExtensions
     private static InstanceSetters<Publication> SetReleases(
         this InstanceSetters<Publication> setters,
         Func<SetterContext, IEnumerable<Release>> releases)
-        => setters.Set(
-                p => p.ReleaseVersions,
+        => setters.Set(p => p.Releases,
                 (_, publication, context) =>
                 {
-                    var releaseList = releases.Invoke(context).ToList();
+                    var list = releases.Invoke(context).ToList();
 
-                    releaseList.ForEach(release =>
+                    list.ForEach(release =>
                     {
-                        publication.ReleaseSeries.Insert(0, new ReleaseSeriesItem
-                        {
-                            Id = Guid.NewGuid(),
-                            ReleaseId = release.Id,
-                        });
+                        release.Publication = publication;
+                        release.PublicationId = publication.Id;
                     });
 
-                    var releaseVersions = releaseList.SelectMany(r => r.Versions)
+                    return list;
+                })
+            .Set(p => p.ReleaseSeries,
+                (_, publication, context) =>
+                    publication.Releases
+                        .OrderByDescending(r => r.Year)
+                        .ThenByDescending(r => r.TimePeriodCoverage)
+                        .Select(release => context.Fixture
+                            .DefaultReleaseSeriesItem()
+                            .WithReleaseId(release.Id)
+                            .Generate())
+                        .ToList())
+            .Set(
+                p => p.ReleaseVersions,
+                (_, publication, _) =>
+                {
+                    var releaseVersions = publication.Releases.SelectMany(r => r.Versions)
                         .ToList();
 
                     releaseVersions.ForEach(releaseVersion =>
@@ -150,38 +153,46 @@ public static class PublicationGeneratorExtensions
                     return releaseVersions;
                 }
             )
-            .Set(p => p.LatestPublishedReleaseVersion, (_, publication, _) =>
-            {
-                var publishedVersions = publication.ReleaseVersions
-                    .Where(releaseVersion => releaseVersion.Published.HasValue)
-                    .ToList();
-
-                if (publishedVersions.Count == 0)
+            .Set(p => p.LatestPublishedReleaseVersion,
+                (_, publication, _) =>
                 {
-                    return null;
-                }
+                    var releaseVersions = publication.Releases.SelectMany(r => r.Versions)
+                        .ToList();
 
-                if (publishedVersions.Count == 1)
-                {
-                    return publishedVersions[0];
-                }
+                    var publishedVersions = releaseVersions
+                        .Where(releaseVersion => releaseVersion.Published.HasValue)
+                        .ToList();
 
-                return publishedVersions
-                    .GroupBy(releaseVersion => releaseVersion.ReleaseId)
-                    .Select(groupedReleases =>
-                        new
-                        {
-                            ReleaseId = groupedReleases.Key,
-                            Version = groupedReleases.Max(releaseVersion => releaseVersion.Version)
-                        })
-                    .Join(publishedVersions,
-                        maxVersion => maxVersion,
-                        releaseVersion => new { releaseVersion.ReleaseId, releaseVersion.Version },
-                        (_, release) => release)
-                    .OrderByDescending(releaseVersion => releaseVersion.Year)
-                    .ThenByDescending(releaseVersion => releaseVersion.TimePeriodCoverage)
-                    .FirstOrDefault();
-            })
+                    if (publishedVersions.Count == 0)
+                    {
+                        return null;
+                    }
+
+                    if (publishedVersions.Count == 1)
+                    {
+                        return publishedVersions[0];
+                    }
+
+                    return publishedVersions
+                        .GroupBy(releaseVersion => releaseVersion.ReleaseId)
+                        .Select(groupedReleases =>
+                            new
+                            {
+                                ReleaseId = groupedReleases.Key,
+                                Version = groupedReleases.Max(releaseVersion => releaseVersion.Version)
+                            })
+                        .Join(publishedVersions,
+                            maxVersion => maxVersion,
+                            releaseVersion => new
+                            {
+                                releaseVersion.ReleaseId,
+                                releaseVersion.Version
+                            },
+                            (_, releaseVersion) => releaseVersion)
+                        .OrderByDescending(releaseVersion => releaseVersion.Release.Year)
+                        .ThenByDescending(releaseVersion => releaseVersion.Release.TimePeriodCoverage)
+                        .FirstOrDefault();
+                })
             .Set(p => p.LatestPublishedReleaseVersionId,
                 (_, publication, _) => publication.LatestPublishedReleaseVersion?.Id);
 
@@ -217,24 +228,26 @@ public static class PublicationGeneratorExtensions
 
     private static InstanceSetters<Publication> SetLegacyLinks(
         this InstanceSetters<Publication> setters,
-        IEnumerable<ReleaseSeriesItem> legacyLinks)
-        => setters.Set(
-                p => p.ReleaseSeries,
-                (_, publication, context) =>
-                {
-                    legacyLinks.ForEach(legacyLink =>
-                    {
-                        publication.ReleaseSeries.Add(new()
-                        {
-                            Id = legacyLink.Id,
-                            LegacyLinkDescription = legacyLink.LegacyLinkDescription,
-                            LegacyLinkUrl = legacyLink.LegacyLinkUrl,
-                        });
-                    });
+        IEnumerable<ReleaseSeriesItem> legacyLinks) =>
+        setters.SetLegacyLinks(_ => legacyLinks);
 
-                    return publication.ReleaseSeries;
+    private static InstanceSetters<Publication> SetLegacyLinks(
+        this InstanceSetters<Publication> setters,
+        Func<SetterContext, IEnumerable<ReleaseSeriesItem>> legacyLinks) =>
+        setters.Set(
+            p => p.ReleaseSeries,
+            (_, publication, context) =>
+            {
+                var list = legacyLinks.Invoke(context).ToList();
+
+                if (list.Any(rsi => !rsi.IsLegacyLink))
+                {
+                    throw new ArgumentException("List can only contain legacy links", nameof(legacyLinks));
                 }
-            );
+
+                return [.. publication.ReleaseSeries, .. list];
+            }
+        );
 
     public static InstanceSetters<Publication> SetSupersededBy(
         this InstanceSetters<Publication> setters,

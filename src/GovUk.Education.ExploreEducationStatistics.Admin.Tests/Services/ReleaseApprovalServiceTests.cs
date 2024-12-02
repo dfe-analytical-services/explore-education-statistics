@@ -224,24 +224,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
             var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
 
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+                
+            releaseChecklistService
+                .Setup(s =>
+                    s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+                .ReturnsAsync(
+                    new List<ReleaseChecklistIssue>
+                    {
+                        new(DataFileImportsMustBeCompleted),
+                        new(DataFileReplacementsMustBeCompleted)
+                    }
+                );
+            
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                releaseChecklistService
-                    .Setup(s =>
-                        s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
-                    .ReturnsAsync(
-                        new List<ReleaseChecklistIssue>
-                        {
-                            new(DataFileImportsMustBeCompleted),
-                            new(DataFileReplacementsMustBeCompleted)
-                        }
-                    );
-
                 var releaseService = BuildService(
                     context,
-                    releaseChecklistService: releaseChecklistService.Object);
+                    releaseChecklistService: releaseChecklistService.Object,
+                    contentService: contentService.Object);
 
                 var result = await releaseService
                     .CreateReleaseStatus(
@@ -260,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                VerifyAllMocks(releaseChecklistService);
+                VerifyAllMocks(releaseChecklistService, contentService);
 
                 result.AssertBadRequest(
                     DataFileImportsMustBeCompleted,
@@ -764,10 +770,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
+            
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildService(context);
+                var releaseService = BuildService(
+                    contentDbContext: context,
+                    contentService: contentService.Object);
 
                 var result = await releaseService
                     .CreateReleaseStatus(
@@ -777,6 +791,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
                         }
                     );
+                
+                VerifyAllMocks(contentService);
 
                 result.AssertBadRequest(PublishedReleaseCannotBeUnapproved);
             }
@@ -1382,7 +1398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             imageFile1.File.Id,
                             imageFile2.File.Id
                         },
-                        false))
+                        true))
                 .ReturnsAsync(Unit.Instance);
 
             userReleaseRoleService.Setup(mock =>
@@ -1422,7 +1438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 imageFile1.File.Id,
                                 imageFile2.File.Id
                             },
-                            false),
+                            true),
                     Times.Once);
 
                 VerifyAllMocks(contentService, releaseFileService, userReleaseRoleService);

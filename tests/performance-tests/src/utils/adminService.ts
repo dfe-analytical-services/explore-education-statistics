@@ -122,7 +122,7 @@ export class AdminService {
         title,
         contact: {
           contactName: 'Team Contact',
-          contactTelNo: '12345',
+          contactTelNo: '01234 567890',
           teamEmail: 'team@example.com',
           teamName: 'Team',
         },

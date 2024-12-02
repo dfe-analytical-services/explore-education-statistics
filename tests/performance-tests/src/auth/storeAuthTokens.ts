@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 import fs from 'fs';
 import dotenvJson from 'dotenv-json-complex';
-import { EnvironmentAndUsers } from '../utils/environmentAndUsers';
-import getAuthDetails, { IdpOption } from './getAuthDetails';
+import getAuthTokens, { IdpOption } from './getAuthTokens';
 
 export interface User {
   name: string;
@@ -16,15 +15,18 @@ export interface Environment {
   contentApiUrl: string;
   dataApiUrl: string;
   publicApiUrl: string;
-  idp: IdpOption;
   users: User[];
-  supportsRefreshTokens: boolean;
+  idp: IdpOption;
+  openIdConnect: {
+    clientId: string;
+    refreshTokenUrl: string;
+  };
 }
 
-const getEnvironmentAndUsers = async (
+const writeLoginCredentialsToFile = async (
   environmentName: string,
   userNames: string[],
-): Promise<EnvironmentAndUsers> => {
+): Promise<void> => {
   dotenvJson({ environment: environmentName });
 
   const environment = JSON.parse(
@@ -35,7 +37,7 @@ const getEnvironmentAndUsers = async (
 
   const authTokens = await Promise.all(
     users.map(async ({ name, email, password }) => {
-      return getAuthDetails(
+      return getAuthTokens(
         name,
         email,
         password,
@@ -45,23 +47,9 @@ const getEnvironmentAndUsers = async (
     }),
   );
 
-  return {
-    environment,
-    users: authTokens,
-  };
-};
-
-const writeEnvironmentDetailsToFile = async (
-  environmentName: string,
-  userNames: string[],
-): Promise<void> => {
-  const environmentAndUsers = await getEnvironmentAndUsers(
-    environmentName,
-    userNames,
-  );
-  const filepath = `/home/node/app/dist/.environment-details.${environmentName}.json`;
-  fs.writeFileSync(filepath, JSON.stringify(environmentAndUsers));
+  const loginCredentialsFilePath = `dist/.auth-tokens.${environmentName}.json`;
+  fs.writeFileSync(loginCredentialsFilePath, JSON.stringify(authTokens));
 };
 
 const [environment, ...userNames] = process.argv.slice(2);
-writeEnvironmentDetailsToFile(environment, userNames);
+writeLoginCredentialsToFile(environment, userNames);

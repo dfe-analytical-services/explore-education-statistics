@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Contr
 
 public abstract class PublicationsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
-    private const string BaseUrl = "api/v1/publications";
+    private const string BaseUrl = "v1/publications";
 
     public class ListPublicationsTests(TestApplicationFactory testApp) : PublicationsControllerTests(testApp)
     {

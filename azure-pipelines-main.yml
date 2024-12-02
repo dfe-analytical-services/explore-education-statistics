@@ -389,6 +389,8 @@ jobs:
 
       - task: Bash@3
         displayName: Build
+        env:
+          TECH_DOCS_API_URL: https://dev.statistics.api.education.gov.uk
         inputs:
           workingDirectory: $(WorkingDirectory)
           targetType: inline

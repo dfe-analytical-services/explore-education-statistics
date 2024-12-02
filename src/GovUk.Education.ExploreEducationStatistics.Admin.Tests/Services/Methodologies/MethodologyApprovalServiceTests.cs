@@ -204,12 +204,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            imageService.Setup(mock =>
-                    mock.Delete(methodologyVersion.Id, new List<Guid>
+            imageService.Setup(mock => mock.Delete(
+                    methodologyVersion.Id, new List<Guid>
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
-                    }, false))
+                    }, true))
                 .ReturnsAsync(Unit.Instance);
 
             methodologyVersionRepository.Setup(mock =>
@@ -232,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
-                    }, false), Times.Once);
+                    }, true), Times.Once);
 
                 VerifyAllMocks(contentService, imageService, methodologyVersionRepository);
 
@@ -680,7 +680,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         new List<AllMethodologiesThemeViewModel>()));
 
             redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                .ReturnsAsync(new RedirectsViewModel(
+                    Publications: [], 
+                    Methodologies: [], 
+                    Releases: []));
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {

@@ -26,6 +26,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -41,11 +42,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
     {
         private static readonly DataFixture Fixture = new();
 
-        private static readonly ReleaseVersion ReleaseVersion = Fixture
-            .DefaultReleaseVersion()
-            .WithPublication(Fixture.DefaultPublication().Generate())
-            .WithPublished(DateTime.UtcNow.AddDays(-1))
-            .Generate();
+        private static readonly Release Release = Fixture.DefaultRelease(publishedVersions: 1)
+            .WithPublication(Fixture.DefaultPublication());
+
+        private static readonly ReleaseVersion ReleaseVersion = Release.Versions.Single();
 
         private static readonly DataBlockParent DataBlockParent = Fixture
             .DefaultDataBlockParent()
