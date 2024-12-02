@@ -1,10 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Mime;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -21,6 +15,12 @@ using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Mime;
+using System.Threading;
+using System.Threading.Tasks;
 using BlobInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
 using BlobProperties = Azure.Storage.Blobs.Models.BlobProperties;
 using CopyStatus = Azure.Storage.Blobs.Models.CopyStatus;
@@ -223,27 +223,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public async Task<bool> MoveBlob(
-            IBlobContainer containerName,
+            IBlobContainer sourceContainer,
             string sourcePath,
-            string destinationPath)
+            string destinationPath,
+            IBlobContainer? destinationContainer = null)
         {
-            var blobContainer = await GetBlobContainer(containerName);
+            var sourceContainerClient = await GetBlobContainer(sourceContainer);
+            var destinationContainerClient = destinationContainer is not null
+                ? await GetBlobContainer(destinationContainer)
+                : sourceContainerClient;
 
-            var destinationBlob = blobContainer.GetBlobClient(destinationPath);
-            if (await destinationBlob.ExistsAsync())
-            {
-                _logger.LogWarning(
-                    "Destination already exists while moving blob. Source: '{source}' Destination: '{destination}'",
-                    sourcePath, destinationPath);
-                return false;
-            }
-
-            var sourceBlob = blobContainer.GetBlobClient(sourcePath);
+            var sourceBlob = sourceContainerClient.GetBlobClient(sourcePath);
             if (!await sourceBlob.ExistsAsync())
             {
                 _logger.LogWarning(
-                    "Source blob not found while moving blob. Source: '{source}' Destination: '{destination}'",
-                    sourcePath, destinationPath);
+                    "Source blob not found while moving blob. Source: '{Source}' Destination: '{Destination}'",
+                    sourcePath,
+                    destinationPath);
+                return false;
+            }
+
+            var destinationBlob = destinationContainerClient.GetBlobClient(destinationPath);
+            if (await destinationBlob.ExistsAsync())
+            {
+                _logger.LogWarning(
+                    "Destination already exists while moving blob. Source: '{Source}' Destination: '{Destination}'",
+                    sourcePath,
+                    destinationPath);
                 return false;
             }
 
@@ -263,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 while (destinationProperties.CopyStatus == CopyStatus.Pending)
                 {
                     await Task.Delay(1000);
-                    _logger.LogInformation("Copy progress: {progress}", destinationProperties.CopyProgress);
+                    _logger.LogInformation("Copy progress: {Progress}", destinationProperties.CopyProgress);
                     destinationProperties = await destinationBlob.GetPropertiesAsync();
                 }
 

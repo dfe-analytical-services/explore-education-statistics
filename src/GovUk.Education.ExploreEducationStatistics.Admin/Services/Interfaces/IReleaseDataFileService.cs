@@ -1,11 +1,13 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -44,8 +46,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             string? dataSetTitle,
             Guid? replacingFileId);
 
-        Task<Either<ActionResult, List<DataFileInfo>>> UploadAsBulkZip(
+        Task<Either<ActionResult, List<ArchiveDataSetFileViewModel>>> ValidateAndUploadBulkZip(
             Guid releaseVersionId,
-            IFormFile bulkZipFormFile);
+            IFormFile zipFile,
+            CancellationToken cancellationToken);
+
+        Task<Either<ActionResult, List<DataFileInfo>>> SaveDataSetsFromTemporaryBlobStorage(
+            Guid releaseVersionId,
+            List<ArchiveDataSetFileViewModel> archiveDataSetFiles,
+            CancellationToken cancellationToken);
     }
 }

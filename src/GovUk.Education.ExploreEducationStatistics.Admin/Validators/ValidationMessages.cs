@@ -1,9 +1,9 @@
 #nullable enable
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
@@ -176,6 +176,34 @@ public static class ValidationMessages
         Code: nameof(DatasetNamesCsvFilenamesShouldNotEndDotCsv),
         Message: "Inside dataset_names.csv, file_name cell entries should not end in '.csv' i.e. should be 'filename' not 'filename.csv'. Filename found with extension: '{0}'."
     );
+
+    public static readonly LocalizableMessage FileIsNull = new(
+        Code: nameof(FileIsNull),
+        Message: "No file provided."
+    );
+
+    public static ErrorViewModel GenerateErrorFileIsNull()
+    {
+        return new ErrorViewModel
+        {
+            Code = FileIsNull.Code,
+            Message = FileIsNull.Message,
+        };
+    }
+
+    public static readonly LocalizableMessage DataReplacementAlreadyInProgress = new(
+        Code: nameof(DataReplacementAlreadyInProgress),
+        Message: "Data replacement already in progress"
+    );
+
+    public static ErrorViewModel GenerateErrorDataReplacementAlreadyInProgress()
+    {
+        return new ErrorViewModel
+        {
+            Code = DataReplacementAlreadyInProgress.Code,
+            Message = DataReplacementAlreadyInProgress.Message,
+        };
+    }
 
     public static ErrorViewModel GenerateErrorDatasetNamesCsvFilenamesShouldNotEndDotCsv(string filename)
     {

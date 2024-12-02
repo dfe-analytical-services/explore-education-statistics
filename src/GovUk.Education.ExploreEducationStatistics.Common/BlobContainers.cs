@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Common
+namespace GovUk.Education.ExploreEducationStatistics.Common
 {
     public interface IBlobContainer
     {
@@ -9,6 +9,7 @@
     public static class BlobContainers
     {
         public static readonly IBlobContainer PrivateReleaseFiles = new BlobContainer("releases");
+        public static readonly IBlobContainer PrivateReleaseTempFiles = new BlobContainer("releases-temp");
         public static readonly IBlobContainer PublicReleaseFiles = new BlobContainer("downloads");
         public static readonly IBlobContainer PrivateContent = new PrivateBlobContainer("cache");
         public static readonly IBlobContainer PublicContent = new PublicBlobContainer("cache");

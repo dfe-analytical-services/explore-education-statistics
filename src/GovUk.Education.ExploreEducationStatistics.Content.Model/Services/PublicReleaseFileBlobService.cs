@@ -46,7 +46,7 @@ public class PublicReleaseFileBlobService : IReleaseFileBlobService
     public Task<bool> MoveBlob(ReleaseFile releaseFile, string destinationPath)
     {
         return _publicBlobStorageService.MoveBlob(
-            containerName: PublicReleaseFiles,
+            sourceContainer: PublicReleaseFiles,
             sourcePath: releaseFile.PublicPath(),
             destinationPath: destinationPath);
     }
