@@ -11,6 +11,7 @@ variables:
   BuildConfiguration: Release
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
+  DotNetVersion: '8.0.x'
   NodeVersion: '20.16.0'
   RubyVersion: '3.2'
   AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
@@ -31,36 +32,28 @@ pr:
   - test
 
 jobs:
-  - job: Backend
-    pool: ees-ubuntu2204-xlarge
+  - job: BackendVerify
+    pool: ees-ubuntu2204-large
     workspace:
       clean: all
     steps:
       - task: UseDotNet@2
-        displayName: Install .NET 8.0 SDK
+        displayName: Install .NET $(DotNetVersion)
         inputs:
-          version: 8.0.x
+          version: $(DotNetVersion)
           performMultiLevelLookup: true
-
-      - task: DotNetCoreCLI@2
-        displayName: Build
-        inputs:
-          projects: |
-            **/GovUk.*/*csproj
-            !**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj
-          arguments: --configuration $(BuildConfiguration)
 
       # TODO: Uncomment this step once formatter has been run globally.
       # This is because whitespace rules cannot be warnings or suggestions; they will always be errors
       # - task: DotNetCoreCLI@2
-      #   displayName:'Verify Formatting and Style
+      #   displayName: Verify formatting
       #   inputs:
       #     command: custom
       #     custom: format whitespace src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error
       #     arguments: --verify-no-changes --verbosity diagnostic
 
       - task: DotNetCoreCLI@2
-        displayName: Verify Formatting and Style
+        displayName: Verify style
         inputs:
           command: custom
           custom: format
@@ -69,7 +62,7 @@ jobs:
           projects: src/GovUk.Education.ExploreEducationStatistics.sln
 
       - task: DotNetCoreCLI@2
-        displayName: Verify Formatting and Style
+        displayName: Verify analyzers
         inputs:
           command: custom
           custom: format
@@ -77,7 +70,18 @@ jobs:
           arguments: analyzers --verify-no-changes --verbosity diagnostic --severity error
           projects: src/GovUk.Education.ExploreEducationStatistics.sln
 
-      # TODO: Wrap these ^ three tasks up into a single `dotnet format` task once all 3 above TODOs are TO-DONE ;)
+      # TODO: Wrap the above three tasks up into a single `dotnet format` task once all TODOs are done
+
+  - job: BackendTest
+    pool: ees-ubuntu2204-xlarge
+    workspace:
+      clean: all
+    steps:
+      - task: UseDotNet@2
+        displayName: Install .NET $(DotNetVersion)
+        inputs:
+          version: $(DotNetVersion)
+          performMultiLevelLookup: true
 
       - task: DotNetCoreCLI@2
         displayName: Test
@@ -88,6 +92,16 @@ jobs:
             !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
           arguments: --configuration $(BuildConfiguration)
 
+  - job: BackendPublish
+    pool:
+      vmImage: ubuntu-22.04
+    steps:
+      - task: UseDotNet@2
+        displayName: Install .NET $(DotNetVersion)
+        inputs:
+          version: $(DotNetVersion)
+          performMultiLevelLookup: true
+
       - task: DotNetCoreCLI@2
         displayName: Package Data API
         inputs:
@@ -97,8 +111,9 @@ jobs:
           arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/data-api
           zipAfterPublish: True
 
-      - task: PublishPipelineArtifact@0
+      - task: PublishPipelineArtifact@1
         displayName: Publish Data API artifact
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           artifactName: data-api
           targetPath: $(Build.ArtifactStagingDirectory)/data-api
@@ -112,8 +127,9 @@ jobs:
           arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/content-api
           zipAfterPublish: True
 
-      - task: PublishPipelineArtifact@0
+      - task: PublishPipelineArtifact@1
         displayName: Publish Content API artifact
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           artifactName: content-api
           targetPath: $(Build.ArtifactStagingDirectory)/content-api
@@ -160,8 +176,9 @@ jobs:
           arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api-data-processor
           zipAfterPublish: True
 
-      - task: PublishPipelineArtifact@0
+      - task: PublishPipelineArtifact@1
         displayName: Publish Public API Data Processor artifact
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           artifactName: public-api-data-processor
           targetPath: $(Build.ArtifactStagingDirectory)/public-api-data-processor
@@ -175,8 +192,9 @@ jobs:
           arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/notifier
           zipAfterPublish: True
 
-      - task: PublishPipelineArtifact@0
+      - task: PublishPipelineArtifact@1
         displayName: Publish Notifier artifact
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           artifactName: notifier
           targetPath: $(Build.ArtifactStagingDirectory)/notifier
@@ -190,8 +208,9 @@ jobs:
           arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/publisher
           zipAfterPublish: True
 
-      - task: PublishPipelineArtifact@0
+      - task: PublishPipelineArtifact@1
         displayName: Publish Publisher artifact
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           artifactName: publisher
           targetPath: $(Build.ArtifactStagingDirectory)/publisher
@@ -205,8 +224,9 @@ jobs:
           arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/processor
           zipAfterPublish: True
 
-      - task: PublishPipelineArtifact@0
+      - task: PublishPipelineArtifact@1
         displayName: Publish Processor artifact
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           artifactName: processor
           targetPath: $(Build.ArtifactStagingDirectory)/processor
@@ -229,9 +249,9 @@ jobs:
           script: corepack enable
 
       - task: UseDotNet@2
-        displayName: Install .NET 8.0 SDK
+        displayName: Install .NET $(DotNetVersion)
         inputs:
-          version: 8.0.x
+          version: $(DotNetVersion)
           performMultiLevelLookup: true
 
       - task: DotNetCoreCLI@2
@@ -267,6 +287,7 @@ jobs:
 
       - task: DotNetCoreCLI@2
         displayName: Package Admin app
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           command: publish
           publishWebProjects: false
@@ -274,6 +295,7 @@ jobs:
           arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
 
       - task: PublishPipelineArtifact@0
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         displayName: Publish Admin artifact
         inputs:
           artifactName: admin
