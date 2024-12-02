@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public static class LogRunningOrchestration
+public static class LongRunningOrchestration
 {
     [Function(nameof(ProcessLongRunningOrchestration))]
     public static async Task ProcessLongRunningOrchestration(

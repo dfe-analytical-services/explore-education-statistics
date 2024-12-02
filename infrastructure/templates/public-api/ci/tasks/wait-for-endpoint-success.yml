@@ -1,24 +1,18 @@
 parameters:
-
   - name: serviceConnection
     type: string
-
   - name: displayName
     type: string
     default: Waiting for a successful response from endpoint
-
   - name: accessTokenScope
     type: string
     default: null
-
   - name: pollingDelaySeconds
     type: number
     default: 5
-
   - name: maxAttempts
     type: number
     default: 50
-
   - name: endpoint
     type: string
 

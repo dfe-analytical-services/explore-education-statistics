@@ -10,7 +10,7 @@ param location string = resourceGroup().location
 @description('Public API Storage : Size of the file share in GB.')
 param publicApiDataFileShareQuota int = 1
 
-@description('Firewall rules for maintenance of the service by allowing key IP ranges access to resources.')
+@description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
 @description('Database : administrator login name.')
@@ -189,7 +189,7 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
 }
 
 module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = 
-  if (deploySharedPrivateDnsZones || deployPsqlFlexibleServer || deployDataProcessor) {
+  if (deploySharedPrivateDnsZones) {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames

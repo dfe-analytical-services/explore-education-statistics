@@ -25,7 +25,7 @@ public class LongRunningTriggerFunction(
             httpRequest.GetRequestParamInt(paramName: "durationSeconds", 60);
 
         const string orchestratorName =
-            nameof(LogRunningOrchestration.ProcessLongRunningOrchestration);
+            nameof(LongRunningOrchestration.ProcessLongRunningOrchestration);
 
         var options = new StartOrchestrationOptions { InstanceId = instanceId.ToString() };
 

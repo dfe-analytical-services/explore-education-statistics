@@ -16,7 +16,7 @@ parameters:
     type: string
   - name: dependsOn
     type: object
-    default: [ ]
+    default: []
   - name: trigger
     type: string
     default: automatic
