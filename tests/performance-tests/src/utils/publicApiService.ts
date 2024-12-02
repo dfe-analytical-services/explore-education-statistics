@@ -153,6 +153,7 @@ export interface DataSetQueryRequest {
       order: string;
     },
   ];
+  pageSize?: number;
 }
 
 export interface DataSetQueryResponse {

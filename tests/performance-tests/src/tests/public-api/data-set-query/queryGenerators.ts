@@ -41,18 +41,26 @@ class DataSetQueryGenerator {
 
   private readonly comparableOperators: DataSetQueryComparableOperator[];
 
+  private readonly minPageSize: number | undefined;
+  
+  private readonly maxPageSize: number | undefined;
+
   constructor({
     maxDepth,
     maxBranching,
     maxArrayItems,
     idOperators,
     comparableOperators,
+    minPageSize,
+    maxPageSize,
   }: QueryGeneratorConfig) {
     this.maxDepth = maxDepth;
     this.maxBranching = maxBranching ?? 3;
     this.maxArrayItems = maxArrayItems ?? Number.MAX_VALUE;
     this.idOperators = idOperators;
     this.comparableOperators = comparableOperators;
+    this.minPageSize = minPageSize;
+    this.maxPageSize = maxPageSize;
   }
 
   generateQuery(dataSetMeta: DataSetMeta): DataSetQueryRequest {
@@ -61,6 +69,12 @@ class DataSetQueryGenerator {
       dataSetMeta.indicators,
       Math.min(indicatorRange.random(), this.maxArrayItems),
     );
+    
+    const minSize = Math.min(this.minPageSize)
+    if (this.minPageSize && this.maxPageSize) {
+      pageSize = this.minPageSize + Math.floor(Math.random() * (this.maxPageSize - this.minPageSize));
+    }
+    
     return {
       criteria: this.generateDataSetQueryNode({
         dataSetMeta,
@@ -251,8 +265,9 @@ export type QueryGeneratorConfig = {
   maxArrayItems?: number;
   idOperators: DataSetQueryIdOperator[];
   comparableOperators: DataSetQueryComparableOperator[];
+  minPageSize?: number;
+  maxPageSize?: number;
 };
-
 export default function createQueryGenerator(config: QueryGeneratorConfig) {
   return new DataSetQueryGenerator(config);
 }

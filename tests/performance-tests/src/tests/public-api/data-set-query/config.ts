@@ -21,6 +21,8 @@ const queries = (__ENV.QUERIES ?? 'simple') as 'simple' | 'complex';
 const dataSetTitlesToInclude = __ENV.DATA_SET_TITLES_TO_INCLUDE?.split(',');
 const dataSetTitlesToExclude = __ENV.DATA_SET_TITLES_TO_EXCLUDE?.split(',');
 const maxDataSetRows = parseIntOptional(__ENV.DATA_SET_MAX_ROWS);
+const minPageSize = parseIntOptional(__ENV.PAGE_SIZE_MIN);
+const maxPageSize = parseIntOptional(__ENV.PAGE_SIZE_MAX);
 
 function getOptions(): Options {
   switch (profile) {
@@ -84,6 +86,8 @@ export interface DataSetConfig {
   includeTitles?: string[];
   excludeTitles?: string[];
   maxRows?: number;
+  minPageSize?: number,
+  maxPageSize?: number
 }
 
 export interface Config {
@@ -99,6 +103,8 @@ const config: Config = {
     includeTitles: dataSetTitlesToInclude,
     excludeTitles: dataSetTitlesToExclude,
     maxRows: maxDataSetRows,
+    minPageSize: minPageSize,
+    maxPageSize: maxPageSize
   },
 };
 
