@@ -3,6 +3,7 @@ import _redirectService, {
   Redirects,
 } from '@frontend/services/redirectService';
 import { NextResponse } from 'next/server';
+import { Dictionary } from '@common/types';
 import runMiddleware from './util/runMiddleware';
 
 jest.mock('@frontend/services/redirectService');
@@ -11,165 +12,432 @@ const redirectService = _redirectService as jest.Mocked<
 >;
 
 describe('redirectPages', () => {
-  interface TestDataWithoutRedirect {
+  interface OldSlugNewSlugPair {
+    oldSlug: string;
+    newSlug: string;
+  }
+
+  interface NonRedirectedCase {
+    oldSlugsByPlaceholder: Dictionary<string>;
+  }
+
+  interface RedirectedCase {
+    oldSlugNewSlugPairsByPlaceholder: Dictionary<OldSlugNewSlugPair>;
+  }
+
+  interface RoutePatternTestCases {
     routePattern: string;
-    fromSlug: string;
+    redirectedCases: RedirectedCase[];
+    nonRedirectedCases: NonRedirectedCase[];
   }
 
-  interface TestDataWithRedirect extends TestDataWithoutRedirect {
-    toSlug: string;
+  interface NonRedirectedCaseTestData {
+    routePattern: string;
+    oldSlugsByPlaceholder: Dictionary<string>;
   }
 
-  const slugPlaceholder = '{slug}';
+  interface RedirectedCaseTestData {
+    routePattern: string;
+    oldSlugNewSlugPairsByPlaceholder: Dictionary<OldSlugNewSlugPair>;
+  }
+
+  const methodologySlugPlaceholder = '{methodology-slug}';
+  const publicationSlugPlaceholder = '{publication-slug}';
+  const releaseSlugPlaceholder = '{release-slug}';
 
   const testRedirects: Redirects = {
-    methodologies: [{ fromSlug: 'original-slug-1', toSlug: 'updated-slug-1' }],
-    publications: [{ fromSlug: 'original-slug-2', toSlug: 'updated-slug-2' }],
-    releases: [{ fromSlug: 'original-slug-3', toSlug: 'updated-slug-3' }],
+    methodologyRedirects: [
+      {
+        fromSlug: 'original-methodology-slug-1',
+        toSlug: 'updated-methodology-slug-1',
+      },
+    ],
+    publicationRedirects: [
+      {
+        fromSlug: 'original-publication-slug-1',
+        toSlug: 'updated-publication-slug-1',
+      },
+      {
+        fromSlug: 'original-publication-slug-3',
+        toSlug: 'updated-publication-slug-3',
+      },
+    ],
+    releaseRedirectsByPublicationSlug: {
+      'updated-publication-slug-1': [
+        {
+          fromSlug: 'original-release-slug-1',
+          toSlug: 'updated-release-slug-1',
+        },
+      ],
+      'original-publication-slug-2': [
+        {
+          fromSlug: 'original-release-slug-1',
+          toSlug: 'updated-release-slug-1',
+        },
+      ],
+    },
   };
 
-  const testRedirectData: TestDataWithRedirect[] = [
+  const mixedPublicationReleasePageRedirectedCases: RedirectedCase[] = [
+    // Publication slug IS NOT latest + Release slug IS NOT latest
     {
-      routePattern: `methodology/${slugPlaceholder}`,
-      fromSlug: testRedirects.methodologies[0].fromSlug,
-      toSlug: testRedirects.methodologies[0].toSlug,
+      oldSlugNewSlugPairsByPlaceholder: {
+        [publicationSlugPlaceholder]: {
+          oldSlug: 'original-publication-slug-1',
+          newSlug: 'updated-publication-slug-1',
+        },
+        [releaseSlugPlaceholder]: {
+          oldSlug: 'original-release-slug-1',
+          newSlug: 'updated-release-slug-1',
+        },
+      },
     },
+    // Publication slug IS NOT latest + Release slug IS latest
     {
-      routePattern: `find-statistics/${slugPlaceholder}`,
-      fromSlug: testRedirects.publications[0].fromSlug,
-      toSlug: testRedirects.publications[0].toSlug,
+      oldSlugNewSlugPairsByPlaceholder: {
+        [publicationSlugPlaceholder]: {
+          oldSlug: 'original-publication-slug-1',
+          newSlug: 'updated-publication-slug-1',
+        },
+        [releaseSlugPlaceholder]: {
+          oldSlug: 'updated-release-slug-1',
+          newSlug: 'updated-release-slug-1',
+        },
+      },
     },
+    // Publication slug IS NOT latest + Release slug HAS NO redirect
     {
-      routePattern: `find-statistics/${slugPlaceholder}/data-guidance`,
-      fromSlug: testRedirects.publications[0].fromSlug,
-      toSlug: testRedirects.publications[0].toSlug,
+      oldSlugNewSlugPairsByPlaceholder: {
+        [publicationSlugPlaceholder]: {
+          oldSlug: 'original-publication-slug-1',
+          newSlug: 'updated-publication-slug-1',
+        },
+        [releaseSlugPlaceholder]: {
+          oldSlug: 'original-release-slug-2',
+          newSlug: 'original-release-slug-2',
+        },
+      },
     },
+    // Publication slug IS NOT latest + Publication HAS NO Release redirects
     {
-      routePattern: `find-statistics/${slugPlaceholder}/prerelease-access-list`,
-      fromSlug: testRedirects.publications[0].fromSlug,
-      toSlug: testRedirects.publications[0].toSlug,
+      oldSlugNewSlugPairsByPlaceholder: {
+        [publicationSlugPlaceholder]: {
+          oldSlug: 'original-publication-slug-3',
+          newSlug: 'updated-publication-slug-3',
+        },
+        [releaseSlugPlaceholder]: {
+          oldSlug: 'original-release-slug-1',
+          newSlug: 'original-release-slug-1',
+        },
+      },
     },
+    // Publication slug IS latest + Release slug IS NOT latest
     {
-      routePattern: `find-statistics/publication-slug/${slugPlaceholder}`,
-      fromSlug: testRedirects.releases[0].fromSlug,
-      toSlug: testRedirects.releases[0].toSlug,
+      oldSlugNewSlugPairsByPlaceholder: {
+        [publicationSlugPlaceholder]: {
+          oldSlug: 'updated-publication-slug-1',
+          newSlug: 'updated-publication-slug-1',
+        },
+        [releaseSlugPlaceholder]: {
+          oldSlug: 'original-release-slug-1',
+          newSlug: 'updated-release-slug-1',
+        },
+      },
     },
+    // Publication slug HAS NO redirect + Release slug IS NOT latest
     {
-      routePattern: `find-statistics/publication-slug/${slugPlaceholder}/data-guidance`,
-      fromSlug: testRedirects.releases[0].fromSlug,
-      toSlug: testRedirects.releases[0].toSlug,
+      oldSlugNewSlugPairsByPlaceholder: {
+        [publicationSlugPlaceholder]: {
+          oldSlug: 'original-publication-slug-2',
+          newSlug: 'original-publication-slug-2',
+        },
+        [releaseSlugPlaceholder]: {
+          oldSlug: 'original-release-slug-1',
+          newSlug: 'updated-release-slug-1',
+        },
+      },
     },
+  ];
+  const mixedPublicationReleasePageNonRedirectedCases: NonRedirectedCase[] = [
+    // Publication slug IS latest + Release slug IS latest
     {
-      routePattern: `find-statistics/publication-slug/${slugPlaceholder}/prerelease-access-list`,
-      fromSlug: testRedirects.releases[0].fromSlug,
-      toSlug: testRedirects.releases[0].toSlug,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'updated-publication-slug-1',
+        [releaseSlugPlaceholder]: 'updated-release-slug-1',
+      },
     },
+    // Publication slug IS latest + Release slug HAS NO redirect
     {
-      routePattern: `data-tables/${slugPlaceholder}`,
-      fromSlug: testRedirects.publications[0].fromSlug,
-      toSlug: testRedirects.publications[0].toSlug,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'updated-publication-slug-1',
+        [releaseSlugPlaceholder]: 'original-release-slug-2',
+      },
     },
+    // Publication slug IS latest + Publication HAS NO Release redirects
     {
-      routePattern: `data-tables/${slugPlaceholder}/fast-track/child-route`,
-      fromSlug: testRedirects.publications[0].fromSlug,
-      toSlug: testRedirects.publications[0].toSlug,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'updated-publication-slug-3',
+        [releaseSlugPlaceholder]: 'original-release-slug-1',
+      },
     },
+    // Publication slug HAS NO redirect + Release slug IS latest
     {
-      routePattern: `data-tables/${slugPlaceholder}/permalink/child-route`,
-      fromSlug: testRedirects.publications[0].fromSlug,
-      toSlug: testRedirects.publications[0].toSlug,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-2',
+        [releaseSlugPlaceholder]: 'updated-release-slug-1',
+      },
     },
+    // Publication slug HAS NO redirect + Release slug HAS NO redirect
     {
-      routePattern: `data-tables/publication-slug/${slugPlaceholder}`,
-      fromSlug: testRedirects.releases[0].fromSlug,
-      toSlug: testRedirects.releases[0].toSlug,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-2',
+        [releaseSlugPlaceholder]: 'original-release-slug-2',
+      },
+    },
+    // Publication slug HAS NO redirect + Publication HAS NO Release redirects
+    {
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-4',
+        [releaseSlugPlaceholder]: 'original-release-slug-1',
+      },
+    },
+    // Matches redirect slugs from another redirect type
+    {
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-methodology-slug-1',
+        [releaseSlugPlaceholder]: 'original-methodology-slug-1',
+      },
     },
   ];
 
-  const testRedirectDataWithFromSlugMatchingAnotherRedirectType: TestDataWithoutRedirect[] =
-    [
+  const methodologyPageTestData: RoutePatternTestCases = {
+    routePattern: `methodology/${methodologySlugPlaceholder}`,
+    redirectedCases: [
       {
-        routePattern: `methodology/${slugPlaceholder}`,
-        fromSlug: testRedirects.publications[0].fromSlug,
+        oldSlugNewSlugPairsByPlaceholder: {
+          [methodologySlugPlaceholder]: {
+            oldSlug: 'original-methodology-slug-1',
+            newSlug: 'updated-methodology-slug-1',
+          },
+        },
       },
+    ],
+    nonRedirectedCases: [
       {
-        routePattern: `find-statistics/${slugPlaceholder}`,
-        fromSlug: testRedirects.methodologies[0].fromSlug,
+        oldSlugsByPlaceholder: {
+          [methodologySlugPlaceholder]: 'original-methodology-slug-2',
+        },
       },
+      // Matches redirect slugs from another redirect type
       {
-        routePattern: `find-statistics/${slugPlaceholder}/data-guidance`,
-        fromSlug: testRedirects.methodologies[0].fromSlug,
+        oldSlugsByPlaceholder: {
+          [methodologySlugPlaceholder]: 'original-publication-slug-1',
+        },
       },
-      {
-        routePattern: `find-statistics/${slugPlaceholder}/prerelease-access-list`,
-        fromSlug: testRedirects.methodologies[0].fromSlug,
-      },
-      {
-        routePattern: `find-statistics/publication-slug/${slugPlaceholder}`,
-        fromSlug: testRedirects.publications[0].fromSlug,
-      },
-      {
-        routePattern: `find-statistics/publication-slug/${slugPlaceholder}/data-guidance`,
-        fromSlug: testRedirects.publications[0].fromSlug,
-      },
-      {
-        routePattern: `find-statistics/publication-slug/${slugPlaceholder}/prerelease-access-list`,
-        fromSlug: testRedirects.publications[0].fromSlug,
-      },
-      {
-        routePattern: `data-tables/${slugPlaceholder}`,
-        fromSlug: testRedirects.releases[0].fromSlug,
-      },
-      {
-        routePattern: `data-tables/${slugPlaceholder}/fast-track/child-route`,
-        fromSlug: testRedirects.releases[0].fromSlug,
-      },
-      {
-        routePattern: `data-tables/${slugPlaceholder}/permalink/child-route`,
-        fromSlug: testRedirects.releases[0].fromSlug,
-      },
-      {
-        routePattern: `data-tables/publication-slug/${slugPlaceholder}`,
-        fromSlug: testRedirects.publications[0].fromSlug,
-      },
-    ];
+    ],
+  };
 
-  const testRedirectDataWithChildRoute: TestDataWithoutRedirect[] = [
+  const findStatisticsPublicationPageTestData: RoutePatternTestCases = {
+    routePattern: `find-statistics/${publicationSlugPlaceholder}`,
+    redirectedCases: [
+      {
+        oldSlugNewSlugPairsByPlaceholder: {
+          [publicationSlugPlaceholder]: {
+            oldSlug: 'original-publication-slug-1',
+            newSlug: 'updated-publication-slug-1',
+          },
+        },
+      },
+    ],
+    nonRedirectedCases: [
+      {
+        oldSlugsByPlaceholder: {
+          [publicationSlugPlaceholder]: 'original-publication-slug-2',
+        },
+      },
+      // Matches redirect slugs from another redirect type
+      {
+        oldSlugsByPlaceholder: {
+          [publicationSlugPlaceholder]: 'original-methodology-slug-1',
+        },
+      },
+    ],
+  };
+
+  const findStatisticsPublicationDataGuidancePageTestData: RoutePatternTestCases =
     {
-      routePattern: `methodology/${slugPlaceholder}/child-route`,
-      fromSlug: testRedirects.methodologies[0].fromSlug,
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/data-guidance`,
+      redirectedCases: findStatisticsPublicationPageTestData.redirectedCases,
+      nonRedirectedCases:
+        findStatisticsPublicationPageTestData.nonRedirectedCases,
+    };
+
+  const findStatisticsPublicationPrereleaseAccessListPageTestData: RoutePatternTestCases =
+    {
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/prerelease-access-list`,
+      redirectedCases: findStatisticsPublicationPageTestData.redirectedCases,
+      nonRedirectedCases:
+        findStatisticsPublicationPageTestData.nonRedirectedCases,
+    };
+
+  const findStatisticsReleasePageTestData: RoutePatternTestCases = {
+    routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}`,
+    redirectedCases: mixedPublicationReleasePageRedirectedCases,
+    nonRedirectedCases: mixedPublicationReleasePageNonRedirectedCases,
+  };
+
+  const findStatisticsReleaseDataGuidancePageTestData: RoutePatternTestCases = {
+    routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/data-guidance`,
+    redirectedCases: findStatisticsReleasePageTestData.redirectedCases,
+    nonRedirectedCases: findStatisticsReleasePageTestData.nonRedirectedCases,
+  };
+
+  const findStatisticsReleasePrereleaseAccessListPageTestData: RoutePatternTestCases =
+    {
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/prerelease-access-list`,
+      redirectedCases: findStatisticsReleasePageTestData.redirectedCases,
+      nonRedirectedCases: findStatisticsReleasePageTestData.nonRedirectedCases,
+    };
+
+  const dataTablesPublicationPageTestData: RoutePatternTestCases = {
+    routePattern: `data-tables/${publicationSlugPlaceholder}`,
+    redirectedCases: [
+      {
+        oldSlugNewSlugPairsByPlaceholder: {
+          [publicationSlugPlaceholder]: {
+            oldSlug: 'original-publication-slug-1',
+            newSlug: 'updated-publication-slug-1',
+          },
+        },
+      },
+    ],
+    nonRedirectedCases: [
+      {
+        oldSlugsByPlaceholder: {
+          [publicationSlugPlaceholder]: 'original-publication-slug-2',
+        },
+      },
+      // Matches redirect slugs from another redirect type
+      {
+        oldSlugsByPlaceholder: {
+          [publicationSlugPlaceholder]: 'original-methodology-slug-1',
+        },
+      },
+    ],
+  };
+
+  const dataTablesPublicationFastTrackPageTestData: RoutePatternTestCases = {
+    routePattern: `data-tables/${publicationSlugPlaceholder}/fast-track/child-route`,
+    redirectedCases: dataTablesPublicationPageTestData.redirectedCases,
+    nonRedirectedCases: dataTablesPublicationPageTestData.nonRedirectedCases,
+  };
+
+  const dataTablesPublicationPermalinkPageTestData: RoutePatternTestCases = {
+    routePattern: `data-tables/${publicationSlugPlaceholder}/permalink/child-route`,
+    redirectedCases: dataTablesPublicationPageTestData.redirectedCases,
+    nonRedirectedCases: dataTablesPublicationPageTestData.nonRedirectedCases,
+  };
+
+  const dataTablesReleasePageTestData: RoutePatternTestCases = {
+    routePattern: `data-tables/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}`,
+    redirectedCases: mixedPublicationReleasePageRedirectedCases,
+    nonRedirectedCases: mixedPublicationReleasePageNonRedirectedCases,
+  };
+
+  const routePatternTestCases: RoutePatternTestCases[] = [
+    methodologyPageTestData,
+    findStatisticsPublicationPageTestData,
+    findStatisticsPublicationDataGuidancePageTestData,
+    findStatisticsPublicationPrereleaseAccessListPageTestData,
+    findStatisticsReleasePageTestData,
+    findStatisticsReleaseDataGuidancePageTestData,
+    findStatisticsReleasePrereleaseAccessListPageTestData,
+    dataTablesPublicationPageTestData,
+    dataTablesPublicationFastTrackPageTestData,
+    dataTablesPublicationPermalinkPageTestData,
+    dataTablesReleasePageTestData,
+  ];
+
+  const redirectedCases: RedirectedCaseTestData[] =
+    routePatternTestCases.flatMap(td => {
+      return td.redirectedCases.map(
+        (rc): RedirectedCaseTestData => ({
+          routePattern: td.routePattern,
+          oldSlugNewSlugPairsByPlaceholder: rc.oldSlugNewSlugPairsByPlaceholder,
+        }),
+      );
+    });
+
+  const nonRedirectedCases: NonRedirectedCaseTestData[] =
+    routePatternTestCases.flatMap(td => {
+      return td.nonRedirectedCases.map(
+        (rc): NonRedirectedCaseTestData => ({
+          routePattern: td.routePattern,
+          oldSlugsByPlaceholder: rc.oldSlugsByPlaceholder,
+        }),
+      );
+    });
+
+  // These are routes that have slugs defined that would normally be redirected, but shouldn't be due
+  // to them being for a child-route that is not explicitly captured in the redirect patterns we look for.
+  const childRouteCases: NonRedirectedCaseTestData[] = [
+    {
+      routePattern: `methodology/${methodologySlugPlaceholder}/child-route`,
+      oldSlugsByPlaceholder: {
+        [methodologySlugPlaceholder]: 'original-methodology-slug-1',
+      },
     },
     {
-      routePattern: `find-statistics/${slugPlaceholder}/data-guidance/child-route`,
-      fromSlug: testRedirects.publications[0].fromSlug,
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/data-guidance/child-route`,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-1',
+      },
     },
     {
-      routePattern: `find-statistics/${slugPlaceholder}/prerelease-access-list/child-route`,
-      fromSlug: testRedirects.publications[0].fromSlug,
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/prerelease-access-list/child-route`,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-1',
+      },
     },
     {
-      routePattern: `find-statistics/publication-slug/${slugPlaceholder}/child-route`,
-      fromSlug: testRedirects.releases[0].fromSlug,
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/child-route`,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-1',
+        [releaseSlugPlaceholder]: 'original-release-slug-1',
+      },
     },
     {
-      routePattern: `find-statistics/publication-slug/${slugPlaceholder}/data-guidance/child-route`,
-      fromSlug: testRedirects.releases[0].fromSlug,
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/data-guidance/child-route`,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-1',
+        [releaseSlugPlaceholder]: 'original-release-slug-1',
+      },
     },
     {
-      routePattern: `find-statistics/publication-slug/${slugPlaceholder}/prerelease-access-list/child-route`,
-      fromSlug: testRedirects.releases[0].fromSlug,
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/prerelease-access-list/child-route`,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-1',
+        [releaseSlugPlaceholder]: 'original-release-slug-1',
+      },
     },
     {
-      routePattern: `data-tables/${slugPlaceholder}/fast-track/child-route/child-route`,
-      fromSlug: testRedirects.publications[0].fromSlug,
+      routePattern: `data-tables/${publicationSlugPlaceholder}/fast-track/child-route/child-route`,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-1',
+      },
     },
     {
-      routePattern: `data-tables/${slugPlaceholder}/permalink/child-route/child-route`,
-      fromSlug: testRedirects.publications[0].fromSlug,
+      routePattern: `data-tables/${publicationSlugPlaceholder}/permalink/child-route/child-route`,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-1',
+      },
     },
     {
-      routePattern: `data-tables/publication-slug/${slugPlaceholder}/child-route`,
-      fromSlug: testRedirects.releases[0].fromSlug,
+      routePattern: `data-tables/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/child-route`,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-1',
+        [releaseSlugPlaceholder]: 'original-release-slug-1',
+      },
     },
   ];
 
@@ -178,8 +446,47 @@ describe('redirectPages', () => {
 
   let redirectPages: typeof redirectPagesModule.default;
 
-  function buildRoute(routePattern: string, slug: string): string {
-    return routePattern.replace(slugPlaceholder, slug);
+  function buildRoute(
+    routePattern: string,
+    slugsByPlaceholder: Dictionary<string>,
+  ): string {
+    let route = routePattern;
+
+    Object.entries(slugsByPlaceholder).forEach(([key, value]) => {
+      route = route.replace(key, value);
+    });
+
+    return route;
+  }
+
+  function buildOldRoute(
+    routePattern: string,
+    oldSlugNewSlugPairsByPlaceholder: Dictionary<OldSlugNewSlugPair>,
+  ): string {
+    return buildRoute(
+      routePattern,
+      Object.fromEntries(
+        Object.entries(oldSlugNewSlugPairsByPlaceholder).map(([k, v]) => [
+          k,
+          v.oldSlug,
+        ]),
+      ),
+    );
+  }
+
+  function buildNewRoute(
+    routePattern: string,
+    oldSlugNewSlugPairsByPlaceholder: Dictionary<OldSlugNewSlugPair>,
+  ): string {
+    return buildRoute(
+      routePattern,
+      Object.fromEntries(
+        Object.entries(oldSlugNewSlugPairsByPlaceholder).map(([k, v]) => [
+          k,
+          v.newSlug,
+        ]),
+      ),
+    );
   }
 
   beforeEach(async () => {
@@ -195,19 +502,19 @@ describe('redirectPages', () => {
   });
 
   describe('General Checks', () => {
-    it.each(testRedirectData)(
+    it.each(redirectedCases)(
       'does not re-request the list of redirects once it has been fetched',
-      async redirectData => {
+      async redirectedCase => {
         redirectService.list.mockResolvedValue(testRedirects);
 
-        const route = buildRoute(redirectData.routePattern, 'original-slug');
+        const route = buildRoute(redirectedCase.routePattern, 'original-slug');
 
         await runMiddleware(redirectPages, `https://my-env/${route}`);
 
         expect(redirectService.list).toHaveBeenCalledTimes(1);
 
         const anotherRoute = buildRoute(
-          redirectData.routePattern,
+          redirectedCase.routePattern,
           'another-slug',
         );
 
@@ -267,26 +574,26 @@ describe('redirectPages', () => {
       expect(nextSpy).not.toHaveBeenCalled();
     });
 
-    it.each(testRedirectData)(
+    it.each(redirectedCases)(
       'redirects the request when the slug for the requested page has changed',
-      async redirectData => {
+      async redirectedCase => {
         redirectService.list.mockResolvedValue(testRedirects);
 
-        const fromRoute = buildRoute(
-          redirectData.routePattern,
-          redirectData.fromSlug,
+        const oldRoute = buildOldRoute(
+          redirectedCase.routePattern,
+          redirectedCase.oldSlugNewSlugPairsByPlaceholder,
         );
-        const toRoute = buildRoute(
-          redirectData.routePattern,
-          redirectData.toSlug,
+        const newRoute = buildNewRoute(
+          redirectedCase.routePattern,
+          redirectedCase.oldSlugNewSlugPairsByPlaceholder,
         );
 
-        await runMiddleware(redirectPages, `https://my-env/${fromRoute}`);
+        await runMiddleware(redirectPages, `https://my-env/${oldRoute}`);
 
         expect(redirectSpy).toHaveBeenCalledTimes(1);
         expect(redirectSpy).toHaveBeenCalledWith(
           expect.objectContaining({
-            href: `https://my-env/${toRoute}`,
+            href: `https://my-env/${newRoute}`,
           }),
           301,
         );
@@ -294,26 +601,26 @@ describe('redirectPages', () => {
       },
     );
 
-    it.each(testRedirectData)(
+    it.each(redirectedCases)(
       'redirects the request when the slug for the requested page has changed, and the url has a trailing slash',
-      async redirectData => {
+      async redirectedCase => {
         redirectService.list.mockResolvedValue(testRedirects);
 
-        const fromRoute = buildRoute(
-          redirectData.routePattern,
-          redirectData.fromSlug,
+        const oldRoute = buildOldRoute(
+          redirectedCase.routePattern,
+          redirectedCase.oldSlugNewSlugPairsByPlaceholder,
         );
-        const toRoute = buildRoute(
-          redirectData.routePattern,
-          redirectData.toSlug,
+        const newRoute = buildNewRoute(
+          redirectedCase.routePattern,
+          redirectedCase.oldSlugNewSlugPairsByPlaceholder,
         );
 
-        await runMiddleware(redirectPages, `https://my-env/${fromRoute}/`);
+        await runMiddleware(redirectPages, `https://my-env/${oldRoute}/`);
 
         expect(redirectSpy).toHaveBeenCalledTimes(1);
         expect(redirectSpy).toHaveBeenCalledWith(
           expect.objectContaining({
-            href: `https://my-env/${toRoute}/`,
+            href: `https://my-env/${newRoute}/`,
           }),
           301,
         );
@@ -321,29 +628,29 @@ describe('redirectPages', () => {
       },
     );
 
-    it.each(testRedirectData)(
+    it.each(redirectedCases)(
       'redirects with query params',
-      async redirectData => {
+      async redirectedCase => {
         redirectService.list.mockResolvedValue(testRedirects);
 
-        const fromRoute = buildRoute(
-          redirectData.routePattern,
-          redirectData.fromSlug,
+        const oldRoute = buildOldRoute(
+          redirectedCase.routePattern,
+          redirectedCase.oldSlugNewSlugPairsByPlaceholder,
         );
-        const toRoute = buildRoute(
-          redirectData.routePattern,
-          redirectData.toSlug,
+        const newRoute = buildNewRoute(
+          redirectedCase.routePattern,
+          redirectedCase.oldSlugNewSlugPairsByPlaceholder,
         );
 
         await runMiddleware(
           redirectPages,
-          `https://my-env/${fromRoute}?search=something`,
+          `https://my-env/${oldRoute}?search=something`,
         );
 
         expect(redirectSpy).toHaveBeenCalledTimes(1);
         expect(redirectSpy).toHaveBeenCalledWith(
           expect.objectContaining({
-            href: `https://my-env/${toRoute}?search=something`,
+            href: `https://my-env/${newRoute}?search=something`,
           }),
           301,
         );
@@ -351,26 +658,26 @@ describe('redirectPages', () => {
       },
     );
 
-    it.each(testRedirectData)(
+    it.each(redirectedCases)(
       'redirects with uppercase characters',
-      async redirectData => {
+      async redirectedCase => {
         redirectService.list.mockResolvedValue(testRedirects);
 
-        const fromRoute = buildRoute(
-          redirectData.routePattern,
-          redirectData.fromSlug,
+        const oldRoute = buildOldRoute(
+          redirectedCase.routePattern,
+          redirectedCase.oldSlugNewSlugPairsByPlaceholder,
         ).toUpperCase();
-        const toRoute = buildRoute(
-          redirectData.routePattern,
-          redirectData.toSlug,
+        const newRoute = buildNewRoute(
+          redirectedCase.routePattern,
+          redirectedCase.oldSlugNewSlugPairsByPlaceholder,
         );
 
-        await runMiddleware(redirectPages, `https://my-env/${fromRoute}`);
+        await runMiddleware(redirectPages, `https://my-env/${oldRoute}`);
 
         expect(redirectSpy).toHaveBeenCalledTimes(1);
         expect(redirectSpy).toHaveBeenCalledWith(
           expect.objectContaining({
-            href: `https://my-env/${toRoute}`,
+            href: `https://my-env/${newRoute}`,
           }),
           301,
         );
@@ -380,14 +687,14 @@ describe('redirectPages', () => {
   });
 
   describe('Does Not Redirect', () => {
-    it.each(testRedirectData)(
-      'does not redirect when the slug for the requested page has not changed',
-      async redirectData => {
+    it.each(nonRedirectedCases)(
+      'does not redirect when the slug(s) for the requested page have no redirect(s) defined for the redirect type(s)',
+      async nonRedirectedCase => {
         redirectService.list.mockResolvedValue(testRedirects);
 
         const route = buildRoute(
-          redirectData.routePattern,
-          'slug-with-no-redirect',
+          nonRedirectedCase.routePattern,
+          nonRedirectedCase.oldSlugsByPlaceholder,
         );
 
         await runMiddleware(redirectPages, `https://my-env/${route}`);
@@ -397,14 +704,14 @@ describe('redirectPages', () => {
       },
     );
 
-    it.each(testRedirectDataWithChildRoute)(
+    it.each(childRouteCases)(
       'does not redirect the request for child-routes not explicitly accounted for, when the slug has changed',
-      async redirectData => {
+      async childRouteCase => {
         redirectService.list.mockResolvedValue(testRedirects);
 
         const route = buildRoute(
-          redirectData.routePattern,
-          redirectData.fromSlug,
+          childRouteCase.routePattern,
+          childRouteCase.oldSlugsByPlaceholder,
         );
 
         await runMiddleware(redirectPages, `https://my-env/${route}`);
@@ -414,14 +721,20 @@ describe('redirectPages', () => {
       },
     );
 
-    it.each(testRedirectData)(
-      'does not redirect if the `fromSlug` only partially matches',
-      async redirectData => {
+    it.each(nonRedirectedCases)(
+      'does not redirect if the `fromSlug` only partially matches a slug with a redirect defined',
+      async nonRedirectedCase => {
         redirectService.list.mockResolvedValue(testRedirects);
+
+        const partiallyMatchedSlugSubstringsByPlaceholder = Object.fromEntries(
+          Object.entries(nonRedirectedCase.oldSlugsByPlaceholder).map(
+            ([k, v]) => [k, v.substring(0, v.length - 1)],
+          ),
+        );
 
         const routeWithRedirectSlugSubstring = buildRoute(
-          redirectData.routePattern,
-          redirectData.fromSlug.substring(0, redirectData.fromSlug.length - 1),
+          nonRedirectedCase.routePattern,
+          partiallyMatchedSlugSubstringsByPlaceholder,
         );
 
         await runMiddleware(
@@ -432,9 +745,15 @@ describe('redirectPages', () => {
         expect(redirectSpy).not.toHaveBeenCalled();
         expect(nextSpy).toHaveBeenCalledTimes(1);
 
+        const partiallyMatchedSlugsWithSuffixByPlaceholder = Object.fromEntries(
+          Object.entries(nonRedirectedCase.oldSlugsByPlaceholder).map(
+            ([k, v]) => [k, `${v}-extra-suffix`],
+          ),
+        );
+
         const routeWithRedirectSlugWithSuffix = buildRoute(
-          redirectData.routePattern,
-          `${redirectData.fromSlug}-extra-suffix`,
+          nonRedirectedCase.routePattern,
+          partiallyMatchedSlugsWithSuffixByPlaceholder,
         );
 
         await runMiddleware(
@@ -444,23 +763,6 @@ describe('redirectPages', () => {
 
         expect(redirectSpy).not.toHaveBeenCalled();
         expect(nextSpy).toHaveBeenCalledTimes(2);
-      },
-    );
-
-    it.each(testRedirectDataWithFromSlugMatchingAnotherRedirectType)(
-      'does not redirect when the slug matches a `fromSlug` in a different redirect type',
-      async redirectData => {
-        redirectService.list.mockResolvedValue(testRedirects);
-
-        const route = buildRoute(
-          redirectData.routePattern,
-          redirectData.fromSlug,
-        );
-
-        await runMiddleware(redirectPages, `https://my-env/${route}`);
-
-        expect(redirectSpy).not.toHaveBeenCalled();
-        expect(nextSpy).toHaveBeenCalledTimes(1);
       },
     );
   });
