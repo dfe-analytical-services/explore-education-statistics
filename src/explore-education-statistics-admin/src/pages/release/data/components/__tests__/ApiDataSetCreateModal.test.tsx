@@ -4,7 +4,7 @@ import _apiDataSetCandidateService, {
 } from '@admin/services/apiDataSetCandidateService';
 import _apiDataSetService from '@admin/services/apiDataSetService';
 import baseRender from '@common-test/render';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { createMemoryHistory, History } from 'history';
 import noop from 'lodash/noop';
 import { ReactElement } from 'react';
@@ -39,17 +39,30 @@ describe('ApiDataSetCreateModal', () => {
       />,
     );
 
+    expect(await screen.findByText('Create API data set')).toBeInTheDocument();
+
     await user.click(
       await screen.findByRole('button', { name: 'Create API data set' }),
     );
 
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+
+    const modal = within(screen.getByRole('dialog'));
+
     expect(
-      await screen.findByText(
+      modal.getByText(
         /No API data sets can be created as there are no candidate data files available/,
       ),
     ).toBeInTheDocument();
 
-    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+    expect(modal.getByRole('link', { name: 'Data and files' })).toHaveAttribute(
+      'href',
+      '/publication/publication-id/release/release-id/data#data-uploads',
+    );
+
+    await user.click(screen.getByRole('link', { name: 'Data and files' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   test('renders form in modal when there are candidates', async () => {
@@ -98,7 +111,6 @@ describe('ApiDataSetCreateModal', () => {
       previousReleaseIds: [],
     });
 
-    const history = createMemoryHistory();
     const handleSubmit = jest.fn();
 
     const { user } = render(
@@ -107,7 +119,6 @@ describe('ApiDataSetCreateModal', () => {
         releaseId="release-id"
         onSubmit={handleSubmit}
       />,
-      { history },
     );
 
     expect(await screen.findByText('Create API data set')).toBeInTheDocument();
