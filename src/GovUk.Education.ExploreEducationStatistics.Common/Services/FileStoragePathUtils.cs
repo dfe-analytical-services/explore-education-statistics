@@ -99,10 +99,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/subjects.json";
         }
 
-        public static string FilesPath(Guid rootPath, FileType type)
+        public static string FilesPath(Guid rootPath, FileType type, Guid? filePath = null)
         {
             var typeFolder = (type == Metadata ? Data : type).GetEnumLabel();
-            return $"{rootPath}/{typeFolder}/";
+            return $"{rootPath}/{typeFolder}/{filePath}";
         }
 
         private static string AppendPathSeparator(string? segment = null)
