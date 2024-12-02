@@ -1,8 +1,5 @@
 import { Dictionary } from '@common/types';
-import redirectService, {
-  Redirects,
-  RedirectType,
-} from '@frontend/services/redirectService';
+import redirectService, { Redirects } from '@frontend/services/redirectService';
 import _ from 'lodash';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -12,14 +9,6 @@ interface CachedRedirects {
   fetchedAt: number;
 }
 
-interface RedirectPattern {
-  redirectTypes: RedirectType[];
-  urlPattern: URLPattern;
-}
-
-const methodologyRedirectType: RedirectType = 'methodologyRedirects';
-const publicationRedirectType: RedirectType = 'publicationRedirects';
-const releaseRedirectType: RedirectType = 'releaseRedirectsByPublicationSlug';
 const methodologySlugKey = 'methodologySlug';
 const publicationSlugKey = 'publicationSlug';
 const releaseSlugKey = 'releaseSlug';
@@ -27,37 +16,22 @@ const cacheTime = getCacheTime();
 
 let cachedRedirects: CachedRedirects | undefined;
 
-const redirectPatterns: RedirectPattern[] = [
-  {
-    redirectTypes: [methodologyRedirectType],
-    urlPattern: new URLPattern({
-      pathname: `/methodology/:${methodologySlugKey}{/}?`,
-    }),
-  },
-  {
-    redirectTypes: [publicationRedirectType],
-    urlPattern: new URLPattern({
-      pathname: `/find-statistics/:${publicationSlugKey}/(data-guidance/?|prerelease-access-list/?|.{0})?`,
-    }),
-  },
-  {
-    redirectTypes: [publicationRedirectType, releaseRedirectType],
-    urlPattern: new URLPattern({
-      pathname: `/find-statistics/:${publicationSlugKey}/:${releaseSlugKey}/(data-guidance/?|prerelease-access-list/?|.{0})?`,
-    }),
-  },
-  {
-    redirectTypes: [publicationRedirectType],
-    urlPattern: new URLPattern({
-      pathname: `/data-tables/:${publicationSlugKey}/(fast-track/[^/]*/?|permalink/[^/]*/?|.{0})?`,
-    }),
-  },
-  {
-    redirectTypes: [publicationRedirectType, releaseRedirectType],
-    urlPattern: new URLPattern({
-      pathname: `/data-tables/:${publicationSlugKey}/:${releaseSlugKey}{/}?`,
-    }),
-  },
+const redirectPatterns: URLPattern[] = [
+  new URLPattern({
+    pathname: `/methodology/:${methodologySlugKey}{/}?`,
+  }),
+  new URLPattern({
+    pathname: `/find-statistics/:${publicationSlugKey}/(data-guidance/?|prerelease-access-list/?|.{0})?`,
+  }),
+  new URLPattern({
+    pathname: `/find-statistics/:${publicationSlugKey}/:${releaseSlugKey}/(data-guidance/?|prerelease-access-list/?|.{0})?`,
+  }),
+  new URLPattern({
+    pathname: `/data-tables/:${publicationSlugKey}/(fast-track/[^/]*/?|permalink/[^/]*/?|.{0})?`,
+  }),
+  new URLPattern({
+    pathname: `/data-tables/:${publicationSlugKey}/:${releaseSlugKey}{/}?`,
+  }),
 ];
 
 export default async function redirectPages(
@@ -70,15 +44,14 @@ export default async function redirectPages(
   const lowerCasedPathname = decodedPathname.toLowerCase();
 
   // Check for redirects for publication, release, and methodology pages
-  const routeSlugsByRedirectType =
-    findRouteSlugsByRedirectType(lowerCasedPathname);
+  const routeSlugsBySlugKey = findRouteSlugsBySlugKey(lowerCasedPathname);
 
-  if (!_.isEmpty(routeSlugsByRedirectType)) {
+  if (!_.isEmpty(routeSlugsBySlugKey)) {
     await refreshCache();
 
     const redirectPath = determineRedirectPath(
       lowerCasedPathname,
-      routeSlugsByRedirectType,
+      routeSlugsBySlugKey,
     );
 
     if (redirectPath !== lowerCasedPathname) {
@@ -98,41 +71,27 @@ export default async function redirectPages(
   return middleware(request, event);
 }
 
-function findRouteSlugsByRedirectType(
+function findRouteSlugsBySlugKey(
   lowerCasedPathname: string,
 ): Dictionary<string> {
   for (let i = 0; i < redirectPatterns.length; i += 1) {
     const redirectPattern = redirectPatterns[i];
 
-    const urlPatternMatch = redirectPattern.urlPattern.exec({
+    const urlPatternMatch = redirectPattern.exec({
       pathname: lowerCasedPathname,
     });
 
     if (urlPatternMatch) {
       return Object.fromEntries(
-        redirectPattern.redirectTypes.map(redirectType => {
-          switch (redirectType) {
-            case methodologyRedirectType:
-              return [
-                redirectType,
-                urlPatternMatch.pathname.groups[methodologySlugKey]!,
-              ];
-            case publicationRedirectType:
-              return [
-                redirectType,
-                urlPatternMatch.pathname.groups[publicationSlugKey]!,
-              ];
-            case releaseRedirectType:
-              return [
-                redirectType,
-                urlPatternMatch.pathname.groups[releaseSlugKey]!,
-              ];
-            default:
-              throw new Error(
-                `'${redirectType}' is not a valid redirect type.`,
-              );
-          }
-        }),
+        Object.entries(urlPatternMatch.pathname.groups)
+          .filter(
+            ([slugKey, slug]) =>
+              (slugKey === methodologySlugKey ||
+                slugKey === publicationSlugKey ||
+                slugKey === releaseSlugKey) &&
+              slug,
+          )
+          .map(([slugKey, slug]) => [slugKey, slug!]),
       );
     }
   }
@@ -154,16 +113,12 @@ async function refreshCache() {
 
 function determineRedirectPath(
   originalPath: string,
-  routeSlugsByRedirectType: Dictionary<string>,
+  routeSlugsBySlugKey: Dictionary<string>,
 ): string {
   let redirectPath = originalPath;
 
-  Object.entries(routeSlugsByRedirectType).forEach(([redirectType, slug]) => {
-    const redirect = findRedirectIfExists(
-      redirectType,
-      slug,
-      routeSlugsByRedirectType,
-    );
+  Object.entries(routeSlugsBySlugKey).forEach(([slugKey, slug]) => {
+    const redirect = findRedirectIfExists(slugKey, slug, routeSlugsBySlugKey);
 
     if (redirect) {
       redirectPath = redirectPath.replace(slug, redirect.toSlug);
@@ -174,22 +129,21 @@ function determineRedirectPath(
 }
 
 function findRedirectIfExists(
-  redirectType: string,
+  slugKey: string,
   slug: string,
-  routeSlugsByRedirectType: Dictionary<string>,
+  routeSlugsBySlugKey: Dictionary<string>,
 ) {
-  switch (redirectType) {
-    case methodologyRedirectType:
+  switch (slugKey) {
+    case methodologySlugKey:
       return cachedRedirects?.redirects.methodologyRedirects?.find(
         ({ fromSlug }) => slug === fromSlug,
       );
-    case publicationRedirectType:
+    case publicationSlugKey:
       return cachedRedirects?.redirects.publicationRedirects?.find(
         ({ fromSlug }) => slug === fromSlug,
       );
-    case releaseRedirectType: {
-      let latestPublicationSlug =
-        routeSlugsByRedirectType[publicationRedirectType];
+    case releaseSlugKey: {
+      let latestPublicationSlug = routeSlugsBySlugKey[publicationSlugKey];
 
       const publicationRedirect =
         cachedRedirects?.redirects.publicationRedirects?.find(
@@ -206,7 +160,7 @@ function findRedirectIfExists(
       )?.find(({ fromSlug }) => slug === fromSlug);
     }
     default:
-      throw new Error(`'${redirectType}' is not a valid redirect type.`);
+      throw new Error(`'${slugKey}' is not a valid redirect type.`);
   }
 }
 
