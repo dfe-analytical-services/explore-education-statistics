@@ -15,6 +15,8 @@ variables:
   NodeVersion: '20.16.0'
   RubyVersion: '3.2'
   AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
+  PublicApiDir: GovUk.Education.ExploreEducationStatistics.Public.Data.Api
+  PublicApiDocsDir: explore-education-statistics-api-docs
 
 trigger:
   branches:
@@ -71,6 +73,25 @@ jobs:
           projects: src/GovUk.Education.ExploreEducationStatistics.sln
 
       # TODO: Wrap the above three tasks up into a single `dotnet format` task once all TODOs are done
+
+      - task: DotNetCoreCLI@2
+        displayName: Build Public API
+        inputs:
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Api.csproj'
+          arguments: --configuration $(BuildConfiguration)
+
+      - task: Bash@3
+        displayName: Diff Public API OpenAPI docs
+        inputs:
+          targetType: inline
+          script: |
+            docker run --rm -t \
+              -v $(System.DefaultWorkingDirectory)/src/$(PublicApiDir)/bin/$(BuildConfiguration)/net8.0:/api \
+              -v $(System.DefaultWorkingDirectory)/src/$(PublicApiDocsDir):/api-docs \
+              -v $(System.DefaultWorkingDirectory)/ci/scripts:/scripts \
+              --entrypoint /bin/sh \
+              tufin/oasdiff \
+              /scripts/public-api-openapi-diff.sh
 
   - job: BackendTest
     pool: ees-ubuntu2204-xlarge
