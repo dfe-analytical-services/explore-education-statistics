@@ -1198,8 +1198,8 @@
       "[concat('Microsoft.Web/sites/', variables('contentAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('dataAppName'))]"
     ],
-    "publicDataFileshareMountPath": "/data/public-api-data",
-    "publicDataFileshareName": "[concat(parameters('subscription'), '-ees-papi-fs-data')]",
+    "publicDataFileShareMountPath": "/data/public-api-data",
+    "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-fs-data')]",
     "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]"
   },
   "resources": [
@@ -3286,7 +3286,7 @@
         "App:NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App:PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "App:PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "DataFiles:BasePath": "[parameters('publicDataFileshareMountPath')]",
+        "DataFiles:BasePath": "[parameters('publicDataFileShareMountPath')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
@@ -3298,16 +3298,16 @@
       "apiVersion": "2019-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-        "[variables('publicDataFileshareMountPath')]",
-        "[variables('publicDataFileshareName')]",
+        "[variables('publicDataFileShareMountPath')]",
+        "[variables('publicDataFileShareName')]",
         "[variables('publicDataStorageAccountName')]"
       ],
       "properties": {
-        "[variables('publicDataFileshareName')]": {
+        "[variables('publicDataFileShareName')]": {
           "type": "AzureFiles",
           "accountName": "[variables('publicDataStorageAccountName')]",
-          "shareName": "[variables('publicDataFileshareName')]",
-          "mountPath": "[variables('publicDataFileshareMountPath')]",
+          "shareName": "[variables('publicDataFileShareName')]",
+          "mountPath": "[variables('publicDataFileShareMountPath')]",
           "protocol": "Smb"
         }
       }

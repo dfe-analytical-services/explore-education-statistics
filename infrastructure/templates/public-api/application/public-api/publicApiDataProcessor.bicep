@@ -106,10 +106,10 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       App__MetaInsertBatchSize: 1000
     }
     azureFileShares: [{
-      storageName: resourceNames.publicApi.publicApiFileshare
+      storageName: resourceNames.publicApi.publicApiFileShare
       storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
       storageAccountName: resourceNames.publicApi.publicApiStorageAccount
-      fileShareName: resourceNames.publicApi.publicApiFileshare
+      fileShareName: resourceNames.publicApi.publicApiFileShare
       mountPath: publicApiDataFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules

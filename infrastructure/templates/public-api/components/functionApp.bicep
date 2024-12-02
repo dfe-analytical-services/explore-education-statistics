@@ -1,4 +1,4 @@
-import { FirewallRule, AzureFileshareMount, EntraIdAuthentication } from '../types.bicep'
+import { FirewallRule, AzureFileShareMount, EntraIdAuthentication } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -71,7 +71,7 @@ param healthCheck {
 }?
 
 @description('Specifies additional Azure Storage Accounts to make available to this Function App')
-param azureFileShares AzureFileshareMount[] = []
+param azureFileShares AzureFileShareMount[] = []
 
 @description('Specifies firewall rules for the various storage accounts in use by the Function App')
 param storageFirewallRules FirewallRule[] = []

@@ -36,10 +36,10 @@ module containerAppEnvironmentModule '../../components/containerAppEnvironment.b
     tagValues: tagValues
     azureFileStorages: [
       {
-        storageName: resourceNames.publicApi.publicApiFileshare
+        storageName: resourceNames.publicApi.publicApiFileShare
         storageAccountName: resourceNames.publicApi.publicApiStorageAccount
         storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
-        fileShareName: resourceNames.publicApi.publicApiFileshare
+        fileShareName: resourceNames.publicApi.publicApiFileShare
         accessMode: 'ReadWrite'
       }
     ]

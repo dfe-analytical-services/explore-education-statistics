@@ -78,15 +78,15 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     vnetName: resourceNames.existingResources.vNet
     volumeMounts: [
       {
-        volumeName: 'public-api-fileshare-mount'
+        volumeName: 'public-api-file-share-mount'
         mountPath: dataFilesFileShareMountPath
       }
     ]
     volumes: [
       {
-        name: 'public-api-fileshare-mount'
+        name: 'public-api-file-share-mount'
         storageType: 'AzureFile'
-        storageName: resourceNames.publicApi.publicApiFileshare
+        storageName: resourceNames.publicApi.publicApiFileShare
       }
     ]
     appSettings: [
