@@ -14,6 +14,8 @@ param storageFirewallRules FirewallRule[] = []
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
+param deployAlerts bool = false
+
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: resourceNames.existingResources.vNet
 }
@@ -53,6 +55,14 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
     fileShareQuota: publicApiDataFileShareQuota
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: 'TransactionOptimized'
+  }
+}
+
+module availabilityAlert '../../components/alerts/storageAccount/availabilityAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.publicApiStorageAccount}AvailabilityAlertDeploy'
+  params: {
+    storageAccountNames: [resourceNames.publicApi.publicApiStorageAccount]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
   }
 }
 

@@ -37,6 +37,7 @@ jobs:
                 parameterFile: $(paramFile)
                 deployContainerApp: true
                 updatePsqlFlexibleServer: false
+                deployAlerts: false
                 dataProcessorExists: true
 
             - task: AzureCLI@2
@@ -63,6 +64,7 @@ jobs:
                 parameterFile: $(paramFile)
                 deployContainerApp: $(deployContainerApp)
                 updatePsqlFlexibleServer: $(updatePsqlFlexibleServer)
+                deployAlerts: $(deployAlerts)
                 dataProcessorExists: $(dataProcessorExists)
 
            # - template: ../tasks/assign-app-role-to-service-principal.yml

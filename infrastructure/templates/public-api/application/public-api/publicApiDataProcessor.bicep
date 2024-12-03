@@ -21,6 +21,8 @@ param dataProcessorAppRegistrationClientId string
 @description('Public API Storage : Firewall rules.')
 param storageFirewallRules FirewallRule[] = []
 
+param deployAlerts bool = false
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -114,6 +116,26 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
     }]
     storageFirewallRules: storageFirewallRules
     tagValues: tagValues
+  }
+}
+
+module storageAvailabilityAlerts '../../components/alerts/storageAccount/availabilityAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.dataProcessor}StorageAvailabilityAlert'
+  params: {
+    storageAccountNames: [
+      dataProcessorFunctionAppModule.outputs.managementStorageAccountName
+      dataProcessorFunctionAppModule.outputs.slot1StorageAccountName
+      dataProcessorFunctionAppModule.outputs.slot2StorageAccountName
+    ]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+  }
+}
+
+module functionAppHealthAlert '../../components/alerts/sites/healthAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.dataProcessor}SitesHealthCheckAlertDeploy'
+  params: {
+    resourceNames: [resourceNames.publicApi.dataProcessor]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
   }
 }
 

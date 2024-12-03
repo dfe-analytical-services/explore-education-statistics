@@ -75,6 +75,8 @@ param deployContainerApp bool = true
 @description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
 param updatePsqlFlexibleServer bool = false
 
+param deployAlerts bool = false
+
 @description('Public URLs of other components in the service.')
 param publicUrls {
   contentApi: string
@@ -183,6 +185,7 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
     resourceNames: resourceNames
     publicApiDataFileShareQuota: publicApiDataFileShareQuota
     storageFirewallRules: storageFirewallRules
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }
@@ -370,6 +373,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
     storageFirewallRules: storageFirewallRules
     dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
   dependsOn: [
