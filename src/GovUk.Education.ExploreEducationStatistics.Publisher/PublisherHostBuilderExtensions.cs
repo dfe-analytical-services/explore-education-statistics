@@ -21,6 +21,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Options;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -132,6 +135,9 @@ public static class PublisherHostBuilderExtensions
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
                 if (publicDataDbExists)
                 {
+                    services.AddOptions<DataFilesOptions>()
+                        .Bind(configuration.GetRequiredSection(DataFilesOptions.Section));
+                    services.AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>();
                     services.AddScoped<IDataSetPublishingService, DataSetPublishingService>();
                 }
                 else

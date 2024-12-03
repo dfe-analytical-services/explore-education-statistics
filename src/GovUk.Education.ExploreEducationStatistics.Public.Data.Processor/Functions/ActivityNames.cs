@@ -18,8 +18,6 @@ internal static class ActivityNames
 
     public const string CreateChanges =
         nameof(ProcessCompletionOfNextDataSetVersionFunctions.CreateChanges);
-    public const string UpdateFileStoragePath =
-        nameof(ProcessCompletionOfNextDataSetVersionFunctions.UpdateFileStoragePath);
     public const string CompleteNextDataSetVersionImportProcessing =
         nameof(ProcessCompletionOfNextDataSetVersionFunctions.CompleteNextDataSetVersionImportProcessing);
 }

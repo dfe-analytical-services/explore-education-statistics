@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -8,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 public class DataSetPublishingService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
-    INotifierClient notifierClient
+    INotifierClient notifierClient,
+    IDataSetVersionPathResolver dataSetVersionPathResolver
 ) : IDataSetPublishingService
 {
     public async Task PublishDataSets(Guid[] releaseVersionIds)
@@ -46,8 +49,11 @@ public class DataSetPublishingService(
 
         foreach (var dataSet in dataSets)
         {
-            var currentDraftVersion = dataSet.LatestDraftVersion;
-            currentDraftVersion!.Status = DataSetVersionStatus.Published;
+            var currentDraftVersion = dataSet.LatestDraftVersion!;
+            
+            var originalFilePath = dataSetVersionPathResolver.DirectoryPath(currentDraftVersion);
+            
+            currentDraftVersion.Status = DataSetVersionStatus.Published;
             currentDraftVersion.Published = DateTimeOffset.UtcNow;
 
             dataSet.Status = DataSetStatus.Published;
@@ -58,9 +64,12 @@ public class DataSetPublishingService(
 
             dataSet.LatestDraftVersion = null;
             dataSet.LatestDraftVersionId = null;
-        }
+            
+            var newFilePath = dataSetVersionPathResolver.DirectoryPath(currentDraftVersion);
+            Directory.Move(sourceDirName: originalFilePath, destDirName: newFilePath);
 
-        await publicDataDbContext.SaveChangesAsync();
+            await publicDataDbContext.SaveChangesAsync();
+        }
 
         return dataSets
             .Select(ds => ds.LatestLiveVersion!)

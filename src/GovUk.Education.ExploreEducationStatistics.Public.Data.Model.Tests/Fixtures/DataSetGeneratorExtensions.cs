@@ -13,6 +13,9 @@ public static class DataSetGeneratorExtensions
     public static Generator<DataSet> WithPublicationId(this Generator<DataSet> generator, Guid publicationId)
         => generator.ForInstance(s => s.SetPublicationId(publicationId));
 
+    public static Generator<DataSet> WithId(this Generator<DataSet> generator, Guid id)
+        => generator.ForInstance(s => s.SetId(id));
+
     public static Generator<DataSet> WithTitle(this Generator<DataSet> generator, string title)
         => generator.ForInstance(s => s.SetTitle(title));
 
@@ -39,7 +42,7 @@ public static class DataSetGeneratorExtensions
 
     public static Generator<DataSet> WithSupersedingDataSet(this Generator<DataSet> generator, DataSet? dataSet)
         => generator.ForInstance(s => s.SetSupersedingDataSet(dataSet));
-    
+
     public static Generator<DataSet> WithLatestDraftVersion(
         this Generator<DataSet> generator,
         DataSetVersion? dataSetVersion)
@@ -77,6 +80,11 @@ public static class DataSetGeneratorExtensions
             .SetDefault(ds => ds.Summary)
             .SetDefault(ds => ds.PublicationId)
             .Set(ds => ds.Status, DataSetStatus.Draft);
+
+    public static InstanceSetters<DataSet> SetId(
+        this InstanceSetters<DataSet> instanceSetter,
+        Guid id)
+        => instanceSetter.Set(ds => ds.Id, id);
 
     public static InstanceSetters<DataSet> SetTitle(
         this InstanceSetters<DataSet> instanceSetter,
@@ -162,7 +170,7 @@ public static class DataSetGeneratorExtensions
                     ds.LatestLiveVersionId = dsv?.Id;
                 }
             );
-    
+
     public static InstanceSetters<DataSet> SetLatestDraftVersion(
         this InstanceSetters<DataSet> instanceSetter,
         DataSetVersion? dataSetVersion)

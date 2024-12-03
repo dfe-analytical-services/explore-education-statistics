@@ -466,6 +466,96 @@ public class EnumerableExtensionsTests
         Assert.True(containsAll);
     }
 
+    public class CartesianTests
+    {
+        [Fact]
+        public void TwoLists_Cartesian()
+        {
+            List<int> list1 = [1, 2];
+            List<string> list2 = ["3", "4"];
+
+            List<(int, string)> expected =
+            [
+                new(1, "3"),
+                new(1, "4"),
+                new(2, "3"),
+                new(2, "4")
+            ];
+
+            var actual = list1.Cartesian(list2);
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void TwoLists_EmptyList()
+        {
+            List<int> list1 = [1, 2];
+            Assert.Empty(list1.Cartesian(new List<string>()));
+        }
+        
+        [Fact]
+        public void TwoLists_NullList()
+        {
+            List<int> list1 = [1, 2];
+            Assert.Empty(list1.Cartesian((List<string>?) null));
+        }
+        
+        [Fact]
+        public void ThreeLists_Cartesian()
+        {
+            List<int> list1 = [1, 2];
+            List<string> list2 = ["3", "4"];
+            List<char> list3 = ['5', '6'];
+
+            List<(int, string, char)> expected =
+            [
+                new(1, "3", '5'),
+                new(1, "3", '6'),
+                new(1, "4", '5'),
+                new(1, "4", '6'),
+                new(2, "3", '5'),
+                new(2, "3", '6'),
+                new(2, "4", '5'),
+                new(2, "4", '6'),
+            ];
+
+            var actual = list1.Cartesian(list2, list3);
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        public void ThreeLists_EmptyFirstList()
+        {
+            List<int> list1 = [1, 2];
+            List<char> list3 = ['5', '6'];
+            Assert.Empty(list1.Cartesian(new List<string>(), list3));
+        }
+        
+        [Fact]
+        public void ThreeLists_EmptySecondList()
+        {
+            List<int> list1 = [1, 2];
+            List<string> list2 = ["3", "4"];
+            Assert.Empty(list1.Cartesian(list2, new List<char>()));
+        }
+        
+        [Fact]
+        public void ThreeLists_NullFirstList()
+        {
+            List<int> list1 = [1, 2];
+            List<char> list3 = ['5', '6'];
+            Assert.Empty(list1.Cartesian((List<string>?) null, list3));
+        }
+        
+        [Fact]
+        public void ThreeLists_NullSecondList()
+        {
+            List<int> list1 = [1, 2];
+            List<string> list2 = ["3", "4"];
+            Assert.Empty(list1.Cartesian(list2, (List<char>?) null));
+        }
+    }
+
     private static async Task<Either<Unit, int>> GetSuccessfulEither(int value)
     {
         await Task.Delay(5);
