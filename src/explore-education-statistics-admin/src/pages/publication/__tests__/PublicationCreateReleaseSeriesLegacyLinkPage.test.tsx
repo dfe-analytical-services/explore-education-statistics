@@ -30,7 +30,7 @@ describe('PublicationCreateReleaseSeriesLegacyLinkPage', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute(
       'href',
-      '/publication/publication-1/legacy',
+      '/publication/publication-1/releases/order',
     );
   });
 
