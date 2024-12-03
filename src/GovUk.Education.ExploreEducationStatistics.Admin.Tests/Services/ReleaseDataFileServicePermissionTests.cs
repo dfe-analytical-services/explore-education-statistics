@@ -1,10 +1,8 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -17,6 +15,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -190,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UploadAsBulkZip()
+        public async Task ValidateAndUploadBulkZip()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
@@ -198,9 +199,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.UploadAsBulkZip(
+                        return service.ValidateAndUploadBulkZip(
                             releaseVersionId: _releaseVersion.Id,
-                            bulkZipFormFile: new Mock<IFormFile>().Object);
+                            zipFile: new Mock<IFormFile>().Object,
+                            default);
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task SaveDataSetsFromTemporaryBlobStorage()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseDataFileService(userService: userService.Object);
+                        return service.SaveDataSetsFromTemporaryBlobStorage(
+                            releaseVersionId: _releaseVersion.Id,
+                            archiveDataSetFiles: new Mock<List<ArchiveDataSetFileViewModel>>().Object,
+                            default);
                     }
                 );
         }

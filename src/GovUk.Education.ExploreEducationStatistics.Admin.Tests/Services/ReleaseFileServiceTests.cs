@@ -2491,7 +2491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
-                        path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
+                        path.Contains(FilesPath(releaseVersion.Id, Ancillary, null))),
                     formFile
                 )).Returns(Task.CompletedTask);
 
@@ -2525,7 +2525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 privateBlobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
+                            path.Contains(FilesPath(releaseVersion.Id, Ancillary, null))),
                         formFile
                     ), Times.Once);
 
@@ -2605,7 +2605,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
-                        path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
+                        path.Contains(FilesPath(releaseVersion.Id, Ancillary, null))),
                     newFormFile
                 )).Returns(Task.CompletedTask);
 
@@ -2639,7 +2639,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 privateBlobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
+                            path.Contains(FilesPath(releaseVersion.Id, Ancillary, null))),
                         newFormFile
                     ), Times.Once);
 
@@ -2729,7 +2729,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
-                        path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
+                        path.Contains(FilesPath(releaseVersion.Id, Ancillary, null))),
                     newFormFile
                 )).Returns(Task.CompletedTask);
 
@@ -2763,7 +2763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 privateBlobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(FilesPath(releaseVersion.Id, Ancillary))),
+                            path.Contains(FilesPath(releaseVersion.Id, Ancillary, null))),
                         newFormFile
                     ), Times.Once);
 
@@ -2886,7 +2886,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
-                        path.Contains(FilesPath(releaseVersion.Id, Chart))),
+                        path.Contains(FilesPath(releaseVersion.Id, Chart, null))),
                     formFile
                 )).Returns(Task.CompletedTask);
 
@@ -2912,7 +2912,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 privateBlobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(FilesPath(releaseVersion.Id, Chart))),
+                            path.Contains(FilesPath(releaseVersion.Id, Chart, null))),
                         formFile
                     ), Times.Once);
 

@@ -59,7 +59,7 @@ const ReleaseDataUploadsSection = ({
   const [bulkUploadPlan, setBulkUploadPlan] = useState<ArchiveDataSetFile[]>();
 
   const {
-    data: initialDataFiles = [],
+    data: initialDataFiles,
     isLoading,
     refetch: refetchDataFiles,
   } = useQuery(releaseDataFileQueries.list(releaseId));
@@ -67,8 +67,8 @@ const ReleaseDataUploadsSection = ({
   // Store the data files on state so we can reliably update them
   // when the permissions/status change.
   useEffect(() => {
-    setDataFiles(initialDataFiles);
-  }, [initialDataFiles, isLoading, setDataFiles]);
+    setDataFiles(initialDataFiles ?? []);
+  }, [initialDataFiles]);
 
   useEffect(() => {
     onDataFilesChange?.(dataFiles);

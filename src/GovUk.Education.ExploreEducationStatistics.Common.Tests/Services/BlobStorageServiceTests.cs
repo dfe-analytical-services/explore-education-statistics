@@ -1,12 +1,4 @@
-﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Net.Mime;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+#nullable enable
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -19,6 +11,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using System.Net.Mime;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Xunit;
 using static Azure.Storage.Blobs.Models.BlobsModelFactory;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -494,7 +494,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        private async Task DeleteBlobs_FilterPrioritisesExcludeRegex()
+        public async Task DeleteBlobs_FilterPrioritisesExcludeRegex()
         {
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
@@ -634,6 +634,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal("publications/item-4", deletedBlobs[2]);
         }
 
+        [Fact]
+        public async Task MoveBlob_SourceBlobNotFound_ReturnsFalse()
+        {
+            // Arrange
+            const string sourcePath = "path/to/test.pdf";
+            const string destinationPath = "new/path/to/test.pdf";
+
+            var sourceBlobClient = MockBlobClient(name: sourcePath, exists: false);
+
+            var sourceBlobContainerClient = MockBlobContainerClient(PrivateReleaseTempFiles.Name, sourceBlobClient);
+
+            sourceBlobContainerClient
+                .Setup(client => client.GetBlobClient(sourcePath))
+                .Returns(sourceBlobClient.Object);
+
+            var blobServiceClient = MockBlobServiceClient(sourceBlobContainerClient);
+
+            var service = SetupTestBlobStorageService(blobServiceClient.Object);
+
+            // Act
+            var result = await service.MoveBlob(PrivateReleaseTempFiles, sourcePath, destinationPath);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task MoveBlob_DestinationBlobAlreadyExists_ReturnsFalse()
+        {
+            // Arrange
+            const string sourcePath = "path/to/test.pdf";
+            const string destinationPath = "new/path/to/test.pdf";
+
+            var sourceBlobClient = MockBlobClient(name: sourcePath, exists: true);
+            var destinationBlobClient = MockBlobClient(name: destinationPath, exists: true);
+
+            var blobContainerClient = MockBlobContainerClient(PrivateReleaseTempFiles.Name, sourceBlobClient, destinationBlobClient);
+
+            blobContainerClient
+                .Setup(client => client.GetBlobClient(sourcePath))
+                .Returns(sourceBlobClient.Object);
+
+            blobContainerClient
+                .Setup(client => client.GetBlobClient(destinationPath))
+                .Returns(destinationBlobClient.Object);
+
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var service = SetupTestBlobStorageService(blobServiceClient.Object);
+
+            // Act
+            var result = await service.MoveBlob(PrivateReleaseTempFiles, sourcePath, destinationPath);
+
+            // Assert
+            Assert.False(result);
+        }
 
         private static Mock<BlobServiceClient> MockBlobServiceClient(
             params Mock<BlobContainerClient>[] blobContainerClients)
@@ -719,7 +775,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 ILogger<IBlobStorageService> logger,
                 IStorageInstanceCreationUtil storageInstanceCreationUtil)
                 : base(connectionString, client, logger, storageInstanceCreationUtil)
-            {}
+            { }
         }
 
         private IEnumerable<Page<T>> CreatePages<T>(params List<T>[] pages)
