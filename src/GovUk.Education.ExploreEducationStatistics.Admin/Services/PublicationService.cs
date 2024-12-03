@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -450,43 +449,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             result.Add(new ReleaseSeriesTableEntryViewModel
                             {
                                 Id = seriesItem.Id,
-                                IsLegacyLink = true,
                                 Description = seriesItem.LegacyLinkDescription!,
                                 LegacyLinkUrl = seriesItem.LegacyLinkUrl,
                             });
                         }
                         else
                         {
-                            // prefer getting the latest published version over an unpublished amendment
-                            var latestVersion = await _context.ReleaseVersions
-                                .LatestReleaseVersion(seriesItem.ReleaseId!.Value, publishedOnly: true)
+                            var release = await _context.Releases
+                                .SingleAsync(r => r.Id == seriesItem.ReleaseId);
+
+                            var latestPublishedReleaseVersion = await _context.ReleaseVersions
+                                .LatestReleaseVersion(releaseId: seriesItem.ReleaseId!.Value, publishedOnly: true)
                                 .SingleOrDefaultAsync();
-
-                            if (latestVersion == null)
-                            {
-                                // if the release has no published version, then use its original unpublished version
-                                latestVersion = await _context.ReleaseVersions
-                                    .LatestReleaseVersion(seriesItem.ReleaseId!.Value)
-                                    .SingleOrDefaultAsync();
-
-                                if (latestVersion == null)
-                                {
-                                    throw new InvalidDataException(
-                                        "ReleaseSeriesItem with ReleaseId set should have an associated " +
-                                        $"ReleaseVersion. Release: {seriesItem.ReleaseId} " +
-                                        $"ReleaseSeriesItem: {seriesItem.Id}");
-                                }
-                            }
 
                             result.Add(new ReleaseSeriesTableEntryViewModel
                             {
                                 Id = seriesItem.Id,
-                                IsLegacyLink = false,
-                                Description = latestVersion.Title,
-                                ReleaseId = latestVersion.ReleaseId,
-                                ReleaseSlug = latestVersion.Slug,
-                                IsLatest = latestVersion.Id == publication.LatestPublishedReleaseVersionId,
-                                IsPublished = latestVersion.Live,
+                                ReleaseId = release.Id,
+                                Description = release.Title,
+                                ReleaseSlug = release.Slug,
+                                IsLatest = publication.LatestPublishedReleaseVersionId != null &&
+                                           latestPublishedReleaseVersion?.Id == publication.LatestPublishedReleaseVersionId,
+                                IsPublished = latestPublishedReleaseVersion != null
                             });
                         }
                     }
@@ -507,11 +491,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     publication.ReleaseSeries.Add(new ReleaseSeriesItem
                     {
                         Id = Guid.NewGuid(),
-                        ReleaseId = null,
                         LegacyLinkDescription = newLegacyLink.Description,
                         LegacyLinkUrl = newLegacyLink.Url,
                     });
 
+                    _context.Publications.Update(publication);
                     await _context.SaveChangesAsync();
 
                     await _publicationCacheService.UpdatePublication(publication.Slug);
@@ -535,15 +519,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         if (seriesItem.ReleaseId != null && (
                                 seriesItem.LegacyLinkDescription != null || seriesItem.LegacyLinkUrl != null))
                         {
-                            throw new ArgumentException(
-                                $"LegacyLink details shouldn't be set if ReleaseId is set. ReleaseSeriesItem: {seriesItem.Id}");
+                            throw new ArgumentException("LegacyLink details shouldn't be set if ReleaseId is set.");
                         }
 
                         if (seriesItem.ReleaseId == null && (
                                 seriesItem.LegacyLinkDescription == null || seriesItem.LegacyLinkUrl == null))
                         {
-                            throw new ArgumentException(
-                                $"LegacyLink details should be set if ReleaseId is null. ReleaseSeriesItem: {seriesItem.Id}");
+                            throw new ArgumentException("LegacyLink details should be set if ReleaseId is null.");
                         }
                     }
 
@@ -562,15 +544,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         throw new ArgumentException(
                             "Missing or duplicate release in new release series. Expected ReleaseIds: " +
-                            publicationReleaseIds.Select(id => id.ToString()).JoinToString(","));
+                            publicationReleaseIds.JoinToString(","));
                     }
-
-                    // NOTE: A malicious user could change the release series items' Ids, but we don't care
 
                     publication.ReleaseSeries = updatedReleaseSeriesItems
                         .Select(request => new ReleaseSeriesItem
                         {
-                            Id = request.Id,
+                            Id = Guid.NewGuid(),
                             ReleaseId = request.ReleaseId,
                             LegacyLinkDescription = request.LegacyLinkDescription,
                             LegacyLinkUrl = request.LegacyLinkUrl,

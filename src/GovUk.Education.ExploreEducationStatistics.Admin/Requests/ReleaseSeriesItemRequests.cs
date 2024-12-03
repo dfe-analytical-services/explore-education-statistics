@@ -1,21 +1,22 @@
 #nullable enable
-
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
-public class ReleaseSeriesLegacyLinkAddRequest
+public record ReleaseSeriesLegacyLinkAddRequest
 {
-    public string Description { get; set; } = string.Empty;
-    public string Url { get; set; } = string.Empty;
+    [Required]
+    public required string Description { get; init; }
+
+    [Required]
+    public required string Url { get; init; }
 }
 
-public class ReleaseSeriesItemUpdateRequest
+public record ReleaseSeriesItemUpdateRequest
 {
-    public Guid Id { get; set; }
-    public Guid? ReleaseId { get; set; }
+    public Guid? ReleaseId { get; init; }
 
-    public string? LegacyLinkDescription { get; set; }
-    public string? LegacyLinkUrl { get; set; }
+    public string? LegacyLinkDescription { get; init; }
+    public string? LegacyLinkUrl { get; init; }
 }
-

@@ -197,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     publication.ReleaseSeries.Insert(0, new ReleaseSeriesItem
                     {
                         Id = Guid.NewGuid(),
-                        ReleaseId = newReleaseVersion.ReleaseId,
+                        ReleaseId = release.Id
                     });
                     _context.Publications.Update(publication);
 

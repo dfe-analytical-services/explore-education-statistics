@@ -18,33 +18,28 @@ export const testPublication: Publication = {
   ],
   releaseSeries: [
     {
-      id: 'release-2',
       isLegacyLink: false,
       description: 'Academic year 2018/19',
       releaseSlug: '2018-19',
     },
     {
-      id: 'legacy-release-3',
       isLegacyLink: true,
       description: 'Academic year 2014/15',
       legacyLinkUrl:
         'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
     },
     {
-      id: 'release-1',
       isLegacyLink: false,
       description: 'Academic year 2017/18',
       releaseSlug: '2017-18',
     },
     {
-      id: 'legacy-release-2',
       isLegacyLink: true,
       description: 'Academic year 2013/14',
       legacyLinkUrl:
         'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
     },
     {
-      id: 'legacy-release-1',
       isLegacyLink: true,
       description: 'Academic year 2012/13',
       legacyLinkUrl:

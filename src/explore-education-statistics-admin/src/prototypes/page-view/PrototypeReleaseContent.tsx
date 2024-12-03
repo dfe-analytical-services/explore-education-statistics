@@ -308,14 +308,19 @@ const PrototypeReleaseContent = ({
                     <ul className="govuk-list">
                       {[
                         ...releaseSeries.map(
-                          ({
-                            id,
-                            isLegacyLink,
-                            description,
-                            legacyLinkUrl,
-                            releaseSlug,
-                          }) => (
-                            <li key={id} data-testid="other-release-item">
+                          (
+                            {
+                              isLegacyLink,
+                              description,
+                              legacyLinkUrl,
+                              releaseSlug,
+                            },
+                            index,
+                          ) => (
+                            <li
+                              key={`release-${index.toString()}`}
+                              data-testid="other-release-item"
+                            >
                               {isLegacyLink ? (
                                 <a href={legacyLinkUrl}>{description}</a>
                               ) : (
