@@ -304,6 +304,57 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 - If snapshot is small in scope and there's a valid use case (e.g. some HTML), then a snapshot might 
   be a suitable tool - up to developer.
 
+<a id="s5.1.5"></a>
+
+#### 5.1.5 Avoid logic and loops in tests
+
+- Prefer to avoid loops and logic in tests - keep things as simple as possible!
+- It may be tempting to abstract some repeated assertions on some items, however, it's usually 
+  simpler, clearer and more precise to just copy and paste the assertions across your items. 
+- For example, instead of doing something like the following:
+
+  ```tsx
+  // ❌ Don't do this
+  
+  const expectedOptions: SelectOption[] = [
+    { value: 'value-1', label: 'Value 1' },
+    { value: 'value-2', label: 'Value 2' },
+  ];
+  
+  const options = screen.getAllByRole('option');
+  
+  options.forEach((option, index) => {
+    if (index === 0) {
+      expect(option).toHaveValue(''); 
+      expect(option).toHaveTextContent('Choose option');
+    } else {
+      expect(option).toHaveValue(expectedOptions[index].value);
+      expect(option).toHaveTextContent(expectedOptions[index].label);
+    }
+  });
+  ```
+  
+  Simplify to the following instead:
+ 
+  ```tsx
+  // ✅ Do this
+  
+  const options = screen.getAllByRole('option');
+  
+  expect(options[0]).toHaveValue(''); 
+  expect(options[0]).toHaveTextContent('Choose option');
+  
+  expect(options[1]).toHaveValue('value-1'); 
+  expect(options[1]).toHaveTextContent('Value 1');
+  
+  expect(options[2]).toHaveValue('value-2'); 
+  expect(options[2]).toHaveTextContent('Value 2');
+  ```
+- If a test needs to use loops or logic, it should be for a specific case where a copy and paste 
+  approach would result in reduced clarity by the sheer number of assertions. Typically, this would
+  be where there are many options, or where we need to test **many permutations** within a broad 
+  range of constraints.
+
 <a id="s5.2"></a>
 
 ### 5.2 Naming and syntax
