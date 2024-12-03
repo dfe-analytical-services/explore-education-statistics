@@ -37,7 +37,7 @@ Validate homepage
     user checks page contains element    link:Statistics at DfE
     user checks page contains element    link:Compare school and college performance
     user checks page contains element    link:Get information about schools
-    user checks page contains element    link:Schools financial benchmarking
+    user checks page contains element    link:Financial Benchmarking and Insights Tool
 
     user checks page contains element    xpath://h2[text()="Contact us"]
 
