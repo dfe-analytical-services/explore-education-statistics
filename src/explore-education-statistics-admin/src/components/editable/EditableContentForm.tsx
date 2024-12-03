@@ -39,6 +39,7 @@ import sanitizeHtml, {
 } from '@common/utils/sanitizeHtml';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useIdleTimer } from 'react-idle-timer';
+import Effect from '@common/components/Effect';
 
 interface FormValues {
   content: string;
@@ -191,6 +192,7 @@ const EditableContentForm = ({
     >
       <div className={styles.form}>
         <FormProvider
+          reValidateMode="onSubmit"
           initialValues={{
             content,
           }}
@@ -263,14 +265,26 @@ const EditableContentForm = ({
               }),
           })}
         >
-          {({ formState }) => {
+          {({ formState, trigger, handleSubmit: rhfSubmit }) => {
             const isSaving = formState.isSubmitting || isAutoSaving;
             return (
               <Form
                 id={`${id}-form`}
                 visuallyHiddenErrorSummary
-                onSubmit={handleSubmit}
+                // onSubmit={() => {
+                //   trigger();
+                //   handleSubmit
+                // }}
+                onSubmit={values => rhfSubmit(handleSubmit)()}
               >
+                <Effect
+                  value={undefined}
+                  onMount={() => {
+                    console.log('mounted Effect');
+                    trigger().then(isValidLog => console.log({ isValidLog }));
+                  }}
+                />
+                isValid: {JSON.stringify(formState.isValid)}
                 <FormFieldEditor<FormValues>
                   allowComments={allowComments}
                   contentErrorDetails={contentErrorDetails}
@@ -286,15 +300,27 @@ const EditableContentForm = ({
                   toolbarConfig={toolbarConfig}
                   onAutoSave={handleAutoSave}
                   onBlur={onBlur}
+                  // onBlur={() => trigger()}
                   onChange={setElements}
                   onCancelComment={toggleCommentAddForm.off}
                   onClickAddComment={toggleCommentAddForm.on}
                   onImageUpload={onImageUpload}
                   onImageUploadCancel={onImageUploadCancel}
                 />
-
                 <ButtonGroup>
-                  <Button type="submit" disabled={isSaving}>
+                  <Button
+                    type="submit"
+                    disabled={isSaving}
+                    onClick={async e => {
+                      e.preventDefault();
+
+                      const isValid = await trigger('content');
+                      console.log({ isValid }, 'save & close');
+                      if (isValid) {
+                        await rhfSubmit(handleSubmit)();
+                      }
+                    }}
+                  >
                     {onAutoSave ? 'Save & close' : 'Save'}
                   </Button>
                   {!onAutoSave && onCancel && (

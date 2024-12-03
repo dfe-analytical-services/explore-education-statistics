@@ -75,7 +75,10 @@ export default function FormProvider<TFormValues extends FieldValues>({
       enableReinitialize &&
       !isEqual(previousInitialValues.current, initialValues)
     ) {
-      form.reset(initialValues as TFormValues);
+      form.reset(initialValues as TFormValues, {
+        keepDirty: true,
+        keepErrors: true,
+      });
       previousInitialValues.current = initialValues;
     }
   }, [enableReinitialize, form, initialValues]);
