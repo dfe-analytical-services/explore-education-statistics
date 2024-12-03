@@ -149,7 +149,7 @@ var resourceNames = {
     dataProcessorPlan: '${publicApiResourcePrefix}-${abbreviations.webServerFarms}-${abbreviations.webSitesFunctions}-processor'
     dataProcessorStorageAccountsPrefix: '${subscription}eessaprocessor'
     docsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
-    publicApiFileshare: '${publicApiResourcePrefix}-fs-data'
+    publicApiFileShare: '${publicApiResourcePrefix}-fs-data'
     publicApiStorageAccount: '${replace(publicApiResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}'
   }
 }

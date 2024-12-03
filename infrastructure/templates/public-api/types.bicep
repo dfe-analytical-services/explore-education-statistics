@@ -36,7 +36,7 @@ type ResourceNames = {
     dataProcessorStorageAccountsPrefix: string
     docsApp: string
     publicApiStorageAccount: string
-    publicApiFileshare: string
+    publicApiFileShare: string
   }
 }
 
@@ -47,7 +47,7 @@ type FirewallRule = {
 }
 
 @export()
-type AzureFileshareMount = {
+type AzureFileShareMount = {
   storageName: string
   storageAccountKey: string
   storageAccountName: string

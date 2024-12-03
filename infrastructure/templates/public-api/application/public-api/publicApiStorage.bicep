@@ -49,7 +49,7 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
 module dataFilesFileShareModule '../../components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
-    fileShareName: resourceNames.publicApi.publicApiFileshare
+    fileShareName: resourceNames.publicApi.publicApiFileShare
     fileShareQuota: publicApiDataFileShareQuota
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: 'TransactionOptimized'
@@ -59,5 +59,5 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
 output storageAccountName string = publicApiStorageAccountModule.outputs.storageAccountName
 output connectionStringSecretName string = publicApiStorageAccountModule.outputs.connectionStringSecretName
 output accessKeySecretName string = publicApiStorageAccountModule.outputs.accessKeySecretName
-output publicApiDataFileShareName string = resourceNames.publicApi.publicApiFileshare
+output publicApiDataFileShareName string = resourceNames.publicApi.publicApiFileShare
 output publicApiStorageAccountName string = resourceNames.publicApi.publicApiStorageAccount
