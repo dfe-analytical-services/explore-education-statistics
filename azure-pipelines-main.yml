@@ -163,7 +163,6 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Api.csproj'
           arguments: -r linux-musl-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api
           zipAfterPublish: False
-
       - task: Docker@2
         displayName: Build Public API Docker image
         condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
@@ -315,7 +314,7 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
 
-      - task: PublishPipelineArtifact@0
+      - task: PublishPipelineArtifact@1
         condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         displayName: Publish Admin artifact
         inputs:
@@ -430,22 +429,44 @@ jobs:
         inputs:
           versionSpec: '>= $(RubyVersion)'
 
+      - task: Cache@2
+        displayName: Cache Gems
+        inputs:
+          key: 'gems | "$(Agent.OS)" | $(WorkingDirectory)/Gemfile.lock'
+          path: $(WorkingDirectory)/vendor
+          restoreKeys: |
+            gems | "$(Agent.OS)"
+            gems
+
       - task: Bash@3
-        displayName: Build
-        env:
-          TECH_DOCS_API_URL: https://dev.statistics.api.education.gov.uk
+        displayName: Set deployment config
         inputs:
           workingDirectory: $(WorkingDirectory)
           targetType: inline
-          script: |
-            bundle install
+          script: bundle config set deployment true
+
+      - task: Bash@3
+        displayName: Install Gems
+        inputs:
+          workingDirectory: $(WorkingDirectory)
+          targetType: inline
+          script: bundle install
+
+      - task: Bash@3
+        displayName: Build
+        inputs:
+          workingDirectory: $(WorkingDirectory)
+          targetType: inline
+          script: | 
             bundle exec middleman build
+            # Remove afterwards as we don't want it in the artifact
+            rm -rf build
 
       - task: PublishPipelineArtifact@1
-        displayName: Publish artifact
+        displayName: Publish Public API docs artifact
         inputs:
           artifactName: public-api-docs
-          targetPath: $(WorkingDirectory)/build
+          targetPath: $(System.DefaultWorkingDirectory)/src/$(PublicApiDocsDir)
 
   - job: MiscellaneousArtifacts
     pool:
