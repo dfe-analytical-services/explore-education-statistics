@@ -35,7 +35,27 @@ describe('MapBlock', () => {
     data: testFullTable.results,
     height: 600,
     width: 900,
-    map: { dataSetConfigs: [] },
+    map: {
+      dataSetConfigs: [
+        {
+          dataGrouping: { customGroups: [], type: 'EqualIntervals' },
+          dataSet: {
+            filters: ['characteristic-total', 'school-type-total'],
+            indicator: 'authorised-absence-rate',
+            timePeriod: '2016_AY',
+          },
+        },
+        {
+          dataGrouping: { customGroups: [], type: 'EqualIntervals' },
+          dataSet: {
+            filters: ['characteristic-total', 'school-type-total'],
+            indicator: 'overall-absence-rate',
+            timePeriod: '2016_AY',
+          },
+          boundaryLevel: 2,
+        },
+      ],
+    },
   };
 
   test('renders legends and polygons correctly', async () => {
@@ -151,34 +171,14 @@ describe('MapBlock', () => {
     });
   });
 
-  test('changing selected data set changes legends and polygons', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
+  test('changing selected data set changes legends', async () => {
     render(<MapBlock {...testBlockProps} />);
 
-    await waitFor(async () => {
-      const select = screen.getByLabelText('1. Select data to view');
-
-      expect(select.children[1]).toHaveTextContent(
-        'Overall absence rate (2016/17)',
-      );
-
-      await userEvent.selectOptions(select, select.children[1] as HTMLElement);
-      // const paths = container.querySelectorAll<HTMLElement>(
-      //   '.leaflet-container svg:not(.leaflet-attribution-flag) path',
-      // );
-
-      // expect(paths).toHaveLength(4);
-
-      // // Location polygon
-      // expect(paths[0]).toHaveAttribute('fill', 'rgba(251, 219, 185, 1)');
-      // expect(paths[1]).toHaveAttribute('fill', 'rgba(253, 237, 220, 1)');
-      // expect(paths[2]).toHaveAttribute('fill', 'rgba(245, 164, 80, 1)');
-      // // UK polygon
-      // expect(paths[3]).toHaveAttribute('fill', '#003078');
-    });
+    const select = screen.getByLabelText('1. Select data to view');
+    expect(select.children[1]).toHaveTextContent(
+      'Overall absence rate (2016/17)',
+    );
+    await userEvent.selectOptions(select, select.children[1] as HTMLElement);
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
@@ -195,6 +195,36 @@ describe('MapBlock', () => {
     expect(legendColours[2].style.backgroundColor).toBe('rgb(249, 200, 150)');
     expect(legendColours[3].style.backgroundColor).toBe('rgb(247, 182, 115)');
     expect(legendColours[4].style.backgroundColor).toBe('rgb(245, 164, 80)');
+  });
+
+  // EES-5718 name should be: 'selecting data set with different boundary level fetches and renders different boundary geo-JSON'
+  test('selecting data set with different boundary level fetches different boundary geo-JSON', async () => {
+    tableBuilderService.getLocationGeoJson.mockResolvedValueOnce(
+      testMapTableData.subjectMeta.locations,
+    ); // EES-5718 need to return different location geoJson for
+
+    render(<MapBlock {...testBlockProps} />);
+
+    expect(tableBuilderService.getLocationGeoJson).not.toHaveBeenCalled();
+
+    const dataSetSelectInput = screen.getByLabelText('1. Select data to view');
+    const dataSetOptions = within(dataSetSelectInput).getAllByRole('option');
+    expect(dataSetOptions).toHaveLength(2);
+
+    // Selecting another data set with different boundary level
+    await userEvent.selectOptions(dataSetSelectInput, dataSetOptions[1]);
+
+    waitFor(() => {
+      // Fetching new geoJson
+      const loadingSpinner = screen.getByTestId('loadingSpinner');
+      expect(loadingSpinner).toHaveTextContent(
+        'fetching geometry for data selection',
+      );
+      expect(tableBuilderService.getLocationGeoJson).toHaveBeenCalled();
+    });
+
+    // TODO: EES-5718
+    // test that returned location geo Json is actually renderred on the screen when 'selecting data set with different boundary level fetches different boundary geo-JSON'
   });
 
   test('changing selected location focuses the correct polygon', async () => {
