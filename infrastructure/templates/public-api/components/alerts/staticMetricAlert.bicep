@@ -1,4 +1,4 @@
-import { EvaluationFrequency, MetricName, MetricOperator, ResourceType, TimeAggregation, WindowSize, Severity, severityMapping } from 'types.bicep'
+import { EvaluationFrequency, MetricName, StaticMetricOperator, ResourceType, TimeAggregation, WindowSize, Severity, severityMapping } from 'types.bicep'
 
 @description('Name of the alert.')
 param alertName string
@@ -13,7 +13,7 @@ param resourceType ResourceType
 param query {
   metric: MetricName
   aggregation: TimeAggregation
-  operator: MetricOperator
+  operator: StaticMetricOperator
   threshold: int
 }
 

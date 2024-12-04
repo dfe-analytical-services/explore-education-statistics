@@ -59,8 +59,17 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
   }
 }
 
-module availabilityAlert '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
+module storageAccountAvailabilityAlert '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
   name: '${resourceNames.publicApi.publicApiStorageAccount}AvailabilityDeploy'
+  params: {
+    resourceNames: [resourceNames.publicApi.publicApiStorageAccount]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
+}
+
+module fileServiceAvailabilityAlert '../../components/alerts/fileServices/availabilityAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.publicApiStorageAccount}FsAvailabilityDeploy'
   params: {
     resourceNames: [resourceNames.publicApi.publicApiStorageAccount]
     alertsGroupName: resourceNames.existingResources.alertsGroup

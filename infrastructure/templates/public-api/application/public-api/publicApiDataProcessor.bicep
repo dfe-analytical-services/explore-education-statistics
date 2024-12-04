@@ -113,8 +113,17 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
   }
 }
 
-module storageAvailabilityAlerts '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.dataProcessor}AvailabilityAlert'
+module functionAppHealthAlert '../../components/alerts/sites/healthAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.dataProcessor}HealthDeploy'
+  params: {
+    resourceNames: [resourceNames.publicApi.dataProcessor]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
+}
+
+module storageAccountAvailabilityAlerts '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.dataProcessor}StorageAvailabilityDeploy'
   params: {
     resourceNames: [
       dataProcessorFunctionAppModule.outputs.managementStorageAccountName
@@ -126,10 +135,14 @@ module storageAvailabilityAlerts '../../components/alerts/storageAccounts/availa
   }
 }
 
-module functionAppHealthAlert '../../components/alerts/sites/healthAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.dataProcessor}HealthDeploy'
+module fileServiceAvailabilityAlerts '../../components/alerts/fileServices/availabilityAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.dataProcessor}FsAvailabilityDeploy'
   params: {
-    resourceNames: [resourceNames.publicApi.dataProcessor]
+    resourceNames: [
+      dataProcessorFunctionAppModule.outputs.managementStorageAccountName
+      dataProcessorFunctionAppModule.outputs.slot1StorageAccountName
+      dataProcessorFunctionAppModule.outputs.slot2StorageAccountName
+    ]
     alertsGroupName: resourceNames.existingResources.alertsGroup
     tagValues: tagValues
   }

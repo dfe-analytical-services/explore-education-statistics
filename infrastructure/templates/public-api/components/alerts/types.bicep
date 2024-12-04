@@ -5,10 +5,19 @@ type EvaluationFrequency = 'PT1M'
 type WindowSize = 'PT5M'
 
 @export()
-type MetricOperator =
-  | 'GreaterOrLessThan' 
-  | 'GreaterThan'
+type DynamicMetricOperator =
+| 'GreaterOrLessThan' 
+| 'GreaterThan'
   | 'LessThan'
+
+
+@export()
+type StaticMetricOperator =
+  | 'Equals'
+  | 'GreaterThan'
+  | 'GreaterThanOrEqual'
+  | 'LessThan'
+  | 'LessThanOrEqual'  
 
 @export()
 type TimeAggregation = 
@@ -35,13 +44,14 @@ var severityMapping = {
 
 @export()
 type ResourceType = 
-  | 'Microsoft.Web/sites' 
-  | 'Microsoft.Web/sites/slots'
+  | 'Microsoft.App/containerApps'
   | 'Microsoft.DBforPostgreSQL/flexibleServers'
+  | 'Microsoft.Network/applicationGateways'
   | 'Microsoft.Sql/servers/databases'
   | 'Microsoft.Storage/storageAccounts'
-  | 'Microsoft.Network/applicationGateways'
-  | 'Microsoft.App/containerApps'
+  | 'Microsoft.Storage/storageAccounts/fileServices'
+  | 'Microsoft.Web/sites' 
+  | 'Microsoft.Web/sites/slots'
 
 @export()
 type MetricName = 
