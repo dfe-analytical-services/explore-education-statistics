@@ -35,15 +35,7 @@ export default function optimizeFilters(
 
   // Add additional filter groups to our filters if required.
   return optimizedFilters.flatMap((filter, index) => {
-    const firstSubGroup = headerConfig[index][0].group;
-
-    // Don't bother showing a single group as this adds
-    // additional groups to a potentially crowded table.
-    const hasMultipleGroups = headerConfig[index].some(
-      header => header.group !== firstSubGroup,
-    );
-
-    return filter.group && filter.group !== 'Default' && hasMultipleGroups
+    return filter.group && filter.group !== 'Default'
       ? [new FilterGroup(filter.group, index), filter]
       : filter;
   });
