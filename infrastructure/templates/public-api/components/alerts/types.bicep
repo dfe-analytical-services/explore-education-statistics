@@ -14,7 +14,12 @@ type TimeAggregation =
   | 'Average'
 
 @export()
-type Severity = 'Critical' | 'Error' | 'Warning' | 'Informational' | 'Verbose'
+type Severity = 
+  | 'Critical'
+  | 'Error'
+  | 'Warning'
+  | 'Informational'
+  | 'Verbose'
 
 @export()
 var severityMapping = {
@@ -32,6 +37,7 @@ type ResourceType =
   | 'Microsoft.DBforPostgreSQL/flexibleServers'
   | 'Microsoft.Sql/servers/databases'
   | 'Microsoft.Storage/storageAccounts'
+  | 'Microsoft.Network/applicationGateways'
 
 @export()
 type MetricName = 
@@ -41,3 +47,4 @@ type MetricName =
   | 'cpu_percent'
   | 'HealthCheckStatus'
   | 'availability'
+  | 'UnhealthyHostCount'

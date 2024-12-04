@@ -29,6 +29,9 @@ param severity Severity = 'Error'
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
 
+@description('Tags with which to tag the resource in Azure.')
+param tagValues object
+
 var severityLevel = severityMapping[severity]
 
 resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
@@ -63,4 +66,5 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
       }
     ]
   }
+  tags: tagValues
 }

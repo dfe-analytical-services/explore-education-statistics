@@ -12,9 +12,6 @@ param appServicePlanName string
 @description('Specifies the name prefix for all storage accounts')
 param storageAccountsNamePrefix string
 
-@description('Specifies the name of an alerts group for reporting metric alerts')
-param alertsGroupName string
-
 @description('Function App Plan : operating system')
 param appServicePlanOS 'Windows' | 'Linux' = 'Linux'
 
@@ -64,11 +61,8 @@ param preWarmedInstanceCount int?
 @description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan')
 param alwaysOn bool?
 
-@description('Specifies configuration for setting up automatic health checks and metric alerts')
-param healthCheck {
-  path: string
-  unhealthyMetricName: string
-}?
+@description('Specifies an optional URL for Azure to use to monitor the health of this resource')
+param healthCheckPath string?
 
 @description('Specifies additional Azure Storage Accounts to make available to this Function App')
 param azureFileShares AzureFileShareMount[] = []
@@ -190,7 +184,7 @@ var commonSiteProperties = {
   reserved: reserved
   siteConfig: {
     alwaysOn: alwaysOn ?? null
-    healthCheckPath: healthCheck != null ? healthCheck!.path : null
+    healthCheckPath: healthCheckPath
     preWarmedInstanceCount: preWarmedInstanceCount ?? null
     netFrameworkVersion: '8.0'
     linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
@@ -230,68 +224,6 @@ module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthenti
     allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
     requireAuthentication: entraIdAuthentication!.requireAuthentication
   }
-}
-
-resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
-  name: alertsGroupName
-}
-
-var commonUnhealthyMetricAlertRuleProperties = {
-  enabled: true
-  severity: 1
-  evaluationFrequency: 'PT1M'
-  windowSize: 'PT5M'
-  criteria: {
-    'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
-    allOf: [
-      {
-        name: 'Metric1'
-        criterionType: 'StaticThresholdCriterion'
-        metricName: 'HealthCheckStatus'
-        timeAggregation: 'Minimum'
-        operator: 'LessThan'
-        threshold: 100
-        skipMetricValidation: false
-      }
-    ]
-  }
-  actions: [
-    {
-      actionGroupId: alertsActionGroup.id
-    }
-  ]
-}
-
-resource functionAppUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = if (healthCheck != null) {
-  name: healthCheck!.unhealthyMetricName
-  location: 'Global'
-  properties: union(commonUnhealthyMetricAlertRuleProperties, {
-    scopes: [functionApp.id]
-    criteria: {
-      allOf: [union(
-        commonUnhealthyMetricAlertRuleProperties.criteria.allOf[0],
-        {
-          metricNamespace: 'Microsoft.Web/sites'
-        }
-      )]
-    }
-  })
-}
-
-resource stagingSlotUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = if (healthCheck != null) {
-  name: '${healthCheck!.unhealthyMetricName}Staging'
-  location: 'Global'
-  properties: union(commonUnhealthyMetricAlertRuleProperties, {
-    scopes: [stagingSlot.id]
-    criteria: {
-      allOf: [union(
-        commonUnhealthyMetricAlertRuleProperties.criteria.allOf[0],
-        {
-          metricNamespace: 'Microsoft.Web/sites/slots'
-        }
-      )]
-    }
-  })
 }
 
 // Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.

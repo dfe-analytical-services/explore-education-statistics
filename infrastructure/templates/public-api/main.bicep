@@ -359,6 +359,7 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
         ]
       }
     ]
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }
@@ -368,7 +369,6 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
   params: {
     location: location
     resourceNames: resourceNames
-    metricsNamePrefix: '${subscription}PublicDataProcessor'
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
     storageFirewallRules: storageFirewallRules

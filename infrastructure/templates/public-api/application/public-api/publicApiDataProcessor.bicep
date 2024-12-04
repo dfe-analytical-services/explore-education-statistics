@@ -6,14 +6,11 @@ param resourceNames ResourceNames
 @description('Specifies the location for all resources.')
 param location string
 
-@description('Alert metric name prefix')
-param metricsNamePrefix string
-
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
-param dataProcessorFunctionAppExists bool = false
+param dataProcessorFunctionAppExists bool
 
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string
@@ -21,7 +18,8 @@ param dataProcessorAppRegistrationClientId string
 @description('Public API Storage : Firewall rules.')
 param storageFirewallRules FirewallRule[] = []
 
-param deployAlerts bool = false
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param deployAlerts bool
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -70,7 +68,6 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
     functionAppName: resourceNames.publicApi.dataProcessor
     appServicePlanName: resourceNames.publicApi.dataProcessor
     storageAccountsNamePrefix: resourceNames.publicApi.dataProcessorStorageAccountsPrefix
-    alertsGroupName: resourceNames.existingResources.alertsGroup
     location: location
     applicationInsightsKey: applicationInsightsKey
     subnetId: outboundVnetSubnet.id
@@ -100,10 +97,7 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       family: 'EP'
     }
     preWarmedInstanceCount: 1
-    healthCheck: {
-      path: '/api/HealthCheck'
-      unhealthyMetricName: '${metricsNamePrefix}Unhealthy'
-    }
+    healthCheckPath: '/api/HealthCheck'
     appSettings: {
       App__MetaInsertBatchSize: 1000
     }
@@ -119,23 +113,25 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
   }
 }
 
-module storageAvailabilityAlerts '../../components/alerts/storageAccount/availabilityAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.dataProcessor}StorageAvailabilityAlert'
+module storageAvailabilityAlerts '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.dataProcessor}AvailabilityAlert'
   params: {
-    storageAccountNames: [
+    resourceNames: [
       dataProcessorFunctionAppModule.outputs.managementStorageAccountName
       dataProcessorFunctionAppModule.outputs.slot1StorageAccountName
       dataProcessorFunctionAppModule.outputs.slot2StorageAccountName
     ]
     alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
   }
 }
 
 module functionAppHealthAlert '../../components/alerts/sites/healthAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.dataProcessor}SitesHealthCheckAlertDeploy'
+  name: '${resourceNames.publicApi.dataProcessor}HealthDeploy'
   params: {
     resourceNames: [resourceNames.publicApi.dataProcessor]
     alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
   }
 }
 
