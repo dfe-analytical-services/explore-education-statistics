@@ -20,7 +20,8 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         _contentDbContext = contentDbContext;
     }
 
-    public async Task<DateTime> GetPublishedDate(Guid releaseVersionId,
+    public async Task<DateTime> GetPublishedDate(
+        Guid releaseVersionId,
         DateTime actualPublishedDate)
     {
         var releaseVersion = await _contentDbContext.ReleaseVersions
@@ -136,14 +137,6 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         return await _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId)
             .Select(rv => rv.Id)
             .ToListAsync(cancellationToken: cancellationToken);
-    }
-
-    public async Task<List<ReleaseVersion>> ListLatestReleaseVersions(CancellationToken cancellationToken = default)
-    {
-        return (await _contentDbContext.ReleaseVersions.LatestReleaseVersions()
-                .ToListAsync(cancellationToken: cancellationToken))
-            .OrderByReverseChronologicalOrder()
-            .ToList();
     }
 
     public async Task<List<ReleaseVersion>> ListLatestReleaseVersions(

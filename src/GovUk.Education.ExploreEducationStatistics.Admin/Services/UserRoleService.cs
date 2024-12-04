@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -110,35 +111,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role)
+        public async Task<Either<ActionResult, Unit>> AddReleaseRole(
+            Guid userId,
+            Guid releaseId,
+            ReleaseRole role)
         {
-            return await _contentPersistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query
-                    .Include(rv => rv.Publication))
-                .OnSuccess(releaseVersion =>
-                    _userService.CheckCanUpdateReleaseRole(releaseVersion.Publication, role)
-                    .OnSuccess(async () =>
-                    {
-                        return await _usersAndRolesPersistenceHelper
-                            .CheckEntityExists<ApplicationUser, string>(userId.ToString())
-                            .OnSuccessDo(_ => ValidateReleaseRoleCanBeAdded(userId: userId,
-                                releaseVersionId: releaseVersionId,
-                                role))
-                            .OnSuccess(async user =>
-                            {
-                                await _userReleaseRoleRepository.Create(
-                                    userId: userId,
-                                    releaseVersionId: releaseVersion.Id,
-                                    role,
-                                    createdById: _userService.GetUserId());
+            return await _contentDbContext.ReleaseVersions
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .LatestReleaseVersion(releaseId: releaseId)
+                .SingleOrNotFoundAsync()
+                .OnSuccessDo(rv => _userService.CheckCanUpdateReleaseRole(rv!.Release.Publication, role))
+                .OnSuccessDo(rv => ValidateReleaseRoleCanBeAdded(userId: userId,
+                    releaseVersionId: rv!.Id,
+                    role))
+                .OnSuccessCombineWith(_ => _usersAndRolesDbContext.Users
+                    .SingleOrNotFoundAsync(u => u.Id == userId.ToString()))
+                .OnSuccess(async tuple =>
+                {
+                    var (releaseVersion, user) = tuple;
+                    await _userReleaseRoleRepository.Create(
+                        userId: userId,
+                        releaseVersionId: releaseVersion!.Id,
+                        role,
+                        createdById: _userService.GetUserId());
 
-                                var globalRole = GetAssociatedGlobalRoleNameForReleaseRole(role);
-                                await UpgradeToGlobalRoleIfRequired(globalRole, user);
+                    var globalRole = GetAssociatedGlobalRoleNameForReleaseRole(role);
+                    await UpgradeToGlobalRoleIfRequired(globalRole, user);
 
-                                return _emailTemplateService.SendReleaseRoleEmail(user.Email, releaseVersion, role);
-                            });
-                    })
-                );
+                    return _emailTemplateService.SendReleaseRoleEmail(user.Email!, releaseVersion, role);
+                });
         }
 
         private async Task SetExclusiveGlobalRole(string? globalRoleNameToSet, ApplicationUser user)
@@ -526,7 +528,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateReleaseRoleCanBeAdded(Guid userId,
+        private async Task<Either<ActionResult, Unit>> ValidateReleaseRoleCanBeAdded(
+            Guid userId,
             Guid releaseVersionId,
             ReleaseRole role)
         {

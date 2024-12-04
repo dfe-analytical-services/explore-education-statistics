@@ -15,8 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> AddPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
 
-        Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId,
-            Guid releaseVersionId,
+        Task<Either<ActionResult, Unit>> AddReleaseRole(
+            Guid userId,
+            Guid releaseId,
             ReleaseRole role);
 
         Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, Guid userId);
@@ -31,7 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(Guid userId);
 
-        Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(Guid publicationId);
+        Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(
+            Guid publicationId);
 
         Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetReleaseRoles(Guid userId);
 
