@@ -221,6 +221,7 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     firewallRules: postgreSqlFirewallRules
     sku: postgreSqlSkuName
     storageSizeGB: postgreSqlStorageSizeGB
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
   dependsOn: [
@@ -265,6 +266,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     publicSiteUrl: publicUrls.publicSite
     dockerImagesTag: dockerImagesTag
     appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
   dependsOn: [

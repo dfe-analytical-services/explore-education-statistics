@@ -5,7 +5,10 @@ type EvaluationFrequency = 'PT1M'
 type WindowSize = 'PT5M'
 
 @export()
-type MetricOperator = 'GreaterThan' | 'LessThan'
+type MetricOperator =
+  | 'GreaterOrLessThan' 
+  | 'GreaterThan'
+  | 'LessThan'
 
 @export()
 type TimeAggregation = 
@@ -38,13 +41,16 @@ type ResourceType =
   | 'Microsoft.Sql/servers/databases'
   | 'Microsoft.Storage/storageAccounts'
   | 'Microsoft.Network/applicationGateways'
+  | 'Microsoft.App/containerApps'
 
 @export()
 type MetricName = 
+  | 'availability'
   | 'blocked_by_firewall'
   | 'connection_failed'
   | 'connections_failed'
   | 'cpu_percent'
   | 'HealthCheckStatus'
-  | 'availability'
+  | 'is_db_alive'
+  | 'RestartCount'
   | 'UnhealthyHostCount'

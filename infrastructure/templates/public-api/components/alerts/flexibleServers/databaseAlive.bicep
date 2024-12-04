@@ -13,16 +13,16 @@ param alertsGroupName string
 param tagValues object
 
 module alerts '../staticMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}BackendHealthAlertModule'
+  name: '${name}DbAliveAlertModule'
   params: {
-    alertName: '${name}-backend-pool-health'
-    resourceIds: [resourceId('Microsoft.Network/applicationGateways', name)]
-    resourceType: 'Microsoft.Network/applicationGateways'
+    alertName: '${name}-database-alive'
+    resourceIds: [resourceId('Microsoft.DBforPostgreSQL/flexibleServers', name)]
+    resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
     query: {
-      metric: 'UnhealthyHostCount'
-      aggregation: 'Average'
-      operator: 'GreaterThan'
-      threshold: 0
+      metric: 'is_db_alive'
+      aggregation: 'Minimum'
+      operator: 'LessThan'
+      threshold: 1
     }
     evaluationFrequency: 'PT1M'
     windowSize: 'PT5M'

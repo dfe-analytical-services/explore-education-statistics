@@ -4,7 +4,7 @@ import { Severity } from '../types.bicep'
 param resourceNames string[]
 
 @description('The alert severity.')
-param severity Severity = 'Critical'
+param severity Severity = 'Warning'
 
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
@@ -13,13 +13,13 @@ param alertsGroupName string
 param tagValues object
 
 module alerts '../staticMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}BackendHealthAlertModule'
+  name: '${name}RestartsAlertModule'
   params: {
-    alertName: '${name}-backend-pool-health'
-    resourceIds: [resourceId('Microsoft.Network/applicationGateways', name)]
-    resourceType: 'Microsoft.Network/applicationGateways'
+    alertName: '${name}-restarts'
+    resourceIds: [resourceId('Microsoft.App/containerApps', name)]
+    resourceType: 'Microsoft.App/containerApps'
     query: {
-      metric: 'UnhealthyHostCount'
+      metric: 'RestartCount'
       aggregation: 'Average'
       operator: 'GreaterThan'
       threshold: 0
