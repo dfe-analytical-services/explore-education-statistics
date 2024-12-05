@@ -67,6 +67,7 @@ export interface AxisConfiguration {
   referenceLines: ReferenceLine[];
   visible?: boolean;
   unit?: string;
+  decimalPlaces?: number;
   showGrid?: boolean;
   label?: Label;
   size?: number;

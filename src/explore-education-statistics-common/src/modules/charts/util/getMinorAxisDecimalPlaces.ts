@@ -16,7 +16,11 @@ import { DataSetCategoryConfig } from '@common/modules/charts/util/getDataSetCat
  */
 export default function getMinorAxisDecimalPlaces(
   categoryDataSets: DataSetCategoryConfig[],
+  decimalPlaces?: number,
 ): number | undefined {
+  if (decimalPlaces || decimalPlaces === 0) {
+    return decimalPlaces;
+  }
   return categoryDataSets.reduce<number | undefined>((acc, { dataSet }) => {
     if (typeof dataSet.indicator.decimalPlaces === 'undefined') {
       return acc;

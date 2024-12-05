@@ -100,6 +100,7 @@ describe('ChartAxisConfiguration', () => {
     tickSpacing: 1,
     type: 'minor',
     unit: '',
+    decimalPlaces: undefined,
     visible: true,
     label: { text: '', width: 100, rotated: false },
     max: undefined,
