@@ -28,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public bool Visible = true;
         public string Title = null!;
         public string Unit = null!;
+        public int? DecimalPlaces;
         public bool ShowGrid = true;
 
         public AxisLabel Label = null!;
