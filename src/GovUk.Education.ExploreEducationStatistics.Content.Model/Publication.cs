@@ -21,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<ReleaseVersion> ReleaseVersions { get; set; } = [];
 
+        public List<PublicationRedirect> PublicationRedirects { get; set; } = [];
+
         public List<PublicationMethodology> Methodologies { get; set; } = [];
 
         public ExternalMethodology? ExternalMethodology { get; set; }

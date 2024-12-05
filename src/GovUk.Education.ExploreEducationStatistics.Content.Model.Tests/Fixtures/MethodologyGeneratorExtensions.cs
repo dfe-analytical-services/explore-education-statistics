@@ -58,16 +58,34 @@ public static class MethodologyGeneratorExtensions
         this InstanceSetters<Methodology> setters,
         Func<SetterContext, IEnumerable<MethodologyVersion>> methodologyVersions)
         => setters.Set(
-            m => m.Versions,
-            (_, methodology, context) =>
-            {
-                var list = methodologyVersions.Invoke(context).ToList();
+                m => m.Versions,
+                (_, methodology, context) =>
+                {
+                    var list = methodologyVersions.Invoke(context).ToList();
 
-                list.ForEach(methodologyVersion => methodologyVersion.Methodology = methodology);
+                    list.ForEach(methodologyVersion => methodologyVersion.Methodology = methodology);
 
-                return list;
-            }
-        );
+                    return list;
+                }
+            )
+            .Set(
+                (_, methodology, context) =>
+                {
+                    var list = methodologyVersions.Invoke(context).ToList();
+
+                    var latestPublishedVersion = list
+                        .Where(mv => mv.Published.HasValue)
+                        .OrderBy(mv => mv.Published!)
+                        .LastOrDefault();
+
+                    if (latestPublishedVersion != null)
+                    {
+                        latestPublishedVersion.Methodology = methodology;
+                        methodology.LatestPublishedVersion = latestPublishedVersion;
+                        methodology.LatestPublishedVersionId = latestPublishedVersion.Id;
+                    }
+                }
+            );
 
     private static InstanceSetters<Methodology> SetLatestPublishedVersion(
         this InstanceSetters<Methodology> setters,

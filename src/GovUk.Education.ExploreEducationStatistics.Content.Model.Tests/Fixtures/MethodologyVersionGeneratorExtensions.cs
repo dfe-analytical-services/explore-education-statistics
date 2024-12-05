@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -38,6 +39,16 @@ public static class MethodologyVersionGeneratorExtensions
         DateTime published)
         => generator.ForInstance(d => d.SetPublished(published));
 
+    public static Generator<MethodologyVersion> WithRedirects(
+        this Generator<MethodologyVersion> generator,
+        IEnumerable<MethodologyRedirect> methodologyRedirects)
+        => generator.ForInstance(s => s.SetRedirects(methodologyRedirects));
+
+    public static Generator<MethodologyVersion> WithRedirects(
+        this Generator<MethodologyVersion> generator,
+        Func<SetterContext, IEnumerable<MethodologyRedirect>> methodologyRedirects)
+        => generator.ForInstance(s => s.SetRedirects(methodologyRedirects.Invoke));
+
     public static InstanceSetters<MethodologyVersion> SetDefaults(this InstanceSetters<MethodologyVersion> setters)
         => setters
             .SetDefault(p => p.Id)
@@ -60,4 +71,27 @@ public static class MethodologyVersionGeneratorExtensions
         this InstanceSetters<MethodologyVersion> setters,
         DateTime published)
         => setters.Set(mv => mv.Published, published);
+
+    public static InstanceSetters<MethodologyVersion> SetRedirects(
+        this InstanceSetters<MethodologyVersion> setters,
+        IEnumerable<MethodologyRedirect> methodologyRedirects)
+        => setters.SetRedirects(_ => methodologyRedirects);
+
+    private static InstanceSetters<MethodologyVersion> SetRedirects(
+        this InstanceSetters<MethodologyVersion> setters,
+        Func<SetterContext, IEnumerable<MethodologyRedirect>> methodologyRedirects)
+        => setters.Set(
+            mv => mv.MethodologyRedirects,
+            (_, methodologyVersion, context) =>
+            {
+                var list = methodologyRedirects.Invoke(context).ToList();
+
+                list.ForEach(methodologyRedirect =>
+                {
+                    methodologyRedirect.MethodologyVersion = methodologyVersion;
+                    methodologyRedirect.MethodologyVersionId = methodologyVersion.Id;
+                });
+
+                return list;
+            });
 }

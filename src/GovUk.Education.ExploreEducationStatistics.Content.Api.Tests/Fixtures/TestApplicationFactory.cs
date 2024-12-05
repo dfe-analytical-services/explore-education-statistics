@@ -1,8 +1,10 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DotNet.Testcontainers.Containers;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -48,9 +50,20 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
         await _azuriteContainer.StartAsync();
     }
 
-    public async Task StopAzurite()
+    public async Task ClearAllTestData()
     {
-        await _azuriteContainer.StopAsync();
+        await EnsureDatabaseDeleted<ContentDbContext>();
+        await EnsureDatabaseDeleted<StatisticsDbContext>();
+
+        var publicBlobStorageService = Services.GetRequiredService<IPublicBlobStorageService>();
+
+        var allBlobContainers = typeof(BlobContainers).GetFields()
+            .Select(fi => (IBlobContainer)fi.GetValue(null)!);
+
+        foreach (var blobContainer in allBlobContainers)
+        {
+            await publicBlobStorageService.DeleteBlobs(blobContainer);
+        }
     }
 
     public WebApplicationFactory<Startup> WithAzurite(bool enabled = true)

@@ -1,26 +1,22 @@
 #nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
 
 [Collection(CacheTestFixture.CollectionName)]
-public abstract class IntegrationTestFixture :
+public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
     CacheServiceTestFixture,
     IClassFixture<TestApplicationFactory>,
     IAsyncLifetime
 {
     protected readonly DataFixture DataFixture = new();
 
-    protected readonly TestApplicationFactory TestApp;
+    protected readonly TestApplicationFactory TestApp = testApp;
 
-    internal IntegrationTestFixture(TestApplicationFactory testApp)
-    {
-        TestApp = testApp;
-    }
+    public readonly double RandomGuid = new Random().Next(100);
 
     public virtual async Task InitializeAsync()
     {
@@ -29,8 +25,6 @@ public abstract class IntegrationTestFixture :
 
     public virtual async Task DisposeAsync()
     {
-        await TestApp.EnsureDatabaseDeleted<ContentDbContext>();
-        await TestApp.EnsureDatabaseDeleted<StatisticsDbContext>();
-        await TestApp.StopAzurite();
+        await TestApp.ClearAllTestData();
     }
 }

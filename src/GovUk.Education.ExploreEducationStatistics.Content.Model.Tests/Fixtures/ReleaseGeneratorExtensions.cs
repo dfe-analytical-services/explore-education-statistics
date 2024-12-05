@@ -97,6 +97,21 @@ public static class ReleaseGeneratorExtensions
         int year)
         => generator.ForInstance(s => s.SetYear(year));
 
+    public static Generator<Release> WithSlug(
+        this Generator<Release> generator,
+        string slug)
+        => generator.ForInstance(s => s.SetSlug(slug));
+
+    public static Generator<Release> WithRedirects(
+        this Generator<Release> generator,
+        IEnumerable<ReleaseRedirect> releaseRedirects)
+        => generator.ForInstance(s => s.SetRedirects(releaseRedirects));
+
+    public static Generator<Release> WithRedirects(
+        this Generator<Release> generator,
+        Func<SetterContext, IEnumerable<ReleaseRedirect>> releaseRedirects)
+        => generator.ForInstance(s => s.SetRedirects(releaseRedirects.Invoke));
+
     public static Generator<Release> WithLabel(
         this Generator<Release> generator,
         string? label)
@@ -239,6 +254,34 @@ public static class ReleaseGeneratorExtensions
         this InstanceSetters<Release> setters,
         int year)
         => setters.Set(p => p.Year, year);
+
+    public static InstanceSetters<Release> SetSlug(
+        this InstanceSetters<Release> setters,
+        string slug)
+        => setters.Set(p => p.Slug, slug);
+
+    public static InstanceSetters<Release> SetRedirects(
+        this InstanceSetters<Release> setters,
+        IEnumerable<ReleaseRedirect> releaseRedirects)
+        => setters.SetRedirects(_ => releaseRedirects);
+
+    private static InstanceSetters<Release> SetRedirects(
+        this InstanceSetters<Release> setters,
+        Func<SetterContext, IEnumerable<ReleaseRedirect>> releaseRedirects)
+        => setters.Set(
+            mv => mv.ReleaseRedirects,
+            (_, release, context) =>
+            {
+                var list = releaseRedirects.Invoke(context).ToList();
+
+                list.ForEach(releaseRedirect =>
+                {
+                    releaseRedirect.Release = release;
+                    releaseRedirect.ReleaseId = release.Id;
+                });
+
+                return list;
+            });
 
     public static InstanceSetters<Release> SetLabel(
         this InstanceSetters<Release> setters,
