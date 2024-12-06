@@ -207,6 +207,9 @@ def run():
             time.sleep(5)
             slack_service.send_test_report(args.env, args.tests, failing_suites, number_of_test_runs)
 
+        if len(failing_suites) > 0:
+            sys.exit(1)
+
     except Exception as ex:
         if args.enable_slack_notifications:
             slack_service = SlackService()
