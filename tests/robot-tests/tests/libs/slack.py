@@ -53,14 +53,14 @@ class SlackService:
         # the final run report, this is not always true of flaky / intermittent test failures, which can be identified
         # in part by an unequal number of failures in the merged test report versus that of the final run attempt. It can
         # also be identified by the fact that the tests finally all passed but the number of attempts was greater than 1.
-        flaky_test_failures_likely = (
-            failed_tests_in_merged_report != failed_tests_in_final_run
-            or failed_tests_in_final_run == 0
-            and number_of_test_runs > 1
-        )
-
         flaky_test_message = (
-            "Yes" if flaky_test_failures_likely else "No" if failed_tests_in_final_run == 0 else "Unknown"
+            "Yes"
+            if failed_tests_in_final_run == 0 and number_of_test_runs > 1
+            else "No"
+            if failed_tests_in_final_run == 0 and number_of_test_runs == 1
+            else "Likely"
+            if failed_tests_in_merged_report != failed_tests_in_final_run
+            else "No"
         )
 
         blocks = [
@@ -81,10 +81,7 @@ class SlackService:
                     {"type": "mrkdwn", "text": f"*Passed test cases*\n{passed_tests}"},
                     {"type": "mrkdwn", "text": f"*Failed test cases*\n{failed_tests_in_final_run}"},
                     {"type": "mrkdwn", "text": f"*Skipped test cases*\n{skipped_tests}"},
-                    {
-                        "type": "mrkdwn",
-                        "text": f"*Flaky failures likely*\n{flaky_test_message}",
-                    },
+                    {"type": "mrkdwn", "text": f"*Flaky tests?*\n{flaky_test_message}"},
                 ],
             },
         ]
