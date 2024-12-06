@@ -31,6 +31,11 @@ resource containerAppEnvironmentSubnet 'Microsoft.Network/virtualNetworks/subnet
   parent: vNet
 }
 
+resource publisherSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: resourceNames.existingResources.subnets.publisherFunction
+  parent: vNet
+}
+
 // TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
 // Currently supported by subnet whitelisting and Storage service endpoints being enabled on the whitelisted subnets.
 module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
@@ -41,6 +46,7 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
     allowedSubnetIds: [
       dataProcessorSubnet.id
       containerAppEnvironmentSubnet.id
+      publisherSubnet.id
     ]
     firewallRules: storageFirewallRules
     skuStorageResource: 'Standard_LRS'
