@@ -109,12 +109,12 @@ def user_waits_for_release_process_status_to_be(status, timeout):
         try:
             sl().driver.find_element(By.ID, f"release-process-status-Failed")
             raise_assertion_error("Release process status FAILED!")
-        except BaseException:
+        except NoSuchElementException:
             pass
         try:
             sl().driver.find_element(By.ID, f"release-process-status-{status}")
             return
-        except BaseException:
+        except NoSuchElementException:
             sl().reload_page()  # Necessary if release previously scheduled
             time.sleep(3)
     raise_assertion_error(f"Release process status wasn't {status} after {timeout} seconds!")

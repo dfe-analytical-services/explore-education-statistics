@@ -16,9 +16,3 @@ class CheckForAtLeastOnePassingRunPrerebotModifier(SuiteVisitor):
                 )
                 test.status = "PASS"
                 test.message = f'Marking test "{test}" as PASS because it passed in at least one of the test runs.  Previous message is {test.message}'
-            elif "SKIP" in test.message:
-                self.logger.info(
-                    f'CheckForAtLeastOnePassingRunPrerebotModifier - marking test "{test}" as SKIPPED because it was skipped in the latter run.'
-                )
-                test.status = "SKIP"
-                test.message = f'Marking test "{test}" as SKIP because it was skipped in the latter test run.  Previous message is {test.message}'
