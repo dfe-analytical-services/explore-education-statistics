@@ -54,13 +54,13 @@ class SlackService:
         # in part by an unequal number of failures in the merged test report versus that of the final run attempt. It can
         # also be identified by the fact that the tests finally all passed but the number of attempts was greater than 1.
         flaky_test_message = (
-            "Yes"
+            "Definitely"
             if failed_tests_in_final_run == 0 and number_of_test_runs > 1
-            else "No"
+            else "Definitely not"
             if failed_tests_in_final_run == 0 and number_of_test_runs == 1
             else "Likely"
             if failed_tests_in_merged_report != failed_tests_in_final_run
-            else "No"
+            else "Unlikely"
         )
 
         blocks = [
