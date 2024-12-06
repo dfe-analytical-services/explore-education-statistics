@@ -6,8 +6,8 @@ type WindowSize = 'PT5M'
 
 @export()
 type DynamicMetricOperator =
-| 'GreaterOrLessThan' 
-| 'GreaterThan'
+  | 'GreaterOrLessThan' 
+  | 'GreaterThan'
   | 'LessThan'
 
 
@@ -21,9 +21,11 @@ type StaticMetricOperator =
 
 @export()
 type TimeAggregation = 
-  | 'Total'
-  | 'Minimum'
   | 'Average'
+  | 'Count'
+  | 'Maximum'
+  | 'Minimum'
+  | 'Total'
 
 @export()
 type Severity = 
