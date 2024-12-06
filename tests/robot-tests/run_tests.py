@@ -127,8 +127,6 @@ def run():
 
     logger.info(f"Running Robot tests with {max_run_attempts} maximum run attempts")
 
-    test_run_results_folder = ""
-
     try:
         # Run tests
         while test_run_index < max_run_attempts:
