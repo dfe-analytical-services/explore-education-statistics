@@ -3297,10 +3297,7 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2019-08-01",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-        "[variables('publicDataFileShareMountPath')]",
-        "[variables('publicDataFileShareName')]",
-        "[variables('publicDataStorageAccountName')]"
+        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
       ],
       "properties": {
         "[variables('publicDataFileShareName')]": {
