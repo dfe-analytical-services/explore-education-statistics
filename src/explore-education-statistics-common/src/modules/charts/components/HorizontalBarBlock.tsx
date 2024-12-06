@@ -103,7 +103,10 @@ const HorizontalBarBlock = ({
     meta,
   });
 
-  const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
+  const minorAxisDecimals = getMinorAxisDecimalPlaces(
+    dataSetCategoryConfigs,
+    axes.minor.decimalPlaces,
+  );
   const minorAxisUnit = axes.minor.unit || getUnit(dataSetCategoryConfigs);
   const chartHasNegativeValues =
     (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;

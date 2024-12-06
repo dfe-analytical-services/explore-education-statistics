@@ -278,6 +278,7 @@ const ChartAxisConfiguration = ({
       min: Yup.number(),
       visible: Yup.boolean(),
       unit: Yup.string(),
+      decimalPlaces: Yup.string(),
       labelText: Yup.string(),
       labelWidth: Yup.number().positive('Label width must be positive'),
     });
@@ -464,6 +465,7 @@ const ChartAxisConfiguration = ({
         labelRotated: values?.label?.rotated ?? false,
         labelText: values?.label?.text ?? '',
         labelWidth: values?.label?.width ?? undefined,
+        decimalPlaces: values?.decimalPlaces ?? undefined,
         referenceLines:
           values?.referenceLines.map(line => {
             return {
@@ -592,12 +594,20 @@ const ChartAxisConfiguration = ({
                       name="visible"
                       label="Show axis"
                       conditional={
-                        <FormFieldTextInput<ChartAxisConfigurationFormValues>
-                          label="Displayed unit"
-                          name="unit"
-                          hint="Leave blank to set default from metadata"
-                          width={10}
-                        />
+                        <>
+                          <FormFieldTextInput<ChartAxisConfigurationFormValues>
+                            label="Displayed unit"
+                            name="unit"
+                            hint="Leave blank to set default from metadata"
+                            width={10}
+                          />
+                          <FormFieldNumberInput<ChartAxisConfigurationFormValues>
+                            label="Displayed decimal places"
+                            name="decimalPlaces"
+                            hint="Leave blank to set default from metadata"
+                            width={10}
+                          />
+                        </>
                       }
                     />
                   )}

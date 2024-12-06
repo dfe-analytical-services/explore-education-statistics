@@ -109,7 +109,10 @@ const VerticalBarBlock = ({
     legendItems: legend.items,
     meta,
   });
-  const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
+  const minorAxisDecimals = getMinorAxisDecimalPlaces(
+    dataSetCategoryConfigs,
+    axes.minor.decimalPlaces,
+  );
   const minorAxisUnit = axes.minor.unit || getUnit(dataSetCategoryConfigs);
   const yAxisWidth = getMinorAxisSize({
     dataSetCategories,
