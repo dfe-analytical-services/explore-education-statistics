@@ -20,7 +20,7 @@ module alerts '../staticMetricAlert.bicep' = [for name in resourceNames: {
     resourceType: 'Microsoft.Network/applicationGateways'
     query: {
       metric: 'UnhealthyHostCount'
-      aggregation: 'Total'
+      aggregation: 'Average'
       operator: 'GreaterThan'
       threshold: 0
     }
