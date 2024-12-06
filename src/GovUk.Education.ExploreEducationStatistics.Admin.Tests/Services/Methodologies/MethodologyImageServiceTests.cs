@@ -714,7 +714,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateMethodologyFiles,
                     It.Is<string>(path =>
-                        path.Contains(FilesPath(methodologyVersion.Id, Image, null))),
+                        path.Contains(FilesPath(methodologyVersion.Id, Image))),
                     formFile
                 )).Returns(Task.CompletedTask);
 
@@ -740,7 +740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 privateBlobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateMethodologyFiles,
                         It.Is<string>(path =>
-                            path.Contains(FilesPath(methodologyVersion.Id, Image, null))),
+                            path.Contains(FilesPath(methodologyVersion.Id, Image))),
                         formFile
                     ), Times.Once);
 

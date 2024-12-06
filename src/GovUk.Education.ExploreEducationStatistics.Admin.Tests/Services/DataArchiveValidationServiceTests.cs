@@ -387,8 +387,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task IsValidZipFile_NoFileProvided_ReturnsValidationError()
         {
             // Arrange
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId);
+            await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
 
             var service = SetupDataArchiveValidationService(contentDbContext: contentDbContext);
 
@@ -409,7 +408,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // Arrange
             var contentDbContextId = Guid.NewGuid().ToString();
             await using var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId);
-
 
             var longFilename = "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongfilename.csv";
             var archive = CreateFormFileFromResource("test-data.csv", longFilename);

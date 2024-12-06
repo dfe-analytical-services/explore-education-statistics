@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         return service.ValidateAndUploadBulkZip(
                             releaseVersionId: _releaseVersion.Id,
                             zipFile: new Mock<IFormFile>().Object,
-                            default);
+                            cancellationToken: default);
                     }
                 );
         }
@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         return service.SaveDataSetsFromTemporaryBlobStorage(
                             releaseVersionId: _releaseVersion.Id,
                             archiveDataSetFiles: new Mock<List<ArchiveDataSetFileViewModel>>().Object,
-                            default);
+                            cancellationToken: default);
                     }
                 );
         }

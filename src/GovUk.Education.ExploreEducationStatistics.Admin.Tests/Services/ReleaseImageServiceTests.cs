@@ -208,7 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
-                        path.Contains(FilesPath(releaseVersion.Id, Image, null))),
+                        path.Contains(FilesPath(releaseVersion.Id, Image))),
                     formFile
                 )).Returns(Task.CompletedTask);
 
@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 privateBlobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(FilesPath(releaseVersion.Id, Image, null))),
+                            path.Contains(FilesPath(releaseVersion.Id, Image))),
                         formFile
                     ), Times.Once);
 
