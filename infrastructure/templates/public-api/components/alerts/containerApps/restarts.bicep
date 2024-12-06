@@ -20,7 +20,7 @@ module alerts '../staticMetricAlert.bicep' = [for name in resourceNames: {
     resourceType: 'Microsoft.App/containerApps'
     query: {
       metric: 'RestartCount'
-      aggregation: 'Average'
+      aggregation: 'Total'
       operator: 'GreaterThan'
       threshold: 0
     }

@@ -56,7 +56,7 @@ module appGatewayModule '../../components/appGateway.bicep' = {
 }
 
 module backendPoolsHealthAlert '../../components/alerts/appGateways/backendPoolHealth.bicep' = if (deployAlerts) {
-  name: '${resourceNames.sharedResources.appGateway}BackedPoolsHealthDeploy'
+  name: '${resourceNames.sharedResources.appGateway}BackendPoolsHealthDeploy'
   params: {
     resourceNames: [resourceNames.sharedResources.appGateway]
     alertsGroupName: resourceNames.existingResources.alertsGroup
