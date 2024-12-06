@@ -23,27 +23,43 @@ class SlackService:
         self.client = WebClient(token=self.slack_app_token)
 
     def _build_test_results_attachments(self, env: str, suites_ran: str, suites_failed: [], number_of_test_runs: int):
-        with open(f"{PATH}{os.sep}output.xml", "rb") as report:
-            contents = report.read()
-
         try:
-            soup = BeautifulSoup(contents, features="xml")
-            tests = soup.find("total").find("stat")
-            failed_tests = int(tests["fail"])
-            passed_tests = int(tests["pass"])
-            skipped_tests = int(tests["skip"])
+            # Gather high-level passing test count from the merged report from all run attempts.
+            with open(f"{PATH}{os.sep}output.xml", "rb") as report:
+                contents = report.read()
+                soup = BeautifulSoup(contents, features="xml")
+                tests = soup.find("total").find("stat")
+                passed_tests = int(tests["pass"])
+                skipped_tests = int(tests["skip"])
+                failed_tests_in_merged_report = int(tests["fail"])
+
+            # Gather final failing test counts from the final run attempt's report. We do this so as to most
+            # accurately report what was failing right at the end of the process. It's not safe to do this from
+            # the merged report because failures in one run attempt that then succeed in another attempt will be
+            # marked as PASSED during the merge, and subsequent test following a failure are only reported as
+            # SKIPPED, thus potentially suggesting that no tests were actually left as failing at the end.
+            with open(f"{PATH}{os.sep}run-{number_of_test_runs}{os.sep}output.xml", "rb") as report:
+                contents = report.read()
+                soup = BeautifulSoup(contents, features="xml")
+                tests = soup.find("total").find("stat")
+                failed_tests_in_final_run = int(tests["fail"])
 
         except AttributeError as e:
             raise Exception("Error parsing the XML report") from e
 
-        total_tests_count = passed_tests + failed_tests + skipped_tests
+        total_tests_count = passed_tests + failed_tests_in_merged_report + skipped_tests
+
+        # Whilst genuine bugs that fail a step every time will always show as FAILED in the merged test report AND
+        # the final run report, this is not always true of flaky / intermittent test failures, which can be identified
+        # in part by an unequal number of failures in the merged test report versus that of the final run attempt.
+        flaky_test_failures_likely = failed_tests_in_merged_report != failed_tests_in_final_run
 
         blocks = [
             {
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": f"{':warning:' if failed_tests > 0 else ':white_check_mark:'} All results",
+                    "text": f"{':warning:' if failed_tests_in_final_run > 0 else ':white_check_mark:'} All results",
                 },
             },
             {
@@ -51,11 +67,15 @@ class SlackService:
                 "fields": [
                     {"type": "mrkdwn", "text": f"*Environment*\n{env}"},
                     {"type": "mrkdwn", "text": f"*Suite*\n{suites_ran.replace('tests/', '')}"},
-                    {"type": "mrkdwn", "text": f"*Total runs*\n{number_of_test_runs}"},
+                    {"type": "mrkdwn", "text": f"*Total run attempts*\n{number_of_test_runs}"},
                     {"type": "mrkdwn", "text": f"*Total test cases*\n{total_tests_count}"},
                     {"type": "mrkdwn", "text": f"*Passed test cases*\n{passed_tests}"},
-                    {"type": "mrkdwn", "text": f"*Failed test cases*\n{failed_tests}"},
+                    {"type": "mrkdwn", "text": f"*Failed test cases*\n{failed_tests_in_final_run}"},
                     {"type": "mrkdwn", "text": f"*Skipped test cases*\n{skipped_tests}"},
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*Flaky failures likely*\n{'Yes' if flaky_test_failures_likely else 'Unknown'}",
+                    },
                 ],
             },
         ]

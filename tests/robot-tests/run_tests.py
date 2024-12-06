@@ -127,10 +127,14 @@ def run():
 
     logger.info(f"Running Robot tests with {max_run_attempts} maximum run attempts")
 
+    test_run_results_folder = ""
+
     try:
         # Run tests
         while test_run_index < max_run_attempts:
             try:
+                test_run_results_folder = f"{main_results_folder}{os.sep}run-{test_run_index + 1}"
+
                 # Ensure all SeleniumLibrary elements and keywords are updated to use a brand new
                 # Selenium instance for every test (re)run.
                 if test_run_index > 0:
@@ -142,7 +146,6 @@ def run():
                 _clear_files_before_next_test_run_attempt(rerunning_failed_suites)
 
                 # Create a folder to contain this test run attempt's outputs and reports.
-                test_run_results_folder = f"{main_results_folder}{os.sep}run-{test_run_index + 1}"
                 os.makedirs(test_run_results_folder)
 
                 if not Path(f"{main_results_folder}/downloads").exists():
