@@ -1198,7 +1198,7 @@
       "[concat('Microsoft.Web/sites/', variables('contentAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('dataAppName'))]"
     ],
-    "publicDataFileShareMountPath": "/data/public-api-data",
+    "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
     "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-fs-data')]",
     "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]"
   },
@@ -3286,7 +3286,7 @@
         "App:NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App:PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "App:PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "DataFiles:BasePath": "[variables('publicDataFileShareMountPath')]",
+        "DataFiles:BasePath": "[variables('publicDataFileShareMountPathWindows')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
@@ -3303,8 +3303,9 @@
         "[variables('publicDataFileShareName')]": {
           "type": "AzureFiles",
           "accountName": "[variables('publicDataStorageAccountName')]",
+          "accessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicDataStorageAccountName')), '2018-02-01').keys[0].value]",
           "shareName": "[variables('publicDataFileShareName')]",
-          "mountPath": "[variables('publicDataFileShareMountPath')]",
+          "mountPath": "[variables('publicDataFileShareMountPathWindows')]",
           "protocol": "Smb"
         }
       }
