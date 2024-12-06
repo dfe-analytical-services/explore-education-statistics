@@ -3286,7 +3286,7 @@
         "App:NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App:PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "App:PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "DataFiles:BasePath": "[parameters('publicDataFileShareMountPath')]",
+        "DataFiles:BasePath": "[variables('publicDataFileShareMountPath')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
