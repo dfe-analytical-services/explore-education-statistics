@@ -75,6 +75,8 @@ param deployContainerApp bool = true
 @description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
 param updatePsqlFlexibleServer bool = false
 
+param deployAlerts bool = false
+
 @description('Public URLs of other components in the service.')
 param publicUrls {
   contentApi: string
@@ -183,6 +185,7 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
     resourceNames: resourceNames
     publicApiDataFileShareQuota: publicApiDataFileShareQuota
     storageFirewallRules: storageFirewallRules
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }
@@ -218,6 +221,7 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     firewallRules: postgreSqlFirewallRules
     sku: postgreSqlSkuName
     storageSizeGB: postgreSqlStorageSizeGB
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
   dependsOn: [
@@ -262,6 +266,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     publicSiteUrl: publicUrls.publicSite
     dockerImagesTag: dockerImagesTag
     appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
   dependsOn: [
@@ -356,6 +361,7 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
         ]
       }
     ]
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }
@@ -365,11 +371,11 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
   params: {
     location: location
     resourceNames: resourceNames
-    metricsNamePrefix: '${subscription}PublicDataProcessor'
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
     storageFirewallRules: storageFirewallRules
     dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
   dependsOn: [

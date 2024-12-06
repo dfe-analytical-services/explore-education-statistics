@@ -30,6 +30,9 @@ param apiAppRegistrationClientId string
 @description('Specifies the Application Insights connection string for this Container App to use for its monitoring.')
 param appInsightsConnectionString string
 
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param deployAlerts bool
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -142,6 +145,15 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       ]
       requireAuthentication: false
     }
+    tagValues: tagValues
+  }
+}
+
+module containerAppRestartsAlert '../../components/alerts/containerApps/restarts.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.apiApp}RestartsDeploy'
+  params: {
+    resourceNames: [resourceNames.publicApi.apiApp]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
     tagValues: tagValues
   }
 }

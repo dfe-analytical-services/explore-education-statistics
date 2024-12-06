@@ -6,13 +6,16 @@ param resourceNames ResourceNames
 param location string
 
 @description('Public API Storage : Size of the file share in GB.')
-param publicApiDataFileShareQuota int = 1
+param publicApiDataFileShareQuota int
 
 @description('Public API Storage : Firewall rules.')
-param storageFirewallRules FirewallRule[] = []
+param storageFirewallRules FirewallRule[]
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
+
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param deployAlerts bool
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: resourceNames.existingResources.vNet
@@ -53,6 +56,24 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
     fileShareQuota: publicApiDataFileShareQuota
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: 'TransactionOptimized'
+  }
+}
+
+module storageAccountAvailabilityAlert '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.publicApiStorageAccount}AvailabilityDeploy'
+  params: {
+    resourceNames: [resourceNames.publicApi.publicApiStorageAccount]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
+}
+
+module fileServiceAvailabilityAlert '../../components/alerts/fileServices/availabilityAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.publicApiStorageAccount}FsAvailabilityDeploy'
+  params: {
+    resourceNames: [resourceNames.publicApi.publicApiStorageAccount]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
   }
 }
 

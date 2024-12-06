@@ -7,6 +7,9 @@ parameters:
   - name: updatePsqlFlexibleServer
     displayName: Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.
     default: false
+  - name: deployAlerts
+    displayName: Whether to create or update Azure Monitor alerts during this deploy.
+    default: false
   - name: forceDeployToEnvironment
     displayName: Set to either dev or test to force a deploy to that environment from the chosen branch.
     type: string
@@ -42,6 +45,8 @@ variables:
     value: ${{ parameters.deployContainerApp }}
   - name: updatePsqlFlexibleServer
     value: ${{ parameters.updatePsqlFlexibleServer }}
+  - name: deployAlerts
+    value: ${{ parameters.deployAlerts }}
 
 pool:
   vmImage: $(vmImageName)

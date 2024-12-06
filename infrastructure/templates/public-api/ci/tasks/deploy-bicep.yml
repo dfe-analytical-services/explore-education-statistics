@@ -13,13 +13,12 @@ parameters:
     type: string
   - name: deployContainerApp
     type: string
-    default: true
   - name: updatePsqlFlexibleServer
     type: string
-    default: false
+  - name: deployAlerts
+    type: string
   - name: dataProcessorExists
     type: string
-    default: true
 
 steps:
   - task: AzureCLI@2
@@ -48,6 +47,7 @@ steps:
               dockerImagesTag='$(resources.pipeline.MainBuild.runName)' \
               deployContainerApp=${{ parameters.deployContainerApp }} \
               updatePsqlFlexibleServer=${{ parameters.updatePsqlFlexibleServer }} \
+              deployAlerts=${{ parameters.deployAlerts }} \
               dataProcessorFunctionAppExists=${{ parameters.dataProcessorExists }} \
               dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
               apiAppRegistrationClientId='$(apiAppRegistrationClientId)'
