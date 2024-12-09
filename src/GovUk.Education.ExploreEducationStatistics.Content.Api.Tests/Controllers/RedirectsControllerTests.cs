@@ -23,14 +23,14 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 {
     public abstract class ListTests(TestApplicationFactory testApp) : RedirectsControllerTests(testApp)
     {
-        public override async Task InitializeAsync() => await TestApp.StartAzurite();
+        public override async Task InitializeAsync() => await StartAzurite();
 
         public class GeneralTests(TestApplicationFactory testApp) : ListTests(testApp)
         {
             [Fact]
             public async Task RedirectsExistInCache_Returns200WithRedirects()
             {
-                var app = BuildApp();
+                var app = BuildApp(enableAzurite: true);
                 var client = app.CreateClient();
 
                 var blobCacheService = app.Services.GetRequiredService<IBlobCacheService>();
@@ -92,7 +92,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             [Fact]
             public async Task NoRedirectsExist_Returns200WithNoRedirects()
             {
-                var response = await ListRedirects();
+                var client = BuildApp(enableAzurite: true).CreateClient();
+                var response = await ListRedirects(client);
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -120,7 +121,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.Methodologies.Add(methodology));
 
-                var response = await ListRedirects();
+                var client = BuildApp(enableAzurite: true).CreateClient();
+                var response = await ListRedirects(client);
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -151,7 +153,7 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.Methodologies.Add(methodology));
 
-                var app = BuildApp();
+                var app = BuildApp(enableAzurite: true);
                 var client = app.CreateClient();
 
                 await ListRedirects(client);
@@ -186,7 +188,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.PublicationRedirects.AddRange(publicationRedirects));
 
-                var response = await ListRedirects();
+                var client = BuildApp(enableAzurite: true).CreateClient();
+                var response = await ListRedirects(client);
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -208,7 +211,9 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.PublicationRedirects.AddRange(publicationRedirects));
 
-                var app = BuildApp();
+                await StartAzurite();
+
+                var app = BuildApp(enableAzurite: true);
                 var client = app.CreateClient();
 
                 await ListRedirects(client);
@@ -240,7 +245,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.PublicationRedirects.Add(publicationRedirect));
 
-                var response = await ListRedirects();
+                var client = BuildApp(enableAzurite: true).CreateClient();
+                var response = await ListRedirects(client);
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -276,7 +282,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
-                var response = await ListRedirects();
+                var client = BuildApp(enableAzurite: true).CreateClient();
+                var response = await ListRedirects(client);
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -312,7 +319,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
-                var response = await ListRedirects();
+                var client = BuildApp(enableAzurite: true).CreateClient();
+                var response = await ListRedirects(client);
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -346,7 +354,7 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
-                var app = BuildApp();
+                var app = BuildApp(enableAzurite: true);
                 var client = app.CreateClient();
 
                 await ListRedirects(client);
@@ -377,9 +385,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
         }
     }
 
-    private WebApplicationFactory<Startup> BuildApp()
+    private WebApplicationFactory<Startup> BuildApp(bool enableAzurite = false)
     {
-        return TestApp
-            .WithAzurite(enabled: true);
+        return WithAzurite(enabled: enableAzurite);
     }
 }
