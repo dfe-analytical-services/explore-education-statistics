@@ -19,13 +19,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class DataImportService : IDataImportService
     {
         private readonly IDbContextSupplier _dbContextSupplier;
+        private readonly IDbContextService _dbContextService;
         private readonly ILogger<DataImportService> _logger;
 
         public DataImportService(
             IDbContextSupplier dbContextSupplier,
+            IDbContextService dbContextService,
             ILogger<DataImportService> logger)
         {
             _dbContextSupplier = dbContextSupplier;
+            _dbContextService = dbContextService;
             _logger = logger;
         }
 
@@ -257,7 +260,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                              && f.SubjectId == subjectId);
             file.DataSetFileMeta = dataSetFileMeta;
             file.DataSetFileMetaOld = dataSetFileMetaOld;
-            await contentDbContext.SaveChangesAsync();
+
+            // The in-memory db we use in tests cannot save to the
+            // DataSetFileMeta JSON column. So to ensure tests succeed
+            // we make the save mockable
+            await _dbContextService.SaveChangesAsync(contentDbContext);
         }
     }
 }

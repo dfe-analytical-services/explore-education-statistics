@@ -325,6 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             return new DataImportService(
                 dbContextSupplier,
+                new DbContextService(),
                 Mock.Of<ILogger<DataImportService>>(Strict));
         }
     }

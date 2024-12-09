@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = Data
+                Type = FileType.Data
             };
 
             var imageFile = new File
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = Data
+                Type = FileType.Data
             };
 
             var imageFile = new File

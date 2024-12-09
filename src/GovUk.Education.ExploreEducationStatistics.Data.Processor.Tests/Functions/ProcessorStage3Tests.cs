@@ -25,7 +25,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -149,6 +148,7 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(
             dbContextSupplier,
+            new DbContextService(),
             Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
@@ -374,6 +374,7 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(
             dbContextSupplier,
+            new DbContextService(),
             Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
@@ -506,6 +507,7 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(
             dbContextSupplier,
+            new DbContextService(),
             Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
@@ -656,6 +658,7 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(
             dbContextSupplier,
+            new DbContextService(),
             Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
@@ -790,8 +793,15 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
+        var dbContextService = new Mock<IDbContextService>(Strict);
+
+        dbContextService.Setup(mock =>
+            mock.SaveChangesAsync(It.IsAny<DbContext>()))
+            .Returns(Task.CompletedTask);
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
+            dbContextService.Object,
             Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
@@ -847,6 +857,10 @@ public class ProcessorStage3Tests
         var outputMessages = await function.ProcessUploads(
             new ImportMessage(import.Id),
             new TestFunctionContext());
+
+        dbContextService.Verify(mock =>
+                mock.SaveChangesAsync(It.IsAny<DbContext>()),
+            Times.Once);
 
         VerifyAllMocks(privateBlobStorageService);
 
@@ -954,6 +968,7 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(
             dbContextSupplier,
+            new DbContextService(),
             Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
@@ -1096,6 +1111,7 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(
             dbContextSupplier,
+            new DbContextService(),
             Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
@@ -1218,6 +1234,7 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(
             dbContextSupplier,
+            new DbContextService(),
             Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
@@ -1364,11 +1381,17 @@ public class ProcessorStage3Tests
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
 
+        var dbContextService = new Mock<IDbContextService>(Strict);
+
+        dbContextService.Setup(mock => mock.SaveChangesAsync(It.IsAny<DbContext>()))
+            .Returns(Task.CompletedTask);
+
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
         var dataImportService = new DataImportService(
             dbContextSupplier,
-            Mock.Of<ILogger<DataImportService>>());
+            dbContextService.Object,
+        Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
@@ -1423,6 +1446,10 @@ public class ProcessorStage3Tests
         var outputMessages = await function.ProcessUploads(
             new ImportMessage(import.Id),
             new TestFunctionContext());
+
+        dbContextService.Verify(mock =>
+                mock.SaveChangesAsync(It.IsAny<DbContext>()),
+            Times.Once);
 
         VerifyAllMocks(privateBlobStorageService);
 
@@ -1536,6 +1563,7 @@ public class ProcessorStage3Tests
 
         var dataImportService = new DataImportService(
             dbContextSupplier,
+            new DbContextService(),
             Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
