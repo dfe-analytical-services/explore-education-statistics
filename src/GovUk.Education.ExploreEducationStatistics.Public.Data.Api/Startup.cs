@@ -155,7 +155,16 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             });
 
         services.AddProblemDetails();
-        services.AddApiVersioning().AddMvc().AddApiExplorer();
+
+        services
+            .AddApiVersioning(options =>
+            {
+                // Supported versions listed in `api-supported-versions` header
+                options.ReportApiVersions = true;
+            })
+            .AddMvc()
+            .AddApiExplorer();
+
         services.AddEndpointsApiExplorer();
 
         // Swagger
