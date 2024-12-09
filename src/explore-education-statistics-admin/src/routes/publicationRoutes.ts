@@ -92,21 +92,21 @@ export const publicationInviteUsersPageRoute: PublicationRouteProps = {
 };
 
 export const publicationReleaseSeriesRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/legacy',
-  title: 'Legacy releases',
+  path: '/publication/:publicationId/releases/order',
+  title: 'Release order',
   component: PublicationReleaseSeriesPage,
 };
 
 export const publicationCreateReleaseSeriesLegacyLinkRoute: PublicationRouteProps =
   {
-    path: '/publication/:publicationId/legacy/create',
+    path: '/publication/:publicationId/releases/legacy/create',
     title: 'Create legacy release',
     component: PublicationCreateReleaseSeriesLegacyLinkPage,
   };
 
 export const publicationEditReleaseSeriesLegacyLinkRoute: PublicationRouteProps =
   {
-    path: '/publication/:publicationId/legacy/:releaseSeriesItemId/edit',
+    path: '/publication/:publicationId/releases/legacy/:releaseSeriesItemId/edit',
     title: 'Edit legacy release',
     component: PublicationEditReleaseSeriesLegacyLinkPage,
   };

@@ -31,14 +31,14 @@ Create new publication via api
 
 Validate publication release order table is empty
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
     user checks page contains    No releases for this publication.
 
 Create first legacy release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
     user creates legacy release    ${LEGACY_RELEASE_1_DESCRIPTION}    ${LEGACY_RELEASE_1_URL}
 
 Validate publication release order table headings
@@ -66,8 +66,8 @@ Create first release via api
 
 Validate first release exists in the publication release order with status unpublished
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
     user checks table body has x rows    2    testid:release-series
 
     user checks table cell contains    1    1    ${RELEASE_1_NAME}
@@ -115,8 +115,8 @@ Approve first release
 
 Validate first release has latest release status in publication release order
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
 
     user checks table body has x rows    3    testid:release-series
 
@@ -156,8 +156,8 @@ Validate other releases section on public frontend
 
 Update first legacy release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
 
     user clicks element    xpath://tr[2]//*[text()="Edit"]
     ${modal}=    user waits until modal is visible    Edit legacy release
@@ -170,7 +170,7 @@ Update first legacy release
     user clicks button    Save legacy release
 
 Validate the first legacy release is updated
-    user waits until h2 is visible    Legacy releases
+    user waits until h2 is visible    Release order
     user checks table body has x rows    3    testid:release-series
 
     user checks table cell contains    1    1    ${RELEASE_1_NAME}
@@ -255,8 +255,8 @@ Create second release via api
 
 Validate second release exists in the publication release order with status unpublished
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
     user checks table body has x rows    4    testid:release-series
 
     user checks table cell contains    1    1    ${RELEASE_2_NAME}
@@ -292,8 +292,8 @@ Approve second release
 
 Validate second release has latest release status in publication release order
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
 
     user checks table body has x rows    4    testid:release-series
 
@@ -343,8 +343,8 @@ Approve second release amendment
 
 Validate amended second release exists in publication release order
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
 
     user checks table body has x rows    4    testid:release-series
 
