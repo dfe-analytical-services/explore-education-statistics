@@ -3275,6 +3275,7 @@
         "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "AzureWebJobs.StageScheduledReleaseVersionsImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
         "AzureWebJobs.PublishStagedReleaseVersionContentImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
+        "WEBSITE_CONTENTOVERVNET": "1",
         "WEBSITE_TIME_ZONE": "[parameters('timeZone')]",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~4",
