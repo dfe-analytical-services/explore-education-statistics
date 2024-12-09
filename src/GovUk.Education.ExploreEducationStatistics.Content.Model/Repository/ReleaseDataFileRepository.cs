@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
         private static readonly List<FileType> SupportedFileTypes = new()
         {
-            Data,
+            FileType.Data,
             Metadata
         };
 
@@ -58,10 +58,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                     CreatedById = createdById,
                     RootPath = releaseVersionId,
                     SubjectId = subjectId,
-                    DataSetFileId = type != Data
+                    DataSetFileId = type != FileType.Data
                         ? null
                         : replacingDataFile?.DataSetFileId ?? Guid.NewGuid(),
-                    DataSetFileVersion = type != Data
+                    DataSetFileVersion = type != FileType.Data
                         ? null
                         : replacingDataFile?.DataSetFileVersion + 1 ?? 0,
                     DataSetFileMeta = null, // If FileType.Data, this is set by Data.Processor when import is complete
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Include(rf => rf.File)
                 .Where(
                     rf => rf.ReleaseVersionId == releaseVersionId
-                          && rf.File.Type == Data
+                          && rf.File.Type == FileType.Data
                           && rf.File.ReplacingId != null
                           && rf.File.SubjectId.HasValue
                 )
@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .SingleAsync(rf =>
                     rf.ReleaseVersionId == releaseVersionId
                     && rf.File.SubjectId == subjectId
-                    && rf.File.Type == Data);
+                    && rf.File.Type == FileType.Data);
         }
 
         private IQueryable<File> ListDataFilesQuery(Guid releaseVersionId)
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Include(rf => rf.File)
                 .Where(
                     rf => rf.ReleaseVersionId == releaseVersionId
-                          && rf.File.Type == Data
+                          && rf.File.Type == FileType.Data
                           && rf.File.ReplacingId == null
                 )
                 .OrderBy(rf => rf.Order)

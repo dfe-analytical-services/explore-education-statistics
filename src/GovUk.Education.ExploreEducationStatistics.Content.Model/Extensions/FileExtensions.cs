@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
         {
             Ancillary,
             Chart,
-            Data,
+            FileType.Data,
             Image,
             DataGuidance
         };
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return file.Type switch
             {
                 Ancillary => $"supporting-files/{file.Filename}",
-                Data => $"data/{file.Filename}",
+                FileType.Data => $"data/{file.Filename}",
                 _ => throw new ArgumentOutOfRangeException(nameof(file.Type), "Unexpected file type"),
             };
         }

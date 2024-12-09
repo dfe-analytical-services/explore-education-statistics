@@ -105,6 +105,7 @@ public class ProcessorStage1Tests
 
         var dataImportService = new DataImportService(
             dbContextSupplier,
+            new DbContextService(),
             Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());

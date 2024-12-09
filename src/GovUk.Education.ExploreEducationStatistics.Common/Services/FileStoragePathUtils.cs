@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public static string FilesPath(Guid rootPath, FileType type)
         {
-            var typeFolder = (type == Metadata ? Data : type).GetEnumLabel();
+            var typeFolder = (type == Metadata ? FileType.Data : type).GetEnumLabel();
             return $"{rootPath}/{typeFolder}/";
         }
 
