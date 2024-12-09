@@ -72,7 +72,7 @@ export default function ReleaseSeriesTable({
   }
 
   return (
-    <table>
+    <table data-testid="release-series">
       <thead>
         <tr>
           <th>Description</th>
