@@ -507,15 +507,18 @@ describe('redirectPages', () => {
       async redirectedCase => {
         redirectService.list.mockResolvedValue(testRedirects);
 
-        const route = buildRoute(redirectedCase.routePattern, 'original-slug');
+        const route = buildOldRoute(
+          redirectedCase.routePattern,
+          redirectedCase.oldSlugNewSlugPairsByPlaceholder,
+        );
 
         await runMiddleware(redirectPages, `https://my-env/${route}`);
 
         expect(redirectService.list).toHaveBeenCalledTimes(1);
 
-        const anotherRoute = buildRoute(
+        const anotherRoute = buildOldRoute(
           redirectedCase.routePattern,
-          'another-slug',
+          redirectedCase.oldSlugNewSlugPairsByPlaceholder,
         );
 
         await runMiddleware(redirectPages, `https://my-env/${anotherRoute}`);
