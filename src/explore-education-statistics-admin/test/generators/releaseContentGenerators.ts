@@ -95,7 +95,6 @@ const defaultPublication: Publication = {
   releases: [],
   releaseSeries: [
     {
-      id: 'legacylink-id',
       isLegacyLink: true,
       description: 'legacy link 1',
       legacyLinkUrl: 'https://test.com/1',

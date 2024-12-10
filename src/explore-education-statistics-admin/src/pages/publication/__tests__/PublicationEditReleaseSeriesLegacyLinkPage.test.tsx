@@ -25,24 +25,24 @@ const publicationService = _publicationService as jest.Mocked<
 describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
   const releaseSeries: ReleaseSeriesTableEntry[] = [
     {
-      id: 'legacy-release-1',
+      id: 'release-series-item-1',
       isLegacyLink: true,
       description: 'Legacy link 1',
 
       legacyLinkUrl: 'https://gov.uk/1',
     },
     {
-      id: 'release-1',
+      id: 'release-series-item-2',
       isLegacyLink: false,
       description: 'Academic Year 2000/01',
 
-      releaseId: 'release-parent-1',
+      releaseId: 'release-1',
       releaseSlug: 'release-slug',
       isLatest: true,
       isPublished: true,
     },
     {
-      id: 'legacy-release-2',
+      id: 'release-series-item-3',
       isLegacyLink: true,
       description: 'Legacy link 2',
 
@@ -55,7 +55,7 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
   });
 
   test('renders the edit legacy release page', async () => {
-    renderPage(testPublication, 'legacy-release-1');
+    renderPage(testPublication, 'release-series-item-1');
 
     await waitFor(() => {
       expect(screen.getByText('Edit legacy release')).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
   });
 
   test('handles successfully submitting the form', async () => {
-    renderPage(testPublication, 'legacy-release-1');
+    renderPage(testPublication, 'release-series-item-1');
     await waitFor(() => {
       expect(screen.getByText('Edit legacy release')).toBeInTheDocument();
     });
@@ -90,19 +90,13 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
         'publication-1',
         [
           {
-            id: 'legacy-release-1',
-
             legacyLinkDescription: 'Legacy link 1 edited',
             legacyLinkUrl: 'https://gov.uk/1/edit',
           },
           {
-            id: 'release-1',
-
-            releaseId: 'release-parent-1',
+            releaseId: 'release-1',
           },
           {
-            id: 'legacy-release-2',
-
             legacyLinkDescription: 'Legacy link 2',
             legacyLinkUrl: 'https://gov.uk/2',
           },

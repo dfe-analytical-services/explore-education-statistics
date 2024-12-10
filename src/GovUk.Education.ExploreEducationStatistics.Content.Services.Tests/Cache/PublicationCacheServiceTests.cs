@@ -52,16 +52,14 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 Title = ""
             }
         },
-        ReleaseSeries = new()
-        {
-            new()
+        ReleaseSeries =
+        [
+            new ReleaseSeriesItemViewModel
             {
-                Id = Guid.NewGuid(),
-                IsLegacyLink = true,
                 Description = "legacy link description",
                 LegacyLinkUrl = "http://test.com/",
             }
-        },
+        ],
         Theme = new ThemeViewModel(
             Guid.NewGuid(),
             Slug: "",

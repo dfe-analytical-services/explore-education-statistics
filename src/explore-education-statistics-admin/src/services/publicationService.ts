@@ -83,7 +83,6 @@ export interface ReleaseSeriesLegacyLinkAddRequest {
 }
 
 export interface ReleaseSeriesItemUpdateRequest {
-  id: string;
   releaseId?: string;
   legacyLinkDescription?: string;
   legacyLinkUrl?: string;
@@ -97,6 +96,7 @@ export interface ListReleasesParams {
 }
 
 export interface ReleaseSeriesTableEntry extends ReleaseSeriesItem {
+  id: string;
   isLatest?: boolean;
   isPublished?: boolean;
 }

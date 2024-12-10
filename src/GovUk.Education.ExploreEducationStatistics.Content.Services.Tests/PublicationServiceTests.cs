@@ -205,7 +205,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Null(releaseSeriesItem2.LegacyLinkUrl);
 
                     var releaseSeriesItem3 = publicationViewModel.ReleaseSeries[2];
-                    Assert.Equal(_legacyLinks[0].Id, releaseSeriesItem3.Id);
                     Assert.True(releaseSeriesItem3.IsLegacyLink);
                     Assert.Null(releaseSeriesItem3.ReleaseId);
                     Assert.Equal(_legacyLinks[0].LegacyLinkDescription, releaseSeriesItem3.Description);

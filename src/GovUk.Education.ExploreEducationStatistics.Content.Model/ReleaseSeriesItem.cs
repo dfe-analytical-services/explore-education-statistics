@@ -6,6 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public record ReleaseSeriesItem
 {
+    /// <summary>
+    /// Unique identifier for the ReleaseSeriesItem which exists to allow safely managing legacy links in the UI.
+    /// </summary>
     public Guid Id { get; set; }
 
     public Guid? ReleaseId { get; set; }

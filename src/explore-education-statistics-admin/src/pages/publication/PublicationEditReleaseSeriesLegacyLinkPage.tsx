@@ -19,7 +19,6 @@ export const mapToReleaseSeriesItemUpdateRequest = (
   releaseSeries: ReleaseSeriesTableEntry[],
 ): ReleaseSeriesItemUpdateRequest[] => {
   return releaseSeries.map(seriesItem => ({
-    id: seriesItem.id,
     releaseId: seriesItem.releaseId,
     legacyLinkDescription: seriesItem.isLegacyLink
       ? seriesItem.description
