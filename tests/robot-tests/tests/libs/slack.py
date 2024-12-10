@@ -130,7 +130,9 @@ class SlackService:
 
         response = self.client.chat_postMessage(channel=self.slack_channel, text="All results", blocks=attachments)
 
-        if suites_failed:
+        # Post the test report if there were test failures or if more than 1 run attempt was necessary in
+        # order to get all tests to pass.  The latter case will help to identify which of our tests are flaky.
+        if suites_failed or number_of_test_runs > 1:
             date = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 
             report_name = f"UI-test-report-{suites_ran.replace('tests/', '')}-{env}-{date}.zip"
