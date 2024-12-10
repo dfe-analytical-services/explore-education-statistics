@@ -9,14 +9,14 @@ public class StatusCheckFunction
 {
     private static readonly OrchestrationQuery ActiveOrchestrationsQuery = new()
     {
-        Statuses = new List<OrchestrationRuntimeStatus>
-        {
+        Statuses =
+        [
             OrchestrationRuntimeStatus.Pending,
             OrchestrationRuntimeStatus.Running
-        }
+        ]
     };
 
-    [Function("StatusCheck")]
+    [Function(nameof(StatusCheck))]
     [Produces("application/json")]
     public static async Task<IActionResult> StatusCheck(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
@@ -27,7 +27,8 @@ public class StatusCheckFunction
     {
         var activeOrchestrations = await client
             .GetAllInstancesAsync(filter: ActiveOrchestrationsQuery)
-            .ToListAsync();
-        return new OkObjectResult(new { ActiveOrchestrations = activeOrchestrations.Count });
+            .CountAsync();
+        
+        return new OkObjectResult(new { ActiveOrchestrations = activeOrchestrations });
     }
 }

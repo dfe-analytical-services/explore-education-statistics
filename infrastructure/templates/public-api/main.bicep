@@ -385,30 +385,22 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
   }
 }
 
-var adminSubnetFirewallRule = {
-  name: 'Admin App Service subnet range'
-  cidr: vNetModule.outputs.adminAppServiceSubnetCidr
-  tag: 'Default'
-  priority: 100
-}
-
 module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = if (deployDataProcessor) {
   name: 'publicApiDataProcessorApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
-    metricsNamePrefix: '${subscription}PublicDataProcessor'
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
     devopsServicePrincipalId: devopsServicePrincipalId
     storageFirewallRules: maintenanceIpRanges
     functionAppFirewallRules: union([
-      adminSubnetFirewallRule
-      // TODO EES-5446 - reinstate when static IP range available for runner scale sets
-      // {
-      //   name: 'Pipeline runner IP address range'
-      //   cidr: pipelineRunnerCidr
-      // }
+      {
+        name: 'Admin App Service subnet range'
+        cidr: vNetModule.outputs.adminAppServiceSubnetCidr
+        tag: 'Default'
+        priority: 100
+      }
       // TODO EES-5446 - remove service tag whitelisting when runner scale set IP range reinstated 
       {
         cidr: 'AzureCloud'
@@ -416,6 +408,11 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
         priority: 101
         name: 'AzureCloud'
       }
+      // TODO EES-5446 - reinstate when static IP range available for runner scale sets
+      // {
+      //   name: 'Pipeline runner IP address range'
+      //   cidr: pipelineRunnerCidr
+      // }
     ], maintenanceFirewallRules)
     dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
     deployAlerts: deployAlerts

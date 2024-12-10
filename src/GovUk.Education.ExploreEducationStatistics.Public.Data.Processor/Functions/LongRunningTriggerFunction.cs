@@ -22,7 +22,7 @@ public class LongRunningTriggerFunction(
         var instanceId = Guid.NewGuid();
 
         var durationSeconds =
-            httpRequest.GetRequestParamInt(paramName: "durationSeconds", 60);
+            httpRequest.GetRequestParamInt("durationSeconds", defaultValue: 60);
 
         const string orchestratorName =
             nameof(LongRunningOrchestration.ProcessLongRunningOrchestration);
@@ -37,10 +37,7 @@ public class LongRunningTriggerFunction(
 
         await client.ScheduleNewOrchestrationInstanceAsync(
             orchestratorName,
-            new LongRunningOrchestrationContext
-            {
-                DurationSeconds = durationSeconds
-            },
+            new LongRunningOrchestrationContext { DurationSeconds = durationSeconds },
             options,
             cancellationToken);
 
