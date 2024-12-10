@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         IReleaseVersionRepository releaseVersionRepository,
         IMethodologyService methodologyService,
         IPublicationCacheService publicationCacheService,
+        IReleaseCacheService releaseCacheService,
         IMethodologyCacheService methodologyCacheService,
         IRedirectsCacheService redirectsCacheService)
         : IPublicationService
@@ -523,6 +524,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             publicationReleaseIds.JoinToString(","));
                     }
 
+                    // Work out the publication's new latest published release version (if any).
+                    // This is the latest published version of the first release which has a published version 
+                    Guid? latestPublishedReleaseVersionId = null;
+                    foreach (var releaseId in updatedSeriesReleaseIds)
+                    {
+                        latestPublishedReleaseVersionId = (await context.ReleaseVersions
+                            .LatestReleaseVersion(releaseId: releaseId, publishedOnly: true)
+                            .SingleOrDefaultAsync())?.Id;
+
+                        if (latestPublishedReleaseVersionId != null)
+                        {
+                            break;
+                        }
+                    }
+
+                    var oldLatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersionId;
+                    publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersionId;
+
                     publication.ReleaseSeries = updatedReleaseSeriesItems
                         .Select(request => new ReleaseSeriesItem
                         {
@@ -534,7 +553,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await context.SaveChangesAsync();
 
+                    // Update the cached publication
                     await publicationCacheService.UpdatePublication(publication.Slug);
+
+                    // If the publication's latest published release version has changed,
+                    // update the publication's cached latest release version
+                    if (oldLatestPublishedReleaseVersionId != latestPublishedReleaseVersionId &&
+                        latestPublishedReleaseVersionId.HasValue)
+                    {
+                        await releaseCacheService.UpdateRelease(releaseVersionId: latestPublishedReleaseVersionId.Value,
+                            publicationSlug: publication.Slug);
+                    }
 
                     return await GetReleaseSeries(publication.Id);
                 });

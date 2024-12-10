@@ -627,6 +627,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseVersionRepository? releaseVersionRepository = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
+            IReleaseCacheService? releaseCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null,
             IRedirectsCacheService? redirectsCacheService = null)
         {
@@ -641,6 +642,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
+                releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
                 redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
         }
