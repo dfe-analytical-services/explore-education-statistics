@@ -73,6 +73,16 @@ param azureFileShares AzureFileShareMount[] = []
 @description('Specifies firewall rules for the various storage accounts in use by the Function App')
 param storageFirewallRules IpRange[] = []
 
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  functionAppHealth: bool
+  storageAccountAvailability: bool
+  storageLatency: bool
+  fileServiceAvailability: bool
+  fileServiceLatency: bool
+  alertsGroupName: string
+}?
+
 var reserved = appServicePlanOS == 'Linux'
 
 var identity = userAssignedManagedIdentityParams != null
@@ -105,6 +115,18 @@ var slot2StorageAccountName = '${storageAccountsNamePrefix}s2'
 var functionAppCodeFileShareName = '${functionAppName}-fs'
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
 
+var storageAlerts = alerts != null ? {
+  availability: alerts!.storageAccountAvailability
+  latency: alerts!.storageLatency
+  alertsGroupName: alerts!.alertsGroupName
+} : null
+
+var fileServiceAlerts = alerts != null ? {
+  availability: alerts!.storageAccountAvailability
+  latency: alerts!.storageLatency
+  alertsGroupName: alerts!.alertsGroupName
+} : null
+
 // This is the shared Storage Account for this Durable Function App that is used for key management, timer trigger
 // management etc.
 //
@@ -123,6 +145,7 @@ module sharedStorageAccountModule 'storageAccount.bicep' = {
     skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     firewallRules: storageFirewallRules
+    alerts: storageAlerts
     tagValues: tagValues
   }
 }
@@ -139,13 +162,20 @@ module slot1StorageAccountModule 'storageAccount.bicep' = {
     skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     firewallRules: storageFirewallRules
+    alerts: storageAlerts
     tagValues: tagValues
   }
 }
 
 // This is the file share for slot 1 to use for its code storage.
-resource slot1FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-05-01' = {
-  name: '${slot1StorageAccountName}/default/${functionAppCodeFileShareName}'
+module slot1FileShareModule 'fileShare.bicep' = {
+  name: '${slot1StorageAccountName}${functionAppCodeFileShareName}Deploy'
+  params: {
+    storageAccountName: slot1StorageAccountName
+    fileShareName: functionAppCodeFileShareName
+    alerts: fileServiceAlerts
+    tagValues: tagValues
+  }
   dependsOn: [
     slot1StorageAccountModule
   ]
@@ -163,13 +193,20 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
     skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     firewallRules: storageFirewallRules
+    alerts: storageAlerts
     tagValues: tagValues
   }
 }
 
 // This is the file share for slot 2 to use for its code storage.
-resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-05-01' = {
-  name: '${slot2StorageAccountName}/default/${functionAppCodeFileShareName}'
+module slot2FileShareModule 'fileShare.bicep' = {
+  name: '${slot2StorageAccountName}${functionAppCodeFileShareName}Deploy'
+  params: {
+    storageAccountName: slot2StorageAccountName
+    fileShareName: functionAppCodeFileShareName
+    alerts: fileServiceAlerts
+    tagValues: tagValues
+  }
   dependsOn: [
     slot2StorageAccountModule
   ]
@@ -370,8 +407,8 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   }
   dependsOn: [
     functionAppKeyVaultRoleAssignments
-    slot1FileShare
-    slot2FileShare
+    slot1FileShareModule
+    slot2FileShareModule
   ]
 }
 
@@ -383,6 +420,15 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnet
     serviceType: 'sites'
     subnetId: privateEndpointSubnetId!
     location: location
+    tagValues: tagValues
+  }
+}
+
+module functionAppHealthAlert 'alerts/sites/healthAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
+  name: '${functionAppName}HealthDeploy'
+  params: {
+    resourceNames: [functionAppName]
+    alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }

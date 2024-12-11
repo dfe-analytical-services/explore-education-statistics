@@ -154,6 +154,11 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     maxReplicas: resourceAndScalingConfig.maxReplicas
     scaleAtConcurrentHttpRequests: resourceAndScalingConfig.scaleAtConcurrentHttpRequests
     workloadProfileName: resourceAndScalingConfig.workloadProfileName
+    alerts: deployAlerts ? {
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+      restarts: true
+      responseTime: true
+    } : null
     tagValues: tagValues
   }
 }
