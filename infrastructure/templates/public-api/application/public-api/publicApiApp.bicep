@@ -155,9 +155,9 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     scaleAtConcurrentHttpRequests: resourceAndScalingConfig.scaleAtConcurrentHttpRequests
     workloadProfileName: resourceAndScalingConfig.workloadProfileName
     alerts: deployAlerts ? {
-      alertsGroupName: resourceNames.existingResources.alertsGroup
       restarts: true
       responseTime: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues
   }
