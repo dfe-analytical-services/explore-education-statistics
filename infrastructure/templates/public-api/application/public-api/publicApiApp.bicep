@@ -146,9 +146,9 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       requireAuthentication: false
     }
     alerts: deployAlerts ? {
-      alertsGroupName: resourceNames.existingResources.alertsGroup
       restarts: true
       responseTime: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues
   }
