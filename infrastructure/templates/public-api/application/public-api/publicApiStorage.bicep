@@ -83,6 +83,15 @@ module fileServiceAvailabilityAlert '../../components/alerts/fileServices/availa
   }
 }
 
+module storageAccountLatencyAlert '../../components/alerts/storageAccounts/latencyAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.publicApiStorageAccount}LatencyDeploy'
+  params: {
+    resourceNames: [resourceNames.publicApi.publicApiStorageAccount]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
+}
+
 output storageAccountName string = publicApiStorageAccountModule.outputs.storageAccountName
 output connectionStringSecretName string = publicApiStorageAccountModule.outputs.connectionStringSecretName
 output accessKeySecretName string = publicApiStorageAccountModule.outputs.accessKeySecretName
