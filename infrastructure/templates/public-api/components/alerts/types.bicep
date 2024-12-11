@@ -36,6 +36,12 @@ type Severity =
   | 'Verbose'
 
 @export()
+type Sensitivity = 
+  | 'High'
+  | 'Medium'
+  | 'Low'
+
+@export()
 var severityMapping = {
   Critical: 0
   Error: 1
@@ -65,4 +71,5 @@ type MetricName =
   | 'HealthCheckStatus'
   | 'is_db_alive'
   | 'RestartCount'
+  | 'SuccessE2ELatency'
   | 'UnhealthyHostCount'

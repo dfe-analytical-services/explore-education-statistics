@@ -1,4 +1,4 @@
-import { EvaluationFrequency, MetricName, StaticMetricOperator, ResourceType, TimeAggregation, WindowSize, Severity, severityMapping } from 'types.bicep'
+import { EvaluationFrequency, MetricName, DynamicMetricOperator, ResourceType, TimeAggregation, WindowSize, Severity, Sensitivity, severityMapping } from 'types.bicep'
 
 @description('Name of the alert.')
 param alertName string
@@ -13,8 +13,7 @@ param resourceType ResourceType
 param query {
   metric: MetricName
   aggregation: TimeAggregation
-  operator: StaticMetricOperator
-  threshold: int
+  operator: DynamicMetricOperator
 }
 
 @description('The evaluation frequency.')
@@ -25,6 +24,14 @@ param windowSize WindowSize = 'PT5M'
 
 @description('The alert severity.')
 param severity Severity = 'Error'
+
+param sensitivity Sensitivity = 'High'
+
+param minFailingPeriodsToAlert int = 1
+
+param numberOfEvaluationPeriods int = 1
+
+param ignoreDataBefore string?
 
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
@@ -38,7 +45,7 @@ resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing
   name: alertsGroupName
 }
 
-resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = if (length(resourceIds) == 1)  {
+resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
   name: alertName
   location: 'Global'
   properties: {
@@ -48,16 +55,21 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = if (leng
     evaluationFrequency: evaluationFrequency
     windowSize: windowSize
     criteria: {
-      'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria' 
+      'odata.type': 'Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria' 
       allOf: [{
-        criterionType: 'StaticThresholdCriterion'
+        criterionType: 'DynamicThresholdCriterion'
         name: 'Metric1'
         metricName: query.metric
         metricNamespace: resourceType
         timeAggregation: query.aggregation
         operator: query.operator
-        threshold: query.threshold
+        alertSensitivity: sensitivity
         skipMetricValidation: false
+        failingPeriods: {
+          minFailingPeriodsToAlert: minFailingPeriodsToAlert
+          numberOfEvaluationPeriods: numberOfEvaluationPeriods
+        }
+        ignoreDataBefore: ignoreDataBefore
       }]
     }
     actions: [
