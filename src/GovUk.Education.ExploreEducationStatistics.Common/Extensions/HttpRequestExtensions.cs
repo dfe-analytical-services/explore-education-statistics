@@ -111,7 +111,16 @@ public static class HttpRequestExtensions
         string paramName,
         bool defaultValue)
     {
-        var paramValue = GetRequestParam(httpRequest, paramName, defaultValue + "");
+        var paramValue = GetRequestParam(httpRequest, paramName, defaultValue.ToString());
         return bool.Parse(paramValue);
+    }
+
+    public static int GetRequestParamInt(
+        this HttpRequest httpRequest,
+        string paramName,
+        int defaultValue)
+    {
+        var paramValue = GetRequestParam(httpRequest, paramName, defaultValue.ToString());
+        return int.Parse(paramValue);
     }
 }

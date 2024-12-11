@@ -1,4 +1,4 @@
-import { FirewallRule, PrincipalNameAndId } from '../types.bicep'
+import { IpRange, PrincipalNameAndId } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -40,7 +40,7 @@ param geoRedundantBackup string = 'Disabled'
 param databaseNames string[]
 
 @description('An array of firewall rules containing IP address ranges')
-param firewallRules FirewallRule[] = []
+param firewallRules IpRange[] = []
 
 @description('An array of Entra ID admin principal names for this resource')
 param entraIdAdminPrincipals PrincipalNameAndId[] = []

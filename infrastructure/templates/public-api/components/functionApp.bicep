@@ -1,4 +1,4 @@
-import { FirewallRule, AzureFileShareMount, EntraIdAuthentication } from '../types.bicep'
+import { FirewallRule, IpRange, AzureFileShareMount, EntraIdAuthentication } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -36,6 +36,9 @@ param privateEndpointSubnetId string?
 @description('Specifies whether this Function App is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
 
+@description('IP address ranges that are allowed to access the Function App endpoints. Dependent on "publicNetworkAccessEnabled" being true.')
+param functionAppFirewallRules FirewallRule[] = []
+
 @description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
 param userAssignedManagedIdentityParams {
   id: string
@@ -68,7 +71,7 @@ param healthCheckPath string?
 param azureFileShares AzureFileShareMount[] = []
 
 @description('Specifies firewall rules for the various storage accounts in use by the Function App')
-param storageFirewallRules FirewallRule[] = []
+param storageFirewallRules IpRange[] = []
 
 var reserved = appServicePlanOS == 'Linux'
 
@@ -172,6 +175,14 @@ resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2
   ]
 }
 
+var firewallRules = [for (firewallRule, index) in functionAppFirewallRules: {
+  name: firewallRule.name
+  ipAddress: firewallRule.cidr
+  action: 'Allow'
+  tag: firewallRule.tag != null ? firewallRule.tag : 'Default'
+  priority: firewallRule.priority != null ? firewallRule.priority : 100 + index
+}]
+
 var commonSiteProperties = {
   enabled: true
   httpsOnly: true
@@ -189,9 +200,23 @@ var commonSiteProperties = {
     netFrameworkVersion: '8.0'
     linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
+    publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
+    ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
+    ipSecurityRestrictionsDefaultAction: 'Deny'
+    // TODO EES-5446 - this setting controls access to the deploy site for the Function App.
+    // This is currently the default value, but ideally we would lock this down to only be accessible
+    // by our runners and certain other whitelisted IP address ranges (e.g. trusted VPNs).
+    scmIpSecurityRestrictions: [
+      {
+        ipAddress: 'Any'
+        action: 'Allow'
+        priority: 2147483647
+        name: 'Allow all'
+        description: 'Allow all access'
+      }
+    ]
   }
   keyVaultReferenceIdentity: keyVaultReferenceIdentity
-  publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
 }
 
 // Create the main production deploy slot.
@@ -363,6 +388,8 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnet
 }
 
 output functionAppName string = functionApp.name
+output url string = 'https://${functionApp.name}.azurewebsites.net'
+output stagingUrl string = 'https://${functionApp.name}-staging.azurewebsites.net'
 output managementStorageAccountName string = sharedStorageAccountName
 output slot1StorageAccountName string = slot1StorageAccountName
 output slot2StorageAccountName string = slot2StorageAccountName

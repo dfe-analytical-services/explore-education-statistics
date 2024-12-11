@@ -1,4 +1,4 @@
-import { FirewallRule } from '../types.bicep'
+import { IpRange } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -10,7 +10,7 @@ param storageAccountName string
 param allowedSubnetIds string[] = []
 
 @description('Storage Account Network Firewall Rules')
-param firewallRules FirewallRule[] = []
+param firewallRules IpRange[] = []
 
 @description('Storage Account SKU')
 param skuStorageResource 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 'Premium_LRS' | 'Premium_ZRS' | 'Standard_GZRS' | 'Standard_RAGZRS' = 'Standard_LRS'

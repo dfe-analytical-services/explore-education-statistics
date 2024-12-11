@@ -1,4 +1,4 @@
-import { ResourceNames, FirewallRule } from '../../types.bicep'
+import { ResourceNames, FirewallRule, IpRange } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -15,8 +15,15 @@ param dataProcessorFunctionAppExists bool
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string
 
-@description('Public API Storage : Firewall rules.')
-param storageFirewallRules FirewallRule[] = []
+@description('Specifies the principal id of the Azure DevOps SPN.')
+@secure()
+param devopsServicePrincipalId string
+
+@description('The IP address ranges that can access the Data Processor storage accounts.')
+param storageFirewallRules IpRange[]
+
+@description('The IP address ranges that can access the Data Processor Function App endpoints.')
+param functionAppFirewallRules FirewallRule[]
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
@@ -36,7 +43,6 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
 }
 
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
-var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
 
 resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: resourceNames.publicApi.publicApiStorageAccount
@@ -72,15 +78,15 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
     applicationInsightsKey: applicationInsightsKey
     subnetId: outboundVnetSubnet.id
     privateEndpointSubnetId: inboundVnetSubnet.id
-    publicNetworkAccessEnabled: false
+    publicNetworkAccessEnabled: true
+    functionAppEndpointFirewallRules: functionAppFirewallRules
     entraIdAuthentication: {
       appRegistrationClientId: dataProcessorAppRegistrationClientId
       allowedClientIds: [
         adminAppClientId
+        devopsServicePrincipalId
       ]
-      allowedPrincipalIds: [
-        adminAppPrincipalId
-      ]
+      allowedPrincipalIds: []
       requireAuthentication: true
     }
     userAssignedManagedIdentityParams: {
@@ -98,9 +104,6 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
     }
     preWarmedInstanceCount: 1
     healthCheckPath: '/api/HealthCheck'
-    appSettings: {
-      App__MetaInsertBatchSize: 1000
-    }
     azureFileShares: [{
       storageName: resourceNames.publicApi.publicApiFileShare
       storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
@@ -151,3 +154,5 @@ module fileServiceAvailabilityAlerts '../../components/alerts/fileServices/avail
 output managedIdentityName string = dataProcessorFunctionAppManagedIdentity.name
 output managedIdentityClientId string = dataProcessorFunctionAppManagedIdentity.properties.clientId
 output publicApiDataFileShareMountPath string = publicApiDataFileShareMountPath
+output url string = dataProcessorFunctionAppModule.outputs.url
+output stagingUrl string = dataProcessorFunctionAppModule.outputs.stagingUrl

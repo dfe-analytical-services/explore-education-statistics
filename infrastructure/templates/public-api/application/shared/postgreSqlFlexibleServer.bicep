@@ -1,4 +1,4 @@
-import { ResourceNames, FirewallRule, PrincipalNameAndId } from '../../types.bicep'
+import { ResourceNames, IpRange, PrincipalNameAndId } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -23,7 +23,7 @@ param storageSizeGB int = 32
 param autoGrowStatus string = 'Disabled'
 
 @description('Firewall rules.')
-param firewallRules FirewallRule[] = []
+param firewallRules IpRange[] = []
 
 @description('Specifies the subnet id that the PostgreSQL private endpoint will be attached to.')
 param privateEndpointSubnetId string

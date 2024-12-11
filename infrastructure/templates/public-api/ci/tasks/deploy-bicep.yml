@@ -11,14 +11,20 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: deploySharedPrivateDnsZones
+    type: string
+  - name: deployPsqlFlexibleServer
+    type: string
   - name: deployContainerApp
     type: string
-  - name: updatePsqlFlexibleServer
+    default: true
+  - name: deployDataProcessor
     type: string
   - name: deployAlerts
     type: string
   - name: dataProcessorExists
     type: string
+    default: true
 
 steps:
   - task: AzureCLI@2
@@ -27,9 +33,10 @@ steps:
       azureSubscription: ${{ parameters.serviceConnection }}
       scriptType: bash
       scriptLocation: inlineScript
+      addSpnToEnvironment: true
       inlineScript: |
         set -e
-        
+
         az deployment group ${{ parameters.action }} \
           --name $(infraDeployName) \
           --resource-group $(resourceGroupName) \
@@ -40,14 +47,16 @@ steps:
               resourceTags='$(resourceTags)' \
               postgreSqlAdminName='$(postgreSqlAdminName)' \
               postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-              postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
               postgreSqlEntraIdAdminPrincipals='$(postgreSqlEntraIdAdminPrincipals)' \
-              storageFirewallRules='$(maintenanceFirewallRules)' \
+              maintenanceIpRanges='$(maintenanceFirewallRules)' \
               acrResourceGroupName='$(acrResourceGroupName)' \
               dockerImagesTag='$(resources.pipeline.MainBuild.runName)' \
+              deploySharedPrivateDnsZones=${{ parameters.deploySharedPrivateDnsZones }} \
+              deployPsqlFlexibleServer=${{ parameters.deployPsqlFlexibleServer }} \
               deployContainerApp=${{ parameters.deployContainerApp }} \
-              updatePsqlFlexibleServer=${{ parameters.updatePsqlFlexibleServer }} \
+              deployDataProcessor=${{ parameters.deployDataProcessor }} \
               deployAlerts=${{ parameters.deployAlerts }} \
               dataProcessorFunctionAppExists=${{ parameters.dataProcessorExists }} \
               dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
-              apiAppRegistrationClientId='$(apiAppRegistrationClientId)'
+              apiAppRegistrationClientId='$(apiAppRegistrationClientId)' \
+              devopsServicePrincipalId="$servicePrincipalId"
