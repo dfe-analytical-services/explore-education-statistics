@@ -13,14 +13,14 @@ param alertsGroupName string
 param tagValues object
 
 module alerts '../dynamicMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}LatencyAlertModule'
+  name: '${name}TransactionTimeAlertModule'
   params: {
-    alertName: '${name}-latency'
-    resourceIds: [resourceId('Microsoft.Storage/storageAccounts', name)]
-    resourceType: 'Microsoft.Storage/storageAccounts'
+    alertName: '${name}-query-time'
+    resourceIds: [resourceId('Microsoft.DBforPostgreSQL/flexibleServers', name)]
+    resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
     query: {
-      metric: 'SuccessE2ELatency'
-      aggregation: 'Average'
+      metric: 'longest_transaction_time_sec'
+      aggregation: 'Maximum'
       operator: 'GreaterThan'
     }
     evaluationFrequency: 'PT1M'

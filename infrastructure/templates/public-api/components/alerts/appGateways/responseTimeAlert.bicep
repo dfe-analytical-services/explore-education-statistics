@@ -13,13 +13,13 @@ param alertsGroupName string
 param tagValues object
 
 module alerts '../dynamicMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}LatencyAlertModule'
+  name: '${name}ResponseTimeAlertModule'
   params: {
-    alertName: '${name}-latency'
-    resourceIds: [resourceId('Microsoft.Storage/storageAccounts', name)]
-    resourceType: 'Microsoft.Storage/storageAccounts'
+    alertName: '${name}-response-time'
+    resourceIds: [resourceId('Microsoft.Network/applicationGateways', name)]
+    resourceType: 'Microsoft.Network/applicationGateways'
     query: {
-      metric: 'SuccessE2ELatency'
+      metric: 'ApplicationGatewayTotalTime'
       aggregation: 'Average'
       operator: 'GreaterThan'
     }

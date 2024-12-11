@@ -158,6 +158,15 @@ module containerAppRestartsAlert '../../components/alerts/containerApps/restarts
   }
 }
 
+module responseTimeAlert '../../components/alerts/containerApps/responseTimeAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.apiApp}ResponseTimeDeploy'
+  params: {
+    resourceNames: [resourceNames.publicApi.apiApp]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
+}
+
 output containerAppFqdn string = apiContainerAppModule.outputs.containerAppFqdn
 output containerAppName string = apiContainerAppModule.outputs.containerAppName
 output healthProbePath string = '/health'

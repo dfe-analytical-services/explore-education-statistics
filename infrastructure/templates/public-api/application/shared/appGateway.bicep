@@ -63,3 +63,12 @@ module backendPoolsHealthAlert '../../components/alerts/appGateways/backendPoolH
     tagValues: tagValues
   }
 }
+
+module responseTimeAlert '../../components/alerts/appGateways/responseTimeAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.sharedResources.appGateway}ResponseTimeDeploy'
+  params: {
+    resourceNames: [resourceNames.sharedResources.appGateway]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
+}

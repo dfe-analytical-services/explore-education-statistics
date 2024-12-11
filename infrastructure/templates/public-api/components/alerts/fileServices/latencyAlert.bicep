@@ -13,11 +13,11 @@ param alertsGroupName string
 param tagValues object
 
 module alerts '../dynamicMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}LatencyAlertModule'
+  name: '${name}FsLatencyAlertModule'
   params: {
-    alertName: '${name}-latency'
-    resourceIds: [resourceId('Microsoft.Storage/storageAccounts', name)]
-    resourceType: 'Microsoft.Storage/storageAccounts'
+    alertName: '${name}-fileservice-latency'
+    resourceIds: [resourceId('Microsoft.Storage/storageAccounts/fileServices', name, 'default')]
+    resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
     query: {
       metric: 'SuccessE2ELatency'
       aggregation: 'Average'

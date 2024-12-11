@@ -16,10 +16,10 @@ module alerts '../dynamicMetricAlert.bicep' = [for name in resourceNames: {
   name: '${name}LatencyAlertModule'
   params: {
     alertName: '${name}-latency'
-    resourceIds: [resourceId('Microsoft.Storage/storageAccounts', name)]
-    resourceType: 'Microsoft.Storage/storageAccounts'
+    resourceIds: [resourceId('Microsoft.App/containerApps', name)]
+    resourceType: 'Microsoft.App/containerApps'
     query: {
-      metric: 'SuccessE2ELatency'
+      metric: 'ResponseTime'
       aggregation: 'Average'
       operator: 'GreaterThan'
     }

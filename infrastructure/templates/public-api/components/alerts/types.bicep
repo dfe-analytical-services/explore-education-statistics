@@ -63,6 +63,7 @@ type ResourceType =
 
 @export()
 type MetricName = 
+  | 'ApplicationGatewayTotalTime'
   | 'availability'
   | 'blocked_by_firewall'
   | 'connection_failed'
@@ -70,6 +71,9 @@ type MetricName =
   | 'cpu_percent'
   | 'HealthCheckStatus'
   | 'is_db_alive'
+  | 'longest_query_time_sec'
+  | 'longest_transaction_time_sec'
+  | 'ResponseTime'
   | 'RestartCount'
   | 'SuccessE2ELatency'
   | 'UnhealthyHostCount'
