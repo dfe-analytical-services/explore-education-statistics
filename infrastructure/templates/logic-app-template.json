@@ -251,12 +251,12 @@
                           {
                             "title": "Alert",
                             "value": "@{triggerBody()?['data']?['essentials']?['alertRule']}",
-                            "short": true
+                            "short": false
                           },
                           {
                             "title": "Severity",
                             "value": "@{if(equals(variables('monitorCondition'), 'Resolved'), 'Resolved', variables('severityDisplay'))}",
-                            "short": true
+                            "short": false
                           },
                           {
                             "title": "@{variables('monitorCondition')} at",
@@ -264,14 +264,9 @@
                             "short": false
                           },
                           {
-                            "title": "Window start",
-                            "value": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], 'dd/MM/yyyy h:mm:sstt'))}",
-                            "short": true
-                          },
-                          {
-                              "title": "Window end",
-                              "value": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], 'dd/MM/yyyy h:mm:sstt'))}",
-                              "short": true
+                            "title": "Monitoring window",
+                            "value": "From @{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], 'dd/MM/yyyy h:mm:sstt'))} to @{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], 'dd/MM/yyyy h:mm:sstt'))}",
+                            "short": false
                           }
                         ]
                       }
