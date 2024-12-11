@@ -5,15 +5,35 @@ import FormTextInput, {
   FormTextInputProps,
 } from '@common/components/form/FormTextInput';
 import React from 'react';
-import { FieldValues } from 'react-hook-form';
+import { FieldValues, useWatch } from 'react-hook-form';
+import FormCharacterCount from '@common/components/form/FormCharacterCount';
+import FormGroup from './FormGroup';
 
 type Props<TFormValues extends FieldValues> = FormFieldComponentProps<
   FormTextInputProps,
   TFormValues
 >;
 
-export default function FormFieldTextInput<TFormValues extends FieldValues>(
-  props: Props<TFormValues>,
-) {
+export default function FormFieldTextInput<TFormValues extends FieldValues>({
+  maxLength,
+  ...props
+}: Props<TFormValues>) {
+  const watchedValue = useWatch({ name: props.name });
+
+  if (!!maxLength && maxLength > 0) {
+    return (
+      <div className="govuk-character-count">
+        <FormGroup>
+          <FormField {...props} maxLength={maxLength} as={FormTextInput} />
+          <FormCharacterCount
+            id={props.id ?? ''}
+            maxLength={maxLength}
+            value={watchedValue}
+          />
+        </FormGroup>
+      </div>
+    );
+  }
+
   return <FormField {...props} as={FormTextInput} />;
 }
