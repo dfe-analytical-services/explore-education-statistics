@@ -83,6 +83,7 @@ function baseErrorMappings(
           ZipContainsUnusedFiles: 'ZipContainsUnusedFiles',
           DataReplacementAlreadyInProgress:
             'Data replacement already in progress',
+          DatasetTitleTooLong: 'DatasetTitleTooLong',
         },
       }),
     ];
@@ -179,21 +180,24 @@ export default function DataFileUploadForm({
           is: (uploadType: FileType) =>
             uploadType === 'csv' || uploadType === 'zip',
           then: s =>
-            s.required('Enter a subject title').test({
-              name: 'unique',
-              message: 'Enter a unique subject title',
-              test(value: string) {
-                if (!value) {
-                  return true;
-                }
+            s
+              .required('Enter a subject title')
+              .test({
+                name: 'unique',
+                message: 'Enter a unique subject title',
+                test(value: string) {
+                  if (!value) {
+                    return true;
+                  }
 
-                return (
-                  dataFiles?.find(
-                    f => f.title.toUpperCase() === value.toUpperCase(),
-                  ) === undefined
-                );
-              },
-            }),
+                  return (
+                    dataFiles?.find(
+                      f => f.title.toUpperCase() === value.toUpperCase(),
+                    ) === undefined
+                  );
+                },
+              })
+              .max(120, 'Subject title must be 120 characters or less'),
         }),
       });
     }
@@ -233,6 +237,7 @@ export default function DataFileUploadForm({
                   name="subjectTitle"
                   label="Subject title"
                   className="govuk-!-width-two-thirds"
+                  maxLength={120}
                 />
               )}
 

@@ -76,8 +76,11 @@ export default function AncillaryFileForm({
               f => f.title.toUpperCase() !== value.toUpperCase(),
             );
           },
-        }),
-      summary: Yup.string().required('Enter a summary'),
+        })
+        .max(120, 'Title must be 120 characters or less'),
+      summary: Yup.string()
+        .required('Enter a summary')
+        .max(250, 'Summary must be 250 characters or less'),
       file: Yup.file()
         .minSize(0, 'Choose a file that is not empty')
         .maxSize(MAX_FILE_SIZE, 'Choose a file that is under 2GB')
@@ -117,6 +120,7 @@ export default function AncillaryFileForm({
               disabled={formState.isSubmitting}
               label="Title"
               name="title"
+              maxLength={120}
             />
 
             <FormFieldTextArea<AncillaryFileFormValues>
@@ -124,6 +128,7 @@ export default function AncillaryFileForm({
               disabled={formState.isSubmitting}
               label="Summary"
               name="summary"
+              maxLength={250}
             />
 
             <FormFieldFileInput<AncillaryFileFormValues>

@@ -76,7 +76,9 @@ export default function ReleaseDataFilePage({
             <FormProvider
               initialValues={{ title: dataFile.title }}
               validationSchema={Yup.object<FormValues>({
-                title: Yup.string().required('Enter a title'),
+                title: Yup.string()
+                  .required('Enter a title')
+                  .max(120, 'Subject title must be 120 characters or less'),
               })}
             >
               <Form id="dataFileForm" onSubmit={handleSubmit}>
@@ -84,6 +86,7 @@ export default function ReleaseDataFilePage({
                   className="govuk-!-width-two-thirds"
                   label="Title"
                   name="title"
+                  maxLength={120}
                 />
 
                 <Button type="submit">Save changes</Button>

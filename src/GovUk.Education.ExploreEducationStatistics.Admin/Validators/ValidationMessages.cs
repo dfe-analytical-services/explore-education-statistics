@@ -205,6 +205,20 @@ public static class ValidationMessages
         };
     }
 
+    public static readonly LocalizableMessage DatasetTitleTooLong = new(
+        Code: nameof(DatasetTitleTooLong),
+        Message: "Subject title '{0}' must be 120 characters or less"
+    );
+
+    public static ErrorViewModel GenerateErrorDatasetTitleTooLong(string title)
+    {
+        return new ErrorViewModel
+        {
+            Code = DatasetTitleTooLong.Code,
+            Message = string.Format(DatasetTitleTooLong.Message, title),
+        };
+    }
+
     public static ErrorViewModel GenerateErrorDatasetNamesCsvFilenamesShouldNotEndDotCsv(string filename)
     {
         return new ErrorViewModel

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -20,5 +20,6 @@ public record DataGuidanceDataSetUpdateRequest
     public Guid FileId { get; init; }
 
     [Required]
+    [MaxLength(250, ErrorMessage = "File guidance content must be 250 characters or less")]
     public string Content { get; init; } = string.Empty;
 }

@@ -56,15 +56,26 @@ const DataBlockDetailsForm = ({
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     return Yup.object({
       name: Yup.string().required('Enter a data block name'),
-      heading: Yup.string().required('Enter a table title'),
+      heading: Yup.string()
+        .required('Enter a table title')
+        .max(120, 'Table title must be 120 characters or less'),
       source: Yup.string(),
       highlightName: Yup.string().when('isHighlight', {
         is: true,
-        then: s => s.required('Enter a featured table name'),
+        then: s =>
+          s
+            .required('Enter a featured table name')
+            .max(120, 'Featured table name must be 120 characters or less'),
       }),
       highlightDescription: Yup.string().when('isHighlight', {
         is: true,
-        then: s => s.required('Enter a featured table description'),
+        then: s =>
+          s
+            .required('Enter a featured table description')
+            .max(
+              200,
+              'Featured table description must be 200 characters or less',
+            ),
       }),
       isHighlight: Yup.boolean(),
     });
@@ -100,6 +111,7 @@ const DataBlockDetailsForm = ({
                 onBlur={() => {
                   onTitleChange?.(getValues('heading'));
                 }}
+                maxLength={120}
               />
 
               <FormFieldTextInput<FormValues>
@@ -125,12 +137,14 @@ const DataBlockDetailsForm = ({
                         label="Featured table name"
                         hint="We will show this name to table builder users as a featured table"
                         className="govuk-!-width-two-thirds"
+                        maxLength={120}
                       />
                       <FormFieldTextArea<FormValues>
                         name="highlightDescription"
                         label="Featured table description"
                         hint="Describe the contents of this featured table to table builder users"
                         className="govuk-!-width-two-thirds"
+                        maxLength={200}
                       />
                     </>
                   }

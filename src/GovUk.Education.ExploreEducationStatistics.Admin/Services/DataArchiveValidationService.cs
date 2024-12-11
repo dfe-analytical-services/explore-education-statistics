@@ -134,16 +134,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 rows = await CsvUtils.GetCsvRows(dataSetNamesStream);
             }
 
+            var errors = new List<ErrorViewModel>();
+
             var dataSetNamesCsvEntries = new List<(string BaseFilename, string Title)>();
             foreach (var row in rows)
             {
                 var filename = row[fileNameIndex];
                 var datasetName = row[datasetNameIndex].Trim();
 
+                if (datasetName.Length > 120)
+                {
+                    errors.Add(ValidationMessages.GenerateErrorDatasetTitleTooLong(datasetName));
+                }
+
                 dataSetNamesCsvEntries.Add((BaseFilename: filename, Title: datasetName));
             }
-
-            var errors = new List<ErrorViewModel>();
 
             dataSetNamesCsvEntries
                 .Select(entry => entry.BaseFilename)

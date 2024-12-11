@@ -1,9 +1,9 @@
 #nullable enable
-using System.Collections.Generic;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
@@ -26,7 +26,9 @@ public record DataBlockCreateRequest
         public Validator()
         {
             RuleFor(request => request.Heading)
-                .NotEmpty();
+                .NotEmpty()
+                .MaximumLength(120)
+                .WithMessage("Table title must be 120 characters or less");
 
             RuleFor(request => request.Name)
                 .NotEmpty();
@@ -56,7 +58,9 @@ public record DataBlockUpdateRequest
         public Validator()
         {
             RuleFor(request => request.Heading)
-                .NotEmpty();
+                .NotEmpty()
+                .MaximumLength(120)
+                .WithMessage("Table title must be 120 characters or less");
 
             RuleFor(request => request.Name)
                 .NotEmpty();

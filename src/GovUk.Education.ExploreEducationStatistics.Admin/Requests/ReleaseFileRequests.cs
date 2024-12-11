@@ -1,6 +1,7 @@
 #nullable enable
-using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
@@ -9,6 +10,16 @@ public record ReleaseDataFileUpdateRequest
     public string? Title { get; set; }
 
     public string? Summary { get; set; }
+
+    public class Validator : AbstractValidator<ReleaseDataFileUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Title)
+                .MaximumLength(120)
+                .WithMessage("Subject title must be 120 characters or less");
+        }
+    }
 }
 
 public record ReleaseAncillaryFileUploadRequest
@@ -20,6 +31,20 @@ public record ReleaseAncillaryFileUploadRequest
 
     [Required]
     public IFormFile File { get; set; } = null!;
+
+    public class Validator : AbstractValidator<ReleaseAncillaryFileUploadRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Title)
+                .MaximumLength(120)
+                .WithMessage("Title must be 120 characters or less");
+
+            RuleFor(request => request.Summary)
+                .MaximumLength(250)
+                .WithMessage("Summary must be 250 characters or less");
+        }
+    }
 }
 
 public record ReleaseAncillaryFileUpdateRequest
