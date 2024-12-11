@@ -82,6 +82,24 @@ module databaseAliveAlert '../../components/alerts/flexibleServers/databaseAlive
   }
 }
 
+module queryTimeAlert '../../components/alerts/flexibleServers/queryTimeAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}QueryTimeDeploy'
+  params: {
+    resourceNames: [resourceNames.sharedResources.postgreSqlFlexibleServer]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
+}
+
+module transactionTimeAlert '../../components/alerts/flexibleServers/transactionTimeAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}TransactionTimeDeploy'
+  params: {
+    resourceNames: [resourceNames.sharedResources.postgreSqlFlexibleServer]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
+}
+
 var managedIdentityConnectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
 
 var dataProcessorPsqlConnectionStringSecretKey = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
