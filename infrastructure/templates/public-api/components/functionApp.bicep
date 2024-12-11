@@ -122,8 +122,8 @@ var storageAlerts = alerts != null ? {
 } : null
 
 var fileServiceAlerts = alerts != null ? {
-  availability: alerts!.storageAccountAvailability
-  latency: alerts!.storageLatency
+  availability: alerts!.fileServiceAvailability
+  latency: alerts!.fileServiceLatency
   alertsGroupName: alerts!.alertsGroupName
 } : null
 
