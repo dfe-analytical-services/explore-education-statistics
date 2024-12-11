@@ -1,20 +1,7 @@
-import Link from '@admin/components/Link';
-import ReorderableAccordion from '@admin/components/editable/ReorderableAccordion';
-import ReorderableAccordionSection from '@admin/components/editable/ReorderableAccordionSection';
-import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
 import DataFileUploadForm, {
   DataFileUploadFormValues,
 } from '@admin/pages/release/data/components/DataFileUploadForm';
-import { terminalImportStatuses } from '@admin/pages/release/data/components/ImporterStatus';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
-import {
-  releaseApiDataSetDetailsRoute,
-  releaseDataFileReplaceRoute,
-  ReleaseDataFileReplaceRouteParams,
-  releaseDataFileRoute,
-  ReleaseDataFileRouteParams,
-  ReleaseDataSetRouteParams,
-} from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
   ArchiveDataSetFile,
@@ -22,18 +9,15 @@ import releaseDataFileService, {
   DataFileImportStatus,
   DeleteDataFilePlan,
 } from '@admin/services/releaseDataFileService';
-import ButtonText from '@common/components/ButtonText';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import Modal from '@common/components/Modal';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import logger from '@common/services/logger';
-import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
-import React, { useCallback, useEffect, useState } from 'react';
-import { generatePath } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
+import React, { useCallback, useEffect, useState } from 'react';
 import BulkZipUploadModalConfirm from './BulkZipUploadModalConfirm';
+import DataFilesTable from './DataFilesTable';
 
 interface Props {
   publicationId: string;
@@ -54,7 +38,6 @@ const ReleaseDataUploadsSection = ({
   onDataFilesChange,
 }: Props) => {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
-  const [activeFileIds, setActiveFileIds] = useState<string[]>();
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [bulkUploadPlan, setBulkUploadPlan] = useState<ArchiveDataSetFile[]>();
 
@@ -89,22 +72,15 @@ const ReleaseDataUploadsSection = ({
 
   const confirmBulkUploadPlan = useCallback(
     async (archiveDataSetFiles: ArchiveDataSetFile[]) => {
-      const newFiles = await releaseDataFileService.importBulkZipDataFile(
+      await releaseDataFileService.importBulkZipDataFile(
         releaseId,
         archiveDataSetFiles,
       );
 
       setBulkUploadPlan(undefined);
-      setActiveFileIds([...dataFiles, ...newFiles].map(file => file.id));
       refetchDataFiles();
     },
-    [
-      releaseId,
-      setBulkUploadPlan,
-      setActiveFileIds,
-      dataFiles,
-      refetchDataFiles,
-    ],
+    [releaseId, setBulkUploadPlan, refetchDataFiles],
   );
 
   const handleStatusChange = async (
@@ -124,8 +100,6 @@ const ReleaseDataUploadsSection = ({
       dataFile.id,
     );
 
-    setActiveFileIds([]);
-
     setDataFiles(currentDataFiles =>
       currentDataFiles.map(file =>
         file.fileName !== dataFile.fileName
@@ -138,6 +112,17 @@ const ReleaseDataUploadsSection = ({
             },
       ),
     );
+  };
+
+  const handleDeleteFile = async (dataFile: DataFile) => {
+    releaseDataFileService
+      .getDeleteDataFilePlan(releaseId, dataFile)
+      .then(plan => {
+        setDeleteDataFile({
+          plan,
+          file: dataFile,
+        });
+      });
   };
 
   const handleSubmit = useCallback(
@@ -185,7 +170,6 @@ const ReleaseDataUploadsSection = ({
         default:
           break;
       }
-      setActiveFileIds(newFiles.map(file => file.id));
     },
     [releaseId, refetchDataFiles],
   );
@@ -242,159 +226,14 @@ const ReleaseDataUploadsSection = ({
 
       <LoadingSpinner loading={isLoading}>
         {dataFiles.length > 0 ? (
-          <ReorderableAccordion
-            canReorder={canUpdateRelease}
-            id="uploadedDataFiles"
-            heading="Uploaded data files"
-            reorderHiddenText="files"
-            onReorder={async (fileIds: string[]) => {
-              setDataFiles(
-                await releaseDataFileService.updateDataFilesOrder(
-                  releaseId,
-                  fileIds,
-                ),
-              );
-            }}
-          >
-            {dataFiles.map(dataFile => (
-              <ReorderableAccordionSection
-                id={dataFile.id}
-                key={dataFile.title}
-                heading={dataFile.title}
-                headingTag="h3"
-                open={activeFileIds?.includes(dataFile.id)}
-              >
-                <div style={{ position: 'relative' }}>
-                  {dataFile.isDeleting && (
-                    <LoadingSpinner text="Deleting files" overlay />
-                  )}
-                  <DataFileDetailsTable
-                    dataFile={dataFile}
-                    releaseId={releaseId}
-                    onStatusChange={handleStatusChange}
-                  >
-                    {canUpdateRelease &&
-                      terminalImportStatuses.includes(dataFile.status) && (
-                        <>
-                          {dataFile.status === 'COMPLETE' && (
-                            <>
-                              <Link
-                                className="govuk-!-margin-right-4"
-                                to={generatePath<ReleaseDataFileRouteParams>(
-                                  releaseDataFileRoute.path,
-                                  {
-                                    publicationId,
-                                    releaseId,
-                                    fileId: dataFile.id,
-                                  },
-                                )}
-                              >
-                                Edit title
-                              </Link>
-                              {dataFile.publicApiDataSetId ? (
-                                <Modal
-                                  showClose
-                                  title="Cannot replace data"
-                                  triggerButton={
-                                    <ButtonText>Replace data</ButtonText>
-                                  }
-                                >
-                                  <p>
-                                    This data file has an API data set linked to
-                                    it. Please remove the API data set before
-                                    replacing the data.
-                                  </p>
-                                  <p>
-                                    <Link
-                                      to={generatePath<ReleaseDataSetRouteParams>(
-                                        releaseApiDataSetDetailsRoute.path,
-                                        {
-                                          publicationId,
-                                          releaseId,
-                                          dataSetId:
-                                            dataFile.publicApiDataSetId,
-                                        },
-                                      )}
-                                    >
-                                      Go to API data set
-                                    </Link>
-                                  </p>
-                                </Modal>
-                              ) : (
-                                <Link
-                                  className="govuk-!-margin-right-4"
-                                  to={generatePath<ReleaseDataFileReplaceRouteParams>(
-                                    releaseDataFileReplaceRoute.path,
-                                    {
-                                      publicationId,
-                                      releaseId,
-                                      fileId: dataFile.id,
-                                    },
-                                  )}
-                                >
-                                  Replace data
-                                </Link>
-                              )}
-                            </>
-                          )}
-                          {dataFile.publicApiDataSetId ? (
-                            <Modal
-                              showClose
-                              title="Cannot delete files"
-                              triggerButton={
-                                <ButtonText className="govuk-!-margin-left-3">
-                                  Delete files
-                                </ButtonText>
-                              }
-                            >
-                              <p>
-                                This data file has an API data set linked to it.
-                                Please remove the API data set before deleting.
-                              </p>
-                              <p>
-                                <Link
-                                  to={generatePath<ReleaseDataSetRouteParams>(
-                                    releaseApiDataSetDetailsRoute.path,
-                                    {
-                                      publicationId,
-                                      releaseId,
-                                      dataSetId: dataFile.publicApiDataSetId,
-                                    },
-                                  )}
-                                >
-                                  Go to API data set
-                                </Link>
-                              </p>
-                            </Modal>
-                          ) : (
-                            <ButtonText
-                              onClick={async () =>
-                                releaseDataFileService
-                                  .getDeleteDataFilePlan(releaseId, dataFile)
-                                  .then(plan => {
-                                    setDeleteDataFile({
-                                      plan,
-                                      file: dataFile,
-                                    });
-                                  })
-                              }
-                            >
-                              Delete files
-                            </ButtonText>
-                          )}
-                        </>
-                      )}
-                    {dataFile.permissions.canCancelImport && (
-                      <DataUploadCancelButton
-                        releaseId={releaseId}
-                        fileId={dataFile.id}
-                      />
-                    )}
-                  </DataFileDetailsTable>
-                </div>
-              </ReorderableAccordionSection>
-            ))}
-          </ReorderableAccordion>
+          <DataFilesTable
+            canUpdateRelease={canUpdateRelease}
+            dataFiles={dataFiles}
+            handleStatusChange={handleStatusChange}
+            handleDeleteFile={handleDeleteFile}
+            publicationId={publicationId}
+            releaseId={releaseId}
+          />
         ) : (
           <InsetText>No data files have been uploaded.</InsetText>
         )}
