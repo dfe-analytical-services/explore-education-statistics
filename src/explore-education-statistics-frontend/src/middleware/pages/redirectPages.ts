@@ -27,7 +27,7 @@ const redirectPatterns: URLPattern[] = [
     pathname: `/find-statistics/:${publicationSlugKey}/:${releaseSlugKey}/(data-guidance/?|prerelease-access-list/?|.{0})?`,
   }),
   new URLPattern({
-    pathname: `/data-tables/:${publicationSlugKey}/(fast-track/[^/]*/?|permalink/[^/]*/?|.{0})?`,
+    pathname: `/data-tables/:${publicationSlugKey}{/}?`,
   }),
   new URLPattern({
     pathname: `/data-tables/:${publicationSlugKey}/:${releaseSlugKey}{/}?`,

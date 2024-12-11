@@ -326,18 +326,6 @@ describe('redirectPages', () => {
     ],
   };
 
-  const dataTablesPublicationFastTrackPageTestData: RoutePatternTestCases = {
-    routePattern: `data-tables/${publicationSlugPlaceholder}/fast-track/child-route`,
-    redirectedCases: dataTablesPublicationPageTestData.redirectedCases,
-    nonRedirectedCases: dataTablesPublicationPageTestData.nonRedirectedCases,
-  };
-
-  const dataTablesPublicationPermalinkPageTestData: RoutePatternTestCases = {
-    routePattern: `data-tables/${publicationSlugPlaceholder}/permalink/child-route`,
-    redirectedCases: dataTablesPublicationPageTestData.redirectedCases,
-    nonRedirectedCases: dataTablesPublicationPageTestData.nonRedirectedCases,
-  };
-
   const dataTablesReleasePageTestData: RoutePatternTestCases = {
     routePattern: `data-tables/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}`,
     redirectedCases: mixedPublicationReleasePageRedirectedCases,
@@ -353,8 +341,6 @@ describe('redirectPages', () => {
     findStatisticsReleaseDataGuidancePageTestData,
     findStatisticsReleasePrereleaseAccessListPageTestData,
     dataTablesPublicationPageTestData,
-    dataTablesPublicationFastTrackPageTestData,
-    dataTablesPublicationPermalinkPageTestData,
     dataTablesReleasePageTestData,
   ];
 
@@ -418,18 +404,6 @@ describe('redirectPages', () => {
       oldSlugsByPlaceholder: {
         [publicationSlugPlaceholder]: 'original-publication-slug-1',
         [releaseSlugPlaceholder]: 'original-release-slug-1',
-      },
-    },
-    {
-      routePattern: `data-tables/${publicationSlugPlaceholder}/fast-track/child-route/child-route`,
-      oldSlugsByPlaceholder: {
-        [publicationSlugPlaceholder]: 'original-publication-slug-1',
-      },
-    },
-    {
-      routePattern: `data-tables/${publicationSlugPlaceholder}/permalink/child-route/child-route`,
-      oldSlugsByPlaceholder: {
-        [publicationSlugPlaceholder]: 'original-publication-slug-1',
       },
     },
     {
