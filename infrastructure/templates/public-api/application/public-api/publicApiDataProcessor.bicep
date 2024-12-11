@@ -112,6 +112,14 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       mountPath: publicApiDataFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules
+    alerts: deployAlerts ? {
+      functionAppHealth: true
+      storageAccountAvailability: true
+      storageLatency: true
+      fileServiceAvailability: true
+      fileServiceLatency: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }
