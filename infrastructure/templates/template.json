@@ -4033,6 +4033,12 @@
               },
               "secretName": "ees-alerts-slackapptoken"
             }
+          },
+          "subscription": {
+            "value": "[parameters('subscription')]"
+          },
+          "resourceGroup": {
+            "value": "[resourceGroup().name]"
           }
         }
       },

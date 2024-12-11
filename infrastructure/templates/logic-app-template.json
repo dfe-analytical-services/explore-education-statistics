@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters":{
+  "parameters": {
     "logicAppName": {
       "type": "string"
     },
@@ -10,9 +10,15 @@
     },
     "slackAppToken": {
       "type": "securestring"
+    },
+    "subscription": {
+      "type": "string"
+    },
+    "resourceGroup": {
+      "type": "string"
     }
   },
-  "resources":[
+  "resources": [
     {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2017-07-01",
@@ -34,7 +40,36 @@
                     "data": {
                       "properties": {
                         "alertContext": {
-                          "properties": {},
+                          "properties": {
+                            "condition": {
+                              "properties": {
+                                "allOf": {
+                                  "properties": {
+                                    "metricName": {
+                                      "type": "string"
+                                    },
+                                    "timeAggregation": {
+                                      "type": "string"
+                                    },
+                                    "operator": {
+                                      "type": "string"
+                                    },
+                                    "threshold": {
+                                      "type": "string"
+                                    },
+                                    "metricValue": {
+                                      "type": "number"
+                                    },
+                                    "type": "object"
+                                  }
+                                },
+                                "windowStartTime": "string",
+                                "windowEndTime": "string",
+                                "type": "array"
+                              }
+                            },
+                            "type": "object"
+                          },
                           "type": "object"
                         },
                         "essentials": {
@@ -97,17 +132,151 @@
             }
           },
           "actions": {
-            "HTTP_Webhook": {
+            "Initialize severity variable": {
               "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "severity",
+                    "type": "string",
+                    "value": "@{triggerBody()?['data']?['essentials']?['severity']}"
+                  }
+                ]
+              }
+            },
+            "Initialize monitorCondition variable": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "monitorCondition",
+                    "type": "string",
+                    "value": "@{triggerBody()?['data']?['essentials']?['monitorCondition']}"
+                  }
+                ]
+              }
+            },
+            "Initialize outsideThresholdMessage variable": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "outsideThresholdMessage",
+                    "type": "string",
+                    "value": "The @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['timeAggregation']} of @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricName']} is at @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricValue']}, which is @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['operator']} the threshold of @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['threshold']}"
+                  }
+                ]
+              }
+            },
+            "Initialize withinThresholdMessage variable": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "withinThresholdMessage",
+                    "type": "string",
+                    "value": "The @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['timeAggregation']} of @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricName']} is at @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricValue']}, and is no longer @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['operator']} the threshold of @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['threshold']}"
+                  }
+                ]
+              }
+            },
+            "Initialize severityDisplay variable": {
+              "runAfter": {
+                "Initialize severity variable": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "severityDisplay",
+                    "type": "string",
+                    "value": "@{if(equals(variables('severity'), 'Sev0'), 'CRITICAL!', '')}@{if(equals(variables('severity'), 'Sev1'), 'Error!', '')}@{if(equals(variables('severity'), 'Sev2'), 'Warning', '')}@{if(equals(variables('severity'), 'Sev3'), 'Information', '')}@{if(equals(variables('severity'), 'Sev4'), 'Verbose', '')}"
+                  }
+                ]
+              }
+            },
+            "Initialize severityColour variable": {
+              "runAfter": {
+                "Initialize severity variable": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "severityColour",
+                    "type": "string",
+                    "value": "@{if(equals(variables('severity'), 'Sev0'), 'danger', '')}@{if(equals(variables('severity'), 'Sev1'), 'danger', '')}@{if(equals(variables('severity'), 'Sev2'), 'warning', '')}@{if(equals(variables('severity'), 'Sev3'), 'good', '')}@{if(equals(variables('severity'), 'Sev4'), 'good', '')}"
+                  }
+                ]
+              }
+            },
+            "HTTP_Webhook": {
+              "runAfter": {
+                "Initialize monitorCondition variable": [
+                  "Succeeded"
+                ],
+                "Initialize severityColour variable": [
+                  "Succeeded"
+                ],
+                "Initialize severityDisplay variable": [
+                  "Succeeded"
+                ],
+                "Initialize withinThresholdMessage variable": [
+                  "Succeeded"
+                ],
+                "Initialize outsideThresholdMessage variable": [
+                  "Succeeded"
+                ]
+              },
               "type": "HttpWebhook",
               "inputs": {
                 "subscribe": {
-                  "body": {
-                    "channel": "[parameters('slackAlertsChannel')]",
-                    "text": "Alert @{triggerBody()?['data']?['essentials']?['monitorCondition']}!\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{triggerBody()?['data']?['essentials']?['description']}"
-                  },
                   "method": "POST",
                   "uri": "https://slack.com/api/chat.postMessage",
+                  "body": {
+                    "channel": "[parameters('slackAlertsChannel')]",
+                    "text": "*Alert @{variables('monitorCondition')}!*\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{triggerBody()?['data']?['essentials']?['description']}\n\n@{if(equals(variables('monitorCondition'), 'Resolved'), variables('withinThresholdMessage'), variables('outsideThresholdMessage'))}\n<https://portal.azure.com/#@platform.education.gov.uk/resource/subscriptions/[parameters('subscription')]/resourceGroups/[parameters('resourceGroup')]/providers/Microsoft.Insights/metricalerts/@{triggerBody()?['data']?['essentials']?['alertRule']}/ViewAlertRuleHistory|Link to alert>\n<https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]}|Link to resource>",
+                    "attachments": [
+                      {
+                        "color": "@{if(equals(variables('monitorCondition'), 'Resolved'), 'good', variables('severityColour'))}",
+                        "fields": [
+                          {
+                            "title": "Alert",
+                            "value": "@{triggerBody()?['data']?['essentials']?['alertRule']}",
+                            "short": true
+                          },
+                          {
+                            "title": "Severity",
+                            "value": "@{if(equals(variables('monitorCondition'), 'Resolved'), 'Resolved', variables('severityDisplay'))}",
+                            "short": true
+                          },
+                          {
+                            "title": "@{variables('monitorCondition')} at",
+                            "value": "@{if(equals(variables('monitorCondition'), 'Resolved'), formatDateTime(triggerBody()?['data']?['essentials']?['resolvedDateTime'], 'dd/MM/yyyy h:mm:sstt'), formatDateTime(triggerBody()?['data']?['essentials']?['firedDateTime'], 'dd/MM/yyyy h:mm:sstt'))}",
+                            "short": false
+                          },
+                          {
+                            "title": "Window start",
+                            "value": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], 'dd/MM/yyyy h:mm:sstt'))}",
+                            "short": true
+                          },
+                          {
+                              "title": "Window end",
+                              "value": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], 'dd/MM/yyyy h:mm:sstt'))}",
+                              "short": true
+                          }
+                        ]
+                      }
+                    ]
+                  },
                   "headers": {
                     "Content-Type": "application/json",
                     "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
