@@ -58,6 +58,12 @@ module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
     firewallRules: formattedFirewallRules
     databaseNames: ['public_data']
     privateEndpointSubnetId: privateEndpointSubnetId
+    alerts: deployAlerts ? {
+      availability: true
+      queryTime: true
+      transactionTime: true
+      alertGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }
@@ -71,33 +77,6 @@ resource maxPreparedTransactionsConfig 'Microsoft.DBforPostgreSQL/flexibleServer
   dependsOn: [
     postgreSqlServerModule
   ]
-}
-
-module databaseAliveAlert '../../components/alerts/flexibleServers/databaseAlive.bicep' = if (deployAlerts) {
-  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}DbAliveDeploy'
-  params: {
-    resourceNames: [resourceNames.sharedResources.postgreSqlFlexibleServer]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
-module queryTimeAlert '../../components/alerts/flexibleServers/queryTimeAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}QueryTimeDeploy'
-  params: {
-    resourceNames: [resourceNames.sharedResources.postgreSqlFlexibleServer]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
-module transactionTimeAlert '../../components/alerts/flexibleServers/transactionTimeAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}TransactionTimeDeploy'
-  params: {
-    resourceNames: [resourceNames.sharedResources.postgreSqlFlexibleServer]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
 }
 
 var managedIdentityConnectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate

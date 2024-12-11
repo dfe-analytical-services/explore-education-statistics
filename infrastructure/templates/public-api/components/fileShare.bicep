@@ -11,6 +11,16 @@ param fileShareAccessTier string = 'Hot'
 @description('Name of the Storage Account')
 param storageAccountName string
 
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  availability: bool
+  latency: bool
+  alertsGroupName: string
+}?
+
+@description('A set of tags with which to tag the resource in Azure')
+param tagValues object
+
 // Reference an existing Storage Account.
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: storageAccountName
@@ -27,6 +37,24 @@ resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-0
   properties: {
     accessTier: fileShareAccessTier
     shareQuota: fileShareQuota
+  }
+}
+
+module fileServiceAvailabilityAlerts 'alerts/fileServices/availabilityAlert.bicep' = if (alerts != null && alerts!.availability) {
+  name: '${storageAccountName}FsAvailabilityDeploy'
+  params: {
+    resourceNames: [storageAccountName]
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module fileServiceLatencyAlert 'alerts/fileServices/latencyAlert.bicep' = if (alerts != null && alerts!.availability) {
+  name: '${storageAccountName}FsLatencyDeploy'
+  params: {
+    resourceNames: [storageAccountName]
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
   }
 }
 
