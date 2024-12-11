@@ -424,7 +424,7 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnet
   }
 }
 
-module functionAppHealthAlert 'alerts/sites/healthAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
+module healthAlert 'alerts/sites/healthAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
   name: '${functionAppName}HealthDeploy'
   params: {
     resourceNames: [functionAppName]
