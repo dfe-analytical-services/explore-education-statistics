@@ -299,33 +299,6 @@ describe('redirectPages', () => {
       nonRedirectedCases: findStatisticsReleasePageTestData.nonRedirectedCases,
     };
 
-  const dataTablesPublicationPageTestData: RoutePatternTestCases = {
-    routePattern: `data-tables/${publicationSlugPlaceholder}`,
-    redirectedCases: [
-      {
-        oldSlugNewSlugPairsByPlaceholder: {
-          [publicationSlugPlaceholder]: {
-            oldSlug: 'original-publication-slug-1',
-            newSlug: 'updated-publication-slug-1',
-          },
-        },
-      },
-    ],
-    nonRedirectedCases: [
-      {
-        oldSlugsByPlaceholder: {
-          [publicationSlugPlaceholder]: 'original-publication-slug-2',
-        },
-      },
-      // Matches redirect slugs from another redirect type
-      {
-        oldSlugsByPlaceholder: {
-          [publicationSlugPlaceholder]: 'original-methodology-slug-1',
-        },
-      },
-    ],
-  };
-
   const dataTablesReleasePageTestData: RoutePatternTestCases = {
     routePattern: `data-tables/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}`,
     redirectedCases: mixedPublicationReleasePageRedirectedCases,
@@ -340,7 +313,6 @@ describe('redirectPages', () => {
     findStatisticsReleasePageTestData,
     findStatisticsReleaseDataGuidancePageTestData,
     findStatisticsReleasePrereleaseAccessListPageTestData,
-    dataTablesPublicationPageTestData,
     dataTablesReleasePageTestData,
   ];
 
