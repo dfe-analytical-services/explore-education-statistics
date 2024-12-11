@@ -163,24 +163,6 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
   }
 }
 
-module containerAppRestartsAlert '../../components/alerts/containerApps/restarts.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.apiApp}RestartsDeploy'
-  params: {
-    resourceNames: [resourceNames.publicApi.apiApp]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
-module responseTimeAlert '../../components/alerts/containerApps/responseTimeAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.apiApp}ResponseTimeDeploy'
-  params: {
-    resourceNames: [resourceNames.publicApi.apiApp]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
 output containerAppFqdn string = apiContainerAppModule.outputs.containerAppFqdn
 output containerAppName string = apiContainerAppModule.outputs.containerAppName
 output healthProbePath string = '/health'
