@@ -79,7 +79,7 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
     subnetId: outboundVnetSubnet.id
     privateEndpointSubnetId: inboundVnetSubnet.id
     publicNetworkAccessEnabled: true
-    functionAppEndpointFirewallRules: functionAppFirewallRules
+    functionAppFirewallRules: functionAppFirewallRules
     entraIdAuthentication: {
       appRegistrationClientId: dataProcessorAppRegistrationClientId
       allowedClientIds: [
