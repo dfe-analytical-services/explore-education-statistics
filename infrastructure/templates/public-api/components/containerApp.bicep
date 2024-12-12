@@ -213,7 +213,7 @@ module privateDns 'containerAppPrivateDns.bicep' = if (deployPrivateDns) {
   }
 }
 
-module containerAppRestartsAlert 'alerts/containerApps/restarts.bicep' = if (alerts != null && alerts!.restarts) {
+module containerAppRestartsAlert 'alerts/containerApps/restartsAlert.bicep' = if (alerts != null && alerts!.restarts) {
   name: '${containerAppName}RestartsDeploy'
   params: {
     resourceNames: [containerAppName]
@@ -231,7 +231,7 @@ module responseTimeAlert 'alerts/containerApps/responseTimeAlert.bicep' = if (al
   }
 }
 
-module cpuPercentageAlert 'alerts/containerApps/cpuPercentage.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert 'alerts/containerApps/cpuPercentageAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${containerAppName}CpuPercentageDeploy'
   params: {
     resourceNames: [containerAppName]
@@ -240,7 +240,7 @@ module cpuPercentageAlert 'alerts/containerApps/cpuPercentage.bicep' = if (alert
   }
 }
 
-module memoryPercentageAlert 'alerts/containerApps/memoryPercentage.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert 'alerts/containerApps/memoryPercentageAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${containerAppName}MemoryPercentageDeploy'
   params: {
     resourceNames: [containerAppName]

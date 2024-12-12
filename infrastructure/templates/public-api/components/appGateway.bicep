@@ -39,6 +39,13 @@ param availabilityZones ('1' | '2' | '3') [] = [
   '3'
 ]
 
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  health: bool
+  responseTime: bool
+  alertsGroupName: string
+}?
+
 @description('Tags for the resources')
 param tagValues object
 
@@ -274,4 +281,22 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
     keyVaultCertificateUserRoleAssignmentModule
     keyVaultAccessPolicyModule
   ]
+}
+
+module backendPoolsHealthAlert 'alerts/appGateways/backendPoolHealthAlert.bicep' = if (alerts != null && alerts!.health) {
+  name: '${appGatewayName}BackendPoolsHealthDeploy'
+  params: {
+    resourceNames: [appGatewayName]
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module responseTimeAlert 'alerts/appGateways/responseTimeAlert.bicep' = if (alerts != null && alerts!.responseTime) {
+  name: '${appGatewayName}ResponseTimeDeploy'
+  params: {
+    resourceNames: [appGatewayName]
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
 }
