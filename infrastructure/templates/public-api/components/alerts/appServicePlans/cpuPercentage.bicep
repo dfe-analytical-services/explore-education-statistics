@@ -4,7 +4,7 @@ import { Severity } from '../types.bicep'
 param resourceNames string[]
 
 @description('The alert severity.')
-param severity Severity = 'Informational'
+param severity Severity = 'Warning'
 
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
