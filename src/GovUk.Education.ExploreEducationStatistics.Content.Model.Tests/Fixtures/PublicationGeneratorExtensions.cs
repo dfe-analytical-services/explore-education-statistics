@@ -80,6 +80,11 @@ public static class PublicationGeneratorExtensions
         Theme theme)
         => generator.ForInstance(s => s.SetTheme(theme));
 
+    public static Generator<Publication> WithSlug(
+        this Generator<Publication> generator,
+        string slug)
+        => generator.ForInstance(s => s.SetSlug(slug));
+
     public static InstanceSetters<Publication> SetId(
         this InstanceSetters<Publication> setters,
         Guid id)
@@ -105,6 +110,16 @@ public static class PublicationGeneratorExtensions
 
         return generator;
     }
+
+    public static Generator<Publication> WithRedirects(
+        this Generator<Publication> generator,
+        IEnumerable<PublicationRedirect> publicationRedirects)
+        => generator.ForInstance(s => s.SetRedirects(publicationRedirects));
+
+    public static Generator<Publication> WithRedirects(
+        this Generator<Publication> generator,
+        Func<SetterContext, IEnumerable<PublicationRedirect>> publicationRedirects)
+        => generator.ForInstance(s => s.SetRedirects(publicationRedirects.Invoke));
 
     public static InstanceSetters<Publication> SetReleases(
         this InstanceSetters<Publication> setters,
@@ -270,4 +285,32 @@ public static class PublicationGeneratorExtensions
         Theme theme)
         => setters.Set(p => p.Theme, theme)
             .SetThemeId(theme.Id);
+
+    public static InstanceSetters<Publication> SetSlug(
+        this InstanceSetters<Publication> setters,
+        string slug)
+        => setters.Set(p => p.Slug, slug);
+
+    public static InstanceSetters<Publication> SetRedirects(
+        this InstanceSetters<Publication> setters,
+        IEnumerable<PublicationRedirect> publicationRedirects)
+        => setters.SetRedirects(_ => publicationRedirects);
+
+    private static InstanceSetters<Publication> SetRedirects(
+        this InstanceSetters<Publication> setters,
+        Func<SetterContext, IEnumerable<PublicationRedirect>> publicationRedirects)
+        => setters.Set(
+            mv => mv.PublicationRedirects,
+            (_, publication, context) =>
+            {
+                var list = publicationRedirects.Invoke(context).ToList();
+
+                list.ForEach(publicationRedirect =>
+                {
+                    publicationRedirect.Publication = publication;
+                    publicationRedirect.PublicationId = publication.Id;
+                });
+
+                return list;
+            });
 }

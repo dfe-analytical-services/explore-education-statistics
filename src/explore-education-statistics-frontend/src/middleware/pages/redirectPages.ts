@@ -15,8 +15,8 @@ const cacheTime = getCacheTime();
 let cachedRedirects: CachedRedirects | undefined;
 
 const redirectPaths = {
-  methodologies: '/methodology',
-  publications: '/find-statistics',
+  methodologyRedirects: '/methodology',
+  publicationRedirects: '/find-statistics',
 };
 
 export default async function redirectPages(

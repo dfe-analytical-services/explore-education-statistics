@@ -681,9 +681,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                 .ReturnsAsync(new RedirectsViewModel(
-                    Publications: [], 
-                    Methodologies: [], 
-                    Releases: []));
+                    PublicationRedirects: [],
+                    MethodologyRedirects: [],
+                    ReleaseRedirectsByPublicationSlug: []));
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
