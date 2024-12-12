@@ -112,67 +112,14 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       mountPath: publicApiDataFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules
-    tagValues: tagValues
-  }
-}
-
-module functionAppHealthAlert '../../components/alerts/sites/healthAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.dataProcessor}HealthDeploy'
-  params: {
-    resourceNames: [resourceNames.publicApi.dataProcessor]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
-module storageAccountAvailabilityAlerts '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.dataProcessor}StorageAvailabilityDeploy'
-  params: {
-    resourceNames: [
-      dataProcessorFunctionAppModule.outputs.managementStorageAccountName
-      dataProcessorFunctionAppModule.outputs.slot1StorageAccountName
-      dataProcessorFunctionAppModule.outputs.slot2StorageAccountName
-    ]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
-module fileServiceAvailabilityAlerts '../../components/alerts/fileServices/availabilityAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.dataProcessor}FsAvailabilityDeploy'
-  params: {
-    resourceNames: [
-      dataProcessorFunctionAppModule.outputs.managementStorageAccountName
-      dataProcessorFunctionAppModule.outputs.slot1StorageAccountName
-      dataProcessorFunctionAppModule.outputs.slot2StorageAccountName
-    ]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
-module storageAccountLatencyAlert '../../components/alerts/storageAccounts/latencyAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.publicApiStorageAccount}LatencyDeploy'
-  params: {
-    resourceNames: [
-      dataProcessorFunctionAppModule.outputs.managementStorageAccountName
-      dataProcessorFunctionAppModule.outputs.slot1StorageAccountName
-      dataProcessorFunctionAppModule.outputs.slot2StorageAccountName
-    ]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
-module fileServiceLatencyAlert '../../components/alerts/fileServices/latencyAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.publicApiStorageAccount}FsLatencyDeploy'
-  params: {
-    resourceNames: [
-      dataProcessorFunctionAppModule.outputs.managementStorageAccountName
-      dataProcessorFunctionAppModule.outputs.slot1StorageAccountName
-      dataProcessorFunctionAppModule.outputs.slot2StorageAccountName
-    ]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    alerts: deployAlerts ? {
+      functionAppHealth: true
+      storageAccountAvailability: true
+      storageLatency: true
+      fileServiceAvailability: true
+      fileServiceLatency: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }

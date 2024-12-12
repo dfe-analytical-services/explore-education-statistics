@@ -145,24 +145,11 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       ]
       requireAuthentication: false
     }
-    tagValues: tagValues
-  }
-}
-
-module containerAppRestartsAlert '../../components/alerts/containerApps/restarts.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.apiApp}RestartsDeploy'
-  params: {
-    resourceNames: [resourceNames.publicApi.apiApp]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
-module responseTimeAlert '../../components/alerts/containerApps/responseTimeAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.apiApp}ResponseTimeDeploy'
-  params: {
-    resourceNames: [resourceNames.publicApi.apiApp]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    alerts: deployAlerts ? {
+      restarts: true
+      responseTime: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }
