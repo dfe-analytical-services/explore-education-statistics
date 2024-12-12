@@ -65,25 +65,15 @@ public static class MethodologyGeneratorExtensions
 
                     list.ForEach(methodologyVersion => methodologyVersion.Methodology = methodology);
 
-                    return list;
-                }
-            )
-            .Set(
-                (_, methodology, context) =>
-                {
-                    var list = methodologyVersions.Invoke(context).ToList();
-
                     var latestPublishedVersion = list
                         .Where(mv => mv.Published.HasValue)
                         .OrderBy(mv => mv.Published!)
                         .LastOrDefault();
 
-                    if (latestPublishedVersion != null)
-                    {
-                        latestPublishedVersion.Methodology = methodology;
-                        methodology.LatestPublishedVersion = latestPublishedVersion;
-                        methodology.LatestPublishedVersionId = latestPublishedVersion.Id;
-                    }
+                    methodology.LatestPublishedVersion = latestPublishedVersion;
+                    methodology.LatestPublishedVersionId = latestPublishedVersion?.Id;
+
+                    return list;
                 }
             );
 

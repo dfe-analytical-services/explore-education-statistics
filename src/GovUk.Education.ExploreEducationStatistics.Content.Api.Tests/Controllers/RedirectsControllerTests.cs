@@ -35,17 +35,17 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 var blobCacheService = app.Services.GetRequiredService<IBlobCacheService>();
 
-                var cachedMethodologyRedirects = new List<RedirectViewModel>()
-                {
+                List<RedirectViewModel> cachedMethodologyRedirects =
+                [
                     new(FromSlug: "original-methodology-slug-1", ToSlug: "updated-methodology-slug-1"),
                     new(FromSlug: "original-methodology-slug-2", ToSlug: "updated-methodology-slug-2"),
-                };
+                ];
 
-                var cachedPublicationRedirects = new List<RedirectViewModel>()
-                {
+                List<RedirectViewModel> cachedPublicationRedirects =
+                [
                     new(FromSlug: "original-publication-slug-1", ToSlug: "updated-publication-slug-1"),
                     new(FromSlug: "original-publication-slug-2", ToSlug: "updated-publication-slug-2"),
-                };
+                ];
 
                 var cachedReleaseRedirectsByPublicationSlug = new Dictionary<string, List<RedirectViewModel>>
                 {
@@ -69,11 +69,14 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
+                Assert.Equal(cachedMethodologyRedirects.Count, viewModel.MethodologyRedirects.Count);
                 Assert.All(
                     cachedMethodologyRedirects,
                     cmr => Assert.Contains(
                         viewModel.MethodologyRedirects,
                         rvm => cmr.FromSlug == rvm.FromSlug && cmr.ToSlug == rvm.ToSlug));
+
+                Assert.Equal(cachedPublicationRedirects.Count, viewModel.PublicationRedirects.Count);
                 Assert.All(
                     cachedPublicationRedirects,
                     cpr => Assert.Contains(
@@ -81,6 +84,7 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                         rvm => cpr.FromSlug == rvm.FromSlug && cpr.ToSlug == rvm.ToSlug));
 
                 var cachedReleaseRedirectsForPublication = Assert.Single(cachedReleaseRedirectsByPublicationSlug);
+                Assert.Equal(cachedReleaseRedirectsForPublication.Value.Count, viewModel.ReleaseRedirectsByPublicationSlug["updated-publication-slug-1"].Count);
                 Assert.Equal("updated-publication-slug-1", cachedReleaseRedirectsForPublication.Key);
                 Assert.All(
                     cachedReleaseRedirectsForPublication.Value,
@@ -126,8 +130,11 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
-                var redirects = methodology.Versions.SelectMany(mv => mv.MethodologyRedirects);
+                var redirects = methodology.Versions
+                    .SelectMany(mv => mv.MethodologyRedirects)
+                    .ToList();
 
+                Assert.Equal(redirects.Count, viewModel.MethodologyRedirects.Count);
                 Assert.All(
                     redirects,
                     mr => Assert.Contains(
@@ -163,10 +170,14 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                 var cachedValue = await blobCacheService.GetItemAsync(new RedirectsCacheKey(), typeof(RedirectsViewModel));
                 var cachedRedirectsViewModel = Assert.IsType<RedirectsViewModel>(cachedValue);
 
-                var redirects = methodology.Versions.SelectMany(mv => mv.MethodologyRedirects);
+                var redirects = methodology.Versions
+                    .SelectMany(mv => mv.MethodologyRedirects)
+                    .ToList();
 
                 Assert.Empty(cachedRedirectsViewModel.PublicationRedirects);
                 Assert.Empty(cachedRedirectsViewModel.ReleaseRedirectsByPublicationSlug);
+
+                Assert.Equal(redirects.Count, cachedRedirectsViewModel.MethodologyRedirects.Count);
                 Assert.All(
                     redirects,
                     mr => Assert.Contains(
@@ -193,6 +204,7 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
+                Assert.Equal(publicationRedirects.Count, viewModel.PublicationRedirects.Count);
                 Assert.All(
                     publicationRedirects,
                     pr => Assert.Contains(
@@ -225,6 +237,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 Assert.Empty(cachedRedirectsViewModel.MethodologyRedirects);
                 Assert.Empty(cachedRedirectsViewModel.ReleaseRedirectsByPublicationSlug);
+
+                Assert.Equal(publicationRedirects.Count, cachedRedirectsViewModel.PublicationRedirects.Count);
                 Assert.All(
                     publicationRedirects,
                     pr => Assert.Contains(
