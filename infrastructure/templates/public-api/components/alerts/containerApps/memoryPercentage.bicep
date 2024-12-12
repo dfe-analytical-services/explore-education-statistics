@@ -16,8 +16,8 @@ module alerts '../dynamicMetricAlert.bicep' = [for name in resourceNames: {
   name: '${name}MemoryPercentageAlertModule'
   params: {
     alertName: '${name}-memory-percentage'
-    resourceIds: [resourceId('Microsoft.Web/serverfarms', name)]
-    resourceType: 'Microsoft.Web/serverfarms'
+    resourceIds: [resourceId('Microsoft.App/containerApps', name)]
+    resourceType: 'Microsoft.App/containerApps'
     query: {
       metric: 'MemoryPercentage'
       aggregation: 'Average'
