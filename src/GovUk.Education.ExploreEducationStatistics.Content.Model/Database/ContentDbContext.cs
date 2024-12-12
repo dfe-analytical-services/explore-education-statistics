@@ -55,6 +55,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<ReleaseStatus> ReleaseStatus { get; set; }
         public virtual DbSet<ReleaseFile> ReleaseFiles { get; set; }
         public virtual DbSet<File> Files { get; set; }
+        public virtual DbSet<DataSetFileMetaGeographicLevel> DataSetFileMetaGeographicLevels { get; set; }
+        public virtual DbSet<DataSetFileMetaTimePeriod> DataSetFileMetaTimePeriods { get; set; }
+        public virtual DbSet<DataSetFileMetaFilter> DataSetFileMetaFilters { get; set; }
+        public virtual DbSet<DataSetFileMetaIndicator> DataSetFileMetaIndicators { get; set; }
         public virtual DbSet<ContentSection> ContentSections { get; set; }
         public virtual DbSet<ContentBlock> ContentBlocks { get; set; }
         public virtual DbSet<KeyStatistic> KeyStatistics { get; set; }
@@ -110,6 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureReleaseStatus(modelBuilder);
             ConfigureReleaseFile(modelBuilder);
             ConfigureFile(modelBuilder);
+            ConfigureDataSetFileMetaTables(modelBuilder);
             ConfigureContentBlock(modelBuilder);
             ConfigureContentSection(modelBuilder);
             ConfigureReleaseVersion(modelBuilder);
@@ -456,6 +461,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     .HasConversion( // You might want to use EF8 JSON support instead of this
                         v => JsonConvert.SerializeObject(v),
                         v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
+            });
+        }
+
+        private static void ConfigureDataSetFileMetaTables(ModelBuilder modelBuilder)
+        {
+            // @MarkFix referential integrity
+            modelBuilder.Entity<DataSetFileMetaGeographicLevel>(entity =>
+            {
+                //entity.HasNoKey();
+            });
+
+            modelBuilder.Entity<DataSetFileMetaTimePeriod>(entity =>
+            {
+                //entity.HasNoKey();
+            });
+
+            modelBuilder.Entity<DataSetFileMetaFilter>(entity =>
+            {
+                //entity.HasNoKey();
+            });
+
+            modelBuilder.Entity<DataSetFileMetaIndicator>(entity =>
+            {
+                //entity.HasNoKey();
             });
         }
 

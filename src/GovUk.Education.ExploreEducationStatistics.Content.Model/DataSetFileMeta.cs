@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public class DataSetFileMeta
+public class DataSetFileMeta // EES-5693 remove
 {
     [JsonConverter(typeof(GeographicLevelsListJsonConverter))]
     public required List<GeographicLevel> GeographicLevels { get; set; }

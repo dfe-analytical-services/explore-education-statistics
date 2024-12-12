@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixture
 
 public static class DataSetFileMetaGeneratorExtensions
 {
-    public static Generator<DataSetFileMeta> DefaultDataSetFileMeta(this DataFixture fixture)
+    public static Generator<DataSetFileMeta> DefaultDataSetFileMeta(this DataFixture fixture) // EES-5693 remove
         => fixture.Generator<DataSetFileMeta>().WithDefaults();
 
     public static Generator<DataSetFileMeta> WithDefaults(this Generator<DataSetFileMeta> generator)
