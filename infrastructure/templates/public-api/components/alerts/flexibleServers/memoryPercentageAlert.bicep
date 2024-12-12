@@ -1,10 +1,5 @@
-import { Severity } from '../types.bicep'
-
 @description('Names of the resources that these alerts are being applied to.')
 param resourceNames string[]
-
-@description('The alert severity.')
-param severity Severity = 'Warning'
 
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
@@ -12,21 +7,13 @@ param alertsGroupName string
 @description('Tags with which to tag the resource in Azure.')
 param tagValues object
 
-module alerts '../dynamicMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}MemoryPercentageAlertModule'
+module alerts '../baseMemoryPercentageAlert.bicep' = {
+  name: '${resourceNames[0]}MemoryPercentageAlertModule'
   params: {
-    alertName: '${name}-memory-percentage'
-    resourceIds: [resourceId('Microsoft.DBforPostgreSQL/flexibleServers', name)]
+    resourceNames: resourceNames
     resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
-    query: {
-      metric: 'memory_percent'
-      aggregation: 'Maximum'
-      operator: 'GreaterThan'
-    }
-    evaluationFrequency: 'PT5M'
-    windowSize: 'PT15M'
-    severity: severity
+    metricName: 'memory_percent' 
     alertsGroupName: alertsGroupName
     tagValues: tagValues
   }
-}]
+}

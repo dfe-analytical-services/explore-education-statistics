@@ -20,7 +20,7 @@ module alerts '../dynamicMetricAlert.bicep' = [for name in resourceNames: {
     resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
     query: {
       metric: 'disk_iops_consumed_percentage'
-      aggregation: 'Maximum'
+      aggregation: 'Average'
       operator: 'GreaterThan'
     }
     evaluationFrequency: 'PT5M'

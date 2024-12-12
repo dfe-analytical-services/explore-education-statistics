@@ -1,10 +1,5 @@
-import { Severity } from '../types.bicep'
-
 @description('Names of the resources that these alerts are being applied to.')
 param resourceNames string[]
-
-@description('The alert severity.')
-param severity Severity = 'Warning'
 
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
@@ -12,21 +7,13 @@ param alertsGroupName string
 @description('Tags with which to tag the resource in Azure.')
 param tagValues object
 
-module alerts '../dynamicMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}ResponseTimeAlertModule'
+module alerts '../baseResponseTimeAlert.bicep' = {
+  name: '${resourceNames[0]}ResponseTimeAlertModule'
   params: {
-    alertName: '${name}-response-time'
-    resourceIds: [resourceId('Microsoft.Network/applicationGateways', name)]
+    resourceNames: resourceNames
     resourceType: 'Microsoft.Network/applicationGateways'
-    query: {
-      metric: 'ApplicationGatewayTotalTime'
-      aggregation: 'Average'
-      operator: 'GreaterThan'
-    }
-    evaluationFrequency: 'PT1M'
-    windowSize: 'PT5M'
-    severity: severity
+    metricName: 'ApplicationGatewayTotalTime' 
     alertsGroupName: alertsGroupName
     tagValues: tagValues
   }
-}]
+}
