@@ -9,11 +9,12 @@ import { GetInfographic } from '@common/modules/charts/components/InfographicBlo
 import { AxesConfiguration } from '@common/modules/charts/types/chart';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { DataBlock } from '@common/services/types/blocks';
 import { useQuery } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import tableBuilderQueries from '../queries/tableBuilderQueries';
 
 const testId = (dataBlock: DataBlock) => `Data block - ${dataBlock.name}`;
@@ -41,23 +42,50 @@ const DataBlockTabs = ({
   releaseId,
   onToggle,
 }: DataBlockTabsProps) => {
+  const [selectedBoundaryLevel, setSelectedBoundaryLevel] = useState(
+    dataBlock.charts[0]?.type === 'map'
+      ? dataBlock.charts[0].boundaryLevel
+      : undefined,
+  );
+
   const {
-    data: fullTable,
-    error,
-    isLoading,
+    data: tableData,
+    error: tableDataError,
+    isLoading: tableDataIsLoading,
   } = useQuery(
     tableBuilderQueries.getDataBlockTable(
       releaseId,
       dataBlock.dataBlockParentId,
-      dataBlock.charts[0]?.type === 'map'
-        ? dataBlock.charts[0].boundaryLevel
-        : undefined,
     ),
   );
 
+  const { data: locationGeoJson, error: geoJsonError } = useQuery(
+    tableBuilderQueries.getDataBlockGeoJson(
+      releaseId,
+      dataBlock.dataBlockParentId,
+      selectedBoundaryLevel,
+    ),
+  );
+
+  const fullTable = useMemo(() => {
+    return !tableData
+      ? undefined
+      : mapFullTable({
+          ...tableData,
+          subjectMeta: {
+            ...tableData.subjectMeta,
+            locations: locationGeoJson ?? tableData.subjectMeta.locations,
+          },
+        });
+  }, [tableData, locationGeoJson]);
+
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
 
-  if (error && isAxiosError(error) && error.response?.status === 403) {
+  if (
+    tableDataError &&
+    isAxiosError(tableDataError) &&
+    tableDataError.response?.status === 403
+  ) {
     return null;
   }
 
@@ -66,7 +94,7 @@ const DataBlockTabs = ({
       ? additionalTabContent({ dataBlock })
       : additionalTabContent;
   return (
-    <LoadingSpinner loading={isLoading}>
+    <LoadingSpinner loading={tableDataIsLoading}>
       <Tabs id={id} testId={testId(dataBlock)} onToggle={onToggle}>
         {firstTabs}
 
@@ -84,42 +112,46 @@ const DataBlockTabs = ({
             }
             title="Chart"
           >
-            {!!error && errorMessage}
+            {(!!tableDataError || !!geoJsonError) && errorMessage}
 
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
                 {dataBlock.charts.map((chart, index) => {
                   const key = index;
 
-                  const axes = { ...chart.axes } as Required<AxesConfiguration>;
+                  const commonChartProps = {
+                    id: `${id}-chart`,
+                    axes: { ...chart.axes } as Required<AxesConfiguration>,
+                    data: fullTable?.results,
+                    meta: fullTable?.subjectMeta,
+                    source: dataBlock?.source,
+                  };
 
                   if (chart.type === 'infographic') {
                     return (
                       <ChartRenderer
                         {...chart}
-                        id={`${id}-chart`}
+                        {...commonChartProps}
                         key={key}
-                        axes={axes}
-                        data={fullTable?.results}
-                        meta={fullTable?.subjectMeta}
-                        source={dataBlock?.source}
                         getInfographic={getInfographic}
+                      />
+                    );
+                  }
+                  if (chart.type === 'map') {
+                    return (
+                      <ChartRenderer
+                        {...chart}
+                        {...commonChartProps}
+                        key={key}
+                        onBoundaryLevelChange={async boundaryLevel => {
+                          setSelectedBoundaryLevel(boundaryLevel);
+                        }}
                       />
                     );
                   }
 
                   return (
-                    <ChartRenderer
-                      {...chart}
-                      releaseId={releaseId}
-                      dataBlockParentId={dataBlock.dataBlockParentId}
-                      id={`${id}-chart`}
-                      key={key}
-                      axes={axes}
-                      data={fullTable?.results}
-                      meta={fullTable?.subjectMeta}
-                      source={dataBlock?.source}
-                    />
+                    <ChartRenderer {...chart} {...commonChartProps} key={key} />
                   );
                 })}
 
@@ -145,7 +177,7 @@ const DataBlockTabs = ({
             }
             title="Table"
           >
-            {!!error && errorMessage}
+            {!!tableDataError && errorMessage}
 
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>

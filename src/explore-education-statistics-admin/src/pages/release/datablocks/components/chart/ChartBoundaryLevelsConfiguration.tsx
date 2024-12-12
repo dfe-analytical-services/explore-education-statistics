@@ -22,7 +22,7 @@ interface Props {
 export default function ChartBoundaryLevelsConfiguration({
   buttons,
   // TODO: EES-5402 - Remove when all boundary level changes are done
-  hasDataSetBoundaryLevels = false,
+  hasDataSetBoundaryLevels = true,
   map,
   meta,
   options,

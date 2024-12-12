@@ -21,9 +21,7 @@ import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import getMapDataSetCategoryConfigs, {
   MapDataSetCategoryConfig,
 } from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
-import tableBuilderService, {
-  GeoJsonFeatureProperties,
-} from '@common/services/tableBuilderService';
+import { GeoJsonFeatureProperties } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import classNames from 'classnames';
@@ -32,9 +30,8 @@ import { Layer, Path, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { LocationFilter } from '@common/modules/table-tool/types/filters';
-import { mapFullTableMetaLocations } from '@common/modules/table-tool/utils/mapFullTableMeta';
+import useToggle from '@common/hooks/useToggle';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -64,8 +61,7 @@ export interface MapBlockProps extends ChartProps {
   map?: MapConfig;
   position?: { lat: number; lng: number };
   boundaryLevel: number;
-  releaseId: string;
-  dataBlockParentId: string;
+  onBoundaryLevelChange: (boundaryLevel: number) => void;
 }
 
 export const mapBlockDefinition: ChartDefinition = {
@@ -130,43 +126,15 @@ export default function MapBlock({
   axes,
   title,
   boundaryLevel,
-  releaseId,
-  dataBlockParentId,
+  onBoundaryLevelChange,
 }: MapBlockProps) {
-  const [selectedBoundaryLevel, setSelectedBoundaryLevel] =
-    useState<number>(boundaryLevel);
+  const [isBoundaryLevelChanging, setIsBoundaryLevelChanging] =
+    useToggle(false);
 
-  const queryClient = useQueryClient();
-  // add existing geoJson to cache, avoiding double fetching
-  queryClient.setQueryData(
-    ['mapLocationGeoJson', releaseId, dataBlockParentId, boundaryLevel],
-    meta.locations,
-  );
-
-  const { data: locations, isFetching: isFetchingGeoJson } = useQuery<
-    LocationFilter[]
-  >({
-    queryKey: [
-      'mapLocationGeoJson',
-      releaseId,
-      dataBlockParentId,
-      selectedBoundaryLevel,
-    ],
-    queryFn: async () => {
-      return mapFullTableMetaLocations(
-        await tableBuilderService.getLocationGeoJson(
-          releaseId,
-          dataBlockParentId,
-          selectedBoundaryLevel,
-        ),
-      );
-    },
-    staleTime: Infinity,
-    cacheTime: Infinity,
-    keepPreviousData: true,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-  });
+  useEffect(() => {
+    // when meta.locations change:
+    setIsBoundaryLevelChanging.off();
+  }, [meta.locations, setIsBoundaryLevelChanging]);
 
   const axisMajor = useMemo<AxisConfiguration>(
     () => ({
@@ -178,13 +146,8 @@ export default function MapBlock({
   );
 
   const dataSetCategories = useMemo<MapDataSetCategory[]>(() => {
-    return createMapDataSetCategories(
-      axisMajor,
-      data,
-      meta,
-      locations ?? meta.locations,
-    );
-  }, [axisMajor, data, meta, locations]);
+    return createMapDataSetCategories(axisMajor, data, meta);
+  }, [axisMajor, data, meta]);
 
   const dataSetCategoryConfigs = useMemo<Dictionary<MapDataSetCategoryConfig>>(
     () =>
@@ -258,16 +221,31 @@ export default function MapBlock({
     (value: string) => {
       setSelectedFeature(features?.features.find(feat => feat.id === value));
     },
-    [setSelectedFeature, features],
+    [features],
   );
+
   const handleDataSetChange = useCallback(
-    (value: string) => {
+    async (value: string) => {
       setSelectedDataSetKey(value);
-      setSelectedBoundaryLevel(
-        dataSetCategoryConfigs[value].boundaryLevel ?? boundaryLevel,
-      );
+      const previouslyRenderredBoundaryLevel =
+        selectedDataSetConfig?.boundaryLevel ?? boundaryLevel;
+      const newBoundaryLevelToRender =
+        dataSetCategoryConfigs[value].boundaryLevel ?? boundaryLevel;
+
+      if (newBoundaryLevelToRender !== previouslyRenderredBoundaryLevel) {
+        setIsBoundaryLevelChanging.on();
+        await onBoundaryLevelChange(
+          dataSetCategoryConfigs[value].boundaryLevel ?? boundaryLevel,
+        );
+      }
     },
-    [dataSetCategoryConfigs, boundaryLevel],
+    [
+      dataSetCategoryConfigs,
+      boundaryLevel,
+      onBoundaryLevelChange,
+      setIsBoundaryLevelChanging,
+      selectedDataSetConfig,
+    ],
   );
 
   if (
@@ -303,15 +281,22 @@ export default function MapBlock({
             minZoom={5}
             zoom={5}
           >
+            <LoadingSpinner
+              className="govuk-!-margin-top-8"
+              loading={isBoundaryLevelChanging}
+              text="Loading map"
+              size="lg"
+              hideText
+              alert
+            />
             <MapGeoJSON
               dataSetCategoryConfigs={dataSetCategoryConfigs}
-              features={features}
+              features={isBoundaryLevelChanging ? undefined : features}
               width={width}
               height={height}
               selectedDataSetKey={selectedDataSetKey}
               selectedFeature={selectedFeature}
               onSelectFeature={setSelectedFeature}
-              isLoading={isFetchingGeoJson}
             />
           </MapContainer>
         </div>

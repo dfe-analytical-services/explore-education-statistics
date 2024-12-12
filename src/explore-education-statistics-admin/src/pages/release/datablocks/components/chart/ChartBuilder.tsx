@@ -100,7 +100,6 @@ interface Props {
   data: TableDataResult[];
   meta: FullTableMeta;
   releaseId: string;
-  dataBlockParentId: DataBlock['dataBlockParentId'];
   initialChart?: Chart;
   tableTitle: string;
   onChartSave: (chart: Chart, file?: File) => Promise<void>;
@@ -112,7 +111,6 @@ export default function ChartBuilder({
   data,
   meta,
   releaseId,
-  dataBlockParentId,
   initialChart,
   tableTitle,
   onChartSave,
@@ -200,8 +198,8 @@ export default function ChartBuilder({
           },
           boundaryLevel: options.boundaryLevel ?? 0,
           type: 'map',
-          releaseId,
-          dataBlockParentId,
+          onBoundaryLevelChange: boundaryLevel =>
+            onTableQueryUpdate({ boundaryLevel }),
         };
       default:
         return undefined;
@@ -215,8 +213,7 @@ export default function ChartBuilder({
     meta,
     options,
     map,
-    releaseId,
-    dataBlockParentId,
+    onTableQueryUpdate,
   ]);
 
   const handleSubmit = useCallback(async () => {
