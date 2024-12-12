@@ -9,10 +9,12 @@ import releaseDataFileService, {
   DataFileImportStatus,
   DeleteDataFilePlan,
 } from '@admin/services/releaseDataFileService';
+import Button from '@common/components/Button';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
+import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -40,6 +42,7 @@ const ReleaseDataUploadsSection = ({
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [bulkUploadPlan, setBulkUploadPlan] = useState<ArchiveDataSetFile[]>();
+  const [isReordering, toggleReordering] = useToggle(false);
 
   const {
     data: initialDataFiles,
@@ -226,14 +229,34 @@ const ReleaseDataUploadsSection = ({
 
       <LoadingSpinner loading={isLoading}>
         {dataFiles.length > 0 ? (
-          <DataFilesTable
-            canUpdateRelease={canUpdateRelease}
-            dataFiles={dataFiles}
-            handleStatusChange={handleStatusChange}
-            handleDeleteFile={handleDeleteFile}
-            publicationId={publicationId}
-            releaseId={releaseId}
-          />
+          <>
+            <h2 className="govuk-heading-l">Uploaded data files</h2>
+            <DataFilesTable
+              canUpdateRelease={canUpdateRelease}
+              dataFiles={dataFiles}
+              isReordering={isReordering}
+              onCancelReordering={toggleReordering.off}
+              onConfirmReordering={async nextDataFiles => {
+                setDataFiles(
+                  await releaseDataFileService.updateDataFilesOrder(
+                    releaseId,
+                    nextDataFiles.map(file => file.id),
+                  ),
+                );
+                toggleReordering.off();
+              }}
+              onStatusChange={handleStatusChange}
+              onDeleteFile={handleDeleteFile}
+              publicationId={publicationId}
+              releaseId={releaseId}
+            />
+
+            {isReordering ? undefined : (
+              <Button onClick={toggleReordering.on} variant="secondary">
+                Reorder data files
+              </Button>
+            )}
+          </>
         ) : (
           <InsetText>No data files have been uploaded.</InsetText>
         )}
