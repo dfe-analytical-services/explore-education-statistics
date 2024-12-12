@@ -50,6 +50,11 @@ param alerts {
   availability: bool
   queryTime: bool
   transactionTime: bool
+  clientConenctionsWaiting: bool
+  cpuPercentage: bool
+  diskBandwidth: bool
+  diskIops: bool
+  memoryPercentage: bool
   alertGroupName: string
 }?
 
@@ -164,6 +169,51 @@ module queryTimeAlert 'alerts/flexibleServers/queryTimeAlert.bicep' = if (alerts
 
 module transactionTimeAlert 'alerts/flexibleServers/transactionTimeAlert.bicep' = if (alerts != null && alerts!.transactionTime) {
   name: '${databaseServerName}TransactionTimeDeploy'
+  params: {
+    resourceNames: [databaseServerName]
+    alertsGroupName: alerts!.alertGroupName
+    tagValues: tagValues
+  }
+}
+
+module clientConenctionsWaitingAlert 'alerts/flexibleServers/clientConnectionsWaitingAlert.bicep' = if (alerts != null && alerts!.clientConenctionsWaiting) {
+  name: '${databaseServerName}ClientConnectionsDeploy'
+  params: {
+    resourceNames: [databaseServerName]
+    alertsGroupName: alerts!.alertGroupName
+    tagValues: tagValues
+  }
+}
+
+module cpuPercentageAlert 'alerts/flexibleServers/cpuPercentageAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+  name: '${databaseServerName}CpuPercentageDeploy'
+  params: {
+    resourceNames: [databaseServerName]
+    alertsGroupName: alerts!.alertGroupName
+    tagValues: tagValues
+  }
+}
+
+module diskBandwidthAlert 'alerts/flexibleServers/diskBandwidthAlert.bicep' = if (alerts != null && alerts!.diskBandwidth) {
+  name: '${databaseServerName}DiskBandwidthDeploy'
+  params: {
+    resourceNames: [databaseServerName]
+    alertsGroupName: alerts!.alertGroupName
+    tagValues: tagValues
+  }
+}
+
+module diskIopsAlert 'alerts/flexibleServers/diskIopsAlert.bicep' = if (alerts != null && alerts!.diskIops) {
+  name: '${databaseServerName}DiskIopsDeploy'
+  params: {
+    resourceNames: [databaseServerName]
+    alertsGroupName: alerts!.alertGroupName
+    tagValues: tagValues
+  }
+}
+
+module memoryPercentageAlert 'alerts/flexibleServers/memoryPercentageAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+  name: '${databaseServerName}MemoryPercentageDeploy'
   params: {
     resourceNames: [databaseServerName]
     alertsGroupName: alerts!.alertGroupName
