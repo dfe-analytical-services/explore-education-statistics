@@ -65,7 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                         ? null
                         : replacingDataFile?.DataSetFileVersion + 1 ?? 0,
                     DataSetFileMeta = null, // If FileType.Data, this is set by Data.Processor when import is complete
-                    DataSetFileMetaOld = null, // If FileType.Data, this is set by Data.Processor when import is complete
                     Filename = filename,
                     ContentLength = contentLength,
                     ContentType = "text/csv",

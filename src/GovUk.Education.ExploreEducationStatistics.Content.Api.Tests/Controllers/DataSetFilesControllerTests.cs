@@ -112,9 +112,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithGeographicLevels(
                             [GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.Institution]))
-                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
-                        .WithGeographicLevels(
-                            [GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.Institution]))
                     .GenerateList(1))
                     .GenerateList();
 
@@ -604,6 +601,11 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2ReleaseFiles);
                 });
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    var pippo = 1;
+                });
+
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -711,7 +713,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var releaseVersionFiles = _fixture.DefaultReleaseFile()
                     .WithReleaseVersion(publication.ReleaseVersions[0])
-                    .WithFile(() => _fixture.DefaultFile(FileType.Data))
+                    .WithFile(() => _fixture.DefaultFile(FileType.Data)
+                        .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()))
                     .ForIndex(0, s => s
                         .SetPublicApiDataSetId(Guid.NewGuid())
                         .SetPublicApiDataSetVersion(major: 1, minor: 0))
@@ -763,7 +766,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var releaseVersionFiles = _fixture.DefaultReleaseFile()
                     .WithReleaseVersion(publication.ReleaseVersions[0])
-                    .WithFile(() => _fixture.DefaultFile(FileType.Data))
+                    .WithFile(() => _fixture.DefaultFile(FileType.Data)
+                        .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()))
                     .ForIndex(0, s => s
                         .SetPublicApiDataSetId(Guid.NewGuid())
                         .SetPublicApiDataSetVersion(major: 1, minor: 1))
@@ -1586,7 +1590,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .WithReleaseVersion(publication.ReleaseVersions[0])
                     .WithFile(_fixture.DefaultFile(FileType.Data)
                         .WithType(FileType.Data)
-                        .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
+                        .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                             .WithGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority])
                             .WithTimePeriodRange(
                                 _fixture.DefaultTimePeriodRangeMeta()
@@ -1594,14 +1598,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                                     .WithEnd("2002", TimeIdentifier.AcademicYear)
                             )
                             .WithFilters([
-                                new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "filter_1", },
-                                new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 2", ColumnName = "filter_2", },
-                                new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 3", ColumnName = "filter_3", },
+                                new FilterMeta { FilterId = Guid.NewGuid(), Label = "Filter 1", ColumnName = "filter_1", },
+                                new FilterMeta { FilterId = Guid.NewGuid(), Label = "Filter 2", ColumnName = "filter_2", },
+                                new FilterMeta { FilterId = Guid.NewGuid(), Label = "Filter 3", ColumnName = "filter_3", },
                             ])
                             .WithIndicators([
-                                new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "indicator_1", },
-                                new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 2", ColumnName = "indicator_2", },
-                                new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 3", ColumnName = "indicator_3", },
+                                new IndicatorMeta { IndicatorId = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "indicator_1", },
+                                new IndicatorMeta { IndicatorId = Guid.NewGuid(), Label = "Indicator 2", ColumnName = "indicator_2", },
+                                new IndicatorMeta { IndicatorId = Guid.NewGuid(), Label = "Indicator 3", ColumnName = "indicator_3", },
                             ])
                         ))
                     .Generate();
@@ -1611,6 +1615,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.Add(releaseFile);
                 });
 
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    var x = 1;
+                });
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey,
                         PaginatedListViewModel<DataSetFileSummaryViewModel>>();
@@ -1625,10 +1633,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 var dataSetFileSummaryViewModel = Assert.Single(pagedResult.Results);
                 var dataSetFileMetaViewModel = dataSetFileSummaryViewModel.Meta;
 
-                var originalMeta = releaseFile.File.DataSetFileMetaOld;
+                var originalMeta = releaseFile.File.DataSetFileMeta;
 
                 Assert.Equal(originalMeta!.GeographicLevels
-                        .Select(gl => gl.GetEnumLabel())
+                        .Select(glMeta => glMeta.Code.GetEnumLabel())
                         .ToList(),
                     dataSetFileMetaViewModel.GeographicLevels);
 
@@ -1784,7 +1792,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithReleaseVersion(releaseVersion)
                 .WithFiles(_fixture.DefaultFile(FileType.Data)
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta())
-                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld())
                     .GenerateList(numberOfDataSets))
                 .GenerateList();
         }
@@ -1944,7 +1951,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithPublicApiDataSetId(Guid.NewGuid())
                 .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithTimePeriodRange(
                         _fixture.DefaultTimePeriodRangeMeta()
                             .WithStart("2000", TimeIdentifier.CalendarYear)
@@ -2010,7 +2017,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithPublicApiDataSetId(Guid.NewGuid())
                 .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithTimePeriodRange(
                         _fixture.DefaultTimePeriodRangeMeta()
                             .WithStart("2000", TimeIdentifier.CalendarYear)
@@ -2076,10 +2083,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 $"{releaseFile.PublicApiDataSetVersion!.Major}.{releaseFile.PublicApiDataSetVersion.Minor}",
                 viewModel.Api.Version);
 
-            var dataSetFileMeta = file.DataSetFileMetaOld;
+            var dataSetFileMeta = file.DataSetFileMeta;
 
             Assert.Equal(dataSetFileMeta!.GeographicLevels
-                    .Select(gl => gl.GetEnumLabel())
+                    .Select(glMeta => glMeta.Code.GetEnumLabel())
                     .ToList(),
                 viewModel.File.Meta.GeographicLevels);
 
@@ -2139,7 +2146,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()));
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
@@ -2199,11 +2206,11 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     new FilterSequenceEntry(filter3Id, []),
                 ])
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithFilters([
-                            new FilterMetaOld { Id = filter3Id, Label = "Filter 3", ColumnName = "filter_3", },
-                            new FilterMetaOld { Id = filter1Id, Label = "Filter 1", ColumnName = "filter_1", },
-                            new FilterMetaOld { Id = filter2Id, Label = "Filter 2", ColumnName = "filter_2", },
+                            new FilterMeta { FilterId = filter3Id, Label = "Filter 3", ColumnName = "filter_3", },
+                            new FilterMeta { FilterId = filter1Id, Label = "Filter 1", ColumnName = "filter_1", },
+                            new FilterMeta { FilterId = filter2Id, Label = "Filter 2", ColumnName = "filter_2", },
                         ])));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -2259,12 +2266,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator3Id, indicator4Id])
                 ])
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithIndicators([
-                            new IndicatorMetaOld { Id = indicator3Id, Label = "Indicator 3", ColumnName = "indicator_3", },
-                            new IndicatorMetaOld { Id = indicator2Id, Label = "Indicator 2", ColumnName = "indicator_2", },
-                            new IndicatorMetaOld { Id = indicator1Id, Label = "Indicator 1", ColumnName = "indicator_1", },
-                            new IndicatorMetaOld { Id = indicator4Id, Label = "Indicator 4", ColumnName = "indicator_4", },
+                            new IndicatorMeta { IndicatorId = indicator3Id, Label = "Indicator 3", ColumnName = "indicator_3", },
+                            new IndicatorMeta { IndicatorId = indicator2Id, Label = "Indicator 2", ColumnName = "indicator_2", },
+                            new IndicatorMeta { IndicatorId = indicator1Id, Label = "Indicator 1", ColumnName = "indicator_1", },
+                            new IndicatorMeta { IndicatorId = indicator4Id, Label = "Indicator 4", ColumnName = "indicator_4", },
                         ])));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -2311,17 +2318,17 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld()
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
                         .WithFilters([
-                            new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 1", ColumnName = "A_filter_1", Hint = "hint", },
-                            new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 2", ColumnName = "G_filter_2", },
-                            new FilterMetaOld { Id = Guid.NewGuid(), Label = "Filter 3", ColumnName = "C_filter_3", Hint = "Another hint", },
+                            new FilterMeta { FilterId = Guid.NewGuid(), Label = "Filter 1", ColumnName = "A_filter_1", Hint = "hint", },
+                            new FilterMeta { FilterId = Guid.NewGuid(), Label = "Filter 2", ColumnName = "G_filter_2", },
+                            new FilterMeta { FilterId = Guid.NewGuid(), Label = "Filter 3", ColumnName = "C_filter_3", Hint = "Another hint", },
                         ])
                         .WithIndicators([
-                            new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 3", ColumnName = "B_indicator_3", },
-                            new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 2", ColumnName = "E_indicator_2", },
-                            new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "D_indicator_1", },
-                            new IndicatorMetaOld { Id = Guid.NewGuid(), Label = "Indicator 4", ColumnName = "F_indicator_4", },
+                            new IndicatorMeta { IndicatorId = Guid.NewGuid(), Label = "Indicator 3", ColumnName = "B_indicator_3", },
+                            new IndicatorMeta { IndicatorId = Guid.NewGuid(), Label = "Indicator 2", ColumnName = "E_indicator_2", },
+                            new IndicatorMeta { IndicatorId = Guid.NewGuid(), Label = "Indicator 1", ColumnName = "D_indicator_1", },
+                            new IndicatorMeta { IndicatorId = Guid.NewGuid(), Label = "Indicator 4", ColumnName = "F_indicator_4", },
                         ])));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -2381,7 +2388,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             var releaseFile = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile(FileType.Data)
-                    .WithSubjectId(subject.Id))
+                    .WithSubjectId(subject.Id)
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()))
                 .Generate();
 
             var statsReleaseVersion = new Data.Model.ReleaseVersion { Id = releaseFile.ReleaseVersionId };
@@ -2495,7 +2503,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .WithTheme(_fixture.DefaultTheme());
 
             File file = _fixture.DefaultFile(FileType.Data)
-                .WithDataSetFileMetaOld(_fixture.DefaultDataSetFileMetaOld());
+                .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta());
 
             ReleaseFile releaseFile0 = _fixture.DefaultReleaseFile()
                 .WithReleaseVersion(publication.ReleaseVersions[0]) // the previous published version

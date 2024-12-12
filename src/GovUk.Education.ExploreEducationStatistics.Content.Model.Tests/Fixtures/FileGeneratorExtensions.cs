@@ -77,11 +77,6 @@ public static class FileGeneratorExtensions
         Guid dataSetFileId)
         => generator.ForInstance(s => s.SetDataSetFileId(dataSetFileId));
 
-    public static Generator<File> WithDataSetFileMetaOld(
-        this Generator<File> generator,
-        DataSetFileMetaOld? dataSetFileMeta)
-        => generator.ForInstance(s => s.SetDataSetFileMetaOld(dataSetFileMeta));
-
     public static Generator<File> WithDataSetFileMeta(
         this Generator<File> generator,
         DataSetFileMeta? dataSetFileMeta)
@@ -113,7 +108,6 @@ public static class FileGeneratorExtensions
             .SetDefault(f => f.SubjectId)
             .SetContentType("text/csv")
             .SetDefault(f => f.DataSetFileId)
-            .Set(f => f.DataSetFileMetaOld, (_, _, context) => context.Fixture.DefaultDataSetFileMetaOld())
             .Set(f => f.DataSetFileMeta, (_, _, _) => null); // InMemory DB doesn't support JSON Columns, so this avoids issues saving Files
 
     public static InstanceSetters<File> SetMetaFileDefaults(this InstanceSetters<File> setters)
@@ -200,11 +194,6 @@ public static class FileGeneratorExtensions
         Guid dataSetFileId)
         => setters.Set(f => f.DataSetFileId, dataSetFileId);
 
-    public static InstanceSetters<File> SetDataSetFileMetaOld(
-        this InstanceSetters<File> setters,
-        DataSetFileMetaOld? dataSetFileMeta)
-        => setters.Set(f => f.DataSetFileMetaOld, dataSetFileMeta);
-    
     public static InstanceSetters<File> SetDataSetFileMeta(
         this InstanceSetters<File> setters,
         DataSetFileMeta? dataSetFileMeta)

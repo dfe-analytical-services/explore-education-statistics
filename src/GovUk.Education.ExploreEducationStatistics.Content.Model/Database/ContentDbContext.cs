@@ -479,10 +479,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     dsfm.OwnsMany(meta => meta.Filters);
                     dsfm.OwnsMany(meta => meta.Indicators);
                 });
-                entity.Property(p => p.DataSetFileMetaOld)
-                    .HasConversion( // You might want to use EF8 JSON support instead of this
-                        v => JsonConvert.SerializeObject(v),
-                        v => JsonConvert.DeserializeObject<DataSetFileMetaOld>(v));
             });
         }
 

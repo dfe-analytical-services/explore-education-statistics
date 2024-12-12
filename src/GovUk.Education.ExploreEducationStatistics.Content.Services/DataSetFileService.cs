@@ -78,6 +78,8 @@ public class DataSetFileService : IDataSetFileService
             _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
 
         var query = _contentDbContext.ReleaseFiles
+            .Include(rf => rf.File.DataSetFileMeta)
+            .Include(rf => rf.ReleaseVersion.Publication.Theme)
             .AsNoTracking()
             .OfFileType(FileType.Data)
             .HavingNoDataReplacementInProgress()
@@ -89,11 +91,50 @@ public class DataSetFileService : IDataSetFileService
             .HavingLatestPublishedReleaseVersions(latestPublishedReleaseVersions, latestOnly.Value)
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
 
-        var results = await query
+        var firstResult = query
             .OrderBy(sort.Value, sortDirection.Value)
             .Paginate(page: page, pageSize: pageSize)
-            .Select(BuildDataSetFileSummaryViewModel())
-            .ToListAsync(cancellationToken: cancellationToken);
+            .ToList();
+
+        var results = firstResult
+            .Select(
+                result =>
+                new DataSetFileSummaryViewModel
+                {
+                    Id = result.Value.File.DataSetFileId!.Value,
+                    FileId = result.Value.FileId,
+                    Filename = result.Value.File.Filename,
+                    FileSize = result.Value.File.DisplaySize(),
+                    Title = result.Value.Name ?? "",
+                    Content = result.Value.Summary ?? "",
+                    Theme = new IdTitleViewModel
+                    {
+                        Id = result.Value.ReleaseVersion.Publication.ThemeId,
+                        Title = result.Value.ReleaseVersion.Publication.Theme.Title
+                    },
+                    Publication = new IdTitleViewModel
+                    {
+                        Id = result.Value.ReleaseVersion.PublicationId,
+                        Title = result.Value.ReleaseVersion.Publication.Title
+                    },
+                    Release = new IdTitleViewModel
+                    {
+                        Id = result.Value.ReleaseVersionId,
+                        Title = result.Value.ReleaseVersion.Title
+                    },
+                    LatestData = result.Value.ReleaseVersionId ==
+                                 result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
+                    IsSuperseded = result.Value.ReleaseVersion.Publication.SupersededBy != null
+                        && result.Value.ReleaseVersion.Publication.SupersededBy.LatestPublishedReleaseVersionId != null,
+                    Published = result.Value.ReleaseVersion.Published!.Value,
+                    LastUpdated = result.Value.Published!.Value,
+                    Api = BuildDataSetFileApiViewModel(result.Value),
+                    Meta = BuildDataSetFileMetaViewModel(
+                        result.Value.File.DataSetFileMeta,
+                        result.Value.FilterSequence,
+                        result.Value.IndicatorSequence),
+                })
+            .ToList();
 
         return new PaginatedListViewModel<DataSetFileSummaryViewModel>(
             // TODO Remove ChangeSummaryHtmlToText once we do further work to remove all HTML at source
@@ -138,7 +179,7 @@ public class DataSetFileService : IDataSetFileService
                 LastUpdated = result.Value.Published!.Value,
                 Api = BuildDataSetFileApiViewModel(result.Value),
                 Meta = BuildDataSetFileMetaViewModel(
-                    result.Value.File.DataSetFileMetaOld,
+                    result.Value.File.DataSetFileMeta,
                     result.Value.FilterSequence,
                     result.Value.IndicatorSequence),
             };
@@ -199,7 +240,7 @@ public class DataSetFileService : IDataSetFileService
 
         var dataCsvPreview = await GetDataCsvPreview(releaseFile);
 
-        var variables = GetVariables(releaseFile.File.DataSetFileMetaOld!);
+        var variables = GetVariables(releaseFile.File.DataSetFileMeta!);
 
         var footnotes = await _footnoteRepository.GetFootnotes(
             releaseFile.ReleaseVersionId,
@@ -237,7 +278,7 @@ public class DataSetFileService : IDataSetFileService
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
                 Meta = BuildDataSetFileMetaViewModel(
-                    releaseFile.File.DataSetFileMetaOld,
+                    releaseFile.File.DataSetFileMeta,
                     releaseFile.FilterSequence,
                     releaseFile.IndicatorSequence),
                 DataCsvPreview = dataCsvPreview,
@@ -279,7 +320,7 @@ public class DataSetFileService : IDataSetFileService
     }
 
     private static DataSetFileMetaViewModel BuildDataSetFileMetaViewModel(
-        DataSetFileMetaOld? meta,
+        DataSetFileMeta? meta,
         List<FilterSequenceEntry>? filterSequence,
         List<IndicatorGroupSequenceEntry>? indicatorGroupSequence)
     {
@@ -288,11 +329,15 @@ public class DataSetFileService : IDataSetFileService
             throw new InvalidDataException("DataSetMeta should not be null");
         }
 
+        var geographicLevelMetas = meta.GeographicLevels;
+
+        var geographicLevels = geographicLevelMetas.Select(glm => glm.Code).ToList();
+
+        var geographicLevelLabels = geographicLevels.Select(gl => gl.GetEnumLabel()).ToList();
+
         return new DataSetFileMetaViewModel
         {
-            GeographicLevels = meta.GeographicLevels
-                .Select(gl => gl.GetEnumLabel())
-                .ToList(),
+            GeographicLevels = geographicLevelLabels,
             TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
             {
                 From = TimePeriodLabelFormatter.Format(
@@ -346,14 +391,14 @@ public class DataSetFileService : IDataSetFileService
         };
     }
 
-    private List<LabelValue> GetVariables(DataSetFileMetaOld metaOld)
+    private List<LabelValue> GetVariables(DataSetFileMeta meta)
     {
-        var filterVariables = metaOld.Filters
+        var filterVariables = meta.Filters
             .Select(filter => new LabelValue(
                 string.IsNullOrWhiteSpace(filter.Hint) ? filter.Label : $"{filter.Label} - {filter.Hint}",
                 filter.ColumnName))
             .ToList();
-        var indicatorVariables = metaOld.Indicators
+        var indicatorVariables = meta.Indicators
             .Select(indicator => new LabelValue(indicator.Label, indicator.ColumnName));
         return filterVariables.Concat(indicatorVariables)
             .OrderBy(variable => variable.Value)
@@ -361,7 +406,7 @@ public class DataSetFileService : IDataSetFileService
     }
 
     private static List<string> GetOrderedFilters(
-        List<FilterMetaOld> metaFilters, List<FilterSequenceEntry>? filterSequenceEntries)
+        List<FilterMeta> metaFilters, List<FilterSequenceEntry>? filterSequenceEntries)
     {
         var filterSequence = filterSequenceEntries?
             .Select(fs => fs.Id)
@@ -370,13 +415,13 @@ public class DataSetFileService : IDataSetFileService
         var filters = filterSequence == null
             ? metaFilters.OrderBy(f => f.Label)
             : metaFilters
-                .OrderBy(f => Array.IndexOf(filterSequence, f.Id));
+                .OrderBy(f => Array.IndexOf(filterSequence, f.FilterId));
 
         return filters.Select(f => f.Label).ToList();
     }
 
     private static List<string> GetOrderedIndicators(
-        List<IndicatorMetaOld> metaIndicators, List<IndicatorGroupSequenceEntry>? indicatorGroupSequenceEntries)
+        List<IndicatorMeta> metaIndicators, List<IndicatorGroupSequenceEntry>? indicatorGroupSequenceEntries)
     {
         var indicatorSequence = indicatorGroupSequenceEntries?
             .SelectMany(seq => seq.ChildSequence)
@@ -385,7 +430,7 @@ public class DataSetFileService : IDataSetFileService
         var indicators = indicatorSequence == null
             ? metaIndicators.OrderBy(i => i.Label)
             : metaIndicators
-                .OrderBy(i => Array.IndexOf(indicatorSequence, i.Id));
+                .OrderBy(i => Array.IndexOf(indicatorSequence, i.IndicatorId));
 
         return indicators.Select(i => i.Label).ToList();
     }

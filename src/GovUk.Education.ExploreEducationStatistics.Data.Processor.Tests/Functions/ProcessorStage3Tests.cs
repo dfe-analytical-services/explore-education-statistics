@@ -289,28 +289,28 @@ public class ProcessorStage3Tests
                 .Single(f => f.Type == FileType.Data
                              && f.SubjectId == import.File.SubjectId);
 
-            Assert.NotNull(file.DataSetFileMetaOld);
+            Assert.NotNull(file.DataSetFileMeta);
 
             // Checking against contents of small-csv.csv in Resources directory / _subject
-            var geographicLevel = Assert.Single(file.DataSetFileMetaOld.GeographicLevels);
-            Assert.Equal(GeographicLevel.LocalAuthority, geographicLevel);
+            var geographicLevel = Assert.Single(file.DataSetFileMeta.GeographicLevels);
+            Assert.Equal(GeographicLevel.LocalAuthority, geographicLevel.Code);
 
             Assert.Equal(TimeIdentifier.CalendarYear,
-                file.DataSetFileMetaOld.TimePeriodRange.Start.TimeIdentifier);
+                file.DataSetFileMeta.TimePeriodRange.Start.TimeIdentifier);
             Assert.Equal(TimeIdentifier.CalendarYear,
-                file.DataSetFileMetaOld.TimePeriodRange.End.TimeIdentifier);
-            Assert.Equal("2018", file.DataSetFileMetaOld.TimePeriodRange.Start.Period);
-            Assert.Equal("2025", file.DataSetFileMetaOld.TimePeriodRange.End.Period);
+                file.DataSetFileMeta.TimePeriodRange.End.TimeIdentifier);
+            Assert.Equal("2018", file.DataSetFileMeta.TimePeriodRange.Start.Period);
+            Assert.Equal("2025", file.DataSetFileMeta.TimePeriodRange.End.Period);
 
             // Checking against contents of small-csv.meta.csv / _subject
-            file.DataSetFileMetaOld.Filters
+            file.DataSetFileMeta.Filters
                 .Select(f => (f.Label, f.Hint, f.ColumnName)).ToList()
                 .AssertDeepEqualTo([
                     ("Filter one", "Hint 1", "filter_one"),
                     ("Filter two", null, "filter_two")
                 ]);
 
-            file.DataSetFileMetaOld.Indicators
+            file.DataSetFileMeta.Indicators
                 .Select(i => (i.Label, i.ColumnName)).ToList()
                 .AssertDeepEqualTo([
                     ("Indicator one", "indicator_one"),

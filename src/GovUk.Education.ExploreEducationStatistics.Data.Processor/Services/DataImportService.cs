@@ -221,45 +221,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 Indicators = indicators,
             };
 
-            var dataSetFileMetaOld = new DataSetFileMetaOld
-            {
-                GeographicLevels = geographicLevels,
-                TimePeriodRange = new TimePeriodRangeMetaOld
-                {
-                    Start = new TimePeriodRangeBoundMetaOld
-                    {
-                        Period = timePeriods.First().Period,
-                        TimeIdentifier = timePeriods.First().TimeIdentifier,
-                    },
-                    End = new TimePeriodRangeBoundMetaOld
-                    {
-                        Period = timePeriods.Last().Period,
-                        TimeIdentifier = timePeriods.Last().TimeIdentifier,
-                    },
-                },
-                Filters = filters
-                    .Select(f => new FilterMetaOld
-                    {
-                        Id = f.FilterId,
-                        Label = f.Label,
-                        ColumnName = f.ColumnName,
-                        Hint = f.Hint,
-                    }).ToList(),
-                Indicators = indicators
-                    .Select(i => new IndicatorMetaOld
-                    {
-                        Id = i.IndicatorId,
-                        Label = i.Label,
-                        ColumnName = i.ColumnName,
-                    }).ToList(),
-            };
-
-
             var file = contentDbContext.Files
                 .Single(f => f.Type == FileType.Data
                              && f.SubjectId == subjectId);
             file.DataSetFileMeta = dataSetFileMeta;
-            file.DataSetFileMetaOld = dataSetFileMetaOld;
 
             // The in-memory db we use in tests cannot save to the
             // DataSetFileMeta JSON column. So to ensure tests succeed
