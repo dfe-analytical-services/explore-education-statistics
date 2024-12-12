@@ -2990,18 +2990,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             LegacyLinkDescription = "Legacy link new",
                             LegacyLinkUrl = "https://test.com/new"
                         },
-                        new ReleaseSeriesItemUpdateRequest
-                        {
-                            ReleaseId = release2022.Id
-                        },
-                        new ReleaseSeriesItemUpdateRequest
-                        {
-                            ReleaseId = release2020.Id
-                        },
-                        new ReleaseSeriesItemUpdateRequest
-                        {
-                            ReleaseId = release2021.Id
-                        }
+                        new ReleaseSeriesItemUpdateRequest { ReleaseId = release2022.Id },
+                        new ReleaseSeriesItemUpdateRequest { ReleaseId = release2020.Id },
+                        new ReleaseSeriesItemUpdateRequest { ReleaseId = release2021.Id }
                     ]);
 
                 VerifyAllMocks(publicationCacheService);
@@ -3059,7 +3050,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // The publication's latest published release version should be unchanged as 2022 was positioned
                 // as the first release after the legacy link
-                Assert.Equal(release2022.Versions[1].Id, publication.LatestPublishedReleaseVersionId);                
+                Assert.Equal(release2022.Versions[1].Id, actualPublication.LatestPublishedReleaseVersionId);
             }
         }
 
@@ -3123,18 +3114,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publication.Id,
                     updatedReleaseSeriesItems:
                     [
-                        new ReleaseSeriesItemUpdateRequest
-                        {
-                            ReleaseId = release2021.Id
-                        },
-                        new ReleaseSeriesItemUpdateRequest
-                        {
-                            ReleaseId = release2020.Id
-                        },
-                        new ReleaseSeriesItemUpdateRequest
-                        {
-                            ReleaseId = release2022.Id
-                        }
+                        new ReleaseSeriesItemUpdateRequest { ReleaseId = release2021.Id },
+                        new ReleaseSeriesItemUpdateRequest { ReleaseId = release2020.Id },
+                        new ReleaseSeriesItemUpdateRequest { ReleaseId = release2022.Id }
                     ]);
 
                 VerifyAllMocks(publicationCacheService, releaseCacheService);
@@ -3181,7 +3163,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // The latest published version of 2021 should now be the publication's latest published release
                 // version since it was positioned as the first release
-                Assert.Equal(release2022.Versions[1].Id, publication.LatestPublishedReleaseVersionId);                
+                Assert.Equal(expectedLatestPublishedReleaseVersionId,
+                    actualPublication.LatestPublishedReleaseVersionId);
             }
         }
 
@@ -3288,14 +3271,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         publication.Id,
                         updatedReleaseSeriesItems:
                         [
-                            new ReleaseSeriesItemUpdateRequest
-                            {
-                                ReleaseId = release.Id
-                            },
-                            new ReleaseSeriesItemUpdateRequest
-                            {
-                                ReleaseId = release.Id
-                            }
+                            new ReleaseSeriesItemUpdateRequest { ReleaseId = release.Id },
+                            new ReleaseSeriesItemUpdateRequest { ReleaseId = release.Id }
                         ]));
 
                 Assert.Equal($"Missing or duplicate release in new release series. Expected ReleaseIds: {release.Id}",
