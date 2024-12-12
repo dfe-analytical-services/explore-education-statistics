@@ -13,13 +13,13 @@ param alertsGroupName string
 param tagValues object
 
 module alerts '../dynamicMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}MemoryPercentageAlertModule'
+  name: '${name}CpuPercentageAlertModule'
   params: {
-    alertName: '${name}-memory-percentage'
-    resourceIds: [resourceId('Microsoft.Web/serverfarms', name)]
-    resourceType: 'Microsoft.Web/serverfarms'
+    alertName: '${name}-cpu-percentage'
+    resourceIds: [resourceId('Microsoft.App/containerApps', name)]
+    resourceType: 'Microsoft.App/containerApps'
     query: {
-      metric: 'MemoryPercentage'
+      metric: 'CpuPercentage'
       aggregation: 'Average'
       operator: 'GreaterThan'
     }
