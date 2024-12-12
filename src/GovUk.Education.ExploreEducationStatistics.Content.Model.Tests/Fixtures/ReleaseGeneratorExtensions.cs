@@ -97,6 +97,11 @@ public static class ReleaseGeneratorExtensions
         int year)
         => generator.ForInstance(s => s.SetYear(year));
 
+    public static Generator<Release> WithLabel(
+        this Generator<Release> generator,
+        string? label)
+        => generator.ForInstance(s => s.SetLabel(label));
+
     public static InstanceSetters<Release> SetDefaults(
         this InstanceSetters<Release> setters,
         int? year = null)
@@ -234,4 +239,9 @@ public static class ReleaseGeneratorExtensions
         this InstanceSetters<Release> setters,
         int year)
         => setters.Set(p => p.Year, year);
+
+    public static InstanceSetters<Release> SetLabel(
+        this InstanceSetters<Release> setters,
+        string? label)
+        => setters.Set(p => p.Label, label);
 }
