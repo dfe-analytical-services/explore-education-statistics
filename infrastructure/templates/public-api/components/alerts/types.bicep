@@ -79,6 +79,7 @@ type MetricName =
   | 'connections_failed'
   | 'cpu_percent'
   | 'CpuPercentage'
+  | 'CpuUtilization'
   | 'HealthCheckStatus'
   | 'is_db_alive'
   | 'longest_query_time_sec'
