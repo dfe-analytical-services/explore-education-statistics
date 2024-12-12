@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         public async Task<ActionResult<Unit>> AddReleaseRole(Guid userId, UserReleaseRoleCreateRequest request)
         {
             return await _userRoleService
-                .AddReleaseRole(userId, request.ReleaseId, request.ReleaseRole)
+                .AddReleaseRole(userId: userId, releaseId: request.ReleaseId, request.ReleaseRole)
                 .HandleFailuresOrOk();
         }
 

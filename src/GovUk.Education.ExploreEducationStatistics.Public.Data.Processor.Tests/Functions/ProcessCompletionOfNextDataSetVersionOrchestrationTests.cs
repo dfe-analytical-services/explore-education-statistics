@@ -27,7 +27,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionOrchestrationTests
 
             string[] expectedActivitySequence =
             [
-                ActivityNames.UpdateFileStoragePath,
                 ActivityNames.ImportMetadata,
                 ActivityNames.CreateChanges,
                 ActivityNames.ImportData,
@@ -57,10 +56,15 @@ public abstract class ProcessCompletionOfNextDataSetVersionOrchestrationTests
 
             var activitySequence = new MockSequence();
 
+            var mockEntityFeature = new Mock<TaskOrchestrationEntityFeature>(MockBehavior.Strict);
+            mockEntityFeature.SetupLockForActivity(ActivityNames.ImportMetadata);
+            mockOrchestrationContext.SetupGet(context => context.Entities)
+                .Returns(mockEntityFeature.Object);
+                
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.UpdateFileStoragePath,
+                    context.CallActivityAsync(ActivityNames.ImportMetadata,
                         mockOrchestrationContext.Object.InstanceId,
                         null))
                 .Throws<Exception>();

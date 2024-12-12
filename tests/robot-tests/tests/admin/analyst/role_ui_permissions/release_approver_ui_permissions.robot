@@ -23,14 +23,17 @@ Validates release approver publication page is correct
     user waits until page contains link    Releases
     user waits until page contains link    Methodologies
     user waits until page contains link    Team access
-    user waits until page contains link    Legacy releases    # remove as part of EES-3794
+    user waits until page contains link    Release order
 
     user checks page does not contain link    Details
     user checks page does not contain link    Contact
 
-Check cannot create a legacy release
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+Check cannot reorder releases
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
+    user checks page does not contain button    Reorder releases
+
+Check cannot create legacy releases
     user checks page does not contain button    Create legacy release
 
 Check cannot create a Methodology for a Publication if they don't have Publication Owner role

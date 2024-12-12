@@ -36,10 +36,10 @@ describe('TimePeriodDataTable', () => {
 
     const table = screen.getByRole('table');
 
-    expect(table.querySelectorAll('thead tr')).toHaveLength(2);
-    expect(table.querySelectorAll('thead th')).toHaveLength(6);
+    expect(table.querySelectorAll('thead tr')).toHaveLength(3);
+    expect(table.querySelectorAll('thead th')).toHaveLength(7);
     expect(table.querySelectorAll('thead th[scope="colgroup"]')).toHaveLength(
-      2,
+      3,
     );
     expect(table.querySelectorAll('thead th[scope="col"]')).toHaveLength(4);
 
@@ -90,10 +90,10 @@ describe('TimePeriodDataTable', () => {
 
     const table = screen.getByRole('table');
 
-    expect(table.querySelectorAll('thead tr')).toHaveLength(2);
-    expect(table.querySelectorAll('thead th')).toHaveLength(6);
+    expect(table.querySelectorAll('thead tr')).toHaveLength(3);
+    expect(table.querySelectorAll('thead th')).toHaveLength(7);
     expect(table.querySelectorAll('thead th[scope="colgroup"]')).toHaveLength(
-      2,
+      3,
     );
     expect(table.querySelectorAll('thead th[scope="col"]')).toHaveLength(4);
 
@@ -144,10 +144,10 @@ describe('TimePeriodDataTable', () => {
 
     const table = screen.getByRole('table');
 
-    expect(table.querySelectorAll('thead tr')).toHaveLength(1);
-    expect(table.querySelectorAll('thead th')).toHaveLength(2);
+    expect(table.querySelectorAll('thead tr')).toHaveLength(2);
+    expect(table.querySelectorAll('thead th')).toHaveLength(3);
     expect(table.querySelectorAll('thead th[scope="colgroup"]')).toHaveLength(
-      0,
+      1,
     );
     expect(table.querySelectorAll('thead th[scope="col"]')).toHaveLength(2);
 
@@ -317,10 +317,10 @@ describe('TimePeriodDataTable', () => {
 
     const table = screen.getByRole('table');
 
-    expect(table.querySelectorAll('thead tr')).toHaveLength(1);
-    expect(table.querySelectorAll('thead th')).toHaveLength(1);
+    expect(table.querySelectorAll('thead tr')).toHaveLength(2);
+    expect(table.querySelectorAll('thead th')).toHaveLength(2);
     expect(table.querySelectorAll('thead th[scope="colgroup"]')).toHaveLength(
-      0,
+      1,
     );
     expect(table.querySelectorAll('thead th[scope="col"]')).toHaveLength(1);
     expect(table.querySelector('thead th[scope="col"]')).toHaveTextContent(
@@ -1450,9 +1450,9 @@ describe('TimePeriodDataTable', () => {
     expect(table.querySelectorAll('thead th[scope="col"]')).toHaveLength(3);
 
     expect(table.querySelectorAll('tbody tr')).toHaveLength(6);
-    expect(table.querySelectorAll('tbody th')).toHaveLength(11);
+    expect(table.querySelectorAll('tbody th')).toHaveLength(13);
     expect(table.querySelectorAll('tbody th[scope="rowgroup"]')).toHaveLength(
-      5,
+      7,
     );
     expect(table.querySelectorAll('tbody th[scope="row"]')).toHaveLength(6);
 
@@ -1526,10 +1526,10 @@ describe('TimePeriodDataTable', () => {
 
     const table = screen.getByRole('table');
 
-    expect(table.querySelectorAll('thead tr')).toHaveLength(2);
-    expect(table.querySelectorAll('thead th')).toHaveLength(6);
+    expect(table.querySelectorAll('thead tr')).toHaveLength(3);
+    expect(table.querySelectorAll('thead th')).toHaveLength(7);
     expect(table.querySelectorAll('thead th[scope="colgroup"]')).toHaveLength(
-      2,
+      3,
     );
     expect(table.querySelectorAll('thead th[scope="col"]')).toHaveLength(4);
 

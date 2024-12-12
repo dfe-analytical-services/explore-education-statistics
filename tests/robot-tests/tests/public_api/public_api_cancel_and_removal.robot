@@ -99,7 +99,7 @@ Click on 'cancel' button while attempting to remove draft API data set
     user clicks button    Cancel    ${modal}
     user waits until h2 is visible    API data sets
 
-Verify the contents inside the 'Draft API data sets' table
+Verify the contents inside the 'Draft API data sets' table again
     user waits until h3 is visible    Draft API data sets
 
     user checks table column heading contains    1    1    Draft version    testid:draft-api-data-sets

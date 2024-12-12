@@ -1,5 +1,5 @@
 import { abbreviations } from 'abbreviations.bicep'
-import { FirewallRule, PrincipalNameAndId, StaticWebAppSku } from 'types.bicep'
+import { IpRange, PrincipalNameAndId, StaticWebAppSku } from 'types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -10,8 +10,8 @@ param location string = resourceGroup().location
 @description('Public API Storage : Size of the file share in GB.')
 param publicApiDataFileShareQuota int = 1
 
-@description('Public API Storage : Firewall rules.')
-param storageFirewallRules FirewallRule[] = []
+@description('Provides access to resources for specific IP address ranges used for service maintenance.')
+param maintenanceIpRanges IpRange[] = []
 
 @description('Database : administrator login name.')
 @minLength(0)
@@ -35,9 +35,6 @@ param postgreSqlStorageSizeGB int = 32
 
 @description('Database : Azure Database for PostgreSQL Autogrow setting.')
 param postgreSqlAutoGrowStatus string = 'Disabled'
-
-@description('Database : Firewall rules.')
-param postgreSqlFirewallRules FirewallRule[] = []
 
 @description('Database : Entra ID admin  principal names for this resource')
 param postgreSqlEntraIdAdminPrincipals PrincipalNameAndId[] = []
@@ -67,13 +64,21 @@ param dateProvisioned string = utcNow('u')
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string = ''
 
-@description('Can we deploy the Container App yet? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.')
-param deployContainerApp bool = true
+@description('Do the shared Private DNS Zones need creating or updating?')
+param deploySharedPrivateDnsZones bool = false
 
 // TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL
 // will redeploy even if no changes exist in this deploy from the previous one.
 @description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
-param updatePsqlFlexibleServer bool = false
+param deployPsqlFlexibleServer bool = false
+
+@description('Does the Public API Container App need creating or updating? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.')
+param deployContainerApp bool = true
+
+@description('Does the Data Processor need creating or updating?')
+param deployDataProcessor bool = true
+
+param deployAlerts bool = false
 
 @description('Public URLs of other components in the service.')
 param publicUrls {
@@ -90,6 +95,14 @@ param dataProcessorAppRegistrationClientId string = ''
 
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the API Container App.')
 param apiAppRegistrationClientId string = ''
+
+@description('Specifies the principal id of the Azure DevOps SPN.')
+@secure()
+param devopsServicePrincipalId string = ''
+
+// TODO EES-5446 - reinstate pipelineRunnerCidr when the DevOps runners have a static IP range available. 
+// @description('Specifies the IP address range of the pipeline runners.')
+// param pipelineRunnerCidr string = ''
 
 @description('Specifies whether or not test Themes can be deleted in the environment.')
 param enableThemeDeletion bool = false
@@ -149,10 +162,17 @@ var resourceNames = {
     dataProcessorPlan: '${publicApiResourcePrefix}-${abbreviations.webServerFarms}-${abbreviations.webSitesFunctions}-processor'
     dataProcessorStorageAccountsPrefix: '${subscription}eessaprocessor'
     docsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
-    publicApiFileshare: '${publicApiResourcePrefix}-fs-data'
+    publicApiFileShare: '${publicApiResourcePrefix}-fs-data'
     publicApiStorageAccount: '${replace(publicApiResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}'
   }
 }
+
+var maintenanceFirewallRules = [for maintenanceIpRange in maintenanceIpRanges: {
+  name: maintenanceIpRange.name
+  cidr: maintenanceIpRange.cidr
+  tag: 'Default'
+  priority: 100
+}]
 
 module vNetModule 'application/shared/virtualNetwork.bicep' = {
   name: 'virtualNetworkApplicationModuleDeploy'
@@ -168,7 +188,8 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
-module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = {
+module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = 
+  if (deploySharedPrivateDnsZones) {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
@@ -182,7 +203,8 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
     location: location
     resourceNames: resourceNames
     publicApiDataFileShareQuota: publicApiDataFileShareQuota
-    storageFirewallRules: storageFirewallRules
+    storageFirewallRules: maintenanceIpRanges
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }
@@ -205,7 +227,7 @@ module logAnalyticsWorkspaceModule 'application/shared/logAnalyticsWorkspace.bic
   }
 }
 
-module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep' = if (updatePsqlFlexibleServer) {
+module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep' = if (deployPsqlFlexibleServer) {
   name: 'postgreSqlFlexibleServerApplicationModuleDeploy'
   params: {
     location: location
@@ -215,9 +237,10 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     entraIdAdminPrincipals: postgreSqlEntraIdAdminPrincipals
     privateEndpointSubnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
     autoGrowStatus: postgreSqlAutoGrowStatus
-    firewallRules: postgreSqlFirewallRules
+    firewallRules: maintenanceIpRanges
     sku: postgreSqlSkuName
     storageSizeGB: postgreSqlStorageSizeGB
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
   dependsOn: [
@@ -262,6 +285,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     publicSiteUrl: publicUrls.publicSite
     dockerImagesTag: dockerImagesTag
     appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
   dependsOn: [
@@ -356,20 +380,42 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
         ]
       }
     ]
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }
 
-module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = {
+module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = if (deployDataProcessor) {
   name: 'publicApiDataProcessorApplicationModuleDeploy'
   params: {
     location: location
     resourceNames: resourceNames
-    metricsNamePrefix: '${subscription}PublicDataProcessor'
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
-    storageFirewallRules: storageFirewallRules
+    devopsServicePrincipalId: devopsServicePrincipalId
+    storageFirewallRules: maintenanceIpRanges
+    functionAppFirewallRules: union([
+      {
+        name: 'Admin App Service subnet range'
+        cidr: vNetModule.outputs.adminAppServiceSubnetCidr
+        tag: 'Default'
+        priority: 100
+      }
+      // TODO EES-5446 - remove service tag whitelisting when runner scale set IP range reinstated 
+      {
+        cidr: 'AzureCloud'
+        tag: 'ServiceTag'
+        priority: 101
+        name: 'AzureCloud'
+      }
+      // TODO EES-5446 - reinstate when static IP range available for runner scale sets
+      // {
+      //   name: 'Pipeline runner IP address range'
+      //   cidr: pipelineRunnerCidr
+      // }
+    ], maintenanceFirewallRules)
     dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
   dependsOn: [
@@ -380,11 +426,23 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
 
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
-output dataProcessorFunctionAppManagedIdentityClientId string = dataProcessorModule.outputs.managedIdentityClientId
+
+output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor 
+  ? dataProcessorModule.outputs.managedIdentityClientId
+  : ''
+
+output dataProcessorFunctionAppUrl string = deployDataProcessor
+  ? dataProcessorModule.outputs.url
+  : ''
+output dataProcessorFunctionAppStagingUrl string = deployDataProcessor
+  ? dataProcessorModule.outputs.stagingUrl
+  : ''
+
+output dataProcessorPublicApiDataFileShareMountPath string = deployDataProcessor
+  ? dataProcessorModule.outputs.publicApiDataFileShareMountPath
+  : ''
 
 output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreStorageConnectionStringSecretKey
 output keyVaultName string = resourceNames.existingResources.keyVault
-
-output dataProcessorPublicApiDataFileShareMountPath string = dataProcessorModule.outputs.publicApiDataFileShareMountPath
 
 output enableThemeDeletion bool = enableThemeDeletion

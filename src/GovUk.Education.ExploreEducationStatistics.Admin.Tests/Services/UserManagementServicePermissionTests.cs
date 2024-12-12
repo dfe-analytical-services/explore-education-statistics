@@ -19,12 +19,10 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminM
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
-using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class UserManagementServicePermissionTest
+    public class UserManagementServicePermissionTests
     {
         [Fact]
         public async Task ListAllUsers()
@@ -130,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             public async Task Success()
             {
                 await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
-                contentDbContext.Users.Add(new User { Email = "ees-test.user@education.gov.uk"} );
+                contentDbContext.Users.Add(new User { Email = "ees-test.user@education.gov.uk" });
                 await contentDbContext.SaveChangesAsync();
 
                 await PolicyCheckBuilder<SecurityPolicies>()
@@ -154,14 +152,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             UsersAndRolesDbContext? usersAndRolesDbContext = null,
             IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
             IEmailTemplateService? emailTemplateService = null,
-            IReleaseVersionRepository? releaseVersionRepository = null,
             IUserRoleService? userRoleService = null,
             IUserService? userService = null,
             IUserInviteRepository? userInviteRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             IUserPublicationInviteRepository? userPublicationInviteRepository = null,
-            UserManager<ApplicationUser>? userManager = null,
-            bool enableDeletion = false)
+            UserManager<ApplicationUser>? userManager = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -171,7 +167,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
                 emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
-                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
                 userRoleService ?? Mock.Of<IUserRoleService>(Strict),
                 userService ?? AlwaysTrueUserService().Object,
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),

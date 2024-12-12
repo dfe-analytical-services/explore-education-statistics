@@ -393,11 +393,12 @@ public class ReleaseVersionRepositoryTests
             var result = await repository.ListLatestPublishedReleaseVersionIds(publications[0].Id);
 
             // Expect the result to contain the highest published version of each release for the specified publication
-            AssertIdsAreEqualIgnoringOrder(new[]
-            {
-                publications[0].ReleaseVersions[2].Id,
-                publications[0].ReleaseVersions[5].Id
-            }, result);
+            AssertIdsAreEqualIgnoringOrder(
+                [
+                    publications[0].ReleaseVersions[2].Id,
+                    publications[0].ReleaseVersions[5].Id
+                ],
+                result);
         }
 
         [Fact]
@@ -479,11 +480,12 @@ public class ReleaseVersionRepositoryTests
             var result = await repository.ListLatestPublishedReleaseVersions(publications[0].Id);
 
             // Expect the result to contain the highest published version of each release for the specified publication
-            AssertIdsAreEqualIgnoringOrder(new[]
-            {
-                publications[0].ReleaseVersions[2].Id,
-                publications[0].ReleaseVersions[5].Id
-            }, result);
+            AssertIdsAreEqualIgnoringOrder(
+                [
+                    publications[0].ReleaseVersions[2].Id,
+                    publications[0].ReleaseVersions[5].Id
+                ],
+                result);
         }
 
         [Fact]
@@ -567,12 +569,13 @@ public class ReleaseVersionRepositoryTests
             var result = await repository.ListLatestReleaseVersionIds(publications[0].Id);
 
             // Expect the result to contain the highest version of each release for the specified publication
-            AssertIdsAreEqualIgnoringOrder(new[]
-            {
-                publications[0].ReleaseVersions[0].Id,
-                publications[0].ReleaseVersions[3].Id,
-                publications[0].ReleaseVersions[5].Id
-            }, result);
+            AssertIdsAreEqualIgnoringOrder(
+                [
+                    publications[0].ReleaseVersions[0].Id,
+                    publications[0].ReleaseVersions[3].Id,
+                    publications[0].ReleaseVersions[5].Id
+                ],
+                result);
         }
 
         [Fact]
@@ -611,136 +614,16 @@ public class ReleaseVersionRepositoryTests
         }
     }
 
-    public class ListLatestReleaseVersionsTests : ReleaseVersionRepositoryTests
-    {
-        [Fact]
-        public async Task AllPublications_Success()
-        {
-            var publications = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => ListOf<Release>(
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2)))
-                .GenerateList(2);
-
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            var result = await repository.ListLatestReleaseVersions();
-
-            // Expect the result to contain the highest version of each release for each publication
-            AssertIdsAreEqualIgnoringOrder(new[]
-            {
-                publications[0].ReleaseVersions[0].Id,
-                publications[0].ReleaseVersions[3].Id,
-                publications[0].ReleaseVersions[5].Id,
-                publications[1].ReleaseVersions[0].Id,
-                publications[1].ReleaseVersions[3].Id,
-                publications[1].ReleaseVersions[5].Id
-            }, result);
-        }
-
-        [Fact]
-        public async Task AllPublications_PublicationsHaveNoReleaseVersions_ReturnsEmpty()
-        {
-            var publications = _dataFixture
-                .DefaultPublication()
-                .GenerateList(2);
-
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Empty(await repository.ListLatestReleaseVersions());
-        }
-
-        [Fact]
-        public async Task AllPublications_NoPublicationsExist_ReturnsEmpty()
-        {
-            await using var contentDbContext = InMemoryContentDbContext();
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Empty(await repository.ListLatestReleaseVersions());
-        }
-
-        [Fact]
-        public async Task SpecificPublication_Success()
-        {
-            var publications = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => ListOf<Release>(
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2)))
-                .GenerateList(2);
-
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            var result = await repository.ListLatestReleaseVersions(publications[0].Id);
-
-            // Expect the result to contain the highest version of each release for the specified publication
-            AssertIdsAreEqualIgnoringOrder(new[]
-            {
-                publications[0].ReleaseVersions[0].Id,
-                publications[0].ReleaseVersions[3].Id,
-                publications[0].ReleaseVersions[5].Id
-            }, result);
-        }
-
-        [Fact]
-        public async Task SpecificPublication_PublicationHasNoReleaseVersions_ReturnsEmpty()
-        {
-            var publications = _dataFixture
-                .DefaultPublication()
-                // Index 0 has no release versions
-                // Index 1 has a published release version
-                .ForIndex(1, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1)))
-                .GenerateList(2);
-
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Empty(await repository.ListLatestReleaseVersions(publications[0].Id));
-        }
-
-        [Fact]
-        public async Task SpecificPublication_PublicationDoesNotExist_ReturnsEmpty()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
-
-            var contextId = await AddTestData(publication);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Empty(await repository.ListLatestReleaseVersions(Guid.NewGuid()));
-        }
-    }
-
-    private static void AssertIdsAreEqualIgnoringOrder(IReadOnlyCollection<Guid> expectedIds,
+    private static void AssertIdsAreEqualIgnoringOrder(
+        IReadOnlyCollection<Guid> expectedIds,
         IReadOnlyCollection<ReleaseVersion> actualReleaseVersions)
     {
         Assert.Equal(expectedIds.Count, actualReleaseVersions.Count);
         Assert.True(SequencesAreEqualIgnoringOrder(expectedIds, actualReleaseVersions.Select(rv => rv.Id)));
     }
 
-    private static void AssertIdsAreEqualIgnoringOrder(IReadOnlyCollection<Guid> expectedIds,
+    private static void AssertIdsAreEqualIgnoringOrder(
+        IReadOnlyCollection<Guid> expectedIds,
         IReadOnlyCollection<Guid> actualIds)
     {
         Assert.Equal(expectedIds.Count, actualIds.Count);

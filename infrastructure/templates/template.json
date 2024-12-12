@@ -1197,7 +1197,10 @@
       "[concat('Microsoft.Web/sites/', variables('importerAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('contentAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('dataAppName'))]"
-    ]
+    ],
+    "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
+    "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-fs-data')]",
+    "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]"
   },
   "resources": [
     {
@@ -3272,6 +3275,7 @@
         "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "AzureWebJobs.StageScheduledReleaseVersionsImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
         "AzureWebJobs.PublishStagedReleaseVersionContentImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
+        "WEBSITE_CONTENTOVERVNET": "1",
         "WEBSITE_TIME_ZONE": "[parameters('timeZone')]",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "FUNCTIONS_EXTENSION_VERSION": "~4",
@@ -3283,7 +3287,28 @@
         "App:NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App:PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "App:PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "DataFiles:BasePath": "[variables('publicDataFileShareMountPathWindows')]",
         "PublicDataDbExists": "[parameters('publicDataDbExists')]"
+      }
+    },
+    {
+      "condition": "[parameters('publicDataDbExists')]",
+      "name": "[concat(variables('publisherAppName'), '/azurestorageaccounts')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
+      ],
+      "properties": {
+        "[variables('publicDataFileShareName')]": {
+          "type": "AzureFiles",
+          "accountName": "[variables('publicDataStorageAccountName')]",
+          "accessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicDataStorageAccountName')), '2018-02-01').keys[0].value]",
+          "shareName": "[variables('publicDataFileShareName')]",
+          "mountPath": "[variables('publicDataFileShareMountPathWindows')]",
+          "protocol": "Smb"
+        }
       }
     },
     {
@@ -4008,6 +4033,12 @@
               },
               "secretName": "ees-alerts-slackapptoken"
             }
+          },
+          "subscription": {
+            "value": "[parameters('subscription')]"
+          },
+          "resourceGroup": {
+            "value": "[resourceGroup().name]"
           }
         }
       },

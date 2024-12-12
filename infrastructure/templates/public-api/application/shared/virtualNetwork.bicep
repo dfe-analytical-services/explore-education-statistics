@@ -83,6 +83,9 @@ output adminAppServiceSubnetStartIpAddress string = parseCidr(adminSubnet.proper
 @description('The last usable IP address for the Admin App Service Subnet.')
 output adminAppServiceSubnetEndIpAddress string = parseCidr(adminSubnet.properties.addressPrefix).lastUsable
 
+@description('The IP address range for the Admin App Service Subnet.')
+output adminAppServiceSubnetCidr string = adminSubnet.properties.addressPrefix
+
 @description('The first usable IP address for the Publisher Function App Subnet.')
 output publisherFunctionAppSubnetStartIpAddress string = parseCidr(publisherSubnet.properties.addressPrefix).firstUsable
 

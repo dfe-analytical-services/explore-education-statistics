@@ -39,7 +39,6 @@ export interface Publication {
 }
 
 export interface ReleaseSeriesItem {
-  id: string;
   isLegacyLink: boolean;
   description: string;
   releaseId?: string;

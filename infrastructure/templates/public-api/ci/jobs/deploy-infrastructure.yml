@@ -35,9 +35,12 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                deployContainerApp: true
-                updatePsqlFlexibleServer: false
-                dataProcessorExists: true
+                deploySharedPrivateDnsZones: false
+                deployPsqlFlexibleServer: false
+                deployContainerApp: false
+                deployDataProcessor: false
+                deployAlerts: false
+                dataProcessorExists: false
 
             - task: AzureCLI@2
               displayName: Check if Data Processor Function App exists
@@ -61,8 +64,11 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deploySharedPrivateDnsZones: $(deploySharedPrivateDnsZones)
+                deployPsqlFlexibleServer: $(deployPsqlFlexibleServer)
                 deployContainerApp: $(deployContainerApp)
-                updatePsqlFlexibleServer: $(updatePsqlFlexibleServer)
+                deployDataProcessor: $(deployDataProcessor)
+                deployAlerts: $(deployAlerts)
                 dataProcessorExists: $(dataProcessorExists)
 
            # - template: ../tasks/assign-app-role-to-service-principal.yml

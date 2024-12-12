@@ -10,9 +10,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -33,6 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class UserRoleServiceTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         private readonly User _user = new()
         {
             Id = Guid.NewGuid(),
@@ -744,10 +748,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = userId.ToString()
             };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication()
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -755,10 +760,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await userAndRolesDbContext.AddAsync(user);
+                userAndRolesDbContext.Users.Add(user);
                 await userAndRolesDbContext.SaveChangesAsync();
 
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -774,7 +779,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userManager
                 .Setup(s => s.GetRolesAsync(ItIsUser(user)))
-                .ReturnsAsync(ListOf(RoleNames.Analyst));
+                .ReturnsAsync([RoleNames.Analyst]);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -784,19 +789,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     emailTemplateService: emailTemplateService.Object,
                     userManager: userManager.Object);
 
-                var result = await service.AddReleaseRole(userId: userId,
-                    releaseVersionId: releaseVersion.Id,
+                var result = await service.AddReleaseRole(
+                    userId: userId,
+                    releaseId: release.Id,
                     Contributor);
 
                 VerifyAllMocks(emailTemplateService, userManager);
 
                 result.AssertRight();
-
-                emailTemplateService.Verify(mock =>
-                        mock.SendReleaseRoleEmail(user.Email,
-                            It.Is<ReleaseVersion>(p => p.Id == releaseVersion.Id),
-                            Contributor),
-                    Times.Once);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -825,10 +825,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = userId.ToString()
             };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication()
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
 
             var userReleaseRole = new UserReleaseRole
             {
@@ -844,10 +845,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await userAndRolesDbContext.AddAsync(user);
+                userAndRolesDbContext.Users.Add(user);
                 await userAndRolesDbContext.SaveChangesAsync();
 
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.Publications.Add(publication);
                 contentDbContext.UserReleaseRoles.Add(userReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -858,8 +859,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext);
 
-                var result = await service.AddReleaseRole(userId: userId,
-                    releaseVersionId: releaseVersion.Id,
+                var result = await service.AddReleaseRole(
+                    userId: userId,
+                    releaseId: release.Id,
                     Contributor);
 
                 result.AssertBadRequest(UserAlreadyHasResourceRole);
@@ -884,28 +886,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task AddReleaseRole_NoUser()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication()
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            var release = publication.Releases.Single();
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext);
 
-                var result = await service.AddReleaseRole(userId: Guid.NewGuid(),
-                    releaseVersionId: releaseVersion.Id,
+                var result = await service.AddReleaseRole(
+                    userId: Guid.NewGuid(),
+                    releaseId: release.Id,
                     Contributor);
 
                 result.AssertNotFound();
@@ -936,7 +938,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                await userAndRolesDbContext.AddAsync(user);
+                userAndRolesDbContext.Users.Add(user);
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
@@ -946,7 +948,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext);
 
-                var result = await service.AddReleaseRole(userId, Guid.NewGuid(), Contributor);
+                var result = await service.AddReleaseRole(
+                    userId: userId,
+                    releaseId: Guid.NewGuid(),
+                    Contributor);
 
                 result.AssertNotFound();
             }
@@ -971,10 +976,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = userId.ToString()
             };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication()
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -982,10 +988,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await userAndRolesDbContext.AddAsync(user);
+                userAndRolesDbContext.Users.Add(user);
                 await userAndRolesDbContext.SaveChangesAsync();
 
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1001,7 +1007,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userManager
                 .Setup(s => s.GetRolesAsync(ItIsUser(user)))
-                .ReturnsAsync(new List<string>());
+                .ReturnsAsync([]);
 
             userManager
                 .Setup(s => s.AddToRoleAsync(ItIsUser(user), RoleNames.Analyst))
@@ -1016,15 +1022,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     emailTemplateService: emailTemplateService.Object,
                     userManager: userManager.Object);
 
-                var result = await service.AddReleaseRole(userId: userId,
-                    releaseVersionId: releaseVersion.Id,
+                var result = await service.AddReleaseRole(
+                    userId: userId,
+                    releaseId: release.Id,
                     Contributor);
 
-                emailTemplateService.Verify(mock =>
-                        mock.SendReleaseRoleEmail(user.Email,
-                            It.Is<ReleaseVersion>(p => p.Id == releaseVersion.Id),
-                            Contributor),
-                    Times.Once);
                 VerifyAllMocks(emailTemplateService, userManager);
 
                 result.AssertRight();
@@ -1056,10 +1058,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = userId.ToString()
             };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication()
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1067,10 +1070,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await userAndRolesDbContext.AddAsync(user);
+                userAndRolesDbContext.Users.Add(user);
                 await userAndRolesDbContext.SaveChangesAsync();
 
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1108,17 +1111,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     emailTemplateService: emailTemplateService.Object,
                     userManager: userManager.Object);
 
-                var result = await service.AddReleaseRole(userId: userId,
-                    releaseVersionId: releaseVersion.Id,
+                var result = await service.AddReleaseRole(
+                    userId: userId,
+                    releaseId: release.Id,
                     Contributor);
 
                 VerifyAllMocks(emailTemplateService, userManager);
-
-                emailTemplateService.Verify(mock =>
-                        mock.SendReleaseRoleEmail(user.Email,
-                            It.Is<ReleaseVersion>(p => p.Id == releaseVersion.Id),
-                            Contributor),
-                    Times.Once);
 
                 result.AssertRight();
             }
@@ -1149,10 +1147,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = userId.ToString()
             };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication()
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1160,10 +1159,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await userAndRolesDbContext.AddAsync(user);
+                userAndRolesDbContext.Users.Add(user);
                 await userAndRolesDbContext.SaveChangesAsync();
 
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1192,8 +1191,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     emailTemplateService: emailTemplateService.Object,
                     userManager: userManager.Object);
 
-                var result = await service.AddReleaseRole(userId: userId,
-                    releaseVersionId: releaseVersion.Id,
+                var result = await service.AddReleaseRole(
+                    userId: userId,
+                    releaseId: release.Id,
                     Contributor);
 
                 emailTemplateService.Verify(mock =>

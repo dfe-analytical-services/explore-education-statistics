@@ -100,8 +100,6 @@ public class PublicationService : IPublicationService
                         {
                             return new ReleaseSeriesItemViewModel
                             {
-                                Id = rsi.Id,
-                                IsLegacyLink = rsi.IsLegacyLink,
                                 Description = rsi.LegacyLinkDescription!,
                                 LegacyLinkUrl = rsi.LegacyLinkUrl,
                             };
@@ -112,10 +110,7 @@ public class PublicationService : IPublicationService
 
                         return new ReleaseSeriesItemViewModel
                         {
-                            Id = rsi.Id,
-                            IsLegacyLink = rsi.IsLegacyLink,
                             Description = latestReleaseVersion.Title,
-
                             ReleaseId = latestReleaseVersion.ReleaseId,
                             ReleaseSlug = latestReleaseVersion.Slug,
                         };

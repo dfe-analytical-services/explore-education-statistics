@@ -1,11 +1,17 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using AngleSharp.Io;
 using Dapper;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Migrations;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Interfaces;
@@ -26,10 +32,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using RequestTimeoutOptions = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options.RequestTimeoutOptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
@@ -191,7 +193,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Services
 
         services.AddFluentValidation();
-        services.AddValidatorsFromAssembly(typeof(DataSetGetQueryLocations.Validator).Assembly); // Adds *all* validators from Public.Data.Requests
+        services.AddValidatorsFromAssembly(typeof(DataSetGetQueryLocations.Validator)
+            .Assembly); // Adds *all* validators from Public.Data.Requests
         services.AddFluentValidationRulesToSwagger();
 
         services.AddHttpClient<IContentApiClient, ContentApiClient>((provider, httpClient) =>
@@ -219,12 +222,15 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetIndicatorRepository, ParquetIndicatorRepository>();
         services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
+
+        // TODO EES-5660 - remove this migration after it has been run against each Public API-enabled environment.
+        services.AddScoped<ICustomMigration, EES5660_MigrateDraftDataSetVersionFolderNames>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        UpdateDatabase(app);
+        UpdateDatabase(app, env);
 
         if (_miniProfilerOptions.Enabled)
         {
@@ -279,7 +285,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         app.UseHealthChecks("/health");
     }
 
-    private static void UpdateDatabase(IApplicationBuilder app)
+    private static void UpdateDatabase(IApplicationBuilder app, IHostEnvironment env)
     {
         using var serviceScope = app.ApplicationServices
             .GetRequiredService<IServiceScopeFactory>()
@@ -289,5 +295,21 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         context.Database.SetCommandTimeout(300);
         context.Database.Migrate();
+
+        if (!env.IsIntegrationTest())
+        {
+            ApplyCustomMigrations(app);
+        }
+    }
+
+    private static void ApplyCustomMigrations(IApplicationBuilder app)
+    {
+        using var serviceScope = app.ApplicationServices
+            .GetRequiredService<IServiceScopeFactory>()
+            .CreateScope();
+
+        var migrations = serviceScope.ServiceProvider.GetServices<ICustomMigration>();
+
+        migrations.ForEach(migration => migration.Apply());
     }
 }

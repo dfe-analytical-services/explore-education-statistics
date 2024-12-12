@@ -44,6 +44,12 @@ const testTimePeriod2 = new TimePeriodFilter({
   code: 'AY',
   order: 1,
 });
+const testFilterGroup1 = new CategoryFilter({
+  value: 'Filter Group 1 (level: 0)',
+  label: 'Filter Group 1',
+  group: undefined,
+  category: 'Category 1',
+});
 const testCategory1Group1Filter1 = new CategoryFilter({
   value: 'filter-1',
   label: 'Filter 1',
@@ -88,17 +94,6 @@ const testCategory3Group2Filter7 = new CategoryFilter({
 });
 
 describe('optimizeFilters', () => {
-  test('returns the filters unchanged when there are no groups to add or single headers to remove', () => {
-    const testFilters: Filter[] = [testLocationFilter1, testTimePeriod1];
-    const testHeaderConfig: Filter[][] = [
-      [testLocationFilter1, testLocationFilter2],
-      [testTimePeriod1, testTimePeriod2],
-    ];
-
-    const result = optimizeFilters(testFilters, testHeaderConfig);
-    expect(result).toEqual(testFilters);
-  });
-
   test('removes the last filter when there are zero filters in the last header array', () => {
     const testFilters: Filter[] = [testLocationFilter1, testTimePeriod1];
     const testHeaderConfig: Filter[][] = [
@@ -107,7 +102,10 @@ describe('optimizeFilters', () => {
     ];
 
     const result = optimizeFilters(testFilters, testHeaderConfig);
-    expect(result).toEqual([testLocationFilter1]);
+    expect(result).toEqual([
+      new FilterGroup('North East', 0),
+      testLocationFilter1,
+    ]);
   });
 
   test('removes the last filter when there is only one filter in the last header array', () => {
@@ -118,7 +116,10 @@ describe('optimizeFilters', () => {
     ];
 
     const result = optimizeFilters(testFilters, testHeaderConfig);
-    expect(result).toEqual([testLocationFilter1]);
+    expect(result).toEqual([
+      new FilterGroup('North East', 0),
+      testLocationFilter1,
+    ]);
   });
 
   test('adds FilterGroup when groups with different labels in 1 level are not `Default`', () => {
@@ -249,7 +250,11 @@ describe('optimizeFilters', () => {
     ];
 
     const result = optimizeFilters(testFilters, testHeaderConfig);
-    expect(result).toEqual([testCategory1Group1Filter1, testTimePeriod1]);
+    expect(result).toEqual([
+      new FilterGroup('Filter Group 1', 0),
+      testCategory1Group1Filter1,
+      testTimePeriod1,
+    ]);
   });
 
   test('does not add FilterGroups when groups across 1 level have same labels that are not `Default`', () => {
@@ -261,7 +266,11 @@ describe('optimizeFilters', () => {
     ];
 
     const result = optimizeFilters(testFilters, testHeaderConfig);
-    expect(result).toEqual([testCategory1Group1Filter1, testTimePeriod1]);
+    expect(result).toEqual([
+      new FilterGroup('Filter Group 1', 0),
+      testCategory1Group1Filter1,
+      testTimePeriod1,
+    ]);
   });
 
   test('does not add FilterGroups when groups across 2 adjacent levels have same labels that are not `Default`', () => {
@@ -280,7 +289,9 @@ describe('optimizeFilters', () => {
 
     const result = optimizeFilters(testFilters, testHeaderConfig);
     expect(result).toEqual([
+      new FilterGroup('Filter Group 1', 0),
       testCategory1Group1Filter2,
+      new FilterGroup('Filter Group 2', 1),
       testCategory3Group2Filter7,
       testTimePeriod2,
     ]);
@@ -288,6 +299,7 @@ describe('optimizeFilters', () => {
 
   test('does not add FilterGroups when groups across 2 non-adjacent levels have same labels that are not `Default`', () => {
     const testFilters: Filter[] = [
+      testFilterGroup1,
       testCategory1Group1Filter1,
       testTimePeriod1,
       testCategory3Group1Filter5,
@@ -302,8 +314,11 @@ describe('optimizeFilters', () => {
 
     const result = optimizeFilters(testFilters, testHeaderConfig);
     expect(result).toEqual([
+      testFilterGroup1,
+      new FilterGroup('Filter Group 1', 1),
       testCategory1Group1Filter1,
       testTimePeriod1,
+      new FilterGroup('Filter Group 1', 3),
       testCategory3Group1Filter5,
     ]);
   });

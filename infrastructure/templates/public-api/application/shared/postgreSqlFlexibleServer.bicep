@@ -1,4 +1,4 @@
-import { ResourceNames, FirewallRule, PrincipalNameAndId } from '../../types.bicep'
+import { ResourceNames, IpRange, PrincipalNameAndId } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -23,13 +23,16 @@ param storageSizeGB int = 32
 param autoGrowStatus string = 'Disabled'
 
 @description('Firewall rules.')
-param firewallRules FirewallRule[] = []
+param firewallRules IpRange[] = []
 
 @description('Specifies the subnet id that the PostgreSQL private endpoint will be attached to.')
 param privateEndpointSubnetId string
 
 @description('An array of Entra ID admin principal names for this resource')
 param entraIdAdminPrincipals PrincipalNameAndId[] = []
+
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param deployAlerts bool
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -68,6 +71,15 @@ resource maxPreparedTransactionsConfig 'Microsoft.DBforPostgreSQL/flexibleServer
   dependsOn: [
     postgreSqlServerModule
   ]
+}
+
+module databaseAliveAlert '../../components/alerts/flexibleServers/databaseAlive.bicep' = if (deployAlerts) {
+  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}DbAliveDeploy'
+  params: {
+    resourceNames: [resourceNames.sharedResources.postgreSqlFlexibleServer]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
 }
 
 var managedIdentityConnectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate

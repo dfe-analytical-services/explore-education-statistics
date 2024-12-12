@@ -894,13 +894,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Label")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(81)
+                        .HasColumnType("nvarchar(81)");
 
                     b.Property<string>("TimePeriodCoverage")
                         .IsRequired()
@@ -915,7 +919,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PublicationId", "Year", "TimePeriodCoverage")
+                    b.HasIndex("PublicationId", "Year", "TimePeriodCoverage", "Label")
                         .IsUnique();
 
                     b.ToTable("Releases");

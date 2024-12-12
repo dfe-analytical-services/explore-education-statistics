@@ -591,7 +591,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var service = BuildPublicationService(
                         context: contentDbContext,
                         userService: userService.Object);
-                    return await service.AddReleaseSeriesLegacyLink(publication.Id, new ReleaseSeriesLegacyLinkAddRequest());
+                    return await service.AddReleaseSeriesLegacyLink(publication.Id,
+                        new ReleaseSeriesLegacyLinkAddRequest
+                        {
+                            Description = "Test description",
+                            Url = "https://test.url"
+                        });
                 });
         }
 

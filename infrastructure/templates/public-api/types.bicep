@@ -36,18 +36,26 @@ type ResourceNames = {
     dataProcessorStorageAccountsPrefix: string
     docsApp: string
     publicApiStorageAccount: string
-    publicApiFileshare: string
+    publicApiFileShare: string
   }
+}
+
+@export()
+type IpRange = {
+  name: string
+  cidr: string
 }
 
 @export()
 type FirewallRule = {
   name: string
   cidr: string
+  priority: int
+  tag: string
 }
 
 @export()
-type AzureFileshareMount = {
+type AzureFileShareMount = {
   storageName: string
   storageAccountKey: string
   storageAccountName: string

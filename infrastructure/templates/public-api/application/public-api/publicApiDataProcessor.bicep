@@ -1,4 +1,4 @@
-import { ResourceNames, FirewallRule } from '../../types.bicep'
+import { ResourceNames, FirewallRule, IpRange } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -6,20 +6,27 @@ param resourceNames ResourceNames
 @description('Specifies the location for all resources.')
 param location string
 
-@description('Alert metric name prefix')
-param metricsNamePrefix string
-
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
-param dataProcessorFunctionAppExists bool = false
+param dataProcessorFunctionAppExists bool
 
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string
 
-@description('Public API Storage : Firewall rules.')
-param storageFirewallRules FirewallRule[] = []
+@description('Specifies the principal id of the Azure DevOps SPN.')
+@secure()
+param devopsServicePrincipalId string
+
+@description('The IP address ranges that can access the Data Processor storage accounts.')
+param storageFirewallRules IpRange[]
+
+@description('The IP address ranges that can access the Data Processor Function App endpoints.')
+param functionAppFirewallRules FirewallRule[]
+
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param deployAlerts bool
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -36,7 +43,6 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
 }
 
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
-var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
 
 resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: resourceNames.publicApi.publicApiStorageAccount
@@ -68,20 +74,19 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
     functionAppName: resourceNames.publicApi.dataProcessor
     appServicePlanName: resourceNames.publicApi.dataProcessor
     storageAccountsNamePrefix: resourceNames.publicApi.dataProcessorStorageAccountsPrefix
-    alertsGroupName: resourceNames.existingResources.alertsGroup
     location: location
     applicationInsightsKey: applicationInsightsKey
     subnetId: outboundVnetSubnet.id
     privateEndpointSubnetId: inboundVnetSubnet.id
-    publicNetworkAccessEnabled: false
+    publicNetworkAccessEnabled: true
+    functionAppFirewallRules: functionAppFirewallRules
     entraIdAuthentication: {
       appRegistrationClientId: dataProcessorAppRegistrationClientId
       allowedClientIds: [
         adminAppClientId
+        devopsServicePrincipalId
       ]
-      allowedPrincipalIds: [
-        adminAppPrincipalId
-      ]
+      allowedPrincipalIds: []
       requireAuthentication: true
     }
     userAssignedManagedIdentityParams: {
@@ -98,18 +103,12 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       family: 'EP'
     }
     preWarmedInstanceCount: 1
-    healthCheck: {
-      path: '/api/HealthCheck'
-      unhealthyMetricName: '${metricsNamePrefix}Unhealthy'
-    }
-    appSettings: {
-      App__MetaInsertBatchSize: 1000
-    }
+    healthCheckPath: '/api/HealthCheck'
     azureFileShares: [{
-      storageName: resourceNames.publicApi.publicApiFileshare
+      storageName: resourceNames.publicApi.publicApiFileShare
       storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
       storageAccountName: resourceNames.publicApi.publicApiStorageAccount
-      fileShareName: resourceNames.publicApi.publicApiFileshare
+      fileShareName: resourceNames.publicApi.publicApiFileShare
       mountPath: publicApiDataFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules
@@ -117,6 +116,43 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
   }
 }
 
+module functionAppHealthAlert '../../components/alerts/sites/healthAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.dataProcessor}HealthDeploy'
+  params: {
+    resourceNames: [resourceNames.publicApi.dataProcessor]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
+}
+
+module storageAccountAvailabilityAlerts '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.dataProcessor}StorageAvailabilityDeploy'
+  params: {
+    resourceNames: [
+      dataProcessorFunctionAppModule.outputs.managementStorageAccountName
+      dataProcessorFunctionAppModule.outputs.slot1StorageAccountName
+      dataProcessorFunctionAppModule.outputs.slot2StorageAccountName
+    ]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
+}
+
+module fileServiceAvailabilityAlerts '../../components/alerts/fileServices/availabilityAlert.bicep' = if (deployAlerts) {
+  name: '${resourceNames.publicApi.dataProcessor}FsAvailabilityDeploy'
+  params: {
+    resourceNames: [
+      dataProcessorFunctionAppModule.outputs.managementStorageAccountName
+      dataProcessorFunctionAppModule.outputs.slot1StorageAccountName
+      dataProcessorFunctionAppModule.outputs.slot2StorageAccountName
+    ]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
+    tagValues: tagValues
+  }
+}
+
 output managedIdentityName string = dataProcessorFunctionAppManagedIdentity.name
 output managedIdentityClientId string = dataProcessorFunctionAppManagedIdentity.properties.clientId
 output publicApiDataFileShareMountPath string = publicApiDataFileShareMountPath
+output url string = dataProcessorFunctionAppModule.outputs.url
+output stagingUrl string = dataProcessorFunctionAppModule.outputs.stagingUrl

@@ -221,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         }
 
         public static IAsyncEnumerable<T> WhereNotNull<T>(this IAsyncEnumerable<T?> source)
-            where T: class
+            where T : class
         {
             return source.Where(item => item is not null)!;
         }
@@ -264,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
             return !(firstNotInSecond.Any() || secondNotInFirst.Any());
         }
-        
+
         public static Tuple<T, T> ToTuple2<T>(this IEnumerable<T> collection)
             where T : class
         {
@@ -275,10 +275,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 throw new ArgumentException(
                     $"Expected 2 list items when constructing a 2-tuple, but found {list.Count}");
             }
-            
+
             return new Tuple<T, T>(list[0], list[1]);
         }
-        
+
         public static Tuple<T, T, T> ToTuple3<T>(this IEnumerable<T> collection)
             where T : class
         {
@@ -289,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 throw new ArgumentException(
                     $"Expected 3 list items when constructing a 3-tuple, but found {list.Count}");
             }
-            
+
             return new Tuple<T, T, T>(list[0], list[1], list[2]);
         }
 
@@ -297,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         {
             return values.All(id => source.Contains(id));
         }
-        
+
         /// <summary>
         /// Order some objects, according to a string key, in natural order for humans to read.
         /// </summary>
@@ -318,6 +318,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
             return source.ThenBy(keySelector, comparison.WithNaturalSort());
+        }
+
+        public static List<(T1, T2)> Cartesian<T1, T2>(
+            this IEnumerable<T1> list1,
+            IEnumerable<T2>? list2)
+        {
+            return list2 == null
+                ? []
+                : list1
+                    .Join(list2, _ => true, _ => true, (t1, t2) => (t1, t2))
+                    .ToList();
+        }
+
+        public static List<(T1, T2, T3)> Cartesian<T1, T2, T3>(
+            this IEnumerable<T1> list1,
+            IEnumerable<T2>? list2,
+            IEnumerable<T3>? list3)
+        {
+            return list2 == null || list3 == null
+                ? []
+                : list1
+                    .Join(list2, _ => true, _ => true, (t1, t2) => (t1, t2))
+                    .Join(list3, _ => true, _ => true,
+                        (tuple, t3) => (tuple.t1, tuple.t2, t3))
+                    .ToList();
         }
     }
 }

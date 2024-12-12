@@ -118,8 +118,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             {
                                 return new ReleaseSeriesItemViewModel
                                 {
-                                    Id = rsi.Id,
-                                    IsLegacyLink = rsi.IsLegacyLink,
                                     Description = rsi.LegacyLinkDescription!,
                                     LegacyLinkUrl = rsi.LegacyLinkUrl,
                                 };
@@ -130,10 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                             return new ReleaseSeriesItemViewModel
                             {
-                                Id = rsi.Id,
-                                IsLegacyLink = rsi.IsLegacyLink,
                                 Description = latestReleaseVersion.Title,
-
                                 ReleaseId = latestReleaseVersion.ReleaseId,
                                 ReleaseSlug = latestReleaseVersion.Slug,
                             };
