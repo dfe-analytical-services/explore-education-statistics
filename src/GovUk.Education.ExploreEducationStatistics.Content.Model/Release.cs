@@ -24,6 +24,8 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public required int Year { get; set; }
 
+    public string? Label { get; set; }
+
     public List<ReleaseVersion> Versions { get; set; } = [];
 
     public DateTime Created { get; set; }
@@ -40,7 +42,10 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
         public void Configure(EntityTypeBuilder<Release> builder)
         {
             builder.Property(m => m.Slug)
-                .HasMaxLength(30);
+                .HasMaxLength(81);
+
+            builder.Property(m => m.Label)
+                .HasMaxLength(50);
 
             builder.Property(m => m.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
@@ -50,7 +55,8 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
                 {
                     dsv.PublicationId,
                     dsv.Year,
-                    dsv.TimePeriodCoverage
+                    dsv.TimePeriodCoverage,
+                    dsv.Label,
                 })
                 .IsUnique();
         }
