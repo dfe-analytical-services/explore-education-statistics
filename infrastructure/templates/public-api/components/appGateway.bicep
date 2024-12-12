@@ -283,7 +283,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
   ]
 }
 
-module backendPoolsHealthAlert 'alerts/appGateways/backendPoolHealth.bicep' = if (alerts != null && alerts!.health) {
+module backendPoolsHealthAlert 'alerts/appGateways/backendPoolHealthAlert.bicep' = if (alerts != null && alerts!.health) {
   name: '${appGatewayName}BackendPoolsHealthDeploy'
   params: {
     resourceNames: [appGatewayName]
