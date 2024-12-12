@@ -11,7 +11,7 @@ public static class ReleaseVersionPredicates
 {
     /// <summary>
     /// Filters a sequence of <see cref="IQueryable{T}"/> of type <see cref="ReleaseVersion"/> to only include the latest
-    /// published versions of each release.
+    /// versions of each release.
     /// </summary>
     /// <param name="releaseVersions">The source <see cref="IQueryable{T}"/> of type <see cref="ReleaseVersion"/> to filter.</param>
     /// <param name="publicationId">Unique identifier of a publication to filter by.</param>
@@ -50,20 +50,20 @@ public static class ReleaseVersionPredicates
 
     /// <summary>
     /// Filters a sequence of <see cref="IQueryable{T}"/> of type <see cref="ReleaseVersion"/> to only include the latest
-    /// published version of the release.
+    /// version of the release.
     /// </summary>
-    /// <param name="releaseVersionsQueryable">The source <see cref="IQueryable{T}"/> of type <see cref="ReleaseVersion"/> to filter.</param>
+    /// <param name="releaseVersions">The source <see cref="IQueryable{T}"/> of type <see cref="ReleaseVersion"/> to filter.</param>
     /// <param name="releaseId">Unique identifier of a release to filter by.</param>
     /// <param name="publishedOnly">Flag to only include published release versions.</param>
     /// <returns>An <see cref="IQueryable{T}"/> of type <see cref="ReleaseVersion"/> that contains elements from the input
     /// sequence filtered to only include the latest version of the release.</returns>
-    public static IQueryable<ReleaseVersion?> LatestReleaseVersion(this IQueryable<ReleaseVersion> releaseVersionsQueryable,
+    public static IQueryable<ReleaseVersion?> LatestReleaseVersion(this IQueryable<ReleaseVersion> releaseVersions,
         Guid releaseId,
         bool publishedOnly = false)
     {
-        return releaseVersionsQueryable
+        return releaseVersions
             .Where(releaseVersion => releaseVersion.ReleaseId == releaseId)
-            .Where(releaseVersion => releaseVersion.Version == releaseVersionsQueryable
+            .Where(releaseVersion => releaseVersion.Version == releaseVersions
                 .Where(latestVersion => latestVersion.ReleaseId == releaseId)
                 .Where(latestVersion => !publishedOnly || latestVersion.Published.HasValue)
                 .Select(latestVersion => (int?)latestVersion.Version)
