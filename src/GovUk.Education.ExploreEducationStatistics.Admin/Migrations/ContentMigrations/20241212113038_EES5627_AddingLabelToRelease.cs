@@ -35,8 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 name: "IX_Releases_PublicationId_Year_TimePeriodCoverage_Label",
                 table: "Releases",
                 columns: new[] { "PublicationId", "Year", "TimePeriodCoverage", "Label" },
-                unique: true,
-                filter: "[Label] IS NOT NULL");
+                unique: true);
         }
 
         /// <inheritdoc />

@@ -920,8 +920,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasKey("Id");
 
                     b.HasIndex("PublicationId", "Year", "TimePeriodCoverage", "Label")
-                        .IsUnique()
-                        .HasFilter("[Label] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Releases");
                 });

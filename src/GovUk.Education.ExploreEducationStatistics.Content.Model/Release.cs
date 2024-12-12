@@ -58,7 +58,8 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
                     dsv.TimePeriodCoverage,
                     dsv.Label,
                 })
-                .IsUnique();
+                .IsUnique()
+                .HasFilter(null);
         }
     }
 }

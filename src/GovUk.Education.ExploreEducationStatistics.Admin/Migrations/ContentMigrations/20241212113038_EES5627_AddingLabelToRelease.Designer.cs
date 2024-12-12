@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20241212105726_EES5627_AddingLabelToRelease")]
+    [Migration("20241212113038_EES5627_AddingLabelToRelease")]
     partial class EES5627_AddingLabelToRelease
     {
         /// <inheritdoc />
@@ -923,8 +923,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasKey("Id");
 
                     b.HasIndex("PublicationId", "Year", "TimePeriodCoverage", "Label")
-                        .IsUnique()
-                        .HasFilter("[Label] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Releases");
                 });
