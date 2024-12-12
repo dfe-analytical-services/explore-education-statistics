@@ -65,7 +65,7 @@ public interface IReleaseVersionRepository
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the latest published release version id's associated with a publication in reverse chronological order.
+    /// Retrieves the latest published release version id's associated with a publication.
     /// </summary>
     /// <param name="publicationId">The unique identifier of the publication.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
@@ -85,7 +85,7 @@ public interface IReleaseVersionRepository
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the latest version id's of all releases associated with a publication in reverse chronological order.
+    /// Retrieves the latest version id's of all releases associated with a publication.
     /// </summary>
     /// <param name="publicationId">The unique identifier of the publication.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
