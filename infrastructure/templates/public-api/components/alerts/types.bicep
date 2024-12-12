@@ -1,15 +1,23 @@
 @export()
-type EvaluationFrequency = 'PT1M'
+type EvaluationFrequency = 
+  | 'PT1M'
+  | 'PT5M'
+  | 'PT15M'
+  | 'PT30M'
+  | 'PT1H'
 
 @export()
-type WindowSize = 'PT5M'
+type WindowSize = 
+  | 'PT5M'
+  | 'PT15M'
+  | 'PT30M'
+  | 'PT1H'
 
 @export()
 type DynamicMetricOperator =
   | 'GreaterOrLessThan' 
   | 'GreaterThan'
   | 'LessThan'
-
 
 @export()
 type StaticMetricOperator =
@@ -36,6 +44,12 @@ type Severity =
   | 'Verbose'
 
 @export()
+type Sensitivity = 
+  | 'High'
+  | 'Medium'
+  | 'Low'
+
+@export()
 var severityMapping = {
   Critical: 0
   Error: 1
@@ -52,17 +66,25 @@ type ResourceType =
   | 'Microsoft.Sql/servers/databases'
   | 'Microsoft.Storage/storageAccounts'
   | 'Microsoft.Storage/storageAccounts/fileServices'
+  | 'Microsoft.Web/serverfarms'
   | 'Microsoft.Web/sites' 
   | 'Microsoft.Web/sites/slots'
 
 @export()
 type MetricName = 
+  | 'ApplicationGatewayTotalTime'
   | 'availability'
   | 'blocked_by_firewall'
   | 'connection_failed'
   | 'connections_failed'
   | 'cpu_percent'
+  | 'CpuPercentage'
   | 'HealthCheckStatus'
   | 'is_db_alive'
+  | 'longest_query_time_sec'
+  | 'longest_transaction_time_sec'
+  | 'MemoryPercentage'
+  | 'ResponseTime'
   | 'RestartCount'
+  | 'SuccessE2ELatency'
   | 'UnhealthyHostCount'
