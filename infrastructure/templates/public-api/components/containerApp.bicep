@@ -106,6 +106,8 @@ param entraIdAuthentication EntraIdAuthentication?
 param alerts {
   restarts: bool
   responseTime: bool
+  cpuPercentage: bool
+  memoryPercentage: bool
   alertsGroupName: string
 }?
 
@@ -222,6 +224,24 @@ module containerAppRestartsAlert 'alerts/containerApps/restarts.bicep' = if (ale
 
 module responseTimeAlert 'alerts/containerApps/responseTimeAlert.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${containerAppName}ResponseTimeDeploy'
+  params: {
+    resourceNames: [containerAppName]
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module cpuPercentageAlert 'alerts/containerApps/cpuPercentage.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+  name: '${containerAppName}CpuPercentageDeploy'
+  params: {
+    resourceNames: [containerAppName]
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module memoryPercentageAlert 'alerts/containerApps/memoryPercentage.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+  name: '${containerAppName}MemoryPercentageDeploy'
   params: {
     resourceNames: [containerAppName]
     alertsGroupName: alerts!.alertsGroupName

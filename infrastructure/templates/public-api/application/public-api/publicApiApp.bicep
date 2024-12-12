@@ -157,6 +157,8 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     alerts: deployAlerts ? {
       restarts: true
       responseTime: true
+      cpuPercentage: true
+      memoryPercentage: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues
