@@ -41,8 +41,6 @@ describe('ChartRenderer', () => {
   const testFullTableMeta = mapFullTable(testChartTableData);
   const testMapChartRenderer: ChartRendererProps = {
     type: 'map',
-    releaseId: 'releaseId',
-    dataBlockParentId: 'dataBlockParentId',
     meta: testFullTableMeta.subjectMeta,
     data: testFullTableMeta.results,
     alt: '',
@@ -55,6 +53,7 @@ describe('ChartRenderer', () => {
     },
     boundaryLevel: 1,
     map: { dataSetConfigs: [] },
+    onBoundaryLevelChange: () => {},
   };
 
   test('renders auto-generated boundary level footnote successfully', async () => {

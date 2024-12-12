@@ -9,24 +9,16 @@ import MapBlock, {
 } from '@common/modules/charts/components/MapBlock';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import _tableBuilderService from '@common/services/tableBuilderService';
 import { within } from '@testing-library/dom';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { produce } from 'immer';
 
-jest.mock('@common/services/tableBuilderService');
-
-const tableBuilderService = _tableBuilderService as jest.Mocked<
-  typeof _tableBuilderService
->;
-
 describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
+  const onBoundaryLevelChange = jest.fn();
   const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
-    releaseId: 'releaseId',
-    dataBlockParentId: 'dataBlockParentId',
     boundaryLevel: 1,
     id: 'testMap',
     axes: testMapConfiguration.axes as MapBlockProps['axes'],
@@ -56,13 +48,10 @@ describe('MapBlock', () => {
         },
       ],
     },
+    onBoundaryLevelChange,
   };
 
   test('renders legends and polygons correctly', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
@@ -104,10 +93,6 @@ describe('MapBlock', () => {
   });
 
   test('renders legend groups correctly with custom 1 d.p decimal places', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const fullTable = mapFullTable(
       produce(testMapTableData, draft => {
         draft.results[0].measures['authorised-absence-rate'] = '3.5123';
@@ -138,10 +123,6 @@ describe('MapBlock', () => {
   });
 
   test('renders legend groups correctly with custom 3 d.p decimal places', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const fullTable = mapFullTable(
       produce(testMapTableData, draft => {
         draft.results[0].measures['authorised-absence-rate'] = '3.5123';
@@ -198,14 +179,10 @@ describe('MapBlock', () => {
   });
 
   // EES-5718 name should be: 'selecting data set with different boundary level fetches and renders different boundary geo-JSON'
-  test('selecting data set with different boundary level fetches different boundary geo-JSON', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValueOnce(
-      testMapTableData.subjectMeta.locations,
-    ); // EES-5718 need to return different location geoJson for
-
+  test('selecting data set with different boundary level calls onBoundaryLevelChange', async () => {
     render(<MapBlock {...testBlockProps} />);
 
-    expect(tableBuilderService.getLocationGeoJson).not.toHaveBeenCalled();
+    expect(onBoundaryLevelChange).not.toHaveBeenCalled();
 
     const dataSetSelectInput = screen.getByLabelText('1. Select data to view');
     const dataSetOptions = within(dataSetSelectInput).getAllByRole('option');
@@ -216,11 +193,8 @@ describe('MapBlock', () => {
 
     waitFor(() => {
       // Fetching new geoJson
-      const loadingSpinner = screen.getByTestId('loadingSpinner');
-      expect(loadingSpinner).toHaveTextContent(
-        'fetching geometry for data selection',
-      );
-      expect(tableBuilderService.getLocationGeoJson).toHaveBeenCalled();
+      expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
+      expect(onBoundaryLevelChange).toHaveBeenCalled();
     });
 
     // TODO: EES-5718
@@ -228,10 +202,6 @@ describe('MapBlock', () => {
   });
 
   test('changing selected location focuses the correct polygon', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
@@ -264,10 +234,6 @@ describe('MapBlock', () => {
   });
 
   test('changing selected location renders its indicator tile', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
@@ -296,10 +262,6 @@ describe('MapBlock', () => {
   });
 
   test('renders location indicator tiles correctly with custom decimal places', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const fullTable = mapFullTable(
       produce(testMapTableData, draft => {
         draft.results[0].measures['authorised-absence-rate'] = '3.5123';
@@ -361,10 +323,6 @@ describe('MapBlock', () => {
   });
 
   test('resetting the map when no location selected', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
@@ -402,10 +360,6 @@ describe('MapBlock', () => {
   });
 
   test('ensure values with decimal places go are assigned the correct colour when the legend values are set to 0 decimal places', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const fullTable = mapFullTable(
       produce(testMapTableData, draft => {
         draft.results[0].measures['authorised-absence-rate'] =
