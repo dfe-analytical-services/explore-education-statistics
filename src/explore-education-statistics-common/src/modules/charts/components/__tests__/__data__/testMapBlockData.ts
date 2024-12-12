@@ -17,9 +17,8 @@ import { Dictionary } from '@common/types';
 
 export const testMapConfiguration: Chart = {
   type: 'map',
-  releaseId: 'releaseId',
-  dataBlockParentId: 'dataBlockParentId',
   boundaryLevel: 1,
+  onBoundaryLevelChange: () => {},
   axes: {
     major: {
       type: 'major',

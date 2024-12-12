@@ -1,41 +1,34 @@
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import tableBuilderService from '@common/services/tableBuilderService';
 import formatPretty from '@common/utils/number/formatPretty';
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 
 const tableBuilderQueries = createQueryKeys('tableBuilder', {
-  getDataBlockTable(
+  getDataBlockTable(releaseId: string, dataBlockParentId: string) {
+    return {
+      queryKey: [releaseId, dataBlockParentId],
+      queryFn: async () =>
+        tableBuilderService.getDataBlockTableData(releaseId, dataBlockParentId),
+    };
+  },
+
+  getDataBlockGeoJson(
     releaseId: string,
     dataBlockParentId: string,
     boundaryLevelId?: number,
   ) {
     return {
       queryKey: [releaseId, dataBlockParentId, boundaryLevelId],
-      queryFn: async () => {
-        const [tableData, locationGeoJson] = await Promise.all([
-          tableBuilderService.getDataBlockTableData(
-            releaseId,
-            dataBlockParentId,
-          ),
-          boundaryLevelId !== undefined
-            ? tableBuilderService.getLocationGeoJson(
-                releaseId,
-                dataBlockParentId,
-                boundaryLevelId,
-              )
-            : undefined,
-        ]);
-
-        return mapFullTable({
-          ...tableData,
-          subjectMeta: {
-            ...tableData.subjectMeta,
-            locations: locationGeoJson ?? tableData.subjectMeta.locations,
-          },
-        });
-      },
+      queryFn: async () =>
+        boundaryLevelId !== undefined
+          ? tableBuilderService.getLocationGeoJson(
+              releaseId,
+              dataBlockParentId,
+              boundaryLevelId,
+            )
+          : undefined,
     };
   },
+
   getKeyStat(releaseId: string, dataBlockParentId: string) {
     return {
       queryKey: [releaseId, dataBlockParentId],

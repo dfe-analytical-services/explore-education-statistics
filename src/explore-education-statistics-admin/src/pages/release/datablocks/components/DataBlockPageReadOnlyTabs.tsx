@@ -76,8 +76,6 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
                   return (
                     <ChartRenderer
                       {...chart}
-                      releaseId={releaseId}
-                      dataBlockParentId={dataBlock.dataBlockParentId}
                       key={key}
                       id={`dataBlockTabs-chart-${index}`}
                       axes={axes}

@@ -18,8 +18,6 @@ import React, { memo, useMemo } from 'react';
 
 export type ChartRendererProps = {
   source?: string;
-  releaseId?: string;
-  dataBlockParentId?: string;
 } & (
   | ({
       type: 'map';
