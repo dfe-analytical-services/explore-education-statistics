@@ -114,6 +114,8 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
     storageFirewallRules: storageFirewallRules
     alerts: deployAlerts ? {
       functionAppHealth: true
+      cpuPercentage: true
+      memoryPercentage: true
       storageAccountAvailability: true
       storageLatency: true
       fileServiceAvailability: true

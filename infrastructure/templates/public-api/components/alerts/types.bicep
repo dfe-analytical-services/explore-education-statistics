@@ -1,15 +1,23 @@
 @export()
-type EvaluationFrequency = 'PT1M'
+type EvaluationFrequency = 
+  | 'PT1M'
+  | 'PT5M'
+  | 'PT15M'
+  | 'PT30M'
+  | 'PT1H'
 
 @export()
-type WindowSize = 'PT5M'
+type WindowSize = 
+  | 'PT5M'
+  | 'PT15M'
+  | 'PT30M'
+  | 'PT1H'
 
 @export()
 type DynamicMetricOperator =
   | 'GreaterOrLessThan' 
   | 'GreaterThan'
   | 'LessThan'
-
 
 @export()
 type StaticMetricOperator =
@@ -58,6 +66,7 @@ type ResourceType =
   | 'Microsoft.Sql/servers/databases'
   | 'Microsoft.Storage/storageAccounts'
   | 'Microsoft.Storage/storageAccounts/fileServices'
+  | 'Microsoft.Web/serverfarms'
   | 'Microsoft.Web/sites' 
   | 'Microsoft.Web/sites/slots'
 
@@ -69,10 +78,12 @@ type MetricName =
   | 'connection_failed'
   | 'connections_failed'
   | 'cpu_percent'
+  | 'CpuPercentage'
   | 'HealthCheckStatus'
   | 'is_db_alive'
   | 'longest_query_time_sec'
   | 'longest_transaction_time_sec'
+  | 'MemoryPercentage'
   | 'ResponseTime'
   | 'RestartCount'
   | 'SuccessE2ELatency'
