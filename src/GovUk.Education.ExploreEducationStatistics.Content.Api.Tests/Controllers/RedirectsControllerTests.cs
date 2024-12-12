@@ -50,7 +50,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                 var cachedReleaseRedirectsByPublicationSlug = new Dictionary<string, List<RedirectViewModel>>
                 {
                     {
-                        "updated-publication-slug-1", new List<RedirectViewModel>()
+                        "updated-publication-slug-1",
+                        new List<RedirectViewModel>()
                         {
                             new(FromSlug: "original-release-slug-1", ToSlug: "updated-release-slug-1"),
                             new(FromSlug: "original-release-slug-2", ToSlug: "updated-release-slug-2"),
@@ -84,7 +85,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                         rvm => cpr.FromSlug == rvm.FromSlug && cpr.ToSlug == rvm.ToSlug));
 
                 var cachedReleaseRedirectsForPublication = Assert.Single(cachedReleaseRedirectsByPublicationSlug);
-                Assert.Equal(cachedReleaseRedirectsForPublication.Value.Count, viewModel.ReleaseRedirectsByPublicationSlug["updated-publication-slug-1"].Count);
+                Assert.Equal(cachedReleaseRedirectsForPublication.Value.Count,
+                    viewModel.ReleaseRedirectsByPublicationSlug["updated-publication-slug-1"].Count);
                 Assert.Equal("updated-publication-slug-1", cachedReleaseRedirectsForPublication.Key);
                 Assert.All(
                     cachedReleaseRedirectsForPublication.Value,
@@ -117,7 +119,7 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                         DataFixture.DefaultMethodologyVersion()
                             .WithRedirects([DataFixture.DefaultMethodologyRedirect()])
                             .ForIndex(0, s => s.SetRedirects([DataFixture.DefaultMethodologyRedirect()]))
-                            .ForIndex(1, 
+                            .ForIndex(1,
                                 s => s
                                     .SetRedirects([DataFixture.DefaultMethodologyRedirect()])
                                     .SetPublished(DateTime.UtcNow))
@@ -139,8 +141,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                     redirects,
                     mr => Assert.Contains(
                         viewModel.MethodologyRedirects,
-                        rvm => 
-                            mr.Slug == rvm.FromSlug && 
+                        rvm =>
+                            mr.Slug == rvm.FromSlug &&
                             mr.MethodologyVersion.Methodology.OwningPublicationSlug == rvm.ToSlug));
             }
 
@@ -167,7 +169,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 var blobCacheService = app.Services.GetRequiredService<IBlobCacheService>();
 
-                var cachedValue = await blobCacheService.GetItemAsync(new RedirectsCacheKey(), typeof(RedirectsViewModel));
+                var cachedValue =
+                    await blobCacheService.GetItemAsync(new RedirectsCacheKey(), typeof(RedirectsViewModel));
                 var cachedRedirectsViewModel = Assert.IsType<RedirectsViewModel>(cachedValue);
 
                 var redirects = methodology.Versions
@@ -197,7 +200,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                     .WithPublication(DataFixture.DefaultPublication())
                     .GenerateList(2);
 
-                await TestApp.AddTestData<ContentDbContext>(context => context.PublicationRedirects.AddRange(publicationRedirects));
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                    context.PublicationRedirects.AddRange(publicationRedirects));
 
                 var client = BuildApp(enableAzurite: true).CreateClient();
                 var response = await ListRedirects(client);
@@ -209,8 +213,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                     publicationRedirects,
                     pr => Assert.Contains(
                         viewModel.PublicationRedirects,
-                        rvm => 
-                            pr.Slug == rvm.FromSlug && 
+                        rvm =>
+                            pr.Slug == rvm.FromSlug &&
                             pr.Publication.Slug == rvm.ToSlug));
             }
 
@@ -221,7 +225,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                     .WithPublication(DataFixture.DefaultPublication())
                     .GenerateList(2);
 
-                await TestApp.AddTestData<ContentDbContext>(context => context.PublicationRedirects.AddRange(publicationRedirects));
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                    context.PublicationRedirects.AddRange(publicationRedirects));
 
                 await StartAzurite();
 
@@ -232,7 +237,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 var blobCacheService = app.Services.GetRequiredService<IBlobCacheService>();
 
-                var cachedValue = await blobCacheService.GetItemAsync(new RedirectsCacheKey(), typeof(RedirectsViewModel));
+                var cachedValue =
+                    await blobCacheService.GetItemAsync(new RedirectsCacheKey(), typeof(RedirectsViewModel));
                 var cachedRedirectsViewModel = Assert.IsType<RedirectsViewModel>(cachedValue);
 
                 Assert.Empty(cachedRedirectsViewModel.MethodologyRedirects);
@@ -257,7 +263,8 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                 PublicationRedirect publicationRedirect = DataFixture.DefaultPublicationRedirect()
                     .WithPublication(DataFixture.DefaultPublication());
 
-                await TestApp.AddTestData<ContentDbContext>(context => context.PublicationRedirects.Add(publicationRedirect));
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                    context.PublicationRedirects.Add(publicationRedirect));
 
                 var client = BuildApp(enableAzurite: true).CreateClient();
                 var response = await ListRedirects(client);
@@ -276,23 +283,23 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             {
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
-                        [
-                            DataFixture
-                                .DefaultRelease(publishedVersions: 1)
-                                .WithSlug("updated-release-slug-1")
-                                .WithRedirects(
-                                    DataFixture.DefaultReleaseRedirect()
-                                        .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
-                                        .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
-                                        .GenerateList(2)
-                                )
-                        ])
+                    [
+                        DataFixture
+                            .DefaultRelease(publishedVersions: 1)
+                            .WithSlug("updated-release-slug-1")
+                            .WithRedirects(
+                                DataFixture.DefaultReleaseRedirect()
+                                    .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
+                                    .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
+                                    .GenerateList(2)
+                            )
+                    ])
                     .WithSlug("updated-publication-slug-1")
                     .WithRedirects(
-                        [
-                            DataFixture.DefaultPublicationRedirect()
-                                .WithSlug("original-publication-slug-1")
-                        ]);
+                    [
+                        DataFixture.DefaultPublicationRedirect()
+                            .WithSlug("original-publication-slug-1")
+                    ]);
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
@@ -309,8 +316,10 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                 Assert.Equal("updated-publication-slug-1", releaseRedirectsForPublication.Key);
 
                 Assert.Equal(2, releaseRedirectsForPublication.Value.Count);
-                Assert.Contains(releaseRedirectsForPublication.Value, r => r.FromSlug == "first-release-slug-1" && r.ToSlug == "updated-release-slug-1");
-                Assert.Contains(releaseRedirectsForPublication.Value, r => r.FromSlug == "second-release-slug-1" && r.ToSlug == "updated-release-slug-1");
+                Assert.Contains(releaseRedirectsForPublication.Value,
+                    r => r.FromSlug == "first-release-slug-1" && r.ToSlug == "updated-release-slug-1");
+                Assert.Contains(releaseRedirectsForPublication.Value,
+                    r => r.FromSlug == "second-release-slug-1" && r.ToSlug == "updated-release-slug-1");
             }
 
             [Fact]
@@ -318,17 +327,17 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             {
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
-                        [
-                            DataFixture
-                                .DefaultRelease(publishedVersions: 1)
-                                .WithSlug("updated-release-slug-1")
-                                .WithRedirects(
-                                    DataFixture.DefaultReleaseRedirect()
-                                        .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
-                                        .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
-                                        .GenerateList(2)
-                                )
-                        ])
+                    [
+                        DataFixture
+                            .DefaultRelease(publishedVersions: 1)
+                            .WithSlug("updated-release-slug-1")
+                            .WithRedirects(
+                                DataFixture.DefaultReleaseRedirect()
+                                    .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
+                                    .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
+                                    .GenerateList(2)
+                            )
+                    ])
                     .WithSlug("original-publication-slug-1");
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
@@ -344,8 +353,10 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                 Assert.Equal("original-publication-slug-1", releaseRedirectsForPublication.Key);
 
                 Assert.Equal(2, releaseRedirectsForPublication.Value.Count);
-                Assert.Contains(releaseRedirectsForPublication.Value, r => r.FromSlug == "first-release-slug-1" && r.ToSlug == "updated-release-slug-1");
-                Assert.Contains(releaseRedirectsForPublication.Value, r => r.FromSlug == "second-release-slug-1" && r.ToSlug == "updated-release-slug-1");
+                Assert.Contains(releaseRedirectsForPublication.Value,
+                    r => r.FromSlug == "first-release-slug-1" && r.ToSlug == "updated-release-slug-1");
+                Assert.Contains(releaseRedirectsForPublication.Value,
+                    r => r.FromSlug == "second-release-slug-1" && r.ToSlug == "updated-release-slug-1");
             }
 
             [Fact]
@@ -353,17 +364,17 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             {
                 Publication publication = DataFixture.DefaultPublication()
                     .WithReleases(
-                        [
-                            DataFixture
-                                .DefaultRelease(publishedVersions: 1)
-                                .WithSlug("updated-release-slug-1")
-                                .WithRedirects(
-                                    DataFixture.DefaultReleaseRedirect()
-                                        .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
-                                        .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
-                                        .GenerateList(2)
-                                )
-                        ])
+                    [
+                        DataFixture
+                            .DefaultRelease(publishedVersions: 1)
+                            .WithSlug("updated-release-slug-1")
+                            .WithRedirects(
+                                DataFixture.DefaultReleaseRedirect()
+                                    .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
+                                    .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
+                                    .GenerateList(2)
+                            )
+                    ])
                     .WithSlug("original-publication-slug-1");
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
@@ -375,18 +386,22 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
 
                 var blobCacheService = app.Services.GetRequiredService<IBlobCacheService>();
 
-                var cachedValue = await blobCacheService.GetItemAsync(new RedirectsCacheKey(), typeof(RedirectsViewModel));
+                var cachedValue =
+                    await blobCacheService.GetItemAsync(new RedirectsCacheKey(), typeof(RedirectsViewModel));
                 var cachedRedirectsViewModel = Assert.IsType<RedirectsViewModel>(cachedValue);
 
                 Assert.Empty(cachedRedirectsViewModel.MethodologyRedirects);
                 Assert.Empty(cachedRedirectsViewModel.PublicationRedirects);
 
-                var releaseRedirectsForPublication = Assert.Single(cachedRedirectsViewModel.ReleaseRedirectsByPublicationSlug);
+                var releaseRedirectsForPublication =
+                    Assert.Single(cachedRedirectsViewModel.ReleaseRedirectsByPublicationSlug);
                 Assert.Equal("original-publication-slug-1", releaseRedirectsForPublication.Key);
 
                 Assert.Equal(2, releaseRedirectsForPublication.Value.Count);
-                Assert.Contains(releaseRedirectsForPublication.Value, r => r.FromSlug == "first-release-slug-1" && r.ToSlug == "updated-release-slug-1");
-                Assert.Contains(releaseRedirectsForPublication.Value, r => r.FromSlug == "second-release-slug-1" && r.ToSlug == "updated-release-slug-1");
+                Assert.Contains(releaseRedirectsForPublication.Value,
+                    r => r.FromSlug == "first-release-slug-1" && r.ToSlug == "updated-release-slug-1");
+                Assert.Contains(releaseRedirectsForPublication.Value,
+                    r => r.FromSlug == "second-release-slug-1" && r.ToSlug == "updated-release-slug-1");
             }
         }
 
