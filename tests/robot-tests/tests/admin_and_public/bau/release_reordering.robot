@@ -136,8 +136,13 @@ Validate first release has latest release status in publication release order
     user checks table cell contains    3    4    Edit
     user checks table cell contains    3    4    Delete
 
-Validate other releases section on public frontend
+Navigate to first published release on public frontend
     user navigates to public frontend    ${PUBLIC_RELEASE_1_URL}
+
+Validate first published release on public frontend is the latest data
+    user checks page contains    This is the latest data
+
+Validate other releases section of first published release includes legacy releases
     user checks number of other releases is correct    2
     ${view_releases}=    user opens details dropdown    View releases (2)
 
@@ -230,8 +235,13 @@ Validate reordered publication releases
     user checks table cell contains    3    2    ${PUBLIC_RELEASE_1_URL}
     user checks table cell contains    3    3    Latest release
 
-Validate other releases section on public frontend includes updated legacy release with expected order
+Navigate to first published release on public frontend after reordering
     user navigates to public frontend    ${PUBLIC_RELEASE_1_URL}
+
+Validate first published release is the latest data after reordering
+    user checks page contains    This is the latest data
+
+Validate other releases section of first published release contains updated legacy release in expected order
     user checks number of other releases is correct    2
     ${view_releases}=    user opens details dropdown    View releases (2)
 
@@ -317,8 +327,13 @@ Validate second release has latest release status in publication release order
     user checks table cell contains    4    2    ${PUBLIC_RELEASE_1_URL}
     user checks table cell does not contain    4    3    Latest release
 
-Validate other releases section on public frontend includes first release with expected order
+Navigate to second published release on public frontend
     user navigates to public frontend    ${PUBLIC_RELEASE_2_URL}
+
+Validate second published release is the latest data
+    user checks page contains    This is the latest data
+
+Validate other releases section of second published release includes first release with expected order
     user checks number of other releases is correct    3
     ${view_releases}=    user opens details dropdown    View releases (3)
 
@@ -392,10 +407,62 @@ Validate first legacy release is deleted from publication release order
     user checks table cell contains    3    2    ${PUBLIC_RELEASE_1_URL}
     user checks table cell does not contain    3    3    Latest release
 
-Validate other releases section on public frontend does not include first legacy release
+Navigate to second published release on public frontend after deleting legacy release
     user navigates to public frontend    ${PUBLIC_RELEASE_2_URL}
+
+Validate other releases section of second published release does not include first legacy release
     user checks number of other releases is correct    2
     ${view_releases}=    user opens details dropdown    View releases (2)
 
     user checks other release is shown in position    ${LEGACY_RELEASE_2_DESCRIPTION}    1
     user checks other release is shown in position    ${RELEASE_1_NAME}    2
+
+Reorder the publication releases so the first release is the latest release
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
+
+    user clicks button    Reorder releases
+    ${modal}=    user waits until modal is visible    Reorder releases
+    user clicks button    OK    ${modal}
+    user waits until modal is not visible    Reorder releases
+    user waits until page contains button    Confirm order
+
+    click element    xpath://div[text()="${RELEASE_1_NAME}"]    CTRL
+    user presses keys    ${SPACE}
+    user presses keys    ARROW_UP
+    user presses keys    ARROW_UP
+    user presses keys    ${SPACE}
+
+    user clicks button    Confirm order
+    sleep    2
+
+Validate first release has latest release status in publication release order after reordering
+    user waits until page contains button    Reorder releases
+    user checks table body has x rows    3    testid:release-series
+
+    user checks table cell contains    1    1    ${RELEASE_1_NAME}
+    user checks table cell contains    1    2    ${PUBLIC_RELEASE_1_URL}
+    user checks table cell contains    1    3    Latest release
+
+    user checks table cell contains    2    1    ${RELEASE_2_NAME}
+    user checks table cell contains    2    2    ${PUBLIC_RELEASE_2_URL}
+    user checks table cell does not contain    2    3    Latest release
+
+    user checks table cell contains    3    1    ${LEGACY_RELEASE_2_DESCRIPTION}
+    user checks table cell contains    3    2    ${LEGACY_RELEASE_2_URL}
+    user checks table cell contains    3    3    Legacy release
+    user checks table cell contains    3    4    Edit
+    user checks table cell contains    3    4    Delete
+
+Navigate to first published release on public frontend after changing the latest release
+    user navigates to public frontend    ${PUBLIC_RELEASE_1_URL}
+
+Validate first published release is the latest data after changing the latest release
+    user checks page contains    This is the latest data
+
+Navigate to second published release on public frontend after changing the latest release
+    user navigates to public frontend    ${PUBLIC_RELEASE_2_URL}
+
+Validate second published release is not the latest data after changing the latest release
+    user checks page contains    This is not the latest data
