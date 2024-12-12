@@ -13,16 +13,13 @@ param appServicePlanName string
 param storageAccountsNamePrefix string
 
 @description('Function App Plan : operating system')
-param appServicePlanOS 'Windows' | 'Linux' = 'Linux'
+param operatingSystem 'Windows' | 'Linux' = 'Linux'
 
 @description('Function App runtime')
 param functionAppRuntime 'dotnet' | 'dotnet-isolated' | 'node' | 'python' | 'java' = 'dotnet'
 
 @description('Specifies the additional setting to add to the Function App')
 param appSettings object = {}
-
-@description('A set of tags with which to tag the resource in Azure')
-param tagValues object
 
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
@@ -76,6 +73,8 @@ param storageFirewallRules IpRange[] = []
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
   functionAppHealth: bool
+  cpuPercentage: bool
+  memoryPercentage: bool
   storageAccountAvailability: bool
   storageLatency: bool
   fileServiceAvailability: bool
@@ -83,7 +82,8 @@ param alerts {
   alertsGroupName: string
 }?
 
-var reserved = appServicePlanOS == 'Linux'
+@description('A set of tags with which to tag the resource in Azure')
+param tagValues object
 
 var identity = userAssignedManagedIdentityParams != null
   ? {
@@ -96,13 +96,20 @@ var identity = userAssignedManagedIdentityParams != null
       type: 'SystemAssigned'
     }
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
+module appServicePlanModule 'appServicePlan.bicep' = {
   name: appServicePlanName
-  location: location
-  kind: 'functionapp'
-  sku: sku
-  properties: {
-    reserved: reserved
+  params: {
+    planName: appServicePlanName
+    location: location
+    kind: 'functionapp'
+    sku: sku
+    operatingSystem: operatingSystem
+    alerts: alerts != null ? {
+      cpuPercentage: alerts!.cpuPercentage
+      memoryPercentage: alerts!.memoryPercentage
+      alertsGroupName: alerts!.alertsGroupName
+    } : null
+    tagValues: tagValues
   }
 }
 
@@ -223,19 +230,19 @@ var firewallRules = [for (firewallRule, index) in functionAppFirewallRules: {
 var commonSiteProperties = {
   enabled: true
   httpsOnly: true
-  serverFarmId: appServicePlan.id
+  serverFarmId: appServicePlanModule.outputs.planId
 
   // This property integrates the Function App into a VNet given the supplied subnet id.
   virtualNetworkSubnetId: subnetId
 
   clientAffinityEnabled: true
-  reserved: reserved
+  reserved: operatingSystem == 'Linux'
   siteConfig: {
     alwaysOn: alwaysOn ?? null
     healthCheckPath: healthCheckPath
     preWarmedInstanceCount: preWarmedInstanceCount ?? null
     netFrameworkVersion: '8.0'
-    linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
+    linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
     publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
     ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null

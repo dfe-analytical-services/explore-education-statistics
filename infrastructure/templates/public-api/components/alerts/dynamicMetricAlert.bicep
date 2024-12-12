@@ -25,7 +25,7 @@ param windowSize WindowSize = 'PT5M'
 @description('The alert severity.')
 param severity Severity = 'Error'
 
-param sensitivity Sensitivity = 'High'
+param sensitivity Sensitivity = 'Low'
 
 param minFailingPeriodsToAlert int = 1
 
