@@ -62,6 +62,11 @@ module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
       availability: true
       queryTime: true
       transactionTime: true
+      clientConenctionsWaiting: true
+      cpuPercentage: true
+      diskBandwidth: true
+      diskIops: true
+      memoryPercentage: true
       alertGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues
