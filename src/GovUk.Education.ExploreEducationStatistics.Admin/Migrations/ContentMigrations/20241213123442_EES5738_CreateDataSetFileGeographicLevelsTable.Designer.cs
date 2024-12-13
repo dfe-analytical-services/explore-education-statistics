@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20241213112036_EES5738_CreateDataSetFileGeographicLevelsTable")]
+    [Migration("20241213123442_EES5738_CreateDataSetFileGeographicLevelsTable")]
     partial class EES5738_CreateDataSetFileGeographicLevelsTable
     {
         /// <inheritdoc />
@@ -336,8 +336,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("DataSetFileVersionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("GeographicLevel")
-                        .HasColumnType("int");
+                    b.Property<string>("GeographicLevel")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("DataSetFileVersionId", "GeographicLevel");
 

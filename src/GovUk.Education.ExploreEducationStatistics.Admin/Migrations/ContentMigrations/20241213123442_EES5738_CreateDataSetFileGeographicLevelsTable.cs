@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 columns: table => new
                 {
                     DataSetFileVersionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    GeographicLevel = table.Column<int>(type: "int", nullable: false)
+                    GeographicLevel = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {

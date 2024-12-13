@@ -333,8 +333,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("DataSetFileVersionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("GeographicLevel")
-                        .HasColumnType("int");
+                    b.Property<string>("GeographicLevel")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("DataSetFileVersionId", "GeographicLevel");
 

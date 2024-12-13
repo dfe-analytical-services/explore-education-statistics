@@ -470,6 +470,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     gl.DataSetFileVersionId,
                     gl.GeographicLevel
                 });
+
+                entity.Property(gl => gl.GeographicLevel)
+                    .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
             });
         }
 
