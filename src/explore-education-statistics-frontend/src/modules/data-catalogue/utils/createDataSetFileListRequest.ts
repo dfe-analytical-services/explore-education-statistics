@@ -23,6 +23,7 @@ export default function createDataSetFileListRequest(
     sortBy,
     publicationId,
     releaseId,
+    geographicLevel,
     searchTerm: searchParam,
     themeId,
   } = getParamsFromQuery(query);
@@ -43,6 +44,7 @@ export default function createDataSetFileListRequest(
       page: parseNumber(query.page) ?? 1,
       publicationId,
       releaseId,
+      geographicLevel,
       sort,
       sortDirection,
       searchTerm,
@@ -101,6 +103,7 @@ export function getParamsFromQuery(query: DataCataloguePageQuery) {
         : 'newest',
     publicationId: getFirst(query.publicationId),
     releaseId: getFirst(query.releaseId),
+    geographicLevel: getFirst(query.geographicLevel),
     searchTerm: getFirst(query.searchTerm),
     themeId: getFirst(query.themeId),
   };

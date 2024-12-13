@@ -26,35 +26,25 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
-public class DataSetFileService : IDataSetFileService
+public class DataSetFileService(
+    ContentDbContext contentDbContext,
+    IReleaseVersionRepository releaseVersionRepository,
+    IPublicBlobStorageService publicBlobStorageService,
+    IFootnoteRepository footnoteRepository)
+    : IDataSetFileService
 {
-    private readonly ContentDbContext _contentDbContext;
-    private readonly IReleaseVersionRepository _releaseVersionRepository;
-    private readonly IPublicBlobStorageService _publicBlobStorageService;
-    private readonly IFootnoteRepository _footnoteRepository;
-
-    public DataSetFileService(
-        ContentDbContext contentDbContext,
-        IReleaseVersionRepository releaseVersionRepository,
-        IPublicBlobStorageService publicBlobStorageService,
-        IFootnoteRepository footnoteRepository)
-    {
-        _contentDbContext = contentDbContext;
-        _releaseVersionRepository = releaseVersionRepository;
-        _publicBlobStorageService = publicBlobStorageService;
-        _footnoteRepository = footnoteRepository;
-    }
-
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
         Guid? themeId,
         Guid? publicationId,
         Guid? releaseVersionId,
+        GeographicLevel? geographicLevel,
         bool? latestOnly,
         DataSetType? dataSetType,
         string? searchTerm,
@@ -73,18 +63,19 @@ public class DataSetFileService : IDataSetFileService
         sortDirection ??= sort is Title or Natural ? Asc : Desc;
 
         var latestPublishedReleaseVersions =
-            _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
+            contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
 
-        var query = _contentDbContext.ReleaseFiles
+        var query = contentDbContext.ReleaseFiles
             .AsNoTracking()
             .OfFileType(FileType.Data)
             .HavingNoDataReplacementInProgress()
             .HavingThemeId(themeId)
             .HavingPublicationIdOrNoSupersededPublication(publicationId)
             .HavingReleaseVersionId(releaseVersionId)
+            .HavingGeographicLevel(geographicLevel)
             .OfDataSetType(dataSetType.Value)
             .HavingLatestPublishedReleaseVersions(latestPublishedReleaseVersions, latestOnly.Value)
-            .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
+            .JoinFreeText(contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
 
         var results = await query
             .OrderBy(sort.Value, sortDirection.Value)
@@ -144,10 +135,10 @@ public class DataSetFileService : IDataSetFileService
     public async Task<Either<ActionResult, List<DataSetSitemapItemViewModel>>> ListSitemapItems(
         CancellationToken cancellationToken = default)
     {
-        var latestReleaseVersions = _contentDbContext.ReleaseVersions
+        var latestReleaseVersions = contentDbContext.ReleaseVersions
             .LatestReleaseVersions(publishedOnly: true);
 
-        var latestReleaseFiles = _contentDbContext.ReleaseFiles
+        var latestReleaseFiles = contentDbContext.ReleaseFiles
             .AsNoTracking()
             .OfFileType(FileType.Data)
             .HavingNoDataReplacementInProgress()
@@ -176,7 +167,7 @@ public class DataSetFileService : IDataSetFileService
 
     public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(Guid dataSetFileId)
     {
-        var releaseFile = await _contentDbContext.ReleaseFiles
+        var releaseFile = await contentDbContext.ReleaseFiles
             .Include(rf => rf.ReleaseVersion.Publication.Theme)
             .Include(rf => rf.ReleaseVersion.Publication.SupersededBy)
             .Include(rf => rf.File)
@@ -188,7 +179,7 @@ public class DataSetFileService : IDataSetFileService
             .FirstOrDefaultAsync();
 
         if (releaseFile == null
-            || !await _releaseVersionRepository.IsLatestPublishedReleaseVersion(
+            || !await releaseVersionRepository.IsLatestPublishedReleaseVersion(
                 releaseFile.ReleaseVersionId))
         {
             return new NotFoundResult();
@@ -198,7 +189,7 @@ public class DataSetFileService : IDataSetFileService
 
         var variables = GetVariables(releaseFile.File.DataSetFileMeta!);
 
-        var footnotes = await _footnoteRepository.GetFootnotes(
+        var footnotes = await footnoteRepository.GetFootnotes(
             releaseFile.ReleaseVersionId,
             releaseFile.File.SubjectId);
 
@@ -249,7 +240,7 @@ public class DataSetFileService : IDataSetFileService
     public async Task<ActionResult> DownloadDataSetFile(
         Guid dataSetFileId)
     {
-        var releaseFile = await _contentDbContext.ReleaseFiles
+        var releaseFile = await contentDbContext.ReleaseFiles
             .Include(rf => rf.File)
             .Where(rf =>
                 rf.File.DataSetFileId == dataSetFileId
@@ -259,13 +250,13 @@ public class DataSetFileService : IDataSetFileService
             .FirstOrDefaultAsync();
 
         if (releaseFile == null
-            || !await _releaseVersionRepository.IsLatestPublishedReleaseVersion(
+            || !await releaseVersionRepository.IsLatestPublishedReleaseVersion(
                 releaseFile.ReleaseVersionId))
         {
             return new NotFoundResult();
         }
 
-        var stream = await _publicBlobStorageService.StreamBlob(
+        var stream = await publicBlobStorageService.StreamBlob(
             containerName: BlobContainers.PublicReleaseFiles,
             path: releaseFile.PublicPath());
 
@@ -306,7 +297,7 @@ public class DataSetFileService : IDataSetFileService
 
     private async Task<DataSetFileCsvPreviewViewModel> GetDataCsvPreview(ReleaseFile releaseFile)
     {
-        var datafileStreamProvider = () => _publicBlobStorageService.StreamBlob(
+        var datafileStreamProvider = () => publicBlobStorageService.StreamBlob(
             containerName: BlobContainers.PublicReleaseFiles,
             path: releaseFile.PublicPath());
 
@@ -489,6 +480,17 @@ internal static class ReleaseFileQueryableExtensions
         Guid? releaseVersionId)
     {
         return releaseVersionId.HasValue ? query.Where(rf => rf.ReleaseVersionId == releaseVersionId.Value) : query;
+    }
+
+    internal static IQueryable<ReleaseFile> HavingGeographicLevel( // @MarkFix write tests
+        this IQueryable<ReleaseFile> query,
+        GeographicLevel? geographicLevel)
+    {
+        return geographicLevel.HasValue
+            ? query.Where(rf => rf.File.DataSetFileGeographicLevels!.Any( // @MarkFix null allowing
+                gl => gl.GeographicLevel == geographicLevel
+                      && rf.FileId == gl.DataSetFileVersionId))
+            : query;
     }
 
     internal static IQueryable<ReleaseFile> OfDataSetType(
