@@ -482,12 +482,12 @@ internal static class ReleaseFileQueryableExtensions
         return releaseVersionId.HasValue ? query.Where(rf => rf.ReleaseVersionId == releaseVersionId.Value) : query;
     }
 
-    internal static IQueryable<ReleaseFile> HavingGeographicLevel( // @MarkFix write tests
+    internal static IQueryable<ReleaseFile> HavingGeographicLevel(
         this IQueryable<ReleaseFile> query,
         GeographicLevel? geographicLevel)
     {
         return geographicLevel.HasValue
-            ? query.Where(rf => rf.File.DataSetFileGeographicLevels!.Any( // @MarkFix null allowing
+            ? query.Where(rf => rf.File.DataSetFileGeographicLevels.Any(
                 gl => gl.GeographicLevel == geographicLevel
                       && rf.FileId == gl.DataSetFileVersionId))
             : query;

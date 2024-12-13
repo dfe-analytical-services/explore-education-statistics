@@ -19,8 +19,15 @@ public static class DataImportGeneratorExtensions
     
     public static Generator<DataImport> WithDefaultFiles(
         this Generator<DataImport> generator,
-        string dataFileName)
-        => generator.ForInstance(s => s.SetDefaultFiles(dataFileName));
+        string dataFileName,
+        bool metaSet = true)
+    {
+        if (metaSet)
+        {
+            return generator.ForInstance(s => s.SetDefaultFiles(dataFileName));
+        }
+        return generator.ForInstance(s => s.SetDefaultFilesWithoutMeta(dataFileName));
+    }
 
     public static Generator<DataImport> WithFile(
         this Generator<DataImport> generator,
@@ -85,6 +92,29 @@ public static class DataImportGeneratorExtensions
                 d => d.File,
                 (_, d, context) => context.Fixture
                     .DefaultFile(FileType.Data)
+                    .WithFilename($"{dataFileName}.csv")
+                    .WithSubjectId(d.SubjectId)
+            )
+            .Set(d => d.FileId, (_, d) => d.File.Id)
+            .Set(
+                d => d.MetaFile,
+                (_, d, context) => context.Fixture
+                    .DefaultFile(FileType.Metadata)
+                    .WithFilename($"{dataFileName}.meta.csv")
+                    .WithSubjectId(d.SubjectId)
+            )
+            .Set(d => d.MetaFileId, (_, d) => d.MetaFile.Id);
+
+    public static InstanceSetters<DataImport> SetDefaultFilesWithoutMeta(
+        this InstanceSetters<DataImport> setters,
+        string dataFileName)
+        => setters
+            .Set(
+                d => d.File,
+                (_, d, context) => context.Fixture
+                    .DefaultFile(FileType.Data)
+                    .WithDataSetFileMeta(null)
+                    .WithDataSetFileGeographicLevels([])
                     .WithFilename($"{dataFileName}.csv")
                     .WithSubjectId(d.SubjectId)
             )

@@ -220,6 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             var file = _fixture.DefaultFile(FileType.Data)
                 .WithDataSetFileMeta(null)
+                .WithDataSetFileGeographicLevels([])
                 .WithSubjectId(subject.Id)
                 .Generate();
 

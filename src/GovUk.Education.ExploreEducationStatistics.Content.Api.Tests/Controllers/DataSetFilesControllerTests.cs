@@ -96,6 +96,51 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             }
 
             [Fact]
+            public async Task FilterByGeographicLevel_Success()
+            {
+                var (publication1, publication2) = _fixture
+                    .DefaultPublication()
+                    // Publications each have a published release version
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                    .WithTheme(_fixture.DefaultTheme())
+                    .GenerateTuple2();
+
+                var publication1Release1Version1Files = _fixture.DefaultReleaseFile()
+                    .WithReleaseVersion(publication1.ReleaseVersions[0])
+                    .WithFiles(_fixture.DefaultFile(FileType.Data)
+                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                        .WithGeographicLevels(
+                            [GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.Institution]))
+                    .WithDataSetFileGeographicLevels(
+                        [GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.Institution])
+                    .GenerateList(1))
+                    .GenerateList();
+
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
+
+                await TestApp.AddTestData<ContentDbContext>(context =>
+                {
+                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                });
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                var query = new DataSetFileListRequest(GeographicLevel: GeographicLevel.Institution.GetEnumValue());
+                var response = await ListDataSetFiles(query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(
+                    expectedTotalResults: 1);
+                AssertResultsForExpectedReleaseFiles(publication1Release1Version1Files, pagedResult.Results);
+            }
+
+            [Fact]
             public async Task FilterByPublicationId_Success()
             {
                 var (publication1, publication2) = _fixture
@@ -1675,6 +1720,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 { "themeId", request.ThemeId?.ToString() },
                 { "publicationId", request.PublicationId?.ToString() },
                 { "releaseId", request.ReleaseId?.ToString() },
+                { "geographicLevel", request.GeographicLevel },
                 { "latestOnly", request.LatestOnly?.ToString() },
                 { "searchTerm", request.SearchTerm },
                 { "sort", request.Sort?.ToString() },
@@ -1737,6 +1783,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithReleaseVersion(releaseVersion)
                 .WithFiles(_fixture.DefaultFile(FileType.Data)
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta())
+                    .WithDataSetFileGeographicLevels([GeographicLevel.Country])
                     .GenerateList(numberOfDataSets))
                 .GenerateList();
         }

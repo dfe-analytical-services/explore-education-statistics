@@ -222,6 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             file.DataSetFileMeta = dataSetFileMeta;
 
             var dataSetFileGeographicLevels = geographicLevels
+                .Distinct()
                 .Select(gl => new DataSetFileGeographicLevel
                 {
                     DataSetFileVersionId = fileId,
