@@ -57,6 +57,7 @@ const fileErrorMappings = {
   FilenameNotUnique: 'FilenameNotUnique',
   FileSizeMustNotBeZero: 'FileSizeMustNotBeZero',
   MustBeCsvFile: 'MustBeCsvFile',
+  CannotReplaceDataSetWithApiDataSet: 'CannotReplaceDataSetWithApiDataSet',
 };
 
 function baseErrorMappings(
