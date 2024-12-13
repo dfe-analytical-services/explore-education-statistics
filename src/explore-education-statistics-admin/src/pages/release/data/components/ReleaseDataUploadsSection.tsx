@@ -111,6 +111,14 @@ const ReleaseDataUploadsSection = ({
     dataFile: DataFile,
     { totalRows, status }: DataFileImportStatus,
   ) => {
+    // EES-5732 UI tests related to data replacement sometimes fail
+    // because of a permission call for the replaced file being called,
+    // probably caused by the speed of the tests.
+    // This prevents this happening.
+    if (status === 'NOT_FOUND') {
+      return;
+    }
+
     const permissions = await permissionService.getDataFilePermissions(
       releaseId,
       dataFile.id,
