@@ -284,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 contentDbContextId,
                 statisticsDbContextId);
 
-            await service.WriteDataSetFileMeta(subject.Id);
+            await service.WriteDataSetFileMeta(file.Id, subject.Id);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
