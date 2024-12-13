@@ -55,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<ReleaseStatus> ReleaseStatus { get; set; }
         public virtual DbSet<ReleaseFile> ReleaseFiles { get; set; }
         public virtual DbSet<File> Files { get; set; }
+        public virtual DbSet<DataSetFileGeographicLevel> DataSetFileGeographicLevels { get; set; }
         public virtual DbSet<ContentSection> ContentSections { get; set; }
         public virtual DbSet<ContentBlock> ContentBlocks { get; set; }
         public virtual DbSet<KeyStatistic> KeyStatistics { get; set; }
@@ -110,6 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureReleaseStatus(modelBuilder);
             ConfigureReleaseFile(modelBuilder);
             ConfigureFile(modelBuilder);
+            ConfigureDataSetFileGeographicLevel(modelBuilder);
             ConfigureContentBlock(modelBuilder);
             ConfigureContentSection(modelBuilder);
             ConfigureReleaseVersion(modelBuilder);
@@ -452,10 +454,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         v => v.HasValue
                             ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
                             : null);
-                entity.Property(p => p.DataSetFileMeta)
-                    .HasConversion( // You might want to use EF8 JSON support instead of this
+                entity.Property(p => p.DataSetFileMeta) // EES-5666
+                    .HasConversion(
                         v => JsonConvert.SerializeObject(v),
                         v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
+            });
+        }
+
+        private static void ConfigureDataSetFileGeographicLevel(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DataSetFileGeographicLevel>(entity =>
+            {
+                entity.HasKey(gl => new
+                {
+                    gl.DataSetFileVersionId,
+                    gl.GeographicLevel
+                });
             });
         }
 
