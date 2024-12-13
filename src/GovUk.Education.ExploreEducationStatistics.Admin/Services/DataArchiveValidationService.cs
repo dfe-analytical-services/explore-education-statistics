@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using static GovUk.Education.ExploreEducationStatistics.Common.Constants.ValidationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -103,8 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
                 {
-                    Code = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Code,
-                    Message = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Message,
+                    Code = ValidationMessages.BulkDataZipMustContainDataSetNamesCsv.Code,
+                    Message = ValidationMessages.BulkDataZipMustContainDataSetNamesCsv.Message,
                 });
             }
 
@@ -120,8 +121,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return Common.Validators.ValidationUtils.ValidationResult(new ErrorViewModel
                 {
-                    Code = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Code,
-                    Message = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Message,
+                    Code = ValidationMessages.DataSetNamesCsvIncorrectHeaders.Code,
+                    Message = ValidationMessages.DataSetNamesCsvIncorrectHeaders.Message,
                 });
             }
 
@@ -142,9 +143,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 var filename = row[fileNameIndex];
                 var datasetName = row[datasetNameIndex].Trim();
 
-                if (datasetName.Length > 120)
+                if (datasetName.Length > SubjectTitleMaxLength)
                 {
-                    errors.Add(ValidationMessages.GenerateErrorDatasetTitleTooLong(datasetName));
+                    errors.Add(ValidationMessages.GenerateErrorDataSetTitleTooLong(datasetName));
                 }
 
                 dataSetNamesCsvEntries.Add((BaseFilename: filename, Title: datasetName));
@@ -156,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList()
                 .ForEach(baseFilename =>
                 {
-                    errors.Add(ValidationMessages.GenerateErrorDatasetNamesCsvFilenamesShouldNotEndDotCsv(baseFilename));
+                    errors.Add(ValidationMessages.GenerateErrorDataSetNamesCsvFilenamesShouldNotEndDotCsv(baseFilename));
                 });
 
             // Check for duplicate data set titles - because the bulk zip itself may contain duplicates!
@@ -180,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ForEach(duplicateFilename =>
                 {
                     errors.Add(ValidationMessages
-                        .GenerateErrorDatasetNamesCsvFilenamesShouldBeUnique(duplicateFilename));
+                        .GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique(duplicateFilename));
                 });
 
             if (errors.Count > 0)

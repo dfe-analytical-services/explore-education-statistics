@@ -21,6 +21,8 @@ export interface AncillaryFileFormValues {
 
 const formId = 'ancillaryFileForm';
 const MAX_FILE_SIZE = 2147483647; // 2GB
+const titleMaxLength = 120;
+const summaryMaxLength = 250;
 
 const errorMappings = [
   mapFieldErrors<AncillaryFileFormValues>({
@@ -77,10 +79,16 @@ export default function AncillaryFileForm({
             );
           },
         })
-        .max(120, 'Title must be 120 characters or less'),
+        .max(
+          titleMaxLength,
+          `Title must be ${titleMaxLength} characters or less`,
+        ),
       summary: Yup.string()
         .required('Enter a summary')
-        .max(250, 'Summary must be 250 characters or less'),
+        .max(
+          summaryMaxLength,
+          `Summary must be ${summaryMaxLength} characters or less`,
+        ),
       file: Yup.file()
         .minSize(0, 'Choose a file that is not empty')
         .maxSize(MAX_FILE_SIZE, 'Choose a file that is under 2GB')
@@ -120,7 +128,7 @@ export default function AncillaryFileForm({
               disabled={formState.isSubmitting}
               label="Title"
               name="title"
-              maxLength={120}
+              maxLength={titleMaxLength}
             />
 
             <FormFieldTextArea<AncillaryFileFormValues>
@@ -128,7 +136,7 @@ export default function AncillaryFileForm({
               disabled={formState.isSubmitting}
               label="Summary"
               name="summary"
-              maxLength={250}
+              maxLength={summaryMaxLength}
             />
 
             <FormFieldFileInput<AncillaryFileFormValues>

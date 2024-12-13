@@ -55,6 +55,8 @@ export default function ReleaseDataFilePage({
     );
   };
 
+  const titleMaxLength = 120;
+
   return (
     <>
       <Link
@@ -78,7 +80,10 @@ export default function ReleaseDataFilePage({
               validationSchema={Yup.object<FormValues>({
                 title: Yup.string()
                   .required('Enter a title')
-                  .max(120, 'Subject title must be 120 characters or less'),
+                  .max(
+                    titleMaxLength,
+                    `Subject title must be ${titleMaxLength} characters or less`,
+                  ),
               })}
             >
               <Form id="dataFileForm" onSubmit={handleSubmit}>
@@ -86,7 +91,7 @@ export default function ReleaseDataFilePage({
                   className="govuk-!-width-two-thirds"
                   label="Title"
                   name="title"
-                  maxLength={120}
+                  maxLength={titleMaxLength}
                 />
 
                 <Button type="submit">Save changes</Button>

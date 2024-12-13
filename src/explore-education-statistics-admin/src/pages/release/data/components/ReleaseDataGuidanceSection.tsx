@@ -44,6 +44,7 @@ interface Props {
   canUpdateRelease: boolean;
 }
 
+const contentMaxLength = 250;
 const formId = 'dataGuidanceForm';
 
 const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
@@ -126,8 +127,8 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                           return `Enter file guidance content for ${dataSet.name}`;
                         })
                         .max(
-                          250,
-                          'File guidance content must be 250 characters or less',
+                          contentMaxLength,
+                          `File guidance content must be ${contentMaxLength} characters or less`,
                         ),
                     }),
                   ),
@@ -184,7 +185,7 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                                         label="File guidance content"
                                         name={`dataSets.${index}.content`}
                                         rows={3}
-                                        maxLength={250}
+                                        maxLength={contentMaxLength}
                                       />
                                     ) : (
                                       <ContentHtml

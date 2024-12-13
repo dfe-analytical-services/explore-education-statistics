@@ -29,6 +29,7 @@ export interface DataFileUploadFormValues {
 }
 
 const MAX_FILENAME_SIZE = 150;
+const titleMaxLength = 120;
 
 const subjectErrorMappings = [
   mapFieldErrors<DataFileUploadFormValues>({
@@ -71,19 +72,19 @@ function baseErrorMappings(
           ...fileErrorMappings,
           ZipFilenameMustEndDotZip: 'ZipFilenameMustEndDotZip',
           MustBeZipFile: 'MustBeZipFile',
-          BulkDataZipMustContainDatasetNamesCsv:
-            'BulkDataZipMustContainDatasetNamesCsv',
-          DatasetNamesCsvReaderException: 'DatasetNamesCsvReaderException',
-          DatasetNamesCsvIncorrectHeaders: 'DatasetNamesCsvIncorrectHeaders',
-          DatasetNamesCsvFilenamesShouldNotEndDotCsv:
-            'DatasetNamesCsvFilenamesShouldNotEndDotCsv',
-          DatasetNamesCsvFilenamesShouldBeUnique:
-            'DatasetNamesCsvFilenamesShouldBeUnique',
+          BulkDataZipMustContainDataSetNamesCsv:
+            'BulkDataZipMustContainDataSetNamesCsv',
+          DataSetNamesCsvReaderException: 'DataSetNamesCsvReaderException',
+          DataSetNamesCsvIncorrectHeaders: 'DataSetNamesCsvIncorrectHeaders',
+          DataSetNamesCsvFilenamesShouldNotEndDotCsv:
+            'DataSetNamesCsvFilenamesShouldNotEndDotCsv',
+          DataSetNamesCsvFilenamesShouldBeUnique:
+            'DataSetNamesCsvFilenamesShouldBeUnique',
           FileNotFoundInZip: 'FileNotFoundInZip',
           ZipContainsUnusedFiles: 'ZipContainsUnusedFiles',
           DataReplacementAlreadyInProgress:
             'Data replacement already in progress',
-          DatasetTitleTooLong: 'DatasetTitleTooLong',
+          DataSetTitleTooLong: 'DataSetTitleTooLong',
         },
       }),
     ];
@@ -197,7 +198,10 @@ export default function DataFileUploadForm({
                   );
                 },
               })
-              .max(120, 'Subject title must be 120 characters or less'),
+              .max(
+                titleMaxLength,
+                `Subject title must be ${titleMaxLength} characters or less`,
+              ),
         }),
       });
     }
@@ -237,7 +241,7 @@ export default function DataFileUploadForm({
                   name="subjectTitle"
                   label="Subject title"
                   className="govuk-!-width-two-thirds"
-                  maxLength={120}
+                  maxLength={titleMaxLength}
                 />
               )}
 
