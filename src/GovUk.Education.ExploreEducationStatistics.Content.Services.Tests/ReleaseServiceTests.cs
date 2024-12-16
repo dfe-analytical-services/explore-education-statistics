@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -851,7 +850,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             return new(
                 contentDbContext,
-                new PersistenceHelper<ContentDbContext>(contentDbContext),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,

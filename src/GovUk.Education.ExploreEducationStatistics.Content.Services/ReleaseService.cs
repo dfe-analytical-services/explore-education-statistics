@@ -8,7 +8,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -25,7 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IUserService _userService;
@@ -36,42 +34,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         public ReleaseService(
             ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IReleaseFileRepository releaseFileRepository,
             IReleaseVersionRepository releaseVersionRepository,
             IUserService userService,
             IMapper mapper)
         {
             _contentDbContext = contentDbContext;
-            _persistenceHelper = persistenceHelper;
             _releaseFileRepository = releaseFileRepository;
             _releaseVersionRepository = releaseVersionRepository;
             _userService = userService;
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(string publicationSlug,
+        public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(
+            string publicationSlug,
             string? releaseSlug = null)
         {
-            return await _persistenceHelper.CheckEntityExists<Publication>(q =>
-                    q.Where(p => p.Slug == publicationSlug))
+            return await _contentDbContext.Publications
+                .SingleOrNotFoundAsync(p => p.Slug == publicationSlug)
                 .OnSuccess(async publication =>
                 {
-                    // If no release is requested get the latest published release version
-                    if (releaseSlug == null)
-                    {
-                        return await _releaseVersionRepository.GetLatestPublishedReleaseVersion(publication.Id)
-                            .OrNotFound();
-                    }
+                    // If no release is requested use the publication's latest published release version,
+                    // otherwise use the latest published version of the requested release
+                    var latestReleaseVersionId = releaseSlug == null
+                        ? publication.LatestPublishedReleaseVersionId
+                        : (await _releaseVersionRepository.GetLatestPublishedReleaseVersion(publication.Id,
+                            releaseSlug))?.Id;
 
-                    // Otherwise get the latest published version of the requested release
-                    return await _releaseVersionRepository.GetLatestPublishedReleaseVersion(publication.Id, releaseSlug)
-                        .OrNotFound();
-                })
-                .OnSuccess(releaseVersion => GetRelease(releaseVersion.Id));
+                    return latestReleaseVersionId.HasValue
+                        ? await GetRelease(latestReleaseVersionId.Value)
+                        : new NotFoundResult();
+                });
         }
 
-        public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(Guid releaseVersionId,
+        public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(
+            Guid releaseVersionId,
             DateTime? expectedPublishDate = null)
         {
             // Note this method is allowed to return a view model for an unpublished release version so that Publisher
@@ -107,10 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug)
         {
-            return await _persistenceHelper.CheckEntityExists<Publication>(
-                    q => q
-                        .Where(p => p.Slug == publicationSlug)
-                )
+            return await _contentDbContext.Publications
+                .SingleOrNotFoundAsync(p => p.Slug == publicationSlug)
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(async publication =>
                 {
@@ -140,9 +135,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private async Task<List<FileInfo>> GetDownloadFiles(ReleaseVersion releaseVersion)
         {
             var files = await _releaseFileRepository.GetByFileType(
-                releaseVersion.Id, 
+                releaseVersion.Id,
                 types: [FileType.Ancillary, FileType.Data]);
-            
+
             return files
                 .Select(rf => rf.ToPublicFileInfo())
                 .OrderBy(file => file.Name)
