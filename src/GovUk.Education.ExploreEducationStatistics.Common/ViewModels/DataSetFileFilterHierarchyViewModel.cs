@@ -1,4 +1,7 @@
-namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using System;
+using System.Collections.Generic;
+
+namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 public record DataSetFileFilterHierarchyViewModel(
     Guid RootFilterId,

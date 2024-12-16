@@ -77,7 +77,7 @@ public class FilterAndIndicatorValuesReader
         return rowValues[columnIndex].Trim().NullIfWhiteSpace() ?? DefaultFilterItemLabel;
     }
 
-    public string GetFilterGroupLabel(
+    public string GetFilterGroupLabel( // @MarkFix
         IReadOnlyList<string> rowValues,
         Guid filterId)
     {

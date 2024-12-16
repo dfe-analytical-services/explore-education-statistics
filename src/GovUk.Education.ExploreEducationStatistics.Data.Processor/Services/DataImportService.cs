@@ -1,13 +1,17 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using AngleSharp.Dom;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -189,6 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Label = f.Label,
                     Hint = f.Hint,
                     ColumnName = f.Name,
+                    GroupCsvColumn = f.GroupCsvColumn,
                 })
                 .ToListAsync();
 
@@ -230,7 +235,111 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             contentDbContext.DataSetFileVersionGeographicLevels.AddRange(
                 dataSetFileVersionGeographicLevels);
 
+            file.FilterHierarchies = await GenerateFilterHierarchies(statisticsDbContext, filters);
+
             await contentDbContext.SaveChangesAsync();
+        }
+
+        private static async Task<List<DataSetFileFilterHierarchy>> GenerateFilterHierarchies(
+            StatisticsDbContext statisticsDbContext,
+            List<FilterMeta> filters)
+        {
+            var rootFilters = filters
+                .Where(parentFilter => parentFilter.GroupCsvColumn == null
+                                       && filters.Any(childFilter =>
+                                           parentFilter.ColumnName == childFilter.GroupCsvColumn));
+
+            var hierarchies = new List<DataSetFileFilterHierarchy>();
+
+            foreach (var rootFilter in rootFilters)
+            {
+                var hierarchy = await GenerateFilterHierarchy(statisticsDbContext, rootFilter, filters);
+                hierarchies.Add(hierarchy);
+            }
+
+            return hierarchies;
+        }
+
+        private static async Task<DataSetFileFilterHierarchy> GenerateFilterHierarchy(
+            StatisticsDbContext statisticsDbContext,
+            FilterMeta rootFilter,
+            List<FilterMeta> filters)
+        {
+            var rootFilterItemIds = statisticsDbContext.FilterItem
+                .AsNoTracking()
+                .Where(fi => fi.FilterGroup.FilterId == rootFilter.Id)
+                .Select(fi => fi.Id)
+                .ToHashSet();
+
+            var childFilterIds = new List<Guid>();
+            var tiers = new List<Dictionary<Guid, List<Guid>>>();
+
+            var parentFilter = rootFilter;
+            var parentFilterItemIds = rootFilterItemIds;
+            var childFilter = filters
+                .Single(f => f.GroupCsvColumn == parentFilter.ColumnName);
+
+            while (true) // one iteration of loop per tier
+            {
+                var currentParentFilterId = parentFilter.Id; // avoid closure madness
+                var currentChildFilterId = childFilter.Id;
+
+                childFilterIds.Add(currentChildFilterId);
+
+                var filterItemRelationships = await statisticsDbContext.FilterItem
+                    .AsNoTracking()
+                    .Where(fi => fi.FilterGroup.FilterId == currentParentFilterId)
+                    .SelectMany(parentFilterItem =>
+                        statisticsDbContext.ObservationFilterItem
+                            .AsNoTracking()
+                            .Where(childOfi =>
+                                childOfi.FilterId == currentChildFilterId
+                                && statisticsDbContext.ObservationFilterItem.Any(parentOfi =>
+                                    childOfi.ObservationId == parentOfi.ObservationId
+                                    && parentOfi.FilterItemId == parentFilterItem.Id))
+                            .Select(childOfi => new
+                            {
+                                FilterItemId = childOfi.FilterItem.Id,
+                                ParentItemId = parentFilterItem.Id,
+                            })
+                            .ToList())
+                    .Distinct()
+                    .ToListAsync();
+
+                var tier = new Dictionary<Guid, List<Guid>>();
+                foreach (var parentFilterItemId in parentFilterItemIds)
+                {
+                    var childFilterItemIdsForParentItem = filterItemRelationships
+                        .Where(childFilterItem => childFilterItem.ParentItemId == parentFilterItemId)
+                        .Select(childFilterItem => childFilterItem.FilterItemId)
+                        .ToList();
+
+                    tier.Add(parentFilterItemId, childFilterItemIdsForParentItem);
+                }
+
+                tiers.Add(tier);
+
+                // check whether we're finished
+                var newChildFilter = filters
+                    .SingleOrDefault(newChildFilter => newChildFilter.GroupCsvColumn == childFilter.ColumnName);
+                if (newChildFilter == null)
+                {
+                    break;
+                }
+
+                // if not finished, prepare for next iteration of loop
+                parentFilter = childFilter;
+                childFilter = newChildFilter;
+                parentFilterItemIds = filterItemRelationships
+                    .Select(childFilterItem => childFilterItem.FilterItemId)
+                    .ToHashSet();
+            }
+
+            return new DataSetFileFilterHierarchy(
+                RootFilterId: rootFilter.Id,
+                ChildFilterIds: childFilterIds,
+                RootOptionIds: [.. rootFilterItemIds],
+                Tiers: tiers);
         }
     }
 }
