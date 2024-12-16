@@ -1,6 +1,9 @@
+import { Dictionary } from '@common/types';
+
 export interface Redirects {
   methodologyRedirects: Redirect[];
   publicationRedirects: Redirect[];
+  releaseRedirectsByPublicationSlug: Dictionary<Redirect[]>;
 }
 
 export type RedirectType = keyof Redirects;
