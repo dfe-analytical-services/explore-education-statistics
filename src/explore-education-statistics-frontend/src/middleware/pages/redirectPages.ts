@@ -157,7 +157,7 @@ function findRedirectIfExists(
         [latestPublicationSlug]: releaseRedirectsForLatestPublication = [],
       } = cachedRedirects?.redirects.releaseRedirectsByPublicationSlug || {};
 
-      return releaseRedirectsForLatestPublication?.find(
+      return releaseRedirectsForLatestPublication.find(
         ({ fromSlug }) => slug === fromSlug,
       );
     }
