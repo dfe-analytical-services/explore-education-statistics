@@ -54,16 +54,6 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         return releaseVersion.PreviousVersion.Published.Value;
     }
 
-    public async Task<ReleaseVersion?> GetLatestPublishedReleaseVersion(
-        Guid publicationId,
-        CancellationToken cancellationToken = default)
-    {
-        return (await _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true)
-                .ToListAsync(cancellationToken: cancellationToken))
-            .OrderByReverseChronologicalOrder()
-            .FirstOrDefault();
-    }
-
     public async Task<ReleaseVersion?> GetLatestReleaseVersion(
         Guid publicationId,
         CancellationToken cancellationToken = default)

@@ -13,16 +13,6 @@ public interface IReleaseVersionRepository
         DateTime actualPublishedDate);
 
     /// <summary>
-    /// Retrieves the latest published version from all releases in reverse chronological order that are associated with a publication.
-    /// </summary>
-    /// <param name="publicationId">The unique identifier of the publication.</param>
-    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-    /// <returns>The latest published version from all releases in reverse chronological order that are associated with a publication.</returns>
-    Task<ReleaseVersion?> GetLatestPublishedReleaseVersion(
-        Guid publicationId,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
     /// Retrieves the latest published version of a release matching a given slug associated with a publication.
     /// </summary>
     /// <param name="publicationId">The unique identifier of the publication.</param>
