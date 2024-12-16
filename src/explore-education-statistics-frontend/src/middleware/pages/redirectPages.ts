@@ -1,6 +1,5 @@
 import { Dictionary } from '@common/types';
 import redirectService, { Redirects } from '@frontend/services/redirectService';
-import _ from 'lodash';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -46,7 +45,7 @@ export default async function redirectPages(
   // Check for redirects for publication, release, and methodology pages
   const routeSlugsBySlugKey = findRouteSlugsBySlugKey(lowerCasedPathname);
 
-  if (!_.isEmpty(routeSlugsBySlugKey)) {
+  if (Object.keys(routeSlugsBySlugKey).length > 0) {
     await refreshCache();
 
     const redirectPath = determineRedirectPath(
@@ -154,10 +153,13 @@ function findRedirectIfExists(
         latestPublicationSlug = publicationRedirect.toSlug;
       }
 
-      return _.get(
-        cachedRedirects?.redirects.releaseRedirectsByPublicationSlug,
-        latestPublicationSlug,
-      )?.find(({ fromSlug }) => slug === fromSlug);
+      const {
+        [latestPublicationSlug]: releaseRedirectsForLatestPublication = [],
+      } = cachedRedirects?.redirects.releaseRedirectsByPublicationSlug || {};
+
+      return releaseRedirectsForLatestPublication?.find(
+        ({ fromSlug }) => slug === fromSlug,
+      );
     }
     default:
       throw new Error(`'${slugKey}' is not a valid redirect type.`);
