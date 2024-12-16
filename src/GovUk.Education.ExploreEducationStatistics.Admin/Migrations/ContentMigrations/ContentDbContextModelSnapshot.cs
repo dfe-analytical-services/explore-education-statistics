@@ -1751,7 +1751,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyRedirect", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersion", "MethodologyVersion")
-                        .WithMany()
+                        .WithMany("MethodologyRedirects")
                         .HasForeignKey("MethodologyVersionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1892,7 +1892,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRedirect", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
-                        .WithMany()
+                        .WithMany("PublicationRedirects")
                         .HasForeignKey("PublicationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1933,7 +1933,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRedirect", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
-                        .WithMany()
+                        .WithMany("ReleaseRedirects")
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2192,12 +2192,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("MethodologyContent")
                         .IsRequired();
 
+                    b.Navigation("MethodologyRedirects");
+
                     b.Navigation("Notes");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
                 {
                     b.Navigation("Methodologies");
+
+                    b.Navigation("PublicationRedirects");
 
                     b.Navigation("ReleaseVersions");
 
@@ -2206,6 +2210,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", b =>
                 {
+                    b.Navigation("ReleaseRedirects");
+
                     b.Navigation("Versions");
                 });
 
