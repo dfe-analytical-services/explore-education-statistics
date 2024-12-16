@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OnSuccess(async publication =>
                 {
                     var publishedReleaseVersions =
-                        await _releaseVersionRepository.ListLatestPublishedReleaseVersions(publication.Id);
+                        await _releaseVersionRepository.ListLatestReleaseVersions(publication.Id, publishedOnly: true);
                     return publishedReleaseVersions
                         .Select(releaseVersion => new ReleaseSummaryViewModel(releaseVersion,
                             latestPublishedRelease: releaseVersion.Id == publication.LatestPublishedReleaseVersionId))

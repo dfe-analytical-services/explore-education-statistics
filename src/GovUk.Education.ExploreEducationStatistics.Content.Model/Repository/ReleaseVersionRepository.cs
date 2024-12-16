@@ -103,39 +103,24 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
             cancellationToken: cancellationToken);
     }
 
-    public async Task<List<ReleaseVersion>> ListLatestPublishedReleaseVersions(
-        Guid publicationId,
-        CancellationToken cancellationToken = default)
-    {
-        return (await _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true)
-                .ToListAsync(cancellationToken: cancellationToken))
-            .OrderByReverseChronologicalOrder()
-            .ToList();
-    }
-
-    public async Task<List<Guid>> ListLatestPublishedReleaseVersionIds(
-        Guid publicationId,
-        CancellationToken cancellationToken = default)
-    {
-        return await _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true)
-            .Select(rv => rv.Id)
-            .ToListAsync(cancellationToken: cancellationToken);
-    }
-
     public async Task<List<Guid>> ListLatestReleaseVersionIds(
         Guid publicationId,
+        bool publishedOnly = false,
         CancellationToken cancellationToken = default)
     {
-        return await _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId)
+        return await _contentDbContext.ReleaseVersions
+            .LatestReleaseVersions(publicationId, publishedOnly: publishedOnly)
             .Select(rv => rv.Id)
             .ToListAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<List<ReleaseVersion>> ListLatestReleaseVersions(
         Guid publicationId,
+        bool publishedOnly = false,
         CancellationToken cancellationToken = default)
     {
-        return (await _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId)
+        return (await _contentDbContext.ReleaseVersions
+                .LatestReleaseVersions(publicationId, publishedOnly: publishedOnly)
                 .ToListAsync(cancellationToken: cancellationToken))
             .OrderByReverseChronologicalOrder()
             .ToList();

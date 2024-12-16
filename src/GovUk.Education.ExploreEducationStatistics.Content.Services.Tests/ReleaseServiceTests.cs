@@ -745,7 +745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(2, releases.Count);
 
-                // Ordered from most newest to oldest
+                // Ordered from newest to oldest
                 Assert.Equal(release2Version1.Id, releases[0].Id);
                 Assert.Equal(release2Version1.Title, releases[0].Title);
                 Assert.Equal(release2Version1.Slug, releases[0].Slug);

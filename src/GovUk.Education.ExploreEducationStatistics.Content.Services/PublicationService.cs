@@ -294,7 +294,8 @@ public class PublicationService : IPublicationService
         var latestReleaseHasData =
             latestPublishedReleaseVersionId.HasValue && await HasAnyDataFiles(latestPublishedReleaseVersionId.Value);
 
-        var publishedReleaseVersionIds = await _releaseVersionRepository.ListLatestPublishedReleaseVersionIds(publication.Id);
+        var publishedReleaseVersionIds =
+            await _releaseVersionRepository.ListLatestReleaseVersionIds(publication.Id, publishedOnly: true);
         var anyLiveReleaseHasData = await publishedReleaseVersionIds
             .ToAsyncEnumerable()
             .AnyAwaitAsync(async id => await HasAnyDataFiles(id));
