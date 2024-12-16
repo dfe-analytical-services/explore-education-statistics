@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public ChartBaseDataSet DataSet;
         public ChartDataGrouping DataGrouping;
-        public long BoundaryLevel;
+        public long? BoundaryLevel;
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
