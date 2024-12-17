@@ -48,8 +48,8 @@ export const connectionRefusedErrorRate = new Rate(
 export const connectionResetErrorRate = new Rate(
   'ees_public_api_query_connection_reset_count',
 );
-export const http2StreamErrorRate = new Rate(
-  'ees_public_api_query_http2_stream_error_count',
+export const gatewayTimeoutErrorRate = new Rate(
+  'ees_public_api_query_gateway_timeout_error_count',
 );
 
 export interface PublicationAndDataSets extends Publication {
@@ -208,8 +208,8 @@ const performTest = ({ publications }: SetupData) => {
         connectionResetErrorRate.add(1);
       }
 
-      if (error.error_code >= 1630 && error.error_code <= 1649) {
-        http2StreamErrorRate.add(1);
+      if (error.error_code === 1504) {
+        gatewayTimeoutErrorRate.add(1);
       }
 
       if (error.status === 400 || error.status === 500) {
