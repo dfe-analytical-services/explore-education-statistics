@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -24,14 +25,14 @@ public class DataSetFileMetaMigrationController(ContentDbContext contentDbContex
     }
 
     [HttpPut("bau/migrate-datasetfile-geographiclevels")]
-    public async Task<MigrationResult> DataSetFileGeographicLevelsMigration(
+    public async Task<MigrationResult> DataSetFileVersionGeographicLevelsMigration(
         [FromQuery] bool isDryRun = true,
         [FromQuery] int? num = null,
         CancellationToken cancellationToken = default)
     {
         var queryable = contentDbContext.Files
-            .Where(f => f.DataSetFileMeta != null
-                        && f.DataSetFileGeographicLevels.Count == 0);
+            .Where(f => f.Type == FileType.Data
+                        && f.DataSetFileVersionGeographicLevels.Count == 0);
 
         if (num != null)
         {
@@ -53,16 +54,17 @@ public class DataSetFileMetaMigrationController(ContentDbContext contentDbContex
                 continue;
             }
 
-            var dataSetFileGeographicLevels = meta!.GeographicLevels
+            var dataSetFileVersionGeographicLevels = meta!.GeographicLevels
                 .Distinct()
-                .Select(gl => new DataSetFileGeographicLevel
+                .Select(gl => new DataSetFileVersionGeographicLevel
                 {
                     DataSetFileVersionId = file.Id,
                     GeographicLevel = gl,
                 })
                 .ToList();
 
-            contentDbContext.DataSetFileGeographicLevels.AddRange(dataSetFileGeographicLevels);
+            contentDbContext.DataSetFileVersionGeographicLevels.AddRange(
+                dataSetFileVersionGeographicLevels);
 
             numProcessed++;
         }

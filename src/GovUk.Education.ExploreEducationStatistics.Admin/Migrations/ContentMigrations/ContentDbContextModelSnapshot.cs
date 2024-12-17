@@ -328,17 +328,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.ToTable("DataImportErrors");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileGeographicLevel", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersionGeographicLevel", b =>
                 {
                     b.Property<Guid>("DataSetFileVersionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("GeographicLevel")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
 
                     b.HasKey("DataSetFileVersionId", "GeographicLevel");
 
-                    b.ToTable("DataSetFileGeographicLevels");
+                    b.ToTable("DataSetFileVersionGeographicLevels");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EmbedBlock", b =>
@@ -1607,10 +1608,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("DataImport");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileGeographicLevel", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersionGeographicLevel", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "DataSetFileVersion")
-                        .WithMany("DataSetFileGeographicLevels")
+                        .WithMany("DataSetFileVersionGeographicLevels")
                         .HasForeignKey("DataSetFileVersionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2206,7 +2207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.File", b =>
                 {
-                    b.Navigation("DataSetFileGeographicLevels");
+                    b.Navigation("DataSetFileVersionGeographicLevels");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", b =>

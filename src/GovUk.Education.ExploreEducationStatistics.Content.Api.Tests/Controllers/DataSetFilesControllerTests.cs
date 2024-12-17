@@ -101,27 +101,21 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
-                        .Generate(1))
+                    .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)])
                     .WithTheme(_fixture.DefaultTheme())
                     .GenerateTuple2();
 
-                var publication1Release1Version1Files = _fixture.DefaultReleaseFile()
+                ReleaseFile publication1Release1Version1File = _fixture.DefaultReleaseFile()
                     .WithReleaseVersion(publication1.ReleaseVersions[0])
-                    .WithFiles(_fixture.DefaultFile(FileType.Data)
-                    .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
-                        .WithGeographicLevels(
-                            [GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.Institution]))
-                    .WithDataSetFileGeographicLevels(
-                        [GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.Institution])
-                    .GenerateList(1))
-                    .GenerateList();
+                    .WithFile(_fixture.DefaultFile(FileType.Data)
+                        .WithDataSetFileVersionGeographicLevels(
+                            [GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.Institution]));
 
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 await TestApp.AddTestData<ContentDbContext>(context =>
                 {
-                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                    context.ReleaseFiles.Add(publication1Release1Version1File);
                     context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                 });
 
@@ -137,7 +131,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(
                     expectedTotalResults: 1);
-                AssertResultsForExpectedReleaseFiles(publication1Release1Version1Files, pagedResult.Results);
+                AssertResultsForExpectedReleaseFiles([publication1Release1Version1File], pagedResult.Results);
             }
 
             [Fact]
@@ -1783,7 +1777,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithReleaseVersion(releaseVersion)
                 .WithFiles(_fixture.DefaultFile(FileType.Data)
                     .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta())
-                    .WithDataSetFileGeographicLevels([GeographicLevel.Country])
+                    .WithDataSetFileVersionGeographicLevels([GeographicLevel.Country])
                     .GenerateList(numberOfDataSets))
                 .GenerateList();
         }

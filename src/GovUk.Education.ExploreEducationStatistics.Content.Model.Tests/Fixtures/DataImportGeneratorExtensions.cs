@@ -114,7 +114,7 @@ public static class DataImportGeneratorExtensions
                 (_, d, context) => context.Fixture
                     .DefaultFile(FileType.Data)
                     .WithDataSetFileMeta(null)
-                    .WithDataSetFileGeographicLevels([])
+                    .WithDataSetFileVersionGeographicLevels([])
                     .WithFilename($"{dataFileName}.csv")
                     .WithSubjectId(d.SubjectId)
             )

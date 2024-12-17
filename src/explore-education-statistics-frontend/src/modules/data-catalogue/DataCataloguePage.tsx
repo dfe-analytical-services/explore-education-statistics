@@ -52,7 +52,11 @@ import omit from 'lodash/omit';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import { GeographicLevelCode } from '@common/utils/locationLevelsMap';
+import locationLevelsMap, {
+  GeographicLevelCode,
+  geographicLevelCodesMap,
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
 
 const defaultPageTitle = 'Data catalogue';
 
@@ -124,11 +128,16 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
 
   const selectedRelease = releases.find(release => release.id === releaseId);
 
+  const selectedGeographicLevel = geographicLevel
+    ? geographicLevelCodesMap[geographicLevel]
+    : undefined;
+
   const { paging, results: dataSets = [] } = dataSetsData ?? {};
   const { page, totalPages, totalResults = 0 } = paging ?? {};
   const [showAllDetails, toggleAllDetails] = useToggle(false);
 
-  const isFiltered = !!publicationId || !!searchTerm || !!themeId;
+  const isFiltered =
+    !!publicationId || !!searchTerm || !!themeId || !!geographicLevel;
 
   const filteredByString = compact([
     searchTerm,
@@ -417,6 +426,15 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                     name={selectedRelease.title}
                     onClick={() =>
                       handleResetFilter({ filterType: 'releaseId' })
+                    }
+                  />
+                )}
+                {selectedGeographicLevel && (
+                  <FilterResetButton
+                    filterType="Geographic level"
+                    name={selectedGeographicLevel.filterLabel}
+                    onClick={() =>
+                      handleResetFilter({ filterType: 'geographicLevel' })
                     }
                   />
                 )}

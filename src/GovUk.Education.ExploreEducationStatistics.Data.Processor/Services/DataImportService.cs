@@ -221,14 +221,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                              && f.SubjectId == subjectId);
             file.DataSetFileMeta = dataSetFileMeta;
 
-            var dataSetFileGeographicLevels = geographicLevels
-                .Distinct()
-                .Select(gl => new DataSetFileGeographicLevel
+            var dataSetFileVersionGeographicLevels = geographicLevels
+                .Select(gl => new DataSetFileVersionGeographicLevel
                 {
                     DataSetFileVersionId = fileId,
                     GeographicLevel = gl,
                 }).ToList();
-            await contentDbContext.DataSetFileGeographicLevels.AddRangeAsync(dataSetFileGeographicLevels);
+            contentDbContext.DataSetFileVersionGeographicLevels.AddRange(
+                dataSetFileVersionGeographicLevels);
 
             await contentDbContext.SaveChangesAsync();
         }

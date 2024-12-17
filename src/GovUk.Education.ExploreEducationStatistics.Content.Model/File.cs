@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public int? DataSetFileVersion { get; set; }
 
-        public List<DataSetFileGeographicLevel> DataSetFileGeographicLevels { get; set; } = [];
+        public List<DataSetFileVersionGeographicLevel> DataSetFileVersionGeographicLevels { get; set; } = [];
 
         public DataSetFileMeta? DataSetFileMeta { get; set; }
 

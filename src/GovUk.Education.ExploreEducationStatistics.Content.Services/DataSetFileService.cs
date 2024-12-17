@@ -487,9 +487,8 @@ internal static class ReleaseFileQueryableExtensions
         GeographicLevel? geographicLevel)
     {
         return geographicLevel.HasValue
-            ? query.Where(rf => rf.File.DataSetFileGeographicLevels.Any(
-                gl => gl.GeographicLevel == geographicLevel
-                      && rf.FileId == gl.DataSetFileVersionId))
+            ? query.Where(rf => rf.File.DataSetFileVersionGeographicLevels.Any(
+                gl => gl.GeographicLevel == geographicLevel))
             : query;
     }
 

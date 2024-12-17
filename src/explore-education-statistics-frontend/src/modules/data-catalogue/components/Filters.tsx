@@ -160,12 +160,12 @@ export default function Filters({
             { label: 'All', value: 'all' },
             ...typedKeys(locationLevelsMap).map(key => {
               return {
-                label: locationLevelsMap[key].label,
+                label: locationLevelsMap[key].filterLabel,
                 value: locationLevelsMap[key].code,
               };
             }),
           ]}
-          value={geographicLevel}
+          value={geographicLevel ?? 'all'}
           order={[]}
           onChange={e => {
             onChange({

@@ -85,10 +85,10 @@ public static class FileGeneratorExtensions
         DataSetFileMeta? dataSetFileMeta)
         => generator.ForInstance(s => s.SetDataSetFileMeta(dataSetFileMeta));
 
-    public static Generator<File> WithDataSetFileGeographicLevels(
+    public static Generator<File> WithDataSetFileVersionGeographicLevels(
         this Generator<File> generator,
         List<GeographicLevel> geographicLevels)
-        => generator.ForInstance(s => s.SetDataSetFileGeographicLevels(geographicLevels));
+        => generator.ForInstance(s => s.SetDataSetFileVersionGeographicLevels(geographicLevels));
 
     public static InstanceSetters<File> SetDefaults(this InstanceSetters<File> setters, FileType? fileType)
         => fileType switch
@@ -117,7 +117,7 @@ public static class FileGeneratorExtensions
             .SetContentType("text/csv")
             .SetDefault(f => f.DataSetFileId)
             .Set(f => f.DataSetFileMeta, (_, _, context) => context.Fixture.DefaultDataSetFileMeta())
-            .SetDataSetFileGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.LocalAuthorityDistrict]);
+            .SetDataSetFileVersionGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.LocalAuthorityDistrict]);
 
     public static InstanceSetters<File> SetMetaFileDefaults(this InstanceSetters<File> setters)
         => setters
@@ -208,15 +208,16 @@ public static class FileGeneratorExtensions
         DataSetFileMeta? dataSetFileMeta)
         => setters.Set(f => f.DataSetFileMeta, dataSetFileMeta);
 
-    public static InstanceSetters<File> SetDataSetFileGeographicLevels(
+    public static InstanceSetters<File> SetDataSetFileVersionGeographicLevels(
         this InstanceSetters<File> setters,
         List<GeographicLevel> geographicLevels)
         => setters.Set(
-            file => file.DataSetFileGeographicLevels,
+            file => file.DataSetFileVersionGeographicLevels,
             (_, file) => geographicLevels.Select(
-                gl => new DataSetFileGeographicLevel
+                gl => new DataSetFileVersionGeographicLevel
                 {
                     DataSetFileVersionId = file.Id,
+                    DataSetFileVersion = file,
                     GeographicLevel = gl,
                 }).ToList());
 }

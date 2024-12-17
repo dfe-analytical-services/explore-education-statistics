@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<ReleaseStatus> ReleaseStatus { get; set; }
         public virtual DbSet<ReleaseFile> ReleaseFiles { get; set; }
         public virtual DbSet<File> Files { get; set; }
-        public virtual DbSet<DataSetFileGeographicLevel> DataSetFileGeographicLevels { get; set; }
+        public virtual DbSet<DataSetFileVersionGeographicLevel> DataSetFileVersionGeographicLevels { get; set; }
         public virtual DbSet<ContentSection> ContentSections { get; set; }
         public virtual DbSet<ContentBlock> ContentBlocks { get; set; }
         public virtual DbSet<KeyStatistic> KeyStatistics { get; set; }
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureReleaseStatus(modelBuilder);
             ConfigureReleaseFile(modelBuilder);
             ConfigureFile(modelBuilder);
-            ConfigureDataSetFileGeographicLevel(modelBuilder);
+            ConfigureDataSetFileVersionGeographicLevel(modelBuilder);
             ConfigureContentBlock(modelBuilder);
             ConfigureContentSection(modelBuilder);
             ConfigureReleaseVersion(modelBuilder);
@@ -454,16 +454,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         v => v.HasValue
                             ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
                             : null);
-                entity.Property(p => p.DataSetFileMeta) // EES-5666
+                entity.Property(p => p.DataSetFileMeta)
                     .HasConversion(
                         v => JsonConvert.SerializeObject(v),
                         v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
             });
         }
 
-        private static void ConfigureDataSetFileGeographicLevel(ModelBuilder modelBuilder)
+        private static void ConfigureDataSetFileVersionGeographicLevel(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<DataSetFileGeographicLevel>(entity =>
+            modelBuilder.Entity<DataSetFileVersionGeographicLevel>(entity =>
             {
                 entity.HasKey(gl => new
                 {
@@ -472,6 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 });
 
                 entity.Property(gl => gl.GeographicLevel)
+                    .HasMaxLength(6)
                     .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
             });
         }

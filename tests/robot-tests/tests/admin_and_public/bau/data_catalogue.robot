@@ -212,6 +212,22 @@ Remove release filter
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks selected option label    id:filters-form-release    All releases
 
+Filter by geographic level
+    user wait for option to be available and select it    css:select[id="filters-form-geographic-level"]
+    ...    Local Authority District
+
+    user checks page contains button    Local Authority District
+    user checks testid element contains    total-results    1 data set
+
+Remove geographic level filter
+    user clicks button    Local Authority District
+
+    user checks page does not contain button    Local Authority District
+    user checks selected option label    id:filters-form-geographic-level    All
+
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+
 Reset all filters
     user clicks element    id:searchForm-search
     user presses keys    pupil
