@@ -103,14 +103,6 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
             cancellationToken: cancellationToken);
     }
 
-    // TODO EES-4336 Remove this
-    public async Task<List<Guid>> ListLatestPublishedReleaseVersionIds(CancellationToken cancellationToken = default)
-    {
-        return await _contentDbContext.ReleaseVersions.LatestReleaseVersions(publishedOnly: true)
-            .Select(rv => rv.Id)
-            .ToListAsync(cancellationToken: cancellationToken);
-    }
-
     public async Task<List<ReleaseVersion>> ListLatestPublishedReleaseVersions(
         Guid publicationId,
         CancellationToken cancellationToken = default)
