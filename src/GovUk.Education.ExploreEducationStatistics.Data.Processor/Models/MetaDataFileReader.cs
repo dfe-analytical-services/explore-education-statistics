@@ -42,7 +42,7 @@ public class MetaDataFileReader
             ColumnName = ReadMetaColumnValue(MetaColumns.col_name, rowValues),
             ColumnType = Enum.Parse<ColumnType>(columnType!),
             Label = ReadMetaColumnValue(MetaColumns.label, rowValues),
-            FilterGroupingColumn = ReadMetaColumnValue(MetaColumns.filter_grouping_column, rowValues), // @MarkFix
+            FilterGroupingColumn = ReadMetaColumnValue(MetaColumns.filter_grouping_column, rowValues),
             FilterHint = ReadMetaColumnValue(MetaColumns.filter_hint, rowValues),
             IndicatorGrouping = ReadMetaColumnValue(MetaColumns.indicator_grouping, rowValues),
             IndicatorUnit = EnumUtil.GetFromEnumValue<IndicatorUnit>(!indicatorUnit.IsNullOrEmpty() ? indicatorUnit : ""),
