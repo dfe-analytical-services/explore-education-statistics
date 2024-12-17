@@ -65,14 +65,6 @@ public interface IReleaseVersionRepository
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the latest published version id's of all releases.
-    /// </summary>
-    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-    /// <returns>A collection of the latest published version id's of all releases.</returns>
-    // TODO EES-4336 Remove this
-    Task<List<Guid>> ListLatestPublishedReleaseVersionIds(CancellationToken cancellationToken = default);
-
-    /// <summary>
     /// Retrieves the latest published release version id's associated with a publication in reverse chronological order.
     /// </summary>
     /// <param name="publicationId">The unique identifier of the publication.</param>
