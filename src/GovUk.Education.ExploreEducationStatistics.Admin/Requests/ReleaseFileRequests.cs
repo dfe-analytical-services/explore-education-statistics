@@ -1,7 +1,6 @@
 #nullable enable
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using static GovUk.Education.ExploreEducationStatistics.Common.Constants.ValidationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
@@ -16,8 +15,7 @@ public record ReleaseDataFileUpdateRequest
         public Validator()
         {
             RuleFor(request => request.Title)
-                .MaximumLength(SubjectTitleMaxLength)
-                .WithMessage(SubjectTitleMaxLengthMessage);
+                .MaximumLength(120);
         }
     }
 }
@@ -36,13 +34,11 @@ public record ReleaseAncillaryFileUploadRequest
         {
             RuleFor(request => request.Title)
                 .NotEmpty()
-                .MaximumLength(TitleMaxLength)
-                .WithMessage(TitleMaxLengthMessage);
+                .MaximumLength(120);
 
             RuleFor(request => request.Summary)
                 .NotEmpty()
-                .MaximumLength(SummaryMaxLength)
-                .WithMessage(SummaryMaxLengthMessage);
+                .MaximumLength(250);
 
             RuleFor(request => request.File)
                 .NotEmpty();
@@ -64,13 +60,11 @@ public record ReleaseAncillaryFileUpdateRequest
         {
             RuleFor(request => request.Title)
                 .NotEmpty()
-                .MaximumLength(TitleMaxLength)
-                .WithMessage(TitleMaxLengthMessage);
+                .MaximumLength(120);
 
             RuleFor(request => request.Summary)
                 .NotEmpty()
-                .MaximumLength(SummaryMaxLength)
-                .WithMessage(SummaryMaxLengthMessage);
+                .MaximumLength(250);
         }
     }
 }

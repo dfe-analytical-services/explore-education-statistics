@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
-using static GovUk.Education.ExploreEducationStatistics.Common.Constants.ValidationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -143,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 var filename = row[fileNameIndex];
                 var datasetName = row[datasetNameIndex].Trim();
 
-                if (datasetName.Length > SubjectTitleMaxLength)
+                if (datasetName.Length > 120)
                 {
                     errors.Add(ValidationMessages.GenerateErrorDataSetTitleTooLong(datasetName));
                 }

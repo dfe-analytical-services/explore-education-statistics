@@ -2,7 +2,6 @@
 using FluentValidation;
 using System;
 using System.Collections.Generic;
-using static GovUk.Education.ExploreEducationStatistics.Common.Constants.ValidationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
@@ -40,8 +39,7 @@ public record DataGuidanceDataSetUpdateRequest
 
             RuleFor(request => request.Content)
                 .NotEmpty()
-                .MaximumLength(FileGuidanceContentMaxLength)
-                .WithMessage(FileGuidanceContentMaxLengthMessage);
+                .MaximumLength(250);
         }
     }
 }

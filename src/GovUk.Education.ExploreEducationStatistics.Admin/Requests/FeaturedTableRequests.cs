@@ -1,7 +1,6 @@
 #nullable enable
 using FluentValidation;
 using System;
-using static GovUk.Education.ExploreEducationStatistics.Common.Constants.ValidationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
@@ -19,13 +18,11 @@ public record FeaturedTableCreateRequest
         {
             RuleFor(request => request.Name)
                 .NotEmpty()
-                .MaximumLength(FeaturedTableNameMaxLength)
-                .WithMessage(FeaturedTableNameMaxLengthMessage);
+                .MaximumLength(120);
 
             RuleFor(request => request.Description)
                 .NotEmpty()
-                .MaximumLength(FeaturedTableDescriptionMaxLength)
-                .WithMessage(FeaturedTableDescriptionMaxLengthMessage);
+                .MaximumLength(200);
         }
     }
 }
@@ -42,13 +39,11 @@ public record FeaturedTableUpdateRequest
         {
             RuleFor(request => request.Name)
                 .NotEmpty()
-                .MaximumLength(FeaturedTableNameMaxLength)
-                .WithMessage(FeaturedTableNameMaxLengthMessage);
+                .MaximumLength(120);
 
             RuleFor(request => request.Description)
                 .NotEmpty()
-                .MaximumLength(FeaturedTableDescriptionMaxLength)
-                .WithMessage(FeaturedTableDescriptionMaxLengthMessage);
+                .MaximumLength(200);
         }
     }
 }

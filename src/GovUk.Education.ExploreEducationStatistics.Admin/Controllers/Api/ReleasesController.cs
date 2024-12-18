@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using static GovUk.Education.ExploreEducationStatistics.Common.Constants.ValidationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -109,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<DataFileInfo>> UploadDataSet(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
             [FromQuery(Name = "title")]
-            [MaxLength(SubjectTitleMaxLength, ErrorMessage = SubjectTitleMaxLengthMessage)]
+            [MaxLength(120)]
             string title,
             IFormFile file,
             IFormFile metaFile)
@@ -129,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<DataFileInfo>> UploadDataSetAsZip(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
             [FromQuery(Name = "title")]
-            [MaxLength(SubjectTitleMaxLength, ErrorMessage = SubjectTitleMaxLengthMessage)]
+            [MaxLength(120)]
             string title,
             IFormFile zipFile)
         {

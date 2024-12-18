@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using System.Collections.Generic;
-using static GovUk.Education.ExploreEducationStatistics.Common.Constants.ValidationConstants;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
@@ -28,8 +27,7 @@ public record DataBlockCreateRequest
         {
             RuleFor(request => request.Heading)
                 .NotEmpty()
-                .MaximumLength(TableTitleMaxLength)
-                .WithMessage(TableTitleMaxLengthMessage);
+                .MaximumLength(120);
 
             RuleFor(request => request.Name)
                 .NotEmpty();
@@ -60,8 +58,7 @@ public record DataBlockUpdateRequest
         {
             RuleFor(request => request.Heading)
                 .NotEmpty()
-                .MaximumLength(TableTitleMaxLength)
-                .WithMessage(TableTitleMaxLengthMessage);
+                .MaximumLength(120);
 
             RuleFor(request => request.Name)
                 .NotEmpty();
