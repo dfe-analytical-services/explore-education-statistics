@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -58,10 +59,16 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         Guid publicationId,
         CancellationToken cancellationToken = default)
     {
-        return (await _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId)
-                .ToListAsync(cancellationToken: cancellationToken))
-            .OrderByReverseChronologicalOrder()
-            .FirstOrDefault();
+        var latestReleaseId = await _contentDbContext.Publications
+            .Where(p => p.Id == publicationId)
+            .Select(p => p.ReleaseSeries.LatestReleaseId())
+            .SingleOrDefaultAsync(cancellationToken: cancellationToken);
+
+        return latestReleaseId.HasValue
+            ? await _contentDbContext.ReleaseVersions
+                .LatestReleaseVersion(releaseId: latestReleaseId.Value)
+                .SingleOrDefaultAsync(cancellationToken: cancellationToken)
+            : null;
     }
 
     public async Task<ReleaseVersion?> GetLatestPublishedReleaseVersion(
@@ -109,10 +116,24 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         bool publishedOnly = false,
         CancellationToken cancellationToken = default)
     {
+        var publication = await _contentDbContext.Publications
+            .SingleOrDefaultAsync(p => p.Id == publicationId, cancellationToken: cancellationToken);
+
+        if (publication == null)
+        {
+            return [];
+        }
+
+        var publicationReleaseSeriesReleaseIds = publication.ReleaseSeries.ReleaseIds();
+
+        var releaseIdIndexMap = publicationReleaseSeriesReleaseIds
+            .Select((releaseId, index) => (releaseId, index))
+            .ToDictionary(tuple => tuple.releaseId, tuple => tuple.index);
+
         return (await _contentDbContext.ReleaseVersions
                 .LatestReleaseVersions(publicationId, publishedOnly: publishedOnly)
                 .ToListAsync(cancellationToken: cancellationToken))
-            .OrderByReverseChronologicalOrder()
+            .OrderBy(rv => releaseIdIndexMap[rv.ReleaseId])
             .ToList();
     }
 
@@ -155,14 +176,4 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
     }
 
     private record ReleaseIdVersion(Guid ReleaseId, int Version);
-}
-
-internal static class ReleaseVersionIEnumerableExtensions
-{
-    internal static IOrderedEnumerable<ReleaseVersion> OrderByReverseChronologicalOrder(
-        this IEnumerable<ReleaseVersion> query)
-    {
-        return query.OrderByDescending(releaseVersion => releaseVersion.Year)
-            .ThenByDescending(releaseVersion => releaseVersion.TimePeriodCoverage);
-    }
 }

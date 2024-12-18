@@ -25,11 +25,11 @@ public interface IReleaseVersionRepository
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the latest version from all releases in reverse chronological order that are associated with a publication.
+    /// Retrieves the latest version of the latest release in release series order associated with a publication.
     /// </summary>
     /// <param name="publicationId">The unique identifier of the publication.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-    /// <returns>The latest version from all releases in reverse chronological order that are associated with a publication.</returns>
+    /// <returns>The latest version of the latest release in release series order associated with the publication.</returns>
     Task<ReleaseVersion?> GetLatestReleaseVersion(
         Guid publicationId,
         CancellationToken cancellationToken = default);
@@ -67,12 +67,12 @@ public interface IReleaseVersionRepository
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the latest versions of all releases associated with a given publication in reverse chronological order.
+    /// Retrieves the latest versions of all releases in release series order associated with a given publication.
     /// </summary>
     /// <param name="publicationId">The unique identifier of the publication.</param>
     /// <param name="publishedOnly">Flag to only include published release versions.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-    /// <returns>A collection of the latest version id's of all releases associated with the publication.</returns>
+    /// <returns>A collection of the latest versions of all releases in release series order associated with the publication.</returns>
     Task<List<ReleaseVersion>> ListLatestReleaseVersions(
         Guid publicationId,
         bool publishedOnly = false,
