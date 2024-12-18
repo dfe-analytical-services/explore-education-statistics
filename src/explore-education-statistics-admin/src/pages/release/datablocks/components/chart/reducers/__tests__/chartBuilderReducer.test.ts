@@ -1141,8 +1141,7 @@ describe('chartBuilderReducer', () => {
     test('has correct state with initial configuration for a map', () => {
       const initialConfiguration: Chart = {
         type: 'map',
-        releaseId: 'releaseId',
-        dataBlockParentId: 'dataBlockParentId',
+        onBoundaryLevelChange: () => {},
         legend: {
           position: 'top',
           items: [],
@@ -1252,8 +1251,7 @@ describe('chartBuilderReducer', () => {
     test('setting boundary levels does not change data groupings', () => {
       const initialConfiguration: Chart = {
         type: 'map',
-        releaseId: 'releaseId',
-        dataBlockParentId: 'dataBlockParentId',
+        onBoundaryLevelChange: () => {},
         legend: {
           position: 'top',
           items: [],
@@ -1363,8 +1361,7 @@ describe('chartBuilderReducer', () => {
     test('setting data groupings does not change boundary levels', () => {
       const initialConfiguration: Chart = {
         type: 'map',
-        releaseId: 'releaseId',
-        dataBlockParentId: 'dataBlockParentId',
+        onBoundaryLevelChange: () => {},
         legend: {
           position: 'top',
           items: [],

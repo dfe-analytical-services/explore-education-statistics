@@ -94,8 +94,7 @@ describe('ChartBuilderPreview', () => {
 
   const testMapChartRenderer: ChartRendererProps = {
     type: 'map',
-    releaseId: 'releaseId',
-    dataBlockParentId: 'dataBlockParentId',
+    onBoundaryLevelChange: () => {},
     data: [],
     meta: testFullTableMeta.subjectMeta,
     alt: '',

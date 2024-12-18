@@ -6,6 +6,7 @@ import {
 import {
   testMapConfiguration,
   testMapTableData,
+  testMapTableDataLocationsLowRes,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
@@ -13,7 +14,8 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { Chart, DataBlock } from '@common/services/types/blocks';
-import { screen, waitFor } from '@testing-library/dom';
+import { screen, waitFor, within } from '@testing-library/dom';
+import userEvent from '@testing-library/user-event';
 import { AxiosError } from 'axios';
 import React from 'react';
 import { forceVisible } from 'react-lazyload';
@@ -378,6 +380,78 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getLocationGeoJson).toBeCalled();
       expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(1);
     });
+  });
+
+  // EES-4902 react-leaflet now uses ESM so unable to test this currently
+  test('selecting data set with boundaryLevel retrieves and renders new map polygons', async () => {
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testMapTableData,
+    );
+    tableBuilderService.getLocationGeoJson
+      .mockResolvedValueOnce(testMapTableData.subjectMeta.locations)
+      .mockResolvedValue(testMapTableDataLocationsLowRes);
+
+    const { container } = render(
+      <DataBlockTabs
+        releaseId="release-1"
+        id="test-block"
+        dataBlock={testDataBlockMap}
+      />,
+    );
+
+    forceVisible();
+
+    await waitFor(() => {
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1-parent',
+      );
+
+      expect(tableBuilderService.getLocationGeoJson).toBeCalledWith(
+        'release-1',
+        'block-1-parent',
+        1,
+      );
+
+      // expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
+    });
+    expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      expect(tableBuilderService.getLocationGeoJson).toBeCalled();
+      expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(1);
+    });
+
+    userEvent.click(screen.getByRole('link', { name: 'Chart for' }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText('1. Select data to view'),
+      ).toBeInTheDocument();
+    });
+
+    // TODO: check for path/polygon node, save position(s) to compare later (EES-4902)
+
+    const dataSetSelectInput = screen.getByLabelText('1. Select data to view');
+    const dataSetOptions = within(dataSetSelectInput).getAllByRole('option');
+    expect(dataSetOptions).toHaveLength(2);
+    await userEvent.selectOptions(dataSetSelectInput, dataSetOptions[1]);
+
+    await waitFor(() => {
+      // EES-4902 map containing spinner isn't currently rendered in tests
+      // expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
+
+      expect(tableBuilderService.getLocationGeoJson).toBeCalledWith(
+        'release-1',
+        'block-1-parent',
+        2,
+      );
+    });
+
+    expect(tableBuilderService.getLocationGeoJson).toHaveBeenCalledTimes(2);
+
+    // TODO: check for path/polygon node position, compare with previous
+    // should be different after rendering different location data (EES-4902)
   });
 
   test('re-rendering with new data block does not throw error', async () => {

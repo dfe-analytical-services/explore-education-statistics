@@ -27,27 +27,6 @@ describe('MapBlock', () => {
     data: testFullTable.results,
     height: 600,
     width: 900,
-    map: {
-      dataSetConfigs: [
-        {
-          dataGrouping: { customGroups: [], type: 'EqualIntervals' },
-          dataSet: {
-            filters: ['characteristic-total', 'school-type-total'],
-            indicator: 'authorised-absence-rate',
-            timePeriod: '2016_AY',
-          },
-        },
-        {
-          dataGrouping: { customGroups: [], type: 'EqualIntervals' },
-          dataSet: {
-            filters: ['characteristic-total', 'school-type-total'],
-            indicator: 'overall-absence-rate',
-            timePeriod: '2016_AY',
-          },
-          boundaryLevel: 2,
-        },
-      ],
-    },
     onBoundaryLevelChange,
   };
 
@@ -178,7 +157,6 @@ describe('MapBlock', () => {
     expect(legendColours[4].style.backgroundColor).toBe('rgb(245, 164, 80)');
   });
 
-  // EES-5718 name should be: 'selecting data set with different boundary level fetches and renders different boundary geo-JSON'
   test('selecting data set with different boundary level calls onBoundaryLevelChange', async () => {
     render(<MapBlock {...testBlockProps} />);
 
@@ -191,14 +169,11 @@ describe('MapBlock', () => {
     // Selecting another data set with different boundary level
     await userEvent.selectOptions(dataSetSelectInput, dataSetOptions[1]);
 
-    waitFor(() => {
-      // Fetching new geoJson
-      expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
-      expect(onBoundaryLevelChange).toHaveBeenCalled();
+    await waitFor(() => {
+      // EES-4902 map containing spinner isn't currently rendered in tests
+      // expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
     });
-
-    // TODO: EES-5718
-    // test that returned location geo Json is actually renderred on the screen when 'selecting data set with different boundary level fetches different boundary geo-JSON'
+    expect(onBoundaryLevelChange).toHaveBeenCalledWith(2);
   });
 
   test('changing selected location focuses the correct polygon', async () => {
