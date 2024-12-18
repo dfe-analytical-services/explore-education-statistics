@@ -29,6 +29,7 @@ export interface DataFileUploadFormValues {
 }
 
 const MAX_FILENAME_SIZE = 150;
+const titleMaxLength = 120;
 
 const subjectErrorMappings = [
   mapFieldErrors<DataFileUploadFormValues>({
@@ -71,18 +72,19 @@ function baseErrorMappings(
           ...fileErrorMappings,
           ZipFilenameMustEndDotZip: 'ZipFilenameMustEndDotZip',
           MustBeZipFile: 'MustBeZipFile',
-          BulkDataZipMustContainDatasetNamesCsv:
-            'BulkDataZipMustContainDatasetNamesCsv',
-          DatasetNamesCsvReaderException: 'DatasetNamesCsvReaderException',
-          DatasetNamesCsvIncorrectHeaders: 'DatasetNamesCsvIncorrectHeaders',
-          DatasetNamesCsvFilenamesShouldNotEndDotCsv:
-            'DatasetNamesCsvFilenamesShouldNotEndDotCsv',
-          DatasetNamesCsvFilenamesShouldBeUnique:
-            'DatasetNamesCsvFilenamesShouldBeUnique',
+          BulkDataZipMustContainDataSetNamesCsv:
+            'BulkDataZipMustContainDataSetNamesCsv',
+          DataSetNamesCsvReaderException: 'DataSetNamesCsvReaderException',
+          DataSetNamesCsvIncorrectHeaders: 'DataSetNamesCsvIncorrectHeaders',
+          DataSetNamesCsvFilenamesShouldNotEndDotCsv:
+            'DataSetNamesCsvFilenamesShouldNotEndDotCsv',
+          DataSetNamesCsvFilenamesShouldBeUnique:
+            'DataSetNamesCsvFilenamesShouldBeUnique',
           FileNotFoundInZip: 'FileNotFoundInZip',
           ZipContainsUnusedFiles: 'ZipContainsUnusedFiles',
           DataReplacementAlreadyInProgress:
             'Data replacement already in progress',
+          DataSetTitleTooLong: 'DataSetTitleTooLong',
         },
       }),
     ];
@@ -179,21 +181,27 @@ export default function DataFileUploadForm({
           is: (uploadType: FileType) =>
             uploadType === 'csv' || uploadType === 'zip',
           then: s =>
-            s.required('Enter a subject title').test({
-              name: 'unique',
-              message: 'Enter a unique subject title',
-              test(value: string) {
-                if (!value) {
-                  return true;
-                }
+            s
+              .required('Enter a subject title')
+              .test({
+                name: 'unique',
+                message: 'Enter a unique subject title',
+                test(value: string) {
+                  if (!value) {
+                    return true;
+                  }
 
-                return (
-                  dataFiles?.find(
-                    f => f.title.toUpperCase() === value.toUpperCase(),
-                  ) === undefined
-                );
-              },
-            }),
+                  return (
+                    dataFiles?.find(
+                      f => f.title.toUpperCase() === value.toUpperCase(),
+                    ) === undefined
+                  );
+                },
+              })
+              .max(
+                titleMaxLength,
+                `Subject title must be ${titleMaxLength} characters or less`,
+              ),
         }),
       });
     }
@@ -233,6 +241,7 @@ export default function DataFileUploadForm({
                   name="subjectTitle"
                   label="Subject title"
                   className="govuk-!-width-two-thirds"
+                  maxLength={titleMaxLength}
                 />
               )}
 
