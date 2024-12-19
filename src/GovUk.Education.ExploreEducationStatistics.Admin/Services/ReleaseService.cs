@@ -134,8 +134,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
         {
             return await ReleaseCreateRequestValidator.Validate(releaseCreate)
-                .OnSuccess(async () =>
-                    await _persistenceHelper.CheckEntityExists<Publication>(releaseCreate.PublicationId))
+                .OnSuccess(async () => await _context.Publications
+                    .SingleOrNotFoundAsync(p => p.Id == releaseCreate.PublicationId))
                 .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
                 .OnSuccessDo(async _ =>
                     await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
@@ -146,7 +146,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         PublicationId = releaseCreate.PublicationId,
                         Year = releaseCreate.Year,
                         TimePeriodCoverage = releaseCreate.TimePeriodCoverage,
-                        Slug = releaseCreate.Slug
+                        Slug = releaseCreate.Slug,
+                        Label = string.IsNullOrWhiteSpace(releaseCreate.Label) ? null : releaseCreate.Label.Trim(),
                     };
 
                     var newReleaseVersion = new ReleaseVersion
@@ -509,54 +510,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId, ReleaseUpdateRequest request)
         {
             return await ReleaseUpdateRequestValidator.Validate(request)
-                .OnSuccess(async () =>
-                    await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId,
-                        queryable => queryable.Include(rv => rv.Release)))
+                .OnSuccess(async () => await _context.ReleaseVersions
+                    .Include(rv => rv.Release)
+                    .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId))
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccessDo(releaseVersion => ValidateUpdateRequest(releaseVersion, request))
                 .OnSuccessDo(async releaseVersion =>
-                    await ValidateReleaseSlugUniqueToPublication(request.Slug,
+                    await ValidateReleaseSlugUniqueToPublication(
+                        slug: request.Slug,
                         publicationId: releaseVersion.PublicationId,
-                        releaseVersionId: releaseVersionId))
-                .OnSuccess(async releaseVersion =>
-                {
-                    return await _context.RequireTransaction(async () =>
-                    {
-                        if (releaseVersion.Version > 0)
-                        {
-                            var yearChanged = releaseVersion.Year != request.Year;
-                            var timePeriodCoverageChanged =
-                                releaseVersion.TimePeriodCoverage != request.TimePeriodCoverage;
-
-                            if (yearChanged || timePeriodCoverageChanged)
-                            {
-                                throw new ArgumentException(
-                                    $"Cannot update {nameof(request.Year)} or {nameof(request.TimePeriodCoverage)} for a release that has already been published",
-                                    nameof(request));
-                            }
-                        }
-
-                        releaseVersion.Release.Year = request.Year;
-                        releaseVersion.Release.TimePeriodCoverage = request.TimePeriodCoverage;
-                        releaseVersion.Release.Slug = request.Slug;
-
-                        // TODO The following will be removed in EES-5659
-                        releaseVersion.ReleaseName = releaseVersion.Release.Year.ToString();
-                        releaseVersion.TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage;
-                        releaseVersion.Slug = releaseVersion.Release.Slug;
-
-                        releaseVersion.Type = request.Type!.Value;
-                        releaseVersion.PreReleaseAccessList = request.PreReleaseAccessList;
-
-                        await _dataSetVersionService.UpdateVersionsForReleaseVersion(
-                            releaseVersionId,
-                            slug: releaseVersion.Slug,
-                            title: releaseVersion.Title);
-
-                        await _context.SaveChangesAsync();
-
-                        return await GetRelease(releaseVersionId);
-                    });
-                });
+                        releaseId: releaseVersion.ReleaseId))
+                .OnSuccessDo(async releaseVersion =>
+                    await _context.RequireTransaction(() =>
+                        UpdateReleaseAndVersion(request, releaseVersion)
+                            .OnSuccessDo(async () => await UpdateApiDataSetVersions(releaseVersion)))
+                )
+                .OnSuccess(async () => await GetRelease(releaseVersionId));
         }
 
         public async Task<Either<ActionResult, Unit>> UpdateReleasePublished(
@@ -838,26 +807,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(
             string slug,
             Guid publicationId,
-            Guid? releaseVersionId = null)
+            Guid? releaseId = null)
         {
-            var releaseVersions = await _context.ReleaseVersions
-                .Where(rv => rv.PublicationId == publicationId)
-                .ToListAsync();
+            var slugAlreadyExists = await _context.Releases
+                .Where(r => r.PublicationId == publicationId)
+                .AnyAsync(r => r.Slug == slug && r.Id != releaseId);
 
-            if (releaseVersions.Any(release =>
-                    release.Slug == slug &&
-                    release.Id != releaseVersionId &&
-                    IsLatestVersionOfRelease(releaseVersions, release.Id)))
+            return slugAlreadyExists 
+                ? ValidationActionResult(SlugNotUnique) 
+                : Unit.Instance;
+        }
+
+        private static Either<ActionResult, Unit> ValidateUpdateRequest(ReleaseVersion releaseVersion, ReleaseUpdateRequest request)
+        {
+            if (releaseVersion.Version == 0)
             {
-                return ValidationActionResult(SlugNotUnique);
+                return Unit.Instance;
             }
+
+            var yearChanged = releaseVersion.Release.Year != request.Year;
+            var timePeriodCoverageChanged =
+                releaseVersion.Release.TimePeriodCoverage != request.TimePeriodCoverage;
+            var labelChanged = releaseVersion.Release.Label != request.Label;
+
+            return yearChanged || timePeriodCoverageChanged || labelChanged
+                ? throw new ArgumentException(
+                    $"Cannot update '{nameof(request.Year)}', '{nameof(request.TimePeriodCoverage)}' or '{nameof(request.Label)}' for a release that has already been published",
+                    nameof(request))
+                : Unit.Instance;
+            // Wondering if we should convert this into a Validation Result
+        }
+
+        private async Task<Either<ActionResult, Unit>> UpdateReleaseAndVersion(ReleaseUpdateRequest request, ReleaseVersion releaseVersion)
+        {
+            releaseVersion.Release.Year = request.Year;
+            releaseVersion.Release.TimePeriodCoverage = request.TimePeriodCoverage;
+            releaseVersion.Release.Slug = request.Slug;
+            releaseVersion.Release.Label = string.IsNullOrWhiteSpace(request.Label) ? null : request.Label.Trim();
+
+            // TODO The following will be removed in EES-5659
+            releaseVersion.ReleaseName = releaseVersion.Release.Year.ToString();
+            releaseVersion.TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage;
+            releaseVersion.Slug = releaseVersion.Release.Slug;
+
+            releaseVersion.Type = request.Type!.Value;
+            releaseVersion.PreReleaseAccessList = request.PreReleaseAccessList;
+
+            await _context.SaveChangesAsync();
 
             return Unit.Instance;
         }
 
-        private static bool IsLatestVersionOfRelease(IEnumerable<ReleaseVersion> releaseVersions, Guid releaseVersionId)
+        private async Task<Either<ActionResult, Unit>> UpdateApiDataSetVersions(ReleaseVersion releaseVersion)
         {
-            return !releaseVersions.Any(rv => rv.PreviousVersionId == releaseVersionId && rv.Id != releaseVersionId);
+            await _dataSetVersionService.UpdateVersionsForReleaseVersion(
+                releaseVersion.Id,
+                slug: releaseVersion.Slug,
+                title: releaseVersion.Title);
+
+            return Unit.Instance;
         }
 
         private async Task CreateGenericContentFromTemplate(
