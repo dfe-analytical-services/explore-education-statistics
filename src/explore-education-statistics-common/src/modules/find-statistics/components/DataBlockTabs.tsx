@@ -6,6 +6,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import withLazyLoad from '@common/hocs/withLazyLoad';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
+import getMapInitialBoundaryLevel from '@common/modules/charts/components/utils/getMapInitialBoundaryLevel';
 import { AxesConfiguration } from '@common/modules/charts/types/chart';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
@@ -43,9 +44,7 @@ const DataBlockTabs = ({
   onToggle,
 }: DataBlockTabsProps) => {
   const [selectedBoundaryLevel, setSelectedBoundaryLevel] = useState(
-    dataBlock.charts[0]?.type === 'map'
-      ? dataBlock.charts[0].boundaryLevel
-      : undefined,
+    getMapInitialBoundaryLevel(dataBlock.charts),
   );
 
   const {
