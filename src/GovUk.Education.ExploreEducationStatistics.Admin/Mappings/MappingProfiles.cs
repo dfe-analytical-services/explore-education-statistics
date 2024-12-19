@@ -128,18 +128,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         Title = rv.Publication.Title,
                         Slug = rv.Publication.Slug,
                         Contact = rv.Publication.Contact,
-                        Releases = rv.Publication.ReleaseVersions
-                            .FindAll(otherReleaseVersion => rv.Id != otherReleaseVersion.Id &&
-                                                     IsLatestVersionOfRelease(rv.Publication.ReleaseVersions, otherReleaseVersion.Id))
-                            .OrderByDescending(otherReleaseVersion => otherReleaseVersion.Year)
-                            .ThenByDescending(otherReleaseVersion => otherReleaseVersion.TimePeriodCoverage)
-                            .Select(otherReleaseVersion => new PreviousReleaseViewModel
-                            {
-                                Id = otherReleaseVersion.Id,
-                                Slug = otherReleaseVersion.Slug,
-                                Title = otherReleaseVersion.Title,
-                            })
-                            .ToList(),
                         ReleaseSeries = new List<ReleaseSeriesItemViewModel>(), // Must be hydrated after mapping
                         ExternalMethodology = rv.Publication.ExternalMethodology != null
                             ? new ExternalMethodology
@@ -224,11 +212,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<HtmlBlock, HtmlBlockViewModel>();
 
             CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
-        }
-
-        private static bool IsLatestVersionOfRelease(IEnumerable<ReleaseVersion> releaseVersions, Guid releaseVersionId)
-        {
-            return !releaseVersions.Any(rv => rv.PreviousVersionId == releaseVersionId && rv.Id != releaseVersionId);
         }
     }
 }

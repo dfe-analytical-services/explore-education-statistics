@@ -324,12 +324,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(publication.ReleaseSeries[2].LegacyLinkUrl,
                     contentPublicationReleaseSeries[2].LegacyLinkUrl);
 
-                var contentPublicationReleases = contentPublication.Releases;
-                Assert.Single(contentPublicationReleases);
-                Assert.Equal(otherReleaseVersion.Id, contentPublicationReleases[0].Id);
-                Assert.Equal(otherReleaseVersion.Slug, contentPublicationReleases[0].Slug);
-                Assert.Equal(otherReleaseVersion.Title, contentPublicationReleases[0].Title);
-
                 Assert.Equal(2, contentPublication.Methodologies.Count);
                 Assert.Equal(methodology.Versions[0].Id, contentPublication.Methodologies[0].Id);
                 Assert.Equal(methodology.Versions[0].Title, contentPublication.Methodologies[0].Title);
