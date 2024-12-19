@@ -42,6 +42,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<MethodologyNote> Notes { get; set; } = new();
 
+        public List<MethodologyRedirect> MethodologyRedirects { get; set; } = [];
+
         public Methodology Methodology { get; set; } = null!;
 
         public Guid MethodologyId { get; set; }

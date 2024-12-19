@@ -1,5 +1,4 @@
 import FormTextArea from '@common/components/form/FormTextArea';
-import FormProvider from '@common/components/form/FormProvider';
 import { render, screen } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -7,9 +6,7 @@ import React from 'react';
 describe('FormTextArea', () => {
   test('renders correctly with required props', () => {
     const { container } = render(
-      <FormProvider>
-        <FormTextArea id="test-input" label="Test input" name="testInput" />
-      </FormProvider>,
+      <FormTextArea id="test-input" label="Test input" name="testInput" />,
     );
 
     expect(screen.getByLabelText('Test input')).toBeDefined();
@@ -18,14 +15,12 @@ describe('FormTextArea', () => {
 
   test('renders correctly with hint', () => {
     const { container } = render(
-      <FormProvider>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          hint="Fill me in"
-        />
-      </FormProvider>,
+      <FormTextArea
+        id="test-input"
+        label="Test input"
+        name="testInput"
+        hint="Fill me in"
+      />,
     );
 
     const hint = screen.getByText('Fill me in');
@@ -36,15 +31,13 @@ describe('FormTextArea', () => {
 
   test('renders correctly with error', () => {
     const { container } = render(
-      <FormProvider>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          error="Field is required"
-          onChange={noop}
-        />
-      </FormProvider>,
+      <FormTextArea
+        id="test-input"
+        label="Test input"
+        name="testInput"
+        error="Field is required"
+        onChange={noop}
+      />,
     );
 
     const error = screen.getByText('Field is required');
@@ -55,15 +48,13 @@ describe('FormTextArea', () => {
 
   test('aria-describedby is equal to the hint id', () => {
     render(
-      <FormProvider>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          hint="Fill me in"
-          onChange={noop}
-        />
-      </FormProvider>,
+      <FormTextArea
+        id="test-input"
+        label="Test input"
+        name="testInput"
+        hint="Fill me in"
+        onChange={noop}
+      />,
     );
 
     expect(screen.getByText('Fill me in')).toHaveAttribute(
@@ -78,15 +69,13 @@ describe('FormTextArea', () => {
 
   test('aria-describedby is equal to the error id', () => {
     render(
-      <FormProvider>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          error="Field is required"
-          onChange={noop}
-        />
-      </FormProvider>,
+      <FormTextArea
+        id="test-input"
+        label="Test input"
+        name="testInput"
+        error="Field is required"
+        onChange={noop}
+      />,
     );
 
     expect(screen.getByText('Field is required')).toHaveAttribute(
@@ -101,15 +90,13 @@ describe('FormTextArea', () => {
 
   test('aria-describedby contains both hint and error ids', () => {
     render(
-      <FormProvider>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          hint="Fill me in"
-          error="Field is required"
-        />
-      </FormProvider>,
+      <FormTextArea
+        id="test-input"
+        label="Test input"
+        name="testInput"
+        hint="Fill me in"
+        error="Field is required"
+      />,
     );
 
     expect(screen.getByText('Fill me in')).toHaveAttribute(
@@ -127,132 +114,5 @@ describe('FormTextArea', () => {
 
     expect(ariaDescribedBy).toContain('test-input-error');
     expect(ariaDescribedBy).toContain('test-input-hint');
-  });
-
-  test('shows a character count message when `maxLength` is above 0', () => {
-    render(
-      <FormProvider>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          maxLength={10}
-        />
-      </FormProvider>,
-    );
-
-    expect(
-      screen.getByText('You have 10 characters remaining'),
-    ).toBeInTheDocument();
-  });
-
-  test('aria-describedby contains the character count message id when `maxLength` is above 0', () => {
-    render(
-      <FormProvider>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          maxLength={10}
-        />
-      </FormProvider>,
-    );
-
-    const ariaDescribedBy = screen
-      .getByLabelText('Test input')
-      .getAttribute('aria-describedby');
-
-    expect(
-      screen.getByText('You have 10 characters remaining'),
-    ).toHaveAttribute('id', 'test-input-info');
-    expect(ariaDescribedBy).toContain('test-input-info');
-  });
-
-  test('does not show a character count message when `maxLength` is below 0', () => {
-    render(
-      <FormProvider>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          maxLength={-1}
-        />
-      </FormProvider>,
-    );
-
-    expect(
-      screen.queryByText(/You have .+ characters remaining/),
-    ).not.toBeInTheDocument();
-  });
-
-  test('does not show a character count message when `maxLength` is 0', () => {
-    render(
-      <FormProvider>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          maxLength={0}
-        />
-      </FormProvider>,
-    );
-
-    expect(
-      screen.queryByText(/You have .+ characters remaining/),
-    ).not.toBeInTheDocument();
-  });
-
-  test('shows correct character count message when difference to `maxLength` is 1', () => {
-    render(
-      <FormProvider initialValues={{ testInput: 'aaa' }}>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          maxLength={4}
-          onChange={noop}
-        />
-      </FormProvider>,
-    );
-
-    expect(
-      screen.getByText('You have 1 character remaining'),
-    ).toBeInTheDocument();
-  });
-
-  test('shows correct character count message when difference to `maxLength` is 0', () => {
-    render(
-      <FormProvider initialValues={{ testInput: 'aaaa' }}>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          maxLength={4}
-          onChange={noop}
-        />
-      </FormProvider>,
-    );
-
-    expect(
-      screen.getByText('You have 0 characters remaining'),
-    ).toBeInTheDocument();
-  });
-
-  test('shows correct character count message when difference to `maxLength` is -1', () => {
-    render(
-      <FormProvider initialValues={{ testInput: 'aaaaa' }}>
-        <FormTextArea
-          id="test-input"
-          label="Test input"
-          name="testInput"
-          maxLength={4}
-          onChange={noop}
-        />
-      </FormProvider>,
-    );
-
-    expect(
-      screen.getByText('You have 1 character too many'),
-    ).toBeInTheDocument();
   });
 });

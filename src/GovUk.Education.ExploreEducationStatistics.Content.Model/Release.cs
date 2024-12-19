@@ -28,6 +28,8 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public List<ReleaseVersion> Versions { get; set; } = [];
 
+    public List<ReleaseRedirect> ReleaseRedirects { get; set; } = [];
+
     public DateTime Created { get; set; }
 
     public DateTime? Updated { get; set; }

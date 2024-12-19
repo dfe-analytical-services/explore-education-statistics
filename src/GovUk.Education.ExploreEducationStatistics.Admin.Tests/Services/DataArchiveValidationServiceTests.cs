@@ -238,8 +238,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .AssertBadRequestWithValidationErrors([
                         new ErrorViewModel
                         {
-                            Code = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Code,
-                            Message = ValidationMessages.BulkDataZipMustContainDatasetNamesCsv.Message,
+                            Code = ValidationMessages.BulkDataZipMustContainDataSetNamesCsv.Code,
+                            Message = ValidationMessages.BulkDataZipMustContainDataSetNamesCsv.Message,
                         }
                     ]);
             }
@@ -267,8 +267,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .AssertBadRequestWithValidationErrors([
                         new ErrorViewModel
                         {
-                            Code = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Code,
-                            Message = ValidationMessages.DatasetNamesCsvIncorrectHeaders.Message,
+                            Code = ValidationMessages.DataSetNamesCsvIncorrectHeaders.Code,
+                            Message = ValidationMessages.DataSetNamesCsvIncorrectHeaders.Message,
                         },
                     ]);
             }
@@ -319,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .AssertLeft()
                     .AssertBadRequestWithValidationErrors([
                         ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique("Duplicate title"),
-                        ValidationMessages.GenerateErrorDatasetNamesCsvFilenamesShouldBeUnique("one"),
+                        ValidationMessages.GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique("one"),
                     ]);
             }
         }
@@ -342,7 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result
                     .AssertLeft()
                     .AssertBadRequestWithValidationErrors([
-                        ValidationMessages.GenerateErrorDatasetNamesCsvFilenamesShouldNotEndDotCsv("one.csv")
+                        ValidationMessages.GenerateErrorDataSetNamesCsvFilenamesShouldNotEndDotCsv("one.csv")
                     ]);
             }
         }

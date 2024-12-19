@@ -21,6 +21,8 @@ interface FormValues {
 
 export type DataBlockDetailsFormValues = OmitStrict<FormValues, 'isHighlight'>;
 
+const titleMaxLength = 120;
+const descriptionMaxLength = 200;
 const formId = 'dataBlockDetailsForm';
 
 interface Props {
@@ -56,15 +58,32 @@ const DataBlockDetailsForm = ({
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     return Yup.object({
       name: Yup.string().required('Enter a data block name'),
-      heading: Yup.string().required('Enter a table title'),
+      heading: Yup.string()
+        .required('Enter a table title')
+        .max(
+          titleMaxLength,
+          `Table title must be ${titleMaxLength} characters or less`,
+        ),
       source: Yup.string(),
       highlightName: Yup.string().when('isHighlight', {
         is: true,
-        then: s => s.required('Enter a featured table name'),
+        then: s =>
+          s
+            .required('Enter a featured table name')
+            .max(
+              titleMaxLength,
+              `Featured table name must be ${titleMaxLength} characters or less`,
+            ),
       }),
       highlightDescription: Yup.string().when('isHighlight', {
         is: true,
-        then: s => s.required('Enter a featured table description'),
+        then: s =>
+          s
+            .required('Enter a featured table description')
+            .max(
+              descriptionMaxLength,
+              `Featured table description must be ${descriptionMaxLength} characters or less`,
+            ),
       }),
       isHighlight: Yup.boolean(),
     });
@@ -100,6 +119,7 @@ const DataBlockDetailsForm = ({
                 onBlur={() => {
                   onTitleChange?.(getValues('heading'));
                 }}
+                maxLength={titleMaxLength}
               />
 
               <FormFieldTextInput<FormValues>
@@ -125,12 +145,14 @@ const DataBlockDetailsForm = ({
                         label="Featured table name"
                         hint="We will show this name to table builder users as a featured table"
                         className="govuk-!-width-two-thirds"
+                        maxLength={titleMaxLength}
                       />
                       <FormFieldTextArea<FormValues>
                         name="highlightDescription"
                         label="Featured table description"
                         hint="Describe the contents of this featured table to table builder users"
                         className="govuk-!-width-two-thirds"
+                        maxLength={descriptionMaxLength}
                       />
                     </>
                   }

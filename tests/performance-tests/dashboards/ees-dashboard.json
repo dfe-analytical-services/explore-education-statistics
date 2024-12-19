@@ -3080,7 +3080,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red"
+                "color": "light-red",
+                "value": null
               },
               {
                 "color": "red",
@@ -3116,13 +3117,13 @@
             "type": "influxdb",
             "uid": "P76A45B24F43298D1"
           },
-          "query": "SELECT count(\"value\") FROM \"ees_public_api_query_http2_stream_error_count\" WHERE $timeFilter GROUP BY time(1m) fill(none)",
+          "query": "SELECT count(\"value\") FROM \"ees_public_api_query_gateway_timeout_error_count\" WHERE $timeFilter GROUP BY time(1m) fill(none)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
         }
       ],
-      "title": "Public API Data Set - query \"http2: stream\" errors per minute",
+      "title": "Public API Data Set - gateway timeout errors per minute",
       "type": "timeseries"
     },
     {
@@ -3172,7 +3173,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red"
+                "color": "light-red",
+                "value": null
               },
               {
                 "color": "red",
@@ -3233,7 +3235,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red"
+                "color": "light-red",
+                "value": null
               },
               {
                 "color": "red",
@@ -3328,7 +3331,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red"
+                "color": "light-red",
+                "value": null
               },
               {
                 "color": "red",
@@ -3389,7 +3393,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red"
+                "color": "light-red",
+                "value": null
               },
               {
                 "color": "red",
@@ -3428,13 +3433,13 @@
             "type": "influxdb",
             "uid": "P76A45B24F43298D1"
           },
-          "query": "SELECT sum(\"value\") FROM \"ees_public_api_query_http2_stream_error_count\" WHERE $timeFilter fill(none)",
+          "query": "SELECT sum(\"value\") FROM \"ees_public_api_query_gateway_timeout_error_count\" WHERE $timeFilter fill(none)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
         }
       ],
-      "title": "Public API Data Set - query \"http2: stream\" errors",
+      "title": "Public API Data Set - gateway timeout errors",
       "type": "stat"
     },
     {
@@ -3453,7 +3458,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red"
+                "color": "light-red",
+                "value": null
               },
               {
                 "color": "red",
@@ -3517,7 +3523,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-red"
+                "color": "light-red",
+                "value": null
               },
               {
                 "color": "red",
@@ -3922,7 +3929,7 @@
       "type": "row"
     }
   ],
-  "refresh": "5s",
+  "refresh": false,
   "schemaVersion": 37,
   "style": "dark",
   "tags": [],
@@ -3952,13 +3959,13 @@
     ]
   },
   "time": {
-    "from": "now-5m",
-    "to": "now"
+    "from": "2024-12-17T16:26:32.679Z",
+    "to": "2024-12-17T16:26:50.464Z"
   },
   "timepicker": {},
   "timezone": "",
   "title": "EES dashboard",
   "uid": "ees-dashboard",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

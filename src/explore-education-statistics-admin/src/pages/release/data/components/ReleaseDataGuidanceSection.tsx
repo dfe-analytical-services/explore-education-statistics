@@ -44,6 +44,7 @@ interface Props {
   canUpdateRelease: boolean;
 }
 
+const contentMaxLength = 250;
 const formId = 'dataGuidanceForm';
 
 const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
@@ -114,16 +115,21 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                   dataSets: Yup.array().of(
                     Yup.object({
                       id: Yup.string(),
-                      content: Yup.string().required(params => {
-                        const [, index] = toPath(params.path);
-                        const dataSet = dataGuidance?.dataSets[Number(index)];
+                      content: Yup.string()
+                        .required(params => {
+                          const [, index] = toPath(params.path);
+                          const dataSet = dataGuidance?.dataSets[Number(index)];
 
-                        if (!dataSet) {
-                          return null;
-                        }
+                          if (!dataSet) {
+                            return null;
+                          }
 
-                        return `Enter file guidance content for ${dataSet.name}`;
-                      }),
+                          return `Enter file guidance content for ${dataSet.name}`;
+                        })
+                        .max(
+                          contentMaxLength,
+                          `File guidance content must be ${contentMaxLength} characters or less`,
+                        ),
                     }),
                   ),
                 })}
@@ -179,6 +185,7 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                                         label="File guidance content"
                                         name={`dataSets.${index}.content`}
                                         rows={3}
+                                        maxLength={contentMaxLength}
                                       />
                                     ) : (
                                       <ContentHtml

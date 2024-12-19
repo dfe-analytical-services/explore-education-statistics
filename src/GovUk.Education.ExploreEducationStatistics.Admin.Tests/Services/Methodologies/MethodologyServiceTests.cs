@@ -3600,9 +3600,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                     .ReturnsAsync(new RedirectsViewModel(
-                        Publications: [],
-                        Methodologies: [],
-                        Releases: []));
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -3662,9 +3662,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                     .ReturnsAsync(new RedirectsViewModel(
-                        Publications: [],
-                        Methodologies: [],
-                        Releases: []));
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -3745,9 +3745,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                     .ReturnsAsync(new RedirectsViewModel(
-                        Publications: [],
-                        Methodologies: [],
-                        Releases: []));
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -3847,9 +3847,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                     .ReturnsAsync(new RedirectsViewModel(
-                        Publications: [],
-                        Methodologies: [],
-                        Releases: []));
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -3917,9 +3917,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                     .ReturnsAsync(new RedirectsViewModel(
-                        Publications: [],
-                        Methodologies: [],
-                        Releases: []));
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -4004,9 +4004,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                     .ReturnsAsync(new RedirectsViewModel(
-                        Publications: [],
-                        Methodologies: [],
-                        Releases: []));
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -4110,9 +4110,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
                     .ReturnsAsync(new RedirectsViewModel(
-                        Publications: [],
-                        Methodologies: [],
-                        Releases: []));
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);

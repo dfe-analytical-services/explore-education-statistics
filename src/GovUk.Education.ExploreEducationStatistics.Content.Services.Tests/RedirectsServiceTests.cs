@@ -12,136 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
     public class RedirectsServiceTests
     {
         [Fact]
-        public async Task List_PublicationRedirect()
-        {
-            var publication = new Publication
-            {
-                Slug = "redirect-to",
-            };
-
-            var publicationRedirects = new List<PublicationRedirect>
-            {
-                new()
-                {
-                    Slug = "redirect-from-2",
-                    Publication = publication,
-                },
-                new()
-                {
-                    Slug = "redirect-from-1",
-                    Publication = publication,
-                },
-                new()
-                {
-                    Slug = "redirect-to", // should be excluded in results, as same as current publication slug
-                    Publication = publication,
-                },
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.PublicationRedirects.AddRangeAsync(publicationRedirects);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var redirectsService = SetupRedirectsService(contentDbContext);
-
-                var result = await redirectsService.List();
-
-                var viewModel = result.AssertRight();
-                var publicationsRedirectViewModel = viewModel.Publications;
-
-                Assert.Equal(2, publicationsRedirectViewModel.Count);
-
-                Assert.Equal("redirect-from-2", publicationsRedirectViewModel[0].FromSlug);
-                Assert.Equal("redirect-to", publicationsRedirectViewModel[0].ToSlug);
-
-                Assert.Equal("redirect-from-1", publicationsRedirectViewModel[1].FromSlug);
-                Assert.Equal("redirect-to", publicationsRedirectViewModel[1].ToSlug);
-            }
-        }
-
-        [Fact]
-        public async Task List_MethodologyRedirect()
-        {
-            var latestPublishedVersionId = Guid.NewGuid();
-            var methodology = new Methodology
-            {
-                LatestPublishedVersionId = latestPublishedVersionId,
-                OwningPublicationSlug = "no-redirect-to-1",
-                Versions = new List<MethodologyVersion>
-                {
-                    new()
-                    {
-                        // previous version
-                        AlternativeSlug = "no-redirect-to-2",
-                        Version = 0,
-                    },
-                    new()
-                    {
-                        Id = latestPublishedVersionId,
-                        AlternativeSlug = "redirect-to",
-                        Version = 1,
-                    },
-                    new()
-                    {
-                        // latestVersion but unpublished
-                        AlternativeSlug = "no-redirect-to-3",
-                        Version = 2,
-                    },
-                }
-            };
-
-            var methodologyRedirects = new List<MethodologyRedirect>
-            {
-                new()
-                {
-                    Slug = "redirect-from-2",
-                    MethodologyVersion = methodology.Versions[0],
-                },
-                new()
-                {
-                    Slug = "redirect-from-1",
-                    MethodologyVersion = methodology.Versions[1],
-                },
-                new()
-                {
-                    Slug = "no-redirect-from-1",
-                    MethodologyVersion = methodology.Versions[2],
-                },
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Methodologies.AddAsync(methodology);
-                await contentDbContext.MethodologyRedirects.AddRangeAsync(methodologyRedirects);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var redirectsService = SetupRedirectsService(contentDbContext);
-
-                var result = await redirectsService.List();
-
-                var viewModel = result.AssertRight();
-                var methodologyRedirectViewModel = viewModel.Methodologies;
-
-                Assert.Equal(2, methodologyRedirectViewModel.Count);
-
-                Assert.Equal("redirect-from-2", methodologyRedirectViewModel[0].FromSlug);
-                Assert.Equal("redirect-to", methodologyRedirectViewModel[0].ToSlug);
-
-                Assert.Equal("redirect-from-1", methodologyRedirectViewModel[1].FromSlug);
-                Assert.Equal("redirect-to", methodologyRedirectViewModel[1].ToSlug);
-            }
-        }
-
-        [Fact]
         public async Task List_MethodologyRedirect_MethodologyNotPublished()
         {
             var methodology = new Methodology
@@ -178,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var viewModel = result.AssertRight();
 
-                Assert.Empty(viewModel.Methodologies);
+                Assert.Empty(viewModel.MethodologyRedirects);
             }
         }
 
@@ -231,9 +101,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await redirectsService.List();
 
                 var viewModel = result.AssertRight();
-                var methodologyRedirectViewModel = viewModel.Methodologies;
+                var methodologyRedirectsViewModel = viewModel.MethodologyRedirects;
 
-                var redirect = Assert.Single(methodologyRedirectViewModel);
+                var redirect = Assert.Single(methodologyRedirectsViewModel);
 
                 Assert.Equal("redirect-from-1", redirect.FromSlug);
                 Assert.Equal("redirect-to", redirect.ToSlug);
@@ -318,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await redirectsService.List();
 
                 var viewModel = result.AssertRight();
-                var methodologyRedirectsViewModel = viewModel.Methodologies;
+                var methodologyRedirectsViewModel = viewModel.MethodologyRedirects;
 
                 Assert.Equal(2, methodologyRedirectsViewModel.Count);
 
@@ -379,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await redirectsService.List();
 
                 var viewModel = result.AssertRight();
-                Assert.Empty(viewModel.Methodologies);
+                Assert.Empty(viewModel.MethodologyRedirects);
             }
         }
 
@@ -438,7 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var viewModel = result.AssertRight();
 
-                var redirect = Assert.Single(viewModel.Methodologies);
+                var redirect = Assert.Single(viewModel.MethodologyRedirects);
                 Assert.Equal("duplicated-redirect", redirect.FromSlug);
                 Assert.Equal("redirect-to", redirect.ToSlug);
             }

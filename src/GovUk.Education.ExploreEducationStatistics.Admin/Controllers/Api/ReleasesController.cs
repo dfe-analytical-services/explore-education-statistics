@@ -107,7 +107,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> UploadDataSet(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
-            [FromQuery(Name = "title")] string title,
+            [FromQuery(Name = "title")]
+            [MaxLength(120)]
+            string title,
             IFormFile file,
             IFormFile metaFile)
         {
@@ -125,7 +127,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> UploadDataSetAsZip(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
-            [FromQuery(Name = "title")] string title,
+            [FromQuery(Name = "title")]
+            [MaxLength(120)]
+            string title,
             IFormFile zipFile)
         {
             return await _releaseDataFileService

@@ -1,9 +1,9 @@
 #nullable enable
-using System.Collections.Generic;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
@@ -17,7 +17,7 @@ public record DataBlockCreateRequest
 
     public FullTableQueryRequest Query { get; init; } = null!;
 
-    public List<IChart> Charts { get; init; } = new();
+    public List<IChart> Charts { get; init; } = [];
 
     public TableBuilderConfiguration Table { get; init; } = null!;
 
@@ -26,7 +26,8 @@ public record DataBlockCreateRequest
         public Validator()
         {
             RuleFor(request => request.Heading)
-                .NotEmpty();
+                .NotEmpty()
+                .MaximumLength(120);
 
             RuleFor(request => request.Name)
                 .NotEmpty();
@@ -47,7 +48,7 @@ public record DataBlockUpdateRequest
 
     public FullTableQueryRequest Query { get; init; } = null!;
 
-    public List<IChart> Charts { get; init; } = new();
+    public List<IChart> Charts { get; init; } = [];
 
     public TableBuilderConfiguration Table { get; init; } = null!;
 
@@ -56,7 +57,8 @@ public record DataBlockUpdateRequest
         public Validator()
         {
             RuleFor(request => request.Heading)
-                .NotEmpty();
+                .NotEmpty()
+                .MaximumLength(120);
 
             RuleFor(request => request.Name)
                 .NotEmpty();

@@ -106,27 +106,27 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage BulkDataZipMustContainDatasetNamesCsv = new(
-        Code: nameof(BulkDataZipMustContainDatasetNamesCsv),
+    public static readonly LocalizableMessage BulkDataZipMustContainDataSetNamesCsv = new(
+        Code: nameof(BulkDataZipMustContainDataSetNamesCsv),
         Message: "For bulk imports, the ZIP must include dataset_names.csv"
     );
 
-    public static readonly LocalizableMessage DatasetNamesCsvReaderException = new(
-        Code: nameof(DatasetNamesCsvReaderException),
+    public static readonly LocalizableMessage DataSetNamesCsvReaderException = new(
+        Code: nameof(DataSetNamesCsvReaderException),
         Message: "Failed to read dataset_names.csv. Exception: {0}"
     );
 
-    public static ErrorViewModel GenerateErrorDatasetNamesCsvReaderException(string exception)
+    public static ErrorViewModel GenerateErrorDataSetNamesCsvReaderException(string exception)
     {
         return new ErrorViewModel
         {
-            Code = DatasetNamesCsvReaderException.Code,
-            Message = string.Format(DatasetNamesCsvReaderException.Message, exception),
+            Code = DataSetNamesCsvReaderException.Code,
+            Message = string.Format(DataSetNamesCsvReaderException.Message, exception),
         };
     }
 
-    public static readonly LocalizableMessage DatasetNamesCsvIncorrectHeaders = new(
-        Code: nameof(DatasetNamesCsvIncorrectHeaders),
+    public static readonly LocalizableMessage DataSetNamesCsvIncorrectHeaders = new(
+        Code: nameof(DataSetNamesCsvIncorrectHeaders),
         Message: "dataset_names.csv has incorrect headers. It should have 'file_name' and 'dataset_name' only."
     );
 
@@ -158,22 +158,22 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage DatasetNamesCsvFilenamesShouldBeUnique = new(
-        Code: nameof(DatasetNamesCsvFilenamesShouldBeUnique),
+    public static readonly LocalizableMessage DataSetNamesCsvFilenamesShouldBeUnique = new(
+        Code: nameof(DataSetNamesCsvFilenamesShouldBeUnique),
         Message: "In dataset_names.csv, all filenames should be unique. Duplicate filename: '{0}'."
     );
 
-    public static ErrorViewModel GenerateErrorDatasetNamesCsvFilenamesShouldBeUnique(string duplicate)
+    public static ErrorViewModel GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique(string duplicate)
     {
         return new ErrorViewModel
         {
-            Code = DatasetNamesCsvFilenamesShouldBeUnique.Code,
-            Message = string.Format(DatasetNamesCsvFilenamesShouldBeUnique.Message, duplicate),
+            Code = DataSetNamesCsvFilenamesShouldBeUnique.Code,
+            Message = string.Format(DataSetNamesCsvFilenamesShouldBeUnique.Message, duplicate),
         };
     }
 
-    public static readonly LocalizableMessage DatasetNamesCsvFilenamesShouldNotEndDotCsv = new(
-        Code: nameof(DatasetNamesCsvFilenamesShouldNotEndDotCsv),
+    public static readonly LocalizableMessage DataSetNamesCsvFilenamesShouldNotEndDotCsv = new(
+        Code: nameof(DataSetNamesCsvFilenamesShouldNotEndDotCsv),
         Message: "Inside dataset_names.csv, file_name cell entries should not end in '.csv' i.e. should be 'filename' not 'filename.csv'. Filename found with extension: '{0}'."
     );
 
@@ -205,12 +205,26 @@ public static class ValidationMessages
         };
     }
 
-    public static ErrorViewModel GenerateErrorDatasetNamesCsvFilenamesShouldNotEndDotCsv(string filename)
+    public static readonly LocalizableMessage DataSetTitleTooLong = new(
+        Code: nameof(DataSetTitleTooLong),
+        Message: "Subject title '{0}' must be 120 characters or less"
+    );
+
+    public static ErrorViewModel GenerateErrorDataSetTitleTooLong(string title)
     {
         return new ErrorViewModel
         {
-            Code = DatasetNamesCsvFilenamesShouldNotEndDotCsv.Code,
-            Message = string.Format(DatasetNamesCsvFilenamesShouldNotEndDotCsv.Message, filename),
+            Code = DataSetTitleTooLong.Code,
+            Message = string.Format(DataSetTitleTooLong.Message, title),
+        };
+    }
+
+    public static ErrorViewModel GenerateErrorDataSetNamesCsvFilenamesShouldNotEndDotCsv(string filename)
+    {
+        return new ErrorViewModel
+        {
+            Code = DataSetNamesCsvFilenamesShouldNotEndDotCsv.Code,
+            Message = string.Format(DataSetNamesCsvFilenamesShouldNotEndDotCsv.Message, filename),
         };
     }
 

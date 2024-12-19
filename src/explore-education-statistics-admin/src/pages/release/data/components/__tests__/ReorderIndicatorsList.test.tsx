@@ -1,10 +1,10 @@
 import ReorderIndicatorsList from '@admin/pages/release/data/components/ReorderIndicatorsList';
+import render from '@common-test/render';
 import _tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -81,20 +81,11 @@ describe('ReorderIndicatorsList', () => {
       />,
     );
 
-    expect(
-      screen.getByRole('heading', {
-        name: 'Reorder indicators for Subject Name',
-      }),
-    );
+    expect(await screen.findByText('Reorder indicators for Subject Name'));
 
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-
-    // the listitems are given role 'button' by react-dnd
-    const indicators = within(screen.getByTestId('reorder-list')).getAllByRole(
-      'button',
-    );
+    const indicators = within(
+      screen.getByTestId('reorder-indicators'),
+    ).getAllByRole('listitem');
     expect(within(indicators[0]).getByText('Category 2'));
     expect(within(indicators[1]).getByText('Category 1'));
   });
@@ -124,8 +115,8 @@ describe('ReorderIndicatorsList', () => {
 
     await waitFor(() => {
       expect(screen.getByText('No indicators available.'));
-      expect(screen.queryByTestId('reorder-list')).not.toBeInTheDocument();
     });
+    expect(screen.queryByTestId('reorder-indicators')).not.toBeInTheDocument();
   });
 
   test('indicators have a `reorder options` button if they have more than one item', async () => {
@@ -138,31 +129,25 @@ describe('ReorderIndicatorsList', () => {
         onSave={noop}
       />,
     );
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-    const indicatorsList = screen.getByTestId('reorder-list');
-
-    const buttons = within(indicatorsList).getAllByRole('button');
-
-    expect(within(buttons[0]).getByText('Category 2'));
     expect(
-      within(buttons[0]).queryByRole('button', {
-        name: 'Reorder options within this group',
+      await screen.findByText('Reorder indicators for Subject Name'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Reorder options within Category 2',
       }),
     ).not.toBeInTheDocument();
-
-    expect(within(buttons[1]).getByText('Category 1'));
     expect(
-      within(buttons[1]).getByRole('button', {
-        name: 'Reorder options within this group',
+      screen.getByRole('button', {
+        name: 'Reorder options within Category 1',
       }),
-    );
+    ).toBeInTheDocument();
   });
 
   test('clicking the `reorder options` button on a indicator shows the items for the indicator', async () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    render(
+    const { user } = render(
       <ReorderIndicatorsList
         releaseId="release-1"
         subject={testSubject}
@@ -170,29 +155,26 @@ describe('ReorderIndicatorsList', () => {
         onSave={noop}
       />,
     );
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-    const indicatorsList = screen.getByTestId('reorder-list');
-    await userEvent.click(
-      screen.getAllByRole('button', {
-        name: 'Reorder options within this group',
-      })[0],
-    );
+    expect(
+      await screen.findByText('Reorder indicators for Subject Name'),
+    ).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByText('Category 1 Item 1'));
-    });
-    const itemsList = within(indicatorsList).getByRole('list');
-    const items = within(itemsList).getAllByRole('button');
+    await user.click(
+      screen.getByRole('button', { name: 'Reorder options within Category 1' }),
+    );
+    expect(await screen.findByText('Category 1 Item 1'));
+
+    const items = within(
+      screen.getByTestId('reorder-indicators-children'),
+    ).getAllByRole('listitem');
     expect(within(items[0]).getByText('Category 1 Item 1'));
     expect(within(items[1]).getByText('Category 1 Item 2'));
     expect(within(items[2]).getByText('Category 1 Item 3'));
   });
 
-  test('clicking the `done` button on a indicator hides the items for the indicator', async () => {
+  test('clicking the `close` button on a indicator hides the items for the indicator', async () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    render(
+    const { user } = render(
       <ReorderIndicatorsList
         releaseId="release-1"
         subject={testSubject}
@@ -200,30 +182,21 @@ describe('ReorderIndicatorsList', () => {
         onSave={noop}
       />,
     );
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-    const indicatorsList = screen.getByTestId('reorder-list');
-    await userEvent.click(
-      screen.getAllByRole('button', {
-        name: 'Reorder options within this group',
-      })[0],
+    expect(await screen.findByText('Reorder indicators for Subject Name'));
+
+    await user.click(
+      screen.getByRole('button', { name: 'Reorder options within Category 1' }),
     );
+    expect(await screen.findByText('Category 1 Item 1'));
 
-    await waitFor(() => {
-      expect(screen.getByText('Category 1 Item 1'));
-    });
-
-    expect(within(indicatorsList).getByRole('list'));
-    await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+    await user.click(screen.getByRole('button', { name: 'Close Category 1' }));
     expect(screen.queryByText('Category 1 Item 1')).not.toBeInTheDocument();
-    expect(within(indicatorsList).queryByRole('list')).not.toBeInTheDocument();
   });
 
   test('clicking the `save` button calls handleSave with the reordered list formatted for the update request', async () => {
     const handleSave = jest.fn();
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    render(
+    const { user } = render(
       <ReorderIndicatorsList
         releaseId="release-1"
         subject={testSubject}
@@ -231,10 +204,10 @@ describe('ReorderIndicatorsList', () => {
         onSave={handleSave}
       />,
     );
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-    await userEvent.click(screen.getByRole('button', { name: 'Save order' }));
+    expect(
+      await screen.findByText('Reorder indicators for Subject Name'),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Save order' }));
 
     const expectedRequest = [
       {

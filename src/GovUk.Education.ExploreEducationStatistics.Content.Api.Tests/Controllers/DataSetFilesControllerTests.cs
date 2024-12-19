@@ -1759,7 +1759,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
     public class DownloadDataSetFileTests(TestApplicationFactory testApp) : DataSetFilesControllerTests(testApp)
     {
-        public override async Task InitializeAsync() => await TestApp.StartAzurite();
+        public override async Task InitializeAsync() => await StartAzurite();
 
         [Fact]
         public async Task DownloadDataSetFile()
@@ -1844,7 +1844,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile(FileType.Data));
 
-            await TestApp.StartAzurite();
+            await StartAzurite();
 
             var testApp = BuildApp(enableAzurite: true);
             var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
@@ -1871,7 +1871,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
     public class ListSitemapItemsTests(TestApplicationFactory testApp) : DataSetFilesControllerTests(testApp)
     {
-        public override async Task InitializeAsync() => await TestApp.StartAzurite();
+        public override async Task InitializeAsync() => await StartAzurite();
 
         private async Task<HttpResponseMessage> InvokeListSitemapItems(
             WebApplicationFactory<Startup>? app = null)
@@ -1904,7 +1904,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         ))
                 );
 
-            await TestApp.StartAzurite();
+            await StartAzurite();
 
             var testApp = BuildApp(enableAzurite: true);
             var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
@@ -1944,7 +1944,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
     {
         public override async Task InitializeAsync()
         {
-            await TestApp.StartAzurite();
+            await StartAzurite();
         }
 
         [Fact]
@@ -1975,7 +1975,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 context.ReleaseFiles.Add(releaseFile);
             });
 
-            await TestApp.StartAzurite();
+            await StartAzurite();
 
             var testApp = BuildApp(enableAzurite: true);
 
@@ -2098,7 +2098,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 context.ReleaseFiles.Add(releaseFile);
             });
 
-            await TestApp.StartAzurite();
+            await StartAzurite();
 
             var testApp = BuildApp(enableAzurite: true);
 
@@ -2163,7 +2163,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 context.ReleaseFiles.Add(releaseFile);
             });
 
-            await TestApp.StartAzurite();
+            await StartAzurite();
 
             var testApp = BuildApp(enableAzurite: true);
 
@@ -2224,7 +2224,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 context.ReleaseFiles.Add(releaseFile);
             });
 
-            await TestApp.StartAzurite();
+            await StartAzurite();
 
             var testApp = BuildApp(enableAzurite: true);
 
@@ -2281,7 +2281,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 context.ReleaseFiles.Add(releaseFile);
             });
 
-            await TestApp.StartAzurite();
+            await StartAzurite();
 
             var testApp = BuildApp(enableAzurite: true);
 
@@ -2362,7 +2362,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 context.ReleaseFootnote.AddRange(releaseFootnote1, releaseFootnote2);
             });
 
-            await TestApp.StartAzurite();
+            await StartAzurite();
 
             var testApp = BuildApp(enableAzurite: true);
 
@@ -2466,7 +2466,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 context.ReleaseFiles.AddRange(releaseFile0, releaseFile1, releaseFile2);
             });
 
-            await TestApp.StartAzurite();
+            await StartAzurite();
 
             var testApp = BuildApp(enableAzurite: true);
 
@@ -2532,8 +2532,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         StatisticsDbContext? statisticsDbContext = null,
         bool enableAzurite = false)
     {
-        return TestApp
-            .WithAzurite(enabled: enableAzurite)
+        return WithAzurite(enabled: enableAzurite)
             .ConfigureServices(services =>
             {
                 services.ReplaceService(MemoryCacheService);
