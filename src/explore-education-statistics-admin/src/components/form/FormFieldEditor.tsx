@@ -42,6 +42,7 @@ export default function FormFieldEditor<TFormValues extends FieldValues>({
   testId,
   onBlur,
   onChange,
+  onElementsReady,
   ...props
 }: Props<TFormValues>) {
   const {
@@ -86,7 +87,10 @@ export default function FormFieldEditor<TFormValues extends FieldValues>({
           }
         }}
         onElementsChange={handleElements}
-        onElementsReady={handleElements}
+        onElementsReady={els => {
+          handleElements(els);
+          onElementsReady?.(els);
+        }}
         onChange={nextValue => {
           setValue(
             name,
