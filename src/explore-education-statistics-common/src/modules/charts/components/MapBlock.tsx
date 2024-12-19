@@ -61,7 +61,7 @@ export interface MapBlockProps extends ChartProps {
   map?: MapConfig;
   position?: { lat: number; lng: number };
   boundaryLevel: number;
-  onBoundaryLevelChange: (boundaryLevel: number) => void;
+  onBoundaryLevelChange?: (boundaryLevel: number) => void;
 }
 
 export const mapBlockDefinition: ChartDefinition = {
@@ -225,8 +225,10 @@ export default function MapBlock({
   );
 
   const handleDataSetChange = useCallback(
-    async (value: string) => {
+    (value: string) => {
       setSelectedDataSetKey(value);
+      if (!onBoundaryLevelChange) return;
+
       const previouslyRenderredBoundaryLevel =
         selectedDataSetConfig?.boundaryLevel ?? boundaryLevel;
       const newBoundaryLevelToRender =
@@ -234,7 +236,7 @@ export default function MapBlock({
 
       if (newBoundaryLevelToRender !== previouslyRenderredBoundaryLevel) {
         setIsBoundaryLevelChanging.on();
-        await onBoundaryLevelChange(
+        onBoundaryLevelChange(
           dataSetCategoryConfigs[value].boundaryLevel ?? boundaryLevel,
         );
       }

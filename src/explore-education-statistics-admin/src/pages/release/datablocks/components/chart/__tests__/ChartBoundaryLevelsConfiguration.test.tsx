@@ -98,7 +98,6 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         options={testDefaultChartOptions}
         onChange={noop}
         onSubmit={noop}
-        hasDataSetBoundaryLevels
       />,
     );
     expect(screen.getByLabelText('Default boundary level')).toBeInTheDocument();
@@ -116,7 +115,6 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         options={testDefaultChartOptions}
         onChange={noop}
         onSubmit={noop}
-        hasDataSetBoundaryLevels
       />,
     );
 
@@ -201,7 +199,6 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         }}
         onChange={noop}
         onSubmit={noop}
-        hasDataSetBoundaryLevels
       />,
     );
 
@@ -229,7 +226,6 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         options={testDefaultChartOptions}
         onChange={handleChange}
         onSubmit={noop}
-        hasDataSetBoundaryLevels
       />,
     );
 
@@ -264,7 +260,6 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         options={testDefaultChartOptions}
         onChange={noop}
         onSubmit={noop}
-        hasDataSetBoundaryLevels
       />,
     );
 
@@ -294,7 +289,6 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         options={testDefaultChartOptions}
         onChange={noop}
         onSubmit={handleSubmit}
-        hasDataSetBoundaryLevels
       />,
     );
 
@@ -329,7 +323,6 @@ describe('ChartBoundaryLevelsConfiguration', () => {
         }}
         onChange={noop}
         onSubmit={handleSubmit}
-        hasDataSetBoundaryLevels
       />,
     );
 

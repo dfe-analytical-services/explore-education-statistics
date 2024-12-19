@@ -361,7 +361,7 @@ describe('ChartBuilder', () => {
 
   test('calls `onTableQueryUpdate` when change boundary level', async () => {
     const testInitialChart: Chart = {
-      onBoundaryLevelChange: () => {},
+      onBoundaryLevelChange: jest.fn(),
       type: 'map',
       boundaryLevel: 2,
       map: {
@@ -444,7 +444,9 @@ describe('ChartBuilder', () => {
 
     await user.click(screen.getByRole('tab', { name: 'Boundary levels' }));
 
-    await user.selectOptions(screen.getByLabelText('Boundary level'), ['1']);
+    await user.selectOptions(screen.getByLabelText('Default boundary level'), [
+      '1',
+    ]);
 
     expect(handleUpdate).toHaveBeenCalledWith({ boundaryLevel: 1 });
   });
@@ -452,7 +454,6 @@ describe('ChartBuilder', () => {
   describe('data groupings tab', () => {
     const testInitialChart: Chart = {
       type: 'map',
-      onBoundaryLevelChange: () => {},
       boundaryLevel: 2,
       map: {
         dataSetConfigs: [

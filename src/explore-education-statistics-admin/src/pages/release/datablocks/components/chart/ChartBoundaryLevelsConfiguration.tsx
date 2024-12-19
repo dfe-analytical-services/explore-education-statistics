@@ -10,8 +10,6 @@ import React, { ReactNode, useCallback, useMemo } from 'react';
 
 interface Props {
   buttons?: ReactNode;
-  // TODO: EES-5402 - Remove when all boundary level changes are done
-  hasDataSetBoundaryLevels?: boolean;
   map: MapConfig;
   meta: FullTableMeta;
   options: ChartOptions;
@@ -21,8 +19,6 @@ interface Props {
 
 export default function ChartBoundaryLevelsConfiguration({
   buttons,
-  // TODO: EES-5402 - Remove when all boundary level changes are done
-  hasDataSetBoundaryLevels = true,
   map,
   meta,
   options,
@@ -77,7 +73,6 @@ export default function ChartBoundaryLevelsConfiguration({
     <ChartBoundaryLevelsForm
       buttons={buttons}
       dataSetConfigs={map.dataSetConfigs}
-      hasDataSetBoundaryLevels={hasDataSetBoundaryLevels}
       initialValues={initialValues}
       meta={meta}
       onChange={handleChange}
