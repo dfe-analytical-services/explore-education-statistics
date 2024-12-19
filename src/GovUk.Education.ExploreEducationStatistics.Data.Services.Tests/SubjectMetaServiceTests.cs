@@ -662,7 +662,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     SubjectId = releaseSubject.SubjectId,
                     Type = FileType.Data,
-                    FilterHierarchies = [], // @MarkFix
+                    FilterHierarchies = [],
                 },
             };
 

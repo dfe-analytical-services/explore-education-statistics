@@ -1,17 +1,13 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using AngleSharp.Dom;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -240,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await contentDbContext.SaveChangesAsync();
         }
 
-        private static async Task<List<DataSetFileFilterHierarchy>> GenerateFilterHierarchies(
+        public static async Task<List<DataSetFileFilterHierarchy>> GenerateFilterHierarchies(
             StatisticsDbContext statisticsDbContext,
             List<FilterMeta> filters)
         {
