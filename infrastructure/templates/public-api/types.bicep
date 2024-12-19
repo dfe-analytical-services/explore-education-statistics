@@ -222,3 +222,20 @@ type KeyVaultRole = 'Secrets User' | 'Certificate User'
 
 @export()
 type StaticWebAppSku = 'Free' | 'Standard'
+
+@export()
+type ContainerAppResourceConfig = {
+  workloadProfileName: string
+  minReplicas: int
+  maxReplicas: int
+  cpuCores: int
+  memoryGis: int
+}
+
+@export()
+type ContainerAppWorkloadProfile = {
+  name: string
+  workloadProfileType: 'D4' | 'D8' | 'D16' | 'D32' | 'E4' | 'E8' | 'E16' | 'E32' 
+  minimumCount: int
+  maximumCount: int
+}

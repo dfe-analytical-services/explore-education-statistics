@@ -14,4 +14,12 @@ param postgreSqlSkuName = 'Standard_B1ms'
 param postgreSqlStorageSizeGB = 32
 param postgreSqlAutoGrowStatus = 'Disabled'
 
+param publicApiContainerAppConfig = {
+  cpuCores: 4
+  memoryGis: 8
+  minReplicas: 1
+  maxReplicas: 16
+  workloadProfileName: 'Consumption'
+}
+
 param enableThemeDeletion = true
