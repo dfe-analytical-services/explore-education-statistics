@@ -1,17 +1,23 @@
-import ReorderList, {
-  FormattedGroup,
-  FormattedFilters,
-  ReorderProps,
-} from '@admin/pages/release/data/components/ReorderList';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import {
+  ReorderableListItem,
+  ReorderResult,
+} from '@common/components/ReorderableItem';
+import ReorderableNestedList from '@common/components/ReorderableNestedList';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
+import reorder from '@common/utils/reorder';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
+
+interface ReorderHandler extends ReorderResult {
+  expandedItemId?: string;
+  expandedItemParentId?: string;
+}
 
 interface UpdatedFilter {
   id: string;
@@ -26,18 +32,18 @@ interface Props {
   onSave: (subjectId: string, requestFilters: UpdateFiltersRequest) => void;
 }
 
-const ReorderFiltersList = ({
+export default function ReorderFiltersList({
   releaseId,
   subject,
   onCancel,
   onSave,
-}: Props) => {
+}: Props) {
   const { value: subjectMeta, isLoading } = useAsyncHandledRetry(
     () => tableBuilderService.getSubjectMeta(subject.id, releaseId),
     [subject.id, releaseId],
   );
 
-  const [filters, setFilters] = useState<FormattedFilters[]>([]);
+  const [filters, setFilters] = useState<ReorderableListItem[]>([]);
 
   useEffect(() => {
     if (isLoading || !subjectMeta) {
@@ -47,105 +53,136 @@ const ReorderFiltersList = ({
 
     // Transforming the filters to be nested arrays rather than keyed objects.
     // Order by the order fields.
-    const formattedFilters = orderBy(
-      Object.entries(filtersMeta).map(([, group]) => {
-        return {
-          id: group.id,
-          label: group.legend,
-          order: group.order,
-          groups: orderBy(
-            Object.entries(group.options).map(([, item]) => {
-              return {
-                id: item.id,
-                label: item.label,
-                order: item.order,
-                items: item.options.map(option => ({
-                  id: option.value,
-                  label: option.label,
-                })),
-              };
-            }),
-            'order',
-          ),
-        };
-      }),
+    const formattedFilters: ReorderableListItem[] = orderBy(
+      Object.values(filtersMeta),
       'order',
-    );
+    ).map(group => {
+      return {
+        id: group.id,
+        label: group.legend,
+        childOptions: orderBy(Object.values(group.options), 'order').map(
+          item => ({
+            id: item.id,
+            label: item.label,
+            parentId: group.id,
+            childOptions: item.options.map(option => ({
+              id: option.value,
+              label: option.label,
+              parentId: item.id,
+            })),
+          }),
+        ),
+      };
+    });
+
     setFilters(formattedFilters);
   }, [isLoading, subjectMeta]);
 
   const handleReorder = ({
-    reordered,
-    parentCategoryId,
-    parentGroupId,
-  }: ReorderProps) => {
-    // reordering filters
-    if (!parentCategoryId && !parentGroupId) {
-      setFilters(reordered as FormattedFilters[]);
+    prevIndex,
+    nextIndex,
+    expandedItemId,
+    expandedItemParentId,
+  }: ReorderHandler) => {
+    // Top level
+    if (!expandedItemId) {
+      setFilters(reorder(filters, prevIndex, nextIndex));
       return;
     }
-
-    const reorderedFilters = filters.map(filter => {
-      if (filter.id !== parentCategoryId) {
-        return filter;
+    const reordered = filters.map(filter => {
+      // Second level
+      if (filter.id === expandedItemId && filter.childOptions?.length) {
+        // Only one child option when has default group.
+        // In this case the children of the group are shown instead of the group.
+        return filter.childOptions.length === 1
+          ? {
+              ...filter,
+              childOptions: [
+                {
+                  ...filter.childOptions[0],
+                  childOptions: filter.childOptions[0].childOptions
+                    ? reorder(
+                        filter.childOptions[0].childOptions,
+                        prevIndex,
+                        nextIndex,
+                      )
+                    : [],
+                },
+              ],
+            }
+          : {
+              ...filter,
+              childOptions: reorder(filter.childOptions, prevIndex, nextIndex),
+            };
       }
-      // Reordering groups
-      if (!parentGroupId) {
-        return { ...filter, groups: reordered };
+
+      // Third level
+      if (expandedItemParentId) {
+        return filter.id === expandedItemParentId
+          ? {
+              ...filter,
+              childOptions: filter.childOptions?.map(option =>
+                option.id === expandedItemId
+                  ? {
+                      ...option,
+                      childOptions: option.childOptions?.length
+                        ? reorder(option.childOptions, prevIndex, nextIndex)
+                        : [],
+                    }
+                  : option,
+              ),
+            }
+          : filter;
       }
-      // Reordering items
-      const updatedFilterGroups = filter.groups.map(
-        (filterGroup: FormattedGroup) => {
-          if (filterGroup.id !== parentGroupId) {
-            return filterGroup;
-          }
-          return {
-            ...filterGroup,
-            items: reordered,
-          };
-        },
-      );
+      return filter;
+    });
 
-      return { ...filter, groups: updatedFilterGroups };
-    }) as FormattedFilters[];
-
-    setFilters(reorderedFilters);
+    setFilters(reordered);
   };
 
   const handleSave = () => {
-    const updateFiltersRequest: UpdateFiltersRequest = filters.map(filter => {
-      return {
-        id: filter.id,
-        filterGroups: filter.groups.map(group => {
-          return {
+    const updateFiltersRequest: UpdateFiltersRequest = filters.map(filter => ({
+      id: filter.id,
+      filterGroups: filter.childOptions
+        ? filter.childOptions?.map(group => ({
             id: group.id,
-            filterItems: group.items.map(item => item.id),
-          };
-        }),
-      };
-    });
+            filterItems: group.childOptions
+              ? group.childOptions?.map(item => item.id)
+              : [],
+          }))
+        : [],
+    }));
     onSave(subject.id, updateFiltersRequest);
   };
 
   return (
-    <>
-      <h3>{`Reorder filters for ${subject.name}`}</h3>
-      <LoadingSpinner loading={isLoading}>
-        {filters.length === 0 ? (
+    <LoadingSpinner loading={isLoading}>
+      {filters.length === 0 ? (
+        <>
           <p>No filters available.</p>
-        ) : (
-          <ReorderList listItems={filters} onReorder={handleReorder} />
-        )}
-        <ButtonGroup>
           <Button variant="secondary" onClick={onCancel}>
-            Cancel
+            Back
           </Button>
-          {filters.length > 0 && (
-            <Button onClick={handleSave}>Save order</Button>
-          )}
-        </ButtonGroup>
-      </LoadingSpinner>
-    </>
+        </>
+      ) : (
+        <>
+          <ReorderableNestedList
+            heading={`Reorder filters for ${subject.name}`}
+            id="reorder-filters"
+            list={filters}
+            testId="reorder-filters"
+            onMoveItem={handleReorder}
+          />
+          <ButtonGroup>
+            {filters.length > 0 && (
+              <Button onClick={handleSave}>Save order</Button>
+            )}
+            <Button variant="secondary" onClick={onCancel}>
+              Cancel
+            </Button>
+          </ButtonGroup>
+        </>
+      )}
+    </LoadingSpinner>
   );
-};
-export default ReorderFiltersList;
+}
