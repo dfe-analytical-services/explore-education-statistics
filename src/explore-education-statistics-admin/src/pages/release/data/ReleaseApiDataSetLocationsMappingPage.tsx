@@ -13,6 +13,7 @@ import getApiDataSetLocationMappings, {
   MappableLocation,
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import getUnmappedLocationErrors from '@admin/pages/release/data/utils/getUnmappedLocationErrors';
+import { mappableTableId } from '@admin/pages/release/data/utils/mappingTableIds';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import apiDataSetVersionQueries from '@admin/queries/apiDataSetVersionQueries';
 import {
@@ -40,6 +41,17 @@ import omit from 'lodash/omit';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 import { useImmer } from 'use-immer';
+
+export const sectionIds = {
+  deletedLocationGroups: 'deleted-location-groups',
+  mappableLocations: 'mappable-locations',
+  newLocationGroups: 'new-location-groups',
+  newLocations: 'new-locations',
+  newLocationsLevel: (level: LocationLevelKey) => `new-locations-${level}`,
+  autoMappedLocations: 'auto-mapped-locations',
+  autoMappedLocationsLevel: (level: LocationLevelKey) =>
+    `auto-mapped-locations-${level}`,
+} as const;
 
 // Fields to omit from mapping diff.
 const omittedDiffingFields: (keyof LocationCandidateWithKey)[] = [
@@ -118,33 +130,36 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
       ...(Object.keys(deletedLocationGroups).length > 0
         ? [
             {
-              id: 'deleted-location-groups',
+              id: sectionIds.deletedLocationGroups,
               text: 'Location groups not found in new data set',
             },
           ]
         : []),
       {
-        id: 'mappable-locations',
+        id: sectionIds.mappableLocations,
         text: 'Locations not found in new data set',
-        subNavItems: getSubNavItems(mappableLocations, 'mappable'),
+        subNavItems: getSubNavItems(mappableLocations, mappableTableId),
       },
       ...(Object.keys(newLocationGroups).length > 0
         ? [
             {
-              id: 'new-location-groups',
+              id: sectionIds.newLocationGroups,
               text: 'New location groups',
             },
           ]
         : []),
       {
-        id: 'new-locations',
+        id: sectionIds.newLocations,
         text: 'New locations',
-        subNavItems: getSubNavItems(newLocations, 'new-locations'),
+        subNavItems: getSubNavItems(newLocations, sectionIds.newLocationsLevel),
       },
       {
-        id: 'auto-mapped-locations',
+        id: sectionIds.autoMappedLocations,
         text: 'Auto mapped locations',
-        subNavItems: getSubNavItems(autoMappedLocations, 'auto-mapped'),
+        subNavItems: getSubNavItems(
+          autoMappedLocations,
+          sectionIds.autoMappedLocationsLevel,
+        ),
       },
     ];
   }, [
@@ -326,7 +341,10 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
 
             {Object.keys(deletedLocationGroups).length > 0 && (
               <>
-                <h3 className="govuk-heading-l" id="deleted-location-groups">
+                <h3
+                  className="govuk-heading-l"
+                  id={sectionIds.deletedLocationGroups}
+                >
                   {`Location groups not found in new data set (${
                     Object.keys(deletedLocationGroups).length
                   }) `}
@@ -339,7 +357,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               </>
             )}
 
-            <h3 className="govuk-heading-l" id="unmapped-locations">
+            <h3 className="govuk-heading-l" id={sectionIds.mappableLocations}>
               Locations not found in new data set
             </h3>
 
@@ -403,7 +421,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               <>
                 <h3
                   className="govuk-heading-l govuk-!-margin-top-8"
-                  id="new-location-groups"
+                  id={sectionIds.newLocationGroups}
                 >
                   {`New location groups (${
                     Object.keys(deletedLocationGroups).length
@@ -419,14 +437,17 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
 
             <h3
               className="govuk-heading-l govuk-!-margin-top-8"
-              id="new-locations"
+              id={sectionIds.newLocations}
             >
               New locations ({totalNewLocations}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
 
             {totalNewLocations > 0 ? (
-              <Accordion id="new-locations" testId="new-locations-accordion">
+              <Accordion
+                id={`${sectionIds.newLocations}-accordion`}
+                testId={`${sectionIds.newLocations}-accordion`}
+              >
                 {typedKeys(newLocations).map(level => {
                   const levelNewLocations = newLocations[level];
                   const groupLabel = locationLevelsMap[level].plural;
@@ -437,7 +458,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                         goToTop={false}
                         heading={`${groupLabel} (${levelNewLocations.length})`}
                         headingTag="h4"
-                        id={`new-locations-${level}`}
+                        id={sectionIds.newLocationsLevel(level)}
                         key={level}
                       >
                         <ApiDataSetNewItemsTable
@@ -465,16 +486,16 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
 
             <h3
               className="govuk-heading-l govuk-!-margin-top-8"
-              id="auto-mapped-locations"
+              id={sectionIds.autoMappedLocations}
             >
               Auto mapped locations ({totalAutoMappedLocations}){' '}
               <Tag colour="grey">No action required</Tag>
             </h3>
             {totalAutoMappedLocations > 0 ? (
               <Accordion
-                id="auto-mapped"
+                id={`${sectionIds.autoMappedLocations}-accordion`}
                 showOpenAll={false}
-                testId="auto-mapped-accordion"
+                testId={`${sectionIds.autoMappedLocations}-accordion`}
               >
                 {typedKeys(autoMappedLocations).map(level => {
                   const levelAutoMappedLocations = autoMappedLocations[level];
@@ -486,7 +507,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                         goToTop={false}
                         heading={`${groupLabel} (${levelAutoMappedLocations.length})`}
                         headingTag="h4"
-                        id={`auto-mapped-${level}`}
+                        id={sectionIds.autoMappedLocationsLevel(level)}
                         key={level}
                       >
                         <ApiDataSetAutoMappedTable
@@ -582,12 +603,12 @@ function getSubNavItems(
       (AutoMappedLocation | LocationCandidateWithKey | MappableLocation)[]
     >
   >,
-  key: string,
-) {
+  sectionId: (level: LocationLevelKey) => string,
+): NavItem[] {
   return typedKeys(locations).reduce<NavItem[]>((acc, level) => {
     if (locations[level]?.length) {
       acc.push({
-        id: `${key}-${level}`,
+        id: sectionId(level),
         text: locationLevelsMap[level]?.plural ?? level,
       });
     }
