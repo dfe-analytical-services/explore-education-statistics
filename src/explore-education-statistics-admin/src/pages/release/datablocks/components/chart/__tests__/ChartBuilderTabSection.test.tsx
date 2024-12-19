@@ -187,7 +187,9 @@ describe('ChartBuilderTabSection', () => {
 
     await user.click(screen.getByRole('tab', { name: 'Boundary levels' }));
 
-    await user.selectOptions(screen.getByLabelText('Boundary level'), ['1']);
+    await user.selectOptions(screen.getByLabelText('Default boundary level'), [
+      '1',
+    ]);
 
     expect(tableBuilderService.getTableData).toHaveBeenCalledWith(
       { ...testQuery, boundaryLevel: 1 },
