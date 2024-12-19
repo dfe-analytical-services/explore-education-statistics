@@ -12,6 +12,7 @@ import getUnmappedFilterErrors from '@admin/pages/release/data/utils/getUnmapped
 import ApiDataSetMappableFilterColumnsTable from '@admin/pages/release/data/components/ApiDataSetMappableFilterColumnsTable';
 import ApiDataSetNewFilterColumnsTable from '@admin/pages/release/data/components/ApiDataSetNewFilterColumnsTable';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
+import { mappableTableId } from '@admin/pages/release/data/utils/mappingTableIds';
 import {
   releaseApiDataSetDetailsRoute,
   ReleaseDataSetRouteParams,
@@ -31,13 +32,25 @@ import PageNav, { NavItem } from '@common/components/PageNav';
 import { Dictionary } from '@common/types';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { useQuery } from '@tanstack/react-query';
+import camelCase from 'lodash/camelCase';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 import omit from 'lodash/omit';
 import { useImmer } from 'use-immer';
 import sumBy from 'lodash/sumBy';
-import kebabCase from 'lodash/kebabCase';
 import compact from 'lodash/compact';
+
+export const sectionIds = {
+  mappableFilterColumns: 'mappable-filter-columns',
+  mappableFilterOptions: 'mappable-filter-options',
+  newFilterColumns: 'new-filter-columns',
+  newFilterOptions: 'new-filter-options',
+  newFilterOptionsGroup: (filterKey: string) =>
+    `new-filter-options-${camelCase(filterKey)}`,
+  autoMappedFilterOptions: 'auto-mapped-filter-options',
+  autoMappedFilterOptionsGroup: (filterKey: string) =>
+    `auto-mapped-filter-options-${camelCase(filterKey)}`,
+} as const;
 
 export default function ReleaseApiDataSetFiltersMappingPage() {
   const [autoMappedFilterOptions, updateAutoMappedFilterOptions] = useImmer<
@@ -111,17 +124,17 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
       ...(Object.keys(mappableFilters).length > 0
         ? [
             {
-              id: 'mappable-filter-columns',
+              id: sectionIds.mappableFilterColumns,
               text: 'Filter columns not found in new data set',
             },
           ]
         : []),
       {
-        id: 'mappable-filter-options',
+        id: sectionIds.mappableFilterOptions,
         text: 'Filter options not found in new data set',
         subNavItems: Object.keys(mappableFilterOptions).map(filterKey => {
           return {
-            id: `mappable-filter-options-${kebabCase(filterKey)}`,
+            id: mappableTableId(filterKey),
             text: filtersMapping?.mappings[filterKey].source.label ?? filterKey,
           };
         }),
@@ -129,27 +142,27 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
       ...(Object.keys(newFilters).length > 0
         ? [
             {
-              id: 'new-filter-columns',
+              id: sectionIds.newFilterColumns,
               text: 'New filter columns',
             },
           ]
         : []),
       {
-        id: 'new-filter-options',
+        id: sectionIds.newFilterOptions,
         text: 'New filter options',
         subNavItems: Object.keys(newFilterOptions).map(filterKey => {
           return {
-            id: `new-filter-options-${kebabCase(filterKey)}`,
+            id: sectionIds.newFilterOptionsGroup(filterKey),
             text: filtersMapping?.candidates[filterKey].label ?? filterKey,
           };
         }),
       },
       {
-        id: 'auto-mapped-filter-options',
+        id: sectionIds.autoMappedFilterOptions,
         text: 'Auto mapped filter options',
         subNavItems: Object.keys(autoMappedFilterOptions).map(filterKey => {
           return {
-            id: `auto-mapped-filter-options-${kebabCase(filterKey)}`,
+            id: sectionIds.autoMappedFilterOptionsGroup(filterKey),
             text: filtersMapping?.mappings[filterKey].source.label ?? filterKey,
           };
         }),
@@ -331,7 +344,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               <>
                 <h3
                   className="govuk-heading-l dfe-flex dfe-align-items--center"
-                  id="mappable-filter-columns"
+                  id={sectionIds.mappableFilterColumns}
                 >
                   Filter columns not found in new data set{' '}
                   <Tag className="govuk-!-margin-left-2" colour="grey">
@@ -345,7 +358,10 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               </>
             )}
 
-            <h3 className="govuk-heading-l" id="mappable-filter-options">
+            <h3
+              className="govuk-heading-l"
+              id={sectionIds.mappableFilterOptions}
+            >
               Filter options not found in new data set
             </h3>
 
@@ -386,7 +402,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               <>
                 <h3
                   className="govuk-heading-l govuk-!-margin-top-8"
-                  id="new-filter-columns"
+                  id={sectionIds.newFilterColumns}
                 >
                   New filter columns <Tag colour="grey">No action required</Tag>
                 </h3>
@@ -396,7 +412,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
             <h3
               className="govuk-heading-l govuk-!-margin-top-8"
-              id="new-filter-options"
+              id={sectionIds.newFilterOptions}
             >
               New filter options ({totalNewFilterOptions}){' '}
               <Tag colour="grey">No action required</Tag>
@@ -404,8 +420,8 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
             {totalNewFilterOptions > 0 && filtersMapping ? (
               <Accordion
-                id="new-filter-options-accordion"
-                testId="new-filter-options-accordion"
+                id={`${sectionIds.newFilterOptions}-accordion`}
+                testId={`${sectionIds.newFilterOptions}-accordion`}
               >
                 {Object.keys(newFilterOptions).map(filterKey => {
                   if (newFilterOptions[filterKey].length) {
@@ -422,7 +438,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                         goToTop={false}
                         heading={`${filterLabel} (${newFilterOptions[filterKey].length})`}
                         headingTag="h4"
-                        id={`new-filter-options-${kebabCase(filterKey)}`}
+                        id={sectionIds.newFilterOptionsGroup(filterKey)}
                         key={filterKey}
                       >
                         <ApiDataSetNewItemsTable
@@ -444,7 +460,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
             <h3
               className="govuk-heading-l govuk-!-margin-top-8"
-              id="auto-mapped-filter-options"
+              id={sectionIds.autoMappedFilterOptions}
             >
               Auto mapped filter options ({totalAutoMappedFilterOptions}){' '}
               <Tag colour="grey">No action required</Tag>
@@ -452,9 +468,9 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
             {totalAutoMappedFilterOptions > 0 ? (
               <Accordion
-                id="auto-mapped-filter-options-accordion"
+                id={`${sectionIds.autoMappedFilterOptions}-accordion`}
                 showOpenAll={false}
-                testId="auto-mapped-filter-options-accordion"
+                testId={`${sectionIds.autoMappedFilterOptions}-accordion`}
               >
                 {Object.keys(autoMappedFilterOptions).map(filterKey => {
                   if (
@@ -474,9 +490,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                         goToTop={false}
                         heading={`${filterLabel} (${autoMappedFilterOptions[filterKey].length})`}
                         headingTag="h4"
-                        id={`auto-mapped-filter-options-${kebabCase(
-                          filterKey,
-                        )}`}
+                        id={sectionIds.autoMappedFilterOptionsGroup(filterKey)}
                         key={filterKey}
                       >
                         <ApiDataSetAutoMappedTable
