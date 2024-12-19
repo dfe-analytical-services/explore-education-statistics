@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     // otherwise use the latest published version of the requested release
                     var latestReleaseVersionId = releaseSlug == null
                         ? publication.LatestPublishedReleaseVersionId
-                        : (await _releaseVersionRepository.GetLatestPublishedReleaseVersion(publication.Id,
+                        : (await _releaseVersionRepository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id,
                             releaseSlug))?.Id;
 
                     return latestReleaseVersionId.HasValue

@@ -16,7 +16,7 @@ public class ReleaseVersionRepositoryTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    public class GetLatestPublishedReleaseVersionTests : ReleaseVersionRepositoryTests
+    public class GetLatestPublishedReleaseVersionByReleaseSlugTests : ReleaseVersionRepositoryTests
     {
         [Fact]
         public async Task Success()
@@ -33,7 +33,8 @@ public class ReleaseVersionRepositoryTests
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var result = await repository.GetLatestPublishedReleaseVersion(publication.Id, releaseSlug: "2021-22");
+            var result =
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22");
 
             // Expect the result to be the latest published version for the 2021-22 release
             var expectedReleaseVersion = publication.Releases.Single(r => r is { Year: 2021 }).Versions[1];
@@ -54,7 +55,8 @@ public class ReleaseVersionRepositoryTests
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var result = await repository.GetLatestPublishedReleaseVersion(publication1.Id, releaseSlug: "2021-22");
+            var result =
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication1.Id, releaseSlug: "2021-22");
 
             // Expect the result to be from the specified publication
             var expectedReleaseVersion = publication1.Releases.Single().Versions.Single();
@@ -74,7 +76,8 @@ public class ReleaseVersionRepositoryTests
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            Assert.Null(await repository.GetLatestPublishedReleaseVersion(publication.Id, releaseSlug: "2021-22"));
+            Assert.Null(
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22"));
         }
 
         [Fact]
@@ -88,7 +91,8 @@ public class ReleaseVersionRepositoryTests
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            Assert.Null(await repository.GetLatestPublishedReleaseVersion(publication.Id, releaseSlug: "2021-22"));
+            Assert.Null(
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22"));
         }
 
         [Fact]
@@ -100,7 +104,8 @@ public class ReleaseVersionRepositoryTests
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            Assert.Null(await repository.GetLatestPublishedReleaseVersion(publication.Id, releaseSlug: "2021-22"));
+            Assert.Null(
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22"));
         }
 
         [Fact]
@@ -108,7 +113,7 @@ public class ReleaseVersionRepositoryTests
         {
             var repository = BuildRepository();
 
-            Assert.Null(await repository.GetLatestPublishedReleaseVersion(publicationId: Guid.NewGuid(),
+            Assert.Null(await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publicationId: Guid.NewGuid(),
                 releaseSlug: "2021-22"));
         }
     }

@@ -19,7 +19,7 @@ public interface IReleaseVersionRepository
     /// <param name="releaseSlug">The slug of the release.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
     /// <returns>The latest published version of the release associated with the publication.</returns>
-    Task<ReleaseVersion?> GetLatestPublishedReleaseVersion(
+    Task<ReleaseVersion?> GetLatestPublishedReleaseVersionByReleaseSlug(
         Guid publicationId,
         string releaseSlug,
         CancellationToken cancellationToken = default);

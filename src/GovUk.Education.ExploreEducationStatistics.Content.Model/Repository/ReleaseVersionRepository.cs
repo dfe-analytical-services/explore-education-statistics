@@ -71,7 +71,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
             : null;
     }
 
-    public async Task<ReleaseVersion?> GetLatestPublishedReleaseVersion(
+    public async Task<ReleaseVersion?> GetLatestPublishedReleaseVersionByReleaseSlug(
         Guid publicationId,
         string releaseSlug,
         CancellationToken cancellationToken = default)
@@ -79,7 +79,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         // There should only ever be one latest published release version with a given slug
         return await _contentDbContext.ReleaseVersions
             .LatestReleaseVersions(publicationId, releaseSlug, publishedOnly: true)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            .SingleOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<bool> IsLatestPublishedReleaseVersion(
