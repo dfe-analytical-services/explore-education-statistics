@@ -219,6 +219,9 @@ Filter by geographic level
     user checks page contains button    Local Authority District
     user checks testid element contains    total-results    1 data set
 
+    user clicks button    Show more details
+    user checks testid element contains    Geographic levels-value    Local authority district
+
 Remove geographic level filter
     user clicks button    Local Authority District
 
