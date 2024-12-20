@@ -20,6 +20,7 @@ const NavLink = ({ children, className, to, ...props }: Props) => {
         'govuk-link--no-visited-state',
         className,
       )}
+      exact
     >
       {children}
     </RouterNavLink>
