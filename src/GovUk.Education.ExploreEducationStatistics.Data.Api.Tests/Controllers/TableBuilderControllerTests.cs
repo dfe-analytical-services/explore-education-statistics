@@ -1,4 +1,10 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -9,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
@@ -23,15 +28,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
@@ -40,83 +38,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
     public class TableBuilderControllerTests(TestApplicationFactory testApp)
         : IntegrationTestFixture(testApp)
     {
-        private static readonly DataFixture Fixture = new();
+        private readonly DataFixture _dataFixture = new();
 
-        private static readonly Release Release = Fixture.DefaultRelease(publishedVersions: 1)
-            .WithPublication(Fixture.DefaultPublication());
+        private static readonly List<IChart> Charts =
+        [
+            new LineChart
+            {
+                Title = "Test chart",
+                Height = 400,
+                Width = 500
+            }
+        ];
 
-        private static readonly ReleaseVersion ReleaseVersion = Release.Versions.Single();
+        private static readonly FullTableQuery FullTableQuery = new()
+        {
+            SubjectId = Guid.NewGuid(),
+            LocationIds = [Guid.NewGuid()],
+            TimePeriod = new TimePeriodQuery
+            {
+                StartYear = 2021,
+                StartCode = CalendarYear,
+                EndYear = 2022,
+                EndCode = CalendarYear
+            },
+            Filters = new List<Guid>(),
+            Indicators = new List<Guid> // use collection expression -> test failures
+            {
+                Guid.NewGuid()
+            }
+        };
 
-        private static readonly DataBlockParent DataBlockParent = Fixture
-            .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(Fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(ReleaseVersion)
-                .WithDates(published: DateTime.UtcNow.AddDays(-1))
-                .WithQuery(new FullTableQuery
-                {
-                    SubjectId = Guid.NewGuid(),
-                    LocationIds = [Guid.NewGuid(),],
-                    TimePeriod = new TimePeriodQuery
-                    {
-                        StartYear = 2021,
-                        StartCode = CalendarYear,
-                        EndYear = 2022,
-                        EndCode = CalendarYear
-                    },
-                    Filters = new List<Guid>(),
-                    Indicators = new List<Guid> // use collection expression -> test failures
-                    {
-                        Guid.NewGuid(),
-                    },
-                })
-                .WithTable(new TableBuilderConfiguration
-                {
-                    TableHeaders = new TableHeaders
-                    {
-                        Rows = new List<TableHeader> { new("table header 1", TableHeaderType.Filter) }
-                    }
-                })
-                .WithCharts(ListOf<IChart>(new LineChart
-                {
-                    Title = "Test chart",
-                    Height = 400,
-                    Width = 500,
-                }))
-                .Generate())
-            .Generate();
-
-        private static readonly DataBlockParent DataBlockParentWithNoPublishedVersion = Fixture
-            .DefaultDataBlockParent()
-            .WithLatestDraftVersion(Fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(ReleaseVersion)
-                .Generate())
-            .Generate();
-
-        private static readonly Guid PublicationId = ReleaseVersion.PublicationId;
-
-        private static readonly Guid ReleaseVersionId = ReleaseVersion.Id;
-
-        private static readonly Guid DataBlockId = DataBlockParent.LatestPublishedVersion!.Id;
-
-        private static readonly Guid DataBlockParentId = DataBlockParent.Id;
-
-        private static readonly FullTableQuery FullTableQuery =
-            DataBlockParent.LatestPublishedVersion!.Query;
-
-        private static readonly TableBuilderConfiguration TableConfiguration =
-            DataBlockParent.LatestPublishedVersion!.Table;
+        private static readonly TableBuilderConfiguration TableConfiguration = new()
+        {
+            TableHeaders = new TableHeaders { Rows = [new TableHeader("table header 1", TableHeaderType.Filter)] }
+        };
 
         private readonly TableBuilderResultViewModel _tableBuilderResults = new()
         {
             SubjectMeta = new SubjectResultMetaViewModel
             {
-                TimePeriodRange = new List<TimePeriodMetaViewModel>
-                {
-                    new(2020, AcademicYear),
-                    new(2021, AcademicYear),
-                }
+                TimePeriodRange =
+                [
+                    new TimePeriodMetaViewModel(2020, AcademicYear),
+                    new TimePeriodMetaViewModel(2021, AcademicYear)
+                ]
             },
             Results = new List<ObservationViewModel>
             {
@@ -164,8 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 )
                 .ReturnsAsync(Unit.Instance)
                 .Callback<FullTableQuery, Stream, CancellationToken>(
-                    (_, stream, _) => { stream.WriteText("Test csv"); }
-                );
+                    (_, stream, _) => stream.WriteText("Test csv"));
 
             var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
 
@@ -181,17 +145,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task Query_ReleaseId()
+        public async Task Query_ReleaseVersionId()
         {
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var releaseVersion = publication.Releases.Single().Versions.Single();
+
             await TestApp.AddTestData<ContentDbContext>(context =>
-                context.ReleaseVersions.Add(ReleaseVersion));
+                context.Publications.Add(publication));
 
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
             tableBuilderService
                 .Setup(
                     s => s.Query(
-                        ReleaseVersionId,
+                        releaseVersion.Id,
                         ItIs.DeepEqualTo(FullTableQuery),
                         It.IsAny<long?>(),
                         It.IsAny<CancellationToken>()
@@ -203,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .CreateClient();
 
             var response = await client
-                .PostAsync($"/api/tablebuilder/release/{ReleaseVersionId}",
+                .PostAsync($"/api/tablebuilder/release/{releaseVersion.Id}",
                     new JsonNetContent(FullTableQuery));
 
             VerifyAllMocks(tableBuilderService);
@@ -212,17 +181,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task Query_ReleaseId_Csv()
+        public async Task Query_ReleaseVersionId_Csv()
         {
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
+
             await TestApp.AddTestData<ContentDbContext>(context =>
-                context.ReleaseVersions.Add(ReleaseVersion));
+                context.Publications.Add(publication));
 
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
             tableBuilderService
                 .Setup(
                     s => s.QueryToCsvStream(
-                        ReleaseVersionId,
+                        releaseVersion.Id,
                         ItIs.DeepEqualTo(FullTableQuery),
                         It.IsAny<Stream>(),
                         It.IsAny<CancellationToken>()
@@ -230,14 +205,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 )
                 .ReturnsAsync(Unit.Instance)
                 .Callback<Guid, FullTableQuery, Stream, CancellationToken>(
-                    (_, _, stream, _) => { stream.WriteText("Test csv"); }
-                );
+                    (_, _, stream, _) => stream.WriteText("Test csv"));
 
             var client = SetupApp(tableBuilderService: tableBuilderService.Object)
                 .CreateClient();
 
             var response = await client
-                .PostAsync($"/api/tablebuilder/release/{ReleaseVersionId}",
+                .PostAsync($"/api/tablebuilder/release/{releaseVersion.Id}",
                     content: new JsonNetContent(FullTableQuery),
                     headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
                 );
@@ -251,12 +225,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForTableBuilderResult()
         {
-            await TestApp.AddTestData<ContentDbContext>(context =>
-                context.DataBlockParents.Add(DataBlockParent));
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var cacheKey = new DataBlockTableResultCacheKey(publicationSlug: ReleaseVersion.Publication.Slug,
-                releaseSlug: ReleaseVersion.Slug,
-                DataBlockParentId);
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
+
+            DataBlockParent dataBlockParent = _dataFixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts));
+
+            var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
+
+            var cacheKey = new DataBlockTableResultCacheKey(
+                publicationSlug: publication.Slug,
+                releaseSlug: release.Slug,
+                dataBlockParent.Id);
 
             BlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
@@ -269,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>();
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
@@ -277,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var response =
                 await client.GetAsync(
-                    $"http://localhost/api/tablebuilder/release/{ReleaseVersionId}/data-block/{DataBlockParentId}");
+                    $"http://localhost/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}");
 
             VerifyAllMocks(BlobCacheService, dataBlockService);
 
@@ -287,10 +283,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForTableBuilderResult_NotFound()
         {
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+
             var client = SetupApp().CreateClient();
 
             var response =
-                await client.GetAsync($"/api/tablebuilder/release/{ReleaseVersionId}/data-block/{DataBlockParentId}");
+                await client.GetAsync($"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{Guid.NewGuid()}");
 
             response.AssertNotFound();
         }
@@ -298,13 +302,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForTableBuilderResult_NotModified()
         {
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
+
+            DataBlockParent dataBlockParent = _dataFixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts));
+
             await TestApp.AddTestData<ContentDbContext>(context =>
-                context.DataBlockParents.Add(DataBlockParent));
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
 
             var client = SetupApp()
                 .CreateClient();
 
-            var publishedDate = DataBlockParent
+            var publishedDate = dataBlockParent
                 .LatestPublishedVersion!
                 .Published!
                 .Value;
@@ -314,7 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var ifModifiedSinceDate = publishedDate.AddSeconds(1);
 
             var response = await client.GetAsync(
-                $"/api/tablebuilder/release/{ReleaseVersionId}/data-block/{DataBlockParentId}",
+                $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
                 new Dictionary<string, string>
                 {
                     { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
@@ -330,12 +353,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForTableBuilderResult_ETagChanged()
         {
-            await TestApp.AddTestData<ContentDbContext>(context =>
-                context.DataBlockParents.Add(DataBlockParent));
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var cacheKey = new DataBlockTableResultCacheKey(publicationSlug: ReleaseVersion.Publication.Slug,
-                releaseSlug: ReleaseVersion.Slug,
-                DataBlockParentId);
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
+
+            DataBlockParent dataBlockParent = _dataFixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts));
+
+            var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
+
+            var cacheKey = new DataBlockTableResultCacheKey(
+                publicationSlug: publication.Slug,
+                releaseSlug: release.Slug,
+                dataBlockParent.Id);
 
             BlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
@@ -348,13 +393,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
                 .CreateClient();
 
-            var publishedDate = DataBlockParent
+            var publishedDate = dataBlockParent
                 .LatestPublishedVersion!
                 .Published!
                 .Value;
@@ -365,7 +410,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var ifModifiedSinceDate = publishedDate.AddSeconds(1);
 
             var response = await client.GetAsync(
-                $"/api/tablebuilder/release/{ReleaseVersionId}/data-block/{DataBlockParentId}",
+                $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
                 new Dictionary<string, string>
                 {
                     { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
@@ -381,12 +426,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForTableBuilderResult_LastModifiedChanged()
         {
-            await TestApp.AddTestData<ContentDbContext>(context =>
-                context.DataBlockParents.Add(DataBlockParent));
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var cacheKey = new DataBlockTableResultCacheKey(publicationSlug: ReleaseVersion.Publication.Slug,
-                releaseSlug: ReleaseVersion.Slug,
-                DataBlockParentId);
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
+
+            DataBlockParent dataBlockParent = _dataFixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts));
+
+            var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
+
+            var cacheKey = new DataBlockTableResultCacheKey(
+                publicationSlug: publication.Slug,
+                releaseSlug: release.Slug,
+                dataBlockParent.Id);
 
             BlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
@@ -399,7 +466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
@@ -407,14 +474,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             // The latest published DataBlockVersion has been published since the caller last requested it, so we
             // consider this "Modified" by the published date alone.
-            var yearBeforePublishedDate = DataBlockParent
+            var yearBeforePublishedDate = dataBlockParent
                 .LatestPublishedVersion!
                 .Published!
                 .Value
                 .AddYears(-1);
 
             var response = await client.GetAsync(
-                $"/api/tablebuilder/release/{ReleaseVersionId}/data-block/{DataBlockParentId}",
+                $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
                 new Dictionary<string, string>
                 {
                     { HeaderNames.IfModifiedSince, yearBeforePublishedDate.ToUniversalTime().ToString("R") },
@@ -430,20 +497,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForFastTrack()
         {
-            await TestApp.AddTestData<ContentDbContext>(context =>
-                context.DataBlockParents.Add(DataBlockParent));
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases([
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2021)
+                ]);
 
-            var latestReleaseVersion = new ReleaseVersion
+            var release = publication.Releases.Single(r => r.Year == 2021);
+            var releaseVersion = release.Versions.Single();
+
+            DataBlockParent dataBlockParent = _dataFixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts));
+
+            var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
             {
-                Id = ReleaseVersionId,
-                ReleaseName = "2020",
-                TimePeriodCoverage = AcademicYear
-            };
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
 
             var cacheKey = new DataBlockTableResultCacheKey(
-                ReleaseVersion.Publication.Slug,
-                ReleaseVersion.Slug,
-                DataBlockParentId);
+                publicationSlug: publication.Slug,
+                releaseSlug: release.Slug,
+                dataBlockParent.Id);
 
             BlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
@@ -456,38 +543,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
                 .ReturnsAsync(_tableBuilderResults);
 
-            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
-
-            releaseVersionRepository
-                .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId, default))
-                .ReturnsAsync(latestReleaseVersion);
-
             var client = SetupApp(
-                    dataBlockService: dataBlockService.Object,
-                    releaseVersionRepository: releaseVersionRepository.Object
+                    dataBlockService: dataBlockService.Object
                 )
                 .CreateClient();
 
-            var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockParentId}");
+            var response = await client.GetAsync($"/api/tablebuilder/fast-track/{dataBlockParent.Id}");
 
-            VerifyAllMocks(BlobCacheService, dataBlockService, releaseVersionRepository);
+            VerifyAllMocks(
+                BlobCacheService,
+                dataBlockService
+            );
 
             var viewModel = response.AssertOk<FastTrackViewModel>();
-            Assert.Equal(DataBlockParentId, viewModel.DataBlockParentId);
-            Assert.Equal(ReleaseVersionId, viewModel.ReleaseId);
-            Assert.Equal(ReleaseVersion.Slug, viewModel.ReleaseSlug);
-            Assert.Equal(ReleaseVersion.Type, viewModel.ReleaseType);
+            Assert.Equal(dataBlockParent.Id, viewModel.DataBlockParentId);
+            Assert.Equal(releaseVersion.Id, viewModel.ReleaseId);
+            Assert.Equal(release.Slug, viewModel.ReleaseSlug);
+            Assert.Equal(releaseVersion.Type, viewModel.ReleaseType);
             viewModel.Configuration.AssertDeepEqualTo(TableConfiguration);
             viewModel.FullTable.AssertDeepEqualTo(_tableBuilderResults);
             Assert.True(viewModel.LatestData);
-            Assert.Equal("Academic year 2020/21", viewModel.LatestReleaseTitle);
+            Assert.Equal(release.Title, viewModel.LatestReleaseTitle);
 
             var queryViewModel = viewModel.Query;
             Assert.NotNull(queryViewModel);
-            Assert.Equal(PublicationId, queryViewModel.PublicationId);
+            Assert.Equal(publication.Id, queryViewModel.PublicationId);
             Assert.Equal(FullTableQuery.SubjectId, viewModel.Query.SubjectId);
             Assert.Equal(FullTableQuery.TimePeriod, viewModel.Query.TimePeriod);
             Assert.Equal(FullTableQuery.Filters, viewModel.Query.Filters);
@@ -498,14 +581,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForFastTrack_DataBlockNotYetPublished()
         {
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var release = publication.Releases.Single();
+            var releaseVersion = release.Versions.Single();
+
+            DataBlockParent dataBlockParentWithNoPublishedVersion = _dataFixture
+                .DefaultDataBlockParent()
+                .WithLatestDraftVersion(_dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion));
+
             await TestApp.AddTestData<ContentDbContext>(context =>
-                context.DataBlockParents.Add(DataBlockParentWithNoPublishedVersion));
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParentWithNoPublishedVersion);
+            });
 
             var client = SetupApp()
                 .CreateClient();
 
             var response =
-                await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockParentWithNoPublishedVersion.Id}");
+                await client.GetAsync($"/api/tablebuilder/fast-track/{dataBlockParentWithNoPublishedVersion.Id}");
 
             VerifyAllMocks(BlobCacheService);
 
@@ -515,19 +613,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForFastTrack_NotLatestRelease()
         {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases([
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2021)
+                ]);
+
+            var release2020 = publication.Releases.Single(r => r.Year == 2020);
+            var release2021 = publication.Releases.Single(r => r.Year == 2021);
+
+            // Release version is from the 2020 release which is not the latest release for the publication
+            var releaseVersion = release2020.Versions.Single();
+
+            DataBlockParent dataBlockParent = _dataFixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_dataFixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithDates(published: DateTime.UtcNow.AddDays(-1))
+                    .WithQuery(FullTableQuery)
+                    .WithTable(TableConfiguration)
+                    .WithCharts(Charts));
+
+            var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
+
             await TestApp.AddTestData<ContentDbContext>(context =>
-                context.DataBlockParents.Add(DataBlockParent));
-
-            var latestReleaseVersion = new ReleaseVersion
             {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2021",
-                TimePeriodCoverage = AcademicYear
-            };
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
 
-            var cacheKey = new DataBlockTableResultCacheKey(publicationSlug: ReleaseVersion.Publication.Slug,
-                releaseSlug: ReleaseVersion.Slug,
-                DataBlockParentId);
+            var cacheKey = new DataBlockTableResultCacheKey(
+                publicationSlug: publication.Slug,
+                releaseSlug: release2020.Slug,
+                dataBlockParent.Id);
 
             BlobCacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
@@ -540,37 +662,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId, null))
+                .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId, null))
                 .ReturnsAsync(_tableBuilderResults);
 
-            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
-
-            releaseVersionRepository
-                .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId, default))
-                .ReturnsAsync(latestReleaseVersion);
-
             var client = SetupApp(
-                    dataBlockService: dataBlockService.Object,
-                    releaseVersionRepository: releaseVersionRepository.Object
+                    dataBlockService: dataBlockService.Object
                 )
                 .CreateClient();
 
-            var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockParentId}");
+            var response = await client.GetAsync($"/api/tablebuilder/fast-track/{dataBlockParent.Id}");
 
-            VerifyAllMocks(BlobCacheService, dataBlockService, releaseVersionRepository);
+            VerifyAllMocks(
+                BlobCacheService,
+                dataBlockService
+            );
 
             var viewModel = response.AssertOk<FastTrackViewModel>();
-            Assert.Equal(DataBlockParentId, viewModel.DataBlockParentId);
-            Assert.Equal(ReleaseVersionId, viewModel.ReleaseId);
-            Assert.Equal(ReleaseVersion.Slug, viewModel.ReleaseSlug);
-            Assert.Equal(ReleaseVersion.Type, viewModel.ReleaseType);
+            Assert.Equal(dataBlockParent.Id, viewModel.DataBlockParentId);
+            Assert.Equal(releaseVersion.Id, viewModel.ReleaseId);
+            Assert.Equal(release2020.Slug, viewModel.ReleaseSlug);
+            Assert.Equal(releaseVersion.Type, viewModel.ReleaseType);
             Assert.False(viewModel.LatestData);
-            Assert.Equal("Academic year 2021/22", viewModel.LatestReleaseTitle);
+            Assert.Equal(release2021.Title, viewModel.LatestReleaseTitle);
         }
 
         private WebApplicationFactory<Startup> SetupApp(
             IDataBlockService? dataBlockService = null,
-            IReleaseVersionRepository? releaseVersionRepository = null,
             ITableBuilderService? tableBuilderService = null)
         {
             return TestApp
@@ -580,8 +697,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                         services.ReplaceService(BlobCacheService);
 
                         services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
-                        services.AddTransient(_ =>
-                            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict));
                         services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));
                     }
                 );

@@ -129,7 +129,6 @@ describe('ReleaseContentPage', () => {
       id: 'publication-id',
       title: 'Publication 1',
       slug: 'publication-1',
-      releases: [],
       releaseSeries: [],
       theme: { id: 'theme-1', title: 'Theme 1' },
       contact: {

@@ -92,7 +92,6 @@ const defaultPublication: Publication = {
       slug: 'methodology-slug',
     },
   ],
-  releases: [],
   releaseSeries: [
     {
       isLegacyLink: true,

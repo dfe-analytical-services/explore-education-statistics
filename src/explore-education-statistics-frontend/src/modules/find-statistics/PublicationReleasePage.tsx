@@ -130,7 +130,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     >
                       View latest data:{' '}
                       <span className="govuk-!-font-weight-bold">
-                        {release.publication.releases[0].title}
+                        {
+                          release.publication.releaseSeries.find(
+                            rsi => !rsi.isLegacyLink,
+                          )?.description
+                        }
                       </span>
                     </Link>
                   )}

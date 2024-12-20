@@ -40,7 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IFrontendService _frontendService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IPublicationRepository _publicationRepository;
-        private readonly IReleaseVersionRepository _releaseVersionRepository;
 
         public PermalinkService(
             ContentDbContext contentDbContext,
@@ -49,8 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             IPublicBlobStorageService publicBlobStorageService,
             IFrontendService frontendService,
             ISubjectRepository subjectRepository,
-            IPublicationRepository publicationRepository,
-            IReleaseVersionRepository releaseVersionRepository)
+            IPublicationRepository publicationRepository)
         {
             _contentDbContext = contentDbContext;
             _tableBuilderService = tableBuilderService;
@@ -59,7 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _frontendService = frontendService;
             _subjectRepository = subjectRepository;
             _publicationRepository = publicationRepository;
-            _releaseVersionRepository = releaseVersionRepository;
         }
 
         public async Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(Guid permalinkId,
@@ -307,9 +304,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             return await _subjectRepository.FindPublicationIdForSubject(subjectId)
                 .OrNotFound()
-                .OnSuccess(publicationId =>
-                    _releaseVersionRepository.GetLatestPublishedReleaseVersion(publicationId).OrNotFound())
-                .OnSuccess(releaseVersion => releaseVersion.Id);
+                .OnSuccess(async publicationId => await _contentDbContext.Publications
+                    .Where(p => p.Id == publicationId)
+                    .Select(p => p.LatestPublishedReleaseVersionId)
+                    .SingleOrDefaultAsync()
+                    .OrNotFound());
         }
 
         private async Task<PermalinkStatus> GetPermalinkStatus(Guid subjectId)
@@ -317,9 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             // TODO EES-3339 This doesn't currently include a status to warn if the footnotes have been amended on a Release,
             // and will return 'Current' unless one of the other cases also applies.
 
-            var releasesWithSubject = await _contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .Include(rf => rf.ReleaseVersion)
+            var releasesVersionsWithSubject = await _contentDbContext.ReleaseFiles
                 .Where(rf =>
                     rf.File.SubjectId == subjectId
                     && rf.File.Type == FileType.Data
@@ -327,26 +324,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 .Select(rf => rf.ReleaseVersion)
                 .ToListAsync();
 
-            if (releasesWithSubject.Count == 0)
+            if (releasesVersionsWithSubject.Count == 0)
             {
                 return PermalinkStatus.SubjectRemoved;
             }
 
             var publication = await _contentDbContext.Publications
                 .Include(p => p.LatestPublishedReleaseVersion)
-                .SingleAsync(p => p.Id == releasesWithSubject.First().PublicationId);
+                .SingleAsync(p => p.Id == releasesVersionsWithSubject.First().PublicationId);
 
             var latestPublishedReleaseVersion = publication.LatestPublishedReleaseVersion;
 
-            if (latestPublishedReleaseVersion != null && releasesWithSubject.All(rv =>
-                    rv.Year != latestPublishedReleaseVersion.Year
-                    || rv.TimePeriodCoverage != latestPublishedReleaseVersion.TimePeriodCoverage))
+            if (latestPublishedReleaseVersion != null && releasesVersionsWithSubject.All(rv =>
+                    rv.ReleaseId != latestPublishedReleaseVersion.ReleaseId))
             {
                 return PermalinkStatus.NotForLatestRelease;
             }
 
             if (latestPublishedReleaseVersion != null
-                && releasesWithSubject.All(rv => rv.Id != latestPublishedReleaseVersion.Id))
+                && releasesVersionsWithSubject.All(rv => rv.Id != latestPublishedReleaseVersion.Id))
             {
                 return PermalinkStatus.SubjectReplacedOrRemoved;
             }

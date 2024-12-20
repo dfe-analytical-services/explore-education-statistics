@@ -1,4 +1,9 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -8,8 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -18,17 +21,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.Extensions.Options;
 using Moq;
 using Snapshooter.Xunit;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -48,9 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -244,9 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -290,9 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -334,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_LatestRelease_ReleaseNotFound()
         {
-            // Set up a ReleaseSubject that references a non-existent release
+            // Set up a ReleaseSubject that references a non-existent release version
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithReleaseVersion(_fixture
@@ -370,9 +362,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -453,9 +443,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -640,13 +628,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task Query_ReleaseId_ReleaseNotFound()
+        public async Task Query_ReleaseVersionId_ReleaseVersionNotFound()
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -677,21 +663,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     SubjectId = releaseSubject.SubjectId
                 };
 
-                // Query using a non-existent release id
-                var result = await service.Query(Guid.NewGuid(), query, null);
+                // Query using a non-existent release version id
+                var result = await service.Query(
+                    releaseVersionId: Guid.NewGuid(),
+                    query,
+                    boundaryLevelId: null);
 
                 result.AssertNotFound();
             }
         }
 
         [Fact]
-        public async Task Query_ReleaseId_SubjectNotFound()
+        public async Task Query_ReleaseVersionId_SubjectNotFound()
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -723,20 +710,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     SubjectId = Guid.NewGuid(),
                 };
 
-                var result = await service.Query(releaseVersion.Id, query, null);
+                var result = await service.Query(
+                    releaseVersionId: releaseVersion.Id,
+                    query,
+                    boundaryLevelId: null);
 
                 result.AssertNotFound();
             }
         }
 
         [Fact]
-        public async Task Query_ReleaseId_PredictedTableTooBig()
+        public async Task Query_ReleaseVersionId_PredictedTableTooBig()
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -803,7 +791,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     tableBuilderOptions: options.ToOptionsWrapper()
                 );
 
-                var result = await service.Query(releaseSubject.ReleaseVersionId, query, null);
+                var result = await service.Query(
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
+                    query,
+                    boundaryLevelId: null);
 
                 VerifyAllMocks(filterItemRepository);
 
@@ -816,9 +807,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var filters = _fixture.DefaultFilter()
                 .ForIndex(0, s =>
@@ -1011,7 +1000,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task QueryToCsvStream_LatestRelease_ReleaseNotFound()
+        public async Task QueryToCsvStream_LatestRelease_ReleaseVersionNotFound()
         {
             // Set up a ReleaseSubject that references a non-existent release
             ReleaseSubject releaseSubject = _fixture
@@ -1053,9 +1042,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -1101,9 +1088,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -1182,13 +1167,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task QueryToCsvStream_ReleaseId()
+        public async Task QueryToCsvStream_ReleaseVersionId()
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -1368,13 +1351,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task QueryToCsvStream_ReleaseId_NoFilters()
+        public async Task QueryToCsvStream_ReleaseVersionId_NoFilters()
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -1504,13 +1485,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task QueryToCsvStream_ReleaseId_ReleaseNotFound()
+        public async Task QueryToCsvStream_ReleaseVersionId_ReleaseVersionNotFound()
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -1544,21 +1523,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 using var stream = new MemoryStream();
 
-                // Query using a non-existent release id
-                var result = await service.QueryToCsvStream(Guid.NewGuid(), query, stream);
+                // Query using a non-existent release version id
+                var result = await service.QueryToCsvStream(
+                    releaseVersionId: Guid.NewGuid(),
+                    query,
+                    stream);
 
                 result.AssertNotFound();
             }
         }
 
         [Fact]
-        public async Task QueryToCsvStream_ReleaseId_SubjectNotFound()
+        public async Task QueryToCsvStream_ReleaseVersionId_SubjectNotFound()
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -1600,13 +1580,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task QueryToCsvStream_ReleaseId_PredictedTableTooBig()
+        public async Task QueryToCsvStream_ReleaseVersionId_PredictedTableTooBig()
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -1711,12 +1689,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ISubjectCsvMetaService? subjectCsvMetaService = null,
             ISubjectRepository? subjectRepository = null,
             IUserService? userService = null,
-            IReleaseVersionRepository? releaseVersionRepository = null,
             IOptions<TableBuilderOptions>? tableBuilderOptions = null,
             IOptions<LocationsOptions>? locationsOptions = null)
         {
             return new(
                 statisticsDbContext,
+                contentDbContext ?? InMemoryContentDbContext(),
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
                 locationService ?? Mock.Of<ILocationService>(Strict),
                 observationService ?? Mock.Of<IObservationService>(Strict),
@@ -1725,7 +1703,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),
                 subjectRepository ?? new SubjectRepository(statisticsDbContext),
                 userService ?? AlwaysTrueUserService().Object,
-                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext ?? Mock.Of<ContentDbContext>()),
                 tableBuilderOptions ?? DefaultTableBuilderOptions(),
                 locationsOptions ?? DefaultLocationOptions()
             );

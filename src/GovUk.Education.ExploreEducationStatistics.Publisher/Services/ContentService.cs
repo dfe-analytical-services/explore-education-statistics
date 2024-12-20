@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
@@ -15,6 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class ContentService : IContentService
     {
+        private readonly ContentDbContext _contentDbContext;
         private readonly IBlobCacheService _privateBlobCacheService;
         private readonly IBlobCacheService _publicBlobCacheService;
         private readonly IBlobStorageService _publicBlobStorageService;
@@ -24,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IPublicationCacheService _publicationCacheService;
 
         public ContentService(
+            ContentDbContext contentDbContext,
             IBlobCacheService privateBlobCacheService,
             IBlobCacheService publicBlobCacheService,
             IBlobStorageService publicBlobStorageService,
@@ -32,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IReleaseCacheService releaseCacheService,
             IPublicationCacheService publicationCacheService)
         {
+            _contentDbContext = contentDbContext;
             _privateBlobCacheService = privateBlobCacheService;
             _publicBlobCacheService = publicBlobCacheService;
             _publicBlobStorageService = publicBlobStorageService;
@@ -94,60 +98,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task UpdateContent(params Guid[] releaseVersionIds)
+        public async Task UpdateContent(Guid releaseVersionId)
         {
-            var releaseVersions = (await _releaseService
-                    .List(releaseVersionIds))
-                .ToList();
+            var releaseVersion = await _contentDbContext.ReleaseVersions
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .SingleAsync(rv => rv.Id == releaseVersionId);
 
-            foreach (var releaseVersion in releaseVersions)
-            {
-                await _releaseCacheService.UpdateRelease(
-                    releaseVersion.Id,
-                    publicationSlug: releaseVersion.Publication.Slug,
-                    releaseSlug: releaseVersion.Slug);
-            }
+            await _releaseCacheService.UpdateRelease(
+                releaseVersion.Id,
+                publicationSlug: releaseVersion.Release.Publication.Slug,
+                releaseSlug: releaseVersion.Release.Slug);
 
-            var publications = releaseVersions
-                .Select(rv => rv.Publication)
-                .DistinctByProperty(publication => publication.Id)
-                .ToList();
+            var publication = releaseVersion.Release.Publication;
 
-            foreach (var publication in publications)
-            {
-                // Cache the latest release version for the publication as a separate cache entry
-                var latestReleaseVersion = await _releaseService.GetLatestReleaseVersion(publication.Id, releaseVersionIds);
-                await _releaseCacheService.UpdateRelease(
-                    latestReleaseVersion.Id,
-                    publicationSlug: publication.Slug);
-            }
+            // Cache the latest release version for the publication as a separate cache entry
+            var latestReleaseVersion = await _releaseService.GetLatestPublishedReleaseVersion(
+                publicationId: publication.Id,
+                includeUnpublishedVersionIds: [releaseVersion.Id]);
+
+            await _releaseCacheService.UpdateRelease(
+                releaseVersionId: latestReleaseVersion.Id,
+                publicationSlug: publication.Slug);
         }
 
-        public async Task UpdateContentStaged(DateTime expectedPublishDate,
+        public async Task UpdateContentStaged(
+            DateTime expectedPublishDate,
             params Guid[] releaseVersionIds)
         {
-            var releaseVersions = (await _releaseService
-                    .List(releaseVersionIds))
-                .ToList();
+            var releaseVersions = await _contentDbContext.ReleaseVersions
+                .Where(rv => releaseVersionIds.Contains(rv.Id))
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .ToListAsync();
 
             foreach (var releaseVersion in releaseVersions)
             {
                 await _releaseCacheService.UpdateReleaseStaged(
                     releaseVersion.Id,
                     expectedPublishDate,
-                    publicationSlug: releaseVersion.Publication.Slug,
-                    releaseSlug: releaseVersion.Slug);
+                    publicationSlug: releaseVersion.Release.Publication.Slug,
+                    releaseSlug: releaseVersion.Release.Slug);
             }
 
             var publications = releaseVersions
-                .Select(rv => rv.Publication)
-                .DistinctByProperty(publication => publication.Id)
+                .Select(rv => rv.Release.Publication)
+                .DistinctBy(p => p.Id)
                 .ToList();
 
             foreach (var publication in publications)
             {
                 // Cache the latest release version for the publication as a separate cache entry
-                var latestReleaseVersion = await _releaseService.GetLatestReleaseVersion(publication.Id, releaseVersionIds);
+                var latestReleaseVersion = await _releaseService.GetLatestPublishedReleaseVersion(
+                        publicationId: publication.Id,
+                        includeUnpublishedVersionIds: releaseVersionIds);
+
                 await _releaseCacheService.UpdateReleaseStaged(
                     latestReleaseVersion.Id,
                     expectedPublishDate,

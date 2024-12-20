@@ -466,3 +466,4 @@ Navigate to second published release on public frontend after changing the lates
 
 Validate second published release is not the latest data after changing the latest release
     user checks page contains    This is not the latest data
+    user waits until page contains link    View latest data: ${RELEASE_1_NAME}

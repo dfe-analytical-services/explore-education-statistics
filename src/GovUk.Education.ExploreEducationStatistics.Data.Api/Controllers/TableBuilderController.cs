@@ -1,12 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -15,38 +18,21 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
     [Route("api")]
     [ApiController]
-    public class TableBuilderController : ControllerBase
+    public class TableBuilderController(
+        ContentDbContext contextDbContext,
+        IDataBlockService dataBlockService,
+        ITableBuilderService tableBuilderService)
+        : ControllerBase
     {
         // Change this whenever there is a breaking change
         // that requires cache invalidation.
         public const string ApiVersion = "1";
-
-        private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
-        private readonly IDataBlockService _dataBlockService;
-        private readonly IReleaseVersionRepository _releaseVersionRepository;
-        private readonly ITableBuilderService _tableBuilderService;
-
-        public TableBuilderController(
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            IDataBlockService dataBlockService,
-            IReleaseVersionRepository releaseVersionRepository,
-            ITableBuilderService tableBuilderService)
-        {
-            _contentPersistenceHelper = contentPersistenceHelper;
-            _dataBlockService = dataBlockService;
-            _releaseVersionRepository = releaseVersionRepository;
-            _tableBuilderService = tableBuilderService;
-        }
 
         [HttpPost("tablebuilder")]
         [Produces("application/json", "text/csv")]
@@ -59,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             {
                 Response.ContentDispositionAttachment(ContentTypes.Csv);
 
-                return await _tableBuilderService.QueryToCsvStream(
+                return await tableBuilderService.QueryToCsvStream(
                     query: request.AsFullTableQuery(),
                     stream: Response.BodyWriter.AsStream(),
                     cancellationToken: cancellationToken
@@ -67,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .HandleFailuresOrNoOp();
             }
 
-            return await _tableBuilderService
+            return await tableBuilderService
                 .Query(request.AsFullTableQuery(), cancellationToken)
                 .HandleFailuresOr(Ok);
         }
@@ -86,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                     contentType: ContentTypes.Csv,
                     filename: $"{releaseVersionId}.csv");
 
-                return await _tableBuilderService.QueryToCsvStream(
+                return await tableBuilderService.QueryToCsvStream(
                         releaseVersionId: releaseVersionId,
                         query: request.AsFullTableQuery(),
                         stream: Response.BodyWriter.AsStream(),
@@ -95,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                     .HandleFailuresOrNoOp();
             }
 
-            return await _tableBuilderService
+            return await tableBuilderService
                 .Query(releaseVersionId, request.AsFullTableQuery(), boundaryLevelId: null, cancellationToken)
                 .HandleFailuresOr(Ok);
         }
@@ -147,9 +133,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             return await GetLatestPublishedDataBlockVersion(dataBlockParentId)
                 .OnSuccessCombineWith(dataBlockVersion => GetDataBlockTableResult(dataBlockVersion))
-                .OnSuccessCombineWith(tuple =>
-                    _releaseVersionRepository.GetLatestPublishedReleaseVersion(tuple.Item1.ReleaseVersion.PublicationId)
-                        .OrNotFound())
+                .OnSuccessCombineWith(async tuple =>
+                {
+                    var (dataBlockVersion, _) = tuple;
+                    return await contextDbContext.Publications
+                        .Where(p => p.Id == dataBlockVersion.ReleaseVersion.PublicationId)
+                        .Select(p => p.LatestPublishedReleaseVersion)
+                        .SingleOrNotFoundAsync();
+                })
                 .OnSuccess(tuple =>
                 {
                     var (dataBlockVersion, tableResult, latestReleaseVersion) = tuple;
@@ -163,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             DataBlockVersion dataBlockVersion,
             long? boundaryLevelId = null)
         {
-            return _dataBlockService.GetDataBlockTableResult(
+            return dataBlockService.GetDataBlockTableResult(
                 releaseVersionId: dataBlockVersion.ReleaseVersionId,
                 dataBlockVersionId: dataBlockVersion.Id,
                 boundaryLevelId);
@@ -174,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             DataBlockVersion dataBlockVersion,
             long boundaryLevelId)
         {
-            return _dataBlockService.GetLocationsForDataBlock(
+            return dataBlockService.GetLocationsForDataBlock(
                 releaseVersionId: dataBlockVersion.ReleaseVersionId,
                 dataBlockVersionId: dataBlockVersion.Id,
                 boundaryLevelId);
@@ -204,14 +195,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         // Get the latest published DataBlockVersion for the given parent id, also including its ReleaseVersion and
         // Publication for the purposes of generating a cache key for Data Block table results.
-        private Task<Either<ActionResult, DataBlockVersion>> GetLatestPublishedDataBlockVersion(Guid dataBlockParentId)
+        private async Task<Either<ActionResult, DataBlockVersion>> GetLatestPublishedDataBlockVersion(
+            Guid dataBlockParentId)
         {
-            return _contentPersistenceHelper
-                .CheckEntityExists<DataBlockParent>(dataBlockParentId, q => q
-                    .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
-                    .ThenInclude(dataBlockVersion => dataBlockVersion.ReleaseVersion)
-                    .ThenInclude(releaseVersion => releaseVersion.Publication))
-                .OnSuccess(dataBlock => dataBlock.LatestPublishedVersion)
+            return await contextDbContext.DataBlockParents
+                .Include(dbp => dbp.LatestPublishedVersion)
+                .ThenInclude(dbv => dbv.ReleaseVersion)
+                .ThenInclude(rv => rv.Publication)
+                .SingleOrNotFoundAsync(dbp => dbp.Id == dataBlockParentId)
+                .OnSuccess(dbp => dbp.LatestPublishedVersion)
                 .OrNotFound();
         }
     }

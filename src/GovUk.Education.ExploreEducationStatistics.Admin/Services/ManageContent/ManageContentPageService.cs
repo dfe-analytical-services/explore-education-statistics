@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -31,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IDataBlockService _dataBlockService;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IReleaseFileService _releaseFileService;
-        private readonly IReleaseVersionRepository _releaseVersionRepository;
+        private readonly IReleaseRepository _releaseRepository;
         private readonly IUserService _userService;
 
         public ManageContentPageService(
@@ -41,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             IDataBlockService dataBlockService,
             IMethodologyVersionRepository methodologyVersionRepository,
             IReleaseFileService releaseFileService,
-            IReleaseVersionRepository releaseVersionRepository,
+            IReleaseRepository releaseRepository,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
@@ -50,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             _dataBlockService = dataBlockService;
             _methodologyVersionRepository = methodologyVersionRepository;
             _releaseFileService = releaseFileService;
-            _releaseVersionRepository = releaseVersionRepository;
+            _releaseRepository = releaseRepository;
             _userService = userService;
         }
 
@@ -101,38 +100,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(releaseVersion);
 
+                    var publishedReleases =
+                        await _releaseRepository.ListPublishedReleases(releaseVersion.PublicationId);
+
                     // Hydrate Publication.ReleaseSeries
-                    var publishedVersions =
-                        await _releaseVersionRepository
-                            .ListLatestPublishedReleaseVersions(releaseVersion.PublicationId);
-                    var filteredReleaseSeries = releaseVersion.Publication.ReleaseSeries
-                        .Where(rsi => // only show items for legacy links and published releases
-                            rsi.IsLegacyLink
-                            || publishedVersions
-                                .Any(rv => rsi.ReleaseId == rv.ReleaseId)
-                        ).ToList();
-                    releaseViewModel.Publication.ReleaseSeries = filteredReleaseSeries
-                        .Select(rsi =>
-                        {
-                            if (rsi.IsLegacyLink)
-                            {
-                                return new ReleaseSeriesItemViewModel
-                                {
-                                    Description = rsi.LegacyLinkDescription!,
-                                    LegacyLinkUrl = rsi.LegacyLinkUrl,
-                                };
-                            }
-
-                            var latestReleaseVersion = publishedVersions
-                                .Single(rv => rv.ReleaseId == rsi.ReleaseId);
-
-                            return new ReleaseSeriesItemViewModel
-                            {
-                                Description = latestReleaseVersion.Title,
-                                ReleaseId = latestReleaseVersion.ReleaseId,
-                                ReleaseSlug = latestReleaseVersion.Slug,
-                            };
-                        }).ToList();
+                    releaseViewModel.Publication.ReleaseSeries =
+                        BuildReleaseSeriesItemViewModels(releaseVersion.Publication, publishedReleases);
 
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
@@ -144,6 +117,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         UnattachedDataBlocks = unattachedDataBlocks
                     };
                 });
+        }
+
+        private static List<ReleaseSeriesItemViewModel> BuildReleaseSeriesItemViewModels(
+            Publication publication,
+            List<Release> publishedReleases)
+        {
+            var publishedReleasesById = publishedReleases.ToDictionary(r => r.Id);
+            return publication.ReleaseSeries
+                // Only include release series items for legacy links and published releases
+                .Where(rsi => rsi.IsLegacyLink || publishedReleasesById.ContainsKey(rsi.ReleaseId!.Value))
+                .Select(rsi =>
+                {
+                    if (rsi.IsLegacyLink)
+                    {
+                        return new ReleaseSeriesItemViewModel
+                        {
+                            Description = rsi.LegacyLinkDescription!,
+                            LegacyLinkUrl = rsi.LegacyLinkUrl
+                        };
+                    }
+
+                    var release = publishedReleasesById[rsi.ReleaseId!.Value];
+
+                    return new ReleaseSeriesItemViewModel
+                    {
+                        Description = release.Title,
+                        ReleaseId = release.Id,
+                        ReleaseSlug = release.Slug
+                    };
+                })
+                .ToList();
         }
 
         private IQueryable<ReleaseVersion> HydrateReleaseQuery(IQueryable<ReleaseVersion> queryable)
