@@ -144,7 +144,7 @@ resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/adminis
   ]
 }]
 
-module databaseAliveAlert 'alerts/flexibleServers/databaseAlive.bicep' = if (alerts != null && alerts!.availability) {
+module databaseAliveAlert 'alerts/postgreSqlFlexibleServers/databaseAlive.bicep' = if (alerts != null && alerts!.availability) {
   name: '${databaseServerName}DbAliveDeploy'
   params: {
     resourceNames: [databaseServerName]
@@ -153,7 +153,7 @@ module databaseAliveAlert 'alerts/flexibleServers/databaseAlive.bicep' = if (ale
   }
 }
 
-module queryTimeAlert 'alerts/flexibleServers/queryTimeAlert.bicep' = if (alerts != null && alerts!.queryTime) {
+module queryTimeAlert 'alerts/postgreSqlFlexibleServers/queryTimeAlert.bicep' = if (alerts != null && alerts!.queryTime) {
   name: '${databaseServerName}QueryTimeDeploy'
   params: {
     resourceNames: [databaseServerName]
@@ -162,7 +162,7 @@ module queryTimeAlert 'alerts/flexibleServers/queryTimeAlert.bicep' = if (alerts
   }
 }
 
-module transactionTimeAlert 'alerts/flexibleServers/transactionTimeAlert.bicep' = if (alerts != null && alerts!.transactionTime) {
+module transactionTimeAlert 'alerts/postgreSqlFlexibleServers/transactionTimeAlert.bicep' = if (alerts != null && alerts!.transactionTime) {
   name: '${databaseServerName}TransactionTimeDeploy'
   params: {
     resourceNames: [databaseServerName]
