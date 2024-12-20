@@ -176,7 +176,7 @@ module transactionTimeAlert 'alerts/postgreSqlFlexibleServers/transactionTimeAle
   }
 }
 
-module clientConenctionsWaitingAlert 'alerts/flexibleServers/clientConnectionsWaitingAlert.bicep' = if (alerts != null && alerts!.clientConenctionsWaiting) {
+module clientConenctionsWaitingAlert 'alerts/postgreSqlFlexibleServers/clientConnectionsWaitingAlert.bicep' = if (alerts != null && alerts!.clientConenctionsWaiting) {
   name: '${databaseServerName}ClientConnectionsDeploy'
   params: {
     resourceNames: [databaseServerName]
@@ -185,7 +185,7 @@ module clientConenctionsWaitingAlert 'alerts/flexibleServers/clientConnectionsWa
   }
 }
 
-module cpuPercentageAlert 'alerts/flexibleServers/cpuPercentageAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert 'alerts/postgreSqlFlexibleServers/cpuPercentageAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${databaseServerName}CpuPercentageDeploy'
   params: {
     resourceNames: [databaseServerName]
@@ -194,7 +194,7 @@ module cpuPercentageAlert 'alerts/flexibleServers/cpuPercentageAlert.bicep' = if
   }
 }
 
-module diskBandwidthAlert 'alerts/flexibleServers/diskBandwidthAlert.bicep' = if (alerts != null && alerts!.diskBandwidth) {
+module diskBandwidthAlert 'alerts/postgreSqlFlexibleServers/diskBandwidthAlert.bicep' = if (alerts != null && alerts!.diskBandwidth) {
   name: '${databaseServerName}DiskBandwidthDeploy'
   params: {
     resourceNames: [databaseServerName]
@@ -203,7 +203,7 @@ module diskBandwidthAlert 'alerts/flexibleServers/diskBandwidthAlert.bicep' = if
   }
 }
 
-module diskIopsAlert 'alerts/flexibleServers/diskIopsAlert.bicep' = if (alerts != null && alerts!.diskIops) {
+module diskIopsAlert 'alerts/postgreSqlFlexibleServers/diskIopsAlert.bicep' = if (alerts != null && alerts!.diskIops) {
   name: '${databaseServerName}DiskIopsDeploy'
   params: {
     resourceNames: [databaseServerName]
@@ -212,7 +212,7 @@ module diskIopsAlert 'alerts/flexibleServers/diskIopsAlert.bicep' = if (alerts !
   }
 }
 
-module memoryPercentageAlert 'alerts/flexibleServers/memoryPercentageAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert 'alerts/postgreSqlFlexibleServers/memoryPercentageAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${databaseServerName}MemoryPercentageDeploy'
   params: {
     resourceNames: [databaseServerName]
