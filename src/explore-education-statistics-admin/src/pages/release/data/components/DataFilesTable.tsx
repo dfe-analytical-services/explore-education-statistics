@@ -96,11 +96,11 @@ const DataFilesTable = ({
       <tbody>
         {dataFiles.map(dataFile => (
           <tr key={dataFile.title}>
-            <td>{dataFile.title}</td>
-            <td className={styles.fileSize}>
+            <td data-testid="Subject title">{dataFile.title}</td>
+            <td data-testid="Data file size" className={styles.fileSize}>
               {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
             </td>
-            <td>
+            <td data-testid="Status">
               <ImporterStatus
                 className={styles.fileStatus}
                 releaseId={releaseId}
@@ -108,7 +108,7 @@ const DataFilesTable = ({
                 onStatusChange={onStatusChange}
               />
             </td>
-            <td>
+            <td data-testid="Actions">
               <ButtonGroup className={styles.actions}>
                 <Modal
                   showClose
