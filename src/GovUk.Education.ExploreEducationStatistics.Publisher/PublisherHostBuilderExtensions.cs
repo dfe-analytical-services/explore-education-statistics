@@ -96,6 +96,7 @@ public static class PublisherHostBuilderExtensions
                             provider.GetRequiredService<ILogger<IBlobStorageService>>()))
                     .AddScoped<IContentService, ContentService>(provider =>
                         new ContentService(
+                            contentDbContext: provider.GetRequiredService<ContentDbContext>(),
                             publicBlobStorageService: provider.GetRequiredService<IPublicBlobStorageService>(),
                             privateBlobCacheService: new BlobCacheService(
                                 provider.GetRequiredService<IPrivateBlobStorageService>(),

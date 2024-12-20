@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -125,30 +123,10 @@ public class PublishingCompletionService(
         var publication = await contentDbContext.Publications
             .SingleAsync(p => p.Id == publicationId);
 
-        // Get the publications release id's by the order they appear in the release series
-        var releaseSeriesReleaseIds = publication.ReleaseSeries.ReleaseIds();
+        var latestPublishedReleaseVersion = await releaseService.GetLatestPublishedReleaseVersion(publicationId);
 
-        // Work out the publication's new latest published release version.
-        // This is the latest published version of the first release which has a published version
-        Guid? latestPublishedReleaseVersionId = null;
-        foreach (var releaseId in releaseSeriesReleaseIds)
-        {
-            latestPublishedReleaseVersionId = (await contentDbContext.ReleaseVersions
-                .LatestReleaseVersion(releaseId: releaseId, publishedOnly: true)
-                .SingleOrDefaultAsync())?.Id;
+        publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id;
 
-            if (latestPublishedReleaseVersionId != null)
-            {
-                break;
-            }
-        }
-
-        publication.LatestPublishedReleaseVersionId =
-            latestPublishedReleaseVersionId ??
-            throw new InvalidOperationException(
-                $"No latest published release version found for publication {publicationId}");
-
-        contentDbContext.Update(publication);
         await contentDbContext.SaveChangesAsync();
     }
 }
