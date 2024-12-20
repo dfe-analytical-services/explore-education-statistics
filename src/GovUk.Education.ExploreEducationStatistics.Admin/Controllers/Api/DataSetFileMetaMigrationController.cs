@@ -1,9 +1,7 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -21,10 +19,10 @@ public class DataSetFileMetaMigrationController(ContentDbContext contentDbContex
     {
         public bool IsDryRun;
         public int Processed;
-        public string Errors;
+        public int NumLeftToProcess;
     }
 
-    [HttpPut("bau/migrate-datasetfile-geographiclevels")]
+    [HttpPut("bau/meta-geographic-levels-remove")]
     public async Task<MigrationResult> DataSetFileVersionGeographicLevelsMigration(
         [FromQuery] bool isDryRun = true,
         [FromQuery] int? num = null,
@@ -32,7 +30,8 @@ public class DataSetFileMetaMigrationController(ContentDbContext contentDbContex
     {
         var queryable = contentDbContext.Files
             .Where(f => f.Type == FileType.Data
-                        && f.DataSetFileVersionGeographicLevels.Count == 0);
+                        && f.DataSetFileMetaGeogLvlMigrated == false
+                        && f.DataSetFileVersionGeographicLevels.Count > 0); // Paranoidly protecting against data set where geog lvls aren't migrated
 
         if (num != null)
         {
@@ -42,30 +41,21 @@ public class DataSetFileMetaMigrationController(ContentDbContext contentDbContex
         var files = queryable.ToList();
 
         var numProcessed = 0;
-        List<string> errors = [];
 
         foreach (var file in files)
         {
-            var meta = file.DataSetFileMeta;
-
-            if (meta == null)
+            if (file.DataSetFileMeta != null)
             {
-                errors.Add($"No DataSetFileMeta found for File {file.Id}");
-                continue;
+                file.DataSetFileMeta = new DataSetFileMeta
+                {
+                    GeographicLevels = null,
+                    TimePeriodRange = file.DataSetFileMeta.TimePeriodRange,
+                    Filters = file.DataSetFileMeta.Filters,
+                    Indicators = file.DataSetFileMeta.Indicators,
+                };
             }
 
-            var dataSetFileVersionGeographicLevels = meta!.GeographicLevels
-                .Distinct()
-                .Select(gl => new DataSetFileVersionGeographicLevel
-                {
-                    DataSetFileVersionId = file.Id,
-                    GeographicLevel = gl,
-                })
-                .ToList();
-
-            contentDbContext.DataSetFileVersionGeographicLevels.AddRange(
-                dataSetFileVersionGeographicLevels);
-
+            file.DataSetFileMetaGeogLvlMigrated = true;
             numProcessed++;
         }
 
@@ -78,7 +68,7 @@ public class DataSetFileMetaMigrationController(ContentDbContext contentDbContex
         {
             IsDryRun = isDryRun,
             Processed = numProcessed,
-            Errors = errors.IsNullOrEmpty() ? "No errors" : errors.JoinToString("\n"),
+            NumLeftToProcess = contentDbContext.Files.Count(f => f.DataSetFileMetaGeogLvlMigrated == false),
         };
     }
 
