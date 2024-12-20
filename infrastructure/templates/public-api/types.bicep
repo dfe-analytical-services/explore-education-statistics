@@ -226,10 +226,11 @@ type StaticWebAppSku = 'Free' | 'Standard'
 @export()
 type ContainerAppResourceConfig = {
   workloadProfileName: string
-  minReplicas: int
-  maxReplicas: int
   cpuCores: int
   memoryGis: int
+  minReplicas: int
+  maxReplicas: int
+  scaleAtConcurrentHttpRequests: int?
 }
 
 @export()

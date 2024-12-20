@@ -78,6 +78,9 @@ param deployContainerApp bool = true
 @description('Does the Data Processor need creating or updating?')
 param deployDataProcessor bool = true
 
+@description('Does the Public API static docs site need creating or updating?')
+param deployDocsSite bool = true
+
 param deployAlerts bool = false
 
 @description('Public URLs of other components in the service.')
@@ -116,6 +119,7 @@ param publicApiContainerAppConfig ContainerAppResourceConfig = {
   memoryGis: 8
   minReplicas: 0
   maxReplicas: 3
+  scaleAtConcurrentHttpRequests: 10
   workloadProfileName: 'Consumption'
 }
 
@@ -309,7 +313,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
 }
 
 // Deploy Public API docs.
-module docsModule 'application/public-api/publicApiDocs.bicep' = {
+module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsSite) {
   name: 'publicApiDocsModuleDeploy'
   params: {
     appSku: docsAppSku
@@ -321,7 +325,7 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = {
 var docsRewriteSetName = '${publicApiResourcePrefix}-docs-rewrites'
 
 // Create an Application Gateway to serve public traffic for the Public API Container App.
-module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp) {
+module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp && deployDocsSite) {
   name: 'appGatewayModuleDeploy'
   params: {
     location: location

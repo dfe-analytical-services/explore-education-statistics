@@ -149,9 +149,11 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       requireAuthentication: false
     }
     cpuCores: resourceAndScalingConfig.cpuCores
-    memorySizeGis: resourceAndScalingConfig.memoryGis
+    memoryGis: resourceAndScalingConfig.memoryGis
     minReplicas: resourceAndScalingConfig.minReplicas
     maxReplicas: resourceAndScalingConfig.maxReplicas
+    scaleAtConcurrentHttpRequests: resourceAndScalingConfig.scaleAtConcurrentHttpRequests
+    workloadProfileName: resourceAndScalingConfig.workloadProfileName
     tagValues: tagValues
   }
 }

@@ -29,36 +29,27 @@ param corsPolicy {
 param workloadProfileName string = 'Consumption'
 
 @description('Number of CPU cores the container can use. Can be with a maximum of two decimals.')
-@allowed([
-  1
-  2
-  3
-  4
-])
+@minValue(1)
+@maxValue(8)
 param cpuCores int = 4
 
-@description('Amount of memory (in gibibytes, GiB) allocated to the container up to 4GiB. Can be with a maximum of two decimals. Ratio with CPU cores must be equal to 2.')
-@allowed([
-  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-])
-param memorySizeGis int = 8
+@description('Amount of memory (in gibibytes, GiB) allocated to the container up to 32GiB. Can be with a maximum of two decimals. Ratio with CPU cores must be equal to 2.')
+@minValue(1)
+@maxValue(32)
+param memoryGis int = 8
 
 @description('Minimum number of replicas that will be deployed')
 @minValue(0)
-@maxValue(25)
 param minReplicas int = 1
 
 @description('Maximum number of replicas that will be deployed')
 @minValue(0)
-@maxValue(25)
+@maxValue(1000)
 param maxReplicas int = 3
+
+@description('Number of concurrent requests required in order to trigger scaling out.')
+@minValue(1)
+param scaleAtConcurrentHttpRequests int?
 
 @description('Specifies the database connection string')
 param appSettings {
@@ -164,7 +155,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
           env: appSettings
           resources: {
             cpu: json(string(cpuCores))
-            memory: '${memorySizeGis}Gi'
+            memory: '${memoryGis}Gi'
           }
           volumeMounts: volumeMounts
         }
@@ -172,16 +163,16 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       scale: {
         minReplicas: minReplicas
         maxReplicas: maxReplicas
-        rules: [
+        rules: scaleAtConcurrentHttpRequests != null ? [
           {
             name: 'http-requests'
             http: {
               metadata: {
-                concurrentRequests: '10'
+                concurrentRequests: string(scaleAtConcurrentHttpRequests)
               }
             }
           }
-        ]
+        ] : []
       }
       volumes: volumes
     }
