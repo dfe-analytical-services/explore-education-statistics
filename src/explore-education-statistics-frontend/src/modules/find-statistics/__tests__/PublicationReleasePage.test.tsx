@@ -342,16 +342,6 @@ describe('PublicationReleasePage', () => {
             month: 2,
             year: 2022,
           },
-          publication: {
-            ...testRelease.publication,
-            releases: [
-              {
-                id: 'latest-release',
-                title: 'Latest Release Title',
-                slug: 'latest-release-slug',
-              },
-            ],
-          },
         }}
       />,
     );

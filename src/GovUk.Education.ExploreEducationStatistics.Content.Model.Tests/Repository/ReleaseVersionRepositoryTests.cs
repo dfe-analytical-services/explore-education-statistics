@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.ComparerUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
@@ -17,32 +16,50 @@ public class ReleaseVersionRepositoryTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    public class GetLatestPublishedReleaseVersionTests : ReleaseVersionRepositoryTests
+    public class GetLatestPublishedReleaseVersionByReleaseSlugTests : ReleaseVersionRepositoryTests
     {
         [Fact]
         public async Task Success()
         {
-            var publications = _dataFixture
+            Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => ListOf<Release>(
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2, year: 2020)))
-                .GenerateList(2);
+                .WithReleases(
+                [
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2022),
+                    _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021)
+                ]);
 
-            var contextId = await AddTestData(publications);
+            var contextId = await AddTestData(publication);
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var result = await repository.GetLatestPublishedReleaseVersion(publications[0].Id);
+            var result =
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22");
 
-            // Expect the result to be the latest published version taken from releases of the specified publication in
-            // reverse chronological order
-            var expectedReleaseVersion = publications[0].ReleaseVersions
-                .Single(rv => rv is { Published: not null, Year: 2021, Version: 1 });
+            // Expect the result to be the latest published version for the 2021-22 release
+            var expectedReleaseVersion = publication.Releases.Single(r => r is { Year: 2021 }).Versions[1];
+
+            Assert.NotNull(result);
+            Assert.Equal(expectedReleaseVersion.Id, result.Id);
+        }
+
+        [Fact]
+        public async Task MultiplePublications_ReturnsReleaseVersionAssociatedWithPublication()
+        {
+            var (publication1, publication2) = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1, year: 2021)])
+                .GenerateTuple2();
+
+            var contextId = await AddTestData(publication1, publication2);
+            await using var contentDbContext = InMemoryContentDbContext(contextId);
+            var repository = BuildRepository(contentDbContext);
+
+            var result =
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication1.Id, releaseSlug: "2021-22");
+
+            // Expect the result to be from the specified publication
+            var expectedReleaseVersion = publication1.Releases.Single().Versions.Single();
 
             Assert.NotNull(result);
             Assert.Equal(expectedReleaseVersion.Id, result.Id);
@@ -51,157 +68,53 @@ public class ReleaseVersionRepositoryTests
         [Fact]
         public async Task PublicationHasNoPublishedReleaseVersions_ReturnsNull()
         {
-            var publications = _dataFixture
+            Publication publication = _dataFixture
                 .DefaultPublication()
-                // Index 0 has an unpublished release version
-                // Index 1 has a published release version
-                .ForIndex(0, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1)))
-                .ForIndex(1, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1)))
-                .GenerateList(2);
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021)]);
 
-            var contextId = await AddTestData(publications);
+            var contextId = await AddTestData(publication);
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            Assert.Null(await repository.GetLatestPublishedReleaseVersion(publications[0].Id));
+            Assert.Null(
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22"));
+        }
+
+        [Fact]
+        public async Task PublicationHasNoPublishedReleaseVersionsMatchingSlug_ReturnsNull()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1, year: 2020)]);
+
+            var contextId = await AddTestData(publication);
+            await using var contentDbContext = InMemoryContentDbContext(contextId);
+            var repository = BuildRepository(contentDbContext);
+
+            Assert.Null(
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22"));
         }
 
         [Fact]
         public async Task PublicationHasNoReleaseVersions_ReturnsNull()
         {
-            var publications = _dataFixture
-                .DefaultPublication()
-                // Index 0 has no release versions
-                // Index 1 has a published release version
-                .ForIndex(1, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1)))
-                .GenerateList(2);
+            Publication publication = _dataFixture.DefaultPublication();
 
-            var contextId = await AddTestData(publications);
+            var contextId = await AddTestData(publication);
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            Assert.Null(await repository.GetLatestPublishedReleaseVersion(publications[0].Id));
+            Assert.Null(
+                await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publication.Id, releaseSlug: "2021-22"));
         }
 
         [Fact]
         public async Task PublicationDoesNotExist_ReturnsNull()
         {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+            var repository = BuildRepository();
 
-            var contextId = await AddTestData(publication);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Null(await repository.GetLatestPublishedReleaseVersion(Guid.NewGuid()));
-        }
-
-        [Fact]
-        public async Task SpecificReleaseSlug_Success()
-        {
-            var publications = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => ListOf<Release>(
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 1, year: 2022),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021)))
-                .GenerateList(2);
-
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            var result = await repository.GetLatestPublishedReleaseVersion(publications[0].Id, "2021-22");
-
-            // Expect the result to be the latest published version for the 2021-22 release of the specified publication
-            var expectedReleaseVersion = publications[0].ReleaseVersions
-                .Single(rv => rv is { Published: not null, Year: 2021, Version: 1 });
-
-            Assert.NotNull(result);
-            Assert.Equal(expectedReleaseVersion.Id, result.Id);
-        }
-
-        [Fact]
-        public async Task SpecificReleaseSlug_PublicationHasNoPublishedReleaseVersions_ReturnsNull()
-        {
-            var publications = _dataFixture
-                .DefaultPublication()
-                // Index 0 has an unpublished release version
-                // Index 1 has a published release version
-                .ForIndex(0, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021)
-                    .Generate(1)))
-                .ForIndex(1, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1, year: 2021)
-                    .Generate(1)))
-                .GenerateList(2);
-
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Null(await repository.GetLatestPublishedReleaseVersion(publications[0].Id, "2021-22"));
-        }
-
-        [Fact]
-        public async Task SpecificReleaseSlug_PublicationHasNoPublishedReleaseVersionsMatchingSlug_ReturnsNull()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1, year: 2020)
-                    .Generate(1));
-
-            var contextId = await AddTestData(publication);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Null(await repository.GetLatestPublishedReleaseVersion(publication.Id, "2021-22"));
-        }
-
-        [Fact]
-        public async Task SpecificReleaseSlug_PublicationHasNoReleaseVersions_ReturnsNull()
-        {
-            var publications = _dataFixture
-                .DefaultPublication()
-                // Index 0 has no release versions
-                // Index 1 has a published release version
-                .ForIndex(1, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1, year: 2021)
-                    .Generate(1)))
-                .GenerateList(2);
-
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Null(await repository.GetLatestPublishedReleaseVersion(publications[0].Id, "2021-22"));
-        }
-
-        [Fact]
-        public async Task SpecificReleaseSlug_PublicationDoesNotExist_ReturnsNull()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1, year: 2021)
-                    .Generate(1));
-
-            var contextId = await AddTestData(publication);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Null(await repository.GetLatestPublishedReleaseVersion(Guid.NewGuid(), "2021-22"));
+            Assert.Null(await repository.GetLatestPublishedReleaseVersionByReleaseSlug(publicationId: Guid.NewGuid(),
+                releaseSlug: "2021-22"));
         }
     }
 
@@ -210,27 +123,45 @@ public class ReleaseVersionRepositoryTests
         [Fact]
         public async Task Success()
         {
-            var publications = _dataFixture
+            Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => ListOf<Release>(
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2, year: 2020)))
-                .GenerateList(2);
+                .WithReleases(
+                [
+                    _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                    _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020)
+                ])
+                .FinishWith(p => p.ReleaseSeries = GenerateReleaseSeries(p.Releases, 2021, 2020, 2022));
 
-            var contextId = await AddTestData(publications);
+            var contextId = await AddTestData(publication);
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var result = await repository.GetLatestReleaseVersion(publications[0].Id);
+            var result = await repository.GetLatestReleaseVersion(publication.Id);
 
-            // Expect the result to be the latest version taken from releases of the specified publication in
-            // reverse chronological order
-            var expectedReleaseVersion = publications[0].ReleaseVersions
-                .Single(rv => rv is { Year: 2022, Version: 0 });
+            // Expect the result to be the latest version of the latest release in the release series
+            var expectedReleaseVersion = publication.Releases.Single(r => r is { Year: 2021 }).Versions[0];
+
+            Assert.NotNull(result);
+            Assert.Equal(expectedReleaseVersion.Id, result.Id);
+        }
+
+        [Fact]
+        public async Task MultiplePublications_ReturnsReleaseVersionAssociatedWithPublication()
+        {
+            var (publication1, publication2) = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+                .GenerateTuple2();
+
+            var contextId = await AddTestData(publication1, publication2);
+            await using var contentDbContext = InMemoryContentDbContext(contextId);
+            var repository = BuildRepository(contentDbContext);
+
+            var result = await repository.GetLatestReleaseVersion(publication1.Id);
+
+            // Expect the result to be from the specified publication
+            var expectedReleaseVersion = publication1.Releases.Single().Versions.Single();
 
             Assert.NotNull(result);
             Assert.Equal(expectedReleaseVersion.Id, result.Id);
@@ -239,36 +170,21 @@ public class ReleaseVersionRepositoryTests
         [Fact]
         public async Task PublicationHasNoReleaseVersions_ReturnsNull()
         {
-            var publications = _dataFixture
-                .DefaultPublication()
-                // Index 0 has no release versions
-                // Index 1 has a release version
-                .ForIndex(1, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1)))
-                .GenerateList(2);
-
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Null(await repository.GetLatestReleaseVersion(publications[0].Id));
-        }
-
-        [Fact]
-        public async Task PublicationDoesNotExist_ReturnsNull()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+            Publication publication = _dataFixture.DefaultPublication();
 
             var contextId = await AddTestData(publication);
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            Assert.Null(await repository.GetLatestReleaseVersion(Guid.NewGuid()));
+            Assert.Null(await repository.GetLatestReleaseVersion(publication.Id));
+        }
+
+        [Fact]
+        public async Task PublicationDoesNotExist_ReturnsNull()
+        {
+            var repository = BuildRepository();
+
+            Assert.Null(await repository.GetLatestReleaseVersion(publicationId: Guid.NewGuid()));
         }
     }
 
@@ -279,20 +195,18 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 2, draftVersion: true)
-                    .Generate(1));
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true)]);
 
             var contextId = await AddTestData(publication);
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var releaseVersions = publication.ReleaseVersions;
+            var release = publication.Releases.Single();
 
-            // Expect only the highest published version of the release to be the latest
-            Assert.False(await repository.IsLatestPublishedReleaseVersion(releaseVersions[0].Id));
-            Assert.True(await repository.IsLatestPublishedReleaseVersion(releaseVersions[1].Id));
-            Assert.False(await repository.IsLatestPublishedReleaseVersion(releaseVersions[2].Id));
+            // Expect only the latest published version of the release to be returned as the latest
+            Assert.False(await repository.IsLatestPublishedReleaseVersion(release.Versions[0].Id));
+            Assert.True(await repository.IsLatestPublishedReleaseVersion(release.Versions[1].Id));
+            Assert.False(await repository.IsLatestPublishedReleaseVersion(release.Versions[2].Id));
         }
 
         [Fact]
@@ -300,15 +214,13 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1));
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
             var contextId = await AddTestData(publication);
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication.Releases.Single().Versions.Single();
 
             Assert.False(await repository.IsLatestPublishedReleaseVersion(releaseVersion.Id));
         }
@@ -316,17 +228,9 @@ public class ReleaseVersionRepositoryTests
         [Fact]
         public async Task ReleaseVersionDoesNotExist_ReturnsFalse()
         {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+            var repository = BuildRepository();
 
-            var contextId = await AddTestData(publication);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.False(await repository.IsLatestPublishedReleaseVersion(Guid.NewGuid()));
+            Assert.False(await repository.IsLatestPublishedReleaseVersion(releaseVersionId: Guid.NewGuid()));
         }
     }
 
@@ -337,281 +241,412 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 2, draftVersion: true)
-                    .Generate(1));
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true)]);
 
             var contextId = await AddTestData(publication);
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var releaseVersions = publication.ReleaseVersions;
+            var release = publication.Releases.Single();
 
-            // Expect only the highest version of the release to be the latest
-            Assert.False(await repository.IsLatestReleaseVersion(releaseVersions[0].Id));
-            Assert.False(await repository.IsLatestReleaseVersion(releaseVersions[1].Id));
-            Assert.True(await repository.IsLatestReleaseVersion(releaseVersions[2].Id));
+            // Expect only the latest draft version of the release to be returned as the latest
+            Assert.False(await repository.IsLatestReleaseVersion(release.Versions[0].Id));
+            Assert.False(await repository.IsLatestReleaseVersion(release.Versions[1].Id));
+            Assert.True(await repository.IsLatestReleaseVersion(release.Versions[2].Id));
         }
 
         [Fact]
         public async Task ReleaseVersionDoesNotExist_ReturnsFalse()
         {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+            var repository = BuildRepository();
 
-            var contextId = await AddTestData(publication);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.False(await repository.IsLatestReleaseVersion(Guid.NewGuid()));
+            Assert.False(await repository.IsLatestReleaseVersion(releaseVersionId: Guid.NewGuid()));
         }
     }
 
-    public class ListLatestPublishedReleaseVersionIdsTests : ReleaseVersionRepositoryTests
+    public class ListLatestReleaseVersionsTests : ReleaseVersionRepositoryTests
     {
-        [Fact]
-        public async Task Success()
+        public class AnyPublishedStateTests : ListLatestReleaseVersionIdsTests
         {
-            var publications = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => ListOf<Release>(
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2)))
-                .GenerateList(2);
+            [Fact]
+            public async Task Success()
+            {
+                Publication publication = _dataFixture
+                    .DefaultPublication()
+                    .WithReleases(
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020)
+                    ])
+                    .FinishWith(p => p.ReleaseSeries = GenerateReleaseSeries(p.Releases, 2021, 2020, 2022));
 
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
+                var contextId = await AddTestData(publication);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
 
-            var result = await repository.ListLatestPublishedReleaseVersionIds(publications[0].Id);
+                var result = await ListLatestReleaseVersions(repository, publication.Id);
 
-            // Expect the result to contain the highest published version of each release for the specified publication
-            AssertIdsAreEqualIgnoringOrder(
+                // Expect the latest versions of each release, ordered by release series
+                Guid[] expectedReleaseVersionIds =
                 [
-                    publications[0].ReleaseVersions[2].Id,
-                    publications[0].ReleaseVersions[5].Id
-                ],
-                result);
+                    publication.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id,
+                    publication.Releases.Single(r => r is { Year: 2020 }).Versions[1].Id,
+                    publication.Releases.Single(r => r is { Year: 2022 }).Versions[2].Id
+                ];
+
+                Assert.Equal(expectedReleaseVersionIds, result.Select(rv => rv.Id));
+            }
+
+            [Fact]
+            public async Task MultiplePublications_ReturnsReleaseVersionsAssociatedWithPublication()
+            {
+                var (publication1, publication2) = _dataFixture
+                    .DefaultPublication()
+                    .WithReleases(_ =>
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021)
+                    ])
+                    .GenerateTuple2();
+
+                var contextId = await AddTestData(publication1, publication2);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
+
+                var result = await ListLatestReleaseVersions(repository, publication1.Id);
+
+                // Expect the results to be from the specified publication
+                AssertIdsAreEqualIgnoringOrder(
+                    [
+                        publication1.Releases.Single(r => r is { Year: 2022 }).Versions[0].Id,
+                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id
+                    ],
+                    result);
+            }
+
+            [Fact]
+            public async Task PublicationHasNoReleaseVersions_ReturnsEmpty()
+            {
+                Publication publication = _dataFixture.DefaultPublication();
+
+                var contextId = await AddTestData(publication);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
+
+                Assert.Empty(await ListLatestReleaseVersions(repository, publication.Id));
+            }
+
+            [Fact]
+            public async Task PublicationDoesNotExist_ReturnsEmpty()
+            {
+                var repository = BuildRepository();
+
+                Assert.Empty(await ListLatestReleaseVersions(repository, publicationId: Guid.NewGuid()));
+            }
+
+            private static async Task<List<ReleaseVersion>> ListLatestReleaseVersions(
+                ReleaseVersionRepository repository,
+                Guid publicationId)
+            {
+                return await repository.ListLatestReleaseVersions(publicationId, publishedOnly: false);
+            }
         }
 
-        [Fact]
-        public async Task PublicationHasNoPublishedReleaseVersions_ReturnsEmpty()
+        public class PublishedOnlyTests : ListLatestReleaseVersionsTests
         {
-            var publications = _dataFixture
-                .DefaultPublication()
-                // Index 0 has an unpublished release version
-                // Index 1 has a published release version
-                .ForIndex(0, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1)))
-                .ForIndex(1, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1)))
-                .GenerateList(2);
+            [Fact]
+            public async Task Success()
+            {
+                Publication publication = _dataFixture
+                    .DefaultPublication()
+                    .WithReleases(
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020)
+                    ])
+                    .FinishWith(p => p.ReleaseSeries = GenerateReleaseSeries(p.Releases, 2021, 2020, 2022));
 
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
+                var contextId = await AddTestData(publication);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
 
-            Assert.Empty(await repository.ListLatestPublishedReleaseVersionIds(publications[0].Id));
-        }
+                var result = await ListLatestReleaseVersions(repository, publication.Id);
 
-        [Fact]
-        public async Task PublicationHasNoReleaseVersions_ReturnsEmpty()
-        {
-            var publications = _dataFixture
-                .DefaultPublication()
-                .ForIndex(1, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1)))
-                .GenerateList(2);
-
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Empty(await repository.ListLatestPublishedReleaseVersionIds(publications[0].Id));
-        }
-
-        [Fact]
-        public async Task PublicationDoesNotExist_ReturnsEmpty()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
-
-            var contextId = await AddTestData(publication);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Empty(await repository.ListLatestPublishedReleaseVersionIds(Guid.NewGuid()));
-        }
-    }
-
-    public class ListLatestPublishedReleaseVersionsTests : ReleaseVersionRepositoryTests
-    {
-        [Fact]
-        public async Task Success()
-        {
-            var publications = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => ListOf<Release>(
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2)))
-                .GenerateList(2);
-
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            var result = await repository.ListLatestPublishedReleaseVersions(publications[0].Id);
-
-            // Expect the result to contain the highest published version of each release for the specified publication
-            AssertIdsAreEqualIgnoringOrder(
+                // Expect the latest published version of each release, ordered by release series
+                Guid[] expectedReleaseVersionIds =
                 [
-                    publications[0].ReleaseVersions[2].Id,
-                    publications[0].ReleaseVersions[5].Id
-                ],
-                result);
-        }
+                    publication.Releases.Single(r => r is { Year: 2020 }).Versions[1].Id,
+                    publication.Releases.Single(r => r is { Year: 2022 }).Versions[1].Id
+                ];
 
-        [Fact]
-        public async Task PublicationHasNoPublishedReleaseVersions_ReturnsEmpty()
-        {
-            var publications = _dataFixture
-                .DefaultPublication()
-                // Index 0 has an unpublished release version
-                // Index 1 has a published release version
-                .ForIndex(0, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1)))
-                .ForIndex(1, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1)))
-                .GenerateList(2);
+                Assert.Equal(expectedReleaseVersionIds, result.Select(rv => rv.Id));
+            }
 
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
+            [Fact]
+            public async Task MultiplePublications_ReturnsReleaseVersionsAssociatedWithPublication()
+            {
+                var (publication1, publication2) = _dataFixture
+                    .DefaultPublication()
+                    .WithReleases(_ =>
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021)
+                    ])
+                    .GenerateTuple2();
 
-            Assert.Empty(await repository.ListLatestPublishedReleaseVersions(publications[0].Id));
-        }
+                var contextId = await AddTestData(publication1, publication2);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
 
-        [Fact]
-        public async Task PublicationHasNoReleaseVersions_ReturnsEmpty()
-        {
-            var publications = _dataFixture
-                .DefaultPublication()
-                // Index 0 has no release versions
-                // Index 1 has a published release version
-                .ForIndex(1, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1)))
-                .GenerateList(2);
+                var result = await ListLatestReleaseVersions(repository, publication1.Id);
 
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
+                // Expect the results to be from the specified publication
+                AssertIdsAreEqualIgnoringOrder(
+                    [
+                        publication1.Releases.Single(r => r is { Year: 2022 }).Versions[0].Id,
+                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id
+                    ],
+                    result);
+            }
 
-            Assert.Empty(await repository.ListLatestPublishedReleaseVersions(publications[0].Id));
-        }
+            [Fact]
+            public async Task PublicationHasNoPublishedReleaseVersions_ReturnsEmpty()
+            {
+                Publication publication = _dataFixture
+                    .DefaultPublication()
+                    .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-        [Fact]
-        public async Task PublicationDoesNotExist_ReturnsEmpty()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
+                var contextId = await AddTestData(publication);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
 
-            var contextId = await AddTestData(publication);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
+                Assert.Empty(await ListLatestReleaseVersions(repository, publication.Id));
+            }
 
-            Assert.Empty(await repository.ListLatestPublishedReleaseVersions(Guid.NewGuid()));
+            [Fact]
+            public async Task PublicationHasNoReleaseVersions_ReturnsEmpty()
+            {
+                Publication publication = _dataFixture.DefaultPublication();
+
+                var contextId = await AddTestData(publication);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
+
+                Assert.Empty(await ListLatestReleaseVersions(repository, publication.Id));
+            }
+
+            [Fact]
+            public async Task PublicationDoesNotExist_ReturnsEmpty()
+            {
+                var repository = BuildRepository();
+
+                Assert.Empty(await ListLatestReleaseVersions(repository, publicationId: Guid.NewGuid()));
+            }
+
+            private static async Task<List<ReleaseVersion>> ListLatestReleaseVersions(
+                ReleaseVersionRepository repository,
+                Guid publicationId)
+            {
+                return await repository.ListLatestReleaseVersions(publicationId, publishedOnly: true);
+            }
         }
     }
 
     public class ListLatestReleaseVersionIdsTests : ReleaseVersionRepositoryTests
     {
-        [Fact]
-        public async Task Success()
+        public class AnyPublishedStateTests : ListLatestReleaseVersionIdsTests
         {
-            var publications = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => ListOf<Release>(
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2, draftVersion: true),
-                    _dataFixture
-                        .DefaultRelease(publishedVersions: 2)))
-                .GenerateList(2);
+            [Fact]
+            public async Task Success()
+            {
+                Publication publication = _dataFixture
+                    .DefaultPublication()
+                    .WithReleases(
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020)
+                    ]);
 
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
+                var contextId = await AddTestData(publication);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
 
-            var result = await repository.ListLatestReleaseVersionIds(publications[0].Id);
+                var result = await ListLatestReleaseVersionIds(repository, publication.Id);
 
-            // Expect the result to contain the highest version of each release for the specified publication
-            AssertIdsAreEqualIgnoringOrder(
-                [
-                    publications[0].ReleaseVersions[0].Id,
-                    publications[0].ReleaseVersions[3].Id,
-                    publications[0].ReleaseVersions[5].Id
-                ],
-                result);
+                // Expect the latest version id's of each release
+                AssertIdsAreEqualIgnoringOrder(
+                    [
+                        publication.Releases.Single(r => r is { Year: 2022 }).Versions[2].Id,
+                        publication.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id,
+                        publication.Releases.Single(r => r is { Year: 2020 }).Versions[1].Id
+                    ],
+                    result);
+            }
+
+            [Fact]
+            public async Task MultiplePublications_ReturnsReleaseVersionsAssociatedWithPublication()
+            {
+                var (publication1, publication2) = _dataFixture
+                    .DefaultPublication()
+                    .WithReleases(_ =>
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021)
+                    ])
+                    .GenerateTuple2();
+
+                var contextId = await AddTestData(publication1, publication2);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
+
+                var result = await ListLatestReleaseVersionIds(repository, publication1.Id);
+
+                // Expect the results to be from the specified publication
+                AssertIdsAreEqualIgnoringOrder(
+                    [
+                        publication1.Releases.Single(r => r is { Year: 2022 }).Versions[0].Id,
+                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id
+                    ],
+                    result);
+            }
+
+            [Fact]
+            public async Task PublicationHasNoReleaseVersions_ReturnsEmpty()
+            {
+                Publication publication = _dataFixture.DefaultPublication();
+
+                var contextId = await AddTestData(publication);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
+
+                Assert.Empty(await ListLatestReleaseVersionIds(repository, publication.Id));
+            }
+
+            [Fact]
+            public async Task PublicationDoesNotExist_ReturnsEmpty()
+            {
+                var repository = BuildRepository();
+
+                Assert.Empty(await ListLatestReleaseVersionIds(repository, publicationId: Guid.NewGuid()));
+            }
+
+            private static async Task<List<Guid>> ListLatestReleaseVersionIds(
+                ReleaseVersionRepository repository,
+                Guid publicationId)
+            {
+                return await repository.ListLatestReleaseVersionIds(publicationId, publishedOnly: false);
+            }
         }
 
-        [Fact]
-        public async Task PublicationHasNoReleaseVersions_ReturnsEmpty()
+        public class PublishedOnlyTests : ListLatestReleaseVersionIdsTests
         {
-            var publications = _dataFixture
-                .DefaultPublication()
-                // Index 0 has no release versions
-                // Index 1 has a published release version
-                .ForIndex(1, p => p.SetReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1)))
-                .GenerateList(2);
+            [Fact]
+            public async Task Success()
+            {
+                Publication publication = _dataFixture
+                    .DefaultPublication()
+                    .WithReleases(
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020)
+                    ]);
 
-            var contextId = await AddTestData(publications);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
+                var contextId = await AddTestData(publication);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
 
-            Assert.Empty(await repository.ListLatestReleaseVersionIds(publications[0].Id));
+                var result = await ListLatestReleaseVersionIds(repository, publication.Id);
+
+                // Expect the latest published version id's of each release
+                AssertIdsAreEqualIgnoringOrder(
+                    [
+                        publication.Releases.Single(r => r is { Year: 2022 }).Versions[1].Id,
+                        publication.Releases.Single(r => r is { Year: 2020 }).Versions[1].Id
+                    ],
+                    result);
+            }
+
+            [Fact]
+            public async Task MultiplePublications_ReturnsReleaseVersionsAssociatedWithPublication()
+            {
+                var (publication1, publication2) = _dataFixture
+                    .DefaultPublication()
+                    .WithReleases(_ =>
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021)
+                    ])
+                    .GenerateTuple2();
+
+                var contextId = await AddTestData(publication1, publication2);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
+
+                var result = await ListLatestReleaseVersionIds(repository, publication1.Id);
+
+                // Expect the results to be from the specified publication
+                AssertIdsAreEqualIgnoringOrder(
+                    [
+                        publication1.Releases.Single(r => r is { Year: 2022 }).Versions[0].Id,
+                        publication1.Releases.Single(r => r is { Year: 2021 }).Versions[0].Id
+                    ],
+                    result);
+            }
+
+            [Fact]
+            public async Task PublicationHasNoPublishedReleaseVersions_ReturnsEmpty()
+            {
+                Publication publication = _dataFixture
+                    .DefaultPublication()
+                    .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+                var contextId = await AddTestData(publication);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
+
+                Assert.Empty(await ListLatestReleaseVersionIds(repository, publication.Id));
+            }
+
+            [Fact]
+            public async Task PublicationHasNoReleaseVersions_ReturnsEmpty()
+            {
+                Publication publication = _dataFixture.DefaultPublication();
+
+                var contextId = await AddTestData(publication);
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var repository = BuildRepository(contentDbContext);
+
+                Assert.Empty(await ListLatestReleaseVersionIds(repository, publication.Id));
+            }
+
+            [Fact]
+            public async Task PublicationDoesNotExist_ReturnsEmpty()
+            {
+                var repository = BuildRepository();
+
+                Assert.Empty(await ListLatestReleaseVersionIds(repository, publicationId: Guid.NewGuid()));
+            }
+
+            private static async Task<List<Guid>> ListLatestReleaseVersionIds(
+                ReleaseVersionRepository repository,
+                Guid publicationId)
+            {
+                return await repository.ListLatestReleaseVersionIds(publicationId, publishedOnly: true);
+            }
         }
+    }
 
-        [Fact]
-        public async Task PublicationDoesNotExist_ReturnsEmpty()
+    private List<ReleaseSeriesItem> GenerateReleaseSeries(IReadOnlyList<Release> releases, params int[] years)
+    {
+        return years.Select(year =>
         {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 1)
-                    .Generate(1));
-
-            var contextId = await AddTestData(publication);
-            await using var contentDbContext = InMemoryContentDbContext(contextId);
-            var repository = BuildRepository(contentDbContext);
-
-            Assert.Empty(await repository.ListLatestReleaseVersionIds(Guid.NewGuid()));
-        }
+            var release = releases.Single(r => r.Year == year);
+            return _dataFixture.DefaultReleaseSeriesItem().WithReleaseId(release.Id).Generate();
+        }).ToList();
     }
 
     private static void AssertIdsAreEqualIgnoringOrder(
@@ -646,11 +681,10 @@ public class ReleaseVersionRepositoryTests
         return contextId;
     }
 
-    private static ReleaseVersionRepository BuildRepository(
-        ContentDbContext contentDbContext)
+    private static ReleaseVersionRepository BuildRepository(ContentDbContext? contentDbContext = null)
     {
         return new ReleaseVersionRepository(
-            contentDbContext: contentDbContext
+            contentDbContext: contentDbContext ?? InMemoryContentDbContext()
         );
     }
 }
