@@ -39,7 +39,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
 module cpuPercentageAlert 'alerts/appServicePlans/cpuPercentageAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${planName}CpuPercentageDeploy'
   params: {
-    resourceNames: [planName]
+    resourceName: planName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
@@ -48,7 +48,7 @@ module cpuPercentageAlert 'alerts/appServicePlans/cpuPercentageAlert.bicep' = if
 module memoryPercentageAlert 'alerts/appServicePlans/memoryPercentageAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${planName}MemoryPercentageDeploy'
   params: {
-    resourceNames: [planName]
+    resourceName: planName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

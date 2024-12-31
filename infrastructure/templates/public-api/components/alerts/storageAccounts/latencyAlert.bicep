@@ -1,5 +1,5 @@
-@description('Names of the resources that these alerts are being applied to.')
-param resourceNames string[]
+@description('Name of the resource that these alerts are being applied to.')
+param resourceName string
 
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
@@ -8,9 +8,9 @@ param alertsGroupName string
 param tagValues object
 
 module alerts '../baseResponseTimeAlert.bicep' = {
-  name: '${resourceNames[0]}LatencyAlertModule'
+  name: '${resourceName}LatencyAlertModule'
   params: {
-    resourceNames: resourceNames
+    resourceName: resourceName
     resourceType: 'Microsoft.Storage/storageAccounts'
     metricName: 'SuccessE2ELatency' 
     alertsGroupName: alertsGroupName

@@ -1,7 +1,7 @@
 import { Severity } from '../types.bicep'
 
-@description('Names of the resources that these alerts are being applied to.')
-param resourceNames string[]
+@description('Name of the resource that these alerts are being applied to.')
+param resourceName string
 
 @description('The alert severity.')
 param severity Severity = 'Warning'
@@ -12,11 +12,11 @@ param alertsGroupName string
 @description('Tags with which to tag the resource in Azure.')
 param tagValues object
 
-module alerts '../dynamicMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}QueryTimeAlertModule'
+module alerts '../dynamicMetricAlert.bicep' = {
+  name: '${resourceName}QueryTimeAlertModule'
   params: {
-    alertName: '${name}-query-time'
-    resourceIds: [resourceId('Microsoft.DBforPostgreSQL/flexibleServers', name)]
+    alertName: '${resourceName}-query-time'
+    resourceIds: [resourceId('Microsoft.DBforPostgreSQL/flexibleServers', resourceName)]
     resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
     query: {
       metric: 'longest_query_time_sec'
@@ -29,4 +29,4 @@ module alerts '../dynamicMetricAlert.bicep' = [for name in resourceNames: {
     alertsGroupName: alertsGroupName
     tagValues: tagValues
   }
-}]
+}

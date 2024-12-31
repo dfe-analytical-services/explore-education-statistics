@@ -1,7 +1,7 @@
 import { Severity } from 'types.bicep'
 
-@description('Names of the resources that these alerts are being applied to.')
-param resourceNames string[]
+@description('Name of the resource that these alerts are being applied to.')
+param resourceName string
 
 @description('Names of the resources that these alerts are being applied to.')
 param resourceType string
@@ -18,11 +18,11 @@ param alertsGroupName string
 @description('Tags with which to tag the resource in Azure.')
 param tagValues object
 
-module alerts 'dynamicMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}ResponseTimeBaseAlertModule'
+module alerts 'dynamicMetricAlert.bicep' = {
+  name: '${resourceName}ResponseTimeBaseAlertModule'
   params: {
-    alertName: '${name}-response-time'
-    resourceIds: [resourceId(resourceType, name)]
+    alertName: '${resourceName}-response-time'
+    resourceIds: [resourceId(resourceType, resourceName)]
     resourceType: resourceType
     query: {
       metric: metricName
@@ -35,4 +35,4 @@ module alerts 'dynamicMetricAlert.bicep' = [for name in resourceNames: {
     alertsGroupName: alertsGroupName
     tagValues: tagValues
   }
-}]
+}
