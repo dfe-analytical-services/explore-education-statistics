@@ -93,3 +93,15 @@ type MetricName =
   | 'RestartCount'
   | 'SuccessE2ELatency'
   | 'UnhealthyHostCount'
+
+@export()
+type DynamicAlertConfig = {
+  alertNameSuffix: string
+  aggregation: TimeAggregation
+  operator: DynamicMetricOperator
+  evaluationFrequency: EvaluationFrequency
+  windowSize: WindowSize
+  severity: Severity
+  numberOfEvaluationPeriods: int
+  minFailingPeriodsToAlert: int
+}
