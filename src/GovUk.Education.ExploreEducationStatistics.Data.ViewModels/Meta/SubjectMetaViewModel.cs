@@ -12,5 +12,5 @@ public record SubjectMetaViewModel
 
     public TimePeriodsMetaViewModel TimePeriod { get; set; } = new();
 
-    public List<DataSetFileFilterHierarchyViewModel>? FilterHierarchies { get; set; } = null;
+    public List<DataSetFileFilterHierarchyViewModel>? FilterHierarchies { get; set; }
 }

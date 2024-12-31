@@ -275,7 +275,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var childFilter = filters
                 .Single(f => f.GroupCsvColumn == parentFilter.ColumnName);
 
-            while (true) // one iteration of loop per tier
+            // Loop over each parent/child or tier, starting with the root filter, until no child is found
+            while (true)
             {
                 var currentParentFilterId = parentFilter.Id; // avoid closure madness
                 var currentChildFilterId = childFilter.Id;
