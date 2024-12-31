@@ -1,5 +1,5 @@
 import { abbreviations } from 'abbreviations.bicep'
-import { IpRange, PrincipalNameAndId, StaticWebAppSku } from 'types.bicep'
+import { ContainerAppResourceConfig, IpRange, PrincipalNameAndId, StaticWebAppSku, ContainerAppWorkloadProfile } from 'types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -78,6 +78,9 @@ param deployContainerApp bool = true
 @description('Does the Data Processor need creating or updating?')
 param deployDataProcessor bool = true
 
+@description('Does the Public API static docs site need creating or updating?')
+param deployDocsSite bool = true
+
 param deployAlerts bool = false
 
 @description('Public URLs of other components in the service.')
@@ -106,6 +109,19 @@ param devopsServicePrincipalId string = ''
 
 @description('Specifies whether or not test Themes can be deleted in the environment.')
 param enableThemeDeletion bool = false
+
+@description('Specifies the workload profiles for this Container App Environment - the default Consumption plan is always included')
+param publicApiContainerAppWorkloadProfiles ContainerAppWorkloadProfile[] = []
+
+@description('Resource configuration for the Public API Container App.')
+param publicApiContainerAppConfig ContainerAppResourceConfig = {
+  cpuCores: 4
+  memoryGis: 8
+  minReplicas: 0
+  maxReplicas: 3
+  scaleAtConcurrentHttpRequests: 10
+  workloadProfileName: 'Consumption'
+}
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -254,6 +270,7 @@ module containerAppEnvironmentModule 'application/shared/containerAppEnvironment
     location: location
     resourceNames: resourceNames
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
+    workloadProfiles: publicApiContainerAppWorkloadProfiles
     tagValues: tagValues
   }
   dependsOn: [
@@ -286,6 +303,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     dockerImagesTag: dockerImagesTag
     appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
     deployAlerts: deployAlerts
+    resourceAndScalingConfig: publicApiContainerAppConfig
     tagValues: tagValues
   }
   dependsOn: [
@@ -295,7 +313,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
 }
 
 // Deploy Public API docs.
-module docsModule 'application/public-api/publicApiDocs.bicep' = {
+module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsSite) {
   name: 'publicApiDocsModuleDeploy'
   params: {
     appSku: docsAppSku
@@ -307,7 +325,7 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = {
 var docsRewriteSetName = '${publicApiResourcePrefix}-docs-rewrites'
 
 // Create an Application Gateway to serve public traffic for the Public API Container App.
-module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp) {
+module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp && deployDocsSite) {
   name: 'appGatewayModuleDeploy'
   params: {
     location: location

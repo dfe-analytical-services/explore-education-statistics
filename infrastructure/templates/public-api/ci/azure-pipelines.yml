@@ -13,6 +13,9 @@ parameters:
   - name: deployDataProcessor
     displayName: Does the Data Processor need creating or updating?
     default: true
+  - name: deployDocsSite
+    displayName: Does the Public API static docs site need creating or updating?
+    default: true
   - name: deployAlerts
     displayName: Whether to create or update Azure Monitor alerts during this deploy.
     default: false
@@ -58,6 +61,8 @@ variables:
     value: ${{ parameters.deployContainerApp }}
   - name: deployDataProcessor
     value: ${{ parameters.deployDataProcessor }}
+  - name: deployDocsSite
+    value: ${{ parameters.deployDocsSite }}
   - name: deployAlerts
     value: ${{ parameters.deployAlerts }}
   - name: awaitActiveOrchestrations
