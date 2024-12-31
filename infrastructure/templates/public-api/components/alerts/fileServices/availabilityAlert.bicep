@@ -1,7 +1,7 @@
 import { Severity } from '../types.bicep'
 
-@description('Names of the resources that these alerts are being applied to.')
-param resourceNames string[]
+@description('Name of the resource that these alerts are being applied to.')
+param resourceName string
 
 @description('The alert severity.')
 param severity Severity = 'Critical'
@@ -12,11 +12,11 @@ param alertsGroupName string
 @description('Tags with which to tag the resource in Azure.')
 param tagValues object
 
-module alerts '../staticMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}FsAvailabilityAlertModule'
+module alerts '../staticMetricAlert.bicep' = {
+  name: '${resourceName}FsAvailabilityAlertModule'
   params: {
-    alertName: '${name}-fileservice-availability'
-    resourceIds: [resourceId('Microsoft.Storage/storageAccounts/fileServices', name, 'default')]
+    alertName: '${resourceName}-fileservice-availability'
+    resourceIds: [resourceId('Microsoft.Storage/storageAccounts/fileServices', resourceName, 'default')]
     resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
     query: {
       metric: 'availability'
@@ -30,4 +30,4 @@ module alerts '../staticMetricAlert.bicep' = [for name in resourceNames: {
     alertsGroupName: alertsGroupName
     tagValues: tagValues
   }
-}]
+}

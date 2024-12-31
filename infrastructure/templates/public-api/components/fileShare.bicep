@@ -43,7 +43,7 @@ resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-0
 module availabilityAlerts 'alerts/fileServices/availabilityAlert.bicep' = if (alerts != null && alerts!.availability) {
   name: '${storageAccountName}FsAvailabilityDeploy'
   params: {
-    resourceNames: [storageAccountName]
+    resourceName: storageAccountName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
@@ -52,7 +52,7 @@ module availabilityAlerts 'alerts/fileServices/availabilityAlert.bicep' = if (al
 module latencyAlert 'alerts/fileServices/latencyAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}FsLatencyDeploy'
   params: {
-    resourceNames: [storageAccountName]
+    resourceName: storageAccountName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

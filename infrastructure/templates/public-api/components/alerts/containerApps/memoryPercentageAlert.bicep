@@ -1,5 +1,5 @@
-@description('Names of the resources that these alerts are being applied to.')
-param resourceNames string[]
+@description('Name of the resources that these alerts are being applied to.')
+param resourceName string
 
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
@@ -8,9 +8,9 @@ param alertsGroupName string
 param tagValues object
 
 module alerts '../baseMemoryPercentageAlert.bicep' = {
-  name: '${resourceNames[0]}MemoryPercentageAlertModule'
+  name: '${resourceName}MemoryPercentageAlertModule'
   params: {
-    resourceNames: resourceNames
+    resourceName: resourceName
     resourceType: 'Microsoft.App/containerApps'
     metricName: 'MemoryPercentage' 
     alertsGroupName: alertsGroupName

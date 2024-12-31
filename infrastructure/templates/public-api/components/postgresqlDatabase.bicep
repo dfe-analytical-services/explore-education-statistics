@@ -152,7 +152,7 @@ resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/adminis
 module databaseAliveAlert 'alerts/postgreSqlFlexibleServers/databaseAlive.bicep' = if (alerts != null && alerts!.availability) {
   name: '${databaseServerName}DbAliveDeploy'
   params: {
-    resourceNames: [databaseServerName]
+    resourceName: databaseServerName
     alertsGroupName: alerts!.alertGroupName
     tagValues: tagValues
   }
@@ -161,7 +161,7 @@ module databaseAliveAlert 'alerts/postgreSqlFlexibleServers/databaseAlive.bicep'
 module queryTimeAlert 'alerts/postgreSqlFlexibleServers/queryTimeAlert.bicep' = if (alerts != null && alerts!.queryTime) {
   name: '${databaseServerName}QueryTimeDeploy'
   params: {
-    resourceNames: [databaseServerName]
+    resourceName: databaseServerName
     alertsGroupName: alerts!.alertGroupName
     tagValues: tagValues
   }
@@ -170,7 +170,7 @@ module queryTimeAlert 'alerts/postgreSqlFlexibleServers/queryTimeAlert.bicep' = 
 module transactionTimeAlert 'alerts/postgreSqlFlexibleServers/transactionTimeAlert.bicep' = if (alerts != null && alerts!.transactionTime) {
   name: '${databaseServerName}TransactionTimeDeploy'
   params: {
-    resourceNames: [databaseServerName]
+    resourceName: databaseServerName
     alertsGroupName: alerts!.alertGroupName
     tagValues: tagValues
   }
@@ -179,7 +179,7 @@ module transactionTimeAlert 'alerts/postgreSqlFlexibleServers/transactionTimeAle
 module clientConenctionsWaitingAlert 'alerts/postgreSqlFlexibleServers/clientConnectionsWaitingAlert.bicep' = if (alerts != null && alerts!.clientConenctionsWaiting) {
   name: '${databaseServerName}ClientConnectionsDeploy'
   params: {
-    resourceNames: [databaseServerName]
+    resourceName: databaseServerName
     alertsGroupName: alerts!.alertGroupName
     tagValues: tagValues
   }
@@ -188,7 +188,7 @@ module clientConenctionsWaitingAlert 'alerts/postgreSqlFlexibleServers/clientCon
 module cpuPercentageAlert 'alerts/postgreSqlFlexibleServers/cpuPercentageAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${databaseServerName}CpuPercentageDeploy'
   params: {
-    resourceNames: [databaseServerName]
+    resourceName: databaseServerName
     alertsGroupName: alerts!.alertGroupName
     tagValues: tagValues
   }
@@ -197,7 +197,7 @@ module cpuPercentageAlert 'alerts/postgreSqlFlexibleServers/cpuPercentageAlert.b
 module diskBandwidthAlert 'alerts/postgreSqlFlexibleServers/diskBandwidthAlert.bicep' = if (alerts != null && alerts!.diskBandwidth) {
   name: '${databaseServerName}DiskBandwidthDeploy'
   params: {
-    resourceNames: [databaseServerName]
+    resourceName: databaseServerName
     alertsGroupName: alerts!.alertGroupName
     tagValues: tagValues
   }
@@ -206,7 +206,7 @@ module diskBandwidthAlert 'alerts/postgreSqlFlexibleServers/diskBandwidthAlert.b
 module diskIopsAlert 'alerts/postgreSqlFlexibleServers/diskIopsAlert.bicep' = if (alerts != null && alerts!.diskIops) {
   name: '${databaseServerName}DiskIopsDeploy'
   params: {
-    resourceNames: [databaseServerName]
+    resourceName: databaseServerName
     alertsGroupName: alerts!.alertGroupName
     tagValues: tagValues
   }
@@ -215,7 +215,7 @@ module diskIopsAlert 'alerts/postgreSqlFlexibleServers/diskIopsAlert.bicep' = if
 module memoryPercentageAlert 'alerts/postgreSqlFlexibleServers/memoryPercentageAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${databaseServerName}MemoryPercentageDeploy'
   params: {
-    resourceNames: [databaseServerName]
+    resourceName: databaseServerName
     alertsGroupName: alerts!.alertGroupName
     tagValues: tagValues
   }

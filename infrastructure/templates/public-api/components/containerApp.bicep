@@ -222,7 +222,7 @@ module privateDns 'containerAppPrivateDns.bicep' = if (deployPrivateDns) {
 module containerAppRestartsAlert 'alerts/containerApps/restartsAlert.bicep' = if (alerts != null && alerts!.restarts) {
   name: '${containerAppName}RestartsDeploy'
   params: {
-    resourceNames: [containerAppName]
+    resourceName: containerAppName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
@@ -231,7 +231,7 @@ module containerAppRestartsAlert 'alerts/containerApps/restartsAlert.bicep' = if
 module responseTimeAlert 'alerts/containerApps/responseTimeAlert.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${containerAppName}ResponseTimeDeploy'
   params: {
-    resourceNames: [containerAppName]
+    resourceName: containerAppName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
@@ -240,7 +240,7 @@ module responseTimeAlert 'alerts/containerApps/responseTimeAlert.bicep' = if (al
 module cpuPercentageAlert 'alerts/containerApps/cpuPercentageAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${containerAppName}CpuPercentageDeploy'
   params: {
-    resourceNames: [containerAppName]
+    resourceName: containerAppName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
@@ -249,7 +249,7 @@ module cpuPercentageAlert 'alerts/containerApps/cpuPercentageAlert.bicep' = if (
 module memoryPercentageAlert 'alerts/containerApps/memoryPercentageAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${containerAppName}MemoryPercentageDeploy'
   params: {
-    resourceNames: [containerAppName]
+    resourceName: containerAppName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

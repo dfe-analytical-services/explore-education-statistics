@@ -60,7 +60,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
 module availabilityAlerts 'alerts/storageAccounts/availabilityAlert.bicep' = if (alerts != null && alerts!.availability) {
   name: '${storageAccountName}StorageAvailabilityDeploy'
   params: {
-    resourceNames: [storageAccountName]
+    resourceName: storageAccountName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
@@ -69,7 +69,7 @@ module availabilityAlerts 'alerts/storageAccounts/availabilityAlert.bicep' = if 
 module latencyAlert 'alerts/storageAccounts/latencyAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}LatencyDeploy'
   params: {
-    resourceNames: [storageAccountName]
+    resourceName: storageAccountName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
