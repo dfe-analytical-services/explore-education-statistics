@@ -52,10 +52,9 @@ import omit from 'lodash/omit';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import locationLevelsMap, {
+import {
   GeographicLevelCode,
   geographicLevelCodesMap,
-  LocationLevelKey,
 } from '@common/utils/locationLevelsMap';
 
 const defaultPageTitle = 'Data catalogue';
@@ -454,6 +453,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                   publicationId={publicationId}
                   publications={publications}
                   releaseId={releaseId}
+                  geographicLevel={geographicLevel}
                   releases={releases}
                   showTypeFilter={showTypeFilter}
                   themeId={themeId}
