@@ -71,7 +71,7 @@ module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
       diskBandwidth: true
       diskIops: true
       memoryPercentage: true
-      alertGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues
   }

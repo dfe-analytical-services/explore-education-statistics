@@ -1,3 +1,5 @@
+import { cpuPercentageConfig, memoryPercentageConfig, responseTimeConfig } from 'alerts/config.bicep'
+
 import { EntraIdAuthentication } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
@@ -222,28 +224,43 @@ module containerAppRestartsAlert 'alerts/containerApps/restartsAlert.bicep' = if
   }
 }
 
-module responseTimeAlert 'alerts/containerApps/responseTimeAlert.bicep' = if (alerts != null && alerts!.responseTime) {
+module responseTimeAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${containerAppName}ResponseTimeDeploy'
   params: {
     resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'ResponseTime'
+    }
+    config: responseTimeConfig
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
 
-module cpuPercentageAlert 'alerts/containerApps/cpuPercentageAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${containerAppName}CpuPercentageDeploy'
   params: {
     resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'CpuPercentage'
+    }
+    config: cpuPercentageConfig
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
 
-module memoryPercentageAlert 'alerts/containerApps/memoryPercentageAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${containerAppName}MemoryPercentageDeploy'
   params: {
     resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'MemoryPercentage'
+    }
+    config: memoryPercentageConfig
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
