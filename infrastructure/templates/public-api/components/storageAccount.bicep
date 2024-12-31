@@ -1,3 +1,5 @@
+import { responseTimeConfig } from 'alerts/config.bicep'
+
 import { IpRange } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
@@ -66,10 +68,15 @@ module availabilityAlerts 'alerts/storageAccounts/availabilityAlert.bicep' = if 
   }
 }
 
-module latencyAlert 'alerts/storageAccounts/latencyAlert.bicep' = if (alerts != null && alerts!.latency) {
+module latencyAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}LatencyDeploy'
   params: {
     resourceName: storageAccountName
+    resourceMetric: {
+      resourceType: 'Microsoft.Storage/storageAccounts'
+      metric: 'SuccessE2ELatency'
+    }
+    config: responseTimeConfig
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

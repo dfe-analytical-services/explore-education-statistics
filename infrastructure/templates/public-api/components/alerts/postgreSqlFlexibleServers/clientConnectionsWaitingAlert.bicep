@@ -13,7 +13,7 @@ param alertsGroupName string
 param tagValues object
 
 module alerts '../dynamicMetricAlert.bicep' = {
-  name: '${resourceName}ClientConnectionsWaitingAlertModule'
+  name: '${resourceName}ClientConnectionsAlertModule'
   params: {
     alertName: '${resourceName}-query-time'
     resourceIds: [resourceId('Microsoft.DBforPostgreSQL/flexibleServers', resourceName)]
