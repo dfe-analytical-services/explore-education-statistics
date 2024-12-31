@@ -13,18 +13,18 @@ param alertsGroupName string
 param tagValues object
 
 module alerts '../dynamicMetricAlert.bicep' = {
-  name: '${resourceName}DiskBandwidthAlertModule'
+  name: '${resourceName}TransactionTimeAlertModule'
   params: {
-    alertName: '${resourceName}-disk-bandwidth'
+    alertName: '${resourceName}-query-time'
     resourceIds: [resourceId('Microsoft.DBforPostgreSQL/flexibleServers', resourceName)]
     resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
     query: {
-      metric: 'disk_bandwidth_consumed_percentage'
-      aggregation: 'Average'
+      metric: 'longest_transaction_time_sec'
+      aggregation: 'Maximum'
       operator: 'GreaterThan'
     }
-    evaluationFrequency: 'PT5M'
-    windowSize: 'PT15M'
+    evaluationFrequency: 'PT1M'
+    windowSize: 'PT5M'
     severity: severity
     alertsGroupName: alertsGroupName
     tagValues: tagValues

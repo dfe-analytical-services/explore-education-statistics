@@ -1,7 +1,7 @@
 import { Severity } from '../types.bicep'
 
-@description('Names of the resources that these alerts are being applied to.')
-param resourceNames string[]
+@description('Name of the resource that these alerts are being applied to.')
+param resourceName string
 
 @description('The alert severity.')
 param severity Severity = 'Critical'
@@ -12,11 +12,11 @@ param alertsGroupName string
 @description('Tags with which to tag the resource in Azure.')
 param tagValues object
 
-module alerts '../staticMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}DbAliveAlertModule'
+module alerts '../staticMetricAlert.bicep' = {
+  name: '${resourceName}DbAliveAlertModule'
   params: {
-    alertName: '${name}-database-alive'
-    resourceIds: [resourceId('Microsoft.DBforPostgreSQL/flexibleServers', name)]
+    alertName: '${resourceName}-database-alive'
+    resourceIds: [resourceId('Microsoft.DBforPostgreSQL/flexibleServers', resourceName)]
     resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
     query: {
       metric: 'is_db_alive'
@@ -30,4 +30,4 @@ module alerts '../staticMetricAlert.bicep' = [for name in resourceNames: {
     alertsGroupName: alertsGroupName
     tagValues: tagValues
   }
-}]
+}

@@ -286,7 +286,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
 module backendPoolsHealthAlert 'alerts/appGateways/backendPoolHealthAlert.bicep' = if (alerts != null && alerts!.health) {
   name: '${appGatewayName}BackendPoolsHealthDeploy'
   params: {
-    resourceNames: [appGatewayName]
+    resourceName: appGatewayName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
@@ -295,7 +295,7 @@ module backendPoolsHealthAlert 'alerts/appGateways/backendPoolHealthAlert.bicep'
 module responseTimeAlert 'alerts/appGateways/responseTimeAlert.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${appGatewayName}ResponseTimeDeploy'
   params: {
-    resourceNames: [appGatewayName]
+    resourceName: appGatewayName
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
