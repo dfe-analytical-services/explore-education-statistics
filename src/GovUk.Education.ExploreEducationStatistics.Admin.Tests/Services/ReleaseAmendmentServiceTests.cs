@@ -53,10 +53,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             ReleaseVersion originalReleaseVersion = _fixture
                 .DefaultReleaseVersion()
-                .WithPublication(_fixture
-                    .DefaultPublication())
                 .WithRelease(_fixture
-                    .DefaultRelease())
+                    .DefaultRelease()
+                    .WithPublication(_fixture
+                        .DefaultPublication()))
                 .WithCreated(
                     created: DateTime.UtcNow.AddDays(-2),
                     createdById: originalCreatedBy.Id)
@@ -771,10 +771,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             ReleaseVersion originalReleaseVersion = _fixture
                 .DefaultReleaseVersion()
-                .WithPublication(_fixture
-                    .DefaultPublication())
                 .WithRelease(_fixture
-                    .DefaultRelease())
+                    .DefaultRelease()
+                    .WithPublication(_fixture
+                        .DefaultPublication()))
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()
@@ -843,10 +843,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             ReleaseVersion originalReleaseVersion = _fixture
                 .DefaultReleaseVersion()
-                .WithPublication(_fixture
-                    .DefaultPublication())
                 .WithRelease(_fixture
-                    .DefaultRelease())
+                    .DefaultRelease()
+                    .WithPublication(_fixture
+                        .DefaultPublication()))
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()
@@ -893,10 +893,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             ReleaseVersion originalReleaseVersion = _fixture
                 .DefaultReleaseVersion()
-                .WithPublication(_fixture
-                    .DefaultPublication())
                 .WithRelease(_fixture
-                    .DefaultRelease())
+                    .DefaultRelease()
+                    .WithPublication(_fixture
+                        .DefaultPublication()))
                 .WithCreated(createdById: _userId);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -937,10 +937,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             ReleaseVersion originalReleaseVersion = _fixture
                 .DefaultReleaseVersion()
-                .WithPublication(_fixture
-                    .DefaultPublication())
                 .WithRelease(_fixture
-                    .DefaultRelease())
+                    .DefaultRelease()
+                    .WithPublication(_fixture
+                        .DefaultPublication()))
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()

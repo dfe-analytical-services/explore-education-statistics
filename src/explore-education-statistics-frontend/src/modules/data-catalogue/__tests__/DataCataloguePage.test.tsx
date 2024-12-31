@@ -1195,6 +1195,32 @@ describe('DataCataloguePage', () => {
       ).toBeInTheDocument();
     });
 
+    test('filters by geographic level', async () => {
+      mockRouter.setCurrentUrl('/data-catalogue?geographicLevel=LA');
+
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
+        paging: { ...testPaging, totalPages: 1, totalResults: 1 },
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+      publicationService.listReleases.mockResolvedValue(testReleases);
+
+      render(<DataCataloguePage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('1 data set')).toBeInTheDocument();
+      });
+
+      expect(mockRouter).toMatchObject({
+        pathname: '/data-catalogue',
+        query: { geographicLevel: 'LA' },
+      });
+
+      expect(screen.getByLabelText('Filter by Geographic level')).toHaveValue(
+        'LA',
+      );
+    });
+
     test('filters by search term', async () => {
       mockRouter.setCurrentUrl('/data-catalogue?searchTerm=find+me');
 

@@ -1,3 +1,4 @@
+require 'dotenv'
 require 'govuk_tech_docs'
 require 'lib/api_reference_pages_extension'
 require 'lib/helpers'
@@ -7,21 +8,28 @@ require 'lib/govuk_tech_docs/path_helpers'
 # Check for broken links
 require 'html-proofer'
 
+Dotenv.load('.env')
+
 GovukTechDocs.configure(self, livereload: { js_host: "localhost", host: "127.0.0.1" })
 
 # Override config from environment variables
 
 if ENV.has_key?("TECH_DOCS_HOST")
-  config[:tech_docs][:host] = ENV["TECH_DOCS_HOST"] || config[:tech_docs][:host]
+  config[:tech_docs][:host] = ENV["TECH_DOCS_HOST"]
 end
 
 if ENV.has_key?("TECH_DOCS_PREVENT_INDEXING")
   config[:tech_docs][:prevent_indexing] = ENV["TECH_DOCS_PREVENT_INDEXING"]
 end
 
-if ENV.has_key?("TECH_DOCS_API_DOCS_PATH")
-  config[:tech_docs][:api_docs_path] = ENV["TECH_DOCS_API_DOCS_PATH"]
+if ENV.has_key?("TECH_DOCS_API_URL")
+  config[:tech_docs][:api_url] = ENV["TECH_DOCS_API_URL"]
 end
+
+ignore "**/template.html"
+ignore "partials/*"
+ignore "endpoints/*"
+ignore "templates/*"
 
 helpers Helpers
 helpers ApiReferenceHelpers

@@ -1,4 +1,4 @@
-import { FirewallRule, AzureFileshareMount, EntraIdAuthentication } from '../types.bicep'
+import { FirewallRule, IpRange, AzureFileShareMount, EntraIdAuthentication } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -11,9 +11,6 @@ param appServicePlanName string
 
 @description('Specifies the name prefix for all storage accounts')
 param storageAccountsNamePrefix string
-
-@description('Specifies the name of an alerts group for reporting metric alerts')
-param alertsGroupName string
 
 @description('Function App Plan : operating system')
 param appServicePlanOS 'Windows' | 'Linux' = 'Linux'
@@ -38,6 +35,9 @@ param privateEndpointSubnetId string?
 
 @description('Specifies whether this Function App is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
+
+@description('IP address ranges that are allowed to access the Function App endpoints. Dependent on "publicNetworkAccessEnabled" being true.')
+param functionAppFirewallRules FirewallRule[] = []
 
 @description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
 param userAssignedManagedIdentityParams {
@@ -64,17 +64,14 @@ param preWarmedInstanceCount int?
 @description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan')
 param alwaysOn bool?
 
-@description('Specifies configuration for setting up automatic health checks and metric alerts')
-param healthCheck {
-  path: string
-  unhealthyMetricName: string
-}?
+@description('Specifies an optional URL for Azure to use to monitor the health of this resource')
+param healthCheckPath string?
 
 @description('Specifies additional Azure Storage Accounts to make available to this Function App')
-param azureFileShares AzureFileshareMount[] = []
+param azureFileShares AzureFileShareMount[] = []
 
 @description('Specifies firewall rules for the various storage accounts in use by the Function App')
-param storageFirewallRules FirewallRule[] = []
+param storageFirewallRules IpRange[] = []
 
 var reserved = appServicePlanOS == 'Linux'
 
@@ -178,6 +175,14 @@ resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2
   ]
 }
 
+var firewallRules = [for (firewallRule, index) in functionAppFirewallRules: {
+  name: firewallRule.name
+  ipAddress: firewallRule.cidr
+  action: 'Allow'
+  tag: firewallRule.tag != null ? firewallRule.tag : 'Default'
+  priority: firewallRule.priority != null ? firewallRule.priority : 100 + index
+}]
+
 var commonSiteProperties = {
   enabled: true
   httpsOnly: true
@@ -190,14 +195,28 @@ var commonSiteProperties = {
   reserved: reserved
   siteConfig: {
     alwaysOn: alwaysOn ?? null
-    healthCheckPath: healthCheck != null ? healthCheck!.path : null
+    healthCheckPath: healthCheckPath
     preWarmedInstanceCount: preWarmedInstanceCount ?? null
     netFrameworkVersion: '8.0'
     linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
+    publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
+    ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
+    ipSecurityRestrictionsDefaultAction: 'Deny'
+    // TODO EES-5446 - this setting controls access to the deploy site for the Function App.
+    // This is currently the default value, but ideally we would lock this down to only be accessible
+    // by our runners and certain other whitelisted IP address ranges (e.g. trusted VPNs).
+    scmIpSecurityRestrictions: [
+      {
+        ipAddress: 'Any'
+        action: 'Allow'
+        priority: 2147483647
+        name: 'Allow all'
+        description: 'Allow all access'
+      }
+    ]
   }
   keyVaultReferenceIdentity: keyVaultReferenceIdentity
-  publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
 }
 
 // Create the main production deploy slot.
@@ -230,68 +249,6 @@ module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthenti
     allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
     requireAuthentication: entraIdAuthentication!.requireAuthentication
   }
-}
-
-resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
-  name: alertsGroupName
-}
-
-var commonUnhealthyMetricAlertRuleProperties = {
-  enabled: true
-  severity: 1
-  evaluationFrequency: 'PT1M'
-  windowSize: 'PT5M'
-  criteria: {
-    'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
-    allOf: [
-      {
-        name: 'Metric1'
-        criterionType: 'StaticThresholdCriterion'
-        metricName: 'HealthCheckStatus'
-        timeAggregation: 'Minimum'
-        operator: 'LessThan'
-        threshold: 100
-        skipMetricValidation: false
-      }
-    ]
-  }
-  actions: [
-    {
-      actionGroupId: alertsActionGroup.id
-    }
-  ]
-}
-
-resource functionAppUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = if (healthCheck != null) {
-  name: healthCheck!.unhealthyMetricName
-  location: 'Global'
-  properties: union(commonUnhealthyMetricAlertRuleProperties, {
-    scopes: [functionApp.id]
-    criteria: {
-      allOf: [union(
-        commonUnhealthyMetricAlertRuleProperties.criteria.allOf[0],
-        {
-          metricNamespace: 'Microsoft.Web/sites'
-        }
-      )]
-    }
-  })
-}
-
-resource stagingSlotUnhealthyMetricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = if (healthCheck != null) {
-  name: '${healthCheck!.unhealthyMetricName}Staging'
-  location: 'Global'
-  properties: union(commonUnhealthyMetricAlertRuleProperties, {
-    scopes: [stagingSlot.id]
-    criteria: {
-      allOf: [union(
-        commonUnhealthyMetricAlertRuleProperties.criteria.allOf[0],
-        {
-          metricNamespace: 'Microsoft.Web/sites/slots'
-        }
-      )]
-    }
-  })
 }
 
 // Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.
@@ -431,3 +388,8 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnet
 }
 
 output functionAppName string = functionApp.name
+output url string = 'https://${functionApp.name}.azurewebsites.net'
+output stagingUrl string = 'https://${functionApp.name}-staging.azurewebsites.net'
+output managementStorageAccountName string = sharedStorageAccountName
+output slot1StorageAccountName string = slot1StorageAccountName
+output slot2StorageAccountName string = slot2StorageAccountName

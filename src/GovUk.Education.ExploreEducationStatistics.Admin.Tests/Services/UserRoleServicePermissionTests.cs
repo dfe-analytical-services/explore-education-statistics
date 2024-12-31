@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -8,9 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -25,6 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class UserRoleServicePermissionTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         private readonly Publication _publication = new()
         {
             Id = Guid.NewGuid(),
@@ -57,16 +62,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task AddReleaseRole()
         {
-            var userId = Guid.NewGuid();
-            var releaseVersion = new ReleaseVersion();
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                ReleaseVersions = new List<ReleaseVersion>
-                {
-                    releaseVersion,
-                }
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var release = publication.Releases.Single();
 
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
@@ -77,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        await contentDbContext.AddRangeAsync(publication);
+                        contentDbContext.Publications.Add(publication);
                         await contentDbContext.SaveChangesAsync();
                     }
 
@@ -85,8 +84,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = SetupUserRoleService(contentDbContext: contentDbContext,
                             userService: userService.Object);
-                        return await service.AddReleaseRole(userId: userId,
-                            releaseVersionId: releaseVersion.Id,
+
+                        return await service.AddReleaseRole(
+                            userId: Guid.NewGuid(),
+                            releaseId: release.Id,
                             Contributor);
                     }
                 });

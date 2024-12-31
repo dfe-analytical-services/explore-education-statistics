@@ -77,7 +77,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
         to: '2020',
       },
       filters: ['Filter 1', 'Filter 2'],
-      geographicLevels: ['National', 'Regional'],
+      geographicLevels: ['National', 'Regional', 'Local authority'],
       indicators: ['Indicator 1', 'Indicator 2'],
     },
     latestData: true,

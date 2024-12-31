@@ -3,6 +3,7 @@ export const dataSetFileFilters = [
   'latest',
   'publicationId',
   'releaseId',
+  'geographicLevel',
   'searchTerm',
   'themeId',
 ] as const;

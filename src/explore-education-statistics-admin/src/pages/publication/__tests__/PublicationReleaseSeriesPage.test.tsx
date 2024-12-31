@@ -26,7 +26,7 @@ describe('PublicationReleaseSeriesPage', () => {
     publicationService.getReleaseSeries.mockResolvedValue(testReleaseSeries);
 
     renderPage(testPublication);
-    expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+    expect(await screen.findByText('Release order')).toBeInTheDocument();
 
     const table = screen.getByRole('table');
     expect(within(table).getAllByRole('row')).toHaveLength(5);
@@ -52,7 +52,7 @@ describe('PublicationReleaseSeriesPage', () => {
     publicationService.getReleaseSeries.mockResolvedValue([]);
     renderPage(testPublication);
 
-    expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+    expect(await screen.findByText('Release order')).toBeInTheDocument();
 
     expect(
       screen.getByText('No releases for this publication.'),
@@ -75,7 +75,7 @@ describe('PublicationReleaseSeriesPage', () => {
       publicationService.getReleaseSeries.mockResolvedValue(testReleaseSeries);
       renderPage(testPublication);
 
-      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+      expect(await screen.findByText('Release order')).toBeInTheDocument();
 
       await user.click(
         screen.getByRole('button', { name: 'Reorder releases' }),
@@ -101,7 +101,7 @@ describe('PublicationReleaseSeriesPage', () => {
       publicationService.getReleaseSeries.mockResolvedValue(testReleaseSeries);
       renderPage(testPublication);
 
-      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+      expect(await screen.findByText('Release order')).toBeInTheDocument();
 
       await user.click(
         screen.getByRole('button', { name: 'Reorder releases' }),
@@ -130,7 +130,7 @@ describe('PublicationReleaseSeriesPage', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('does not show button to reorder when user does not have permission to manage legacy releases', async () => {
+    test('does not show button to reorder when user does not have permission to manage the release series', async () => {
       publicationService.getReleaseSeries.mockResolvedValue(testReleaseSeries);
       renderPage({
         ...testPublication,
@@ -140,7 +140,7 @@ describe('PublicationReleaseSeriesPage', () => {
         },
       });
 
-      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+      expect(await screen.findByText('Release order')).toBeInTheDocument();
 
       expect(
         screen.queryByRole('button', { name: 'Reorder releases' }),
@@ -161,7 +161,7 @@ describe('PublicationReleaseSeriesPage', () => {
       ]);
       renderPage(testPublication);
 
-      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+      expect(await screen.findByText('Release order')).toBeInTheDocument();
 
       await user.click(
         screen.getByRole('button', { name: 'Delete Legacy link 1' }),
@@ -207,7 +207,7 @@ describe('PublicationReleaseSeriesPage', () => {
       );
       renderPage(testPublication);
 
-      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+      expect(await screen.findByText('Release order')).toBeInTheDocument();
 
       await user.click(
         screen.getByRole('button', { name: 'Create legacy release' }),
@@ -248,7 +248,7 @@ describe('PublicationReleaseSeriesPage', () => {
         </Router>,
       );
 
-      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+      expect(await screen.findByText('Release order')).toBeInTheDocument();
 
       await user.click(
         screen.getByRole('button', { name: 'Create legacy release' }),
@@ -261,12 +261,12 @@ describe('PublicationReleaseSeriesPage', () => {
       );
       await waitFor(() => {
         expect(history.location.pathname).toBe(
-          `/publication/${testPublication.id}/legacy/create`,
+          `/publication/${testPublication.id}/releases/legacy/create`,
         );
       });
     });
 
-    test('does not show button to create when user does not have permission to manage legacy releases', async () => {
+    test('does not show button to create when user does not have permission to manage the release series', async () => {
       publicationService.getReleaseSeries.mockResolvedValueOnce(
         testReleaseSeries,
       );
@@ -278,7 +278,7 @@ describe('PublicationReleaseSeriesPage', () => {
         },
       });
 
-      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+      expect(await screen.findByText('Release order')).toBeInTheDocument();
 
       expect(
         screen.queryByRole('button', { name: 'Create legacy release' }),

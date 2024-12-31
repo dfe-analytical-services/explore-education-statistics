@@ -2,6 +2,7 @@ import { PaginatedList } from '@common/services/types/pagination';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { contentApi } from '@common/services/api';
 import { SortDirection } from '@common/services/types/sort';
+import { GeographicLevelCode } from '@common/utils/locationLevelsMap';
 
 export interface DataSetVariable {
   label: string;
@@ -115,6 +116,7 @@ export interface DataSetFileListRequest {
   pageSize?: number;
   publicationId?: string;
   releaseId?: string;
+  geographicLevel?: GeographicLevelCode;
   searchTerm?: string;
   sort?: DataSetFileSortParam;
   sortDirection?: SortDirection;

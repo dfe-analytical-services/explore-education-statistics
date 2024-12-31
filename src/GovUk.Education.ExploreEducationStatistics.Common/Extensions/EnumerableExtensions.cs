@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using NaturalSort.Extension;
 
@@ -221,38 +220,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         }
 
         public static IAsyncEnumerable<T> WhereNotNull<T>(this IAsyncEnumerable<T?> source)
-            where T: class
+            where T : class
         {
             return source.Where(item => item is not null)!;
         }
 
         public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) =>
             self.Select((item, index) => (item, index));
-
-        /// <summary>
-        /// Filter a list down to distinct elements based on a property of the type.
-        /// </summary>
-        ///
-        /// <remarks>
-        /// As IEqualityComparers (as used in Linq's Distinct() method) compare with GetHashCode() rather than with
-        /// Equals(), the property being used to compare distinctions against needs to produce a reliable hash code
-        /// that we can use for equality.  A good property type then could be a Guid Id field, as two identical Guid Ids
-        /// can then represent that 2 or more entities in the list are duplicates as they will have the same hash code.
-        /// </remarks>
-        ///
-        /// <param name="source">Sequence of elements to filter on a distinct property</param>
-        /// <param name="propertyGetter">A supplier of a property from each entity to check for equality. The property
-        /// chosen must produce the same hash code for any two elements in the source list that are considered
-        /// duplicates.  A good example would be a Guid Id.</param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static IEnumerable<T> DistinctByProperty<T>(
-            this IEnumerable<T> source,
-            Func<T, object> propertyGetter)
-            where T : class
-        {
-            return source.Distinct(ComparerUtils.CreateComparerByProperty(propertyGetter));
-        }
 
         public static bool IsSameAsIgnoringOrder<T>(this IEnumerable<T> first, IEnumerable<T> second)
         {
@@ -264,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
             return !(firstNotInSecond.Any() || secondNotInFirst.Any());
         }
-        
+
         public static Tuple<T, T> ToTuple2<T>(this IEnumerable<T> collection)
             where T : class
         {
@@ -275,10 +249,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 throw new ArgumentException(
                     $"Expected 2 list items when constructing a 2-tuple, but found {list.Count}");
             }
-            
+
             return new Tuple<T, T>(list[0], list[1]);
         }
-        
+
         public static Tuple<T, T, T> ToTuple3<T>(this IEnumerable<T> collection)
             where T : class
         {
@@ -289,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 throw new ArgumentException(
                     $"Expected 3 list items when constructing a 3-tuple, but found {list.Count}");
             }
-            
+
             return new Tuple<T, T, T>(list[0], list[1], list[2]);
         }
 
@@ -297,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         {
             return values.All(id => source.Contains(id));
         }
-        
+
         /// <summary>
         /// Order some objects, according to a string key, in natural order for humans to read.
         /// </summary>
@@ -318,6 +292,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
             return source.ThenBy(keySelector, comparison.WithNaturalSort());
+        }
+
+        public static List<(T1, T2)> Cartesian<T1, T2>(
+            this IEnumerable<T1> list1,
+            IEnumerable<T2>? list2)
+        {
+            return list2 == null
+                ? []
+                : list1
+                    .Join(list2, _ => true, _ => true, (t1, t2) => (t1, t2))
+                    .ToList();
+        }
+
+        public static List<(T1, T2, T3)> Cartesian<T1, T2, T3>(
+            this IEnumerable<T1> list1,
+            IEnumerable<T2>? list2,
+            IEnumerable<T3>? list3)
+        {
+            return list2 == null || list3 == null
+                ? []
+                : list1
+                    .Join(list2, _ => true, _ => true, (t1, t2) => (t1, t2))
+                    .Join(list3, _ => true, _ => true,
+                        (tuple, t3) => (tuple.t1, tuple.t2, t3))
+                    .ToList();
         }
     }
 }

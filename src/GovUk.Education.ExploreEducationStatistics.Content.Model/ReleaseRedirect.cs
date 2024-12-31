@@ -6,11 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class ReleaseRedirect : ICreatedTimestamp<DateTime>
 {
-    public string Slug { get; init; } = null!;
+    public string Slug { get; set; } = null!;
 
-    public Guid ReleaseId { get; init; }
+    public Guid ReleaseId { get; set; }
 
-    public Release Release { get; init; } = null!;
+    public Release Release { get; set; } = null!;
 
     public DateTime Created { get; set; }
 }

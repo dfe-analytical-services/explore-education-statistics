@@ -52,6 +52,11 @@ import omit from 'lodash/omit';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
+import locationLevelsMap, {
+  GeographicLevelCode,
+  geographicLevelCodesMap,
+  LocationLevelKey,
+} from '@common/utils/locationLevelsMap';
 
 const defaultPageTitle = 'Data catalogue';
 
@@ -61,6 +66,7 @@ export interface DataCataloguePageQuery {
   page?: number;
   publicationId?: string;
   releaseId?: string;
+  geographicLevel?: GeographicLevelCode;
   searchTerm?: string;
   sortBy?: DataSetFileSortOption;
   sortDirection?: SortDirection;
@@ -85,6 +91,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
     sortBy,
     publicationId,
     releaseId,
+    geographicLevel,
     searchTerm,
     themeId,
   } = getParamsFromQuery(router.query);
@@ -121,16 +128,22 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
 
   const selectedRelease = releases.find(release => release.id === releaseId);
 
+  const selectedGeographicLevel = geographicLevel
+    ? geographicLevelCodesMap[geographicLevel]
+    : undefined;
+
   const { paging, results: dataSets = [] } = dataSetsData ?? {};
   const { page, totalPages, totalResults = 0 } = paging ?? {};
   const [showAllDetails, toggleAllDetails] = useToggle(false);
 
-  const isFiltered = !!publicationId || !!searchTerm || !!themeId;
+  const isFiltered =
+    !!publicationId || !!searchTerm || !!themeId || !!geographicLevel;
 
   const filteredByString = compact([
     searchTerm,
     selectedTheme?.title,
     selectedPublication?.title,
+    geographicLevel,
   ]).join(', ');
 
   const updateQueryParams = async (nextQuery: DataCataloguePageQuery) => {
@@ -327,6 +340,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                 publicationId={publicationId}
                 publications={publications}
                 releaseId={releaseId}
+                geographicLevel={geographicLevel}
                 releases={releases}
                 showResetFiltersButton={!isMobileMedia && isFiltered}
                 showTypeFilter={showTypeFilter}
@@ -412,6 +426,15 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                     name={selectedRelease.title}
                     onClick={() =>
                       handleResetFilter({ filterType: 'releaseId' })
+                    }
+                  />
+                )}
+                {selectedGeographicLevel && (
+                  <FilterResetButton
+                    filterType="Geographic level"
+                    name={selectedGeographicLevel.filterLabel}
+                    onClick={() =>
+                      handleResetFilter({ filterType: 'geographicLevel' })
                     }
                   />
                 )}

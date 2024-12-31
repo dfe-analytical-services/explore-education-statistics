@@ -1,24 +1,45 @@
-﻿#nullable enable
+#nullable enable
+using FluentValidation;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
 public record DataGuidanceUpdateRequest
 {
-    [Required]
     public string Content { get; init; } = string.Empty;
 
-    [MinLength(1)]
-    public List<DataGuidanceDataSetUpdateRequest> DataSets { get; init; } = new();
+    public List<DataGuidanceDataSetUpdateRequest> DataSets { get; init; } = [];
+
+    public class Validator : AbstractValidator<DataGuidanceUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Content)
+                .NotEmpty();
+
+            RuleFor(request => request.DataSets)
+                .NotEmpty();
+        }
+    }
 }
 
 public record DataGuidanceDataSetUpdateRequest
 {
-    [Required]
     public Guid FileId { get; init; }
 
-    [Required]
     public string Content { get; init; } = string.Empty;
+
+    public class Validator : AbstractValidator<DataGuidanceDataSetUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.FileId)
+                .NotEmpty();
+
+            RuleFor(request => request.Content)
+                .NotEmpty()
+                .MaximumLength(250);
+        }
+    }
 }

@@ -1,8 +1,7 @@
-﻿#nullable enable
-using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+#nullable enable
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
@@ -10,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public ChartBaseDataSet DataSet;
         public ChartDataGrouping DataGrouping;
-        public BoundaryLevel BoundaryLevels;
+        public long? BoundaryLevel;
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

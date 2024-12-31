@@ -9,7 +9,7 @@
   {
     "publication_summary": "Attainment and retention data for A level and other qualifications by age 16-18 in England. Includes region, institution type, characteristics, and subject.",
     "publication_title": "A level and other 16 to 18 results",
-    "published": "18 Apr 2024",
+    "published": "28 Nov 2024",
     "release_type": "Accredited official statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -30,7 +30,7 @@
   {
     "publication_summary": "Apprenticeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships",
-    "published": "10 Oct 2024",
+    "published": "28 Nov 2024",
     "release_type": "Accredited official statistics",
     "theme": "Further education"
   },
@@ -65,7 +65,7 @@
   {
     "publication_summary": "Statistics on the characteristics of early years providers in England.",
     "publication_title": "Childcare and early years provider survey",
-    "published": "14 Dec 2023",
+    "published": "12 Dec 2024",
     "release_type": "Official statistics",
     "theme": "Early years"
   },
@@ -100,7 +100,7 @@
   {
     "publication_summary": "This publication provides data reported by local authorities on children missing education (CME) in England.",
     "publication_title": "Children missing education",
-    "published": "29 Feb 2024",
+    "published": "12 Dec 2024",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
@@ -163,7 +163,7 @@
   {
     "publication_summary": "Annual statistics on early years foundation stage profile assessments in England relating to the 7 areas of learning and the 17 early learning goals.",
     "publication_title": "Early years foundation stage profile results",
-    "published": "30 Nov 2023",
+    "published": "28 Nov 2024",
     "release_type": "Accredited official statistics",
     "theme": "Early years"
   },
@@ -177,7 +177,7 @@
   {
     "publication_summary": "Annual data release on schools, pupils, teachers, qualifications gained, education expenditure, further education and higher education in the UK.",
     "publication_title": "Education and training statistics for the UK",
-    "published": "9 Nov 2023",
+    "published": "28 Nov 2024",
     "release_type": "Accredited official statistics",
     "theme": "UK education and training statistics"
   },
@@ -205,7 +205,7 @@
   {
     "publication_summary": "This publication provides data reported by local authorities on children in\u202felective home education (EHE) in England.",
     "publication_title": "Elective home education",
-    "published": "29 Feb 2024",
+    "published": "12 Dec 2024",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
@@ -247,14 +247,14 @@
   {
     "publication_summary": "Apprenticeship and adult 19+ Further Education and skills learning, including community learning, education and training, and basic skills (English and maths).",
     "publication_title": "Further education and skills",
-    "published": "9 Sep 2024",
+    "published": "28 Nov 2024",
     "release_type": "Accredited official statistics",
     "theme": "Further education"
   },
   {
     "publication_summary": "Sustained employment and learning destinations, and earnings of further education learners in England. Annual statistics with demographic and other breakdowns.",
     "publication_title": "Further education outcomes",
-    "published": "30 Nov 2023",
+    "published": "28 Nov 2024",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
@@ -289,7 +289,7 @@
   {
     "publication_summary": "Annual national and provider level statistics on new entrants to Initial Teacher Training (ITT) in England and their characteristics.",
     "publication_title": "Initial Teacher Training Census",
-    "published": "7 Dec 2023",
+    "published": "5 Dec 2024",
     "release_type": "Official statistics",
     "theme": "Teachers and school workforce"
   },
@@ -299,13 +299,6 @@
     "published": "25 Jul 2024",
     "release_type": "Official statistics",
     "theme": "Teachers and school workforce"
-  },
-  {
-    "publication_summary": "Phonics screening check and key stage 1 attainment of pupils in England at national and LA level. This release includes pupil characteristic breakdowns.",
-    "publication_title": "Key stage 1 and phonics screening check attainment",
-    "published": "12 Oct 2023",
-    "release_type": "Accredited official statistics",
-    "theme": "School and college outcomes and performance"
   },
   {
     "publication_summary": "Key stage 2 attainment statistics by pupil characteristics, school characteristics, region and local authority.",
@@ -331,14 +324,14 @@
   {
     "publication_summary": "GCSE results of pupils at the end of KS4 attending state-funded schools in England at national & LA level. This release includes pupil characteristic breakdowns",
     "publication_title": "Key stage 4 performance",
-    "published": "1 Feb 2024",
+    "published": "5 Dec 2024",
     "release_type": "Accredited official statistics",
     "theme": "School and college outcomes and performance"
   },
   {
     "publication_summary": "Local authority and school spending on education, children's services and social care across financial years. Also includes income of LA maintained schools.",
     "publication_title": "LA and school expenditure",
-    "published": "25 Jan 2024",
+    "published": "12 Dec 2024",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
   },
@@ -415,7 +408,7 @@
   {
     "publication_summary": "Multiplication tables check attainment by pupil characteristics, school characteristics, region and local authority.",
     "publication_title": "Multiplication tables check attainment",
-    "published": "23 Nov 2023",
+    "published": "21 Nov 2024",
     "release_type": "Official statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -534,7 +527,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "7 Nov 2024",
+    "published": "19 Dec 2024",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
@@ -653,7 +646,7 @@
   {
     "publication_summary": "Data on suspensions and permanent exclusions, including by reason, duration, by pupil characteristics and data on independent review panels.",
     "publication_title": "Suspensions and permanent exclusions in England",
-    "published": "18 Jul 2024",
+    "published": "21 Nov 2024",
     "release_type": "Accredited official statistics",
     "theme": "Pupils and schools"
   },

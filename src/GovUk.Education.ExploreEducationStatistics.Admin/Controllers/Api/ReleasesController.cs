@@ -107,7 +107,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> UploadDataSet(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
-            [FromQuery(Name = "title")] string title,
+            [FromQuery(Name = "title")]
+            [MaxLength(120)]
+            string title,
             IFormFile file,
             IFormFile metaFile)
         {
@@ -125,7 +127,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<DataFileInfo>> UploadDataSetAsZip(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
-            [FromQuery(Name = "title")] string title,
+            [FromQuery(Name = "title")]
+            [MaxLength(120)]
+            string title,
             IFormFile zipFile)
         {
             return await _releaseDataFileService
@@ -136,15 +140,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseVersionId:guid}/bulk-zip-data")]
+        [HttpPost("release/{releaseVersionId:guid}/upload-bulk-zip-data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<List<DataFileInfo>>> UploadDataSetsAsBulkZip(
+        public async Task<ActionResult<List<ArchiveDataSetFileViewModel>>> UploadBulkZipDataSetsToTempStorage(
             Guid releaseVersionId,
-            IFormFile zipFile)
+            IFormFile zipFile,
+            CancellationToken cancellationToken)
         {
             return await _releaseDataFileService
-                .UploadAsBulkZip(releaseVersionId: releaseVersionId, bulkZipFormFile: zipFile)
+                .ValidateAndUploadBulkZip(releaseVersionId, zipFile, cancellationToken)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("release/{releaseVersionId:guid}/import-bulk-zip-data")]
+        public async Task<ActionResult<List<DataFileInfo>>> ImportBulkZipDataSetsFromTempStorage(
+            Guid releaseVersionId,
+            List<ArchiveDataSetFileViewModel> dataSetFiles,
+            CancellationToken cancellationToken)
+        {
+            return await _releaseDataFileService
+                .SaveDataSetsFromTemporaryBlobStorage(releaseVersionId, dataSetFiles, cancellationToken)
                 .HandleFailuresOrOk();
         }
 

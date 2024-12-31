@@ -13,6 +13,10 @@ import styles from '@frontend/modules/data-catalogue/components/Filters.module.s
 import { DataSetFileFilter } from '@frontend/modules/data-catalogue/utils/dataSetFileFilters';
 import React from 'react';
 import classNames from 'classnames';
+import locationLevelsMap, {
+  GeographicLevelCode,
+} from '@common/utils/locationLevelsMap';
+import typedKeys from '@common/utils/object/typedKeys';
 
 const formId = 'filters-form';
 
@@ -23,6 +27,7 @@ interface Props {
   publications?: PublicationTreeSummary[];
   releaseId?: string;
   releases?: ReleaseSummary[];
+  geographicLevel?: GeographicLevelCode;
   showResetFiltersButton?: boolean;
   showTypeFilter?: boolean;
   themeId?: string;
@@ -44,6 +49,7 @@ export default function Filters({
   publicationId,
   releaseId,
   releases = [],
+  geographicLevel,
   showResetFiltersButton,
   showTypeFilter,
   themeId,
@@ -136,6 +142,36 @@ export default function Filters({
           order={[]}
           onChange={e => {
             onChange({ filterType: 'releaseId', nextValue: e.target.value });
+          }}
+        />
+      </FormGroup>
+
+      <FormGroup>
+        <FormSelect
+          className="govuk-!-width-full"
+          id={`${formId}-geographic-level`}
+          label={
+            <>
+              <VisuallyHidden>Filter by </VisuallyHidden>Geographic level
+            </>
+          }
+          name="geographicLevel"
+          options={[
+            { label: 'All', value: 'all' },
+            ...typedKeys(locationLevelsMap).map(key => {
+              return {
+                label: locationLevelsMap[key].filterLabel,
+                value: locationLevelsMap[key].code,
+              };
+            }),
+          ]}
+          value={geographicLevel ?? 'all'}
+          order={[]}
+          onChange={e => {
+            onChange({
+              filterType: 'geographicLevel',
+              nextValue: e.target.value,
+            });
           }}
         />
       </FormGroup>

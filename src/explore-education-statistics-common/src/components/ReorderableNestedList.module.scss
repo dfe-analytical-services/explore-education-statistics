@@ -1,0 +1,26 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.list {
+  .list {
+    border-top: 1px solid govuk-colour('mid-grey');
+  }
+}
+
+.item {
+  border-bottom: 1px solid govuk-colour('mid-grey');
+  min-height: 60px;
+  padding: govuk-spacing(2);
+}
+
+.itemExpanded {
+  background: govuk-colour('light-grey');
+
+  > span {
+    padding: govuk-spacing(1) 0;
+  }
+}
+
+.itemNotExpanded {
+  align-items: center;
+  display: flex;
+}

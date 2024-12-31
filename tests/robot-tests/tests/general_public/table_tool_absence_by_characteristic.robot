@@ -192,16 +192,17 @@ Click Update and view reordered table button
     user clicks button    Update and view reordered table
 
 Validate results table column headings after reordering
-    user checks table column heading contains    1    1    Gender male
-    user checks table column heading contains    1    2    Gender female
-    user checks table column heading contains    2    1    2013/14
-    user checks table column heading contains    2    2    2014/15
-    user checks table column heading contains    2    3    2015/16
-    user checks table column heading contains    2    4    2012/13
-    user checks table column heading contains    2    5    2013/14
-    user checks table column heading contains    2    6    2014/15
-    user checks table column heading contains    2    7    2015/16
-    user checks table column heading contains    2    8    2012/13
+    user checks table column heading contains    1    1    Gender
+    user checks table column heading contains    2    1    Gender male
+    user checks table column heading contains    2    2    Gender female
+    user checks table column heading contains    3    1    2013/14
+    user checks table column heading contains    3    2    2014/15
+    user checks table column heading contains    3    3    2015/16
+    user checks table column heading contains    3    4    2012/13
+    user checks table column heading contains    3    5    2013/14
+    user checks table column heading contains    3    6    2014/15
+    user checks table column heading contains    3    7    2015/16
+    user checks table column heading contains    3    8    2012/13
 
 Validate results table row headings after reordering
     user checks table row heading contains    1    1    Overall absence rate
@@ -251,16 +252,17 @@ User validates permanent link works correctly
     user waits until h1 is visible    'Absence by characteristic' from '${PUPIL_ABSENCE_PUBLICATION_TITLE}'
 
 User validates permalink table
-    user checks table column heading contains    1    1    Gender male
-    user checks table column heading contains    1    2    Gender female
-    user checks table column heading contains    2    1    2013/14
-    user checks table column heading contains    2    2    2014/15
-    user checks table column heading contains    2    3    2015/16
-    user checks table column heading contains    2    4    2012/13
-    user checks table column heading contains    2    5    2013/14
-    user checks table column heading contains    2    6    2014/15
-    user checks table column heading contains    2    7    2015/16
-    user checks table column heading contains    2    8    2012/13
+    user checks table column heading contains    1    1    Gender
+    user checks table column heading contains    2    1    Gender male
+    user checks table column heading contains    2    2    Gender female
+    user checks table column heading contains    3    1    2013/14
+    user checks table column heading contains    3    2    2014/15
+    user checks table column heading contains    3    3    2015/16
+    user checks table column heading contains    3    4    2012/13
+    user checks table column heading contains    3    5    2013/14
+    user checks table column heading contains    3    6    2014/15
+    user checks table column heading contains    3    7    2015/16
+    user checks table column heading contains    3    8    2012/13
 
     user checks table row heading contains    1    1    Overall absence rate
     user checks table row heading contains    2    1    Unauthorised absence rate

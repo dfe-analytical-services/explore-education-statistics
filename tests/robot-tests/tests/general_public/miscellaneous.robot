@@ -37,7 +37,7 @@ Validate homepage
     user checks page contains element    link:Statistics at DfE
     user checks page contains element    link:Compare school and college performance
     user checks page contains element    link:Get information about schools
-    user checks page contains element    link:Schools financial benchmarking
+    user checks page contains element    link:Financial Benchmarking and Insights Tool
 
     user checks page contains element    xpath://h2[text()="Contact us"]
 
@@ -93,18 +93,6 @@ Validate Cookies Details page
     user checks nth breadcrumb contains    3    Details about cookies
 
     cookie names should be on page
-
-Validate Privacy notice page
-    user clicks link    Privacy notice
-    user waits until h1 is visible    Privacy notice
-    user waits until page contains
-    ...    The Explore education statistics service is operated by the Department for Education
-
-    user checks url contains    %{PUBLIC_URL}/privacy-notice
-
-    user checks breadcrumb count should be    2
-    user checks nth breadcrumb contains    1    Home
-    user checks nth breadcrumb contains    2    Privacy notice
 
 Validate Contact page
     user clicks link    Contact us

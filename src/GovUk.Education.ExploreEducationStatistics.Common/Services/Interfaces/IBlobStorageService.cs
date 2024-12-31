@@ -1,15 +1,15 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Storage.DataMovement;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage.DataMovement;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {
@@ -36,7 +36,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         public Task DeleteBlob(IBlobContainer containerName, string path);
 
-        public Task<bool> MoveBlob(IBlobContainer containerName, string sourcePath, string destinationPath);
+        public Task<bool> MoveBlob(
+            IBlobContainer sourceContainer,
+            string sourcePath,
+            string destinationPath,
+            IBlobContainer? destinationContainer = null);
 
         public Task UploadFile(
             IBlobContainer containerName,

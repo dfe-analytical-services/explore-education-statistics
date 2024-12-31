@@ -128,13 +128,6 @@ const prototypeReleaseContent: ReleaseContent = {
           slug: 'methodology-slug',
         },
       ],
-      releases: [
-        {
-          id: 'previous-release-id',
-          slug: 'previous-release-slug',
-          title: 'Previous release title',
-        },
-      ],
       releaseSeries: [],
       slug: 'publication-slug',
       title: 'Initial Teacher Training Census',

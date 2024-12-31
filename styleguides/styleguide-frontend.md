@@ -148,7 +148,7 @@ onB
 
 <a id="s2.4.2"></a>
 
-#### 2.4.2 Context API conventions e.g. use\*Context hook
+#### 2.4.2 Context API conventions e.g. `use\*Context` hook
 
 - Create an exported custom hook called `use*Context` which uses `Context.Consumer`.
 - Create an exported Provider component which uses `Context.Provider`.
@@ -288,7 +288,7 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 <a id="s5.1.3"></a>
 
-#### 5.1.3 Determining whether or not to leave particular test cases out as they're covered by Robot tests
+#### 5.1.3 Determining whether to leave particular test cases out as they're covered by Robot tests
 
 - Currently, UI tests only really test happy path.
 - Frontend unit tests tend to test happy and unhappy paths as well.
@@ -299,8 +299,61 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 #### 5.1.4 Use of snapshot tests
 
-- Prefer to not use snapshot tests - they tend to let mistakes through as they rely on people checking them properly (which is hard).
-- If snapshot is small in scope and there's a valid use case (e.g. some HTML), then a snapshot might be a suitable tool - up to developer.
+- Prefer to not use snapshot tests - they tend to let mistakes through as they rely on people checking 
+  them properly (which is hard).
+- If snapshot is small in scope and there's a valid use case (e.g. some HTML), then a snapshot might 
+  be a suitable tool - up to developer.
+
+<a id="s5.1.5"></a>
+
+#### 5.1.5 Avoid logic and loops in tests
+
+- Prefer to avoid loops and logic in tests - keep things as simple as possible!
+- It may be tempting to abstract some repeated assertions on some items, however, it's usually 
+  simpler, clearer and more precise to just copy and paste the assertions across your items. 
+- For example, instead of doing something like the following:
+
+  ```tsx
+  // ❌ Don't do this
+  
+  const expectedOptions: SelectOption[] = [
+    { value: 'value-1', label: 'Value 1' },
+    { value: 'value-2', label: 'Value 2' },
+  ];
+  
+  const options = screen.getAllByRole('option');
+  
+  options.forEach((option, index) => {
+    if (index === 0) {
+      expect(option).toHaveValue(''); 
+      expect(option).toHaveTextContent('Choose option');
+    } else {
+      expect(option).toHaveValue(expectedOptions[index].value);
+      expect(option).toHaveTextContent(expectedOptions[index].label);
+    }
+  });
+  ```
+  
+  Simplify to the following instead:
+ 
+  ```tsx
+  // ✅ Do this
+  
+  const options = screen.getAllByRole('option');
+  
+  expect(options[0]).toHaveValue(''); 
+  expect(options[0]).toHaveTextContent('Choose option');
+  
+  expect(options[1]).toHaveValue('value-1'); 
+  expect(options[1]).toHaveTextContent('Value 1');
+  
+  expect(options[2]).toHaveValue('value-2'); 
+  expect(options[2]).toHaveTextContent('Value 2');
+  ```
+- If a test needs to use loops or logic, it should be for a specific case where a copy and paste 
+  approach would result in reduced clarity by the sheer number of assertions. Typically, this would
+  be where there are many options, or where we need to test **many permutations** within a broad 
+  range of constraints.
 
 <a id="s5.2"></a>
 
@@ -310,15 +363,21 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 #### 5.2.1 Test case naming
 
-- The general  style is 'action does something'.
-- The name should start lowercased.
+- The general naming convention is `{action} {subject?} {expectation or condition?}` e.g.
+  - `renders correctly`
+  - `renders button if user is logged in`
+  - `clicking the button calls x service`
+  - `submitting form successfully`
+  - `submitting form with invalid values shows errors`
+- The name should start **lowercased** unless there is a specific reason for it not to.
 
 <a id="s5.2.2"></a>
 
-#### 5.2.2 testid naming
+#### 5.2.2 Test ID (`data-testid`) naming
 
 - Use hyphens
-- We're not too precious about this as sometimes it makes sense to put a string (e.g. a name) inside of the test ID for ease
+- We're not too precious about this as sometimes it makes sense to put a string (e.g. a name) inside 
+  of the test ID for ease
 
 <a id="s5.2.3"></a>
 
@@ -338,7 +397,7 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 <a id="s5.3.1"></a>
 
-#### 5.3.1 getByRole vs getByText vs getByLabel
+#### 5.3.1 `getByRole` vs `getByText` vs `getByLabel`
 
 - `getByRole` is good for most things and should be used as much as possible.
 - `getByLabel` is good for form inputs.
@@ -351,8 +410,14 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 #### 5.3.2 Waiting for UI changes
 
 - UI changes on load or following user interaction usually have to be waited for.
-- Use `findBy*` where applicable, e.g. `expect(await screen.findByText('find me')).toBeInTheDocument()`.
-- When using `waitFor` don't use `getByRole` as it causes performance degradation. Use a faster selector like `getByText` or `getByLabel` in `waitFor` and keep assertions minimal inside. Follow up after `waitFor` with any `getByRoles`.
+- Use `findBy*` where applicable e.g.
+  ```tsx
+  expect(await screen.findByText('find me')).toBeInTheDocument()
+  ```
+- When using `waitFor` don't use `getByRole` as it causes performance degradation. Use a faster 
+  selector like `getByText` or `getByLabel` in `waitFor` and keep assertions minimal inside. 
+  
+  Follow up after `waitFor` with any `getByRole` selectors.
 
 <a id="s5.4"></a>
 
@@ -360,11 +425,14 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 <a id="s5.4.1"></a>
 
-#### 5.4.1 userEvents
+#### 5.4.1 Using `userEvent` library
 
-- Use `await` with all `userEvents`.
-- Invoke `userEvent.setup()` before the component is rendered (this is a recent change to Testing Library so most tests still use `userEvent` directly), e.g.
-  ```
+- Don't use `fireEvent` unless it's necessary. Use `userEvent` library instead.
+- Use `await` with all `userEvent` methods.
+- Invoke `userEvent.setup()` before the component is rendered (this is a recent change to Testing 
+  Library so most tests still use `userEvent` directly), e.g.
+
+  ```tsx
   const user = userEvent.setup();
   render(<MyComponent />);
   await user.click(screen.getByRole('button', {name: 'click me'}));
@@ -372,13 +440,17 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 <a id="s5.4.2"></a>
 
-#### 5.4.2 Using jest.useFakeTimers with userEvents
+#### 5.4.2 Using `jest.useFakeTimers` with `userEvent`
 
-- Using `jest.useFakeTimers()` with `userEvents` can cause tests to timeout.
-- To fix this invoke `userEvent` with one of the following as appropriate:
-  - `const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });`
-  - `const user = userEvent.setup({ delay: null });`
-
+- Using `jest.useFakeTimers()` with `userEvent` can cause tests to timeout.
+- To fix this invoke `userEvent` with one of following:
+  ```tsx
+  const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+  ```
+  
+  ```tsx
+  const user = userEvent.setup({ delay: null });
+  ```
 <a id="s5.5"></a>
 
 ### 5.5 Test data
@@ -402,8 +474,8 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 #### 5.5.3 What to use for test data values
 
-- Values don't have to realistic. Prefer to use generic defaults like 'Publication title 1' following structure:
-  `{type} {property} {number}`.
+- Values don't have to realistic. Prefer to use generic defaults like 'Publication title 1' following 
+  structure: `{type} {property} {number}`.
 - This doesn't need to hard and fast rule and people can use their discretion.
 
 <a id="s5.6"></a>
@@ -412,17 +484,17 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 <a id="s5.6.1"></a>
 
-#### 5.6.1 toEqual vs individual assertions
+#### 5.6.1 `toEqual` vs individual assertions
 
 - Prefer to use toEqual when comparing objects (instead assertions on each property).
 
 <a id="s5.6.2"></a>
 
-#### 5.6.2 toBeInTheDocument vs toBeVisible
+#### 5.6.2 `toBeInTheDocument` vs `toBeVisible`
 
-- Use toBeInTheDocument by default
-- Use toBeVisible when you actually need to test visibility e.g. transparent or display: none stuff
-- toBeVisible incurs extra style checks during assertion (which is overkill)
+- Use `toBeInTheDocument` by default
+- Use `toBeVisible` when you actually need to test visibility e.g. transparent or `display: none` stuff
+- `toBeVisible` incurs extra style checks during assertion (which is overkill)
 
 <a id="s5.6.3"></a>
 
@@ -430,7 +502,8 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 - Have a check that the error summary message links back to the input that has the error
 - Check that the error message is rendered next to the field
-- We plan to create a custom Jest assertion that handles this for us  at some point e.g. `expect().toHaveFormError()`. This would roll up any required assertions into one.
+- We plan to create a custom Jest assertion that handles this for us at some point e.g.
+  `expect().toHaveFormError()`. This would roll up any required assertions into one.
 
 <a id="s5.6.4"></a>
 
@@ -438,17 +511,17 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 - Length check - make sure there are correct number of checkboxes or radios.
 - Check each radio or checkbox state as part of a list of assertions
-- getByLabelText to get the input and assert that it's one of the radios
+- `getByLabelText` to get the input and assert that it's one of the radios
 
-```
-const radios = within(
- screen.getByRole('group', { name: 'Change page view' }),
-).getAllByRole('radio');
-
-expect(radios).toHaveLength(3);
-
-expect(radios[0]).toEqual(screen.getByLabelText('Edit content'));
-```
+  ```tsx
+  const radios = within(
+   screen.getByRole('group', { name: 'Change page view' }),
+  ).getAllByRole('radio');
+  
+  expect(radios).toHaveLength(3);
+  
+  expect(radios[0]).toEqual(screen.getByLabelText('Edit content'));
+  ```
 
 <a id="s5.6.5"></a>
 
@@ -462,7 +535,7 @@ expect(radios[0]).toEqual(screen.getByLabelText('Edit content'));
 #### 5.6.6 Asserting mocks have been called
 
 - Check that the mock hasn't been called before an event happens.
-- Check that the mock has been called with right values after event happens.
+- Check that the mock has been called with right values after event happens.
 - Check number of calls explicitly if required, but don't need to in most cases - up to developer.
 
 <a id="s5.7"></a>
@@ -483,12 +556,12 @@ expect(radios[0]).toEqual(screen.getByLabelText('Edit content'));
 #### 5.7.2 Setting up Jest mocks
 
 - We currently do a lot of the following:
-  ```
+  ```tsx
   import _theService from 'theService';
   const theService = _theService as jest.Mocked<typeof _theService>
   ```
 - However, we should switch to using jest.mocked.
-  ```
+  ```tsx
   import _theService from 'theService'
   const theService = jest.mocked(_theService);
   ```

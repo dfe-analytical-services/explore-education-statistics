@@ -67,6 +67,7 @@ export interface AxisConfiguration {
   referenceLines: ReferenceLine[];
   visible?: boolean;
   unit?: string;
+  decimalPlaces?: number;
   showGrid?: boolean;
   label?: Label;
   size?: number;
@@ -102,6 +103,7 @@ export interface DataGroupingConfig {
 export interface MapDataSetConfig {
   dataSet: DataSet;
   dataGrouping: DataGroupingConfig;
+  boundaryLevel?: number;
 }
 
 export interface MapConfig {

@@ -16,7 +16,9 @@ public interface IReleaseService
 
     Task<List<File>> GetFiles(Guid releaseVersionId, params FileType[] types);
 
-    Task<ReleaseVersion> GetLatestReleaseVersion(Guid publicationId, IEnumerable<Guid> includedReleaseVersionIds);
+    Task<ReleaseVersion> GetLatestPublishedReleaseVersion(
+        Guid publicationId,
+        IReadOnlyList<Guid>? includeUnpublishedVersionIds = null);
 
     Task CompletePublishing(Guid releaseVersionId, DateTime actualPublishedDate);
 }

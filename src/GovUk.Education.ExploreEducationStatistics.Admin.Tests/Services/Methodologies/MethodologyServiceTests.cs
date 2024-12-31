@@ -1399,6 +1399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(viewModels[3].PreviousVersionId);
             }
         }
+
         [Fact]
         public async Task ListLatestMethodologyVersions_IsPrerelease()
         {
@@ -1924,13 +1925,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 }),
                 Versions = new List<MethodologyVersion>
                 {
-                    new ()
+                    new()
                     {
                         Id = latestPublishedVersionId,
                         Status = Approved,
                         Version = 0,
                     },
-                    new ()
+                    new()
                     {
                         Id = latestVersionId,
                         Status = Draft,
@@ -2039,13 +2040,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 }),
                 Versions = new List<MethodologyVersion>
                 {
-                    new ()
+                    new()
                     {
                         Id = latestPublishedVersionId,
                         Status = Approved,
                         Version = 0,
                     },
-                    new ()
+                    new()
                     {
                         Id = latestVersionId,
                         AlternativeTitle = "Alternative Methodology Title",
@@ -2590,7 +2591,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     {
                         MethodologyId = methodologyId,
                         PublicationId = Guid.NewGuid(),
-
                     })
                 }
             };
@@ -3221,13 +3221,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsApproverOnOwningPublicationRelease_Included()
             {
-                var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
-
-                var publication = _fixture
+                Publication publication = _fixture
                     .DefaultPublication()
                     .WithContact(MockContact)
-                    .WithReleaseVersions(ListOf(releaseVersion))
-                    .Generate();
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1));
+
+                var releaseVersion = publication.Releases.Single().Versions.Single();
 
                 var methodology = _fixture
                     .DefaultMethodology()
@@ -3271,18 +3271,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsApproverOnOwningPublicationOldRelease_Included()
             {
-                var releaseVersions = _fixture
-                    .DefaultReleaseVersion()
-                    .WithApprovalStatuses(ListOf(
-                        ReleaseApprovalStatus.Approved,
-                        ReleaseApprovalStatus.Draft))
-                    .GenerateList();
-
-                var publication = _fixture
+                Publication publication = _fixture
                     .DefaultPublication()
                     .WithContact(MockContact)
-                    .WithReleaseVersions(releaseVersions)
-                    .Generate();
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1, draftVersion: true)
+                        .Generate(1));
+
+                var publishedReleaseVersion = publication.Releases.Single().Versions
+                    .Single(rv => rv is { Published: not null, Version: 0 });
 
                 var methodology = _fixture
                     .DefaultMethodology()
@@ -3296,7 +3292,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var releaseRoleForUserOnOldRelease = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
-                    .WithReleaseVersion(releaseVersions[0])
+                    .WithReleaseVersion(publishedReleaseVersion)
                     .WithRole(ReleaseRole.Approver)
                     .Generate();
 
@@ -3505,13 +3501,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsPublicationAndReleaseApprover_NoDuplication()
             {
-                var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
-
-                var publication = _fixture
+                Publication publication = _fixture
                     .DefaultPublication()
                     .WithContact(MockContact)
-                    .WithReleaseVersions(ListOf(releaseVersion))
-                    .Generate();
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
+                        .Generate(1));
+
+                var publishedReleaseVersion = publication.Releases.Single().Versions.Single();
 
                 var methodology = _fixture
                     .DefaultMethodology()
@@ -3532,7 +3528,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var releaseRoleForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
-                    .WithReleaseVersion(releaseVersion)
+                    .WithReleaseVersion(publishedReleaseVersion)
                     .WithRole(ReleaseRole.Approver)
                     .Generate();
 
@@ -3603,7 +3599,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -3662,7 +3661,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -3691,8 +3693,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Empty(methodologyRedirects);
             }
         }
-
-
 
         [Fact]
         public async Task PublicationTitleOrSlugChanged_DoesNotAffectUnrelatedMethodologies()
@@ -3744,7 +3744,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -3843,7 +3846,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -3910,7 +3916,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -3937,7 +3946,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task PublicationTitleOrSlugChanged_CurrentInheritedPubSlugChangesWithUnpublishedAmendmentWithAlternativeSlug()
+        public async Task
+            PublicationTitleOrSlugChanged_CurrentInheritedPubSlugChangesWithUnpublishedAmendmentWithAlternativeSlug()
         {
             var publicationId = Guid.NewGuid();
             var latestPublishedVersionId = Guid.NewGuid();
@@ -3959,12 +3969,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         LatestPublishedVersionId = latestPublishedVersionId,
                         Versions = new List<MethodologyVersion>
                         {
-                            new ()
+                            new()
                             {
                                 Id = latestPublishedVersionId,
                                 Version = 0,
                             },
-                            new ()
+                            new()
                             {
                                 Id = latestVersionId,
                                 Version = 1,
@@ -3993,7 +4003,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -4032,7 +4045,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task PublicationTitleOrSlugChanged_UnpublishedMethodologyAmendmentDoesNotNeedRedirectIfRedirectAlreadyExists()
+        public async Task
+            PublicationTitleOrSlugChanged_UnpublishedMethodologyAmendmentDoesNotNeedRedirectIfRedirectAlreadyExists()
         {
             var publicationId = Guid.NewGuid();
             var latestPublishedVersionId = Guid.NewGuid();
@@ -4054,12 +4068,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         LatestPublishedVersionId = latestPublishedVersionId,
                         Versions = new List<MethodologyVersion>
                         {
-                            new ()
+                            new()
                             {
                                 Id = latestPublishedVersionId,
                                 Version = 0,
                             },
-                            new ()
+                            new()
                             {
                                 Id = latestVersionId,
                                 Version = 1,
@@ -4095,7 +4109,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(
+                        PublicationRedirects: [],
+                        MethodologyRedirects: [],
+                        ReleaseRedirectsByPublicationSlug: []));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);

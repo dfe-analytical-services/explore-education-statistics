@@ -194,6 +194,34 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     });
   });
 
+  test('renders warning if unable to fetch data set', async () => {
+    apiDataSetService.getDataSet.mockRejectedValue(
+      new Error('Unable to fetch changes'),
+    );
+    apiDataSetVersionService.getChanges.mockResolvedValue(testChanges);
+
+    renderPage('draft-version-id');
+
+    expect(screen.queryByText('Data set title')).not.toBeInTheDocument();
+
+    expect(
+      await screen.findByText('Could not load API data set'),
+    ).toBeInTheDocument();
+  });
+
+  test('renders warning if unable to fetch changes', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getChanges.mockRejectedValue(
+      new Error('Unable to fetch changes'),
+    );
+
+    renderPage('draft-version-id');
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+    expect(screen.getByText('Could not load changelog')).toBeInTheDocument();
+  });
+
   function renderPage(dataSetVersionId: string) {
     return render(
       <TestConfigContextProvider>

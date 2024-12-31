@@ -55,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<ReleaseStatus> ReleaseStatus { get; set; }
         public virtual DbSet<ReleaseFile> ReleaseFiles { get; set; }
         public virtual DbSet<File> Files { get; set; }
+        public virtual DbSet<DataSetFileVersionGeographicLevel> DataSetFileVersionGeographicLevels { get; set; }
         public virtual DbSet<ContentSection> ContentSections { get; set; }
         public virtual DbSet<ContentBlock> ContentBlocks { get; set; }
         public virtual DbSet<KeyStatistic> KeyStatistics { get; set; }
@@ -110,9 +111,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureReleaseStatus(modelBuilder);
             ConfigureReleaseFile(modelBuilder);
             ConfigureFile(modelBuilder);
+            ConfigureDataSetFileVersionGeographicLevel(modelBuilder);
             ConfigureContentBlock(modelBuilder);
             ConfigureContentSection(modelBuilder);
-            ConfigureRelease(modelBuilder);
+            ConfigureReleaseVersion(modelBuilder);
             ConfigureDataBlock(modelBuilder);
             ConfigureHtmlBlock(modelBuilder);
             ConfigureEmbedBlockLink(modelBuilder);
@@ -131,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureDataBlockVersion(modelBuilder);
 
             // Apply model configuration for types which implement IEntityTypeConfiguration
-
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
             new FreeTextRank.Config().Configure(modelBuilder.Entity<FreeTextRank>());
         }
 
@@ -453,9 +455,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
                             : null);
                 entity.Property(p => p.DataSetFileMeta)
-                    .HasConversion( // You might want to use EF8 JSON support instead of this
+                    .HasConversion(
                         v => JsonConvert.SerializeObject(v),
                         v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
+            });
+        }
+
+        private static void ConfigureDataSetFileVersionGeographicLevel(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DataSetFileVersionGeographicLevel>(entity =>
+            {
+                entity.HasKey(gl => new
+                {
+                    gl.DataSetFileVersionId,
+                    gl.GeographicLevel
+                });
+
+                entity.Property(gl => gl.GeographicLevel)
+                    .HasMaxLength(6)
+                    .HasConversion(new EnumToEnumValueConverter<GeographicLevel>());
             });
         }
 
@@ -490,8 +508,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             });
         }
 
-        private static void ConfigureRelease(ModelBuilder modelBuilder)
+        private static void ConfigureReleaseVersion(ModelBuilder modelBuilder)
         {
+            // TODO This will be removed in EES-5659. It's been added to prevent multiple delete cascade paths
+            modelBuilder.Entity<ReleaseVersion>()
+                .HasOne(rv => rv.Publication)
+                .WithMany(p => p.ReleaseVersions)
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<ReleaseVersion>()
                 .Property(rv => rv.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())

@@ -36,12 +36,12 @@ Navigate to Seed Data Theme 1 Publication 1 page
     user clicks link    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
-Navigate to legacy releases
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+Navigate to publication release order
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
 
-Validate Analyst1 can see correct legacy releases
-    user checks element count is x    css:tbody tr    7
+Validate Analyst1 can see correct publication release order
+    user checks table body has x rows    7    testid:release-series
 
     user checks table cell contains    1    1    Academic year 2016/17
     user checks table cell contains    1    2
@@ -81,8 +81,8 @@ Validate Analyst1 can see correct legacy releases
 Check Analyst1 cannot create a legacy release
     user checks page does not contain button    Create legacy release
 
-Check Analyst1 cannot reorder legacy releases
-    user checks page does not contain button    Reorder legacy releases
+Check Analyst1 cannot reorder releases
+    user checks page does not contain button    Reorder releases
 
 Check Analyst1 cannot edit a legacy release
     user checks page does not contain button    Edit

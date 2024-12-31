@@ -3,7 +3,6 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
-using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
@@ -553,6 +552,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
             services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
+            services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<Content.Model.Repository.Interfaces.IReleaseVersionRepository,
                 Content.Model.Repository.ReleaseVersionRepository>();
             services.AddTransient<Content.Model.Repository.Interfaces.IPublicationRepository,
@@ -782,8 +782,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
+                }
 
-                    ApplyCustomMigrations();
+                if (!env.IsIntegrationTest())
+                {
+                    ApplyCustomMigrations(app);
                 }
             }
 
@@ -798,8 +801,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             }
         }
 
-        private static void ApplyCustomMigrations(params ICustomMigration[] migrations)
+        private static void ApplyCustomMigrations(IApplicationBuilder app)
         {
+            using var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope();
+
+            var migrations = serviceScope.ServiceProvider.GetServices<ICustomMigration>();
+
             foreach (var migration in migrations)
             {
                 migration.Apply();

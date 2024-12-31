@@ -20,11 +20,6 @@ export interface Publication {
   id: string;
   slug: string;
   title: string;
-  releases: {
-    id: string;
-    slug: string;
-    title: string;
-  }[];
   releaseSeries: ReleaseSeriesItem[];
   theme: {
     id: string;
@@ -39,7 +34,6 @@ export interface Publication {
 }
 
 export interface ReleaseSeriesItem {
-  id: string;
   isLegacyLink: boolean;
   description: string;
   releaseId?: string;

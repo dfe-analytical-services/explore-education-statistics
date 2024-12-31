@@ -447,4 +447,217 @@ describe('ChartBuilder', () => {
 
     expect(handleUpdate).toHaveBeenCalledWith({ boundaryLevel: 1 });
   });
+
+  describe('data groupings tab', () => {
+    const testInitialChart: Chart = {
+      type: 'map',
+      boundaryLevel: 2,
+      map: {
+        dataSetConfigs: [
+          {
+            dataGrouping: {
+              customGroups: [],
+              numberOfGroups: 5,
+              type: 'EqualIntervals',
+            },
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2014_AY',
+            },
+          },
+          {
+            dataGrouping: {
+              customGroups: [],
+              numberOfGroups: 5,
+              type: 'EqualIntervals',
+            },
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2015_AY',
+            },
+          },
+        ],
+      },
+      title: 'Data block title',
+      subtitle: '',
+      alt: 'd',
+      height: 600,
+      includeNonNumericData: false,
+      axes: {
+        major: {
+          type: 'major',
+          groupBy: 'locations',
+          groupByFilter: '',
+          groupByFilterGroups: false,
+          sortBy: 'name',
+          sortAsc: false,
+          dataSets: [
+            {
+              order: 0,
+              indicator: 'overall-absence-sessions',
+              filters: ['state-funded-primary'],
+              timePeriod: '2014_AY',
+            },
+
+            {
+              order: 1,
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2014_AY',
+            },
+            {
+              order: 2,
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2015_AY',
+            },
+          ],
+          referenceLines: [],
+          visible: true,
+          unit: '',
+          showGrid: false,
+          label: {
+            text: '',
+            rotated: false,
+          },
+          min: 0,
+          size: 50,
+          tickConfig: 'default',
+          tickSpacing: 1,
+        },
+      },
+      legend: {
+        items: [
+          {
+            colour: '#12436D',
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2014_AY',
+            },
+            inlinePosition: undefined,
+            label:
+              'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2014/15)',
+            lineStyle: undefined,
+            symbol: undefined,
+          },
+          {
+            colour: '#F46A25',
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2015_AY',
+            },
+            inlinePosition: undefined,
+            label:
+              'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2015/16)',
+            lineStyle: undefined,
+            symbol: undefined,
+          },
+        ],
+        position: 'bottom',
+      },
+    };
+
+    test('save chart with updated data groupings', async () => {
+      const handleSubmit = jest.fn();
+
+      const { user } = render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartBuilder
+            releaseId="release-1"
+            data={testFullTable.results}
+            initialChart={testInitialChart}
+            meta={{
+              ...testFullTable.subjectMeta,
+              boundaryLevels: [
+                {
+                  id: 1,
+                  label: 'Boundary level 1',
+                },
+                {
+                  id: 2,
+                  label: 'Boundary level 2',
+                },
+              ],
+            }}
+            tableTitle="Table title"
+            onChartSave={handleSubmit}
+            onChartDelete={noop}
+            onTableQueryUpdate={jest.fn()}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Chart preview' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('tab', { name: 'Data groupings' }),
+      ).toBeInTheDocument();
+
+      await user.click(screen.getByRole('tab', { name: 'Data groupings' }));
+
+      expect(await screen.findByRole('heading', { name: 'Data groupings' }));
+
+      await user.click(screen.getAllByRole('button', { name: 'Edit' })[0]);
+
+      expect(await screen.findByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText('Edit groupings')).toBeInTheDocument();
+
+      await user.click(screen.getByLabelText('Quantiles'));
+      await user.click(screen.getByRole('button', { name: 'Done' }));
+
+      await user.click(
+        screen.getByRole('button', { name: 'Save chart options' }),
+      );
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledTimes(1);
+        expect(handleSubmit).toHaveBeenCalledWith(
+          {
+            ...testInitialChart,
+            map: {
+              dataSetConfigs: [
+                {
+                  dataGrouping: {
+                    customGroups: [],
+                    numberOfGroups: 5,
+                    type: 'Quantiles',
+                  },
+                  dataSet: {
+                    filters: [
+                      'ethnicity-major-chinese',
+                      'state-funded-primary',
+                    ],
+                    indicator: 'authorised-absence-sessions',
+                    timePeriod: '2014_AY',
+                  },
+                },
+                {
+                  dataGrouping: {
+                    customGroups: [],
+                    numberOfGroups: 5,
+                    type: 'EqualIntervals',
+                  },
+                  dataSet: {
+                    filters: [
+                      'ethnicity-major-chinese',
+                      'state-funded-primary',
+                    ],
+                    indicator: 'authorised-absence-sessions',
+                    timePeriod: '2015_AY',
+                  },
+                },
+              ],
+            },
+          },
+          undefined,
+        );
+      });
+    });
+  });
 });

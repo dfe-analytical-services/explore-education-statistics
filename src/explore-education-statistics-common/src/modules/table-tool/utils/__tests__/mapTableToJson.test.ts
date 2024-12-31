@@ -66,7 +66,7 @@ describe('mapTableToJson', () => {
     expect(result.thead).toEqual<TableCellJson[][]>([
       [
         {
-          colSpan: 1,
+          colSpan: 2,
           rowSpan: 1,
           tag: 'td',
         },
@@ -82,6 +82,13 @@ describe('mapTableToJson', () => {
 
     expect(result.tbody).toEqual<TableCellJson[][]>([
       [
+        {
+          rowSpan: 2,
+          colSpan: 1,
+          scope: 'rowgroup',
+          text: 'Region 1',
+          tag: 'th',
+        },
         {
           rowSpan: 1,
           colSpan: 1,
@@ -115,7 +122,7 @@ describe('mapTableToJson', () => {
     expect(result.thead).toEqual<TableCellJson[][]>([
       [
         {
-          colSpan: 2,
+          colSpan: 3,
           rowSpan: 1,
           tag: 'td',
         },
@@ -136,6 +143,13 @@ describe('mapTableToJson', () => {
           colSpan: 1,
           scope: 'rowgroup',
           text: 'Indicator 1',
+          tag: 'th',
+        },
+        {
+          rowSpan: 2,
+          colSpan: 1,
+          scope: 'rowgroup',
+          text: 'Region 1',
           tag: 'th',
         },
         {
@@ -160,7 +174,7 @@ describe('mapTableToJson', () => {
     ]);
   });
 
-  test('returns the correct JSON for a table with two levels of col headers and one level of row headers', () => {
+  test('returns the correct JSON for a table with three levels of col headers and one level of row headers', () => {
     const result = mapTableToJson({
       tableHeadersConfig:
         testTableWithOneLevelOfRowsAndTwoLevelsOfColHeadersConfig,
@@ -172,7 +186,7 @@ describe('mapTableToJson', () => {
       [
         {
           colSpan: 1,
-          rowSpan: 2,
+          rowSpan: 3,
           tag: 'td',
         },
         {
@@ -180,6 +194,15 @@ describe('mapTableToJson', () => {
           rowSpan: 1,
           scope: 'colgroup',
           text: '2012/13',
+          tag: 'th',
+        },
+      ],
+      [
+        {
+          colSpan: 2,
+          rowSpan: 1,
+          scope: 'colgroup',
+          text: 'Region 1',
           tag: 'th',
         },
       ],
@@ -225,7 +248,16 @@ describe('mapTableToJson', () => {
 
     expect(result.thead).toEqual<TableCellJson[][]>([
       [
-        { colSpan: 2, rowSpan: 2, tag: 'td' },
+        { colSpan: 2, rowSpan: 3, tag: 'td' },
+        {
+          colSpan: 4,
+          rowSpan: 1,
+          scope: 'colgroup',
+          tag: 'th',
+          text: 'Region 1',
+        },
+      ],
+      [
         { colSpan: 2, rowSpan: 1, scope: 'colgroup', tag: 'th', text: 'LA 1' },
         { colSpan: 2, rowSpan: 1, scope: 'colgroup', tag: 'th', text: 'LA 2' },
       ],
@@ -307,7 +339,7 @@ describe('mapTableToJson', () => {
     ]);
   });
 
-  test('returns the correct JSON for a table with three levels of row and column headers', () => {
+  test('returns the correct JSON for a table with three levels of row and four column headers', () => {
     const result = mapTableToJson({
       tableHeadersConfig: testTableWithThreeLevelsOfRowAndColHeadersConfig,
       subjectMeta: testTableWithThreeLevelsOfRowAndColHeaders.subjectMeta,
@@ -316,7 +348,7 @@ describe('mapTableToJson', () => {
 
     expect(result.thead).toEqual<TableCellJson[][]>([
       [
-        { colSpan: 3, rowSpan: 3, tag: 'td' },
+        { colSpan: 3, rowSpan: 4, tag: 'td' },
         {
           colSpan: 4,
           rowSpan: 1,
@@ -330,6 +362,22 @@ describe('mapTableToJson', () => {
           scope: 'colgroup',
           tag: 'th',
           text: 'Category 2 Filter 2',
+        },
+      ],
+      [
+        {
+          colSpan: 4,
+          rowSpan: 1,
+          scope: 'colgroup',
+          tag: 'th',
+          text: 'Group 1',
+        },
+        {
+          colSpan: 4,
+          rowSpan: 1,
+          scope: 'colgroup',
+          tag: 'th',
+          text: 'Group 1',
         },
       ],
       [
@@ -1184,7 +1232,7 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 1, rowSpan: 2, tag: 'td' },
+          { colSpan: 1, rowSpan: 3, tag: 'td' },
           {
             colSpan: 2,
             rowSpan: 1,
@@ -1198,6 +1246,22 @@ describe('mapTableToJson', () => {
             scope: 'colgroup',
             tag: 'th',
             text: 'Category 1 Group 2',
+          },
+        ],
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
         ],
         [
@@ -1261,7 +1325,7 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 1, rowSpan: 3, tag: 'td' },
+          { colSpan: 1, rowSpan: 4, tag: 'td' },
           {
             colSpan: 2,
             rowSpan: 2,
@@ -1284,6 +1348,22 @@ describe('mapTableToJson', () => {
             scope: 'colgroup',
             tag: 'th',
             text: 'Category 1 Group 2 Filter 1',
+          },
+        ],
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
         ],
         [
@@ -1346,7 +1426,7 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 1, rowSpan: 3, tag: 'td' },
+          { colSpan: 1, rowSpan: 4, tag: 'td' },
           {
             colSpan: 4,
             rowSpan: 1,
@@ -1369,6 +1449,22 @@ describe('mapTableToJson', () => {
             scope: 'colgroup',
             text: 'Category 1 Group 2',
             tag: 'th',
+          },
+        ],
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
         ],
         [
@@ -1444,7 +1540,7 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 1, rowSpan: 4, tag: 'td' },
+          { colSpan: 1, rowSpan: 5, tag: 'td' },
           {
             colSpan: 6,
             rowSpan: 1,
@@ -1483,6 +1579,29 @@ describe('mapTableToJson', () => {
             scope: 'colgroup',
             text: 'Category 1 Group 2',
             tag: 'th',
+          },
+        ],
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
         ],
         [
@@ -1579,13 +1698,22 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 1, rowSpan: 3, tag: 'td' },
+          { colSpan: 1, rowSpan: 4, tag: 'td' },
           {
             colSpan: 4,
             rowSpan: 1,
             scope: 'colgroup',
             text: 'Indicator 1',
             tag: 'th',
+          },
+        ],
+        [
+          {
+            colSpan: 4,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
         ],
         [
@@ -1677,13 +1805,22 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 1, rowSpan: 4, tag: 'td' },
+          { colSpan: 1, rowSpan: 5, tag: 'td' },
           {
             colSpan: 4,
             rowSpan: 1,
             scope: 'colgroup',
             text: 'Indicator 1',
             tag: 'th',
+          },
+        ],
+        [
+          {
+            colSpan: 4,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
         ],
         [
@@ -1789,7 +1926,16 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 1, rowSpan: 3, tag: 'td' },
+          { colSpan: 1, rowSpan: 4, tag: 'td' },
+          {
+            colSpan: 3,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
+          },
+        ],
+        [
           {
             colSpan: 2,
             rowSpan: 1,
@@ -1866,8 +2012,8 @@ describe('mapTableToJson', () => {
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
           {
-            colSpan: 1,
-            rowSpan: 4,
+            colSpan: 2,
+            rowSpan: 5,
             tag: 'td',
           },
           {
@@ -1876,6 +2022,15 @@ describe('mapTableToJson', () => {
             scope: 'colgroup',
             text: '2012/13',
             tag: 'th',
+          },
+        ],
+        [
+          {
+            colSpan: 3,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
         ],
         [
@@ -1930,6 +2085,13 @@ describe('mapTableToJson', () => {
 
       expect(result.tbody).toEqual<TableCellJson[][]>([
         [
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
+          },
           {
             text: 'Category 2 Group 1 Filter 1',
             rowSpan: 1,
@@ -2084,7 +2246,7 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 2, rowSpan: 1, tag: 'td' },
+          { colSpan: 3, rowSpan: 1, tag: 'td' },
           {
             colSpan: 1,
             rowSpan: 1,
@@ -2103,6 +2265,13 @@ describe('mapTableToJson', () => {
             scope: 'rowgroup',
             tag: 'th',
             text: 'Category 1 Group 1',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
           {
             colSpan: 1,
@@ -2130,6 +2299,13 @@ describe('mapTableToJson', () => {
             scope: 'rowgroup',
             tag: 'th',
             text: 'Category 1 Group 2',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
           {
             colSpan: 1,
@@ -2165,7 +2341,7 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 3, rowSpan: 1, tag: 'td' },
+          { colSpan: 4, rowSpan: 1, tag: 'td' },
           {
             colSpan: 1,
             rowSpan: 1,
@@ -2184,6 +2360,13 @@ describe('mapTableToJson', () => {
             scope: 'rowgroup',
             tag: 'th',
             text: 'Category 1 Group 1',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
           {
             colSpan: 1,
@@ -2221,6 +2404,13 @@ describe('mapTableToJson', () => {
           },
           {
             colSpan: 1,
+            rowSpan: 2,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
+          },
+          {
+            colSpan: 1,
             rowSpan: 1,
             scope: 'row',
             tag: 'th',
@@ -2252,7 +2442,7 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 3, rowSpan: 1, tag: 'td' },
+          { colSpan: 4, rowSpan: 1, tag: 'td' },
           {
             colSpan: 1,
             rowSpan: 1,
@@ -2281,6 +2471,13 @@ describe('mapTableToJson', () => {
           },
           {
             colSpan: 1,
+            rowSpan: 2,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
+          },
+          {
+            colSpan: 1,
             rowSpan: 1,
             scope: 'row',
             tag: 'th',
@@ -2305,6 +2502,13 @@ describe('mapTableToJson', () => {
             scope: 'rowgroup',
             tag: 'th',
             text: 'Category 1 Group 2',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
           {
             colSpan: 1,
@@ -2340,7 +2544,7 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 4, rowSpan: 1, tag: 'td' },
+          { colSpan: 5, rowSpan: 1, tag: 'td' },
           {
             colSpan: 1,
             rowSpan: 1,
@@ -2366,6 +2570,13 @@ describe('mapTableToJson', () => {
             scope: 'rowgroup',
             tag: 'th',
             text: 'Category 1 Group 1',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
           {
             colSpan: 1,
@@ -2403,6 +2614,13 @@ describe('mapTableToJson', () => {
           },
           {
             colSpan: 1,
+            rowSpan: 2,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
+          },
+          {
+            colSpan: 1,
             rowSpan: 1,
             scope: 'row',
             tag: 'th',
@@ -2434,7 +2652,7 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 3, rowSpan: 1, tag: 'td' },
+          { colSpan: 4, rowSpan: 1, tag: 'td' },
           {
             colSpan: 1,
             rowSpan: 1,
@@ -2453,6 +2671,13 @@ describe('mapTableToJson', () => {
             scope: 'rowgroup',
             tag: 'th',
             text: 'Indicator 1',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 4,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
           {
             colSpan: 1,
@@ -2522,7 +2747,7 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 4, rowSpan: 1, tag: 'td' },
+          { colSpan: 5, rowSpan: 1, tag: 'td' },
           {
             colSpan: 1,
             rowSpan: 1,
@@ -2541,6 +2766,13 @@ describe('mapTableToJson', () => {
             scope: 'rowgroup',
             tag: 'th',
             text: 'Indicator 1',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 4,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
           },
           {
             colSpan: 1,
@@ -2622,7 +2854,7 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
-          { colSpan: 3, rowSpan: 1, tag: 'td' },
+          { colSpan: 4, rowSpan: 1, tag: 'td' },
           {
             colSpan: 1,
             rowSpan: 1,
@@ -2635,6 +2867,13 @@ describe('mapTableToJson', () => {
 
       expect(result.tbody).toEqual<TableCellJson[][]>([
         [
+          {
+            colSpan: 1,
+            rowSpan: 3,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Group 1',
+          },
           {
             colSpan: 1,
             rowSpan: 2,
@@ -2699,11 +2938,16 @@ describe('mapTableToJson', () => {
 
       expect(result.thead).toEqual<TableCellJson[][]>([
         [
+          { colSpan: 5, rowSpan: 2, tag: 'td' },
           {
-            colSpan: 4,
+            colSpan: 2,
             rowSpan: 1,
-            tag: 'td',
+            scope: 'colgroup',
+            text: 'Group 1',
+            tag: 'th',
           },
+        ],
+        [
           {
             colSpan: 1,
             rowSpan: 1,
@@ -2725,6 +2969,13 @@ describe('mapTableToJson', () => {
         [
           {
             text: '2012/13',
+            rowSpan: 3,
+            scope: 'rowgroup',
+            colSpan: 1,
+            tag: 'th',
+          },
+          {
+            text: 'Group 1',
             rowSpan: 3,
             scope: 'rowgroup',
             colSpan: 1,

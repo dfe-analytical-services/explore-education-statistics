@@ -1,118 +1,87 @@
-import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
-import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
+import ChartBoundaryLevelsForm, {
+  ChartBoundaryLevelsFormValues,
+} from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsForm';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
-import Effect from '@common/components/Effect';
-import FormProvider from '@common/components/form/FormProvider';
-import Form from '@common/components/form/Form';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import { MapBoundaryLevelConfig } from '@admin/pages/release/datablocks/components/chart/types/mapConfig';
+import { MapConfig } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
-import Yup from '@common/validation/yup';
-import merge from 'lodash/merge';
-import React, { ReactNode, useCallback } from 'react';
-
-const formId = 'chartBoundaryLevelsConfigurationForm';
-
-interface FormValues {
-  boundaryLevel?: number;
-}
+import React, { ReactNode, useCallback, useMemo } from 'react';
 
 interface Props {
   buttons?: ReactNode;
+  // TODO: EES-5402 - Remove when all boundary level changes are done
+  hasDataSetBoundaryLevels?: boolean;
+  map: MapConfig;
   meta: FullTableMeta;
   options: ChartOptions;
-  onChange: (values: ChartOptions) => void;
-  onSubmit: (chartOptions: ChartOptions) => void;
+  onChange: (values: MapBoundaryLevelConfig) => void;
+  onSubmit: (values: MapBoundaryLevelConfig) => void;
 }
 
 export default function ChartBoundaryLevelsConfiguration({
   buttons,
+  // TODO: EES-5402 - Remove when all boundary level changes are done
+  hasDataSetBoundaryLevels = false,
+  map,
   meta,
   options,
   onChange,
   onSubmit,
 }: Props) {
-  const { updateForm, submitForms } = useChartBuilderFormsContext();
+  const initialValues = useMemo<ChartBoundaryLevelsFormValues>(() => {
+    return {
+      boundaryLevel: options.boundaryLevel?.toString(),
+      dataSetConfigs:
+        map?.dataSetConfigs.map(dataSetConfig => {
+          return {
+            boundaryLevel: dataSetConfig.boundaryLevel?.toString(),
+          };
+        }) ?? [],
+    };
+  }, [options.boundaryLevel, map?.dataSetConfigs]);
 
   const normalizeValues = useCallback(
-    (values: FormValues): ChartOptions => {
-      // Use `merge` as we want to avoid potential undefined
-      // values from overwriting existing values
-      return merge({}, options, values, {
-        boundaryLevel: values.boundaryLevel
-          ? parseNumber(values.boundaryLevel)
-          : undefined,
-      });
+    (
+      values: Partial<ChartBoundaryLevelsFormValues>,
+    ): MapBoundaryLevelConfig => {
+      return {
+        boundaryLevel: parseNumber(values.boundaryLevel),
+        dataSetConfigs:
+          values.dataSetConfigs?.map(({ boundaryLevel }, index) => {
+            return {
+              boundaryLevel: parseNumber(boundaryLevel),
+              dataSet: map.dataSetConfigs[index].dataSet,
+            };
+          }) ?? [],
+      };
     },
-    [options],
+    [map.dataSetConfigs],
+  );
+
+  const handleSubmit = useCallback(
+    (values: ChartBoundaryLevelsFormValues) => {
+      onSubmit(normalizeValues(values));
+    },
+    [onSubmit, normalizeValues],
   );
 
   const handleChange = useCallback(
-    (values: FormValues) => {
+    (values: Partial<ChartBoundaryLevelsFormValues>) => {
       onChange(normalizeValues(values));
     },
-    [normalizeValues, onChange],
+    [onChange, normalizeValues],
   );
 
   return (
-    <FormProvider
-      enableReinitialize
-      initialValues={{ boundaryLevel: options.boundaryLevel }}
-      validationSchema={Yup.object<FormValues>({
-        boundaryLevel: Yup.number()
-          .transform(value => (Number.isNaN(value) ? undefined : value))
-          .nullable()
-          .oneOf(meta.boundaryLevels.map(level => level.id))
-          .required('Choose a boundary level'),
-      })}
-    >
-      {({ formState, watch }) => {
-        const values = watch();
-        return (
-          <Form
-            id={formId}
-            onSubmit={async () => {
-              onSubmit(normalizeValues(values));
-              await submitForms();
-            }}
-          >
-            <Effect value={values} onChange={handleChange} />
-            <Effect
-              value={{
-                formKey: 'boundaryLevels',
-                isValid: formState.isValid,
-                submitCount: formState.submitCount,
-              }}
-              onChange={updateForm}
-              onMount={updateForm}
-            />
-            <FormFieldSelect<FormValues>
-              label="Boundary level"
-              hint="Select a version of geographical data to use"
-              name="boundaryLevel"
-              order={[]}
-              options={[
-                {
-                  label: 'Please select',
-                  value: '',
-                },
-                ...meta.boundaryLevels.map(({ id, label }) => ({
-                  value: id,
-                  label,
-                })),
-              ]}
-            />
-
-            <ChartBuilderSaveActions
-              formId={formId}
-              formKey="boundaryLevels"
-              disabled={formState.isSubmitting}
-            >
-              {buttons}
-            </ChartBuilderSaveActions>
-          </Form>
-        );
-      }}
-    </FormProvider>
+    <ChartBoundaryLevelsForm
+      buttons={buttons}
+      dataSetConfigs={map.dataSetConfigs}
+      hasDataSetBoundaryLevels={hasDataSetBoundaryLevels}
+      initialValues={initialValues}
+      meta={meta}
+      onChange={handleChange}
+      onSubmit={handleSubmit}
+    />
   );
 }

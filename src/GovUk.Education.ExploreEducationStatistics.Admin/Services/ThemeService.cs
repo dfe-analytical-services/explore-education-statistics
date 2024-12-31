@@ -352,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 // Delete non-cancelled ReleaseVersions first.
                 if (releaseVersion1.SoftDeleted != releaseVersion2.SoftDeleted)
                 {
-                    return releaseVersion1.SoftDeleted ? 1 : 0;
+                    return releaseVersion1.SoftDeleted ? 1 : -1;
                 }
 
                 return -releaseVersion1.Created.CompareTo(releaseVersion2.Created);

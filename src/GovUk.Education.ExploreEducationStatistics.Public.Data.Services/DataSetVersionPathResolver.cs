@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using Microsoft.AspNetCore.Hosting;
@@ -12,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 
 public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 {
+    private const string DraftVersionFolderName = "draft";
+    
     private readonly IOptions<DataFilesOptions> _options;
     private readonly IWebHostEnvironment _environment;
     private readonly string _basePath;
@@ -34,12 +37,24 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 
     public string BasePath() => _basePath;
 
-    public string DirectoryPath(DataSetVersion dataSetVersion, SemVersion? versionNumber = null)
+    public string DirectoryPath(DataSetVersion dataSetVersion)
+    {
+        var folderName = dataSetVersion.IsPrivateStatus() 
+            ? DraftVersionFolderName
+            : $"v{dataSetVersion.SemVersion()}";
+        
+        return Path.Combine(
+            ((IDataSetVersionPathResolver) this).DataSetsPath(),
+            dataSetVersion.DataSetId.ToString(),
+            folderName);
+    }
+    
+    public string DirectoryPath(DataSetVersion dataSetVersion, SemVersion versionNumber)
     {
         return Path.Combine(
             ((IDataSetVersionPathResolver) this).DataSetsPath(),
             dataSetVersion.DataSetId.ToString(),
-            $"v{versionNumber ?? dataSetVersion.SemVersion()}");
+            $"v{versionNumber}");
     }
 
     private string GetBasePath()

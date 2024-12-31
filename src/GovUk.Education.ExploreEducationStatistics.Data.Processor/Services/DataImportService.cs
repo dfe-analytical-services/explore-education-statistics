@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task WriteDataSetFileMeta(Guid subjectId)
+        public async Task WriteDataSetFileMeta(Guid fileId, Guid subjectId)
         {
             await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
             await using var statisticsDbContext = _dbContextSupplier.CreateDbContext<StatisticsDbContext>();
@@ -220,6 +220,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Single(f => f.Type == FileType.Data
                              && f.SubjectId == subjectId);
             file.DataSetFileMeta = dataSetFileMeta;
+
+            var dataSetFileVersionGeographicLevels = geographicLevels
+                .Select(gl => new DataSetFileVersionGeographicLevel
+                {
+                    DataSetFileVersionId = fileId,
+                    GeographicLevel = gl,
+                }).ToList();
+            contentDbContext.DataSetFileVersionGeographicLevels.AddRange(
+                dataSetFileVersionGeographicLevels);
+
             await contentDbContext.SaveChangesAsync();
         }
     }

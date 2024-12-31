@@ -289,6 +289,7 @@ const EditableContentForm = ({
                   onChange={setElements}
                   onCancelComment={toggleCommentAddForm.off}
                   onClickAddComment={toggleCommentAddForm.on}
+                  onElementsReady={setElements}
                   onImageUpload={onImageUpload}
                   onImageUploadCancel={onImageUploadCancel}
                 />

@@ -5,17 +5,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public record ReleaseSeriesTableEntryViewModel
 {
-    public Guid Id { get; set; }
-    public bool IsLegacyLink { get; set; }
-    public string Description { get; set; } = string.Empty;
+    public required Guid Id { get; init; }
+    public required string Description { get; init; }
 
     // used by EES release series item
-    public Guid? ReleaseId { get; set; }
-    public string? ReleaseSlug { get; set; }
-    public bool? IsLatest { get; set; }
-    public bool? IsPublished { get; set; }
+    public Guid? ReleaseId { get; init; }
+    public string? ReleaseSlug { get; init; }
+    public bool? IsLatest { get; init; }
+    public bool? IsPublished { get; init; }
 
     // used by legacy link series item
-    public string? LegacyLinkUrl { get; set; }
-}
+    public string? LegacyLinkUrl { get; init; }
 
+    public bool IsLegacyLink => ReleaseId == null;
+}

@@ -50,7 +50,7 @@ describe('DataSetFileSummary', () => {
 
     expect(
       within(screen.getByTestId('Geographic levels')).getByText(
-        'National, Regional',
+        'Local authority, National, Regional',
       ),
     ).toBeInTheDocument();
     expect(
@@ -83,7 +83,7 @@ describe('DataSetFileSummary', () => {
 
     expect(
       within(screen.getByTestId('Geographic levels')).getByText(
-        'National, Regional',
+        'Local authority, National, Regional',
       ),
     ).toBeInTheDocument();
     expect(

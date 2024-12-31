@@ -161,13 +161,13 @@ describe('ReleaseSeriesTable', () => {
 
       await waitFor(() => {
         expect(history.location.pathname).toBe(
-          `/publication/${testPublicationId}/legacy/${testReleaseSeries[3].id}/edit`,
+          `/publication/${testPublicationId}/releases/legacy/${testReleaseSeries[3].id}/edit`,
         );
       });
     });
   });
 
-  test('does not show edit and delete actions when user does not have permission to manage legacy releases', () => {
+  test('does not show edit and delete actions when user does not have permission to manage the release series', () => {
     render(
       <TestConfigContextProvider>
         <ReleaseSeriesTable

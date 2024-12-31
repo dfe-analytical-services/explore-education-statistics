@@ -1,39 +1,32 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
-    public class ReleaseService : IReleaseService
+    public class ReleaseService(
+        ContentDbContext contentDbContext,
+        IReleaseVersionRepository releaseVersionRepository
+        ) : IReleaseService
     {
-        private readonly ContentDbContext _contentDbContext;
-        private readonly IReleaseVersionRepository _releaseVersionRepository;
-
-        public ReleaseService(
-            ContentDbContext contentDbContext,
-            IReleaseVersionRepository releaseVersionRepository)
-        {
-            _contentDbContext = contentDbContext;
-            _releaseVersionRepository = releaseVersionRepository;
-        }
-
         public async Task<ReleaseVersion> Get(Guid releaseVersionId)
         {
-            return await _contentDbContext.ReleaseVersions
+            return await contentDbContext.ReleaseVersions
                 .SingleAsync(releaseVersion => releaseVersion.Id == releaseVersionId);
         }
 
         public async Task<IEnumerable<ReleaseVersion>> List(IEnumerable<Guid> releaseVersionIds)
         {
-            return await _contentDbContext.ReleaseVersions
+            return await contentDbContext.ReleaseVersions
                 .Where(rv => releaseVersionIds.Contains(rv.Id))
                 .Include(rv => rv.Publication)
                 .Include(rv => rv.PreviousVersion)
@@ -42,31 +35,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task<IEnumerable<ReleaseVersion>> GetAmendedReleases(IEnumerable<Guid> releaseVersionIds)
         {
-            return await _contentDbContext.ReleaseVersions
+            return await contentDbContext.ReleaseVersions
                 .Include(rv => rv.PreviousVersion)
                 .Include(rv => rv.Publication)
                 .Where(rv => releaseVersionIds.Contains(rv.Id) && rv.PreviousVersionId != null)
                 .ToListAsync();
         }
 
-        public async Task<ReleaseVersion> GetLatestReleaseVersion(Guid publicationId,
-            IEnumerable<Guid> includedReleaseVersionIds)
+        public async Task<ReleaseVersion> GetLatestPublishedReleaseVersion(
+            Guid publicationId,
+            IReadOnlyList<Guid>? includeUnpublishedVersionIds = null)
         {
-            var releases = await _contentDbContext.ReleaseVersions
-                .Include(rv => rv.Publication)
-                .Where(rv => rv.PublicationId == publicationId)
-                .ToListAsync();
+            var publication = await contentDbContext.Publications
+                .SingleAsync(p => p.Id == publicationId);
 
-            return releases
-                .Where(rv => rv.IsReleasePublished(includedReleaseVersionIds))
-                .OrderBy(rv => rv.Year)
-                .ThenBy(rv => rv.TimePeriodCoverage)
-                .Last();
+            // Get the publications release id's by the order they appear in the release series
+            var releaseSeriesReleaseIds = publication.ReleaseSeries.ReleaseIds();
+
+            // Work out the publication's latest published release version.
+            // This is the latest published version of the first release which has either a published version
+            // or one of the included (about to be published) release version ids
+            ReleaseVersion? latestPublishedReleaseVersion = null;
+            foreach (var releaseId in releaseSeriesReleaseIds)
+            {
+                latestPublishedReleaseVersion = await contentDbContext.ReleaseVersions
+                    .LatestReleaseVersion(releaseId: releaseId,
+                        publishedOnly: true,
+                        includeUnpublishedVersionIds: includeUnpublishedVersionIds)
+                    .SingleOrDefaultAsync();
+
+                if (latestPublishedReleaseVersion != null)
+                {
+                    break;
+                }
+            }
+
+            return latestPublishedReleaseVersion ?? throw new InvalidOperationException(
+                $"No latest published release version found for publication {publicationId}");
         }
 
         public async Task<List<File>> GetFiles(Guid releaseVersionId, params FileType[] types)
         {
-            return await _contentDbContext
+            return await contentDbContext
                 .ReleaseFiles
                 .Include(rf => rf.File)
                 .Where(rf => rf.ReleaseVersionId == releaseVersionId)
@@ -77,15 +87,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task CompletePublishing(Guid releaseVersionId, DateTime actualPublishedDate)
         {
-            var releaseVersion = await _contentDbContext
+            var releaseVersion = await contentDbContext
                 .ReleaseVersions
                 .Include(rv => rv.DataBlockVersions)
                 .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
                 .SingleAsync(rv => rv.Id == releaseVersionId);
 
-            _contentDbContext.ReleaseVersions.Update(releaseVersion);
+            contentDbContext.ReleaseVersions.Update(releaseVersion);
 
-            var publishedDate = await _releaseVersionRepository.GetPublishedDate(releaseVersion.Id, actualPublishedDate);
+            var publishedDate = await releaseVersionRepository.GetPublishedDate(releaseVersion.Id, actualPublishedDate);
 
             releaseVersion.Published = publishedDate;
 
@@ -93,14 +103,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await UpdatePublishedDataBlockVersions(releaseVersion);
 
-            await _contentDbContext.SaveChangesAsync();
+            await contentDbContext.SaveChangesAsync();
         }
 
         private async Task UpdateReleaseFilePublishedDate(
             ReleaseVersion releaseVersion,
             DateTime publishedDate)
         {
-            var dataReleaseFiles = _contentDbContext.ReleaseFiles
+            var dataReleaseFiles = contentDbContext.ReleaseFiles
                 .Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersion.Id)
                 .Include(rf => rf.File);
 
@@ -143,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var latestDataBlockParentIds = latestDataBlockParents.Select(dataBlockParent => dataBlockParent.Id);
 
-                var removedDataBlockVersions = await _contentDbContext
+                var removedDataBlockVersions = await contentDbContext
                     .DataBlockVersions
                     .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersion.PreviousVersionId &&
                                                !latestDataBlockParentIds.Contains(dataBlockVersion.DataBlockParentId))

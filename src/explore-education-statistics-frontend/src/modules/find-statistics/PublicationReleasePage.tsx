@@ -130,7 +130,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     >
                       View latest data:{' '}
                       <span className="govuk-!-font-weight-bold">
-                        {release.publication.releases[0].title}
+                        {
+                          release.publication.releaseSeries.find(
+                            rsi => !rsi.isLegacyLink,
+                          )?.description
+                        }
                       </span>
                     </Link>
                   )}
@@ -341,14 +345,19 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     <ul className="govuk-list">
                       {[
                         ...releaseSeries.map(
-                          ({
-                            id,
-                            isLegacyLink,
-                            description,
-                            legacyLinkUrl,
-                            releaseSlug,
-                          }) => (
-                            <li key={id} data-testid="other-release-item">
+                          (
+                            {
+                              isLegacyLink,
+                              description,
+                              legacyLinkUrl,
+                              releaseSlug,
+                            },
+                            index,
+                          ) => (
+                            <li
+                              key={`release-${index.toString()}`}
+                              data-testid="other-release-item"
+                            >
                               {isLegacyLink ? (
                                 <a href={legacyLinkUrl}>{description}</a>
                               ) : (

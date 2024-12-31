@@ -15,6 +15,8 @@ import { generatePath, RouteComponentProps } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Yup from '@common/validation/yup';
 import Button from '@common/components/Button';
+import { useQueryClient } from '@tanstack/react-query';
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 
 interface FormValues {
   title: string;
@@ -31,9 +33,18 @@ export default function ReleaseDataFilePage({
     [releaseId, fileId],
   );
 
+  const queryClient = useQueryClient();
+
   const handleSubmit = async (values: FormValues) => {
     await releaseDataFileService.updateFile(releaseId, fileId, {
       title: values.title,
+    });
+
+    queryClient.removeQueries({
+      queryKey: releaseDataFileQueries.list(releaseId).queryKey,
+    });
+    await queryClient.invalidateQueries({
+      queryKey: releaseDataFileQueries.list._def,
     });
 
     history.push(
@@ -43,6 +54,8 @@ export default function ReleaseDataFilePage({
       }),
     );
   };
+
+  const titleMaxLength = 120;
 
   return (
     <>
@@ -65,7 +78,12 @@ export default function ReleaseDataFilePage({
             <FormProvider
               initialValues={{ title: dataFile.title }}
               validationSchema={Yup.object<FormValues>({
-                title: Yup.string().required('Enter a title'),
+                title: Yup.string()
+                  .required('Enter a title')
+                  .max(
+                    titleMaxLength,
+                    `Subject title must be ${titleMaxLength} characters or less`,
+                  ),
               })}
             >
               <Form id="dataFileForm" onSubmit={handleSubmit}>
@@ -73,6 +91,7 @@ export default function ReleaseDataFilePage({
                   className="govuk-!-width-two-thirds"
                   label="Title"
                   name="title"
+                  maxLength={titleMaxLength}
                 />
 
                 <Button type="submit">Save changes</Button>

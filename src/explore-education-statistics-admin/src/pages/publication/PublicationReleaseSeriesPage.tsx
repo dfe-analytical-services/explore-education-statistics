@@ -32,14 +32,19 @@ export default function PublicationReleaseSeriesPage() {
 
   return (
     <LoadingSpinner loading={isLoading}>
-      <h2>Legacy releases</h2>
+      <h2>Release order</h2>
 
-      <p>Releases will be shown in the order below on the publication.</p>
       <p>
-        Explore education statistics releases from this publication can also be
-        reordered, including those in draft status or with a draft amendment,
-        but cannot be edited or deleted. Only releases with a published version
-        will be shown on the publication.
+        Releases will be shown in the order below on the publication and can be
+        reordered.
+      </p>
+      <p>
+        Legacy releases which link to extenal pages outside the service can be
+        created, edited, deleted, and are included in the release order.
+      </p>
+      <p>
+        Only releases with a published version and legacy releases will appear
+        in the publication.
       </p>
 
       {canManageReleaseSeries && !isReordering && (

@@ -48,8 +48,8 @@ Create ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
 Add legacy releases to ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
     user creates legacy release    Academic year 2009/10
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010
     user creates legacy release    Academic year 2010/11
@@ -513,8 +513,8 @@ Create ${EXCLUSIONS_PUBLICATION_TITLE}
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
 Add legacy releases to ${EXCLUSIONS_PUBLICATION_TITLE}
-    user clicks link    Legacy releases
-    user waits until h2 is visible    Legacy releases
+    user clicks link    Release order
+    user waits until h2 is visible    Release order
     user creates legacy release    Academic year 2008/09
     ...    https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-academic-year-2008-to-2009
     user creates legacy release    Academic year 2009/10

@@ -24,6 +24,9 @@ param routes AppGatewayRoute[]
 @description('Rules for how the App Gateway should rewrite URLs')
 param rewrites AppGatewayRewriteSet[]
 
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param deployAlerts bool
+
 @description('Tags for the resources')
 param tagValues object
 
@@ -48,6 +51,15 @@ module appGatewayModule '../../components/appGateway.bicep' = {
     backends: backends
     routes: routes
     rewrites: rewrites
+    tagValues: tagValues
+  }
+}
+
+module backendPoolsHealthAlert '../../components/alerts/appGateways/backendPoolHealth.bicep' = if (deployAlerts) {
+  name: '${resourceNames.sharedResources.appGateway}BackendPoolsHealthDeploy'
+  params: {
+    resourceNames: [resourceNames.sharedResources.appGateway]
+    alertsGroupName: resourceNames.existingResources.alertsGroup
     tagValues: tagValues
   }
 }

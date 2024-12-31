@@ -297,8 +297,8 @@ Create a third draft release via API
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3020
 
 Upload subject to the third release
-    user uploads subject and waits until complete    ${SUBJECT_NAME_5}    institution_and_provider.csv
-    ...    institution_and_provider.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_5}    grouped-filters-and-indicators.csv
+    ...    grouped-filters-and-indicators.meta.csv    ${PUBLIC_API_FILES_DIR}
 
 Add data guidance to the third release
     user clicks link    Data and files

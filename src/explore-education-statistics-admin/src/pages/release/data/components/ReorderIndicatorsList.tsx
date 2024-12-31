@@ -1,16 +1,22 @@
-import ReorderList, {
-  FormattedIndicators,
-  ReorderProps,
-} from '@admin/pages/release/data/components/ReorderList';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import ReorderableNestedList from '@common/components/ReorderableNestedList';
+import {
+  ReorderableListItem,
+  ReorderResult,
+} from '@common/components/ReorderableItem';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import reorder from '@common/utils/reorder';
 import tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
+
+interface ReorderHandler extends ReorderResult {
+  expandedItemId?: string;
+}
 
 interface UpdatedIndicator {
   id: string;
@@ -28,18 +34,18 @@ interface Props {
   ) => void;
 }
 
-const ReorderIndicatorsList = ({
+export default function ReorderIndicatorsList({
   releaseId,
   subject,
   onCancel,
   onSave,
-}: Props) => {
+}: Props) {
   const { value: subjectMeta, isLoading } = useAsyncHandledRetry(
     () => tableBuilderService.getSubjectMeta(subject.id, releaseId),
     [subject.id, releaseId],
   );
 
-  const [indicators, setIndicators] = useState<FormattedIndicators[]>([]);
+  const [indicators, setIndicators] = useState<ReorderableListItem[]>([]);
 
   useEffect(() => {
     if (isLoading || !subjectMeta) {
@@ -49,38 +55,46 @@ const ReorderIndicatorsList = ({
 
     // Transforming the indicators to be nested arrays rather than keyed objects.
     // Order by the order field.
-    const formattedIndicators = orderBy(
-      Object.entries(indicatorsMeta).map(([, item]) => {
-        return {
-          id: item.id,
-          label: item.label,
-          order: item.order,
-          items: item.options.map(option => ({
-            id: option.value,
-            label: option.label,
-          })),
-        };
-      }),
+    const formattedIndicators: ReorderableListItem[] = orderBy(
+      Object.values(indicatorsMeta),
       'order',
-    );
+    ).map(item => {
+      return {
+        id: item.id,
+        label: item.label,
+        childOptions: item.options.map(option => ({
+          id: option.value,
+          label: option.label,
+        })),
+      };
+    });
 
     setIndicators(formattedIndicators);
   }, [isLoading, subjectMeta]);
 
-  const handleReorder = ({ reordered, parentCategoryId }: ReorderProps) => {
-    // reordering indicators
-    if (!parentCategoryId) {
-      setIndicators(reordered as FormattedIndicators[]);
+  const handleReorder = ({
+    prevIndex,
+    nextIndex,
+    expandedItemId,
+  }: ReorderHandler) => {
+    // Top level
+    if (!expandedItemId) {
+      setIndicators(reorder(indicators, prevIndex, nextIndex));
       return;
     }
-    // reordering indicator items
-    const reorderedIndicators = indicators.map(indicator =>
-      indicator.id !== parentCategoryId
+    // Second level
+    const reordered = indicators.map(indicator =>
+      indicator.id !== expandedItemId
         ? indicator
-        : { ...indicator, items: reordered },
-    ) as FormattedIndicators[];
+        : {
+            ...indicator,
+            childOptions: indicator.childOptions
+              ? reorder(indicator.childOptions, prevIndex, nextIndex)
+              : [],
+          },
+    );
 
-    setIndicators(reorderedIndicators);
+    setIndicators(reordered);
   };
 
   const handleSave = () => {
@@ -88,7 +102,9 @@ const ReorderIndicatorsList = ({
       indicator => {
         return {
           id: indicator.id,
-          indicators: indicator.items.map(item => item.id),
+          indicators: indicator.childOptions
+            ? indicator.childOptions?.map(item => item.id)
+            : [],
         };
       },
     );
@@ -96,24 +112,33 @@ const ReorderIndicatorsList = ({
   };
 
   return (
-    <>
-      <h3>{`Reorder indicators for ${subject.name}`}</h3>
-      <LoadingSpinner loading={isLoading}>
-        {indicators.length === 0 ? (
+    <LoadingSpinner loading={isLoading}>
+      {indicators.length === 0 ? (
+        <>
           <p>No indicators available.</p>
-        ) : (
-          <ReorderList listItems={indicators} onReorder={handleReorder} />
-        )}
-        <ButtonGroup>
           <Button variant="secondary" onClick={onCancel}>
-            Cancel
+            Back
           </Button>
-          {indicators.length > 0 && (
-            <Button onClick={handleSave}>Save order</Button>
-          )}
-        </ButtonGroup>
-      </LoadingSpinner>
-    </>
+        </>
+      ) : (
+        <>
+          <ReorderableNestedList
+            heading={`Reorder indicators for ${subject.name}`}
+            id="reorder-indicators"
+            list={indicators}
+            testId="reorder-indicators"
+            onMoveItem={handleReorder}
+          />
+          <ButtonGroup>
+            {indicators.length > 0 && (
+              <Button onClick={handleSave}>Save order</Button>
+            )}
+            <Button variant="secondary" onClick={onCancel}>
+              Cancel
+            </Button>
+          </ButtonGroup>
+        </>
+      )}
+    </LoadingSpinner>
   );
-};
-export default ReorderIndicatorsList;
+}

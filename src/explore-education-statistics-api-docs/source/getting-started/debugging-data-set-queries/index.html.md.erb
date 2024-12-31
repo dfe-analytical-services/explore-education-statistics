@@ -17,8 +17,8 @@ first as this guide will presume some prior knowledge.
 
 You should already be familiar with the basic usages of the following endpoints to proceed:
 
-- [Query a data set](/endpoints/QueryDataSetPost/index.html)
-- [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html)
+- [Query a data set](/reference-v1/endpoints/QueryDataSetPost/index.html)
+- [Get a data set's metadata](/reference-v1/endpoints/GetDataSetMeta/index.html)
 
 ## Diagnosing error responses
 
@@ -40,8 +40,8 @@ When there is an error response, the body will typically look like:
 }
 ```
 
-The response body is modelled by the [ProblemDetailsViewModel](/schemas/ProblemDetailsViewModel/index.html) schema,
-which attempts to detail the reason(s) why the request failed. The following fields are always
+The response body is modelled by the [ProblemDetailsViewModel](/reference-v1/schemas/ProblemDetailsViewModel/index.html)
+schema, which attempts to detail the reason(s) why the request failed. The following fields are always
 included:
 
 | Property | Type   | Description                                                    |
@@ -84,7 +84,7 @@ Validation errors and error responses in general are covered in much more detail
 
 ## Validation errors for data set queries
 
-The [Query a data set](/endpoints/QueryDataSetPost/index.html) endpoint will usually try to process a
+The [Query a data set](/reference-v1/endpoints/QueryDataSetPost/index.html) endpoint will usually try to process a
 query as much as possible before a validation error response is sent (instead of failing early).
 Consequently, the response typically aggregates as many validation errors as possible.
 
@@ -187,7 +187,7 @@ incompatible and will result in an error response like:
 
 #### Solution
 
-Check that your query correctly follows the [DataSetQueryRequest](/schemas/DataSetQueryRequest/index.html)
+Check that your query correctly follows the [DataSetQueryRequest](/reference-v1/schemas/DataSetQueryRequest/index.html)
 schema. Pay close attention to any usages of condition clauses.
 
 The `and` / `or` clauses accept **multiple** criteria or condition clauses in an array:
@@ -315,7 +315,7 @@ missing (e.g. `invalid-filter-1`) in the `details` property.
 #### Solution
 
 Ensure that all facets in the data set query exist in the corresponding data set metadata.
-You should check this by cross-referencing the missing facets with the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html)
+You should check this by cross-referencing the missing facets with the [Get a data set's metadata](/reference-v1/endpoints/GetDataSetMeta/index.html)
 endpoint.
 
 Facets are not usually removed from existing data sets, so there may be a typo (or similar) in
@@ -361,7 +361,7 @@ adjacent comment causing the JSON to be syntactically invalid.
 
 ## Debug mode
 
-To assist in debugging unexpected results for a data set query, the [Query a data set](/endpoints/QueryDataSetPost/index.html)
+To assist in debugging unexpected results for a data set query, the [Query a data set](/reference-v1/endpoints/QueryDataSetPost/index.html)
 endpoint also accepts a `debug` query parameter that enables debug mode. This can be set in the
 request's query string like so:
 
@@ -399,7 +399,7 @@ The keys and values of `filters`, `locations` and `values` are changed to displa
 labels and facet IDs in the format `{facet ID} :: {label}`.
 
 Enabling debug mode is useful to avoid having to cross-reference the facets of each result with the
-data set's metadata (using the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html) endpoint).
+data set's metadata (using the [Get a data set's metadata](/reference-v1/endpoints/GetDataSetMeta/index.html) endpoint).
 
 However, it is important to note that debug mode **should not** be used outside of development / debugging
 purposes. When your query's issues have been resolved, you should disable debug mode before pushing

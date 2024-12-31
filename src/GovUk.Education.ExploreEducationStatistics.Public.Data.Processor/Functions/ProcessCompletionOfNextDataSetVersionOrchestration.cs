@@ -23,7 +23,6 @@ public static class ProcessCompletionOfNextDataSetVersionOrchestration
 
         try
         {
-            await context.CallActivity(ActivityNames.UpdateFileStoragePath, logger, context.InstanceId);
             await context.CallActivityExclusively(ActivityNames.ImportMetadata, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.CreateChanges, logger, context.InstanceId);
             await context.CallActivity(ActivityNames.ImportData, logger, context.InstanceId);

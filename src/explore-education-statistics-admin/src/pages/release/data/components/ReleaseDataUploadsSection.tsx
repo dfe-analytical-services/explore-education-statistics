@@ -17,6 +17,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
+  ArchiveDataSetFile,
   DataFile,
   DataFileImportStatus,
   DeleteDataFilePlan,
@@ -32,7 +33,7 @@ import DataUploadCancelButton from '@admin/pages/release/data/components/DataUpl
 import React, { useCallback, useEffect, useState } from 'react';
 import { generatePath } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { reverse, uniqBy } from 'lodash';
+import BulkZipUploadModalConfirm from './BulkZipUploadModalConfirm';
 
 interface Props {
   publicationId: string;
@@ -55,18 +56,19 @@ const ReleaseDataUploadsSection = ({
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [activeFileIds, setActiveFileIds] = useState<string[]>();
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
+  const [bulkUploadPlan, setBulkUploadPlan] = useState<ArchiveDataSetFile[]>();
 
-  const { data: initialDataFiles = [], isLoading } = useQuery(
-    releaseDataFileQueries.list(releaseId),
-  );
+  const {
+    data: initialDataFiles,
+    isLoading,
+    refetch: refetchDataFiles,
+  } = useQuery(releaseDataFileQueries.list(releaseId));
 
   // Store the data files on state so we can reliably update them
   // when the permissions/status change.
   useEffect(() => {
-    if (!isLoading) {
-      setDataFiles(initialDataFiles);
-    }
-  }, [initialDataFiles, isLoading, setDataFiles]);
+    setDataFiles(initialDataFiles ?? []);
+  }, [initialDataFiles]);
 
   useEffect(() => {
     onDataFilesChange?.(dataFiles);
@@ -85,10 +87,38 @@ const ReleaseDataUploadsSection = ({
     );
   };
 
+  const confirmBulkUploadPlan = useCallback(
+    async (archiveDataSetFiles: ArchiveDataSetFile[]) => {
+      const newFiles = await releaseDataFileService.importBulkZipDataFile(
+        releaseId,
+        archiveDataSetFiles,
+      );
+
+      setBulkUploadPlan(undefined);
+      setActiveFileIds([...dataFiles, ...newFiles].map(file => file.id));
+      refetchDataFiles();
+    },
+    [
+      releaseId,
+      setBulkUploadPlan,
+      setActiveFileIds,
+      dataFiles,
+      refetchDataFiles,
+    ],
+  );
+
   const handleStatusChange = async (
     dataFile: DataFile,
     { totalRows, status }: DataFileImportStatus,
   ) => {
+    // EES-5732 UI tests related to data replacement sometimes fail
+    // because of a permission call for the replaced file being called,
+    // probably caused by the speed of the tests.
+    // This prevents this happening.
+    if (status === 'NOT_FOUND') {
+      return;
+    }
+
     const permissions = await permissionService.getDataFilePermissions(
       releaseId,
       dataFile.id,
@@ -126,6 +156,7 @@ const ReleaseDataUploadsSection = ({
               metadataFile: values.metadataFile as File,
             }),
           );
+          refetchDataFiles();
           break;
         }
         case 'zip': {
@@ -138,26 +169,25 @@ const ReleaseDataUploadsSection = ({
               zipFile: values.zipFile as File,
             }),
           );
+          refetchDataFiles();
           break;
         }
-        case 'bulkZip':
-          newFiles.push(
-            ...(await releaseDataFileService.uploadBulkZipDataFile(
+        case 'bulkZip': {
+          const uploadPlan =
+            await releaseDataFileService.getUploadBulkZipDataFilePlan(
               releaseId,
-              values.bulkZipFile as File,
-            )),
-          );
+              values.bulkZipFile!,
+            );
+
+          setBulkUploadPlan(uploadPlan);
           break;
+        }
         default:
           break;
       }
       setActiveFileIds(newFiles.map(file => file.id));
-      setDataFiles(currentDataFiles =>
-        // double reverse keeps *new* files as uniq item and at the end of the list
-        reverse(uniqBy(reverse([...currentDataFiles, ...newFiles]), 'title')),
-      );
     },
-    [releaseId],
+    [releaseId, refetchDataFiles],
   );
 
   return (
@@ -191,7 +221,17 @@ const ReleaseDataUploadsSection = ({
         </ul>
       </InsetText>
       {canUpdateRelease ? (
-        <DataFileUploadForm dataFiles={dataFiles} onSubmit={handleSubmit} />
+        <>
+          <DataFileUploadForm dataFiles={dataFiles} onSubmit={handleSubmit} />
+          {bulkUploadPlan === undefined ||
+          bulkUploadPlan.length === 0 ? null : (
+            <BulkZipUploadModalConfirm
+              bulkUploadPlan={bulkUploadPlan}
+              onConfirm={confirmBulkUploadPlan}
+              onCancel={() => setBulkUploadPlan(undefined)}
+            />
+          )}
+        </>
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.

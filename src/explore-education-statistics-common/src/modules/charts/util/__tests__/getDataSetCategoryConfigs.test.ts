@@ -1,7 +1,3 @@
-import {
-  DataGroupingConfig,
-  MapDataSetConfig,
-} from '@common/modules/charts/types/chart';
 import { DataSet, DataSetCategory } from '@common/modules/charts/types/dataSet';
 import getDataSetCategoryConfigs, {
   DataSetCategoryConfig,
@@ -125,12 +121,6 @@ describe('getDataSetCategoryConfigs', () => {
     },
   };
 
-  const testDataGrouping: DataGroupingConfig = {
-    customGroups: [],
-    numberOfGroups: 5,
-    type: 'EqualIntervals',
-  };
-
   test('returns configs correctly when grouped by time period', () => {
     const testDataSetCategories: DataSetCategory[] = [
       {
@@ -168,7 +158,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 1 item 1, Location 1)',
           colour: '#12436D',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
         dataSet: expandDataSet(testDataSet1, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -180,7 +169,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 1 item 2, Location 1)',
           colour: '#F46A25',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet2, testTimePeriod1),
         dataSet: expandDataSet(testDataSet2, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -192,7 +180,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 2 item 1, Location 1)',
           colour: '#801650',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet3, testTimePeriod1),
         dataSet: expandDataSet(testDataSet3, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -204,7 +191,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 2 item 2, Location 1)',
           colour: '#28A197',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet4, testTimePeriod1),
         dataSet: expandDataSet(testDataSet4, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -253,7 +239,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 1 item 1, 2020/21)',
           colour: '#12436D',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet1, testLocation1),
         dataSet: expandDataSet(testDataSet1, testSubjectMeta),
         rawDataSet: JSON.parse(generateDataSetKey(testDataSet1, testLocation1)),
@@ -263,7 +248,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 1 item 2, 2020/21)',
           colour: '#F46A25',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet2, testLocation1),
         dataSet: expandDataSet(testDataSet2, testSubjectMeta),
         rawDataSet: JSON.parse(generateDataSetKey(testDataSet2, testLocation1)),
@@ -273,7 +257,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 2 item 1, 2020/21)',
           colour: '#801650',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet3, testLocation1),
         dataSet: expandDataSet(testDataSet3, testSubjectMeta),
         rawDataSet: JSON.parse(generateDataSetKey(testDataSet3, testLocation1)),
@@ -283,7 +266,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 2 item 2, 2020/21)',
           colour: '#28A197',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet4, testLocation1),
         dataSet: expandDataSet(testDataSet4, testSubjectMeta),
         rawDataSet: JSON.parse(generateDataSetKey(testDataSet4, testLocation1)),
@@ -330,7 +312,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Filter group 1 item 1, Location 1, 2020/21',
           colour: '#12436D',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet1, testIndicator1),
         dataSet: expandDataSet(testDataSet1, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -342,7 +323,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Filter group 1 item 2, Location 1, 2020/21',
           colour: '#F46A25',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet2, testIndicator1),
         dataSet: expandDataSet(testDataSet2, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -354,7 +334,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Filter group 2 item 1, Location 1, 2020/21',
           colour: '#801650',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet3, testIndicator1),
         dataSet: expandDataSet(testDataSet3, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -366,7 +345,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Filter group 2 item 2, Location 1, 2020/21',
           colour: '#28A197',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet4, testIndicator1),
         dataSet: expandDataSet(testDataSet4, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -429,7 +407,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Location 1, 2020/21)',
           colour: '#12436D',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet1, testFilterGroup1Item1),
         dataSet: expandDataSet(testDataSet1, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -494,7 +471,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 1 item 1, Location 1, 2020/21)',
           colour: '#12436D',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet1),
         dataSet: expandDataSet(testDataSet1, testSubjectMeta),
         rawDataSet: testDataSet1,
@@ -504,7 +480,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 1 item 2, Location 1, 2020/21)',
           colour: '#F46A25',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet2),
         dataSet: expandDataSet(testDataSet2, testSubjectMeta),
         rawDataSet: testDataSet2,
@@ -514,7 +489,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 2 item 1, Location 1, 2020/21)',
           colour: '#801650',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet3),
         dataSet: expandDataSet(testDataSet3, testSubjectMeta),
         rawDataSet: testDataSet3,
@@ -524,7 +498,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 2 item 2, Location 1, 2020/21)',
           colour: '#28A197',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet4),
         dataSet: expandDataSet(testDataSet4, testSubjectMeta),
         rawDataSet: testDataSet4,
@@ -594,7 +567,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Label 1',
           colour: '#28A197',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
         dataSet: expandDataSet(testDataSet1, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -606,7 +578,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Label 2',
           colour: '#6BACE6',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet2, testTimePeriod1),
         dataSet: expandDataSet(testDataSet2, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -618,7 +589,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Label 3',
           colour: '#28A197',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet3, testTimePeriod1),
         dataSet: expandDataSet(testDataSet3, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -630,7 +600,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Label 4',
           colour: '#6BACE6',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet4, testTimePeriod1),
         dataSet: expandDataSet(testDataSet4, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -703,7 +672,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Label 1',
           colour: '#28A197',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
         dataSet: expandDataSet(testDataSet1, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -715,7 +683,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Label 2',
           colour: '#6BACE6',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet2, testTimePeriod1),
         dataSet: expandDataSet(testDataSet2, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -727,7 +694,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Label 3',
           colour: '#28A197',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet3, testTimePeriod1),
         dataSet: expandDataSet(testDataSet3, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -739,7 +705,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Label 4',
           colour: '#6BACE6',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet4, testTimePeriod1),
         dataSet: expandDataSet(testDataSet4, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -788,7 +753,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 1 item 1, Location 1)',
           colour: '#12436D',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
         dataSet: expandDataSet(testDataSet1, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -800,7 +764,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 1 item 2, Location 1)',
           colour: '#F46A25',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet2, testTimePeriod1),
         dataSet: expandDataSet(testDataSet2, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -812,7 +775,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 2 item 1, Location 1)',
           colour: '#801650',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet3, testTimePeriod1),
         dataSet: expandDataSet(testDataSet3, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -824,7 +786,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 2 item 2, Location 1)',
           colour: '#28A197',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet4, testTimePeriod1),
         dataSet: expandDataSet(testDataSet4, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -861,16 +822,8 @@ describe('getDataSetCategoryConfigs', () => {
       },
     ];
 
-    const testDeprecatedDataGrouping: DataGroupingConfig = {
-      customGroups: [],
-      numberOfGroups: 7,
-      type: 'Quantiles',
-    };
-
     const result = getDataSetCategoryConfigs({
       dataSetCategories: testDataSetCategories,
-      deprecatedDataClassification: 'Quantiles',
-      deprecatedDataGroups: 7,
       legendItems: [],
       meta: testSubjectMeta,
     });
@@ -880,135 +833,6 @@ describe('getDataSetCategoryConfigs', () => {
         config: {
           label: 'Indicator 1 (Filter group 1 item 1, Location 1)',
           colour: '#12436D',
-        },
-        dataGrouping: testDeprecatedDataGrouping,
-        dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
-        dataSet: expandDataSet(testDataSet1, testSubjectMeta),
-        rawDataSet: JSON.parse(
-          generateDataSetKey(testDataSet1, testTimePeriod1),
-        ),
-      },
-      {
-        config: {
-          label: 'Indicator 1 (Filter group 1 item 2, Location 1)',
-          colour: '#F46A25',
-        },
-        dataGrouping: testDeprecatedDataGrouping,
-        dataKey: generateDataSetKey(testDataSet2, testTimePeriod1),
-        dataSet: expandDataSet(testDataSet2, testSubjectMeta),
-        rawDataSet: JSON.parse(
-          generateDataSetKey(testDataSet2, testTimePeriod1),
-        ),
-      },
-      {
-        config: {
-          label: 'Indicator 1 (Filter group 2 item 1, Location 1)',
-          colour: '#801650',
-        },
-        dataGrouping: testDeprecatedDataGrouping,
-        dataKey: generateDataSetKey(testDataSet3, testTimePeriod1),
-        dataSet: expandDataSet(testDataSet3, testSubjectMeta),
-        rawDataSet: JSON.parse(
-          generateDataSetKey(testDataSet3, testTimePeriod1),
-        ),
-      },
-      {
-        config: {
-          label: 'Indicator 1 (Filter group 2 item 2, Location 1)',
-          colour: '#28A197',
-        },
-        dataGrouping: testDeprecatedDataGrouping,
-        dataKey: generateDataSetKey(testDataSet4, testTimePeriod1),
-        dataSet: expandDataSet(testDataSet4, testSubjectMeta),
-        rawDataSet: JSON.parse(
-          generateDataSetKey(testDataSet4, testTimePeriod1),
-        ),
-      },
-    ];
-
-    expect(result).toEqual(expected);
-  });
-
-  test('returns the data set data grouping if present', () => {
-    const testDataSetCategories: DataSetCategory[] = [
-      {
-        dataSets: {
-          [generateDataSetKey(testDataSet1, testTimePeriod1)]: {
-            dataSet: testDataSet1,
-            value: 30,
-          },
-          [generateDataSetKey(testDataSet2, testTimePeriod1)]: {
-            dataSet: testDataSet2,
-            value: 70,
-          },
-          [generateDataSetKey(testDataSet3, testTimePeriod1)]: {
-            dataSet: testDataSet3,
-            value: 60,
-          },
-          [generateDataSetKey(testDataSet4, testTimePeriod1)]: {
-            dataSet: testDataSet4,
-            value: 40,
-          },
-        },
-        filter: testTimePeriod1,
-      },
-    ];
-
-    const testDataSetConfigs: MapDataSetConfig[] = [
-      {
-        dataSet: omit(testDataSet1, 'timePeriod'),
-        dataGrouping: {
-          customGroups: [],
-          numberOfGroups: 2,
-          type: 'EqualIntervals',
-        },
-      },
-      {
-        dataSet: omit(testDataSet2, 'timePeriod'),
-        dataGrouping: {
-          customGroups: [],
-          numberOfGroups: 9,
-          type: 'Quantiles',
-        },
-      },
-      {
-        dataSet: omit(testDataSet3, 'timePeriod'),
-        dataGrouping: {
-          customGroups: [{ min: 0, max: 10 }],
-          numberOfGroups: 9,
-          type: 'Custom',
-        },
-      },
-      {
-        dataSet: omit(testDataSet4, 'timePeriod'),
-        dataGrouping: {
-          customGroups: [
-            { min: 0, max: 10 },
-            { min: 11, max: 20 },
-          ],
-          numberOfGroups: 9,
-          type: 'Custom',
-        },
-      },
-    ];
-
-    const result = getDataSetCategoryConfigs({
-      dataSetCategories: testDataSetCategories,
-      dataSetConfigs: testDataSetConfigs,
-      legendItems: [],
-      meta: testSubjectMeta,
-    });
-
-    const expected: DataSetCategoryConfig[] = [
-      {
-        config: {
-          label: 'Indicator 1 (Filter group 1 item 1, Location 1)',
-          colour: '#12436D',
-        },
-        dataGrouping: {
-          customGroups: [],
-          numberOfGroups: 2,
-          type: 'EqualIntervals',
         },
         dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
         dataSet: expandDataSet(testDataSet1, testSubjectMeta),
@@ -1021,11 +845,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 1 item 2, Location 1)',
           colour: '#F46A25',
         },
-        dataGrouping: {
-          customGroups: [],
-          numberOfGroups: 9,
-          type: 'Quantiles',
-        },
         dataKey: generateDataSetKey(testDataSet2, testTimePeriod1),
         dataSet: expandDataSet(testDataSet2, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -1037,11 +856,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 2 item 1, Location 1)',
           colour: '#801650',
         },
-        dataGrouping: {
-          customGroups: [{ min: 0, max: 10 }],
-          numberOfGroups: 9,
-          type: 'Custom',
-        },
         dataKey: generateDataSetKey(testDataSet3, testTimePeriod1),
         dataSet: expandDataSet(testDataSet3, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -1052,14 +866,6 @@ describe('getDataSetCategoryConfigs', () => {
         config: {
           label: 'Indicator 1 (Filter group 2 item 2, Location 1)',
           colour: '#28A197',
-        },
-        dataGrouping: {
-          customGroups: [
-            { min: 0, max: 10 },
-            { min: 11, max: 20 },
-          ],
-          numberOfGroups: 9,
-          type: 'Custom',
         },
         dataKey: generateDataSetKey(testDataSet4, testTimePeriod1),
         dataSet: expandDataSet(testDataSet4, testSubjectMeta),
@@ -1109,7 +915,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 1 item 1, Location 1)',
           colour: '#12436D',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
         dataSet: expandDataSet(testDataSet1, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -1121,7 +926,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 1 item 2, Location 1)',
           colour: '#F46A25',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet2, testTimePeriod1),
         dataSet: expandDataSet(testDataSet2, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -1133,7 +937,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 2 item 1, Location 1)',
           colour: '#801650',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet3, testTimePeriod1),
         dataSet: expandDataSet(testDataSet3, testSubjectMeta),
         rawDataSet: JSON.parse(
@@ -1145,7 +948,6 @@ describe('getDataSetCategoryConfigs', () => {
           label: 'Indicator 1 (Filter group 2 item 2, Location 1)',
           colour: '#28A197',
         },
-        dataGrouping: testDataGrouping,
         dataKey: generateDataSetKey(testDataSet4, testTimePeriod1),
         dataSet: expandDataSet(testDataSet4, testSubjectMeta),
         rawDataSet: JSON.parse(

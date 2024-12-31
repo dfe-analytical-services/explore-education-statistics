@@ -2990,61 +2990,6 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         }
     }
 
-    public class UpdateFileStoragePathTests(
-        ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessCompletionOfNextDataSetVersionFunctionsTests(fixture)
-    {
-        private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ManualMapping;
-
-        [Fact]
-        public async Task Success_PathUpdated()
-        {
-            var (_, nextDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage);
-
-            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-            var originalStoragePath = dataSetVersionPathResolver.DirectoryPath(nextDataSetVersion);
-            Directory.CreateDirectory(originalStoragePath);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            nextDataSetVersion.VersionMajor++;
-
-            publicDataDbContext.DataSetVersions.Update(nextDataSetVersion);
-            await publicDataDbContext.SaveChangesAsync();
-
-            var newStoragePath = dataSetVersionPathResolver.DirectoryPath(nextDataSetVersion);
-
-            await UpdateFileStoragePath(instanceId);
-
-            Assert.False(Directory.Exists(originalStoragePath));
-            Assert.True(Directory.Exists(newStoragePath));
-        }
-
-        [Fact]
-        public async Task Success_PathNotUpdated()
-        {
-            var (_, nextDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage);
-
-            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-            var originalStoragePath = dataSetVersionPathResolver.DirectoryPath(nextDataSetVersion);
-            Directory.CreateDirectory(originalStoragePath);
-
-            await UpdateFileStoragePath(instanceId);
-
-            Assert.True(Directory.Exists(originalStoragePath));
-        }
-
-        private async Task UpdateFileStoragePath(Guid instanceId)
-        {
-            var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunctions>();
-            await function.UpdateFileStoragePath(instanceId, CancellationToken.None);
-        }
-    }
-
     public class CompleteNextDataSetVersionImportProcessingTests(
         ProcessorFunctionsIntegrationTestFixture fixture)
         : ProcessCompletionOfNextDataSetVersionFunctionsTests(fixture)

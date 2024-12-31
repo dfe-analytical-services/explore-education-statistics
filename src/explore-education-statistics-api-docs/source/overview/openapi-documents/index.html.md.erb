@@ -1,0 +1,26 @@
+---
+title: OpenAPI documents
+last_reviewed_on: 2024-09-18
+review_in: 12 months
+weight: 3
+---
+
+# OpenAPI documents
+
+The explore education statistics (EES) API is fully compliant with the [OpenAPI 3.0 specification](https://swagger.io/specification/v3/).
+
+The OpenAPI specification provides a standard language for documenting REST APIs and their capabilities.
+Using a document that conforms to this specification, users can understand how to use an API and navigate
+through it with minimal effort.
+
+OpenAPI documents for the EES API can be downloaded below:
+
+<% get_openapi_links.each do |link| %>
+- <%= link_to "#{link[:name]} document", link[:url] %>
+<% end %>
+
+With an OpenAPI document, you can do things like:
+
+- explore it with a third-party HTTP client tool such as Postman or Insomnia
+- generate an API client for writing integrations
+- run automated tests against it to validate your integrations

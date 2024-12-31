@@ -220,6 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             var file = _fixture.DefaultFile(FileType.Data)
                 .WithDataSetFileMeta(null)
+                .WithDataSetFileVersionGeographicLevels([])
                 .WithSubjectId(subject.Id)
                 .Generate();
 
@@ -284,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 contentDbContextId,
                 statisticsDbContextId);
 
-            await service.WriteDataSetFileMeta(subject.Id);
+            await service.WriteDataSetFileMeta(file.Id, subject.Id);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {

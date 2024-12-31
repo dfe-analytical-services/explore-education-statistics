@@ -131,6 +131,8 @@ def run():
         # Run tests
         while test_run_index < max_run_attempts:
             try:
+                test_run_results_folder = f"{main_results_folder}{os.sep}run-{test_run_index + 1}"
+
                 # Ensure all SeleniumLibrary elements and keywords are updated to use a brand new
                 # Selenium instance for every test (re)run.
                 if test_run_index > 0:
@@ -142,7 +144,6 @@ def run():
                 _clear_files_before_next_test_run_attempt(rerunning_failed_suites)
 
                 # Create a folder to contain this test run attempt's outputs and reports.
-                test_run_results_folder = f"{main_results_folder}{os.sep}run-{test_run_index + 1}"
                 os.makedirs(test_run_results_folder)
 
                 if not Path(f"{main_results_folder}/downloads").exists():
@@ -203,6 +204,9 @@ def run():
             # Wait for 5 seconds to ensure the merge reports are properly synchronized after rerun attempts.
             time.sleep(5)
             slack_service.send_test_report(args.env, args.tests, failing_suites, number_of_test_runs)
+
+        if len(failing_suites) > 0:
+            sys.exit(1)
 
     except Exception as ex:
         if args.enable_slack_notifications:

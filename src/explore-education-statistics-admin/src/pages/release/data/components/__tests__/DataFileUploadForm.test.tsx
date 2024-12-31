@@ -149,6 +149,25 @@ describe('DataFileUploadForm', () => {
     });
   });
 
+  test('form submits without error when suitable file is used', async () => {
+    const onSubmit = jest.fn();
+    const { user } = render(<DataFileUploadForm onSubmit={onSubmit} />);
+
+    const file = new File(['hello, world!'], 'test.zip', {
+      type: 'application/zip',
+    });
+
+    await user.click(screen.getByLabelText('Bulk ZIP upload'));
+    await user.upload(screen.getByLabelText('Upload bulk ZIP file'), file);
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Upload data files',
+      }),
+    );
+
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+
   test('shows validation message when bulk ZIP file is empty', async () => {
     const { user } = render(<DataFileUploadForm onSubmit={noop} />);
 

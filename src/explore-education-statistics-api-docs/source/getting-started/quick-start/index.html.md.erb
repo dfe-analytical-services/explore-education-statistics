@@ -50,7 +50,7 @@ In the following sections, this guide will walk you through how to perform the a
 ### Step 1: Find a publication
 
 To find a publication that you may be interested in, you'll need to make a `GET` request to the
-[List publications](/endpoints/ListPublications/index.html) endpoint:
+[List publications](/reference-v1/endpoints/ListPublications/index.html) endpoint:
 
 ```
 GET <%= api_url "/api/v1/publications" %>
@@ -125,7 +125,7 @@ Once you find a publication you are interested in, proceed to the next step.
 
 Now that you have a publication that you are interested, you can use this to find data sets related
 to it. This can be done using
-the [List a publication's data sets](/endpoints/ListPublicationDataSets/index.html)
+the [List a publication's data sets](/reference-v1/endpoints/ListPublicationDataSets/index.html)
 endpoint:
 
 ```
@@ -207,7 +207,7 @@ Once you have chosen a data set, proceed to the next step.
 ### Step 3: Get the data set's metadata
 
 Now that you have a chosen a data set, you'll want to query it for some data. To create a query,
-you'll need to use the [Get a data set's metadata](/endpoints/GetDataSetMeta/index.html) endpoint.
+you'll need to use the [Get a data set's metadata](/reference-v1/endpoints/GetDataSetMeta/index.html) endpoint.
 This provides information about all the filterable facets and indicators available to a data set.
 
 **Facets** are specific features / characteristics of the data. These are used in a data set query
@@ -340,14 +340,14 @@ In the above example, there are location options for:
 
 The `geographicLevels` property contains the different geographic levels that the data was collected
 at. Each geographic level is identified by its `code` and a full list of these can be found in the
-[GeographicLevelCode schema](/schemas/GeographicLevelCode/index.html).
+[GeographicLevelCode schema](/reference-v1/schemas/GeographicLevelCode/index.html).
 
 In the above example, there are geographic level options for 'National' (`NAT`) and 'Regional' (`REG`)
 geographic levels.
 
 The `timePeriods` property contains the time periods the data was collected at. The time period options
 are represented by a `code` that describes the time period's type and a `period` that describes the
-date range. A full list of time period codes can be found in the [TimePeriodCode schema](/schemas/TimePeriodCode/index.html).
+date range. A full list of time period codes can be found in the [TimePeriodCode schema](/reference-v1/schemas/TimePeriodCode/index.html).
 
 In the above example there is a single time period option for 'academic year 2022/23'.
 
@@ -375,7 +375,7 @@ ready.
 ### Step 4: Create and run your data set query
 
 In this final step, you'll need to use the metadata from the previous step to create and run your
-query against the [Query a data set](/endpoints/QueryDataSetPost/index.html) endpoint.
+query against the [Query a data set](/reference-v1/endpoints/QueryDataSetPost/index.html) endpoint.
 
 To use this endpoint, a `POST` request needs to be sent to the endpoint URL with an appropriate
 request body. The most basic request would look like the following:
