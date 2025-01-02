@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -22,7 +23,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public int? DataSetFileVersion { get; set; }
 
+        public List<DataSetFileVersionGeographicLevel> DataSetFileVersionGeographicLevels { get; set; } = [];
+
         public DataSetFileMeta? DataSetFileMeta { get; set; }
+
+        public List<DataSetFileFilterHierarchy>? FilterHierarchies { get; set; }
 
         public Guid? ReplacedById { get; set; }
 

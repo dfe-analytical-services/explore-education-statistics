@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -18,7 +17,6 @@ public class PublishingCompletionService(
     INotificationsService notificationsService,
     IReleasePublishingStatusService releasePublishingStatusService,
     IPublicationCacheService publicationCacheService,
-    IReleaseVersionRepository releaseVersionRepository,
     IReleaseService releaseService,
     IRedirectsCacheService redirectsCacheService,
     IDataSetPublishingService dataSetPublishingService)
@@ -29,10 +27,7 @@ public class PublishingCompletionService(
     {
         var releaseStatuses = await releasePublishingKeys
             .ToAsyncEnumerable()
-            .SelectAwait(async key =>
-            {
-                return await releasePublishingStatusService.Get(key);
-            })
+            .SelectAwait(async key => await releasePublishingStatusService.Get(key))
             .ToListAsync();
 
         var prePublishingStagesComplete = releaseStatuses
@@ -72,7 +67,6 @@ public class PublishingCompletionService(
 
                 foreach (var methodologyVersion in methodologyVersions)
                 {
-                    // WARN: This must be called before PublicationRepository#UpdateLatestPublishedRelease
                     if (await methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, releaseVersion))
                     {
                         await methodologyService.Publish(methodologyVersion);
@@ -89,7 +83,7 @@ public class PublishingCompletionService(
 
         await directlyRelatedPublicationIds
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(UpdateLatestPublishedRelease);
+            .ForEachAwaitAsync(UpdateLatestPublishedReleaseVersionForPublication);
 
         // Update the cached publication and any cached superseded publications.
         // If this is the first live release of the publication, the superseding is now enforced
@@ -124,16 +118,15 @@ public class PublishingCompletionService(
                     .UpdatePublishingStage(status.AsTableRowKey(), ReleasePublishingStatusPublishingStage.Complete));
     }
 
-    private async Task UpdateLatestPublishedRelease(Guid publicationId)
+    private async Task UpdateLatestPublishedReleaseVersionForPublication(Guid publicationId)
     {
         var publication = await contentDbContext.Publications
             .SingleAsync(p => p.Id == publicationId);
 
-        var latestPublishedReleaseVersion =
-            await releaseVersionRepository.GetLatestPublishedReleaseVersion(publicationId);
-        publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersion!.Id;
+        var latestPublishedReleaseVersion = await releaseService.GetLatestPublishedReleaseVersion(publicationId);
 
-        contentDbContext.Update(publication);
+        publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersion.Id;
+
         await contentDbContext.SaveChangesAsync();
     }
 }

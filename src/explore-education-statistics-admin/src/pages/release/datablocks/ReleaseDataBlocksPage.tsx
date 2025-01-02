@@ -128,7 +128,7 @@ const ReleaseDataBlocksPage = ({
         </p>
       </InsetText>
 
-      {canUpdateRelease && filteredDataBlocks.length > 5 && (
+      {canUpdateRelease && dataBlocks.length > 5 && (
         <ButtonLink to={createPath}>Create data block</ButtonLink>
       )}
 

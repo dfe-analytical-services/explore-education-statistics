@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
@@ -26,10 +27,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
-using IReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
-using ReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
 {
@@ -326,12 +323,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     contentPublicationReleaseSeries[2].Description);
                 Assert.Equal(publication.ReleaseSeries[2].LegacyLinkUrl,
                     contentPublicationReleaseSeries[2].LegacyLinkUrl);
-
-                var contentPublicationReleases = contentPublication.Releases;
-                Assert.Single(contentPublicationReleases);
-                Assert.Equal(otherReleaseVersion.Id, contentPublicationReleases[0].Id);
-                Assert.Equal(otherReleaseVersion.Slug, contentPublicationReleases[0].Slug);
-                Assert.Equal(otherReleaseVersion.Title, contentPublicationReleases[0].Title);
 
                 Assert.Equal(2, contentPublication.Methodologies.Count);
                 Assert.Equal(methodology.Versions[0].Id, contentPublication.Methodologies[0].Id);
@@ -678,7 +669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             IDataBlockService? dataBlockService = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IReleaseFileService? releaseFileService = null,
-            IReleaseVersionRepository? releaseVersionRepository = null,
+            IReleaseRepository? releaseRepository = null,
             IUserService? userService = null)
         {
             return new(
@@ -688,7 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
                 methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
-                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
+                releaseRepository ?? new ReleaseRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object
             );
         }

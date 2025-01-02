@@ -1,4 +1,4 @@
-import { ResourceNames } from '../../types.bicep'
+import { ResourceNames, ContainerAppResourceConfig } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -29,6 +29,9 @@ param apiAppRegistrationClientId string
 
 @description('Specifies the Application Insights connection string for this Container App to use for its monitoring.')
 param appInsightsConnectionString string
+
+@description('Resource limits and scaling configuration.')
+param resourceAndScalingConfig ContainerAppResourceConfig
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
@@ -145,6 +148,12 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       ]
       requireAuthentication: false
     }
+    cpuCores: resourceAndScalingConfig.cpuCores
+    memoryGis: resourceAndScalingConfig.memoryGis
+    minReplicas: resourceAndScalingConfig.minReplicas
+    maxReplicas: resourceAndScalingConfig.maxReplicas
+    scaleAtConcurrentHttpRequests: resourceAndScalingConfig.scaleAtConcurrentHttpRequests
+    workloadProfileName: resourceAndScalingConfig.workloadProfileName
     tagValues: tagValues
   }
 }

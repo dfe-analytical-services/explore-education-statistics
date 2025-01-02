@@ -43,15 +43,15 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             Url = ""
         },
         LatestReleaseId = Guid.NewGuid(),
-        Releases = new List<ReleaseVersionTitleViewModel>
-        {
-            new()
+        Releases =
+        [
+            new ReleaseTitleViewModel
             {
                 Id = Guid.NewGuid(),
                 Slug = "",
                 Title = ""
             }
-        },
+        ],
         ReleaseSeries =
         [
             new ReleaseSeriesItemViewModel

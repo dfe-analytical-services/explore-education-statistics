@@ -1,4 +1,4 @@
-import { ResourceNames } from '../../types.bicep'
+import { ResourceNames, ContainerAppWorkloadProfile } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -8,6 +8,9 @@ param location string
 
 @description('Specifies the Application Insights key that is associated with this resource.')
 param applicationInsightsKey string
+
+@description('Specifies the workload profiles for this Container App Environment - the default Consumption plan is always included')
+param workloadProfiles ContainerAppWorkloadProfile[] = []
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -33,7 +36,6 @@ module containerAppEnvironmentModule '../../components/containerAppEnvironment.b
     subnetId: subnet.id
     logAnalyticsWorkspaceName: resourceNames.sharedResources.logAnalyticsWorkspace
     applicationInsightsKey: applicationInsightsKey
-    tagValues: tagValues
     azureFileStorages: [
       {
         storageName: resourceNames.publicApi.publicApiFileShare
@@ -43,6 +45,8 @@ module containerAppEnvironmentModule '../../components/containerAppEnvironment.b
         accessMode: 'ReadWrite'
       }
     ]
+    workloadProfiles: workloadProfiles
+    tagValues: tagValues
   }
 }
 

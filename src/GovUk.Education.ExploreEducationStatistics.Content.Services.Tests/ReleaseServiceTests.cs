@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -745,7 +744,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(2, releases.Count);
 
-                // Ordered from most newest to oldest
+                // Ordered from newest to oldest
                 Assert.Equal(release2Version1.Id, releases[0].Id);
                 Assert.Equal(release2Version1.Title, releases[0].Title);
                 Assert.Equal(release2Version1.Slug, releases[0].Slug);
@@ -851,7 +850,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             return new(
                 contentDbContext,
-                new PersistenceHelper<ContentDbContext>(contentDbContext),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,

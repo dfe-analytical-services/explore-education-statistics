@@ -80,8 +80,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public string Slug { get; set; }
 
-            public List<PreviousReleaseViewModel> Releases { get; set; }
-
             public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; set; }
 
             public Contact Contact { get; set; }
@@ -99,14 +97,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         public string Reason { get; set; }
 
         public DateTime On { get; set; }
-    }
-
-    public class PreviousReleaseViewModel
-    {
-        public Guid Id { get; set; }
-
-        public string Slug { get; set; }
-
-        public string Title { get; set; }
     }
 }

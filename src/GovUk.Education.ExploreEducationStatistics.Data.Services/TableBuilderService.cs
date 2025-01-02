@@ -1,4 +1,12 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -6,7 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -20,14 +28,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Utils.TableBuilderUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -36,7 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class TableBuilderService : ITableBuilderService
     {
-        private readonly StatisticsDbContext _context;
+        private readonly StatisticsDbContext _statisticsDbContext;
+        private readonly ContentDbContext _contentDbContext;
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly ILocationService _locationService;
         private readonly IObservationService _observationService;
@@ -45,12 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ISubjectCsvMetaService _subjectCsvMetaService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IUserService _userService;
-        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly TableBuilderOptions _options;
         private readonly LocationsOptions _locationOptions;
 
         public TableBuilderService(
-            StatisticsDbContext context,
+            StatisticsDbContext statisticsDbContext,
+            ContentDbContext contentDbContext,
             IFilterItemRepository filterItemRepository,
             ILocationService locationService,
             IObservationService observationService,
@@ -59,11 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ISubjectCsvMetaService subjectCsvMetaService,
             ISubjectRepository subjectRepository,
             IUserService userService,
-            IReleaseVersionRepository releaseVersionRepository,
             IOptions<TableBuilderOptions> options,
             IOptions<LocationsOptions> locationOptions)
         {
-            _context = context;
+            _statisticsDbContext = statisticsDbContext;
+            _contentDbContext = contentDbContext;
             _filterItemRepository = filterItemRepository;
             _locationService = locationService;
             _observationService = observationService;
@@ -72,7 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _subjectCsvMetaService = subjectCsvMetaService;
             _subjectRepository = subjectRepository;
             _userService = userService;
-            _releaseVersionRepository = releaseVersionRepository;
             _options = options.Value;
             _locationOptions = locationOptions.Value;
         }
@@ -189,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 (await _observationService.GetMatchedObservations(query, cancellationToken))
                 .Select(row => row.Id);
 
-            return await _context
+            return await _statisticsDbContext
                 .Observation
                 .AsNoTracking()
                 .Include(o => o.Location)
@@ -236,9 +236,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return await _subjectRepository.FindPublicationIdForSubject(subjectId)
                 .OrNotFound()
-                .OnSuccess(publicationId =>
-                    _releaseVersionRepository.GetLatestPublishedReleaseVersion(publicationId).OrNotFound())
-                .OnSuccess(releaseVersion => releaseVersion.Id);
+                .OnSuccess(async publicationId => await _contentDbContext.Publications
+                    .Where(p => p.Id == publicationId)
+                    .Select(p => p.LatestPublishedReleaseVersionId)
+                    .SingleOrDefaultAsync()
+                    .OrNotFound());
         }
 
         private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId,

@@ -23,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -106,7 +107,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -325,7 +326,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -454,7 +455,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -604,7 +605,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -749,7 +750,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("ignored-school-rows")
+            .WithDefaultFiles("ignored-school-rows", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(8)
@@ -894,7 +895,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("ignored-school-rows")
+            .WithDefaultFiles("ignored-school-rows", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(8)
@@ -1052,7 +1053,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -1190,7 +1191,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(CANCELLED)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -1324,7 +1325,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("additional-filters-and-indicators")
+            .WithDefaultFiles("additional-filters-and-indicators", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -1493,7 +1494,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(subject.Id)
-            .WithDefaultFiles("small-csv-with-special-data")
+            .WithDefaultFiles("small-csv-with-special-data", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(5)
             .WithExpectedImportedRows(5)
