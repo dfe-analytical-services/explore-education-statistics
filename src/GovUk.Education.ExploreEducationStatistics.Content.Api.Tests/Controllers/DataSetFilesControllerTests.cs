@@ -1626,8 +1626,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var originalMeta = releaseFile.File.DataSetFileMeta;
 
-                Assert.Null(originalMeta!.GeographicLevels); // TODO: remove in EES-5750
-
                 Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                 {
                     From = TimePeriodLabelFormatter.Format(
