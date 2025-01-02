@@ -13,6 +13,7 @@ param publicUrls = {
 param postgreSqlSkuName = 'Standard_B1ms'
 param postgreSqlStorageSizeGB = 32
 param postgreSqlAutoGrowStatus = 'Disabled'
+param postgreSqlGeoRedundantBackupEnabled = true
 
 param docsAppSku = 'Standard'
 
