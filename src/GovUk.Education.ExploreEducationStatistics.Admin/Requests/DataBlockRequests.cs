@@ -27,7 +27,7 @@ public record DataBlockCreateRequest
         {
             RuleFor(request => request.Heading)
                 .NotEmpty()
-                .MaximumLength(120);
+                .MaximumLength(220);
 
             RuleFor(request => request.Name)
                 .NotEmpty();
@@ -58,7 +58,7 @@ public record DataBlockUpdateRequest
         {
             RuleFor(request => request.Heading)
                 .NotEmpty()
-                .MaximumLength(120);
+                .MaximumLength(220);
 
             RuleFor(request => request.Name)
                 .NotEmpty();

@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241216111431_EES5740_AddFilterHierarchiesColumnToFilesTable")]
+    partial class EES5740_AddFilterHierarchiesColumnToFilesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -328,20 +331,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.ToTable("DataImportErrors");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersionGeographicLevel", b =>
-                {
-                    b.Property<Guid>("DataSetFileVersionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("GeographicLevel")
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
-
-                    b.HasKey("DataSetFileVersionId", "GeographicLevel");
-
-                    b.ToTable("DataSetFileVersionGeographicLevels");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EmbedBlock", b =>
                 {
                     b.Property<Guid>("Id")
@@ -445,9 +434,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("DataSetFileMeta")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("DataSetFileMetaGeogLvlMigrated")
-                        .HasColumnType("bit");
 
                     b.Property<int?>("DataSetFileVersion")
                         .HasColumnType("int");
@@ -1614,17 +1600,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("DataImport");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersionGeographicLevel", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.File", "DataSetFileVersion")
-                        .WithMany("DataSetFileVersionGeographicLevels")
-                        .HasForeignKey("DataSetFileVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DataSetFileVersion");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.FeaturedTable", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
@@ -2209,11 +2184,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport", b =>
                 {
                     b.Navigation("Errors");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.File", b =>
-                {
-                    b.Navigation("DataSetFileVersionGeographicLevels");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", b =>

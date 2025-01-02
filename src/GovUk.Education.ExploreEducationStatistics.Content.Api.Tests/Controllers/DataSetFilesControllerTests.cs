@@ -1579,8 +1579,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .WithReleaseVersion(publication.ReleaseVersions[0])
                     .WithFile(_fixture.DefaultFile(FileType.Data)
                         .WithType(FileType.Data)
+                        .WithDataSetFileVersionGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority])
                         .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
-                            .WithGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority])
                             .WithTimePeriodRange(
                                 _fixture.DefaultTimePeriodRangeMeta()
                                     .WithStart("2000", TimeIdentifier.AcademicYear)
@@ -1618,12 +1618,15 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 var dataSetFileSummaryViewModel = Assert.Single(pagedResult.Results);
                 var dataSetFileMetaViewModel = dataSetFileSummaryViewModel.Meta;
 
+                var geographicLevels = releaseFile.File.DataSetFileVersionGeographicLevels
+                    .Select(gl => gl.GeographicLevel)
+                    .ToList();
+                Assert.True(ComparerUtils.SequencesAreEqualIgnoringOrder(
+                    [GeographicLevel.Country, GeographicLevel.LocalAuthority], geographicLevels));
+
                 var originalMeta = releaseFile.File.DataSetFileMeta;
 
-                Assert.Equal(originalMeta!.GeographicLevels
-                        .Select(gl => gl.GetEnumLabel())
-                        .ToList(),
-                    dataSetFileMetaViewModel.GeographicLevels);
+                Assert.Null(originalMeta!.GeographicLevels); // TODO: remove in EES-5750
 
                 Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                 {
@@ -2069,12 +2072,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 $"{releaseFile.PublicApiDataSetVersion!.Major}.{releaseFile.PublicApiDataSetVersion.Minor}",
                 viewModel.Api.Version);
 
-            var dataSetFileMeta = file.DataSetFileMeta;
-
-            Assert.Equal(dataSetFileMeta!.GeographicLevels
-                    .Select(gl => gl.GetEnumLabel())
-                    .ToList(),
+            Assert.Equal([
+                    GeographicLevel.Country.GetEnumLabel(),
+                    GeographicLevel.LocalAuthority.GetEnumLabel(),
+                    GeographicLevel.LocalAuthorityDistrict.GetEnumLabel()
+                ],
                 viewModel.File.Meta.GeographicLevels);
+
+            var dataSetFileMeta = file.DataSetFileMeta;
 
             Assert.Equal(new DataSetFileTimePeriodRangeViewModel
             {

@@ -458,6 +458,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     .HasConversion(
                         v => JsonConvert.SerializeObject(v),
                         v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
+                entity.Property(p => p.FilterHierarchies)
+                    .HasConversion(
+                        v => JsonConvert.SerializeObject(v),
+                        v => JsonConvert.DeserializeObject<List<DataSetFileFilterHierarchy>>(v));
             });
         }
 

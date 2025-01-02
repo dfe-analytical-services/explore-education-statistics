@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -24,6 +25,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
@@ -198,6 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var stopwatch = Stopwatch.StartNew();
 
                     var releaseFile = await contentDbContext.ReleaseFiles
+                        .Include(rf => rf.File)
                         .Where(rf => rf.ReleaseVersionId == releaseSubject.ReleaseVersionId
                                      && rf.File.SubjectId == releaseSubject.SubjectId
                                      && rf.File.Type == FileType.Data)
@@ -222,10 +225,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         releaseSubject.SubjectId, releaseFile.IndicatorSequence);
                     logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
 
+                    var filterHierarchies = releaseFile.File.FilterHierarchies!
+                        .Select(fh => new DataSetFileFilterHierarchyViewModel(
+                            RootFilterId: fh.RootFilterId,
+                            ChildFilterIds: fh.ChildFilterIds,
+                            RootOptionIds: fh.RootOptionIds,
+                            Tiers: fh.Tiers
+                                .Select((tier, index) =>
+                                    new DataSetFileFilterHierarchyTierViewModel(index, tier))
+                                .ToList()
+                        )).ToList();
+
                     return new SubjectMetaViewModel
                     {
                         Filters = filters,
                         Indicators = indicators,
+                        FilterHierarchies = filterHierarchies,
                     };
                 }
                 default:

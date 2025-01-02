@@ -10,6 +10,7 @@ parameters:
 jobs:
   - deployment: DeployPublicApiDocs
     displayName: Deploy Public API docs
+    condition: and(succeeded(), eq(variables.deployDocsSite, true))
     dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
     strategy:
