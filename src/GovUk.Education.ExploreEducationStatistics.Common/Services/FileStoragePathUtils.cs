@@ -99,6 +99,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/subjects.json";
         }
 
+        public static string DataSetFilesPath(Guid rootPath)
+        {
+            return $"{rootPath}/data";
+        }
+
         public static string FilesPath(Guid rootPath, FileType type)
         {
             var typeFolder = (type == Metadata ? Data : type).GetEnumLabel();

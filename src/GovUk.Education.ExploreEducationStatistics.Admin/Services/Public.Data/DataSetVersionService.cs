@@ -78,7 +78,7 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default)
     {
         var releaseFileIds = await contentDbContext
-            .ReleaseFiles
+            .ReleaseFiles // @MarkFix ReleaseDataSetFileVersion
             .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data)
             .Select(rf => rf.Id)
             .ToListAsync(cancellationToken);

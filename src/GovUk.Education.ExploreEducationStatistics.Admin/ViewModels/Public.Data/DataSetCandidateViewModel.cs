@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Dat
 
 public record DataSetCandidateViewModel
 {
-    public required Guid ReleaseFileId { get; init; }
+    public required Guid ReleaseFileId { get; init; } // @MarkFix ReleaseDataSetFileVersionId
 
     public required string Title { get; init; }
 }

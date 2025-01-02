@@ -55,6 +55,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<ReleaseStatus> ReleaseStatus { get; set; }
         public virtual DbSet<ReleaseFile> ReleaseFiles { get; set; }
         public virtual DbSet<File> Files { get; set; }
+        public virtual DbSet<ReleaseDataSetFile> ReleaseDataSetFiles { get; set; }
+        public virtual DbSet<DataSetFile> DataSetFiles { get; set; }
+        public virtual DbSet<DataSetFileVersion> DataSetFileVersions { get; set; }
         public virtual DbSet<DataSetFileVersionGeographicLevel> DataSetFileVersionGeographicLevels { get; set; }
         public virtual DbSet<ContentSection> ContentSections { get; set; }
         public virtual DbSet<ContentBlock> ContentBlocks { get; set; }

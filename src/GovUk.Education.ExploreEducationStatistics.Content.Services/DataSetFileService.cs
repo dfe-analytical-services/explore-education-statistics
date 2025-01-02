@@ -126,6 +126,7 @@ public class DataSetFileService(
                 LastUpdated = result.Value.Published!.Value,
                 Api = BuildDataSetFileApiViewModel(result.Value),
                 Meta = BuildDataSetFileMetaViewModel(
+                    contentDbContext,
                     result.Value.File.DataSetFileVersionGeographicLevels,
                     result.Value.File.DataSetFileMeta,
                     result.Value.FilterSequence,
@@ -269,6 +270,7 @@ public class DataSetFileService(
     }
 
     private static DataSetFileMetaViewModel BuildDataSetFileMetaViewModel(
+        ContentDbContext contentDbContext,
         List<DataSetFileVersionGeographicLevel> dataSetFileVersionGeographicLevels,
         DataSetFileMeta? meta,
         List<FilterSequenceEntry>? filterSequence,

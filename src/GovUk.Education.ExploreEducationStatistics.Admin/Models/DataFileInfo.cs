@@ -7,7 +7,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 {
-    public record DataFileInfo : FileInfo
+    public record DataFileInfo : FileInfo // @MarkFix look into this - guess it'll get removed?
     {
         public override FileType Type { get; set; } = FileType.Data;
 

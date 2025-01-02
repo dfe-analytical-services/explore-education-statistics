@@ -15,7 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 table: "Files",
                 type: "bit",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: false,
+                );
 
             migrationBuilder.Sql("""
                                  UPDATE [dbo].Files
