@@ -299,6 +299,11 @@ public class ProcessorStage3Tests
 
             Assert.NotNull(file.DataSetFileMeta);
 
+            // Checking against contents of small-csv.csv in Resources directory / _subject
+            Assert.NotNull(file.DataSetFileMeta.GeographicLevels);
+            var metaGeographicLevel = Assert.Single(file.DataSetFileMeta.GeographicLevels);
+            Assert.Equal(GeographicLevel.LocalAuthority.GetEnumValue(), metaGeographicLevel); // TODO: EES-5765
+
             Assert.Equal(TimeIdentifier.CalendarYear,
                 file.DataSetFileMeta.TimePeriodRange.Start.TimeIdentifier);
             Assert.Equal(TimeIdentifier.CalendarYear,

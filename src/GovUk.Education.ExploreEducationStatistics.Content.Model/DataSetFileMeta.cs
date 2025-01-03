@@ -9,10 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class DataSetFileMeta
 {
-    // NOTE: GeographicLevels aren't in DataSetFileMeta JSON because they need to queryable
-    // So that meta data lives in DataSetFileVersionGeographicLevels
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-    public List<string>? GeographicLevels { get; set; } // TODO: remove in EES-5750
+    public List<string>? GeographicLevels { get; set; }
+    //[JsonConverter(typeof(GeographicLevelsListJsonConverter))] // TODO: EES-5765
+    //public required List<GeographicLevel> GeographicLevels { get; set; }
 
     public required TimePeriodRangeMeta TimePeriodRange { get; set; }
 

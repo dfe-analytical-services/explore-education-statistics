@@ -2,11 +2,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 
@@ -22,13 +24,10 @@ public class DataSetFileMetaMigrationController(ContentDbContext contentDbContex
         public int NumLeftToProcess;
     }
 
-    [HttpPut("bau/meta-geographic-levels-remove")]
-    public async Task<MigrationResult> DataSetFileVersionGeographicLevelsMigration(
-        [FromQuery] bool isDryRun = true,
-        [FromQuery] int? num = null,
-        CancellationToken cancellationToken = default)
+    [HttpPut("bau/meta-geographic-levels-set")] public async Task<MigrationResult> DataSetFileVersionGeographicLevelsMigrationSet( [FromQuery] bool isDryRun = true, [FromQuery] int? num = null, CancellationToken cancellationToken = default)
     {
         var queryable = contentDbContext.Files
+            .Include(f => f.DataSetFileVersionGeographicLevels)
             .Where(f => f.Type == FileType.Data
                         && f.DataSetFileMetaGeogLvlMigrated == false
                         && f.DataSetFileVersionGeographicLevels.Count > 0); // Paranoidly protecting against data set where geog lvls aren't migrated
@@ -48,7 +47,9 @@ public class DataSetFileMetaMigrationController(ContentDbContext contentDbContex
             {
                 file.DataSetFileMeta = new DataSetFileMeta
                 {
-                    GeographicLevels = null,
+                    GeographicLevels = file.DataSetFileVersionGeographicLevels
+                        .Select(gl => gl.GeographicLevel.GetEnumValue())
+                        .ToList(),
                     TimePeriodRange = file.DataSetFileMeta.TimePeriodRange,
                     Filters = file.DataSetFileMeta.Filters,
                     Indicators = file.DataSetFileMeta.Indicators,
@@ -71,5 +72,4 @@ public class DataSetFileMetaMigrationController(ContentDbContext contentDbContex
             NumLeftToProcess = contentDbContext.Files.Count(f => f.DataSetFileMetaGeogLvlMigrated == false),
         };
     }
-
 }

@@ -117,7 +117,7 @@ public static class FileGeneratorExtensions
             .SetContentType("text/csv")
             .SetDefault(f => f.DataSetFileId)
             .Set(f => f.DataSetFileMeta, (_, _, context) => context.Fixture.DefaultDataSetFileMeta())
-            .SetDataSetFileVersionGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.LocalAuthorityDistrict]);
+            .SetDataSetFileVersionGeographicLevels([GeographicLevel.Country]);
 
     public static InstanceSetters<File> SetMetaFileDefaults(this InstanceSetters<File> setters)
         => setters

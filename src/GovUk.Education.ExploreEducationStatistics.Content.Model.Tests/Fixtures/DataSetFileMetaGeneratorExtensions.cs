@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -16,6 +17,7 @@ public static class DataSetFileMetaGeneratorExtensions
 
     public static InstanceSetters<DataSetFileMeta> SetDefaults(this InstanceSetters<DataSetFileMeta> setters)
         => setters
+            .SetGeographicLevels([GeographicLevel.Country.GetEnumValue()]) // TODO: EES-5765
             .SetTimePeriodRange(new TimePeriodRangeMeta
             {
                 Start = new TimePeriodRangeBoundMeta { TimeIdentifier = TimeIdentifier.CalendarYear, Period = "2000", },
@@ -36,6 +38,11 @@ public static class DataSetFileMetaGeneratorExtensions
                 },
             ]);
 
+    public static Generator<DataSetFileMeta> WithGeographicLevels(
+        this Generator<DataSetFileMeta> generator,
+        List<string> geographicLevels) // TODO: EES-5765 type
+        => generator.ForInstance(s => s.SetGeographicLevels(geographicLevels));
+
     public static Generator<DataSetFileMeta> WithTimePeriodRange(
         this Generator<DataSetFileMeta> generator,
         TimePeriodRangeMeta timePeriodRange)
@@ -50,6 +57,11 @@ public static class DataSetFileMetaGeneratorExtensions
         this Generator<DataSetFileMeta> generator,
         List<IndicatorMeta> indicators)
         => generator.ForInstance(s => s.SetIndicators(indicators));
+
+    public static InstanceSetters<DataSetFileMeta> SetGeographicLevels(
+        this InstanceSetters<DataSetFileMeta> setters,
+        List<string> geographicLevels) // TODO: EES-5765 type
+        => setters.Set(s => s.GeographicLevels, geographicLevels);
 
     public static InstanceSetters<DataSetFileMeta> SetTimePeriodRange(
         this InstanceSetters<DataSetFileMeta> setters,

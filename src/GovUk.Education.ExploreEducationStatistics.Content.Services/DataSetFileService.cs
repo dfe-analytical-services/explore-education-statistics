@@ -26,6 +26,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
@@ -126,7 +127,6 @@ public class DataSetFileService(
                 LastUpdated = result.Value.Published!.Value,
                 Api = BuildDataSetFileApiViewModel(result.Value),
                 Meta = BuildDataSetFileMetaViewModel(
-                    result.Value.File.DataSetFileVersionGeographicLevels,
                     result.Value.File.DataSetFileMeta,
                     result.Value.FilterSequence,
                     result.Value.IndicatorSequence),
@@ -171,7 +171,7 @@ public class DataSetFileService(
         var releaseFile = await contentDbContext.ReleaseFiles
             .Include(rf => rf.ReleaseVersion.Publication.Theme)
             .Include(rf => rf.ReleaseVersion.Publication.SupersededBy)
-            .Include(rf => rf.File.DataSetFileVersionGeographicLevels)
+            .Include(rf => rf.File)
             .Where(rf =>
                 rf.File.DataSetFileId == dataSetFileId
                 && rf.ReleaseVersion.Published.HasValue
@@ -226,7 +226,6 @@ public class DataSetFileService(
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
                 Meta = BuildDataSetFileMetaViewModel(
-                    releaseFile.File.DataSetFileVersionGeographicLevels,
                     releaseFile.File.DataSetFileMeta,
                     releaseFile.FilterSequence,
                     releaseFile.IndicatorSequence),
@@ -269,7 +268,6 @@ public class DataSetFileService(
     }
 
     private static DataSetFileMetaViewModel BuildDataSetFileMetaViewModel(
-        List<DataSetFileVersionGeographicLevel> dataSetFileVersionGeographicLevels,
         DataSetFileMeta? meta,
         List<FilterSequenceEntry>? filterSequence,
         List<IndicatorGroupSequenceEntry>? indicatorGroupSequence)
@@ -281,8 +279,11 @@ public class DataSetFileService(
 
         return new DataSetFileMetaViewModel
         {
-            GeographicLevels = dataSetFileVersionGeographicLevels
-                .Select(gl => gl.GeographicLevel.GetEnumLabel())
+            //GeographicLevels = meta.GeographicLevels
+            //    .Select(gl => gl.GetEnumLabel())
+            //    .ToList(),
+            GeographicLevels = meta.GeographicLevels! // TODO: EES-5765
+                .Select(code => EnumToEnumValueConverter<GeographicLevel>.FromProvider(code).GetEnumLabel())
                 .ToList(),
             TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
             {

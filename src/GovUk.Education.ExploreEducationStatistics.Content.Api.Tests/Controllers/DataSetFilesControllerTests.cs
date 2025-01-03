@@ -1581,6 +1581,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         .WithType(FileType.Data)
                         .WithDataSetFileVersionGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority])
                         .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
+                            .WithGeographicLevels(
+                                [GeographicLevel.Country.GetEnumValue(), GeographicLevel.LocalAuthority.GetEnumValue()]) // TODO: EES-5765
                             .WithTimePeriodRange(
                                 _fixture.DefaultTimePeriodRangeMeta()
                                     .WithStart("2000", TimeIdentifier.AcademicYear)
@@ -1626,7 +1628,9 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var originalMeta = releaseFile.File.DataSetFileMeta;
 
-                Assert.Null(originalMeta!.GeographicLevels); // TODO: remove in EES-5750
+                Assert.True(ComparerUtils.SequencesAreEqualIgnoringOrder(
+                    [GeographicLevel.Country.GetEnumLabel(), GeographicLevel.LocalAuthority.GetEnumLabel()], // TODO: EES-5765
+                    dataSetFileMetaViewModel.GeographicLevels));
 
                 Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                 {
@@ -2074,8 +2078,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
             Assert.Equal([
                     GeographicLevel.Country.GetEnumLabel(),
-                    GeographicLevel.LocalAuthority.GetEnumLabel(),
-                    GeographicLevel.LocalAuthorityDistrict.GetEnumLabel()
                 ],
                 viewModel.File.Meta.GeographicLevels);
 

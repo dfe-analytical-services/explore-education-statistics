@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -14,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -306,6 +304,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.NotNull(updatedFile.DataSetFileMeta);
                 var meta = updatedFile.DataSetFileMeta;
+
+                Assert.Equal(3, meta.GeographicLevels!.Count);
+                Assert.Contains(GeographicLevel.Country.GetEnumValue(), meta.GeographicLevels); // TODO: EES-5765
+                Assert.Contains(GeographicLevel.LocalAuthority.GetEnumValue(), meta.GeographicLevels);
+                Assert.Contains(GeographicLevel.Region.GetEnumValue(), meta.GeographicLevels);
 
                 Assert.Equal("2000", meta.TimePeriodRange.Start.Period);
                 Assert.Equal(TimeIdentifier.April, meta.TimePeriodRange.Start.TimeIdentifier);
