@@ -16,4 +16,6 @@ param postgreSqlAutoGrowStatus = 'Disabled'
 
 param docsAppSku = 'Standard'
 
+param recoveryVaultImmutable = true
+
 param enableThemeDeletion = false

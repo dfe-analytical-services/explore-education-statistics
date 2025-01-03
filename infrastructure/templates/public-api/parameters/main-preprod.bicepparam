@@ -14,4 +14,6 @@ param postgreSqlSkuName = 'Standard_B1ms'
 param postgreSqlStorageSizeGB = 32
 param postgreSqlAutoGrowStatus = 'Disabled'
 
+param recoveryVaultImmutable = true
+
 param enableThemeDeletion = false
