@@ -40,6 +40,17 @@ const BauDashboardPage = () => {
             </p>
           </div>
         )}
+
+        {user?.permissions.isBauUser && (
+          <div className="govuk-grid-column-one-third">
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+              <Link to="/administration/glossary">Manage glossary</Link>
+            </h3>
+            <p className="govuk-caption-m govuk-!-margin-top-1">
+              Clear glossary cache.
+            </p>
+          </div>
+        )}
       </div>
 
       <hr className="govuk-!-margin-top-9" />
