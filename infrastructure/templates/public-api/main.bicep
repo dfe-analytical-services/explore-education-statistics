@@ -39,6 +39,9 @@ param postgreSqlAutoGrowStatus string = 'Disabled'
 @description('Database : Entra ID admin  principal names for this resource')
 param postgreSqlEntraIdAdminPrincipals PrincipalNameAndId[] = []
 
+@description('Database : Is geo-redundant backup enabled?')
+param postgreSqlGeoRedundantBackupEnabled bool
+
 @description('ACR : Specifies the resource group in which the shared Container Registry lives.')
 param acrResourceGroupName string = ''
 
@@ -260,6 +263,7 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     sku: postgreSqlSkuName
     storageSizeGB: postgreSqlStorageSizeGB
     deployAlerts: deployAlerts
+    geoRedundantBackupEnabled: postgreSqlGeoRedundantBackupEnabled
     tagValues: tagValues
   }
   dependsOn: [
