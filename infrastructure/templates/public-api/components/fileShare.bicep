@@ -51,7 +51,7 @@ module availabilityAlerts 'alerts/fileServices/availabilityAlert.bicep' = if (al
   }
 }
 
-module latencyAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.latency) {
+module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}FsLatencyDeploy'
   params: {
     resourceName: '${storageAccountName}-fs'

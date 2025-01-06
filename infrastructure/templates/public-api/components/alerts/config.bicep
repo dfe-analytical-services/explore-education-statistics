@@ -1,25 +1,37 @@
 var defaultDynamicAlertConfig = {
-  aggregation: 'Average'
-  operator: 'GreaterThan'
   evaluationFrequency: 'PT5M'
+  evaluationPeriods: 5
+  minFailingEvaluationPeriods: 5
   windowSize: 'PT15M'
-  numberOfEvaluationPeriods: 5
-  minFailingPeriodsToAlert: 5
   sensitivity: 'Low'
   severity: 'Warning'
 }
 
 @export()
-var cpuPercentageConfig = union(defaultDynamicAlertConfig, {
+var dynamicAverageGreaterThan = {
+  ...defaultDynamicAlertConfig
+  aggregation: 'Average'
+  operator: 'GreaterThan'
+}
+
+@export()
+var dynamicMaxGreaterThan = {
+  ...defaultDynamicAlertConfig
+  aggregation: 'Maximum'
+  operator: 'GreaterThan'
+}
+
+@export()
+var cpuPercentageConfig = union(dynamicAverageGreaterThan, {
   nameSuffix: 'cpu-percentage'
 })
 
 @export()
-var memoryPercentageConfig = union(defaultDynamicAlertConfig, {
+var memoryPercentageConfig = union(dynamicAverageGreaterThan, {
   nameSuffix: 'memory-percentage'
 })
 
 @export()
-var responseTimeConfig = union(defaultDynamicAlertConfig, {
+var responseTimeConfig = union(dynamicAverageGreaterThan, {
   nameSuffix: 'response-time'
 })

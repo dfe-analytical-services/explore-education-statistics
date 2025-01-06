@@ -1,4 +1,4 @@
-import { dynamicAverageGreaterThan } from '../config.bicep'
+import { dynamicMaxGreaterThan } from '../config.bicep'
 
 @description('Name of the resource that these alerts are being applied to.')
 param resourceName string
@@ -10,16 +10,16 @@ param alertsGroupName string
 param tagValues object
 
 module alert '../dynamicMetricAlert.bicep' = {
-  name: '${resourceName}DiskIopsAlertModule'
+  name: '${resourceName}QueryTimeAlertModule'
   params: {
     resourceName: resourceName
     resourceMetric: {
       resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
-      metric: 'disk_iops_consumed_percentage'
+      metric: 'longest_query_time_sec'
     }
     config: {
-      ...dynamicAverageGreaterThan
-      nameSuffix: 'disk-iops'
+      ...dynamicMaxGreaterThan
+      nameSuffix: 'max-query-time'
     }
     alertsGroupName: alertsGroupName
     tagValues: tagValues

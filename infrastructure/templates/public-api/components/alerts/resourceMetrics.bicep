@@ -29,7 +29,12 @@ type FileServiceMetric = {
 type PostgreSqlMetric = {
   resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
   metric: 
+    | 'client_connections_waiting'
     | 'cpu_percent'
+    | 'disk_bandwidth_consumed_percentage'
+    | 'disk_iops_consumed_percentage'
+    | 'longest_query_time_sec'
+    | 'longest_transaction_time_sec'
     | 'memory_percent'
 }
 
@@ -38,8 +43,6 @@ type StorageAccountMetric = {
   metric: 
     | 'SuccessE2ELatency'
 }
-
-
 
 @export()
 @discriminator('resourceType')

@@ -38,7 +38,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   tags: tagValues
 }
 
-module cpuPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${planName}CpuPercentageDeploy'
   params: {
     resourceName: planName
@@ -52,7 +52,7 @@ module cpuPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != n
   }
 }
 
-module memoryPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${planName}MemoryPercentageDeploy'
   params: {
     resourceName: planName

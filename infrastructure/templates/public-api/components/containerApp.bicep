@@ -224,7 +224,7 @@ module containerAppRestartsAlert 'alerts/containerApps/restartsAlert.bicep' = if
   }
 }
 
-module responseTimeAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.responseTime) {
+module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${containerAppName}ResponseTimeDeploy'
   params: {
     resourceName: containerAppName
@@ -238,7 +238,7 @@ module responseTimeAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != nu
   }
 }
 
-module cpuPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${containerAppName}CpuPercentageDeploy'
   params: {
     resourceName: containerAppName
@@ -252,7 +252,7 @@ module cpuPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != n
   }
 }
 
-module memoryPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${containerAppName}MemoryPercentageDeploy'
   params: {
     resourceName: containerAppName

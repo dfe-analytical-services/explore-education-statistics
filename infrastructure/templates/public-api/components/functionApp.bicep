@@ -21,9 +21,6 @@ param functionAppRuntime 'dotnet' | 'dotnet-isolated' | 'node' | 'python' | 'jav
 @description('Specifies the additional setting to add to the Function App')
 param appSettings object = {}
 
-@description('A set of tags with which to tag the resource in Azure')
-param tagValues object
-
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
 
