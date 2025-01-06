@@ -31,6 +31,10 @@ type PostgreSqlMetric = {
   metric: 
     | 'client_connections_waiting'
     | 'cpu_percent'
+    | 'disk_bandwidth_consumed_percentage'
+    | 'disk_iops_consumed_percentage'
+    | 'longest_query_time_sec'
+    | 'longest_transaction_time_sec'
     | 'memory_percent'
 }
 

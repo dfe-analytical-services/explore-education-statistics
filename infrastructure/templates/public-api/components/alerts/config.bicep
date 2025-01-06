@@ -1,7 +1,4 @@
-@export()
 var defaultDynamicAlertConfig = {
-  aggregation: 'Average'
-  operator: 'GreaterThan'
   evaluationFrequency: 'PT5M'
   evaluationPeriods: 5
   minFailingEvaluationPeriods: 5
@@ -11,16 +8,30 @@ var defaultDynamicAlertConfig = {
 }
 
 @export()
-var cpuPercentageConfig = union(defaultDynamicAlertConfig, {
+var greaterThanAverageDynamicConfig = {
+  ...defaultDynamicAlertConfig
+  aggregation: 'Average'
+  operator: 'GreaterThan'
+}
+
+@export()
+var greaterThanMaximumDynamicConfig = {
+  ...defaultDynamicAlertConfig
+  aggregation: 'Maximum'
+  operator: 'GreaterThan'
+}
+
+@export()
+var cpuPercentageConfig = union(greaterThanAverageDynamicConfig, {
   nameSuffix: 'cpu-percentage'
 })
 
 @export()
-var memoryPercentageConfig = union(defaultDynamicAlertConfig, {
+var memoryPercentageConfig = union(greaterThanAverageDynamicConfig, {
   nameSuffix: 'memory-percentage'
 })
 
 @export()
-var responseTimeConfig = union(defaultDynamicAlertConfig, {
+var responseTimeConfig = union(greaterThanAverageDynamicConfig, {
   nameSuffix: 'response-time'
 })
