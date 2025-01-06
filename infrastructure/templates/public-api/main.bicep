@@ -103,11 +103,11 @@ param apiAppRegistrationClientId string = ''
 @secure()
 param devopsServicePrincipalId string = ''
 
-// TODO EES-5446 - reinstate pipelineRunnerCidr when the DevOps runners have a static IP range available. 
+// TODO EES-5446 - reinstate pipelineRunnerCidr when the DevOps runners have a static IP range available.
 // @description('Specifies the IP address range of the pipeline runners.')
 // param pipelineRunnerCidr string = ''
 
-@description('Specifies whether or not test Themes can be deleted in the environment.')
+@description('Enable deletion of data relating to a theme that is being deleted.')
 param enableThemeDeletion bool = false
 
 @description('Specifies the workload profiles for this Container App Environment - the default Consumption plan is always included')
@@ -122,6 +122,9 @@ param publicApiContainerAppConfig ContainerAppResourceConfig = {
   scaleAtConcurrentHttpRequests: 10
   workloadProfileName: 'Consumption'
 }
+
+@description('Enable the Swagger UI for public API.')
+param enableSwagger bool = false
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -204,7 +207,7 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
-module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = 
+module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' =
   if (deploySharedPrivateDnsZones) {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
@@ -304,6 +307,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
     deployAlerts: deployAlerts
     resourceAndScalingConfig: publicApiContainerAppConfig
+    enableSwagger: enableSwagger
     tagValues: tagValues
   }
   dependsOn: [
@@ -419,7 +423,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
         tag: 'Default'
         priority: 100
       }
-      // TODO EES-5446 - remove service tag whitelisting when runner scale set IP range reinstated 
+      // TODO EES-5446 - remove service tag whitelisting when runner scale set IP range reinstated
       {
         cidr: 'AzureCloud'
         tag: 'ServiceTag'
@@ -445,7 +449,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
 
-output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor 
+output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor
   ? dataProcessorModule.outputs.managedIdentityClientId
   : ''
 

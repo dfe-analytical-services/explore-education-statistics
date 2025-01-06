@@ -16,7 +16,7 @@
     }
   ],
   "paths": {
-    "/api/v1/data-sets/{dataSetId}": {
+    "/v1/data-sets/{dataSetId}": {
       "get": {
         "tags": [
           "DataSets"
@@ -73,7 +73,7 @@
         }
       }
     },
-    "/api/v1/data-sets/{dataSetId}/meta": {
+    "/v1/data-sets/{dataSetId}/meta": {
       "get": {
         "tags": [
           "DataSets"
@@ -165,7 +165,7 @@
         }
       }
     },
-    "/api/v1/data-sets/{dataSetId}/query": {
+    "/v1/data-sets/{dataSetId}/query": {
       "get": {
         "tags": [
           "DataSets"
@@ -673,7 +673,7 @@
         }
       }
     },
-    "/api/v1/data-sets/{dataSetId}/csv": {
+    "/v1/data-sets/{dataSetId}/csv": {
       "get": {
         "tags": [
           "DataSets"
@@ -738,7 +738,7 @@
         }
       }
     },
-    "/api/v1/data-sets/{dataSetId}/versions": {
+    "/v1/data-sets/{dataSetId}/versions": {
       "get": {
         "tags": [
           "DataSetVersions"
@@ -820,7 +820,7 @@
         }
       }
     },
-    "/api/v1/data-sets/{dataSetId}/versions/{dataSetVersion}": {
+    "/v1/data-sets/{dataSetId}/versions/{dataSetVersion}": {
       "get": {
         "tags": [
           "DataSetVersions"
@@ -886,7 +886,7 @@
         }
       }
     },
-    "/api/v1/data-sets/{dataSetId}/versions/{dataSetVersion}/changes": {
+    "/v1/data-sets/{dataSetId}/versions/{dataSetVersion}/changes": {
       "get": {
         "tags": [
           "DataSetVersions"
@@ -952,7 +952,7 @@
         }
       }
     },
-    "/api/v1/publications": {
+    "/v1/publications": {
       "get": {
         "tags": [
           "Publications"
@@ -1027,7 +1027,7 @@
         }
       }
     },
-    "/api/v1/publications/{publicationId}": {
+    "/v1/publications/{publicationId}": {
       "get": {
         "tags": [
           "Publications"
@@ -1074,7 +1074,7 @@
         }
       }
     },
-    "/api/v1/publications/{publicationId}/data-sets": {
+    "/v1/publications/{publicationId}/data-sets": {
       "get": {
         "tags": [
           "Publications"

@@ -36,6 +36,9 @@ param resourceAndScalingConfig ContainerAppResourceConfig
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
 
+@description('Enable the Swagger UI')
+param enableSwagger bool
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -112,6 +115,10 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       {
         name: 'App__Url'
         value: publicApiUrl
+      }
+      {
+        name: 'App__EnableSwagger'
+        value: enableSwagger ? 'true' : 'false'
       }
       {
         name: 'AppInsights__ConnectionString'

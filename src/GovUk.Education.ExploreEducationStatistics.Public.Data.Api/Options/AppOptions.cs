@@ -8,4 +8,6 @@ public class AppOptions
     /// The host URL of the public API.
     /// </summary>
     public string Url { get; init; } = string.Empty;
+
+    public bool EnableSwagger { get; init; }
 }
