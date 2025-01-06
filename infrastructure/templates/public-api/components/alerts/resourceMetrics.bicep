@@ -39,8 +39,6 @@ type StorageAccountMetric = {
     | 'SuccessE2ELatency'
 }
 
-
-
 @export()
 @discriminator('resourceType')
 type ResourceMetric = 

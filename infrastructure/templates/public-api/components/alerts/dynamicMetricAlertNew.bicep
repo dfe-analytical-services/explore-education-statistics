@@ -70,8 +70,8 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
           alertSensitivity: config.sensitivity
           skipMetricValidation: false
           failingPeriods: {
-            minFailingPeriodsToAlert: config.minFailingPeriodsToAlert
-            numberOfEvaluationPeriods: config.numberOfEvaluationPeriods
+            numberOfEvaluationPeriods: config.evaluationPeriods
+            minFailingPeriodsToAlert: config.minFailingEvaluationPeriods
           }
           ignoreDataBefore: ignoreDataBefore
         }

@@ -120,20 +120,20 @@ type DynamicAlertConfig = {
   windowSize: WindowSize
   
   @description('''
-  How many periods to look back over to count failing periods.  Used in conjunction with "minFailingPeriodsToAlert".
-  As an example, if "numberOfEvaluationPeriods" is set to 5 and "evaluationFrequency" is set to every minute, the past 
+  How many periods to look back over to count failing periods.  Used in conjunction with "minFailingEvaluationPeriods".
+  As an example, if "evaluationPeriods" is set to 5 and "evaluationFrequency" is set to every minute, the past 
   5 alerts (one for each of the last 5 minutes) is looked at and each failure is counted up. 
   ''')
-  numberOfEvaluationPeriods: int
+  evaluationPeriods: int
   
   @description('''
-  How many of the "numberOfEvaluationPeriods" results need to have failed in order for this rule to fire.
-  For instance, if this rule is using the past 5 calculations (with "numberOfEvaluationPeriods" set to 5) to evaluate
-  whether or not to fire, "minFailingPeriodsToAlert" determines how many of those past 5 periods have to have failed 
+  How many of the "evaluationPeriods" results need to have failed in order for this rule to fire.
+  For instance, if this rule is using the past 5 calculations (with "evaluationPeriods" set to 5) to evaluate
+  whether or not to fire, "minFailingEvaluationPeriods" determines how many of those past 5 periods have to have failed 
   in order for this rule to fire.  If this was set to 3, 3 out of the 5 past calculations will have had to fail in
   order for this rule to fire.
   ''')
-  minFailingPeriodsToAlert: int
+  minFailingEvaluationPeriods: int
 
   @description('''
   How sensitive the alert is if a metric exceeds its dynamic threshold.

@@ -2,9 +2,9 @@ var defaultDynamicAlertConfig = {
   aggregation: 'Average'
   operator: 'GreaterThan'
   evaluationFrequency: 'PT5M'
+  evaluationPeriods: 5
+  minFailingEvaluationPeriods: 5
   windowSize: 'PT15M'
-  numberOfEvaluationPeriods: 5
-  minFailingPeriodsToAlert: 5
   sensitivity: 'Low'
   severity: 'Warning'
 }
