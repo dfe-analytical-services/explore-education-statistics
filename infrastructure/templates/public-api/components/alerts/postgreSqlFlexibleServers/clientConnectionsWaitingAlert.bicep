@@ -15,6 +15,15 @@ param tagValues object
 module alerts '../dynamicMetricAlert.bicep' = {
   name: '${resourceName}ClientConnectionsAlertModule'
   params: {
+    resourceName: resourceName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'client_connections_waiting'
+    }
+    config: {
+      aggregation: 'Maximum'
+      
+    }
     alertName: '${resourceName}-query-time'
     resourceIds: [resourceId('Microsoft.DBforPostgreSQL/flexibleServers', resourceName)]
     resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'

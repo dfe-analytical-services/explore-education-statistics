@@ -1,3 +1,4 @@
+@export()
 var defaultDynamicAlertConfig = {
   aggregation: 'Average'
   operator: 'GreaterThan'

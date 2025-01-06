@@ -187,7 +187,7 @@ module clientConnectionsWaitingAlert 'alerts/postgreSqlFlexibleServers/clientCon
   }
 }
 
-module cpuPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${databaseServerName}CpuPercentageDeploy'
   params: {
     resourceName: databaseServerName
@@ -219,7 +219,7 @@ module diskIopsAlert 'alerts/postgreSqlFlexibleServers/diskIopsAlert.bicep' = if
   }
 }
 
-module memoryPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${databaseServerName}MemoryPercentageDeploy'
   params: {
     resourceName: databaseServerName

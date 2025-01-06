@@ -68,7 +68,7 @@ module availabilityAlerts 'alerts/storageAccounts/availabilityAlert.bicep' = if 
   }
 }
 
-module latencyAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.latency) {
+module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}LatencyDeploy'
   params: {
     resourceName: storageAccountName

@@ -294,7 +294,7 @@ module backendPoolsHealthAlert 'alerts/appGateways/backendPoolHealthAlert.bicep'
   }
 }
 
-module responseTimeAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.responseTime) {
+module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${appGatewayName}ResponseTimeDeploy'
   params: {
     resourceName: appGatewayName

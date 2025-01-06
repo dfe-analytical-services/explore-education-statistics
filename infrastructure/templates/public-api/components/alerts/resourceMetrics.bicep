@@ -29,6 +29,7 @@ type FileServiceMetric = {
 type PostgreSqlMetric = {
   resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
   metric: 
+    | 'client_connections_waiting'
     | 'cpu_percent'
     | 'memory_percent'
 }
