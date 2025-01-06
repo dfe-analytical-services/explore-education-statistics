@@ -163,7 +163,7 @@ Validate the version task statuses inside the 'Draft version task' section
 User clicks on Map locations link
     user clicks link    Map locations
     user waits until h3 is visible    Locations not found in new data set
-    user waits until element contains    xpath://table[@data-testid='mappable-table-region']/caption//strong[1]
+    user waits until element contains    css:[data-testid="mappable-table-region"] caption
     ...    1 unmapped location    %{WAIT_LONG}
 
 Validate the 'unmapped location' notification banner
@@ -190,7 +190,7 @@ User edits location mapping
     user waits until modal is not visible    Map existing location
 
 Verify location mapping changes
-    user waits until element contains    xpath://table[@data-testid='mappable-table-region']/caption//strong[1]
+    user waits until element contains    css:[data-testid="mappable-table-region"] caption
     ...    1 mapped location    %{WAIT_LONG}
 
 Validate the row headings and its contents in the 'Regions' section after mapping
@@ -217,7 +217,7 @@ Validate the version status of location task is now complete
 User clicks on Map filters link
     user clicks link    Map filters
     user waits until h3 is visible    Filter options not found in new data set
-    user waits until element contains    xpath://table[@data-testid='mappable-table-school_type']/caption//strong[1]
+    user waits until element contains    css:[data-testid="mappable-table-schoolType"] caption
     ...    1 unmapped filter option    %{WAIT_LONG}
 
 Validate the 'unmapped filter option' notification banner
@@ -244,7 +244,7 @@ User edits filter mapping
     user waits until modal is not visible    Map existing location
 
 Verify filter mapping changes
-    user waits until element contains    xpath://table[@data-testid='mappable-table-school_type']/caption//strong[1]
+    user waits until element contains    css:[data-testid="mappable-table-schoolType"] caption
     ...    1 mapped filter option    %{WAIT_LONG}
 
 Validate the row headings and its contents in the 'filters options' section after mapping

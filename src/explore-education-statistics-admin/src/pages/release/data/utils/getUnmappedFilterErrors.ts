@@ -1,8 +1,8 @@
 import { MappableFilterOption } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
+import { mappableTableId } from '@admin/pages/release/data/utils/mappingTableIds';
 import { FiltersMapping } from '@admin/services/apiDataSetVersionService';
 import { ErrorSummaryMessage } from '@common/components/ErrorSummary';
 import { Dictionary } from '@common/types';
-import kebabCase from 'lodash/kebabCase';
 import sumBy from 'lodash/sumBy';
 
 export default function getUnmappedFilterErrors(
@@ -25,7 +25,7 @@ export default function getUnmappedFilterErrors(
       const filterLabel = filtersMapping.mappings[filterKey].source.label;
 
       errors.push({
-        id: `mappable-table-${kebabCase(filterKey)}`,
+        id: mappableTableId(filterKey),
         message: `There ${
           total > 1 ? 'are' : 'is'
         } ${total} unmapped ${filterLabel} filter option${
