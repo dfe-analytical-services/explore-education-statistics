@@ -68,10 +68,11 @@ jobs:
             - task: AzureStaticWebApp@0
               displayName: Deploy API docs
               inputs:
-                app_location: /
+                app_location: build
                 output_location: '' # Leave this empty
                 skip_app_build: true
                 skip_api_build: true
                 azure_static_web_apps_api_token: $(docsDeploymentToken)
-                cwd: $(docsPath)/build
+                config_file_location: .
+                cwd: $(docsPath)
 

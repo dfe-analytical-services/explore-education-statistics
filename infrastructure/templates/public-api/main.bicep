@@ -366,17 +366,6 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
             backendName: resourceNames.publicApi.docsApp
             rewriteSetName: docsRewriteSetName
           }
-          {
-            // Redirect non-rooted URL (has no trailing slash) to the
-            // rooted URL so that relative links in the docs site
-            // can resolve correctly.
-            name: 'docs-root-redirect'
-            paths: ['/docs']
-            type: 'redirect'
-            redirectUrl: '${publicUrls.publicApi}/docs/'
-            redirectType: 'Permanent'
-            includePath: false
-          }
         ]
       }
     ]
