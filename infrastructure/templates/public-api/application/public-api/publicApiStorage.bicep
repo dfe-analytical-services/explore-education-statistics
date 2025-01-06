@@ -62,13 +62,14 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
     fileShareQuota: publicApiDataFileShareQuota
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: 'TransactionOptimized'
+    tagValues: tagValues
   }
 }
 
 module storageAccountAvailabilityAlert '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
   name: '${resourceNames.publicApi.publicApiStorageAccount}AvailabilityDeploy'
   params: {
-    resourceNames: [resourceNames.publicApi.publicApiStorageAccount]
+    resourceName: resourceNames.publicApi.publicApiStorageAccount
     alertsGroupName: resourceNames.existingResources.alertsGroup
     tagValues: tagValues
   }
@@ -77,7 +78,7 @@ module storageAccountAvailabilityAlert '../../components/alerts/storageAccounts/
 module fileServiceAvailabilityAlert '../../components/alerts/fileServices/availabilityAlert.bicep' = if (deployAlerts) {
   name: '${resourceNames.publicApi.publicApiStorageAccount}FsAvailabilityDeploy'
   params: {
-    resourceNames: [resourceNames.publicApi.publicApiStorageAccount]
+    resourceName: resourceNames.publicApi.publicApiStorageAccount
     alertsGroupName: resourceNames.existingResources.alertsGroup
     tagValues: tagValues
   }

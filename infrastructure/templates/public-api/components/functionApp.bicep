@@ -13,16 +13,13 @@ param appServicePlanName string
 param storageAccountsNamePrefix string
 
 @description('Function App Plan : operating system')
-param appServicePlanOS 'Windows' | 'Linux' = 'Linux'
+param operatingSystem 'Windows' | 'Linux' = 'Linux'
 
 @description('Function App runtime')
 param functionAppRuntime 'dotnet' | 'dotnet-isolated' | 'node' | 'python' | 'java' = 'dotnet'
 
 @description('Specifies the additional setting to add to the Function App')
 param appSettings object = {}
-
-@description('A set of tags with which to tag the resource in Azure')
-param tagValues object
 
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
@@ -73,7 +70,20 @@ param azureFileShares AzureFileShareMount[] = []
 @description('Specifies firewall rules for the various storage accounts in use by the Function App')
 param storageFirewallRules IpRange[] = []
 
-var reserved = appServicePlanOS == 'Linux'
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  functionAppHealth: bool
+  cpuPercentage: bool
+  memoryPercentage: bool
+  storageAccountAvailability: bool
+  storageLatency: bool
+  fileServiceAvailability: bool
+  fileServiceLatency: bool
+  alertsGroupName: string
+}?
+
+@description('A set of tags with which to tag the resource in Azure')
+param tagValues object
 
 var identity = userAssignedManagedIdentityParams != null
   ? {
@@ -86,13 +96,20 @@ var identity = userAssignedManagedIdentityParams != null
       type: 'SystemAssigned'
     }
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
+module appServicePlanModule 'appServicePlan.bicep' = {
   name: appServicePlanName
-  location: location
-  kind: 'functionapp'
-  sku: sku
-  properties: {
-    reserved: reserved
+  params: {
+    planName: appServicePlanName
+    location: location
+    kind: 'functionapp'
+    sku: sku
+    operatingSystem: operatingSystem
+    alerts: alerts != null ? {
+      cpuPercentage: alerts!.cpuPercentage
+      memoryPercentage: alerts!.memoryPercentage
+      alertsGroupName: alerts!.alertsGroupName
+    } : null
+    tagValues: tagValues
   }
 }
 
@@ -104,6 +121,18 @@ var slot1StorageAccountName = '${storageAccountsNamePrefix}s1'
 var slot2StorageAccountName = '${storageAccountsNamePrefix}s2'
 var functionAppCodeFileShareName = '${functionAppName}-fs'
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
+
+var storageAlerts = alerts != null ? {
+  availability: alerts!.storageAccountAvailability
+  latency: alerts!.storageLatency
+  alertsGroupName: alerts!.alertsGroupName
+} : null
+
+var fileServiceAlerts = alerts != null ? {
+  availability: alerts!.fileServiceAvailability
+  latency: alerts!.fileServiceLatency
+  alertsGroupName: alerts!.alertsGroupName
+} : null
 
 // This is the shared Storage Account for this Durable Function App that is used for key management, timer trigger
 // management etc.
@@ -123,6 +152,7 @@ module sharedStorageAccountModule 'storageAccount.bicep' = {
     skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     firewallRules: storageFirewallRules
+    alerts: storageAlerts
     tagValues: tagValues
   }
 }
@@ -139,13 +169,20 @@ module slot1StorageAccountModule 'storageAccount.bicep' = {
     skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     firewallRules: storageFirewallRules
+    alerts: storageAlerts
     tagValues: tagValues
   }
 }
 
 // This is the file share for slot 1 to use for its code storage.
-resource slot1FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-05-01' = {
-  name: '${slot1StorageAccountName}/default/${functionAppCodeFileShareName}'
+module slot1FileShareModule 'fileShare.bicep' = {
+  name: '${slot1StorageAccountName}${functionAppCodeFileShareName}Deploy'
+  params: {
+    storageAccountName: slot1StorageAccountName
+    fileShareName: functionAppCodeFileShareName
+    alerts: fileServiceAlerts
+    tagValues: tagValues
+  }
   dependsOn: [
     slot1StorageAccountModule
   ]
@@ -163,13 +200,20 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
     skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     firewallRules: storageFirewallRules
+    alerts: storageAlerts
     tagValues: tagValues
   }
 }
 
 // This is the file share for slot 2 to use for its code storage.
-resource slot2FileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-05-01' = {
-  name: '${slot2StorageAccountName}/default/${functionAppCodeFileShareName}'
+module slot2FileShareModule 'fileShare.bicep' = {
+  name: '${slot2StorageAccountName}${functionAppCodeFileShareName}Deploy'
+  params: {
+    storageAccountName: slot2StorageAccountName
+    fileShareName: functionAppCodeFileShareName
+    alerts: fileServiceAlerts
+    tagValues: tagValues
+  }
   dependsOn: [
     slot2StorageAccountModule
   ]
@@ -186,19 +230,19 @@ var firewallRules = [for (firewallRule, index) in functionAppFirewallRules: {
 var commonSiteProperties = {
   enabled: true
   httpsOnly: true
-  serverFarmId: appServicePlan.id
+  serverFarmId: appServicePlanModule.outputs.planId
 
   // This property integrates the Function App into a VNet given the supplied subnet id.
   virtualNetworkSubnetId: subnetId
 
   clientAffinityEnabled: true
-  reserved: reserved
+  reserved: operatingSystem == 'Linux'
   siteConfig: {
     alwaysOn: alwaysOn ?? null
     healthCheckPath: healthCheckPath
     preWarmedInstanceCount: preWarmedInstanceCount ?? null
     netFrameworkVersion: '8.0'
-    linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
+    linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
     publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
     ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
@@ -370,8 +414,8 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   }
   dependsOn: [
     functionAppKeyVaultRoleAssignments
-    slot1FileShare
-    slot2FileShare
+    slot1FileShareModule
+    slot2FileShareModule
   ]
 }
 
@@ -383,6 +427,15 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnet
     serviceType: 'sites'
     subnetId: privateEndpointSubnetId!
     location: location
+    tagValues: tagValues
+  }
+}
+
+module healthAlert 'alerts/sites/healthAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
+  name: '${functionAppName}HealthDeploy'
+  params: {
+    resourceName: functionAppName
+    alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }

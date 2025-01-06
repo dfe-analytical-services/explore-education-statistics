@@ -1,3 +1,5 @@
+import { cpuPercentageConfig, memoryPercentageConfig } from 'alerts/config.bicep'
+
 import { IpRange, PrincipalNameAndId } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
@@ -44,6 +46,19 @@ param firewallRules IpRange[] = []
 
 @description('An array of Entra ID admin principal names for this resource')
 param entraIdAdminPrincipals PrincipalNameAndId[] = []
+
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  availability: bool
+  queryTime: bool
+  transactionTime: bool
+  clientConenctionsWaiting: bool
+  cpuPercentage: bool
+  diskBandwidth: bool
+  diskIops: bool
+  memoryPercentage: bool
+  alertsGroupName: string
+}?
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -135,6 +150,88 @@ resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/adminis
     firewallRuleAssignments
   ]
 }]
+
+module databaseAliveAlert 'alerts/postgreSqlFlexibleServers/databaseAliveAlert.bicep' = if (alerts != null && alerts!.availability) {
+  name: '${databaseServerName}DbAliveDeploy'
+  params: {
+    resourceName: databaseServerName
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module queryTimeAlert 'alerts/postgreSqlFlexibleServers/queryTimeAlert.bicep' = if (alerts != null && alerts!.queryTime) {
+  name: '${databaseServerName}QueryTimeDeploy'
+  params: {
+    resourceName: databaseServerName
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module transactionTimeAlert 'alerts/postgreSqlFlexibleServers/transactionTimeAlert.bicep' = if (alerts != null && alerts!.transactionTime) {
+  name: '${databaseServerName}TransactionTimeDeploy'
+  params: {
+    resourceName: databaseServerName
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module clientConnectionsWaitingAlert 'alerts/postgreSqlFlexibleServers/clientConnectionsWaitingAlert.bicep' = if (alerts != null && alerts!.clientConenctionsWaiting) {
+  name: '${databaseServerName}ClientConnectionsDeploy'
+  params: {
+    resourceName: databaseServerName
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+  name: '${databaseServerName}CpuPercentageDeploy'
+  params: {
+    resourceName: databaseServerName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'cpu_percent'
+    }
+    config: cpuPercentageConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module diskBandwidthAlert 'alerts/postgreSqlFlexibleServers/diskBandwidthAlert.bicep' = if (alerts != null && alerts!.diskBandwidth) {
+  name: '${databaseServerName}DiskBandwidthDeploy'
+  params: {
+    resourceName: databaseServerName
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module diskIopsAlert 'alerts/postgreSqlFlexibleServers/diskIopsAlert.bicep' = if (alerts != null && alerts!.diskIops) {
+  name: '${databaseServerName}DiskIopsDeploy'
+  params: {
+    resourceName: databaseServerName
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+  name: '${databaseServerName}MemoryPercentageDeploy'
+  params: {
+    resourceName: databaseServerName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'memory_percent'
+    }
+    config: memoryPercentageConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
 
 @description('The fully qualified Azure resource ID of the Database Server.')
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)

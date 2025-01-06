@@ -161,15 +161,13 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     maxReplicas: resourceAndScalingConfig.maxReplicas
     scaleAtConcurrentHttpRequests: resourceAndScalingConfig.scaleAtConcurrentHttpRequests
     workloadProfileName: resourceAndScalingConfig.workloadProfileName
-    tagValues: tagValues
-  }
-}
-
-module containerAppRestartsAlert '../../components/alerts/containerApps/restarts.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.apiApp}RestartsDeploy'
-  params: {
-    resourceNames: [resourceNames.publicApi.apiApp]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    alerts: deployAlerts ? {
+      restarts: true
+      responseTime: true
+      cpuPercentage: true
+      memoryPercentage: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }

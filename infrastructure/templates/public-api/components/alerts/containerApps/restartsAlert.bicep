@@ -1,7 +1,7 @@
 import { Severity } from '../types.bicep'
 
-@description('Names of the resources that these alerts are being applied to.')
-param resourceNames string[]
+@description('Name of the resource that these alerts are being applied to.')
+param resourceName string
 
 @description('The alert severity.')
 param severity Severity = 'Warning'
@@ -12,11 +12,11 @@ param alertsGroupName string
 @description('Tags with which to tag the resource in Azure.')
 param tagValues object
 
-module alerts '../staticMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}RestartsAlertModule'
+module alerts '../staticMetricAlert.bicep' = {
+  name: '${resourceName}RestartsAlertModule'
   params: {
-    alertName: '${name}-restarts'
-    resourceIds: [resourceId('Microsoft.App/containerApps', name)]
+    alertName: '${resourceName}-restarts'
+    resourceIds: [resourceId('Microsoft.App/containerApps', resourceName)]
     resourceType: 'Microsoft.App/containerApps'
     query: {
       metric: 'RestartCount'
@@ -30,4 +30,4 @@ module alerts '../staticMetricAlert.bicep' = [for name in resourceNames: {
     alertsGroupName: alertsGroupName
     tagValues: tagValues
   }
-}]
+}
