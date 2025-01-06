@@ -1,3 +1,5 @@
+import { cpuPercentageConfig, memoryPercentageConfig } from 'alerts/config.bicep'
+
 @description('Specifies the App Service plan name')
 param planName string
 
@@ -36,19 +38,29 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   tags: tagValues
 }
 
-module cpuPercentageAlert 'alerts/appServicePlans/cpuPercentageAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${planName}CpuPercentageDeploy'
   params: {
     resourceName: planName
+    resourceMetric: {
+      resourceType: 'Microsoft.Web/serverfarms'
+      metric: 'CpuPercentage'
+    }
+    config: cpuPercentageConfig
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
 
-module memoryPercentageAlert 'alerts/appServicePlans/memoryPercentageAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${planName}MemoryPercentageDeploy'
   params: {
     resourceName: planName
+    resourceMetric: {
+      resourceType: 'Microsoft.Web/serverfarms'
+      metric: 'MemoryPercentage'
+    }
+    config: memoryPercentageConfig
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

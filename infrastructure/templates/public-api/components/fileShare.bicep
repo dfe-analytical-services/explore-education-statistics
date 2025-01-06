@@ -1,3 +1,5 @@
+import { responseTimeConfig } from 'alerts/config.bicep'
+
 @description('Size in GB of the file share')
 param fileShareQuota int = 6
 
@@ -49,10 +51,16 @@ module availabilityAlerts 'alerts/fileServices/availabilityAlert.bicep' = if (al
   }
 }
 
-module latencyAlert 'alerts/fileServices/latencyAlert.bicep' = if (alerts != null && alerts!.latency) {
+module latencyAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}FsLatencyDeploy'
   params: {
-    resourceName: storageAccountName
+    resourceName: '${storageAccountName}-fs'
+    id: resourceId('Microsoft.Storage/storageAccounts/fileServices', storageAccountName, 'default')
+    resourceMetric: {
+      resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
+      metric: 'SuccessE2ELatency'
+    }
+    config: responseTimeConfig
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

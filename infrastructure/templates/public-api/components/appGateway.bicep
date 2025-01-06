@@ -1,3 +1,5 @@
+import { responseTimeConfig } from 'alerts/config.bicep'
+
 import {
   AppGatewayBackend
   AppGatewayRewriteSet
@@ -292,10 +294,15 @@ module backendPoolsHealthAlert 'alerts/appGateways/backendPoolHealthAlert.bicep'
   }
 }
 
-module responseTimeAlert 'alerts/appGateways/responseTimeAlert.bicep' = if (alerts != null && alerts!.responseTime) {
+module responseTimeAlert 'alerts/dynamicMetricAlertNew.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${appGatewayName}ResponseTimeDeploy'
   params: {
     resourceName: appGatewayName
+    resourceMetric: {
+      resourceType: 'Microsoft.Network/applicationGateways'
+      metric: 'ApplicationGatewayTotalTime'
+    }
+    config: responseTimeConfig
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
