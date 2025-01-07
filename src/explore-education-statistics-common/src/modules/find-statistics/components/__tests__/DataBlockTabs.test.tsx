@@ -342,8 +342,7 @@ describe('DataBlockTabs', () => {
     });
   });
 
-  // EES-4902 react-leaflet now uses ESM so unable to test this currently
-  test.skip('renders map', async () => {
+  test('renders map', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testMapTableData,
     );
