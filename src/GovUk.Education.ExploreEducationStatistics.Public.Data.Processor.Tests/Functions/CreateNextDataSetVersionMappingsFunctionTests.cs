@@ -103,8 +103,8 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
 
             Assert.Equal(nextReleaseFile.File.DataSetFileId, nextDataSetVersion.Release.DataSetFileId);
             Assert.Equal(nextReleaseFile.Id, nextDataSetVersion.Release.ReleaseFileId);
-            Assert.Equal(nextReleaseFile.ReleaseVersion.Slug, nextDataSetVersion.Release.Slug);
-            Assert.Equal(nextReleaseFile.ReleaseVersion.Title, nextDataSetVersion.Release.Title);
+            Assert.Equal(nextReleaseFile.ReleaseVersion.Release.Slug, nextDataSetVersion.Release.Slug);
+            Assert.Equal(nextReleaseFile.ReleaseVersion.Release.Title, nextDataSetVersion.Release.Title);
 
             // Assert a single import was created.
             var dataSetVersionImport = Assert.Single(nextDataSetVersion.Imports);
@@ -451,6 +451,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         {
             var subjectId = Guid.NewGuid();
 
+            // TODO EES-5365 Setup seems to be causing test failures
             var (dataFile, metaFile) = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture

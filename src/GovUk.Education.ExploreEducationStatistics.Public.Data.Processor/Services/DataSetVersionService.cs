@@ -384,6 +384,7 @@ internal class DataSetVersionService(
         var releaseFile = await contentDbContext.ReleaseFiles
             .Include(rf => rf.File)
             .Include(rf => rf.ReleaseVersion)
+            .ThenInclude(r => r.Release)
             .FirstOrDefaultAsync(rf => rf.Id == releaseFileId, cancellationToken);
 
         return releaseFile is null
@@ -494,8 +495,8 @@ internal class DataSetVersionService(
                 DataSetFileId =
                     releaseFile.File.DataSetFileId ?? throw new NullReferenceException("DataSetFileId cannot be null"),
                 ReleaseFileId = releaseFile.Id,
-                Slug = releaseFile.ReleaseVersion.Slug,
-                Title = releaseFile.ReleaseVersion.Title
+                Slug = releaseFile.ReleaseVersion.Release.Slug,
+                Title = releaseFile.ReleaseVersion.Release.Title
             },
             Notes = "",
             VersionMajor = nextVersion.Major,
