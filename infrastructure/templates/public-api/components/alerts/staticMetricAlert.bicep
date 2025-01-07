@@ -1,30 +1,21 @@
-import { EvaluationFrequency, MetricName, StaticMetricOperator, ResourceType, TimeAggregation, WindowSize, Severity, severityMapping } from 'types.bicep'
+import { StaticAlertConfig, severityMapping } from 'types.bicep'
 
-@description('Name of the alert.')
-param alertName string
+import { ResourceMetric } from 'resourceMetrics.bicep'
 
-@description('Ids of the resources that this alert is being applied to.')
-param resourceIds string[]
+@description('Name of the resource that this alert is being applied to.')
+param resourceName string
 
-@description('Type of the resource that this alert is being applied to.')
-param resourceType ResourceType
+@description('''
+Optional id of the resource that this alert is being applied to, 
+if it cannot be looked up by the combination of resourceName and resourceType.
+''')
+param id string?
 
-@description('The query being used to test if the alert should be fired.')
-param query {
-  metric: MetricName
-  aggregation: TimeAggregation
-  operator: StaticMetricOperator
-  threshold: int
-}
+@description('Resource type and metric name combination.')
+param resourceMetric ResourceMetric
 
-@description('The evaluation frequency.')
-param evaluationFrequency EvaluationFrequency = 'PT1M'
-
-@description('The window size.')
-param windowSize WindowSize = 'PT5M'
-
-@description('The alert severity.')
-param severity Severity = 'Error'
+@description('Configuration for this alert.')
+param config StaticAlertConfig
 
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
@@ -32,31 +23,39 @@ param alertsGroupName string
 @description('Tags with which to tag the resource in Azure.')
 param tagValues object
 
-var severityLevel = severityMapping[severity]
+var severityLevel = severityMapping[config.severity]
+
+var resourceIds = [id != null ? id! : resourceId(resourceMetric.resourceType, resourceName)]
 
 resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
   name: alertsGroupName
 }
 
 resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
-  name: alertName
+  name: '${resourceName}-${config.nameSuffix}'
   location: 'Global'
   properties: {
     enabled: true
     scopes: resourceIds
     severity: severityLevel
-    evaluationFrequency: evaluationFrequency
-    windowSize: windowSize
+    evaluationFrequency: config.evaluationFrequency
+    windowSize: config.windowSize
     criteria: {
-      'odata.type': length(resourceIds) > 1 ? 'Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria' : 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria' 
+      'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria' 
       allOf: [{
         criterionType: 'StaticThresholdCriterion'
         name: 'Metric1'
-        metricName: query.metric
-        metricNamespace: resourceType
-        timeAggregation: query.aggregation
-        operator: query.operator
-        threshold: query.threshold
+        metricName: resourceMetric.metric
+        metricNamespace: resourceMetric.resourceType
+        timeAggregation: config.aggregation
+        operator: config.operator
+        
+        // Disabling type checking against the "threshold" field as we need to be able to supply
+        // thresholds that are not only ints, but decimals too.  The underlying ARM type definition
+        // expects only ints.  
+        #disable-next-line BCP036
+        threshold: config.threshold
+
         skipMetricValidation: false
       }]
     }

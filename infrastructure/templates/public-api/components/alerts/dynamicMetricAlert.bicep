@@ -1,15 +1,4 @@
-import {
-  EvaluationFrequency
-  MetricName
-  DynamicMetricOperator
-  DynamicAlertConfig
-  ResourceType
-  TimeAggregation
-  WindowSize
-  Severity
-  Sensitivity
-  severityMapping
-} from 'types.bicep'
+import { DynamicAlertConfig, severityMapping } from 'types.bicep'
 
 import { ResourceMetric } from 'resourceMetrics.bicep'
 
@@ -25,7 +14,7 @@ param id string?
 @description('Resource type and metric name combination.')
 param resourceMetric ResourceMetric
 
-@description('Configuration for this dynamic alert.')
+@description('Configuration for this alert.')
 param config DynamicAlertConfig
 
 @description('''
