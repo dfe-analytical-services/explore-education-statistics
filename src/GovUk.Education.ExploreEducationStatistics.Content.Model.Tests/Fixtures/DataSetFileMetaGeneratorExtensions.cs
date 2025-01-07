@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -35,7 +34,6 @@ public static class DataSetFileMetaGeneratorExtensions
                     ColumnName = "indicator_1",
                 },
             ]);
-
     public static Generator<DataSetFileMeta> WithTimePeriodRange(
         this Generator<DataSetFileMeta> generator,
         TimePeriodRangeMeta timePeriodRange)
