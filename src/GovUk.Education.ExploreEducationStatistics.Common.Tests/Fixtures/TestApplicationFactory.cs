@@ -29,8 +29,6 @@ public class TestApplicationFactory<TStartup> : WebApplicationFactory<TStartup> 
 
         supplier.Invoke(context);
         await context.SaveChangesAsync();
-
-        var x = 2;
     }
 
     public async Task EnsureDatabaseDeleted<TDbContext>() where TDbContext : DbContext

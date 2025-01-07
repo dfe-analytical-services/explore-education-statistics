@@ -36,7 +36,7 @@ using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Valida
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
-    public abstract class ReleasesControllerUnitTests
+    public class ReleasesControllerUnitTests
     {
         private readonly Guid _releaseVersionId = Guid.NewGuid();
         private readonly Guid _publicationId = Guid.NewGuid();
@@ -882,7 +882,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 var validationProblem = response.AssertValidationProblem();
 
-                var error = Assert.Single(validationProblem.Errors); // Need to change the code to stop throwing an error and return a Validation Result instead
+                var error = Assert.Single(validationProblem.Errors);
+
+                Assert.Equal(UpdateRequestForPublishedReleaseInvalid.ToString(), error.Code);
             }
 
             [Fact]
@@ -908,7 +910,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 var validationProblem = response.AssertValidationProblem();
 
-                var error = Assert.Single(validationProblem.Errors); // Need to change the code to stop throwing an error and return a Validation Result instead
+                var error = Assert.Single(validationProblem.Errors);
+
+                Assert.Equal(UpdateRequestForPublishedReleaseInvalid.ToString(), error.Code);
             }
 
             [Fact]
@@ -934,7 +938,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 var validationProblem = response.AssertValidationProblem();
 
-                var error = Assert.Single(validationProblem.Errors); // Need to change the code to stop throwing an error and return a Validation Result instead
+                var error = Assert.Single(validationProblem.Errors);
+
+                Assert.Equal(UpdateRequestForPublishedReleaseInvalid.ToString(), error.Code);
             }
 
             [Fact]
@@ -1036,11 +1042,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 string existingReleaseSlug)
             {
                 Publication publication = DataFixture.DefaultPublication()
-                    .WithReleases([
+                    .WithReleases(
                         DataFixture
                             .DefaultRelease(publishedVersions: 0, draftVersion: true)
                             .WithSlug(existingReleaseSlug)
-                        ]);
+                            .GenerateList(2)
+                        );
 
                 await TestApp.AddTestData<ContentDbContext>(
                     context => context.Publications.Add(publication));

@@ -47,8 +47,7 @@ public class TestApplicationFactory : TestApplicationFactory<TestStartup>
                         options =>
                         {
                             options.UseNpgsql(
-                                _postgreSqlContainer.GetConnectionString(),
-                                psqlOptions => psqlOptions.EnableRetryOnFailure());
+                                _postgreSqlContainer.GetConnectionString());
                         });
 
                 using var serviceScope = services.BuildServiceProvider()

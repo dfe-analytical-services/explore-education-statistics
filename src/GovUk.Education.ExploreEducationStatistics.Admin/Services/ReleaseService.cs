@@ -831,11 +831,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var labelChanged = releaseVersion.Release.Label != request.Label;
 
             return yearChanged || timePeriodCoverageChanged || labelChanged
-                ? throw new ArgumentException(
-                    $"Cannot update '{nameof(request.Year)}', '{nameof(request.TimePeriodCoverage)}' or '{nameof(request.Label)}' for a release that has already been published",
-                    nameof(request))
+                ? ValidationActionResult(UpdateRequestForPublishedReleaseInvalid)
                 : Unit.Instance;
-            // Wondering if we should convert this into a Validation Result
         }
 
         private async Task<Either<ActionResult, Unit>> UpdateReleaseAndVersion(ReleaseUpdateRequest request, ReleaseVersion releaseVersion)
