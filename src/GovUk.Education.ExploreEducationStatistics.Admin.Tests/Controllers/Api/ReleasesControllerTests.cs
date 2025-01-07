@@ -713,7 +713,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal(SlugNotUnique.ToString(), error.Code);
             }
 
-            // Add test for character limit on Label of 50
+            [Fact]
+            public async Task LabelOver50Characters()
+            {
+                Publication publication = DataFixture.DefaultPublication();
+
+                await TestApp.AddTestData<ContentDbContext>(
+                    context => context.Publications.Add(publication));
+
+                var response = await CreateRelease(
+                    publicationId: publication.Id,
+                    year: 2020,
+                    timePeriodCoverage: TimeIdentifier.AcademicYear,
+                    label: new string('a', 51));
+
+                var validationProblem = response.AssertValidationProblem();
+
+                var error = Assert.Single(validationProblem.Errors);
+
+                Assert.Equal($"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '50'.", error.Message);
+                Assert.Equal(nameof(ReleaseCreateRequest.Label), error.Path);
+            }
 
             private WebApplicationFactory<TestStartup> BuildApp(
                 ClaimsPrincipal? user = null)
@@ -1065,7 +1085,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal(SlugNotUnique.ToString(), error.Code);
             }
 
-            // Add test for character limit on Label of 50
+            [Fact]
+            public async Task LabelOver50Characters()
+            {
+                Publication publication = DataFixture.DefaultPublication()
+                    .WithReleases([
+                            DataFixture
+                                .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                        ]);
+
+                await TestApp.AddTestData<ContentDbContext>(
+                    context => context.Publications.Add(publication));
+
+                var response = await UpdateRelease(
+                    releaseVersionId: publication.Releases[0].Versions[0].Id,
+                    year: 2020,
+                    timePeriodCoverage: TimeIdentifier.AcademicYear,
+                    label: new string('a', 51));
+
+                var validationProblem = response.AssertValidationProblem();
+
+                var error = Assert.Single(validationProblem.Errors);
+
+                Assert.Equal($"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '50'.", error.Message);
+                Assert.Equal(nameof(ReleaseCreateRequest.Label), error.Path);
+            }
 
             private WebApplicationFactory<TestStartup> BuildApp(
                 ClaimsPrincipal? user = null)
