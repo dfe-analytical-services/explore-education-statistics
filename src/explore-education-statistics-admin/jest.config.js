@@ -19,7 +19,7 @@ const config = {
       '<rootDir>/config/jest/fileTransform.js',
   },
   transformIgnorePatterns: [
-    '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
+    '[/\\\\]node_modules[/\\\\](?!react-leaflet)[/\\\\]',
     '^.+\\.module\\.(css|sass|scss)$',
   ],
   moduleNameMapper: {
@@ -39,7 +39,6 @@ const config = {
     '@azure/msal-react': '<rootDir>/test/stub.js',
     'react-markdown':
       '<rootDir>/node_modules/react-markdown/react-markdown.min.js',
-    'react-leaflet': '<rootDir>/__mocks__/reactLeafletMock.ts',
   },
   moduleFileExtensions: [
     'web.js',
