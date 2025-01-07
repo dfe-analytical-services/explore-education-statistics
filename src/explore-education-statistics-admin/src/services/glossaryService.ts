@@ -11,6 +11,9 @@ const glossaryService = {
   getEntry(slug: string): Promise<GlossaryEntry> {
     return client.get(`/glossary-entries/${slug}`);
   },
+  clearCache(): Promise<Response> {
+    return client.put('bau/public-cache/glossary');
+  },
 };
 
 export default glossaryService;
