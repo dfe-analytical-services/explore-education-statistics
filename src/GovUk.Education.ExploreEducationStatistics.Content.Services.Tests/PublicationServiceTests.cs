@@ -372,8 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     .WithReleases(_dataFixture
                         .DefaultRelease(publishedVersions: 1)
                         .Generate(1))
-                    .Generate(3)
-                    .ToTuple3();
+                    .GenerateTuple3();
 
                 var (theme1, theme2) = _dataFixture
                     .DefaultTheme()
