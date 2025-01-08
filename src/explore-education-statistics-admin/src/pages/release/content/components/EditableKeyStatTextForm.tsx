@@ -33,6 +33,9 @@ export default function EditableKeyStatTextForm({
   testId,
 }: EditableKeyStatTextFormProps) {
   const handleSubmit = async (values: KeyStatTextFormValues) => {
+    console.log({...values})
+    console.log(values.guidanceTitle)
+
     await onSubmit({
       ...values,
       guidanceTitle: values.guidanceTitle,
@@ -63,12 +66,12 @@ export default function EditableKeyStatTextForm({
             .test({
               name: 'duplicateGuidanceTitles',
               message: 'Guidance titles must be unique',
-              test: (value?: string) =>
+              test: (value?: string) => {console.log(value)
                 !(
                   value !== undefined &&
                   value !== '' &&
                   keyStatisticGuidanceTitles?.includes(value?.toLowerCase())
-                ),
+                )},
             }),
           guidanceText: Yup.string(),
         })}

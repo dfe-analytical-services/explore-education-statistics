@@ -36,6 +36,9 @@ export default function EditableKeyStatDataBlockForm({
   onCancel,
 }: EditableKeyStatDataBlockFormProps) {
   const handleSubmit = async (values: KeyStatDataBlockFormValues) => {
+    console.log({...values})
+    console.log(values.guidanceTitle)
+
     onSubmit({
       ...values,
       guidanceTitle: values.guidanceTitle,
@@ -61,12 +64,22 @@ export default function EditableKeyStatDataBlockForm({
           .test({
             name: 'duplicateGuidanceTitles',
             message: 'Guidance titles must be unique',
-            test: (value?: string) =>
+            test: (value?: string) => {
+              console.log({value})
+              console.log({keyStatisticGuidanceTitles})
+              console.log(`value isn't undefined: ${value !== undefined}`)
+              console.log(`value isn't an empty string: ${value !== ''}`)
+              console.log(`list contains the value: ${keyStatisticGuidanceTitles?.includes(value?.toLowerCase())}`)
+              console.log(`the whole condition: ${!(
+                value !== undefined &&
+                value !== '' &&
+                keyStatisticGuidanceTitles?.includes(value?.toLowerCase())
+              )}`)
               !(
                 value !== undefined &&
                 value !== '' &&
                 keyStatisticGuidanceTitles?.includes(value?.toLowerCase())
-              ),
+              )},
           }),
         guidanceText: Yup.string(),
       })}
