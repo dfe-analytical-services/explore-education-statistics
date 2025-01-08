@@ -22,6 +22,9 @@ const config = {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)':
       '<rootDir>/../explore-education-statistics-common/test/fileTransform.js',
   },
+  transformIgnorePatterns: [
+    '[/\\\\]node_modules[/\\\\](?!react-leaflet)[/\\\\]',
+  ],
   moduleNameMapper: {
     '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
     '^@frontend/(.*)$': '<rootDir>/src/$1',
@@ -32,7 +35,6 @@ const config = {
     '^axios$': '<rootDir>/node_modules/axios/dist/axios.js',
     'react-markdown':
       '<rootDir>/node_modules/react-markdown/react-markdown.min.js',
-    'react-leaflet': '<rootDir>/__mocks__/reactLeafletMock.ts',
   },
   moduleFileExtensions: [
     'web.js',
