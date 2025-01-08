@@ -73,7 +73,7 @@ export default function ApiDataSetQuickStart({
       />
       <p>
         {renderLink({
-          to: `${publicApiDocsUrl}/endpoints/GetDataSet`,
+          to: `${publicApiDocsUrl}/reference-v1/endpoints/GetDataSet/`,
           children: 'Guidance: Get data set summary',
         })}
       </p>
@@ -93,7 +93,7 @@ export default function ApiDataSetQuickStart({
       />
       <p>
         {renderLink({
-          to: `${publicApiDocsUrl}/endpoints/GetDataSetMeta`,
+          to: `${publicApiDocsUrl}/reference-v1/endpoints/GetDataSetMeta/`,
           children: 'Guidance: Get data set metadata',
         })}
       </p>
@@ -113,7 +113,7 @@ export default function ApiDataSetQuickStart({
       />
       <p>
         {renderLink({
-          to: `${publicApiDocsUrl}/endpoints/QueryDataSetGet`,
+          to: `${publicApiDocsUrl}/reference-v1/endpoints/QueryDataSetGet/`,
           children: 'Guidance: Query data set (GET)',
         })}
       </p>
@@ -133,7 +133,7 @@ export default function ApiDataSetQuickStart({
       />
       <p>
         {renderLink({
-          to: `${publicApiDocsUrl}/endpoints/QueryDataSetPost`,
+          to: `${publicApiDocsUrl}/reference-v1/endpoints/QueryDataSetPost/`,
           children: 'Guidance: Query data set (POST)',
         })}
       </p>
@@ -153,7 +153,7 @@ export default function ApiDataSetQuickStart({
       />
       <p>
         {renderLink({
-          to: `${publicApiDocsUrl}/endpoints/DownloadDataSetCsv`,
+          to: `${publicApiDocsUrl}/reference-v1/endpoints/DownloadDataSetCsv/`,
           children: 'Guidance: Download data set as CSV',
         })}
       </p>

@@ -1,9 +1,12 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using Microsoft.Extensions.Logging.ApplicationInsights;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.SwaggerGen;
+
+// Update current working directory to ensure we're actually in the location the
+// build is outputted to e.g. `bin/Debug/net8.0`.
+// By default, at least in Rider, this defaults to the project's source directory meaning
+// OpenAPI files copied into the build output's `wwwroot` directory are not detected.
+Directory.SetCurrentDirectory(AppContext.BaseDirectory);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,9 +29,6 @@ builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Program).Ful
 builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Startup).FullName, LogLevel.Debug);
 builder.Logging.AddAzureWebAppDiagnostics();
 
-builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfig>();
-builder.Services.AddSwaggerGen();
-
 var startup = new Startup(builder.Configuration, builder.Environment);
 
 startup.ConfigureServices(builder.Services);
@@ -36,22 +36,6 @@ startup.ConfigureServices(builder.Services);
 var app = builder.Build();
 
 startup.Configure(app, app.Environment);
-
-app.UseSwagger(options =>
-{
-    options.RouteTemplate = "/swagger/v{documentName}/openapi.json";
-});
-app.UseSwaggerUI(options =>
-{
-    options.RoutePrefix = "swagger";
-
-    foreach (var description in app.DescribeApiVersions())
-    {
-        options.SwaggerEndpoint(
-            url: $"/swagger/v{description.GroupName}/openapi.json",
-            name: $"v{description.GroupName}");
-    }
-});
 
 await app.StartAsync();
 

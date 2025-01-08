@@ -21,10 +21,6 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
 
-// EES-4902 react leaflet now uses ESM so unable to test this currently.
-// It's stubbed out in the mocks folder.
-// Tests are skipped or partially commented out when they
-// are testing the maps directly.
 describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
   const testBlockProps: MapBlockProps = {
@@ -43,28 +39,27 @@ describe('MapBlock', () => {
     tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
-    render(<MapBlock {...testBlockProps} />);
 
-    // await waitFor(() => {
-    //   const paths = container.querySelectorAll<HTMLElement>(
-    //     '.leaflet-container svg:not(.leaflet-attribution-flag) path',
-    //   );
-
-    //   expect(paths).toHaveLength(4);
-
-    //   // Location polygons
-    //   expect(paths[0]).toHaveAttribute('fill', 'rgba(145, 161, 201, 1)');
-    //   expect(paths[1]).toHaveAttribute('fill', 'rgba(218, 224, 237, 1)');
-    //   expect(paths[2]).toHaveAttribute('fill', 'rgba(71, 99, 165, 1)');
-    //   // UK polygon
-    //   expect(paths[3]).toHaveAttribute('fill', '#003078');
-    // });
+    const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByLabelText('1. Select data to view'),
-      ).toBeInTheDocument();
+      const paths = container.querySelectorAll<HTMLElement>(
+        '.leaflet-container svg:not(.leaflet-attribution-flag) path',
+      );
+
+      expect(paths).toHaveLength(4);
+
+      // Location polygons
+      expect(paths[0]).toHaveAttribute('fill', 'rgba(145, 161, 201, 1)');
+      expect(paths[1]).toHaveAttribute('fill', 'rgba(218, 224, 237, 1)');
+      expect(paths[2]).toHaveAttribute('fill', 'rgba(71, 99, 165, 1)');
+      // UK polygon
+      expect(paths[3]).toHaveAttribute('fill', '#003078');
     });
+
+    expect(
+      await screen.findByLabelText('1. Select data to view'),
+    ).toBeInTheDocument();
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
@@ -199,7 +194,7 @@ describe('MapBlock', () => {
     expect(legendColours[4].style.backgroundColor).toBe('rgb(245, 164, 80)');
   });
 
-  test.skip('changing selected location focuses the correct polygon', async () => {
+  test('changing selected location focuses the correct polygon', async () => {
     tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
@@ -221,17 +216,18 @@ describe('MapBlock', () => {
     expect(group1Options[0]).toHaveTextContent('Leeds');
 
     await userEvent.selectOptions(select, group1Options[0]);
+
     const paths = container.querySelectorAll<HTMLElement>(
-      '.leaflet-container svg:not(.leaflet-attribution-flag) path',
+      '.leaflet-container svg:not(.leaflet-attribution-flag) path.leaflet-interactive',
     );
 
-    expect(paths).toHaveLength(4);
+    expect(paths).toHaveLength(3);
 
     // Location polygons
     // selected polygon has a wider border.
-    expect(paths[0]).toHaveAttribute('stroke-width', '3');
+    expect(paths[0]).toHaveAttribute('stroke-width', '1');
     expect(paths[1]).toHaveAttribute('stroke-width', '1');
-    expect(paths[2]).toHaveAttribute('stroke-width', '1');
+    expect(paths[2]).toHaveAttribute('stroke-width', '3');
   });
 
   test('changing selected location renders its indicator tile', async () => {
@@ -331,7 +327,7 @@ describe('MapBlock', () => {
     ).toHaveTextContent('4.01%');
   });
 
-  test.skip('resetting the map when select None Selected', async () => {
+  test('resetting the map when no location selected', async () => {
     tableBuilderService.getLocationGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
@@ -353,10 +349,13 @@ describe('MapBlock', () => {
     await userEvent.selectOptions(select, group1Options[0]);
 
     const paths = container.querySelectorAll<HTMLElement>(
-      '.leaflet-container svg:not(.leaflet-attribution-flag) path',
+      '.leaflet-container svg:not(.leaflet-attribution-flag) path.leaflet-interactive',
     );
 
-    expect(paths[0]).toHaveAttribute('stroke-width', '3');
+    expect(paths).toHaveLength(3);
+    expect(paths[0]).toHaveAttribute('stroke-width', '1');
+    expect(paths[1]).toHaveAttribute('stroke-width', '1');
+    expect(paths[2]).toHaveAttribute('stroke-width', '3');
 
     await userEvent.selectOptions(
       select,
@@ -364,6 +363,9 @@ describe('MapBlock', () => {
     );
 
     expect(paths[0]).toHaveAttribute('stroke-width', '1');
+    expect(paths[1]).toHaveAttribute('stroke-width', '1');
+    // Stroke width is reset
+    expect(paths[2]).toHaveAttribute('stroke-width', '1');
   });
 
   test('ensure values with decimal places go are assigned the correct colour when the legend values are set to 0 decimal places', async () => {
