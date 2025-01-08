@@ -74,6 +74,9 @@
     "minCapacityContentDb": {
       "value": "0.5"
     },
+    "licenseTypeStatisticsDb": {
+      "value": "BasePrice"
+    },
     "skuStatisticsDb": {
       "value": "GP_Gen5"
     },
