@@ -20,7 +20,7 @@ public record ReleaseCreateRequest
     [JsonConverter(typeof(TimeIdentifierJsonConverter))]
     public TimeIdentifier TimePeriodCoverage { get; init; }
 
-    public string Slug => CreateSlug(year: Year, timePeriodCoverage: TimePeriodCoverage, label: Label);
+    public string Slug => CreateReleaseSlug(year: Year, timePeriodCoverage: TimePeriodCoverage, label: Label);
 
     [Range(1000, 9999)]
     public int Year { get; init; }
@@ -42,7 +42,7 @@ public record ReleaseUpdateRequest
 
     public string PreReleaseAccessList { get; init; } = string.Empty;
 
-    public string Slug => CreateSlug(year: Year, timePeriodCoverage: TimePeriodCoverage, label: Label);
+    public string Slug => CreateReleaseSlug(year: Year, timePeriodCoverage: TimePeriodCoverage, label: Label);
 
     [Range(1000, 9999)]
     public int Year { get; init; }

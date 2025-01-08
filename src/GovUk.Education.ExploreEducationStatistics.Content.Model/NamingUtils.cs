@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public static class NamingUtils
 {
-    public static string CreateSlug(
+    public static string CreateReleaseSlug(
         int year,
         TimeIdentifier timePeriodCoverage,
         string? label = null)
