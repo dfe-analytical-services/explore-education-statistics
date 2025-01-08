@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,13 +40,15 @@ public class TestApplicationFactory : TestApplicationFactory<TestStartup>
             .CreateHostBuilder()
             .ConfigureServices(services =>
             {
-                services.AddDbContext<PublicDataDbContext>(
-                    options =>
-                    {
-                        options.UseNpgsql(
-                            _postgreSqlContainer.GetConnectionString(),
-                            psqlOptions => psqlOptions.EnableRetryOnFailure());
-                    });
+                services
+                    .UseInMemoryDbContext<ContentDbContext>()
+                    .UseInMemoryDbContext<StatisticsDbContext>()
+                    .AddDbContext<PublicDataDbContext>(
+                        options =>
+                        {
+                            options.UseNpgsql(
+                                _postgreSqlContainer.GetConnectionString());
+                        });
 
                 using var serviceScope = services.BuildServiceProvider()
                     .GetRequiredService<IServiceScopeFactory>()
