@@ -18,6 +18,9 @@ param resourceMetric ResourceMetric
 @description('Configuration for this alert.')
 param config DynamicAlertConfig
 
+@description('Optional description of alert.')
+param fullDescription string?
+
 @description('''
 An optional date that prevents machine learning algorithms from using metric data prior to this date in order to
 calculate its dynamic threshold.
@@ -47,6 +50,7 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
     severity: severityLevel
     evaluationFrequency: config.evaluationFrequency
     windowSize: config.windowSize
+    description: fullDescription
     criteria: {
       'odata.type': 'Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria'
       allOf: [
