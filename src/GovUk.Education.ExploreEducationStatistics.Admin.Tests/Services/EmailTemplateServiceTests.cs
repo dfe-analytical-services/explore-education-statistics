@@ -1,11 +1,14 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -18,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class EmailTemplateServiceTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         [Fact]
         public void SendInviteEmail()
         {
@@ -63,11 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void SendPublicationRoleEmail()
         {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                Title = "Test Publication"
-            };
+            Publication publication = _dataFixture.DefaultPublication();
 
             const string expectedTemplateId = "publication-role-template-id";
 
@@ -75,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 {"url", "https://admin-uri"},
                 {"role", Owner.ToString()},
-                {"publication", "Test Publication"},
+                {"publication", publication.Title}
             };
 
             var emailService = new Mock<IEmailService>(Strict);
@@ -108,17 +109,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void SendReleaseRoleEmail()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Test Publication"
-                },
-                ReleaseName = "2020",
-                TimePeriodCoverage = December
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             const string expectedTemplateId = "release-role-template-id";
 
@@ -126,11 +119,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 {
                     "url",
-                    $"https://admin-uri/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/summary"
+                    $"https://admin-uri/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/summary"
                 },
                 { "role", Contributor.ToString() },
-                { "publication", "Test Publication" },
-                { "release", "December 2020" }
+                { "publication", releaseVersion.Release.Publication.Title },
+                { "release", releaseVersion.Release.Title }
             };
 
             var emailService = new Mock<IEmailService>(Strict);

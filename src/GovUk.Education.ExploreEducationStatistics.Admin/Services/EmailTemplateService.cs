@@ -91,11 +91,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 {
                     "url",
-                    $"{url}/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/{link}"
+                    $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/{link}"
                 },
                 { "role", role.ToString() },
-                { "publication", releaseVersion.Publication.Title },
-                { "release", releaseVersion.Title }
+                { "publication", releaseVersion.Release.Publication.Title },
+                { "release", releaseVersion.Release.Title }
             };
 
             return emailService.SendEmail(email, template, emailValues);
