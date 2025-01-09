@@ -1,4 +1,4 @@
-import { cpuPercentageConfig, memoryPercentageConfig } from 'alerts/config.bicep'
+import { cpuPercentageConfig, memoryPercentageConfig } from 'alerts/dynamicAlertConfig.bicep'
 
 import { IpRange, PrincipalNameAndId } from '../types.bicep'
 

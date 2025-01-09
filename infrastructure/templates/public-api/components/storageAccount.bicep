@@ -1,4 +1,4 @@
-import { responseTimeConfig } from 'alerts/config.bicep'
+import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
 
 import { IpRange } from '../types.bicep'
 

@@ -1,4 +1,4 @@
-import { staticAverageLessThanHundred } from '../config.bicep'
+import { staticAverageLessThanHundred } from '../staticAlertConfig.bicep'
 
 @description('Name of the resource that these alerts are being applied to.')
 param resourceName string

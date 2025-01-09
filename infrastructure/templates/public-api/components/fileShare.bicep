@@ -1,4 +1,4 @@
-import { responseTimeConfig } from 'alerts/config.bicep'
+import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
 
 @description('Size in GB of the file share')
 param fileShareQuota int = 6
