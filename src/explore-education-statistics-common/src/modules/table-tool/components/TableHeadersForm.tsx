@@ -240,13 +240,13 @@ export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                   <h3>Move and reorder table headers</h3>
-                  <h4>Using a mouse, track pad, touch screen and a keyboard</h4>
+                  <h4>Using a mouse, track pad, touch screen or keyboard</h4>
                   <p className="govuk-hint">
-                    Drag and drop or use the keyboard to reorder headers within
-                    or between columns and rows. Click the Reorder button on a
-                    header group to reorder the items within that group. Hold
-                    the Ctrl key and click to select multiple items to drag and
-                    drop.
+                    Drag and drop, use the keyboard or use the 'Move' buttons to
+                    reorder headers within or between columns and rows. Click
+                    the Reorder button on a header group to reorder the items
+                    within that group. Hold the Ctrl key and click to select
+                    multiple items to drag and drop.
                   </p>
                   <h4>Using only a keyboard</h4>
                   <p className="govuk-hint">
@@ -256,9 +256,26 @@ export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
                     items, you can press Ctrl and Enter to add an item to your
                     selected items.
                   </p>
-                  <p className="govuk-visually-hidden">
-                    If you are using a screen reader disable scan mode.
-                  </p>
+                  <div className="govuk-visually-hidden">
+                    <p>
+                      For screen reader users, you may need to change mode to
+                      use the keyboard controls:
+                    </p>
+                    <ul>
+                      <li>
+                        If you are using NVDA, enable focus mode (Insert + Space
+                        bar)
+                      </li>
+                      <li>
+                        If you are using JAWS, enable the virtual cursor (Insert
+                        + Z)
+                      </li>
+                      <li>
+                        If you are using Windows Narrator, disable scan mode
+                        (Caps lock + Space bar)
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 
