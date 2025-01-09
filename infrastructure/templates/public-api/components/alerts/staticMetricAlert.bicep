@@ -17,6 +17,8 @@ param resourceMetric ResourceMetric
 @description('Configuration for this alert.')
 param config StaticAlertConfig
 
+
+
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
 
@@ -40,6 +42,7 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
     severity: severityLevel
     evaluationFrequency: config.evaluationFrequency
     windowSize: config.windowSize
+    description: description
     criteria: {
       'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria' 
       allOf: [{
