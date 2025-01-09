@@ -87,18 +87,18 @@ public class DataSetFileService(
         // `JoinFreeText`. That JOIN means we cannot fetch any collection, as that means we don't get a one-to-one
         // matching of search ranks with the results after filtering. So instead we fetch the geographic levels
         // in a separate query below
-        var geogLvlsDict = contentDbContext.Files
+        var geogLvlsDict = await contentDbContext.Files
             .AsNoTracking()
             .Include(f => f.DataSetFileVersionGeographicLevels)
             .Where(file => results
                 .Select(r => r.FileId).ToList()
                 .Contains(file.Id))
-            .ToDictionary(
+            .ToDictionaryAsync(
                 file => file.Id,
                 file => file.DataSetFileVersionGeographicLevels
                     .Select(gl => gl.GeographicLevel.GetEnumLabel())
                     .Order()
-                    .ToList());
+                    .ToList(), cancellationToken: cancellationToken);
         foreach (var result in results)
         {
             result.Meta.GeographicLevels = geogLvlsDict[result.FileId];
