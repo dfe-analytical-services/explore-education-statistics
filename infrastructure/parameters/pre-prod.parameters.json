@@ -71,6 +71,9 @@
     "capacityContentDb": {
       "value": 50
     },
+    "licenseTypeStatisticsDb": {
+      "value": "BasePrice"
+    },
     "skuStatisticsDb": {
       "value": "GP_Gen5"
     },

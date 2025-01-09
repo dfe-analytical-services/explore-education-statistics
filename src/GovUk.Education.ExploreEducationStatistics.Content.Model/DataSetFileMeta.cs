@@ -3,15 +3,16 @@ using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class DataSetFileMeta
 {
-    [JsonConverter(typeof(GeographicLevelsListJsonConverter))]
-    public required List<GeographicLevel> GeographicLevels { get; set; }
+    // NOTE: GeographicLevels aren't in DataSetFileMeta JSON because they need to queryable
+    // So that meta data lives in DataSetFileVersionGeographicLevels
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public List<string>? GeographicLevels { get; set; } // TODO: remove in EES-5750
 
     public required TimePeriodRangeMeta TimePeriodRange { get; set; }
 
@@ -44,6 +45,9 @@ public class FilterMeta
     public string? Hint { get; set; }
 
     public required string ColumnName { get; set; }
+
+    [JsonIgnore]
+    public string? GroupCsvColumn { get; set; }
 }
 
 public class IndicatorMeta

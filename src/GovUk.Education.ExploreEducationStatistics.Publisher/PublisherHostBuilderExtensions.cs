@@ -96,6 +96,7 @@ public static class PublisherHostBuilderExtensions
                             provider.GetRequiredService<ILogger<IBlobStorageService>>()))
                     .AddScoped<IContentService, ContentService>(provider =>
                         new ContentService(
+                            contentDbContext: provider.GetRequiredService<ContentDbContext>(),
                             publicBlobStorageService: provider.GetRequiredService<IPublicBlobStorageService>(),
                             privateBlobCacheService: new BlobCacheService(
                                 provider.GetRequiredService<IPrivateBlobStorageService>(),
@@ -123,6 +124,7 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IIndicatorRepository, IndicatorRepository>()
                     .AddScoped<IPublishingCompletionService, PublishingCompletionService>()
                     .AddScoped<IPublicationRepository, PublicationRepository>()
+                    .AddScoped<IReleaseRepository, ReleaseRepository>()
                     .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()

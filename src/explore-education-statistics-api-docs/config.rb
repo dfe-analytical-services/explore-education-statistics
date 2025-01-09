@@ -1,5 +1,6 @@
 require 'dotenv'
 require 'govuk_tech_docs'
+require 'lib/utils/env'
 require 'lib/api_reference_pages_extension'
 require 'lib/helpers'
 require 'lib/api_reference_helpers'
@@ -19,7 +20,7 @@ if ENV.has_key?("TECH_DOCS_HOST")
 end
 
 if ENV.has_key?("TECH_DOCS_PREVENT_INDEXING")
-  config[:tech_docs][:prevent_indexing] = ENV["TECH_DOCS_PREVENT_INDEXING"]
+  config[:tech_docs][:prevent_indexing] = EnvUtils.get_bool("TECH_DOCS_PREVENT_INDEXING")
 end
 
 if ENV.has_key?("TECH_DOCS_API_URL")

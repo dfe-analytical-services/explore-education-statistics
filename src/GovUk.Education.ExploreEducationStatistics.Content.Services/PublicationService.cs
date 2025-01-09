@@ -27,17 +27,20 @@ public class PublicationService : IPublicationService
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
     private readonly IPublicationRepository _publicationRepository;
+    private readonly IReleaseRepository _releaseRepository;
     private readonly IReleaseVersionRepository _releaseVersionRepository;
 
     public PublicationService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
         IPublicationRepository publicationRepository,
+        IReleaseRepository releaseRepository,
         IReleaseVersionRepository releaseVersionRepository)
     {
         _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
         _publicationRepository = publicationRepository;
+        _releaseRepository = releaseRepository;
         _releaseVersionRepository = releaseVersionRepository;
     }
 
@@ -81,42 +84,9 @@ public class PublicationService : IPublicationService
                     return new Either<ActionResult, PublicationCacheViewModel>(new NotFoundResult());
                 }
 
-                var publishedReleaseVersions = await _releaseVersionRepository.ListLatestPublishedReleaseVersions(publication.Id);
-
+                var publishedReleases = await _releaseRepository.ListPublishedReleases(publication.Id);
                 var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
-
-                // Only show legacy links and published releases in ReleaseSeries
-                var filteredReleaseSeries = publication.ReleaseSeries
-                    .Where(rsi =>
-                        rsi.IsLegacyLink
-                        || publishedReleaseVersions
-                            .Any(rv => rsi.ReleaseId == rv.ReleaseId)
-                    ).ToList();
-
-                var releaseSeriesItemViewModels = filteredReleaseSeries
-                    .Select(rsi =>
-                    {
-                        if (rsi.IsLegacyLink)
-                        {
-                            return new ReleaseSeriesItemViewModel
-                            {
-                                Description = rsi.LegacyLinkDescription!,
-                                LegacyLinkUrl = rsi.LegacyLinkUrl,
-                            };
-                        }
-
-                        var latestReleaseVersion = publishedReleaseVersions
-                            .Single(rv => rv.ReleaseId == rsi.ReleaseId);
-
-                        return new ReleaseSeriesItemViewModel
-                        {
-                            Description = latestReleaseVersion.Title,
-                            ReleaseId = latestReleaseVersion.ReleaseId,
-                            ReleaseSlug = latestReleaseVersion.Slug,
-                        };
-                    }).ToList();
-
-                return BuildPublicationViewModel(publication, publishedReleaseVersions, isSuperseded, releaseSeriesItemViewModels);
+                return BuildPublicationViewModel(publication, publishedReleases, isSuperseded);
             });
     }
 
@@ -226,23 +196,24 @@ public class PublicationService : IPublicationService
 
     private static PublicationCacheViewModel BuildPublicationViewModel(
         Publication publication,
-        List<ReleaseVersion> releaseVersions,
-        bool isSuperseded,
-        List<ReleaseSeriesItemViewModel> releaseSeries)
+        List<Release> releases,
+        bool isSuperseded)
     {
-        var theme = new ThemeViewModel(
-            publication.Theme.Id,
-            publication.Theme.Slug,
-            publication.Theme.Title,
-            publication.Theme.Summary
-        );
+        var theme = publication.Theme;
+
+        var releaseSeriesItemViewModels = BuildReleaseSeriesItemViewModels(publication, releases);
 
         return new PublicationCacheViewModel
         {
             Id = publication.Id,
             Title = publication.Title,
             Slug = publication.Slug,
-            Theme = theme,
+            Theme = new ThemeViewModel(
+                theme.Id,
+                theme.Slug,
+                theme.Title,
+                theme.Summary
+            ),
             Contact = new ContactViewModel(publication.Contact),
             ExternalMethodology = publication.ExternalMethodology != null
                 ? new ExternalMethodologyViewModel(publication.ExternalMethodology)
@@ -257,16 +228,47 @@ public class PublicationService : IPublicationService
                     Title = publication.SupersededBy.Title
                 }
                 : null,
-            Releases = releaseVersions
-                .Select(releaseVersion => new ReleaseVersionTitleViewModel
+            Releases = releases
+                .Select(r => new ReleaseTitleViewModel
                 {
-                    Id = releaseVersion.Id,
-                    Slug = releaseVersion.Slug,
-                    Title = releaseVersion.Title,
+                    Id = r.Id,
+                    Slug = r.Slug,
+                    Title = r.Title
                 })
                 .ToList(),
-            ReleaseSeries = releaseSeries,
+            ReleaseSeries = releaseSeriesItemViewModels
         };
+    }
+
+    private static List<ReleaseSeriesItemViewModel> BuildReleaseSeriesItemViewModels(
+        Publication publication,
+        List<Release> releases)
+    {
+        var publishedReleasesById = releases.ToDictionary(r => r.Id);
+        return publication.ReleaseSeries
+            // Only include release series items for legacy links and published releases
+            .Where(rsi => rsi.IsLegacyLink || publishedReleasesById.ContainsKey(rsi.ReleaseId!.Value))
+            .Select(rsi =>
+            {
+                if (rsi.IsLegacyLink)
+                {
+                    return new ReleaseSeriesItemViewModel
+                    {
+                        Description = rsi.LegacyLinkDescription!,
+                        LegacyLinkUrl = rsi.LegacyLinkUrl
+                    };
+                }
+
+                var release = publishedReleasesById[rsi.ReleaseId!.Value];
+
+                return new ReleaseSeriesItemViewModel
+                {
+                    Description = release.Title,
+                    ReleaseId = release.Id,
+                    ReleaseSlug = release.Slug
+                };
+            })
+            .ToList();
     }
 
     private async Task<PublicationTreeThemeViewModel> BuildPublicationTreeTheme(Theme theme)
@@ -296,7 +298,8 @@ public class PublicationService : IPublicationService
         var latestReleaseHasData =
             latestPublishedReleaseVersionId.HasValue && await HasAnyDataFiles(latestPublishedReleaseVersionId.Value);
 
-        var publishedReleaseVersionIds = await _releaseVersionRepository.ListLatestPublishedReleaseVersionIds(publication.Id);
+        var publishedReleaseVersionIds =
+            await _releaseVersionRepository.ListLatestReleaseVersionIds(publication.Id, publishedOnly: true);
         var anyLiveReleaseHasData = await publishedReleaseVersionIds
             .ToAsyncEnumerable()
             .AnyAwaitAsync(async id => await HasAnyDataFiles(id));

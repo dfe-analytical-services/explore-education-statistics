@@ -1,4 +1,11 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -12,11 +19,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
@@ -29,18 +38,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Snapshooter;
 using Snapshooter.Xunit;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 {
@@ -55,8 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             }
         };
 
-        private readonly Guid _publicationId = Guid.NewGuid();
-
         private readonly PermalinkTableViewModel _frontendTableResponse = new()
         {
             Caption = "Admission Numbers for 'Sample publication' in North East between 2022 and 2023",
@@ -70,6 +71,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task CreatePermalink_LatestPublishedReleaseForSubjectNotFound()
         {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+                .WithTheme(_fixture.DefaultTheme());
+
             var request = new PermalinkCreateRequest
             {
                 Query =
@@ -78,57 +83,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-
-            releaseVersionRepository
-                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId, default))
-                .ReturnsAsync((ReleaseVersion?)null);
 
             subjectRepository
                 .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId, default))
-                .ReturnsAsync(_publicationId);
+                .ReturnsAsync(publication.Id);
 
-            var service = BuildService(releaseVersionRepository: releaseVersionRepository.Object,
-                subjectRepository: subjectRepository.Object);
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var result = await service.CreatePermalink(request);
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    subjectRepository: subjectRepository.Object
+                );
 
-            MockUtils.VerifyAllMocks(
-                releaseVersionRepository,
-                subjectRepository);
+                var result = await service.CreatePermalink(request);
 
-            result.AssertNotFound();
+                MockUtils.VerifyAllMocks(subjectRepository);
+
+                result.AssertNotFound();
+            }
         }
 
         [Fact]
-        public async Task CreatePermalink_WithoutReleaseId()
+        public async Task CreatePermalink_WithoutReleaseVersionId()
         {
-            var subject = _fixture
+            Subject subject = _fixture
                 .DefaultSubject()
                 .WithFilters(_fixture.DefaultFilter()
-                    .ForIndex(0, s =>
-                        s.SetGroupCsvColumn("filter_0_grouping")
-                            .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                                .ForInstance(s => s.Set(
-                                    fg => fg.Label,
-                                    (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                                .Generate(2)))
-                    .ForIndex(1, s =>
-                        s.SetGroupCsvColumn("filter_1_grouping")
-                            .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                                .ForInstance(s => s.Set(
-                                    fg => fg.Label,
-                                    (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                                .Generate(2)))
-                    .ForIndex(2, s =>
-                        s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2)
-                            .Generate(1)))
+                    .ForIndex(0,
+                        s =>
+                            s.SetGroupCsvColumn("filter_0_grouping")
+                                .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                                    .ForInstance(s => s.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                                    .Generate(2)))
+                    .ForIndex(1,
+                        s =>
+                            s.SetGroupCsvColumn("filter_1_grouping")
+                                .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                                    .ForInstance(s => s.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                                    .Generate(2)))
+                    .ForIndex(2,
+                        s =>
+                            s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2)
+                                .Generate(1)))
                     .GenerateList())
                 .WithIndicatorGroups(_fixture
                     .DefaultIndicatorGroup(indicatorCount: 1)
-                    .Generate(3))
-                .Generate();
+                    .Generate(3));
 
             var indicators = subject
                 .IndicatorGroups
@@ -201,17 +213,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     Filters = FiltersMetaViewModelBuilder.BuildFilters(subject.Filters),
                     Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
                     Footnotes = footnoteViewModels,
-                    TimePeriodRange = new List<TimePeriodMetaViewModel>
-                    {
-                        new(2022, AcademicYear)
-                        {
-                            Label = "2022/23"
-                        },
-                        new(2023, AcademicYear)
-                        {
-                            Label = "2023/24"
-                        }
-                    }
+                    TimePeriodRange =
+                    [
+                        new TimePeriodMetaViewModel(2022, AcademicYear) { Label = "2022/23" },
+                        new TimePeriodMetaViewModel(2023, AcademicYear) { Label = "2023/24" }
+                    ]
                 },
                 Results = observations
                     .Select(o =>
@@ -219,20 +225,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .ToList()
             };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
-                ReleaseName = "2000",
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow,
-            };
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(_fixture.DefaultTheme());
 
-            var publication = new Publication
-            {
-                Id = _publicationId,
-                LatestPublishedReleaseVersion = releaseVersion
-            };
+            var releaseVersion = publication.Releases.Single().Versions.Single();
+
+            var releaseDataFile = ReleaseDataFile(releaseVersion, subject.Id);
 
             var csvMeta = new PermalinkCsvMetaViewModel
             {
@@ -242,8 +241,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .Select(i => new IndicatorCsvMetaViewModel(i))
                     .ToDictionary(i => i.Name),
                 Locations = locations.ToDictionary(l => l.Id, l => l.GetCsvValues()),
-                Headers = new List<string>
-                {
+                Headers =
+                [
                     "time_period",
                     "time_identifier",
                     "geographic_level",
@@ -262,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     indicators[0].Name,
                     indicators[1].Name,
                     indicators[2].Name
-                }
+                ]
             };
 
             var request = new PermalinkCreateRequest
@@ -349,17 +348,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(csvMeta);
 
-            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
-
-            releaseVersionRepository
-                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId, default))
-                .ReturnsAsync(releaseVersion);
-
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
             subjectRepository
                 .Setup(s => s.FindPublicationIdForSubject(subject.Id, default))
-                .ReturnsAsync(_publicationId);
+                .ReturnsAsync(publication.Id);
 
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
@@ -375,8 +368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, subject.Id));
+                contentDbContext.ReleaseFiles.Add(releaseDataFile);
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -388,7 +380,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     publicBlobStorageService: publicBlobStorageService.Object,
                     frontendService: frontendService.Object,
                     permalinkCsvMetaService: permalinkCsvMetaService.Object,
-                    releaseVersionRepository: releaseVersionRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     tableBuilderService: tableBuilderService.Object);
 
@@ -398,7 +389,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     publicBlobStorageService,
                     frontendService,
                     permalinkCsvMetaService,
-                    releaseVersionRepository,
                     subjectRepository,
                     tableBuilderService);
 
@@ -439,33 +429,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task CreatePermalink_WithReleaseId()
+        public async Task CreatePermalink_WithReleaseVersionId()
         {
-            var subject = _fixture
+            Subject subject = _fixture
                 .DefaultSubject()
                 .WithFilters(_fixture.DefaultFilter()
-                    .ForIndex(0, s =>
-                        s.SetGroupCsvColumn("filter_0_grouping")
-                            .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                                .ForInstance(s => s.Set(
-                                    fg => fg.Label,
-                                    (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                                .Generate(2)))
-                    .ForIndex(1, s =>
-                        s.SetGroupCsvColumn("filter_1_grouping")
-                            .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
-                                .ForInstance(s => s.Set(
-                                    fg => fg.Label,
-                                    (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
-                                .Generate(2)))
-                    .ForIndex(2, s =>
-                        s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2)
-                            .Generate(1)))
+                    .ForIndex(0,
+                        s =>
+                            s.SetGroupCsvColumn("filter_0_grouping")
+                                .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                                    .ForInstance(s => s.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                                    .Generate(2)))
+                    .ForIndex(1,
+                        s =>
+                            s.SetGroupCsvColumn("filter_1_grouping")
+                                .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                                    .ForInstance(s => s.Set(
+                                        fg => fg.Label,
+                                        (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                                    .Generate(2)))
+                    .ForIndex(2,
+                        s =>
+                            s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2)
+                                .Generate(1)))
                     .GenerateList())
                 .WithIndicatorGroups(_fixture
                     .DefaultIndicatorGroup(indicatorCount: 1)
-                    .Generate(3))
-                .Generate();
+                    .Generate(3));
 
             var indicators = subject
                 .IndicatorGroups
@@ -537,17 +529,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     Filters = FiltersMetaViewModelBuilder.BuildFilters(subject.Filters),
                     Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
                     Footnotes = footnoteViewModels,
-                    TimePeriodRange = new List<TimePeriodMetaViewModel>
-                    {
-                        new(2022, AcademicYear)
-                        {
-                            Label = "2022/23"
-                        },
-                        new(2023, AcademicYear)
-                        {
-                            Label = "2023/24"
-                        }
-                    }
+                    TimePeriodRange =
+                    [
+                        new TimePeriodMetaViewModel(2022, AcademicYear) { Label = "2022/23" },
+                        new TimePeriodMetaViewModel(2023, AcademicYear) { Label = "2023/24" }
+                    ]
                 },
                 Results = observations
                     .Select(o =>
@@ -555,20 +541,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .ToList()
             };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
-                ReleaseName = "2000",
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow,
-            };
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(_fixture.DefaultTheme());
 
-            var publication = new Publication
-            {
-                Id = _publicationId,
-                LatestPublishedReleaseVersion = releaseVersion
-            };
+            var releaseVersion = publication.Releases.Single().Versions.Single();
+
+            var releaseDataFile = ReleaseDataFile(releaseVersion, subject.Id);
 
             var csvMeta = new PermalinkCsvMetaViewModel
             {
@@ -578,8 +557,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .Select(i => new IndicatorCsvMetaViewModel(i))
                     .ToDictionary(i => i.Name),
                 Locations = locations.ToDictionary(l => l.Id, l => l.GetCsvValues()),
-                Headers = new List<string>
-                {
+                Headers =
+                [
                     "time_period",
                     "time_identifier",
                     "geographic_level",
@@ -598,7 +577,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     indicators[0].Name,
                     indicators[1].Name,
                     indicators[2].Name
-                }
+                ]
             };
 
             var request = new PermalinkCreateRequest
@@ -699,8 +678,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, subject.Id));
+                contentDbContext.ReleaseFiles.Add(releaseDataFile);
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -761,20 +739,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task GetPermalink()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2000",
-                PublicationId = _publicationId,
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow,
-            };
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(_fixture.DefaultTheme());
 
-            var publication = new Publication
-            {
-                Id = _publicationId,
-                LatestPublishedReleaseVersion = releaseVersion
-            };
+            var releaseVersion = publication.Releases.Single().Versions.Single();
 
             var permalink = new Permalink
             {
@@ -784,6 +753,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 PublicationTitle = "Test publication",
                 SubjectId = Guid.NewGuid()
             };
+
+            var releaseDataFile = ReleaseDataFile(releaseVersion, permalink.SubjectId);
 
             var table = _frontendTableResponse with
             {
@@ -797,8 +768,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 contentDbContext.Permalinks.Add(permalink);
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, permalink.SubjectId));
+                contentDbContext.ReleaseFiles.Add(releaseDataFile);
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -873,7 +843,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task GetPermalink_ReleaseWithSubjectNotFound()
+        public async Task GetPermalink_ReleaseVersionWithSubjectNotFound()
         {
             var permalink = new Permalink
             {
@@ -912,47 +882,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task GetPermalink_SubjectIsForMultipleReleaseVersions()
         {
-            var previousVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
-                ReleaseName = "2000",
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow,
-                PreviousVersionId = null
-            };
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 2)])
+                .WithTheme(_fixture.DefaultTheme());
 
-            var latestVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
-                ReleaseName = "2000",
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow,
-                PreviousVersionId = previousVersion.Id
-            };
-
-            var publication = new Publication
-            {
-                Id = _publicationId,
-                LatestPublishedReleaseVersion = latestVersion
-            };
+            var (previousReleaseVersion, latestReleaseVersion) = publication.Releases.Single().Versions.ToTuple2();
 
             var permalink = new Permalink
             {
                 SubjectId = Guid.NewGuid()
             };
 
+            ReleaseFile[] releaseDataFiles =
+            [
+                ReleaseDataFile(previousReleaseVersion, permalink.SubjectId),
+                ReleaseDataFile(latestReleaseVersion, permalink.SubjectId)
+            ];
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.Permalinks.Add(permalink);
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.ReleaseVersions.AddRange(previousVersion, latestVersion);
-                contentDbContext.ReleaseFiles.AddRange(
-                    ReleaseDataFile(previousVersion, permalink.SubjectId),
-                    ReleaseDataFile(latestVersion, permalink.SubjectId)
-                );
+                contentDbContext.ReleaseFiles.AddRange(releaseDataFiles);
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -980,109 +932,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task GetPermalink_SubjectIsNotForLatestRelease_OlderByYear()
+        public async Task GetPermalink_SubjectIsNotForPublicationsLatestRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
-                ReleaseName = "2000",
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow,
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleases([
+                    _fixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020),
+                    _fixture
+                        .DefaultRelease(publishedVersions: 1, year: 2021)
+                ])
+                .WithTheme(_fixture.DefaultTheme());
 
-            var latestReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
-                ReleaseName = "2001",
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow,
-            };
+            var release2020 = publication.Releases.Single(r => r.Year == 2020);
+            var release2021 = publication.Releases.Single(r => r.Year == 2021);
 
-            var publication = new Publication
-            {
-                Id = _publicationId,
-                LatestPublishedReleaseVersion = latestReleaseVersion
-            };
+            // Check the publication's latest published release version in the generated test data setup
+            Assert.Equal(release2021.Versions[0].Id, publication.LatestPublishedReleaseVersionId);
 
             var permalink = new Permalink
             {
                 SubjectId = Guid.NewGuid()
             };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.Permalinks.Add(permalink);
-                contentDbContext.Publications.Add(publication);
-                contentDbContext.ReleaseVersions.AddRange(releaseVersion, latestReleaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, permalink.SubjectId));
-
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
-
-            publicBlobStorageService.SetupGetDeserializedJson(
-                container: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.json.zst",
-                value: new PermalinkTableViewModel());
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildService(
-                    contentDbContext: contentDbContext,
-                    publicBlobStorageService: publicBlobStorageService.Object);
-
-                var result = (await service.GetPermalink(permalink.Id)).AssertRight();
-
-                MockUtils.VerifyAllMocks(publicBlobStorageService);
-
-                Assert.Equal(permalink.Id, result.Id);
-                Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);
-            }
-        }
-
-        [Fact]
-        public async Task GetPermalink_SubjectIsNotForLatestRelease_OlderByTimePeriod()
-        {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
-                ReleaseName = "2000",
-                TimePeriodCoverage = January,
-                Published = DateTime.UtcNow,
-            };
-
-            var latestReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
-                ReleaseName = "2000",
-                TimePeriodCoverage = February,
-                Published = DateTime.UtcNow,
-            };
-
-            var publication = new Publication
-            {
-                Id = _publicationId,
-                LatestPublishedReleaseVersion = latestReleaseVersion
-            };
-
-            var permalink = new Permalink
-            {
-                SubjectId = Guid.NewGuid()
-            };
+            var releaseDataFile = ReleaseDataFile(release2020.Versions[0], permalink.SubjectId);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.Permalinks.Add(permalink);
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.ReleaseVersions.AddRange(releaseVersion, latestReleaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, permalink.SubjectId));
+                contentDbContext.ReleaseFiles.Add(releaseDataFile);
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -1112,45 +992,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task GetPermalink_SubjectIsNotForLatestReleaseVersion()
         {
-            var previousVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
-                ReleaseName = "2000",
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow,
-                PreviousVersionId = null
-            };
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 2)]);
 
-            var latestVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
-                ReleaseName = "2000",
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow,
-                PreviousVersionId = previousVersion.Id
-            };
-
-            var publication = new Publication
-            {
-                Id = _publicationId,
-                LatestPublishedReleaseVersion = latestVersion
-            };
+            var previousReleaseVersion = publication.Releases.Single().Versions[0];
 
             var permalink = new Permalink
             {
                 SubjectId = Guid.NewGuid()
             };
 
+            var releaseDataFile = ReleaseDataFile(previousReleaseVersion, permalink.SubjectId);
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.Permalinks.Add(permalink);
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.ReleaseVersions.AddRange(previousVersion, latestVersion);
-                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(previousVersion,
-                    permalink.SubjectId));
+                contentDbContext.ReleaseFiles.Add(releaseDataFile);
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -1180,37 +1039,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task GetPermalink_SubjectIsFromSupersededPublication()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
-                ReleaseName = "2000",
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow,
-            };
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)])
+                .WithSupersededBy(_fixture
+                    .DefaultPublication()
+                    .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]));
 
-            var publication = new Publication
-            {
-                Id = _publicationId,
-                LatestPublishedReleaseVersion = releaseVersion,
-                SupersededBy = new Publication
-                {
-                    LatestPublishedReleaseVersionId = Guid.NewGuid()
-                }
-            };
+            var releaseVersion = publication.Releases.Single().Versions.Single();
 
             var permalink = new Permalink
             {
                 SubjectId = Guid.NewGuid()
             };
 
+            var releaseDataFile = ReleaseDataFile(releaseVersion, permalink.SubjectId);
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.Permalinks.Add(permalink);
-                contentDbContext.Publications.Add(publication);
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, permalink.SubjectId));
+                contentDbContext.Publications.AddRange(publication);
+                contentDbContext.ReleaseFiles.Add(releaseDataFile);
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -1337,7 +1186,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             IPermalinkCsvMetaService? permalinkCsvMetaService = null,
             IPublicBlobStorageService? publicBlobStorageService = null,
             IFrontendService? frontendService = null,
-            IReleaseVersionRepository? releaseVersionRepository = null,
             ISubjectRepository? subjectRepository = null,
             IPublicationRepository? publicationRepository = null)
         {
@@ -1350,8 +1198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(MockBehavior.Strict),
                 frontendService ?? Mock.Of<IFrontendService>(MockBehavior.Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
-                publicationRepository ?? new PublicationRepository(contentDbContext),
-                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict)
+                publicationRepository ?? new PublicationRepository(contentDbContext)
             );
         }
     }

@@ -1,10 +1,12 @@
-import ReorderFiltersList from '@admin/pages/release/data/components/ReorderFiltersList';
+import ReorderFiltersList, {
+  UpdateFiltersRequest,
+} from '@admin/pages/release/data/components/ReorderFiltersList';
+import render from '@common-test/render';
 import _tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -120,28 +122,23 @@ describe('ReorderFiltersList', () => {
     );
 
     expect(
-      screen.getByRole('heading', { name: 'Reorder filters for Subject Name' }),
+      await screen.findByText('Reorder filters for Subject Name'),
+    ).toBeInTheDocument();
+
+    const filters = within(screen.getByTestId('reorder-filters')).getAllByRole(
+      'listitem',
     );
 
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-
-    const filters = within(screen.getByTestId('reorder-list')).getAllByRole(
-      'button',
-    );
-
-    // the listitems are given role 'button' by react-dnd
     expect(within(filters[0]).getByText('Category 2'));
     expect(
       within(filters[0]).getByRole('button', {
-        name: 'Reorder options within this group',
+        name: 'Reorder options within Category 2',
       }),
     );
-    expect(within(filters[2]).getByText('Category 1'));
+    expect(within(filters[1]).getByText('Category 1'));
     expect(
-      within(filters[2]).getByRole('button', {
-        name: 'Reorder options within this group',
+      within(filters[1]).getByRole('button', {
+        name: 'Reorder options within Category 1',
       }),
     );
   });
@@ -171,13 +168,14 @@ describe('ReorderFiltersList', () => {
 
     await waitFor(() => {
       expect(screen.getByText('No filters available.'));
-      expect(screen.queryByTestId('reorder-list')).not.toBeInTheDocument();
     });
+
+    expect(screen.queryByTestId('reorder-filters')).not.toBeInTheDocument();
   });
 
   test('clicking the `reorder options` button on a filter shows the filter groups for the filter ordered by the order property', async () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    render(
+    const { user } = render(
       <ReorderFiltersList
         releaseId="release-1"
         subject={testSubject}
@@ -185,29 +183,26 @@ describe('ReorderFiltersList', () => {
         onSave={noop}
       />,
     );
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-    const filtersList = screen.getByTestId('reorder-list');
-    await userEvent.click(
-      screen.getAllByRole('button', {
-        name: 'Reorder options within this group',
-      })[1],
-    );
+    expect(
+      await screen.findByText('Reorder filters for Subject Name'),
+    ).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByText('Category 1 Group 2'));
-    });
-    const groupsList = within(filtersList).getByRole('list');
-    const groups = within(groupsList).getAllByRole('button');
+    await user.click(
+      screen.getByRole('button', { name: 'Reorder options within Category 1' }),
+    );
+    expect(await screen.findByText('Category 1 Group 2'));
+
+    const groups = within(
+      screen.getByTestId('reorder-filters-children'),
+    ).getAllByRole('listitem');
     expect(within(groups[0]).getByText('Category 1 Group 2'));
-    expect(within(groups[2]).getByText('Category 1 Group 1'));
-    expect(within(groups[3]).getByText('Category 1 Group 3'));
+    expect(within(groups[1]).getByText('Category 1 Group 1'));
+    expect(within(groups[2]).getByText('Category 1 Group 3'));
   });
 
   test('filter groups have a `reorder options` button if they have more than one filter item', async () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    render(
+    const { user } = render(
       <ReorderFiltersList
         releaseId="release-1"
         subject={testSubject}
@@ -215,46 +210,39 @@ describe('ReorderFiltersList', () => {
         onSave={noop}
       />,
     );
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-    const filtersList = screen.getByTestId('reorder-list');
-    await userEvent.click(
-      screen.getAllByRole('button', {
-        name: 'Reorder options within this group',
-      })[1],
+    expect(
+      await screen.findByText('Reorder filters for Subject Name'),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Reorder options within Category 1' }),
     );
+    expect(await screen.findByText('Category 1 Group 2'));
 
     await waitFor(() => {
       expect(screen.getByText('Category 1 Group 2'));
     });
 
-    const groupsList = within(filtersList).getByRole('list');
-    const groups = within(groupsList).getAllByRole('button');
-    expect(within(groups[0]).getByText('Category 1 Group 2'));
     expect(
-      within(groups[0]).getByRole('button', {
-        name: 'Reorder options within this group',
+      screen.getByRole('button', {
+        name: 'Reorder options within Category 1 Group 2',
       }),
     );
-    expect(within(groups[2]).getByText('Category 1 Group 1'));
     expect(
-      within(groups[2]).queryByRole('button', {
-        name: 'Reorder options within this group',
+      screen.queryByRole('button', {
+        name: 'Reorder options within Category 1 Group 1',
       }),
-    ).not.toBeInTheDocument();
-
-    expect(within(groups[3]).getByText('Category 1 Group 3'));
+    );
     expect(
-      within(groups[3]).getByRole('button', {
-        name: 'Reorder options within this group',
+      screen.getByRole('button', {
+        name: 'Reorder options within Category 1 Group 3',
       }),
     );
   });
 
-  test('clicking the `done` button on a filter hides the groups for the filter', async () => {
+  test('clicking the `close` button on a filter hides the groups for the filter', async () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    render(
+    const { user } = render(
       <ReorderFiltersList
         releaseId="release-1"
         subject={testSubject}
@@ -262,29 +250,26 @@ describe('ReorderFiltersList', () => {
         onSave={noop}
       />,
     );
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-    const filtersList = screen.getByTestId('reorder-list');
-    await userEvent.click(
-      screen.getAllByRole('button', {
-        name: 'Reorder options within this group',
-      })[1],
+    expect(
+      await screen.findByText('Reorder filters for Subject Name'),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Reorder options within Category 1' }),
     );
+    expect(await screen.findByText('Category 1 Group 2'));
 
     await waitFor(() => {
       expect(screen.getByText('Category 1 Group 2'));
     });
 
-    expect(within(filtersList).getByRole('list'));
-    await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+    await user.click(screen.getByRole('button', { name: 'Close Category 1' }));
     expect(screen.queryByText('Category 1 Group 2')).not.toBeInTheDocument();
-    expect(within(filtersList).queryByRole('list')).not.toBeInTheDocument();
   });
 
   test('clicking the `reorder options` button on a filter group shows the options for that group', async () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    render(
+    const { user } = render(
       <ReorderFiltersList
         releaseId="release-1"
         subject={testSubject}
@@ -292,37 +277,33 @@ describe('ReorderFiltersList', () => {
         onSave={noop}
       />,
     );
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-    const filtersList = screen.getByTestId('reorder-list');
-    await userEvent.click(
-      screen.getAllByRole('button', {
-        name: 'Reorder options within this group',
-      })[1],
-    );
+    expect(
+      await screen.findByText('Reorder filters for Subject Name'),
+    ).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByText('Category 1 Group 2'));
-    });
-    const buttons = within(within(filtersList).getByRole('list')).getAllByRole(
-      'button',
+    await user.click(
+      screen.getByRole('button', { name: 'Reorder options within Category 1' }),
     );
-    await userEvent.click(
-      within(buttons[0]).getByRole('button', {
-        name: 'Reorder options within this group',
+    expect(await screen.findByText('Category 1 Group 2'));
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Reorder options within Category 1 Group 2',
       }),
     );
+    expect(await screen.findByText('Category 1 Group 2 Item 1'));
 
-    const options = within(buttons[0]).getAllByRole('button');
+    const options = within(
+      screen.getByTestId('reorder-filters-children'),
+    ).getAllByRole('listitem');
     expect(within(options[1]).getByText('Category 1 Group 2 Item 1'));
     expect(within(options[2]).getByText('Category 1 Group 2 Item 2'));
     expect(within(options[3]).getByText('Category 1 Group 2 Item 3'));
   });
 
-  test('clicking the `done` button on a filter group hides the options for the group', async () => {
+  test('clicking the `close` button on a filter group hides the options for the group', async () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    render(
+    const { user } = render(
       <ReorderFiltersList
         releaseId="release-1"
         subject={testSubject}
@@ -330,41 +311,24 @@ describe('ReorderFiltersList', () => {
         onSave={noop}
       />,
     );
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-    const filtersList = screen.getByTestId('reorder-list');
-    await userEvent.click(
-      screen.getAllByRole('button', {
-        name: 'Reorder options within this group',
-      })[1],
+    expect(
+      await screen.findByText('Reorder filters for Subject Name'),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Reorder options within Category 1' }),
     );
+    expect(await screen.findByText('Category 1 Group 2'));
 
-    await waitFor(() => {
-      expect(screen.getByText('Category 1 Group 2'));
-    });
-
-    const groupsList = within(filtersList).getByRole('list');
-    const groups = within(groupsList).getAllByRole('button');
-
-    await userEvent.click(
-      within(groups[0]).getByRole('button', {
-        name: 'Reorder options within this group',
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Reorder options within Category 1 Group 2',
       }),
     );
+    expect(await screen.findByText('Category 1 Group 2 Item 1'));
 
-    const options = within(groups[0]).getAllByRole('button');
-
-    expect(within(options[1]).getByText('Category 1 Group 2 Item 1'));
-
-    // Waiting to make sure the button has changed,
-    // otherwise it's clicked too quickly and thinks it's a double-click.
-    await waitFor(() => {
-      expect(within(groups[0]).getByText('Done')).toBeInTheDocument();
-    });
-
-    await userEvent.click(
-      within(groups[0]).getByRole('button', { name: 'Done' }),
+    await user.click(
+      screen.getByRole('button', { name: 'Close Category 1 Group 2' }),
     );
 
     expect(
@@ -374,7 +338,7 @@ describe('ReorderFiltersList', () => {
 
   test('if the filter only has one group, clicking the `reorder options` button on the filter shows the options for the group', async () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    render(
+    const { user } = render(
       <ReorderFiltersList
         releaseId="release-1"
         subject={testSubject}
@@ -382,22 +346,20 @@ describe('ReorderFiltersList', () => {
         onSave={noop}
       />,
     );
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-    const filtersList = screen.getByTestId('reorder-list');
-    await userEvent.click(
-      screen.getAllByRole('button', {
-        name: 'Reorder options within this group',
-      })[0],
+
+    expect(
+      await screen.findByText('Reorder filters for Subject Name'),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Reorder options within Category 2' }),
     );
 
-    await waitFor(() => {
-      expect(screen.getByText('Category 2 Group 1 Item 1'));
-    });
+    expect(await screen.findByText('Category 2 Group 1 Item 1'));
 
-    const optionsList = within(filtersList).getByRole('list');
-    const options = within(optionsList).getAllByRole('button');
+    const options = within(
+      screen.getByTestId('reorder-filters-children'),
+    ).getAllByRole('listitem');
     expect(within(options[0]).getByText('Category 2 Group 1 Item 1'));
     expect(within(options[1]).getByText('Category 2 Group 1 Item 2'));
   });
@@ -405,7 +367,7 @@ describe('ReorderFiltersList', () => {
   test('clicking the `save` button calls handleSave with the reordered list formatted for the update request', async () => {
     const handleSave = jest.fn();
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    render(
+    const { user } = render(
       <ReorderFiltersList
         releaseId="release-1"
         subject={testSubject}
@@ -413,12 +375,12 @@ describe('ReorderFiltersList', () => {
         onSave={handleSave}
       />,
     );
-    await waitFor(() => {
-      expect(screen.getByTestId('reorder-list'));
-    });
-    await userEvent.click(screen.getByRole('button', { name: 'Save order' }));
+    expect(
+      await screen.findByText('Reorder filters for Subject Name'),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Save order' }));
 
-    const expectedRequest = [
+    const expectedRequest: UpdateFiltersRequest = [
       {
         id: 'category-2-id',
         filterGroups: [

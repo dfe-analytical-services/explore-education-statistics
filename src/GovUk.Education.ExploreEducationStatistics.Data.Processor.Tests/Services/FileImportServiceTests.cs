@@ -60,6 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             dataImportService
                 .Setup(s => s.WriteDataSetFileMeta(
+                    import.FileId,
                     import.SubjectId))
                 .Returns(Task.CompletedTask);
 
@@ -228,7 +229,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     var dataImportService = new Mock<IDataImportService>(Strict);
                     if (finishedStatus == COMPLETE)
                     {
-                        dataImportService.Setup(mock => mock.WriteDataSetFileMeta(import.SubjectId))
+                        dataImportService.Setup(mock => mock.WriteDataSetFileMeta(
+                                import.FileId,
+                                import.SubjectId))
                             .Returns(Task.CompletedTask);
                     }
 

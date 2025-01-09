@@ -91,7 +91,7 @@ const DownloadTable = ({
                 'Download Table',
               )}
               <FormFieldRadioGroup<FormValues>
-                legend="Select file format:"
+                legend="Select a file format to download:"
                 legendSize="s"
                 legendWeight="regular"
                 name="fileFormat"

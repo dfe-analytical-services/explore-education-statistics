@@ -13,33 +13,23 @@ public interface IReleaseVersionRepository
         DateTime actualPublishedDate);
 
     /// <summary>
-    /// Retrieves the latest published version from all releases in reverse chronological order that are associated with a publication.
-    /// </summary>
-    /// <param name="publicationId">The unique identifier of the publication.</param>
-    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-    /// <returns>The latest published version from all releases in reverse chronological order that are associated with a publication.</returns>
-    Task<ReleaseVersion?> GetLatestPublishedReleaseVersion(
-        Guid publicationId,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
     /// Retrieves the latest published version of a release matching a given slug associated with a publication.
     /// </summary>
     /// <param name="publicationId">The unique identifier of the publication.</param>
     /// <param name="releaseSlug">The slug of the release.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
     /// <returns>The latest published version of the release associated with the publication.</returns>
-    Task<ReleaseVersion?> GetLatestPublishedReleaseVersion(
+    Task<ReleaseVersion?> GetLatestPublishedReleaseVersionByReleaseSlug(
         Guid publicationId,
         string releaseSlug,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the latest version from all releases in reverse chronological order that are associated with a publication.
+    /// Retrieves the latest version of the latest release in release series order associated with a publication.
     /// </summary>
     /// <param name="publicationId">The unique identifier of the publication.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-    /// <returns>The latest version from all releases in reverse chronological order that are associated with a publication.</returns>
+    /// <returns>The latest version of the latest release in release series order associated with the publication.</returns>
     Task<ReleaseVersion?> GetLatestReleaseVersion(
         Guid publicationId,
         CancellationToken cancellationToken = default);
@@ -65,42 +55,26 @@ public interface IReleaseVersionRepository
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the latest published release version id's associated with a publication in reverse chronological order.
+    /// Retrieves the latest version id's of all releases associated with a publication.
     /// </summary>
     /// <param name="publicationId">The unique identifier of the publication.</param>
-    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-    /// <returns>A collection of the latest published version id's of all releases associated with the publication.</returns>
-    Task<List<Guid>> ListLatestPublishedReleaseVersionIds(
-        Guid publicationId,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Retrieves the latest published versions of all releases associated with a publication in reverse chronological order.
-    /// </summary>
-    /// <param name="publicationId">The unique identifier of the publication.</param>
-    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-    /// <returns>A collection of the latest published versions of all releases associated with the publication.</returns>
-    Task<List<ReleaseVersion>> ListLatestPublishedReleaseVersions(
-        Guid publicationId,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Retrieves the latest version id's of all releases associated with a publication in reverse chronological order.
-    /// </summary>
-    /// <param name="publicationId">The unique identifier of the publication.</param>
+    /// <param name="publishedOnly">Flag to only include published release version id's.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
     /// <returns>A collection of the latest version id's of all releases associated with the publication.</returns>
     Task<List<Guid>> ListLatestReleaseVersionIds(
         Guid publicationId,
+        bool publishedOnly = false,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the latest versions of all releases associated with a given publication in reverse chronological order.
+    /// Retrieves the latest versions of all releases in release series order associated with a given publication.
     /// </summary>
     /// <param name="publicationId">The unique identifier of the publication.</param>
+    /// <param name="publishedOnly">Flag to only include published release versions.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-    /// <returns>A collection of the latest version id's of all releases associated with the publication.</returns>
+    /// <returns>A collection of the latest versions of all releases in release series order associated with the publication.</returns>
     Task<List<ReleaseVersion>> ListLatestReleaseVersions(
         Guid publicationId,
+        bool publishedOnly = false,
         CancellationToken cancellationToken = default);
 }

@@ -1,4 +1,4 @@
-import { ResourceNames } from '../../types.bicep'
+import { ResourceNames, ContainerAppResourceConfig } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -30,8 +30,14 @@ param apiAppRegistrationClientId string
 @description('Specifies the Application Insights connection string for this Container App to use for its monitoring.')
 param appInsightsConnectionString string
 
+@description('Resource limits and scaling configuration.')
+param resourceAndScalingConfig ContainerAppResourceConfig
+
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
+
+@description('Enable the Swagger UI')
+param enableSwagger bool
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -111,6 +117,10 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
         value: publicApiUrl
       }
       {
+        name: 'App__EnableSwagger'
+        value: enableSwagger ? 'true' : 'false'
+      }
+      {
         name: 'AppInsights__ConnectionString'
         value: appInsightsConnectionString
       }
@@ -145,15 +155,19 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       ]
       requireAuthentication: false
     }
-    tagValues: tagValues
-  }
-}
-
-module containerAppRestartsAlert '../../components/alerts/containerApps/restarts.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.apiApp}RestartsDeploy'
-  params: {
-    resourceNames: [resourceNames.publicApi.apiApp]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    cpuCores: resourceAndScalingConfig.cpuCores
+    memoryGis: resourceAndScalingConfig.memoryGis
+    minReplicas: resourceAndScalingConfig.minReplicas
+    maxReplicas: resourceAndScalingConfig.maxReplicas
+    scaleAtConcurrentHttpRequests: resourceAndScalingConfig.scaleAtConcurrentHttpRequests
+    workloadProfileName: resourceAndScalingConfig.workloadProfileName
+    alerts: deployAlerts ? {
+      restarts: true
+      responseTime: true
+      cpuPercentage: true
+      memoryPercentage: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }

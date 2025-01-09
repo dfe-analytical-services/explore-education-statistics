@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -17,6 +18,7 @@ public interface IDataSetFileService
         Guid? themeId,
         Guid? publicationId,
         Guid? releaseVersionId,
+        GeographicLevel? geographicLevel,
         bool? latestOnly,
         DataSetType? dataSetType,
         string? searchTerm,

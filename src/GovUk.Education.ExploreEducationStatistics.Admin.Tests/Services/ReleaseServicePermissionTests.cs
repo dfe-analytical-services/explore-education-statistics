@@ -69,7 +69,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildReleaseService(userService.Object);
+                        using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.Publications.Add(Publication);
+                        contextDbContext.SaveChangesAsync();
+
+                        var service = BuildReleaseService(
+                            context: contextDbContext,
+                            userService: userService.Object);
+
                         return service.CreateRelease(
                             new ReleaseCreateRequest
                             {

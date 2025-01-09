@@ -97,6 +97,9 @@ const ChartConfiguration = ({
     });
   }, [definition.type]);
 
+  const titleMaxLength = 220;
+  const altTextMaxLength = 220;
+
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
       titleType: Yup.mixed()
@@ -104,11 +107,21 @@ const ChartConfiguration = ({
         .required('Choose a title type'),
       title: Yup.string().when('titleType', {
         is: 'alternative',
-        then: s => s.required('Enter chart title'),
+        then: s =>
+          s
+            .required('Enter chart title')
+            .max(
+              titleMaxLength,
+              `Chart title must be ${titleMaxLength} characters or less`,
+            ),
         otherwise: s => s.notRequired(),
       }),
       alt: Yup.string()
         .required('Enter chart alt text')
+        .max(
+          altTextMaxLength,
+          `Alt text must be ${altTextMaxLength} characters or less`,
+        )
         .test({
           name: 'noRepeatTitle',
           message: 'Alt text should not repeat the title',
@@ -336,6 +349,7 @@ const ChartConfiguration = ({
                         label="Enter chart title"
                         name="title"
                         hint="Use a concise descriptive title that summarises the main message in the chart."
+                        maxLength={titleMaxLength}
                       />
                     ),
                   },
@@ -358,6 +372,7 @@ const ChartConfiguration = ({
               hint="Brief and accurate description of the chart. Should not repeat the title."
               rows={3}
               onChange={replaceNewLines}
+              maxLength={altTextMaxLength}
             />
 
             {validationSchema.fields.stacked && (

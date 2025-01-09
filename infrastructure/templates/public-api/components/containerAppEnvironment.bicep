@@ -1,3 +1,5 @@
+import { ContainerAppWorkloadProfile } from '../types.bicep'
+
 @description('Specifies the location of the Container App Environment - defaults to that of the Resource Group')
 param location string
 
@@ -13,14 +15,8 @@ param logAnalyticsWorkspaceName string
 @description('Specifies the Application Insights key that is associated with this resource')
 param applicationInsightsKey string
 
-@description('Specifies the workload profiles for this Container App Environment - defaults to Consumption')
-param workloadProfiles {
- name: string
- workloadProfileType: string
-}[] = [{
- name: 'Consumption'
- workloadProfileType: 'Consumption'
-}]
+@description('Specifies the workload profiles for this Container App Environment - the default Consumption plan is always included')
+param workloadProfiles ContainerAppWorkloadProfile[] = []
 
 @description('Specifies a set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -57,7 +53,12 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' 
         sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
       }
     }
-    workloadProfiles: workloadProfiles
+    workloadProfiles: union([{
+      name: 'Consumption'
+      workloadProfileType: 'Consumption'
+     }],
+     workloadProfiles
+    )
   }
   tags: tagValues
 

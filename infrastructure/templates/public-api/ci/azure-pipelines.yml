@@ -5,7 +5,7 @@ parameters:
     displayName: Do the shared Private DNS Zones need creating or updating?
     default: false
   - name: deployPsqlFlexibleServer
-    displayName: Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.
+    displayName: Does the PostgreSQL Flexible Server need creating or updating?
     default: false
   - name: deployContainerApp
     displayName: Does the Public API Container App need creating or updating? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.
@@ -13,6 +13,12 @@ parameters:
   - name: deployDataProcessor
     displayName: Does the Data Processor need creating or updating?
     default: true
+  - name: deployDocsSite
+    displayName: Does the Public API static docs site need creating or updating?
+    default: true
+  - name: deployRecoveryVault
+    displayName: Does the Recovery Services Vault need creating or updating?
+    default: false
   - name: deployAlerts
     displayName: Whether to create or update Azure Monitor alerts during this deploy.
     default: false
@@ -58,6 +64,10 @@ variables:
     value: ${{ parameters.deployContainerApp }}
   - name: deployDataProcessor
     value: ${{ parameters.deployDataProcessor }}
+  - name: deployDocsSite
+    value: ${{ parameters.deployDocsSite }}
+  - name: deployRecoveryVault
+    value: ${{ parameters.deployRecoveryVault }}
   - name: deployAlerts
     value: ${{ parameters.deployAlerts }}
   - name: awaitActiveOrchestrations

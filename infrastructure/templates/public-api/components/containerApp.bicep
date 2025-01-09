@@ -1,3 +1,5 @@
+import { cpuPercentageConfig, memoryPercentageConfig, responseTimeConfig } from 'alerts/config.bicep'
+
 import { EntraIdAuthentication } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
@@ -25,37 +27,31 @@ param corsPolicy {
   allowedOrigins: string[]?
 }
 
-@description('Number of CPU cores the container can use. Can be with a maximum of two decimals.')
-@allowed([
-  '1'
-  '2'
-  '3'
-  '4'
-])
-param cpuCore string = '4'
+@description('Name of the workload profile under which this Container App will be deployed.  Defaults to Consumption.')
+param workloadProfileName string = 'Consumption'
 
-@description('Amount of memory (in gibibytes, GiB) allocated to the container up to 4GiB. Can be with a maximum of two decimals. Ratio with CPU cores must be equal to 2.')
-@allowed([
-  '1'
-  '2'
-  '3'
-  '4'
-  '5'
-  '6'
-  '7'
-  '8'
-])
-param memorySize string = '8'
+@description('Number of CPU cores the container can use. Can be with a maximum of two decimals.')
+@minValue(1)
+@maxValue(8)
+param cpuCores int = 4
+
+@description('Amount of memory (in gibibytes, GiB) allocated to the container up to 32GiB. Can be with a maximum of two decimals. Ratio with CPU cores must be equal to 2.')
+@minValue(1)
+@maxValue(32)
+param memoryGis int = 8
 
 @description('Minimum number of replicas that will be deployed')
 @minValue(0)
-@maxValue(25)
-param minReplica int = 1
+param minReplicas int = 1
 
 @description('Maximum number of replicas that will be deployed')
 @minValue(0)
-@maxValue(25)
-param maxReplica int = 3
+@maxValue(1000)
+param maxReplicas int = 3
+
+@description('Number of concurrent requests required in order to trigger scaling out.')
+@minValue(1)
+param scaleAtConcurrentHttpRequests int?
 
 @description('Specifies the database connection string')
 param appSettings {
@@ -108,12 +104,21 @@ param volumeMounts {
 @description('An existing App Registration registered with Entra ID that will be used to control access to this Container App')
 param entraIdAuthentication EntraIdAuthentication?
 
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  restarts: bool
+  responseTime: bool
+  cpuPercentage: bool
+  memoryPercentage: bool
+  alertsGroupName: string
+}?
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
 
-resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
+resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
   location: location
   identity: {
@@ -160,29 +165,29 @@ resource containerApp 'Microsoft.App/containerApps@2023-11-02-preview' = {
           image: containerImageName
           env: appSettings
           resources: {
-            cpu: json(cpuCore)
-            memory: '${memorySize}Gi'
+            cpu: json(string(cpuCores))
+            memory: '${memoryGis}Gi'
           }
           volumeMounts: volumeMounts
         }
       ]
       scale: {
-        minReplicas: minReplica
-        maxReplicas: maxReplica
-        rules: [
+        minReplicas: minReplicas
+        maxReplicas: maxReplicas
+        rules: scaleAtConcurrentHttpRequests != null ? [
           {
             name: 'http-requests'
             http: {
               metadata: {
-                concurrentRequests: '10'
+                concurrentRequests: string(scaleAtConcurrentHttpRequests)
               }
             }
           }
-        ]
+        ] : []
       }
       volumes: volumes
     }
-    workloadProfileName: 'Consumption'
+    workloadProfileName: workloadProfileName
   }
   tags: tagValues
 }
@@ -206,6 +211,57 @@ module privateDns 'containerAppPrivateDns.bicep' = if (deployPrivateDns) {
     domain: substring(containerAppFqdn, indexOf(containerAppFqdn, '.') + 1)
     ipAddress: environmentIpAddress
     vnetName: vnetName
+    tagValues: tagValues
+  }
+}
+
+module containerAppRestartsAlert 'alerts/containerApps/restartsAlert.bicep' = if (alerts != null && alerts!.restarts) {
+  name: '${containerAppName}RestartsDeploy'
+  params: {
+    resourceName: containerAppName
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
+  name: '${containerAppName}ResponseTimeDeploy'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'ResponseTime'
+    }
+    config: responseTimeConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+  name: '${containerAppName}CpuPercentageDeploy'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'CpuPercentage'
+    }
+    config: cpuPercentageConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+  name: '${containerAppName}MemoryPercentageDeploy'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'MemoryPercentage'
+    }
+    config: memoryPercentageConfig
+    alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }

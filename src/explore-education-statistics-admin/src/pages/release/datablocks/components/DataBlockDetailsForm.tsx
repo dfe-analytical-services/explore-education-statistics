@@ -21,8 +21,10 @@ interface FormValues {
 
 export type DataBlockDetailsFormValues = OmitStrict<FormValues, 'isHighlight'>;
 
-const titleMaxLength = 120;
-const descriptionMaxLength = 200;
+const dataBlockTableTitleMaxLength = 220;
+const featuredTableNameMaxLength = 120;
+const featuredTableDescriptionMaxLength = 200;
+
 const formId = 'dataBlockDetailsForm';
 
 interface Props {
@@ -61,8 +63,8 @@ const DataBlockDetailsForm = ({
       heading: Yup.string()
         .required('Enter a table title')
         .max(
-          titleMaxLength,
-          `Table title must be ${titleMaxLength} characters or less`,
+          dataBlockTableTitleMaxLength,
+          `Table title must be ${dataBlockTableTitleMaxLength} characters or less`,
         ),
       source: Yup.string(),
       highlightName: Yup.string().when('isHighlight', {
@@ -71,8 +73,8 @@ const DataBlockDetailsForm = ({
           s
             .required('Enter a featured table name')
             .max(
-              titleMaxLength,
-              `Featured table name must be ${titleMaxLength} characters or less`,
+              featuredTableNameMaxLength,
+              `Featured table name must be ${featuredTableNameMaxLength} characters or less`,
             ),
       }),
       highlightDescription: Yup.string().when('isHighlight', {
@@ -81,8 +83,8 @@ const DataBlockDetailsForm = ({
           s
             .required('Enter a featured table description')
             .max(
-              descriptionMaxLength,
-              `Featured table description must be ${descriptionMaxLength} characters or less`,
+              featuredTableDescriptionMaxLength,
+              `Featured table description must be ${featuredTableDescriptionMaxLength} characters or less`,
             ),
       }),
       isHighlight: Yup.boolean(),
@@ -119,7 +121,7 @@ const DataBlockDetailsForm = ({
                 onBlur={() => {
                   onTitleChange?.(getValues('heading'));
                 }}
-                maxLength={titleMaxLength}
+                maxLength={dataBlockTableTitleMaxLength}
               />
 
               <FormFieldTextInput<FormValues>
@@ -145,14 +147,14 @@ const DataBlockDetailsForm = ({
                         label="Featured table name"
                         hint="We will show this name to table builder users as a featured table"
                         className="govuk-!-width-two-thirds"
-                        maxLength={titleMaxLength}
+                        maxLength={featuredTableNameMaxLength}
                       />
                       <FormFieldTextArea<FormValues>
                         name="highlightDescription"
                         label="Featured table description"
                         hint="Describe the contents of this featured table to table builder users"
                         className="govuk-!-width-two-thirds"
-                        maxLength={descriptionMaxLength}
+                        maxLength={featuredTableDescriptionMaxLength}
                       />
                     </>
                   }

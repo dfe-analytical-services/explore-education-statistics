@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using NaturalSort.Extension;
 
@@ -228,31 +227,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
         public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) =>
             self.Select((item, index) => (item, index));
-
-        /// <summary>
-        /// Filter a list down to distinct elements based on a property of the type.
-        /// </summary>
-        ///
-        /// <remarks>
-        /// As IEqualityComparers (as used in Linq's Distinct() method) compare with GetHashCode() rather than with
-        /// Equals(), the property being used to compare distinctions against needs to produce a reliable hash code
-        /// that we can use for equality.  A good property type then could be a Guid Id field, as two identical Guid Ids
-        /// can then represent that 2 or more entities in the list are duplicates as they will have the same hash code.
-        /// </remarks>
-        ///
-        /// <param name="source">Sequence of elements to filter on a distinct property</param>
-        /// <param name="propertyGetter">A supplier of a property from each entity to check for equality. The property
-        /// chosen must produce the same hash code for any two elements in the source list that are considered
-        /// duplicates.  A good example would be a Guid Id.</param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static IEnumerable<T> DistinctByProperty<T>(
-            this IEnumerable<T> source,
-            Func<T, object> propertyGetter)
-            where T : class
-        {
-            return source.Distinct(ComparerUtils.CreateComparerByProperty(propertyGetter));
-        }
 
         public static bool IsSameAsIgnoringOrder<T>(this IEnumerable<T> first, IEnumerable<T> second)
         {

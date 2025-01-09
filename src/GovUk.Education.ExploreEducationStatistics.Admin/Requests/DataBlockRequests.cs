@@ -27,7 +27,7 @@ public record DataBlockCreateRequest
         {
             RuleFor(request => request.Heading)
                 .NotEmpty()
-                .MaximumLength(120);
+                .MaximumLength(220);
 
             RuleFor(request => request.Name)
                 .NotEmpty();
@@ -58,13 +58,25 @@ public record DataBlockUpdateRequest
         {
             RuleFor(request => request.Heading)
                 .NotEmpty()
-                .MaximumLength(120);
+                .MaximumLength(220);
 
             RuleFor(request => request.Name)
                 .NotEmpty();
 
             RuleFor(request => request.Query)
                 .SetValidator(new FullTableQueryRequest.Validator());
+
+            RuleForEach(x => x.Charts).ChildRules(chart =>
+            {
+                chart
+                    .RuleFor(request => request.Title)
+                    .NotEmpty()
+                    .MaximumLength(220);
+
+                chart.RuleFor(request => request.Alt)
+                    .NotEmpty()
+                    .MaximumLength(220);
+            });
         }
     }
 }

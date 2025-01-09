@@ -86,11 +86,11 @@ describe('getUnmappedFilterErrors', () => {
   test('returns the error messages', () => {
     const expected: ErrorSummaryMessage[] = [
       {
-        id: 'mappable-table-filter-1-key',
+        id: 'mappable-table-filter1Key',
         message: 'There are 2 unmapped Filter 1 filter options',
       },
       {
-        id: 'mappable-table-filter-2-key',
+        id: 'mappable-table-filter2Key',
         message: 'There is 1 unmapped Filter 2 filter option',
       },
     ];
@@ -103,11 +103,11 @@ describe('getUnmappedFilterErrors', () => {
   test('does not return error messages for unmapped filter columns', () => {
     const expected: ErrorSummaryMessage[] = [
       {
-        id: 'mappable-table-filter-1-key',
+        id: 'mappable-table-filter1Key',
         message: 'There are 2 unmapped Filter 1 filter options',
       },
       {
-        id: 'mappable-table-filter-2-key',
+        id: 'mappable-table-filter2Key',
         message: 'There is 1 unmapped Filter 2 filter option',
       },
     ];
@@ -221,11 +221,11 @@ describe('getUnmappedFilterErrors', () => {
       getUnmappedFilterErrors(testUnsafeMappableFilters, testUnsafeMappings),
     ).toEqual<ErrorSummaryMessage[]>([
       {
-        id: 'mappable-table-filter-1',
+        id: 'mappable-table-filter1',
         message: 'There is 1 unmapped Filter 1 filter option',
       },
       {
-        id: 'mappable-table-filter-2',
+        id: 'mappable-table-filter2',
         message: 'There is 1 unmapped Filter 2 filter option',
       },
     ]);

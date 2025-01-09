@@ -23,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -106,7 +107,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -286,14 +287,17 @@ public class ProcessorStage3Tests
             Assert.Equal("32", lastObservation.Measures[_subject.IndicatorGroups[0].Indicators[1].Id]);
 
             var file = contentDbContext.Files
+                .Include(f => f.DataSetFileVersionGeographicLevels)
                 .Single(f => f.Type == FileType.Data
                              && f.SubjectId == import.File.SubjectId);
 
-            Assert.NotNull(file.DataSetFileMeta);
-
-            // Checking against contents of small-csv.csv in Resources directory / _subject
-            var geographicLevel = Assert.Single(file.DataSetFileMeta.GeographicLevels);
+            Assert.NotNull(file.DataSetFileVersionGeographicLevels);
+            var geographicLevel = Assert.Single(file.DataSetFileVersionGeographicLevels
+                .Select(gl => gl.GeographicLevel)
+                .ToList());
             Assert.Equal(GeographicLevel.LocalAuthority, geographicLevel);
+
+            Assert.NotNull(file.DataSetFileMeta);
 
             Assert.Equal(TimeIdentifier.CalendarYear,
                 file.DataSetFileMeta.TimePeriodRange.Start.TimeIdentifier);
@@ -325,7 +329,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -454,7 +458,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -604,7 +608,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -749,7 +753,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("ignored-school-rows")
+            .WithDefaultFiles("ignored-school-rows", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(8)
@@ -894,7 +898,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("ignored-school-rows")
+            .WithDefaultFiles("ignored-school-rows", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(8)
@@ -1052,7 +1056,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -1190,7 +1194,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("small-csv")
+            .WithDefaultFiles("small-csv", metaSet: false)
             .WithStatus(CANCELLED)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -1324,7 +1328,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithDefaultFiles("additional-filters-and-indicators")
+            .WithDefaultFiles("additional-filters-and-indicators", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
@@ -1493,7 +1497,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(subject.Id)
-            .WithDefaultFiles("small-csv-with-special-data")
+            .WithDefaultFiles("small-csv-with-special-data", metaSet: false)
             .WithStatus(STAGE_3)
             .WithTotalRows(5)
             .WithExpectedImportedRows(5)

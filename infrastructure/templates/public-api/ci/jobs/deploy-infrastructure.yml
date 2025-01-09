@@ -39,6 +39,8 @@ jobs:
                 deployPsqlFlexibleServer: false
                 deployContainerApp: false
                 deployDataProcessor: false
+                deployDocsSite: false
+                deployRecoveryVault: false
                 deployAlerts: false
                 dataProcessorExists: false
 
@@ -68,6 +70,8 @@ jobs:
                 deployPsqlFlexibleServer: $(deployPsqlFlexibleServer)
                 deployContainerApp: $(deployContainerApp)
                 deployDataProcessor: $(deployDataProcessor)
+                deployDocsSite: $(deployDocsSite)
+                deployRecoveryVault: $(deployRecoveryVault)
                 deployAlerts: $(deployAlerts)
                 dataProcessorExists: $(dataProcessorExists)
 

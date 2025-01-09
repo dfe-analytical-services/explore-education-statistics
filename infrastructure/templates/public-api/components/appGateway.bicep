@@ -1,3 +1,5 @@
+import { responseTimeConfig } from 'alerts/config.bicep'
+
 import {
   AppGatewayBackend
   AppGatewayRewriteSet
@@ -38,6 +40,13 @@ param availabilityZones ('1' | '2' | '3') [] = [
   '2'
   '3'
 ]
+
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  health: bool
+  responseTime: bool
+  alertsGroupName: string
+}?
 
 @description('Tags for the resources')
 param tagValues object
@@ -274,4 +283,27 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
     keyVaultCertificateUserRoleAssignmentModule
     keyVaultAccessPolicyModule
   ]
+}
+
+module backendPoolsHealthAlert 'alerts/appGateways/backendPoolHealthAlert.bicep' = if (alerts != null && alerts!.health) {
+  name: '${appGatewayName}BackendPoolsHealthDeploy'
+  params: {
+    resourceName: appGatewayName
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
+  name: '${appGatewayName}ResponseTimeDeploy'
+  params: {
+    resourceName: appGatewayName
+    resourceMetric: {
+      resourceType: 'Microsoft.Network/applicationGateways'
+      metric: 'ApplicationGatewayTotalTime'
+    }
+    config: responseTimeConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
 }

@@ -20,6 +20,10 @@ parameters:
     default: true
   - name: deployDataProcessor
     type: string
+  - name: deployDocsSite
+    type: string
+  - name: deployRecoveryVault
+    type: string
   - name: deployAlerts
     type: string
   - name: dataProcessorExists
@@ -55,6 +59,8 @@ steps:
               deployPsqlFlexibleServer=${{ parameters.deployPsqlFlexibleServer }} \
               deployContainerApp=${{ parameters.deployContainerApp }} \
               deployDataProcessor=${{ parameters.deployDataProcessor }} \
+              deployDocsSite=${{ parameters.deployDocsSite }} \
+              deployRecoveryVault=${{ parameters.deployRecoveryVault }} \
               deployAlerts=${{ parameters.deployAlerts }} \
               dataProcessorFunctionAppExists=${{ parameters.dataProcessorExists }} \
               dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \

@@ -1,3 +1,5 @@
+import { responseTimeConfig } from 'alerts/config.bicep'
+
 import { IpRange } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
@@ -17,6 +19,13 @@ param skuStorageResource 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'S
 
 @description('Storage Account Name')
 param keyVaultName string
+
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  availability: bool
+  latency: bool
+  alertsGroupName: string
+}?
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -48,6 +57,29 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     }
   }
   tags: tagValues
+}
+
+module availabilityAlerts 'alerts/storageAccounts/availabilityAlert.bicep' = if (alerts != null && alerts!.availability) {
+  name: '${storageAccountName}StorageAvailabilityDeploy'
+  params: {
+    resourceName: storageAccountName
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
+  name: '${storageAccountName}LatencyDeploy'
+  params: {
+    resourceName: storageAccountName
+    resourceMetric: {
+      resourceType: 'Microsoft.Storage/storageAccounts'
+      metric: 'SuccessE2ELatency'
+    }
+    config: responseTimeConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
 }
 
 var key = storageAccount.listKeys().keys[0].value

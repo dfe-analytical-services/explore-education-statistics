@@ -80,6 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Release update
         ReleasePublishedCannotBeFutureDate,
         ReleaseNotPublished,
+        UpdateRequestForPublishedReleaseInvalid,
 
         // Release checklist errors
         DataFileImportsMustBeCompleted,

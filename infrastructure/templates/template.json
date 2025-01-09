@@ -594,7 +594,24 @@
       "defaultValue": "master",
       "allowedValues": [
         "master",
-        "dev"
+        "dev",
+        "test"
+      ]
+    },
+    "licenseTypeContentDb": {
+      "type": "string",
+      "defaultValue": "LicenseIncluded",
+      "allowedValues": [
+        "BasePrice",
+        "LicenseIncluded"
+      ]
+    },
+    "licenseTypeStatisticsDb": {
+      "type": "string",
+      "defaultValue": "LicenseIncluded",
+      "allowedValues": [
+        "BasePrice",
+        "LicenseIncluded"
       ]
     },
     "skuContentDb": {
@@ -2290,6 +2307,7 @@
           },
           "properties": {
             "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "licenseType": "[parameters('licenseTypeStatisticsDb')]",
             "maxSizeBytes": "[parameters('maxStatsDbSizeBytes')]",
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
@@ -2327,6 +2345,7 @@
           },
           "properties": {
             "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "licenseType": "[parameters('licenseTypeContentDb')]",
             "maxSizeBytes": "[parameters('maxContentDbSizeBytes')]",
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
@@ -2534,6 +2553,7 @@
           },
           "properties": {
             "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "licenseType": "[parameters('licenseTypeStatisticsDb')]",
             "maxSizeBytes": "[parameters('maxStatsDbSizeBytes')]",
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,

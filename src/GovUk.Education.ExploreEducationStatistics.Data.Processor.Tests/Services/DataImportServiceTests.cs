@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -12,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -220,6 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             var file = _fixture.DefaultFile(FileType.Data)
                 .WithDataSetFileMeta(null)
+                .WithDataSetFileVersionGeographicLevels([])
                 .WithSubjectId(subject.Id)
                 .Generate();
 
@@ -284,19 +288,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 contentDbContextId,
                 statisticsDbContextId);
 
-            await service.WriteDataSetFileMeta(subject.Id);
+            await service.WriteDataSetFileMeta(file.Id, subject.Id);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var updatedFile = contentDbContext.Files.Single(f => f.SubjectId == subject.Id);
+                var updatedFile = contentDbContext.Files
+                    .Include(f => f.DataSetFileVersionGeographicLevels)
+                    .Single(f => f.SubjectId == subject.Id);
+
+                var geogLvls = updatedFile.DataSetFileVersionGeographicLevels
+                    .Select(gl => gl.GeographicLevel)
+                    .ToList();
+                Assert.Equal(3, geogLvls.Count);
+                Assert.Contains(GeographicLevel.Country, geogLvls);
+                Assert.Contains(GeographicLevel.LocalAuthority, geogLvls);
+                Assert.Contains(GeographicLevel.Region, geogLvls);
 
                 Assert.NotNull(updatedFile.DataSetFileMeta);
-
                 var meta = updatedFile.DataSetFileMeta;
-                Assert.Equal(3, meta.GeographicLevels.Count);
-                Assert.Contains(GeographicLevel.Country, meta.GeographicLevels);
-                Assert.Contains(GeographicLevel.LocalAuthority, meta.GeographicLevels);
-                Assert.Contains(GeographicLevel.Region, meta.GeographicLevels);
 
                 Assert.Equal("2000", meta.TimePeriodRange.Start.Period);
                 Assert.Equal(TimeIdentifier.April, meta.TimePeriodRange.Start.TimeIdentifier);
@@ -312,6 +321,322 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(indicatorGroup.Indicators[0].Id, dbIndicator.Id);
                 Assert.Equal(indicatorGroup.Indicators[0].Label, dbIndicator.Label);
                 Assert.Equal(indicatorGroup.Indicators[0].Name, dbIndicator.ColumnName);
+
+                Assert.NotNull(updatedFile.FilterHierarchies);
+                Assert.Empty(updatedFile.FilterHierarchies);
+            }
+        }
+
+        [Fact]
+        public async Task GenerateFilterHierarchies_Success()
+        {
+            var subject = new Subject { Id = Guid.NewGuid() };
+
+            var filters = new List<Filter>
+            {
+                new()
+                {
+                    SubjectId = subject.Id,
+                    Name = "root_filter",
+                    FilterGroups = [
+                        new FilterGroup
+                        {
+                            Label  = "Root filter group",
+                            FilterItems = [
+                                new FilterItem { Label = "RootFilterItem0", },
+                                new FilterItem { Label = "RootFilterItem1", },
+                            ],
+                        },
+                    ],
+                    GroupCsvColumn = null,
+                },
+                new()
+                {
+                    SubjectId = subject.Id,
+                    Name = "child_filter1",
+                    FilterGroups = [
+                        new FilterGroup
+                        {
+                            Label  = "Child filter 1 group",
+                            FilterItems = [
+                                new FilterItem { Label = "ChildFilter1Item0", },
+                                new FilterItem { Label = "ChildFilter1Item1", },
+                                new FilterItem { Label = "ChildFilter1Item2", },
+                            ],
+                        },
+                    ],
+                    GroupCsvColumn = "root_filter",
+                },
+                new()
+                {
+                    SubjectId = subject.Id,
+                    Name = "child_filter2",
+                    FilterGroups = [
+                        new FilterGroup
+                        {
+                            Label  = "Child filter 2 group",
+                            FilterItems = [
+                                new FilterItem { Label = "ChildFilter2Item0", },
+                                new FilterItem { Label = "ChildFilter2Item1", },
+                                new FilterItem { Label = "ChildFilter2Item2", },
+                                new FilterItem { Label = "ChildFilter2Item3", },
+                                new FilterItem { Label = "ChildFilter2Item4", },
+                                new FilterItem { Label = "ChildFilter2Item5", },
+                            ],
+                        },
+                    ],
+                    GroupCsvColumn = "child_filter1",
+                }
+            };
+
+            var rootFilterItem0 = filters[0].FilterGroups[0].FilterItems[0];
+            var rootFilterItem1 = filters[0].FilterGroups[0].FilterItems[1];
+            var childFilter1Item0 = filters[1].FilterGroups[0].FilterItems[0];
+            var childFilter1Item1 = filters[1].FilterGroups[0].FilterItems[1];
+            var childFilter1Item2 = filters[1].FilterGroups[0].FilterItems[2];
+            var childFilter2Item0 = filters[2].FilterGroups[0].FilterItems[0];
+            var childFilter2Item1 = filters[2].FilterGroups[0].FilterItems[1];
+            var childFilter2Item2 = filters[2].FilterGroups[0].FilterItems[2];
+            var childFilter2Item3 = filters[2].FilterGroups[0].FilterItems[3];
+            var childFilter2Item4 = filters[2].FilterGroups[0].FilterItems[4];
+            var childFilter2Item5 = filters[2].FilterGroups[0].FilterItems[5];
+
+            var observation0 = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithFilterItems([
+                    rootFilterItem0,
+                    childFilter1Item0,
+                    childFilter2Item0,
+                ]);
+
+            var observation1 = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithFilterItems([
+                    rootFilterItem1,
+                    childFilter1Item1,
+                    childFilter2Item1,
+                ]);
+
+            var observation2 = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithFilterItems([
+                    rootFilterItem1,
+                    childFilter1Item1,
+                    childFilter2Item2,
+                ]);
+
+            var observation3 = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithFilterItems([
+                    rootFilterItem1,
+                    childFilter1Item2,
+                    childFilter2Item3,
+                ]);
+
+            var observation4 = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithFilterItems([
+                    rootFilterItem1,
+                    childFilter1Item2,
+                    childFilter2Item4,
+                ]);
+
+            var observation5 = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithFilterItems([
+                    rootFilterItem1,
+                    childFilter1Item2,
+                    childFilter2Item5,
+                ]);
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.Filter.AddRange(filters);
+                statisticsDbContext.Observation.AddRange(
+                    observation0, observation1, observation2, observation3, observation4, observation5);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var results = await DataImportService.GenerateFilterHierarchies(
+                    statisticsDbContext,
+                    filters.Select(f => new FilterMeta
+                    {
+                        Id = f.Id,
+                        Label = f.Label,
+                        Hint = f.Hint,
+                        ColumnName = f.Name,
+                        GroupCsvColumn = f.GroupCsvColumn,
+                    }).ToList());
+
+                var hierarchy = Assert.Single(results);
+                Assert.Equal(filters[0].Id, hierarchy.RootFilterId);
+                Assert.Equal([filters[1].Id, filters[2].Id], hierarchy.ChildFilterIds);
+
+                Assert.Equal(
+                    [rootFilterItem0.Id, rootFilterItem1.Id],
+                    hierarchy.RootOptionIds);
+
+                Assert.Equal(2, hierarchy.Tiers.Count);
+
+                // tier 0
+                Assert.Equal(2, hierarchy.Tiers[0].Count); // two root filter items
+                Assert.Equal([rootFilterItem0.Id, rootFilterItem1.Id], hierarchy.Tiers[0].Keys.ToList());
+                Assert.Equal([childFilter1Item0.Id], hierarchy.Tiers[0][rootFilterItem0.Id]);
+                Assert.Equal([childFilter1Item1.Id, childFilter1Item2.Id], hierarchy.Tiers[0][rootFilterItem1.Id]);
+
+                // tier 1
+                Assert.Equal(3, hierarchy.Tiers[1].Count); // three child filter 1 items
+                Assert.Equal(
+                    [childFilter1Item0.Id, childFilter1Item1.Id, childFilter1Item2.Id],
+                    hierarchy.Tiers[1].Keys.ToList());
+                Assert.Equal([childFilter2Item0.Id], hierarchy.Tiers[1][childFilter1Item0.Id]);
+                Assert.Equal([childFilter2Item1.Id, childFilter2Item2.Id], hierarchy.Tiers[1][childFilter1Item1.Id]);
+                Assert.Equal([childFilter2Item3.Id, childFilter2Item4.Id, childFilter2Item5.Id],
+                    hierarchy.Tiers[1][childFilter1Item2.Id]);
+            }
+        }
+
+        [Fact]
+        public async Task GenerateFilterHierarchies_TwoRootFilters_Success()
+        {
+            var subject = new Subject { Id = Guid.NewGuid() };
+
+            var filters = new List<Filter>
+            {
+                new()
+                {
+                    SubjectId = subject.Id,
+                    Name = "root_filter0",
+                    FilterGroups = [
+                        new FilterGroup
+                        {
+                            Label  = "Root filter 0 group",
+                            FilterItems = [
+                                new FilterItem { Label = "RootFilter0Item0", },
+                            ],
+                        },
+                    ],
+                    GroupCsvColumn = null,
+                },
+                new()
+                {
+                    SubjectId = subject.Id,
+                    Name = "child_filter0",
+                    FilterGroups = [
+                        new FilterGroup
+                        {
+                            Label  = "Child filter 0 group",
+                            FilterItems = [
+                                new FilterItem { Label = "ChildFilter0Item0", },
+                            ],
+                        },
+                    ],
+                    GroupCsvColumn = "root_filter0",
+                },
+                new()
+                {
+                    SubjectId = subject.Id,
+                    Name = "root_filter1",
+                    FilterGroups = [
+                        new FilterGroup
+                        {
+                            Label  = "Root filter 1 group",
+                            FilterItems = [
+                                new FilterItem { Label = "RootFilter1Item0", },
+                            ],
+                        },
+                    ],
+                    GroupCsvColumn = null,
+                },
+                new()
+                {
+                    SubjectId = subject.Id,
+                    Name = "child_filter1",
+                    FilterGroups = [
+                        new FilterGroup
+                        {
+                            Label  = "Child filter 1 group",
+                            FilterItems = [
+                                new FilterItem { Label = "ChildFilter1Item0", },
+                            ],
+                        },
+                    ],
+                    GroupCsvColumn = "root_filter1",
+                },
+            };
+
+            var rootFilter0Item0 = filters[0].FilterGroups[0].FilterItems[0];
+            var childFilter0Item0 = filters[1].FilterGroups[0].FilterItems[0];
+            var rootFilter1Item0 = filters[2].FilterGroups[0].FilterItems[0];
+            var childFilter1Item0 = filters[3].FilterGroups[0].FilterItems[0];
+
+            var observation0 = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithFilterItems([
+                    rootFilter0Item0,
+                    childFilter0Item0,
+                ]);
+
+            var observation1 = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithFilterItems([
+                    rootFilter1Item0,
+                    childFilter1Item0,
+                ]);
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.Filter.AddRange(filters);
+                statisticsDbContext.Observation.AddRange(observation0, observation1);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var results = await DataImportService.GenerateFilterHierarchies(
+                    statisticsDbContext,
+                    filters.Select(f => new FilterMeta
+                    {
+                        Id = f.Id,
+                        Label = f.Label,
+                        Hint = f.Hint,
+                        ColumnName = f.Name,
+                        GroupCsvColumn = f.GroupCsvColumn,
+                    }).ToList());
+
+                Assert.Equal(2, results.Count);
+
+                // hierarchy for root filter 0
+                var hierarchy0 = results[0];
+
+                Assert.Equal(filters[0].Id, hierarchy0.RootFilterId);
+                Assert.Equal([filters[1].Id], hierarchy0.ChildFilterIds);
+
+                Assert.Equal([rootFilter0Item0.Id], hierarchy0.RootOptionIds);
+
+                Assert.Single(hierarchy0.Tiers);
+
+                Assert.Single(hierarchy0.Tiers[0]); // single root filter 0 item
+                Assert.Equal([rootFilter0Item0.Id], hierarchy0.Tiers[0].Keys.ToList());
+                Assert.Equal([childFilter0Item0.Id], hierarchy0.Tiers[0][rootFilter0Item0.Id]);
+
+                // hierarchy for root filter 1
+                var hierarchy1 = results[1];
+
+                Assert.Equal(filters[2].Id, hierarchy1.RootFilterId);
+                Assert.Equal([filters[3].Id], hierarchy1.ChildFilterIds);
+
+                Assert.Equal([rootFilter1Item0.Id], hierarchy1.RootOptionIds);
+
+                Assert.Single(hierarchy1.Tiers);
+
+                Assert.Single(hierarchy1.Tiers[0]); // single root filter 1 item
+                Assert.Equal([rootFilter1Item0.Id], hierarchy1.Tiers[0].Keys.ToList());
+                Assert.Equal([childFilter1Item0.Id], hierarchy1.Tiers[0][rootFilter1Item0.Id]);
             }
         }
 

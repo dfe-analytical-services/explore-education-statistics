@@ -162,7 +162,7 @@ describe('ChartBuilderTabSection', () => {
     expect(tabs).toHaveLength(5);
   });
 
-  test('calls  `getTableData` and `onTableUpdate` when change boundary level', async () => {
+  test('calls `getTableData` and `onTableUpdate` when boundary level changed', async () => {
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
 
     const handleUpdate = jest.fn();

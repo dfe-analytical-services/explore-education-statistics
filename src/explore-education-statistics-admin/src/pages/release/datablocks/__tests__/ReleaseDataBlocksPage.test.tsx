@@ -14,7 +14,6 @@ import _permissionService from '@admin/services/permissionService';
 import render from '@common-test/render';
 import { waitFor } from '@testing-library/dom';
 import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { generatePath, MemoryRouter } from 'react-router';
 import { Route } from 'react-router-dom';
@@ -218,6 +217,10 @@ describe('ReleaseDataBlocksPage', () => {
         name: 'Delete block',
       }),
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', { name: 'Create data block' }),
+    ).toBeInTheDocument();
   });
 
   test('renders page correctly when release cannot be updated', async () => {
@@ -334,9 +337,28 @@ describe('ReleaseDataBlocksPage', () => {
     ).toBeInTheDocument();
   });
 
-  test('clicking `Delete block` button shows modal', async () => {
-    dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
-    dataBlockService.getDeleteBlockPlan.mockResolvedValue(testBlock1DeletePlan);
+  test('renders an extra "Create data block" button when there are more than 5 blocks', async () => {
+    dataBlockService.listDataBlocks.mockResolvedValue([
+      ...testDataBlocks,
+      {
+        id: 'block-5',
+        name: 'Block 5',
+        created: '2021-02-01T15:00:00.0000000',
+        heading: 'Block 5 heading',
+        source: 'Block 5 source',
+        inContent: false,
+        chartsCount: 0,
+      },
+      {
+        id: 'block-6',
+        name: 'Block 6',
+        created: '2021-02-01T15:00:00.0000000',
+        heading: 'Block 6 heading',
+        source: 'Block 6 source',
+        inContent: false,
+        chartsCount: 0,
+      },
+    ]);
     featuredTableService.listFeaturedTables.mockResolvedValue(
       testFeaturedTables,
     );
@@ -347,122 +369,148 @@ describe('ReleaseDataBlocksPage', () => {
       expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
     });
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(dataBlockService.getDeleteBlockPlan).toHaveBeenCalledTimes(0);
-
-    const buttons = screen.getAllByRole('button', { name: 'Delete block' });
-
-    await userEvent.click(buttons[0]);
-
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-    });
-
-    expect(dataBlockService.getDeleteBlockPlan).toHaveBeenCalledTimes(1);
-
-    const modal = within(screen.getByRole('dialog'));
-
-    expect(modal.getByTestId('deleteDataBlock-name')).toHaveTextContent(
-      'Block 1',
-    );
     expect(
-      modal.getByTestId('deleteDataBlock-contentSectionHeading'),
-    ).toHaveTextContent('Section 1');
+      screen.getAllByRole('link', { name: 'Create data block' }),
+    ).toHaveLength(2);
   });
 
-  test('clicking `Cancel` button hides modal', async () => {
-    dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
-    dataBlockService.getDeleteBlockPlan.mockResolvedValue(testBlock1DeletePlan);
-    featuredTableService.listFeaturedTables.mockResolvedValue(
-      testFeaturedTables,
-    );
+  describe('deleting a data block', () => {
+    test('clicking `Delete block` button shows modal', async () => {
+      dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
+      dataBlockService.getDeleteBlockPlan.mockResolvedValue(
+        testBlock1DeletePlan,
+      );
+      featuredTableService.listFeaturedTables.mockResolvedValue(
+        testFeaturedTables,
+      );
 
-    renderPage();
+      const { user } = renderPage();
 
-    await waitFor(() => {
-      expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
-    });
+      await waitFor(() => {
+        expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
+      });
 
-    const buttons = screen.getAllByRole('button', { name: 'Delete block' });
-
-    await userEvent.click(buttons[0]);
-
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-    });
-
-    const modal = within(screen.getByRole('dialog'));
-
-    await userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
-
-    await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    });
-  });
+      expect(dataBlockService.getDeleteBlockPlan).toHaveBeenCalledTimes(0);
 
-  test('clicking `Confirm` button hides modal and deletes data block', async () => {
-    dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
-    dataBlockService.getDeleteBlockPlan.mockResolvedValue(testBlock1DeletePlan);
-    featuredTableService.listFeaturedTables.mockResolvedValue(
-      testFeaturedTables,
-    );
+      const buttons = screen.getAllByRole('button', { name: 'Delete block' });
 
-    renderPage();
+      await user.click(buttons[0]);
 
-    await waitFor(() => {
-      expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
-    });
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
 
-    const buttons = screen.getAllByRole('button', { name: 'Delete block' });
+      expect(dataBlockService.getDeleteBlockPlan).toHaveBeenCalledTimes(1);
 
-    await userEvent.click(buttons[0]);
+      const modal = within(screen.getByRole('dialog'));
 
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(modal.getByTestId('deleteDataBlock-name')).toHaveTextContent(
+        'Block 1',
+      );
+      expect(
+        modal.getByTestId('deleteDataBlock-contentSectionHeading'),
+      ).toHaveTextContent('Section 1');
     });
 
-    const modal = within(screen.getByRole('dialog'));
+    test('clicking `Cancel` button hides modal', async () => {
+      dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
+      dataBlockService.getDeleteBlockPlan.mockResolvedValue(
+        testBlock1DeletePlan,
+      );
+      featuredTableService.listFeaturedTables.mockResolvedValue(
+        testFeaturedTables,
+      );
 
-    await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+      const { user } = renderPage();
 
-    await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
+      });
+
+      const buttons = screen.getAllByRole('button', { name: 'Delete block' });
+
+      await user.click(buttons[0]);
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+
+      await user.click(modal.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
     });
 
-    expect(dataBlockService.deleteDataBlock).toHaveBeenCalledTimes(1);
-    expect(dataBlockService.deleteDataBlock).toHaveBeenCalledWith(
-      'release-1',
-      'block-1',
-    );
+    test('clicking `Confirm` button hides modal and deletes data block', async () => {
+      dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
+      dataBlockService.getDeleteBlockPlan.mockResolvedValue(
+        testBlock1DeletePlan,
+      );
+      featuredTableService.listFeaturedTables.mockResolvedValue(
+        testFeaturedTables,
+      );
 
-    const featuredTablesTable = within(screen.getByTestId('featuredTables'));
-    const featuredTablesRows = featuredTablesTable.getAllByRole('row');
-    expect(featuredTablesRows).toHaveLength(2);
+      const { user } = renderPage();
 
-    const featuredTablesRow1Cells = within(featuredTablesRows[1]).getAllByRole(
-      'cell',
-    );
-    expect(featuredTablesRow1Cells).toHaveLength(6);
-    expect(featuredTablesRow1Cells[0]).toHaveTextContent('Block 3');
-    expect(featuredTablesRow1Cells[1]).toHaveTextContent('No');
-    expect(featuredTablesRow1Cells[2]).toHaveTextContent('No');
-    expect(featuredTablesRow1Cells[3]).toHaveTextContent('Featured 3');
-    expect(featuredTablesRow1Cells[4]).toHaveTextContent(
-      '1 January 2021 15:00',
-    );
-    expect(
-      within(featuredTablesRow1Cells[5]).getByRole('link', {
-        name: 'Edit block',
-      }),
-    ).toHaveAttribute(
-      'href',
-      '/publication/publication-1/release/release-1/data-blocks/block-3',
-    );
-    expect(
-      within(featuredTablesRow1Cells[5]).getByRole('button', {
-        name: 'Delete block',
-      }),
-    ).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
+      });
+
+      const buttons = screen.getAllByRole('button', { name: 'Delete block' });
+
+      await user.click(buttons[0]);
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+
+      await user.click(modal.getByRole('button', { name: 'Confirm' }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      expect(dataBlockService.deleteDataBlock).toHaveBeenCalledTimes(1);
+      expect(dataBlockService.deleteDataBlock).toHaveBeenCalledWith(
+        'release-1',
+        'block-1',
+      );
+
+      const featuredTablesTable = within(screen.getByTestId('featuredTables'));
+      const featuredTablesRows = featuredTablesTable.getAllByRole('row');
+      expect(featuredTablesRows).toHaveLength(2);
+
+      const featuredTablesRow1Cells = within(
+        featuredTablesRows[1],
+      ).getAllByRole('cell');
+      expect(featuredTablesRow1Cells).toHaveLength(6);
+      expect(featuredTablesRow1Cells[0]).toHaveTextContent('Block 3');
+      expect(featuredTablesRow1Cells[1]).toHaveTextContent('No');
+      expect(featuredTablesRow1Cells[2]).toHaveTextContent('No');
+      expect(featuredTablesRow1Cells[3]).toHaveTextContent('Featured 3');
+      expect(featuredTablesRow1Cells[4]).toHaveTextContent(
+        '1 January 2021 15:00',
+      );
+      expect(
+        within(featuredTablesRow1Cells[5]).getByRole('link', {
+          name: 'Edit block',
+        }),
+      ).toHaveAttribute(
+        'href',
+        '/publication/publication-1/release/release-1/data-blocks/block-3',
+      );
+      expect(
+        within(featuredTablesRow1Cells[5]).getByRole('button', {
+          name: 'Delete block',
+        }),
+      ).toBeInTheDocument();
+    });
   });
 
   const renderPage = () => {

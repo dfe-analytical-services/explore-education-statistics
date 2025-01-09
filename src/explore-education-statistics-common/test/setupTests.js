@@ -9,6 +9,7 @@ jest.setTimeout(10000);
 if (typeof window !== 'undefined') {
   // fetch polyfill for making API calls.
   require('cross-fetch');
+  require('intersection-observer');
 }
 
 // fix for jsdom not working with SVGs
@@ -27,5 +28,3 @@ global.document.createElementNS = function (namespaceURI, qualifiedName) {
   // eslint-disable-next-line prefer-rest-params
   return createElementNSOrig.apply(this, arguments);
 };
-
-require('intersection-observer');

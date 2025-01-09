@@ -9,13 +9,14 @@ import classNames from 'classnames';
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 
-interface Props {
+export interface ReorderableListProps {
   heading?: string;
   id: string;
   list: ReorderableListItem[];
   testId?: string;
   onCancel?: () => void;
   onConfirm?: () => void;
+  onExpandOptions?: (itemId: string, itemParentId?: string) => void;
   onMoveItem: ({ prevIndex, nextIndex }: ReorderResult) => void;
   onReverse?: () => void;
 }
@@ -27,9 +28,10 @@ export default function ReorderableList({
   testId,
   onCancel,
   onConfirm,
+  onExpandOptions,
   onMoveItem,
   onReverse,
-}: Props) {
+}: ReorderableListProps) {
   const [focusItem, setFocusItem] = useState<number>(0);
 
   return (
@@ -72,6 +74,7 @@ export default function ReorderableList({
                         index={index}
                         isLastItem={index === list.length - 1}
                         item={item}
+                        onExpandOptions={onExpandOptions}
                         onMoveItem={({ prevIndex, nextIndex }) => {
                           onMoveItem({ prevIndex, nextIndex });
                           setFocusItem(nextIndex);

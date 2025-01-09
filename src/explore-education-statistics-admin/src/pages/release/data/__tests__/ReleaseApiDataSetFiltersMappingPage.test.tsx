@@ -95,7 +95,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       name: 'Filter 1 2 unmapped filter options 1 mapped filter option Column: Filter1Key',
     });
     expect(mappableFilter1Table).toBe(
-      screen.getByTestId('mappable-table-Filter1Key'),
+      screen.getByTestId('mappable-table-filter1Key'),
     );
     expect(within(mappableFilter1Table).getAllByRole('row')).toHaveLength(4);
 
@@ -104,7 +104,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       name: 'Filter 2 1 unmapped filter option 2 mapped filter options Column: Filter2Key',
     });
     expect(mappableFilter2Table).toBe(
-      screen.getByTestId('mappable-table-Filter2Key'),
+      screen.getByTestId('mappable-table-filter2Key'),
     );
     expect(within(mappableFilter2Table).getAllByRole('row')).toHaveLength(4);
 
@@ -150,7 +150,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     ).toBeInTheDocument();
     expect(
       within(
-        autoMappedAccordion.getByTestId('auto-mapped-table-Filter1Key'),
+        autoMappedAccordion.getByTestId('auto-mapped-table-filter1Key'),
       ).getAllByRole('row'),
     ).toHaveLength(2);
 
@@ -162,7 +162,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     ).toBeInTheDocument();
     expect(
       within(
-        autoMappedAccordion.getByTestId('auto-mapped-table-Filter3Key'),
+        autoMappedAccordion.getByTestId('auto-mapped-table-filter3Key'),
       ).getAllByRole('row'),
     ).toHaveLength(4);
   });
@@ -196,12 +196,12 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       within(mappableSubItems[0]).getByRole('link', {
         name: 'Filter 1',
       }),
-    ).toHaveAttribute('href', '#mappable-filter-options-filter-1-key');
+    ).toHaveAttribute('href', '#mappable-table-filter1Key');
     expect(
       within(mappableSubItems[1]).getByRole('link', {
         name: 'Filter 2',
       }),
-    ).toHaveAttribute('href', '#mappable-filter-options-filter-2-key');
+    ).toHaveAttribute('href', '#mappable-table-filter2Key');
 
     expect(
       within(navItems[3]).getByRole('link', {
@@ -214,7 +214,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       within(newSubItems[0]).getByRole('link', {
         name: 'Filter 1',
       }),
-    ).toHaveAttribute('href', '#new-filter-options-filter-1-key');
+    ).toHaveAttribute('href', '#new-filter-options-filter1Key');
 
     expect(
       within(navItems[5]).getByRole('link', {
@@ -227,12 +227,12 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       within(autoMappedSubItems[0]).getByRole('link', {
         name: 'Filter 1',
       }),
-    ).toHaveAttribute('href', '#auto-mapped-filter-options-filter-1-key');
+    ).toHaveAttribute('href', '#auto-mapped-filter-options-filter1Key');
     expect(
       within(autoMappedSubItems[1]).getByRole('link', {
         name: 'Filter 3',
       }),
-    ).toHaveAttribute('href', '#auto-mapped-filter-options-filter-3-key');
+    ).toHaveAttribute('href', '#auto-mapped-filter-options-filter3Key');
   });
 
   test('renders the notification banner if there are mappable filter options', async () => {
@@ -256,12 +256,12 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       banner.getByRole('link', {
         name: 'There are 2 unmapped Filter 1 filter options',
       }),
-    ).toHaveAttribute('href', '#mappable-table-filter-1-key');
+    ).toHaveAttribute('href', '#mappable-table-filter1Key');
     expect(
       banner.getByRole('link', {
         name: 'There is 1 unmapped Filter 2 filter option',
       }),
-    ).toHaveAttribute('href', '#mappable-table-filter-2-key');
+    ).toHaveAttribute('href', '#mappable-table-filter2Key');
   });
 
   test('does not render the notification banner if there are no unmapped filter options', async () => {
@@ -486,7 +486,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
+      ).toHaveAttribute('href', '#mappable-table-filter1Key');
 
       // mappable table
       const mappableFilter1Table = screen.getByRole('table', {
@@ -617,7 +617,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
+      ).toHaveAttribute('href', '#mappable-table-filter1Key');
 
       const mappableFilter1Table = screen.getByRole('table', {
         name: 'Filter 1 2 unmapped filter options 1 mapped filter option Column: Filter1Key',
@@ -705,7 +705,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
+      ).toHaveAttribute('href', '#mappable-table-filter1Key');
 
       const mappableFilter1Table = screen.getByRole('table', {
         name: 'Filter 1 2 unmapped filter options 1 mapped filter option Column: Filter1Key',
@@ -785,7 +785,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         }),
       ).toBeInTheDocument();
       const autoMappedTable = screen.getByTestId(
-        'auto-mapped-table-Filter1Key',
+        'auto-mapped-table-filter1Key',
       );
       const autoMappedFilter = within(autoMappedTable).getAllByRole('row')[1];
       const autoMappedFilterCells =
@@ -934,7 +934,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         }),
       ).toBeInTheDocument();
       const autoMappedTable = screen.getByTestId(
-        'auto-mapped-table-Filter1Key',
+        'auto-mapped-table-filter1Key',
       );
       const autoMappedFilter = within(autoMappedTable).getAllByRole('row')[1];
       const autoMappedFilterCells =
@@ -1035,7 +1035,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('link', {
           name: 'There are 2 unmapped Filter 1 filter options',
         }),
-      ).toHaveAttribute('href', '#mappable-table-filter-1-key');
+      ).toHaveAttribute('href', '#mappable-table-filter1Key');
 
       // mappable table
       const mappableFilter1Table = screen.getByRole('table', {
