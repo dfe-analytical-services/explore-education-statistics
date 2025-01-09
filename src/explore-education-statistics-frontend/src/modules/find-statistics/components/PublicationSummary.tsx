@@ -12,15 +12,20 @@ interface Props {
 }
 
 const PublicationSummary = ({ publication }: Props) => {
-  const { published, slug, summary, theme, title, type, releaseSlug } = publication;
+  const { published, slug, summary, theme, title, type, releaseSlug } =
+    publication;
   return (
     <li className={`${styles.container} govuk-!-margin-top-4`}>
       <h3 className="govuk-!-margin-bottom-2">
-        <Link to={
-          publication.releaseSlug 
-          ? `/find-statistics/${slug}/${releaseSlug}`
-          : `/find-statistics/${slug}`
-          }>{title}</Link>
+        <Link
+          to={
+            publication.releaseSlug
+              ? `/find-statistics/${slug}/${releaseSlug}`
+              : `/find-statistics/${slug}`
+          }
+        >
+          {title}
+        </Link>
       </h3>
       <p>{summary}</p>
 
