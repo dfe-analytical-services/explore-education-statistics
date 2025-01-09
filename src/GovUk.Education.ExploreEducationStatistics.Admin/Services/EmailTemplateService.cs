@@ -27,17 +27,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var template = notifyOptions.Value.InviteWithRolesTemplateId;
 
             var releaseRoleList = userReleaseInvites
-                .OrderBy(invite => invite.ReleaseVersion.Publication.Title)
-                .ThenBy(invite => invite.ReleaseVersion.Title)
+                .OrderBy(invite => invite.ReleaseVersion.Release.Publication.Title)
+                .ThenBy(invite => invite.ReleaseVersion.Release.Title)
                 .ThenBy(invite => invite.Role.ToString())
                 .Select(invite =>
-                    $"* {invite.ReleaseVersion.Publication.Title}, {invite.ReleaseVersion.Title} - {invite.Role.ToString()}")
+                    $"* {invite.ReleaseVersion.Release.Publication.Title}, {invite.ReleaseVersion.Release.Title} - {invite.Role}")
                 .ToList();
 
             var publicationRoleList = userPublicationInvites
                 .OrderBy(invite => invite.Publication.Title)
                 .ThenBy(invite => invite.Role)
-                .Select(invite => $"* {invite.Publication.Title} - {invite.Role.ToString()}")
+                .Select(invite => $"* {invite.Publication.Title} - {invite.Role}")
                 .ToList();
 
             var emailValues = new Dictionary<string, dynamic>
