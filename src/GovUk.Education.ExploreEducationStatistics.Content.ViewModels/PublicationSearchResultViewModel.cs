@@ -7,6 +7,7 @@ public record PublicationSearchResultViewModel
 {
     public Guid Id { get; init; }
     public string Slug { get; init; } = string.Empty;
+    public string ReleaseSlug { get; init; } = string.Empty;
     public string Summary { get; init; } = string.Empty;
     public string Title { get; init; } = string.Empty;
     public string Theme { get; init; } = string.Empty;

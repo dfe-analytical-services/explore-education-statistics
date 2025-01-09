@@ -12,6 +12,8 @@ public record PublicationSummaryViewModel
 
     public required string Slug { get; init; }
 
+    public string ReleaseSlug { get; init; } = string.Empty;
+
     public bool? Owner { get; init; }
     
     public ContactViewModel? Contact { get; init; }

@@ -114,6 +114,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     Id = pm.PublicationId,
                     Title = pm.Publication.Title,
                     Slug = pm.Publication.Slug,
+                    ReleaseSlug = pm.Publication.ReleaseVersions
+                            .Where(r => r.Id == pm.Publication.LatestPublishedReleaseVersionId.Value)
+                            .Select(r => r.Slug).FirstOrDefault() ?? "",
                     Owner = pm.Owner,
                     Contact = _mapper.Map<ContactViewModel>(pm.Publication.Contact)
                 })
