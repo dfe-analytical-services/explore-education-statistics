@@ -742,14 +742,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             preReleaseUserService
                 .Setup(mock => mock.SendPreReleaseInviteEmail(
-                    It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
+                    releaseVersion.Id,
                     existingUser1Invite.Email,
                     false))
                 .ReturnsAsync(Unit.Instance);
 
             preReleaseUserService
                 .Setup(mock => mock.SendPreReleaseInviteEmail(
-                    It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
+                    releaseVersion.Id,
                     nonExistingUserPreReleaseInvite.Email,
                     true))
                 .ReturnsAsync(Unit.Instance);
@@ -1264,14 +1264,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             preReleaseUserService
                 .Setup(mock => mock.SendPreReleaseInviteEmail(
-                    It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
+                    releaseVersion.Id,
                     invite1.Email,
                     true))
                 .ReturnsAsync(new BadRequestResult());
 
             preReleaseUserService
                 .Setup(mock => mock.SendPreReleaseInviteEmail(
-                    It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
+                    releaseVersion.Id,
                     invite2.Email,
                     true))
                 .ReturnsAsync(Unit.Instance);
@@ -1366,7 +1366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             preReleaseUserService
                 .Setup(mock => mock.SendPreReleaseInviteEmail(
-                    It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
+                    releaseVersion.Id,
                     invite.Email,
                     true))
                 .ReturnsAsync(Unit.Instance);
