@@ -35,6 +35,29 @@ export default function reorderMultiple<T>({
     return list;
   }
 
+  // Adapted from https://github.com/atlassian/react-beautiful-dnd/blob/master/stories/src/multi-drag/utils.js
+  const insertAtIndex: number = (() => {
+    const destinationIndexOffset: number = selectedIndices.reduce(
+      (previous: number, current: number): number => {
+        if (current === selectedIndices[0]) {
+          return previous;
+        }
+
+        if (current >= destinationIndex) {
+          return previous;
+        }
+
+        // the selected item is before the destination index
+        // we need to account for this when inserting into the new location
+        return previous + 1;
+      },
+      0,
+    );
+
+    const result: number = destinationIndex - destinationIndexOffset;
+    return result;
+  })();
+
   const [selectedList, newList] = list.reduce<[T[], T[]]>(
     (acc, item, index) => {
       if (selectedIndices.includes(index)) {
@@ -48,17 +71,6 @@ export default function reorderMultiple<T>({
     [[], []],
   );
 
-  const maxIndex = max(selectedIndices) as number;
-
-  let insertIndex = destinationIndex;
-
-  // Last selected item is before the final destination
-  // position, so we need to offset this by 1 for maths reasons
-  if (maxIndex < insertIndex) {
-    insertIndex += 1;
-  }
-
-  newList.splice(insertIndex, 0, ...selectedList);
-
+  newList.splice(insertAtIndex, 0, ...selectedList);
   return newList;
 }

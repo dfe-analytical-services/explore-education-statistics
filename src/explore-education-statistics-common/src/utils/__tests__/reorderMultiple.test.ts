@@ -302,4 +302,34 @@ describe('reorderMultiple', () => {
 
     expect(newList).toEqual(['b', 'd', 'a', 'c', 'e']);
   });
+
+  test('move first two items to the middle', () => {
+    const newList = reorderMultiple({
+      list: [...list, 'e'],
+      destinationIndex: 2,
+      selectedIndices: [0, 1],
+    });
+
+    expect(newList).toEqual(['c', 'a', 'b', 'd', 'e']);
+  });
+
+  test('move first two items to the second to last', () => {
+    const newList = reorderMultiple({
+      list: [...list, 'e'],
+      destinationIndex: 3,
+      selectedIndices: [0, 1],
+    });
+
+    expect(newList).toEqual(['c', 'd', 'a', 'b', 'e']);
+  });
+
+  test('move middle two items to second', () => {
+    const newList = reorderMultiple({
+      list: [...list, 'e'],
+      destinationIndex: 1,
+      selectedIndices: [2, 3],
+    });
+
+    expect(newList).toEqual(['a', 'c', 'd', 'b', 'e']);
+  });
 });
