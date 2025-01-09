@@ -219,10 +219,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             {
                                 var userReleaseInvites = await _contentDbContext
                                     .UserReleaseInvites
-                                    .Include(userReleaseInvite =>
-                                        userReleaseInvite.ReleaseVersion.Publication)
-                                    .Where(userReleaseInvite =>
-                                        userReleaseInvite.Email.ToLower().Equals(invite.Email.ToLower()))
+                                    .Include(uri => uri.ReleaseVersion)
+                                    .ThenInclude(rv => rv.Release)
+                                    .ThenInclude(r => r.Publication)
+                                    .Where(uri => uri.Email.ToLower().Equals(invite.Email.ToLower()))
                                     .ToListAsync();
 
                                 var userReleaseRoles = userReleaseInvites
@@ -230,18 +230,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         new UserReleaseRoleViewModel
                                         {
                                             Id = userReleaseInvite.Id,
-                                            Publication = userReleaseInvite.ReleaseVersion.Publication.Title,
-                                            Release = userReleaseInvite.ReleaseVersion.Title,
+                                            Publication = userReleaseInvite.ReleaseVersion.Release.Publication.Title,
+                                            Release = userReleaseInvite.ReleaseVersion.Release.Title,
                                             Role = userReleaseInvite.Role,
                                         }
                                     ).ToList();
 
                                 var userPublicationInvites = await _contentDbContext
                                     .UserPublicationInvites
-                                    .Include(userPublicationInvite =>
-                                        userPublicationInvite.Publication)
-                                    .Where(userPublicationInvite =>
-                                        userPublicationInvite.Email.ToLower().Equals(invite.Email.ToLower()))
+                                    .Include(upi => upi.Publication)
+                                    .Where(upi => upi.Email.ToLower().Equals(invite.Email.ToLower()))
                                     .ToListAsync();
 
                                 var userPublicationRoles = userPublicationInvites
