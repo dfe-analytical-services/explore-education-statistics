@@ -15,4 +15,6 @@ param postgreSqlStorageSizeGB = 32
 param postgreSqlAutoGrowStatus = 'Disabled'
 param postgreSqlGeoRedundantBackupEnabled = true
 
+param recoveryVaultImmutable = true
+
 param enableThemeDeletion = false

@@ -1,19 +1,20 @@
 type AppGatewayMetric = {
   resourceType: 'Microsoft.Network/applicationGateways'
-  metric: 
+  metric:
     | 'ApplicationGatewayTotalTime'
+    | 'UnhealthyHostCount'
 }
 
 type AppServicePlanMetric = {
   resourceType: 'Microsoft.Web/serverfarms'
-  metric: 
+  metric:
     | 'CpuPercentage'
     | 'MemoryPercentage'
 }
 
 type ContainerAppMetric = {
   resourceType: 'Microsoft.App/containerApps'
-  metric: 
+  metric:
     | 'CpuPercentage' 
     | 'MemoryPercentage'
     | 'ResponseTime'
@@ -22,25 +23,34 @@ type ContainerAppMetric = {
 
 type FileServiceMetric = {
   resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
-  metric: 
+  metric:
+    | 'availability'
     | 'SuccessE2ELatency'
 }
 
 type PostgreSqlMetric = {
   resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
-  metric: 
+  metric:
     | 'client_connections_waiting'
     | 'cpu_percent'
     | 'disk_bandwidth_consumed_percentage'
     | 'disk_iops_consumed_percentage'
+    | 'is_db_alive'
     | 'longest_query_time_sec'
     | 'longest_transaction_time_sec'
     | 'memory_percent'
 }
 
+type SiteMetric = {
+  resourceType: 'Microsoft.Web/sites'
+  metric:
+    | 'HealthCheckStatus'
+}
+
 type StorageAccountMetric = {
   resourceType: 'Microsoft.Storage/storageAccounts'
-  metric: 
+  metric:
+    | 'availability'
     | 'SuccessE2ELatency'
 }
 
@@ -53,4 +63,5 @@ type ResourceMetric =
 | ContainerAppMetric
 | FileServiceMetric
 | PostgreSqlMetric
+| SiteMetric
 | StorageAccountMetric

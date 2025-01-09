@@ -1626,8 +1626,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var originalMeta = releaseFile.File.DataSetFileMeta;
 
-                Assert.Null(originalMeta!.GeographicLevels); // TODO: remove in EES-5750
-
                 Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                 {
                     From = TimePeriodLabelFormatter.Format(
@@ -1795,6 +1793,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .Returns((releaseVersions ?? Array.Empty<ReleaseVersion>()).AsQueryable().BuildMockDbSet().Object);
             contentDbContext.Setup(context => context.ReleaseFiles)
                 .Returns((releaseFiles ?? Array.Empty<ReleaseFile>()).AsQueryable().BuildMockDbSet().Object);
+            contentDbContext.Setup(context => context.Files)
+                .Returns((releaseFiles != null ? releaseFiles.Select(rf => rf.File).ToArray() : []).AsQueryable().BuildMockDbSet().Object);
             contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable(It.IsAny<string>()))
                 .Returns((freeTextRanks ?? Array.Empty<FreeTextRank>()).AsQueryable().BuildMockDbSet().Object);
             return contentDbContext;
