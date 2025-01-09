@@ -1,4 +1,4 @@
-import { dynamicAverageGreaterThan } from '../config.bicep'
+import { dynamicAverageGreaterThan } from '../dynamicAlertConfig.bicep'
 
 @description('Name of the resource that these alerts are being applied to.')
 param resourceName string

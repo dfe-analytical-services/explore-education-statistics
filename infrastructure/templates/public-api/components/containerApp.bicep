@@ -1,4 +1,4 @@
-import { cpuPercentageConfig, memoryPercentageConfig, responseTimeConfig } from 'alerts/config.bicep'
+import { cpuPercentageConfig, memoryPercentageConfig, responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
 
 import { EntraIdAuthentication } from '../types.bicep'
 

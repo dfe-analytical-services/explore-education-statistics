@@ -1,4 +1,5 @@
-import { DynamicAlertConfig, severityMapping } from 'types.bicep'
+import { severityMapping } from 'types.bicep'
+import { DynamicAlertConfig } from 'dynamicAlertConfig.bicep'
 
 import { ResourceMetric } from 'resourceMetrics.bicep'
 
