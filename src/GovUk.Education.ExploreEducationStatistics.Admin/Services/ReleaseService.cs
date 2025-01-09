@@ -126,7 +126,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return _mapper.Map<ReleaseViewModel>(releaseVersion) with
                     {
-                        PreReleaseUsersOrInvitesAdded = prereleaseRolesOrInvitesAdded
+                        PreReleaseUsersOrInvitesAdded = prereleaseRolesOrInvitesAdded,
+                        Label = releaseVersion.Release.Label
                     };
                 });
         }
@@ -961,6 +962,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Require publication / release graph to be able to work out:
             // If the release is the latest
             return values
+                .Include(rv => rv.Release)
                 .Include(rv => rv.Publication)
                 .Include(rv => rv.ReleaseStatuses);
         }
