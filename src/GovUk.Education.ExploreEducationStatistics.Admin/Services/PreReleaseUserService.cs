@@ -271,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     // TODO EES-4681 - we're not currently marking this email as having been sent using
                     // MarkInviteEmailAsSent, but should we be doing so?
-                    var emailResult = await SendPreReleaseInviteEmail(releaseVersion, email, isNewUser: true);
+                    var emailResult = await SendPreReleaseInviteEmail(releaseVersion.Id, email, isNewUser: true);
                     if (emailResult.IsLeft)
                     {
                         return emailResult;
@@ -301,7 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     // TODO EES-4681 - we're not currently marking this email as having been sent using
                     // MarkInviteEmailAsSent, but should we be doing so?
-                    var emailResult = await SendPreReleaseInviteEmail(releaseVersion, email, isNewUser: false);
+                    var emailResult = await SendPreReleaseInviteEmail(releaseVersion.Id, email, isNewUser: false);
                     if (emailResult.IsLeft)
                     {
                         return emailResult;
@@ -329,45 +329,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(
-            ReleaseVersion releaseVersion,
+            Guid releaseVersionId,
             string email,
             bool isNewUser)
         {
-            await _context.Entry(releaseVersion)
-                .Reference(rv => rv.Publication)
-                .LoadAsync();
+            return await _context.ReleaseVersions
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+                .OnSuccess(releaseVersion =>
+                {
+                    var url = _appOptions.Value.Url;
+                    var template = _notifyOptions.Value.PreReleaseTemplateId;
 
-            var url = _appOptions.Value.Url;
-            var template = _notifyOptions.Value.PreReleaseTemplateId;
+                    var prereleaseUrl =
+                        $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/prerelease/content";
 
-            var prereleaseUrl =
-                $"{url}/publication/{releaseVersion.PublicationId}/release/{releaseVersion.Id}/prerelease/content";
+                    var preReleaseWindow = _preReleaseService.GetPreReleaseWindow(releaseVersion);
+                    var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();
+                    var publishScheduled = releaseVersion.PublishScheduled!.Value.ConvertUtcToUkTimeZone();
 
-            var preReleaseWindow = _preReleaseService.GetPreReleaseWindow(releaseVersion);
-            var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();
-            var publishScheduled = releaseVersion.PublishScheduled!.Value.ConvertUtcToUkTimeZone();
+                    // TODO EES-828 This time should depend on the Publisher schedule
+                    var publishScheduledTime = new TimeSpan(9, 30, 0);
 
-            // TODO EES-828 This time should depend on the Publisher schedule
-            var publishScheduledTime = new TimeSpan(9, 30, 0);
+                    var preReleaseDay = FormatDayForEmail(preReleaseWindowStart);
+                    var preReleaseTime = FormatTimeForEmail(preReleaseWindowStart);
+                    var publishDay = FormatDayForEmail(publishScheduled);
+                    var publishTime = FormatTimeForEmail(publishScheduledTime);
 
-            var preReleaseDay = FormatDayForEmail(preReleaseWindowStart);
-            var preReleaseTime = FormatTimeForEmail(preReleaseWindowStart);
-            var publishDay = FormatDayForEmail(publishScheduled);
-            var publishTime = FormatTimeForEmail(publishScheduledTime);
+                    var emailValues = new Dictionary<string, dynamic>
+                    {
+                        { "newUser", isNewUser ? "yes" : "no" },
+                        { "release name", releaseVersion.Release.Title },
+                        { "publication name", releaseVersion.Release.Publication.Title },
+                        { "prerelease link", prereleaseUrl },
+                        { "prerelease day", preReleaseDay },
+                        { "prerelease time", preReleaseTime },
+                        { "publish day", publishDay },
+                        { "publish time", publishTime }
+                    };
 
-            var emailValues = new Dictionary<string, dynamic>
-            {
-                { "newUser", isNewUser ? "yes" : "no" },
-                { "release name", releaseVersion.Title },
-                { "publication name", releaseVersion.Publication.Title },
-                { "prerelease link", prereleaseUrl },
-                { "prerelease day", preReleaseDay },
-                { "prerelease time", preReleaseTime },
-                { "publish day", publishDay },
-                { "publish time", publishTime }
-            };
-
-            return _emailService.SendEmail(email, template, emailValues);
+                    return _emailService.SendEmail(email, template, emailValues);
+                });
         }
 
         public async Task MarkInviteEmailAsSent(UserReleaseInvite invite)
