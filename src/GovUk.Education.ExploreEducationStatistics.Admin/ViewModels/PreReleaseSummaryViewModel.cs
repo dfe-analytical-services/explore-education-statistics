@@ -1,37 +1,17 @@
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
+#nullable enable
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+
+public record PreReleaseSummaryViewModel
 {
-    public class PreReleaseSummaryViewModel
-    {
-        public string PublicationSlug { get; }
+    public required string PublicationSlug { get; init; }
 
-        public string ReleaseSlug { get; }
+    public required string ReleaseSlug { get; init; }
 
-        public string PublicationTitle { get; }
+    public required string PublicationTitle { get; init; }
 
-        public string ReleaseTitle { get; }
+    public required string ReleaseTitle { get; init; }
 
-        public string ContactEmail { get; }
+    public required string ContactEmail { get; init; }
 
-        public string ContactTeam { get; }
-
-        public PreReleaseSummaryViewModel()
-        {
-        }
-
-        public PreReleaseSummaryViewModel(
-            string publicationSlug,
-            string publicationTitle,
-            string releaseSlug,
-            string releaseTitle,
-            string contactEmail, 
-            string contactTeam)
-        {
-            PublicationSlug = publicationSlug;
-            ReleaseSlug = releaseSlug;
-            PublicationTitle = publicationTitle;
-            ReleaseTitle = releaseTitle;
-            ContactEmail = contactEmail;
-            ContactTeam = contactTeam;
-        }
-    }
+    public required string ContactTeam { get; init; }
 }
