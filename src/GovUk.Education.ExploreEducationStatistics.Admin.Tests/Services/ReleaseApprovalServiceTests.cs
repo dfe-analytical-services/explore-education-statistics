@@ -38,99 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly DataFixture _fixture = new();
 
         [Fact]
-        public async Task CreateReleaseStatus_Amendment_NoUniqueSlugFailure()
-        {
-            var publication = new Publication();
-
-            var initialReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Type = ReleaseType.AdHocStatistics,
-                TimePeriodCoverage = TimeIdentifier.TaxYear,
-                Publication = publication,
-                ReleaseName = "2035",
-                Slug = "2035",
-                PublishScheduled = DateTime.UtcNow,
-                Version = 0
-            };
-
-            var amendedReleaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Publication = publication,
-                ReleaseName = "2030",
-                Slug = "2030",
-                PublishScheduled = DateTime.UtcNow,
-                Version = 1,
-                PreviousVersionId = initialReleaseVersion.Id
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.ReleaseVersions.AddRange(initialReleaseVersion, amendedReleaseVersion);
-                await context.SaveChangesAsync();
-            }
-
-            var contentService = new Mock<IContentService>(MockBehavior.Strict);
-
-            contentService.Setup(mock =>
-                    mock.GetContentBlocks<HtmlBlock>(amendedReleaseVersion.Id))
-                .ReturnsAsync(new List<HtmlBlock>());
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var releaseService = BuildService(
-                    context,
-                    contentService: contentService.Object);
-
-                var result = await releaseService
-                    .CreateReleaseStatus(
-                        amendedReleaseVersion.Id,
-                        new ReleaseStatusCreateRequest
-                        {
-                            PublishScheduled = "2051-06-30",
-                            ApprovalStatus = ReleaseApprovalStatus.Draft
-                        }
-                    );
-
-                VerifyAllMocks(contentService);
-
-                result.AssertRight();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var saved = await context.ReleaseVersions
-                    .SingleAsync(rv => rv.Id == amendedReleaseVersion.Id);
-
-                Assert.Equal("2030", saved.ReleaseName);
-                Assert.Equal(TimeIdentifier.CalendarYear, saved.TimePeriodCoverage);
-            }
-        }
-
-        [Fact]
         public async Task CreateReleaseStatus()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                TimePeriodCoverage = TimeIdentifier.March,
-                Slug = "2030-march",
-                ApprovalStatus = ReleaseApprovalStatus.Draft,
-                PublishScheduled = DateTime.UtcNow,
-                NextReleaseDate = new PartialDate
-                {
-                    Day = "15",
-                    Month = "6",
-                    Year = "2039"
-                },
-                PreReleaseAccessList = "Access list",
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -181,7 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Include(rv => rv.ReleaseStatuses)
                     .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
-                Assert.Equal(releaseVersion.Publication.Id, saved.PublicationId);
                 Assert.Equal(ReleaseApprovalStatus.Draft, saved.ApprovalStatus);
                 Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc),
                     saved.PublishScheduled);
@@ -189,11 +100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // NotifySubscribers should default to true for first release versions
                 Assert.True(saved.NotifySubscribers);
                 Assert.False(saved.UpdatePublishedDate);
-                Assert.Equal(ReleaseType.AdHocStatistics, saved.Type);
-                Assert.Equal("2030-march", saved.Slug);
-                Assert.Equal("2030", saved.ReleaseName);
-                Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
-                Assert.Equal("Access list", saved.PreReleaseAccessList);
 
                 var savedStatus = Assert.Single(saved.ReleaseStatuses);
                 Assert.Equal(releaseVersion.Id, savedStatus.ReleaseVersionId);
@@ -206,15 +112,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_FailsOnChecklistErrors()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication { Title = "Old publication" },
-                ReleaseName = "2030",
-                Slug = "2030",
-                PublishScheduled = DateTime.UtcNow,
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -277,15 +177,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_FailsNullPublishDate()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Published = DateTime.Now,
-                PublishScheduled = DateTime.UtcNow
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -323,15 +217,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_FailsEmptyPublishDate()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Published = DateTime.Now,
-                PublishScheduled = DateTime.UtcNow
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -369,15 +257,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_PreviousDay()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Published = DateTime.Now,
-                PublishScheduled = DateTime.UtcNow
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -432,15 +314,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task
             CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_PreviousDay_DaylightSavingTime()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Published = DateTime.Now,
-                PublishScheduled = DateTime.UtcNow
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -496,15 +372,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_SameDay()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Published = DateTime.Now,
-                PublishScheduled = DateTime.UtcNow
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -559,15 +429,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task
             CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_SameDay_DaylightSavingTime()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Published = DateTime.Now,
-                PublishScheduled = DateTime.UtcNow
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -623,15 +487,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_FutureDay()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Published = DateTime.Now,
-                PublishScheduled = DateTime.UtcNow
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -686,15 +544,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task
             CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_SecondFunctionHasNoOccurrence()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Published = DateTime.Now,
-                PublishScheduled = DateTime.UtcNow
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -749,19 +601,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsChangingToDraft()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication
-                {
-                    Title = "Old publication",
-                },
-                ReleaseName = "2030",
-                Slug = "2030",
-                Published = DateTime.Now,
-                PublishScheduled = DateTime.UtcNow,
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()))
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTime.UtcNow);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -770,7 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
-            
+
             var contentService = new Mock<IContentService>(MockBehavior.Strict);
 
             contentService.Setup(mock =>
@@ -789,6 +633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
+                            PublishMethod = PublishMethod.Scheduled,
                         }
                     );
                 
@@ -801,15 +646,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft,
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var existingUser1 = new User
             {
@@ -988,15 +827,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Immediately()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft,
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1089,34 +922,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Amendment()
         {
-            var publication = new Publication();
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1, draftVersion: true)]);
 
-            var initialReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication
-            };
-
-            var amendedReleaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft,
-                Type = ReleaseType.AdHocStatistics,
-                TimePeriodCoverage = TimeIdentifier.TaxYear,
-                Publication = publication,
-                ReleaseName = "2035",
-                Slug = "2035",
-                NotifySubscribers = true,
-                UpdatePublishedDate = false,
-                Version = 1,
-                PreviousVersionId = initialReleaseVersion.Id
-            };
+            var amendedReleaseVersion = publication.Releases[0].Versions.Single(rv => rv is { Published: null });
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Publications.Add(publication);
-                context.ReleaseVersions.AddRange(initialReleaseVersion, amendedReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -1185,14 +1000,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Draft_DoNotSendPreReleaseEmails()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication { Title = "Old publication" },
-                ReleaseName = "2030",
-                Slug = "2030",
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1232,23 +1042,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_ReleaseHasImages()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication { Title = "Old publication" },
-                ReleaseName = "2030",
-                TimePeriodCoverage = TimeIdentifier.March,
-                Slug = "2030-march",
-                PublishScheduled = DateTime.UtcNow,
-                NextReleaseDate = new PartialDate
-                {
-                    Day = "15",
-                    Month = "6",
-                    Year = "2039"
-                },
-                PreReleaseAccessList = "Access list",
-                Version = 0
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var imageFile1 = new ReleaseFile
             {
@@ -1285,7 +1081,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRoleService = new Mock<IUserReleaseRoleService>(MockBehavior.Strict);
 
             userReleaseRoleService.Setup(mock =>
-                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
+                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver,
+                        releaseVersion.Release.PublicationId))
                 .ReturnsAsync(ListOf<UserReleaseRole>());
 
             contentService.Setup(mock =>
@@ -1300,13 +1097,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
 
-            var nextReleaseDateEdited = new PartialDate
-            {
-                Day = "1",
-                Month = "1",
-                Year = "2040"
-            };
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(
@@ -1320,7 +1110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
-                            NextReleaseDate = nextReleaseDateEdited,
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             InternalReleaseNote = "Internal note"
                         }
@@ -1335,22 +1124,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_ReleaseHasUnusedImages()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication { Title = "Old publication" },
-                ReleaseName = "2030",
-                TimePeriodCoverage = TimeIdentifier.March,
-                PublishScheduled = DateTime.UtcNow,
-                NextReleaseDate = new PartialDate
-                {
-                    Day = "15",
-                    Month = "6",
-                    Year = "2039"
-                },
-                PreReleaseAccessList = "Access list",
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var imageFile1 = new ReleaseFile
             {
@@ -1402,15 +1178,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(Unit.Instance);
 
             userReleaseRoleService.Setup(mock =>
-                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
+                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver,
+                        releaseVersion.Release.PublicationId))
                 .ReturnsAsync(ListOf<UserReleaseRole>());
-
-            var nextReleaseDateEdited = new PartialDate
-            {
-                Day = "1",
-                Month = "1",
-                Year = "2040"
-            };
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1425,7 +1195,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
-                            NextReleaseDate = nextReleaseDateEdited,
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             InternalReleaseNote = "Test internal note"
                         }
@@ -1450,15 +1219,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsSendingPreReleaseInviteEmail()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft,
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var invite1 = new UserReleaseInvite
             {
@@ -1518,12 +1281,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     It.Is<UserReleaseInvite>(i => i.Email == invite2.Email)))
                 .Returns(Task.CompletedTask);
 
-            var nextReleaseDateEdited = new PartialDate
-            {
-                Month = "12",
-                Year = "2000"
-            };
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(contentDbContext: context,
@@ -1540,7 +1297,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
-                            NextReleaseDate = nextReleaseDateEdited
                         }
                     );
 
@@ -1562,7 +1318,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Assert that the failure to send emails prevented the release version from completing approval.
                 // The release version should remain unchanged from the original release version.
                 // Additionally, no new ReleaseStatus entries were added.
-                saved.AssertDeepEqualTo(releaseVersion);
+                saved.AssertDeepEqualTo(releaseVersion,
+                    notEqualProperties: AssertExtensions.Except<ReleaseVersion>(
+                        rv => rv.Release,
+                        rv => rv.Publication
+                    ));
 
                 // Furthermore, we have proven that the Publisher was not informed of the change, as it
                 // did not complete.
@@ -1572,15 +1332,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsWhileInformingPublisher()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ApprovalStatus = ReleaseApprovalStatus.Draft,
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
-                ReleaseName = "2030",
-                Slug = "2030",
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var invite = new UserReleaseInvite
             {
@@ -1634,12 +1388,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            var nextReleaseDateEdited = new PartialDate
-            {
-                Month = "12",
-                Year = "2000"
-            };
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(contentDbContext: context,
@@ -1657,7 +1405,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
-                            NextReleaseDate = nextReleaseDateEdited
                         }
                     );
 
@@ -1681,7 +1428,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Assert that the failure to notify the Publisher prevented the release version from completing approval.
                 // The release version should remain unchanged from the original release version.
                 // Additionally, no new ReleaseStatus entries were added.
-                saved.AssertDeepEqualTo(releaseVersion);
+                saved.AssertDeepEqualTo(releaseVersion,
+                    notEqualProperties: AssertExtensions.Except<ReleaseVersion>(
+                        rv => rv.Release,
+                        rv => rv.Publication
+                    ));
 
                 // We have also shown that unfortunately the invite emails would have been sent out despite the
                 // approval failing, but we have more importantly stopped a release version from only having been partially
@@ -1692,14 +1443,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_HigherReview_DoesNotSendEmailIfNoReleaseApprovers()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication { Title = "Test publication" },
-                ReleaseName = "2030",
-                Slug = "2030",
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1719,7 +1465,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 userReleaseRoleService.Setup(mock =>
-                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
+                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver,
+                            releaseVersion.Release.PublicationId))
                     .ReturnsAsync(new List<UserReleaseRole>());
 
                 var releaseService = BuildService(
@@ -1738,11 +1485,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             InternalReleaseNote = "Test internal note",
-                            NextReleaseDate = new PartialDate
-                            {
-                                Month = "12",
-                                Year = "2077"
-                            }
                         });
 
                 VerifyAllMocks(contentService,
@@ -1774,14 +1516,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_HigherReview_SendsEmailIfReleaseApprovers()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication { Title = "Test publication" },
-                ReleaseName = "2030",
-                Slug = "2030",
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var userReleaseRole1 = new UserReleaseRole
             {
@@ -1823,7 +1560,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 userReleaseRoleService.Setup(mock =>
-                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
+                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver,
+                            releaseVersion.Release.PublicationId))
                     .ReturnsAsync(ListOf(userReleaseRole1, userReleaseRole2));
 
                 emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole1.User.Email,
@@ -1850,11 +1588,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             InternalReleaseNote = "Test internal note",
-                            NextReleaseDate = new PartialDate
-                            {
-                                Month = "12",
-                                Year = "2077"
-                            },
                         });
 
                 VerifyAllMocks(contentService, userReleaseRoleService, emailTemplateService);
@@ -1883,14 +1616,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_HigherReview_SendsEmailIfPublicationReleaseApprover()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication { Title = "Test publication" },
-                ReleaseName = "2030",
-                Slug = "2030",
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var userPublicationApproverRole = new UserPublicationRole
             {
@@ -1899,7 +1627,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid(),
                     Email = "test@test.com"
                 },
-                Publication = releaseVersion.Publication,
+                Publication = releaseVersion.Release.Publication,
                 Role = PublicationRole.Approver
             };
 
@@ -1922,7 +1650,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 userReleaseRoleService.Setup(mock =>
-                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
+                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver,
+                            releaseVersion.Release.PublicationId))
                     .ReturnsAsync(new List<UserReleaseRole>());
 
                 emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(
@@ -1945,11 +1674,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             InternalReleaseNote = "Test internal note",
-                            NextReleaseDate = new PartialDate
-                            {
-                                Month = "12",
-                                Year = "2077"
-                            },
                         });
 
                 VerifyAllMocks(contentService, userReleaseRoleService, emailTemplateService);
@@ -1979,14 +1703,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_HigherReview_FailsSendingEmail()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication { Title = "Test publication" },
-                ReleaseName = "2030",
-                Slug = "2030",
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var userReleaseRole1 = new UserReleaseRole
             {
@@ -2028,7 +1747,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 userReleaseRoleService.Setup(mock =>
-                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
+                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver,
+                            releaseVersion.Release.PublicationId))
                     .ReturnsAsync(ListOf(userReleaseRole1, userReleaseRole2));
 
                 emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole1.User.Email,
@@ -2055,11 +1775,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                             InternalReleaseNote = "Test internal note",
-                            NextReleaseDate = new PartialDate
-                            {
-                                Month = "12",
-                                Year = "2077"
-                            },
                         });
 
                 VerifyAllMocks(contentService, userReleaseRoleService, emailTemplateService);
