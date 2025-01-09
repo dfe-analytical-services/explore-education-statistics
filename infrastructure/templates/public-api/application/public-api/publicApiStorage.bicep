@@ -52,6 +52,11 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
     firewallRules: storageFirewallRules
     skuStorageResource: 'Standard_LRS'
     keyVaultName: resourceNames.existingResources.keyVault
+    alerts: deployAlerts ? {
+      availability: true
+      latency: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }
@@ -63,24 +68,11 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
     fileShareQuota: publicApiDataFileShareQuota
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: 'TransactionOptimized'
-    tagValues: tagValues
-  }
-}
-
-module storageAccountAvailabilityAlert '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.publicApiStorageAccount}AvailabilityDeploy'
-  params: {
-    resourceName: resourceNames.publicApi.publicApiStorageAccount
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
-module fileServiceAvailabilityAlert '../../components/alerts/fileServices/availabilityAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.publicApiStorageAccount}FsAvailabilityDeploy'
-  params: {
-    resourceName: resourceNames.publicApi.publicApiStorageAccount
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    alerts: deployAlerts ? {
+      availability: true
+      latency: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }

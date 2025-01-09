@@ -1,4 +1,5 @@
 import { cpuPercentageConfig, memoryPercentageConfig, responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
+import { staticTotalGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 
 import { EntraIdAuthentication } from '../types.bicep'
 
@@ -215,10 +216,18 @@ module privateDns 'containerAppPrivateDns.bicep' = if (deployPrivateDns) {
   }
 }
 
-module containerAppRestartsAlert 'alerts/containerApps/restartsAlert.bicep' = if (alerts != null && alerts!.restarts) {
-  name: '${containerAppName}RestartsDeploy'
+module containerAppRestartsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.restarts) {
+  name: '${containerAppName}RestartsAlertModule'
   params: {
     resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'RestartCount'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'restarts'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

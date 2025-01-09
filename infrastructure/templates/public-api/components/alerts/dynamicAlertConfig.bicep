@@ -76,16 +76,19 @@ var dynamicMaxGreaterThan = {
 }
 
 @export()
-var cpuPercentageConfig = union(dynamicAverageGreaterThan, {
+var cpuPercentageConfig = {
+  ...dynamicAverageGreaterThan
   nameSuffix: 'cpu-percentage'
-})
+}
 
 @export()
-var memoryPercentageConfig = union(dynamicAverageGreaterThan, {
+var memoryPercentageConfig = {
+  ...dynamicAverageGreaterThan
   nameSuffix: 'memory-percentage'
-})
+}
 
 @export()
-var responseTimeConfig = union(dynamicAverageGreaterThan, {
+var responseTimeConfig = {
+  ...dynamicAverageGreaterThan
   nameSuffix: 'response-time'
-})
+}

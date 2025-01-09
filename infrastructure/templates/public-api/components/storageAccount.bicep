@@ -1,4 +1,5 @@
 import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
+import { staticAverageLessThanHundred } from 'alerts/staticAlertConfig.bicep'
 
 import { IpRange } from '../types.bicep'
 
@@ -59,14 +60,23 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   tags: tagValues
 }
 
-module availabilityAlerts 'alerts/storageAccounts/availabilityAlert.bicep' = if (alerts != null && alerts!.availability) {
-  name: '${storageAccountName}StorageAvailabilityDeploy'
+module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
+  name: '${storageAccountName}AvailabilityAlertModule'
   params: {
     resourceName: storageAccountName
+    resourceMetric: {
+      resourceType: 'Microsoft.Storage/storageAccounts'
+      metric: 'availability'
+    }
+    config: {
+      ...staticAverageLessThanHundred
+      nameSuffix: 'availability'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
+
 
 module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}LatencyDeploy'

@@ -1,5 +1,5 @@
 import { FirewallRule, IpRange, AzureFileShareMount, EntraIdAuthentication } from '../types.bicep'
-
+import { staticAverageLessThanHundred } from 'alerts/staticAlertConfig.bicep'
 import { abbreviations } from '../abbreviations.bicep'
 
 @description('Specifies the location for all resources.')
@@ -106,11 +106,13 @@ module appServicePlanModule 'appServicePlan.bicep' = {
     kind: 'functionapp'
     sku: sku
     operatingSystem: operatingSystem
-    alerts: alerts != null ? {
-      cpuPercentage: alerts!.cpuPercentage
-      memoryPercentage: alerts!.memoryPercentage
-      alertsGroupName: alerts!.alertsGroupName
-    } : null
+    alerts: alerts != null
+      ? {
+          cpuPercentage: alerts!.cpuPercentage
+          memoryPercentage: alerts!.memoryPercentage
+          alertsGroupName: alerts!.alertsGroupName
+        }
+      : null
     tagValues: tagValues
   }
 }
@@ -124,17 +126,21 @@ var slot2StorageAccountName = '${storageAccountsNamePrefix}s2'
 var functionAppCodeFileShareName = '${functionAppName}-${abbreviations.fileShare}'
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
 
-var storageAlerts = alerts != null ? {
-  availability: alerts!.storageAccountAvailability
-  latency: alerts!.storageLatency
-  alertsGroupName: alerts!.alertsGroupName
-} : null
+var storageAlerts = alerts != null
+  ? {
+      availability: alerts!.storageAccountAvailability
+      latency: alerts!.storageLatency
+      alertsGroupName: alerts!.alertsGroupName
+    }
+  : null
 
-var fileServiceAlerts = alerts != null ? {
-  availability: alerts!.fileServiceAvailability
-  latency: alerts!.fileServiceLatency
-  alertsGroupName: alerts!.alertsGroupName
-} : null
+var fileServiceAlerts = alerts != null
+  ? {
+      availability: alerts!.fileServiceAvailability
+      latency: alerts!.fileServiceLatency
+      alertsGroupName: alerts!.alertsGroupName
+    }
+  : null
 
 // This is the shared Storage Account for this Durable Function App that is used for key management, timer trigger
 // management etc.
@@ -221,13 +227,15 @@ module slot2FileShareModule 'fileShare.bicep' = {
   ]
 }
 
-var firewallRules = [for (firewallRule, index) in functionAppFirewallRules: {
-  name: firewallRule.name
-  ipAddress: firewallRule.cidr
-  action: 'Allow'
-  tag: firewallRule.tag != null ? firewallRule.tag : 'Default'
-  priority: firewallRule.priority != null ? firewallRule.priority : 100 + index
-}]
+var firewallRules = [
+  for (firewallRule, index) in functionAppFirewallRules: {
+    name: firewallRule.name
+    ipAddress: firewallRule.cidr
+    action: 'Allow'
+    tag: firewallRule.tag != null ? firewallRule.tag : 'Default'
+    priority: firewallRule.priority != null ? firewallRule.priority : 100 + index
+  }
+]
 
 var commonSiteProperties = {
   enabled: true
@@ -322,17 +330,22 @@ module functionAppKeyVaultRoleAssignments 'keyVaultRoleAssignment.bicep' = {
 }
 
 resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
-   name: 'azurestorageaccounts'
-   parent: functionApp
-   properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
-     '${next.storageName}': {
-       type: 'AzureFiles'
-       shareName: next.fileShareName
-       mountPath: next.mountPath
-       accountName: next.storageAccountName
-       accessKey: next.storageAccountKey
-     }
-   }))
+  name: 'azurestorageaccounts'
+  parent: functionApp
+  properties: reduce(
+    azureFileShares,
+    {},
+    (cur, next) =>
+      union(cur, {
+        '${next.storageName}': {
+          type: 'AzureFiles'
+          shareName: next.fileShareName
+          mountPath: next.mountPath
+          accountName: next.storageAccountName
+          accessKey: next.storageAccountKey
+        }
+      })
+  )
 }
 
 // We determine any pre-existing appsettings for both the production and the staging slots during this infrastructure
@@ -340,8 +353,12 @@ resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
 // appsettings back to their original values by allowing existing ones to take precedence.
 //
 // See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
-var existingStagingAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/slots/config', functionApp.name, 'staging', 'appsettings'), '2021-03-01').properties : {}
-var existingProductionAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/config', functionApp.name, 'appsettings'), '2021-03-01').properties : {}
+var existingStagingAppSettings = functionAppExists
+  ? list(resourceId('Microsoft.Web/sites/slots/config', functionApp.name, 'staging', 'appsettings'), '2021-03-01').properties
+  : {}
+var existingProductionAppSettings = functionAppExists
+  ? list(resourceId('Microsoft.Web/sites/config', functionApp.name, 'appsettings'), '2021-03-01').properties
+  : {}
 
 // Create staging and production deploy slots, and set base app settings on both.
 // These will be infrastructure-specific appsettings, and the YAML pipeline will handle the deployment of
@@ -360,7 +377,6 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       'SLOT_NAME'
     ]
     commonSettings: union(appSettings, {
-
       // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
       AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${sharedStorageAccountModule.outputs.connectionStringSecretName})'
 
@@ -433,10 +449,18 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnet
   }
 }
 
-module healthAlert 'alerts/sites/healthAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
-  name: '${functionAppName}HealthDeploy'
+module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
+  name: '${functionAppName}HealthAlertModule'
   params: {
     resourceName: functionAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.Web/sites'
+      metric: 'HealthCheckStatus'
+    }
+    config: {
+      ...staticAverageLessThanHundred
+      nameSuffix: 'health'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
