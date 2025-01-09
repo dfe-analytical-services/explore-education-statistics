@@ -1,4 +1,5 @@
 import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
+import { staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 
 import {
   AppGatewayBackend
@@ -285,14 +286,24 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
   ]
 }
 
-module backendPoolsHealthAlert 'alerts/appGateways/backendPoolHealthAlert.bicep' = if (alerts != null && alerts!.health) {
-  name: '${appGatewayName}BackendPoolsHealthDeploy'
+module backendPoolsHealthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.health) {
+  name: '${appGatewayName}BackendHealthAlertModule'
   params: {
     resourceName: appGatewayName
+    resourceMetric: {
+      resourceType: 'Microsoft.Network/applicationGateways'
+      metric: 'UnhealthyHostCount'
+    }
+    config: {
+      ...staticAverageGreaterThanZero
+      nameSuffix: 'backend-pool-health'
+      threshold: '0.05'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
+
 
 module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${appGatewayName}ResponseTimeDeploy'
