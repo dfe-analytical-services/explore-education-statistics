@@ -326,19 +326,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return userInvite;
                 })
-                .OnSuccess(userInvite =>
+                .OnSuccess(async userInvite =>
                 {
-                    var userReleaseInvites = _contentDbContext
+                    var userReleaseInvites = await _contentDbContext
                         .UserReleaseInvites
-                        .Include(invite => invite.ReleaseVersion.Publication)
-                        .Where(invite => invite.Email.ToLower() == sanitisedEmail)
-                        .ToList();
+                        .Include(uri => uri.ReleaseVersion)
+                        .ThenInclude(rv => rv.Release)
+                        .ThenInclude(r => r.Publication)
+                        .Where(uri => uri.Email.ToLower() == sanitisedEmail)
+                        .ToListAsync();
 
-                    var userPublicationInvites = _contentDbContext
+                    var userPublicationInvites = await _contentDbContext
                         .UserPublicationInvites
-                        .Include(invite => invite.Publication)
-                        .Where(invite => invite.Email.ToLower() == sanitisedEmail)
-                        .ToList();
+                        .Include(upi => upi.Publication)
+                        .Where(upi => upi.Email.ToLower() == sanitisedEmail)
+                        .ToListAsync();
 
                     return _emailTemplateService
                         .SendInviteEmail(sanitisedEmail, userReleaseInvites, userPublicationInvites)
