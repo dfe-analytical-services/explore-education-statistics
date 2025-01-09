@@ -17,6 +17,10 @@ $active-colour: lighten(govuk-colour('orange'), 10);
     width: 100%;
   }
 
+  :global(.ck-content blockquote) {
+    font-style: normal;
+  }
+
   // show grouped toolbar options in a vertical list
   :global(.ck-dropdown__panel .ck.ck-toolbar > .ck-toolbar__items) {
     flex-direction: column;
