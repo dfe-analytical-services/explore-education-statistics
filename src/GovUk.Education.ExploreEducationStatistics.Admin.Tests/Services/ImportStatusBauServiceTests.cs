@@ -1,21 +1,25 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ImportStatusBauServiceTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         [Fact]
         public async Task GetIncompleteImports_NoResults()
         {
@@ -32,46 +36,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetIncompleteImports()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Slug = "test-release",
-                Publication = new Publication
-                {
-                    Title = "Test Publication"
-                },
-                TimePeriodCoverage = CalendarYear,
-                ReleaseName = "2000"
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-            var releaseFile1 = new ReleaseFile
-            {
-                File = new File
-                {
-                    Filename = "file1.csv",
-                    Type = FileType.Data
-                },
-                ReleaseVersion = releaseVersion
-            };
+            var releaseVersion = publication.Releases.Single().Versions.Single();
 
-            var releaseFile2 = new ReleaseFile
-            {
-                File = new File
-                {
-                    Filename = "file2.csv",
-                    Type = FileType.Data
-                },
-                ReleaseVersion = releaseVersion
-            };
-
-            var releaseFile3 = new ReleaseFile
-            {
-                File = new File
-                {
-                    Filename = "file3.csv",
-                    Type = FileType.Data
-                },
-                ReleaseVersion = releaseVersion
-            };
+            var (releaseFile1, releaseFile2, releaseFile3) = _dataFixture.DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion)
+                .GenerateTuple3();
 
             var import1 = new DataImport
             {
@@ -106,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.Publications.Add(publication);
                 contentDbContext.ReleaseFiles.AddRange(releaseFile1, releaseFile2, releaseFile3);
                 contentDbContext.DataImports.AddRange(import1, import2, import3);
                 await contentDbContext.SaveChangesAsync();
@@ -128,10 +101,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(import2.File.Id, imports[0].FileId);
                 Assert.Null(imports[0].SubjectTitle);
                 Assert.Equal(import2.SubjectId, imports[0].SubjectId);
-                Assert.Equal(releaseVersion.Publication.Id, imports[0].PublicationId);
-                Assert.Equal(releaseVersion.Publication.Title, imports[0].PublicationTitle);
+                Assert.Equal(releaseVersion.Release.Publication.Id, imports[0].PublicationId);
+                Assert.Equal(releaseVersion.Release.Publication.Title, imports[0].PublicationTitle);
                 Assert.Equal(releaseVersion.Id, imports[0].ReleaseId);
-                Assert.Equal(releaseVersion.Title, imports[0].ReleaseTitle);
+                Assert.Equal(releaseVersion.Release.Title, imports[0].ReleaseTitle);
                 Assert.Equal(import2.File.Filename, imports[0].DataFileName);
                 Assert.Equal(import2.TotalRows, imports[0].TotalRows);
                 Assert.Equal(import2.Status, imports[0].Status);
@@ -141,10 +114,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(import1.File.Id, imports[1].FileId);
                 Assert.Null(imports[1].SubjectTitle);
                 Assert.Equal(import1.SubjectId, imports[1].SubjectId);
-                Assert.Equal(releaseVersion.Publication.Id, imports[1].PublicationId);
-                Assert.Equal(releaseVersion.Publication.Title, imports[1].PublicationTitle);
+                Assert.Equal(releaseVersion.Release.Publication.Id, imports[1].PublicationId);
+                Assert.Equal(releaseVersion.Release.Publication.Title, imports[1].PublicationTitle);
                 Assert.Equal(releaseVersion.Id, imports[1].ReleaseId);
-                Assert.Equal(releaseVersion.Title, imports[1].ReleaseTitle);
+                Assert.Equal(releaseVersion.Release.Title, imports[1].ReleaseTitle);
                 Assert.Equal(import1.File.Filename, imports[1].DataFileName);
                 Assert.Equal(import1.TotalRows, imports[1].TotalRows);
                 Assert.Equal(import1.Status, imports[1].Status);
@@ -154,10 +127,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(import3.File.Id, imports[2].FileId);
                 Assert.Null(imports[2].SubjectTitle);
                 Assert.Equal(import3.SubjectId, imports[2].SubjectId);
-                Assert.Equal(releaseVersion.Publication.Id, imports[2].PublicationId);
-                Assert.Equal(releaseVersion.Publication.Title, imports[2].PublicationTitle);
+                Assert.Equal(releaseVersion.Release.Publication.Id, imports[2].PublicationId);
+                Assert.Equal(releaseVersion.Release.Publication.Title, imports[2].PublicationTitle);
                 Assert.Equal(releaseVersion.Id, imports[2].ReleaseId);
-                Assert.Equal(releaseVersion.Title, imports[2].ReleaseTitle);
+                Assert.Equal(releaseVersion.Release.Title, imports[2].ReleaseTitle);
                 Assert.Equal(import3.File.Filename, imports[2].DataFileName);
                 Assert.Equal(import3.TotalRows, imports[2].TotalRows);
                 Assert.Equal(import3.StagePercentageComplete, imports[2].StagePercentageComplete);
