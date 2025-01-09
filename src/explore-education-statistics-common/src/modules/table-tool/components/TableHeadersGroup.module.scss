@@ -28,7 +28,9 @@
 
   &.focused {
     border-color: transparent;
+    box-shadow: inset 0 0 0 4px;
     outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline-offset: -2px;
   }
 
   &.dragEnabled:hover {
