@@ -48,6 +48,9 @@ param acrResourceGroupName string = ''
 @description('Public API docs app : SKU to use.')
 param docsAppSku StaticWebAppSku = 'Free'
 
+@description('Recovery Services Vault : specify if manual deletion of backups is allowed or not.')
+param recoveryVaultImmutable bool = false
+
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
@@ -70,9 +73,7 @@ param dockerImagesTag string = ''
 @description('Do the shared Private DNS Zones need creating or updating?')
 param deploySharedPrivateDnsZones bool = false
 
-// TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL
-// will redeploy even if no changes exist in this deploy from the previous one.
-@description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
+@description('Does the PostgreSQL Flexible Server need creating or updating?')
 param deployPsqlFlexibleServer bool = false
 
 @description('Does the Public API Container App need creating or updating? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.')
@@ -84,7 +85,11 @@ param deployDataProcessor bool = true
 @description('Does the Public API static docs site need creating or updating?')
 param deployDocsSite bool = true
 
+@description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
+
+@description('Does the Recovery Services Vault need creating or updating?')
+param deployRecoveryVault bool = false
 
 @description('Public URLs of other components in the service.')
 param publicUrls {
@@ -174,6 +179,8 @@ var resourceNames = {
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
     logAnalyticsWorkspace: '${commonResourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
     postgreSqlFlexibleServer: '${commonResourcePrefix}-${abbreviations.dBforPostgreSQLServers}'
+    recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVault}'
+    recoveryVaultFileShareBackupPolicy: 'DailyPolicy'
   }
   publicApi: {
     apiApp: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
@@ -184,7 +191,7 @@ var resourceNames = {
     dataProcessorPlan: '${publicApiResourcePrefix}-${abbreviations.webServerFarms}-${abbreviations.webSitesFunctions}-processor'
     dataProcessorStorageAccountsPrefix: '${subscription}eessaprocessor'
     docsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
-    publicApiFileShare: '${publicApiResourcePrefix}-fs-data'
+    publicApiFileShare: '${publicApiResourcePrefix}-${abbreviations.fileShare}-data'
     publicApiStorageAccount: '${replace(publicApiResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}'
   }
 }
@@ -268,6 +275,30 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
   }
   dependsOn: [
     privateDnsZonesModule
+  ]
+}
+
+module recoveryVaultModule 'application/shared/recoveryVault.bicep' = if (deployRecoveryVault) {
+  name: 'recoveryVaultApplicationModuleDeploy'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    immutable: recoveryVaultImmutable
+    tagValues: tagValues
+  }
+}
+
+module publicApiStorageBackupModule 'components/recoveryVaultFileShareRegistration.bicep' = if (deployRecoveryVault) {
+  name: 'publicApiStorageBackupModuleDeploy'
+  params: {
+    vaultName: resourceNames.sharedResources.recoveryVault
+    backupPolicyName: resourceNames.sharedResources.recoveryVaultFileShareBackupPolicy
+    storageAccountName: resourceNames.publicApi.publicApiStorageAccount
+    fileShareName: resourceNames.publicApi.publicApiFileShare
+    tagValues: tagValues
+  }
+  dependsOn: [
+    publicApiStorageModule
   ]
 }
 

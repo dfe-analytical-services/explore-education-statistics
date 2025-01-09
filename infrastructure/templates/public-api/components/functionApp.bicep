@@ -1,5 +1,7 @@
 import { FirewallRule, IpRange, AzureFileShareMount, EntraIdAuthentication } from '../types.bicep'
 
+import { abbreviations } from '../abbreviations.bicep'
+
 @description('Specifies the location for all resources.')
 param location string
 
@@ -119,7 +121,7 @@ module appServicePlanModule 'appServicePlan.bicep' = {
 var sharedStorageAccountName = '${storageAccountsNamePrefix}mg'
 var slot1StorageAccountName = '${storageAccountsNamePrefix}s1'
 var slot2StorageAccountName = '${storageAccountsNamePrefix}s2'
-var functionAppCodeFileShareName = '${functionAppName}-fs'
+var functionAppCodeFileShareName = '${functionAppName}-${abbreviations.fileShare}'
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
 
 var storageAlerts = alerts != null ? {

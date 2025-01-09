@@ -17,4 +17,6 @@ param postgreSqlGeoRedundantBackupEnabled = true
 
 param docsAppSku = 'Standard'
 
+param recoveryVaultImmutable = true
+
 param enableThemeDeletion = false

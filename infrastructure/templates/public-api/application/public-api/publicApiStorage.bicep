@@ -1,5 +1,6 @@
 import { ResourceNames, IpRange } from '../../types.bicep'
 
+@description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
 
 @description('Specifies the location for all resources.')
