@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -11,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.Extensions.Options;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
@@ -156,27 +154,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void SendReleaseHigherReviewEmail()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             const string expectedTemplateId = "notify-release-higher-reviewers-template-id";
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Test Publication"
-                },
-                ReleaseName = "2020",
-                TimePeriodCoverage = December
-            };
 
             var expectedValues = new Dictionary<string, dynamic>
             {
                 {
                     "url",
-                    $"https://admin-uri/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/summary"
+                    $"https://admin-uri/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/summary"
                 },
-                { "publication", releaseVersion.Publication.Title },
-                { "release", releaseVersion.Title },
+                { "publication", releaseVersion.Release.Publication.Title },
+                { "release", releaseVersion.Release.Title }
             };
 
             var emailService = new Mock<IEmailService>(Strict);

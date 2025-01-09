@@ -101,7 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return emailService.SendEmail(email, template, emailValues);
         }
 
-        public Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email,
+        public Either<ActionResult, Unit> SendReleaseHigherReviewEmail(
+            string email,
             ReleaseVersion releaseVersion)
         {
             var url = appOptions.Value.Url;
@@ -109,12 +110,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var emailValues = new Dictionary<string, dynamic>
             {
-                {
-                    "url",
-                    $"{url}/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/summary"
-                },
-                { "publication", releaseVersion.Publication.Title },
-                { "release", releaseVersion.Title },
+                { "url", $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/summary" },
+                { "publication", releaseVersion.Release.Publication.Title },
+                { "release", releaseVersion.Release.Title }
             };
 
             return emailService.SendEmail(email, template, emailValues);
