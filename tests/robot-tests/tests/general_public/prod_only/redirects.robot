@@ -58,7 +58,7 @@ Verify that routes with search parameters retain them
 
 Verify that multiple rules work together
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/1000?foo=bar&baz=zod
-    user waits until page contains   Data catalogue
+    user waits until page contains    Data catalogue
     user checks url equals    %{PUBLIC_URL}/data-catalogue?foo=bar&baz=zod
 
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/1000/?foo=bar

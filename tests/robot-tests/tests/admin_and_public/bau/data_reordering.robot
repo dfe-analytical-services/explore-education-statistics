@@ -223,9 +223,8 @@ Cancel reordering indicators
 
 Replace subject data
     user clicks link    Data uploads
-    user waits until h2 is visible    Uploaded data files
-    ${section}    user gets accordion section content element    ${SUBJECT_NAME}
-    user clicks link    Replace data    ${section}
+    user waits until page contains data uploads table
+    user clicks link    Replace data
     user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}grouped-filters-and-indicators-replacement.csv
     user chooses file    id:dataFileUploadForm-metadataFile
     ...    ${FILES_DIR}grouped-filters-and-indicators-replacement.meta.csv
