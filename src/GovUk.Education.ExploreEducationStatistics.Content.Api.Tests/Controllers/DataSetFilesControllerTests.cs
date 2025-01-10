@@ -1726,7 +1726,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 var (releaseFile, viewModel) = tuple;
 
                 var releaseVersion = releaseFile.ReleaseVersion;
-                var publication = releaseVersion.Publication;
+                var release = releaseVersion.Release;
+                var publication = release.Publication;
                 var theme = publication.Theme;
 
                 Assert.Multiple(
@@ -1737,7 +1738,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     () => Assert.Equal(releaseFile.Name, viewModel.Title),
                     () => Assert.Equal(releaseFile.Summary, viewModel.Content),
                     () => Assert.Equal(releaseVersion.Id, viewModel.Release.Id),
-                    () => Assert.Equal(releaseVersion.Title, viewModel.Release.Title),
+                    () => Assert.Equal(release.Title, viewModel.Release.Title),
                     () => Assert.Equal(publication.Id, viewModel.Publication.Id),
                     () => Assert.Equal(publication.Title, viewModel.Publication.Title),
                     () => Assert.Equal(theme.Id, viewModel.Theme.Id),
@@ -2018,9 +2019,9 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             Assert.Equal(file.DisplaySize(), viewModel.File.Size);
             Assert.Equal(file.SubjectId, viewModel.File.SubjectId);
 
-            Assert.Equal(releaseFile.ReleaseVersionId, viewModel.Release.Id);
-            Assert.Equal(releaseFile.ReleaseVersion.Title, viewModel.Release.Title);
-            Assert.Equal(releaseFile.ReleaseVersion.Slug, viewModel.Release.Slug);
+            Assert.Equal(releaseFile.ReleaseVersion.Id, viewModel.Release.Id);
+            Assert.Equal(releaseFile.ReleaseVersion.Release.Title, viewModel.Release.Title);
+            Assert.Equal(releaseFile.ReleaseVersion.Release.Slug, viewModel.Release.Slug);
             Assert.Equal(releaseFile.ReleaseVersion.Type, viewModel.Release.Type);
             Assert.True(viewModel.Release.IsLatestPublishedRelease);
             Assert.False(viewModel.Release.IsSuperseded);
