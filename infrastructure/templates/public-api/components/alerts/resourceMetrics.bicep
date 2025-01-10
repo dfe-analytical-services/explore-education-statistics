@@ -4,7 +4,13 @@ type AppGatewayMetric = {
   resourceType: 'Microsoft.Network/applicationGateways'
   metric:
     | 'ApplicationGatewayTotalTime'
+    | 'FailedRequests'
     | 'UnhealthyHostCount'
+  dimensions: {
+    name: 'BackendSettingsPool'
+    operator: DimensionOperator?
+    values: string[]
+  }[]?
 }
 
 type AppServicePlanMetric = {
@@ -25,15 +31,15 @@ type ContainerAppMetric = {
 
 type FileServiceMetric = {
   resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
-  dimensions: {
-    name: 'FileShare' | 'Tier'
-    operator: DimensionOperator?
-    values: string[]
-  }[]?
   metric:
     | 'availability'
     | 'FileCapacity'
     | 'SuccessE2ELatency'
+    dimensions: {
+      name: 'FileShare' | 'Tier'
+      operator: DimensionOperator?
+      values: string[]
+    }[]?
 }
 
 type PostgreSqlMetric = {

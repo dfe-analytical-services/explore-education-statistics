@@ -54,6 +54,7 @@ module appGatewayModule '../../components/appGateway.bicep' = {
     alerts: deployAlerts ? {
       health: true
       responseTime: true
+      failedRequests: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues
