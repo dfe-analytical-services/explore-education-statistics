@@ -83,7 +83,7 @@ const DataFilesTable = ({
   }
 
   return (
-    <table className={styles.table}>
+    <table className={styles.table} data-testid="Data files table">
       <thead>
         <tr>
           <th scope="col">Subject title</th>

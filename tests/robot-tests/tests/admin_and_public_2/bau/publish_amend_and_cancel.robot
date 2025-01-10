@@ -212,15 +212,8 @@ Change the Release type
 
 Navigate to data replacement page
     user clicks link    Data and files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
-    user waits until page contains accordion section    Dates test subject
-    user opens accordion section    Dates test subject
-
-    ${section}=    user gets accordion section content element    Dates test subject
-    user clicks link    Replace data    ${section}
-
-    user waits until h2 is visible    Data file details
-    user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
+    user waits until page contains data uploads table
+    user clicks link    Replace data
 
 Upload replacement data
     user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
@@ -400,16 +393,11 @@ Revisit the Release after the cancellation to double check it remains unaffected
 
 Verify that the Data and Files are unchanged
     user clicks link    Data and files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
-    user waits until page contains accordion section    Dates test subject
-    user opens accordion section    Dates test subject
-    ${section}=    user gets accordion section content element    Dates test subject
-    user checks headed table body row contains    Subject title    Dates test subject
-    user checks headed table body row contains    Data file    dates.csv
-    user checks headed table body row contains    Metadata file    dates.meta.csv
-    user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
-    user checks headed table body row contains    Data file size    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
+    user waits until page contains data uploads table
+    user checks table cell contains    row=1    column=1    expected=Dates test subject
+    ...    parent=testid:Data files table
+    user checks table cell contains    row=1    column=2    expected=17 Kb    parent=testid:Data files table
+    user checks table cell contains    row=1    column=3    expected=Complete    parent=testid:Data files table
 
 Verify that the ancillary file is unchanged
     user clicks link    Data and files

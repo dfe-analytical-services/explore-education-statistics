@@ -493,12 +493,8 @@ Change the Release type
 
 Navigate to data replacement page
     user clicks link    Data and files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
-    user waits until page contains accordion section    Dates test subject
-    user opens accordion section    Dates test subject
-
-    ${section}=    user gets accordion section content element    Dates test subject
-    user clicks link    Replace data    ${section}
+    user waits until page contains data uploads table
+    user clicks link    Replace data
 
     user waits until h2 is visible    Data file details
     user checks headed table body row contains    Subject title    Dates test subject

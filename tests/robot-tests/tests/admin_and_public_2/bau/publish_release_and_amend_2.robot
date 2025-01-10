@@ -254,12 +254,8 @@ Create release amendment
 Replace subject data
     user clicks link    Data and files
     user waits until page contains element    id:dataFileUploadForm-subjectTitle
-    user waits until h2 is visible    Uploaded data files
-
-    user waits until page contains accordion section    ${SUBJECT_NAME}
-    user opens accordion section    ${SUBJECT_NAME}
-    ${section}    user gets accordion section content element    ${SUBJECT_NAME}
-    user clicks link    Replace data    ${section}
+    user waits until page contains data uploads table
+    user clicks link    Replace data
     user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}dates.csv
     user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates.meta.csv
     user clicks button    Upload data files

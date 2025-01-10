@@ -48,25 +48,27 @@ Upload subjects to release
     ...    ordering-test-2.meta.csv
 
 Validate order of subjects after upload
-    user checks there are x accordion sections    4    id:uploadedDataFiles
-    user checks accordion is in position    Four    1    id:uploadedDataFiles
-    user checks accordion is in position    Three    2    id:uploadedDataFiles
-    user checks accordion is in position    One    3    id:uploadedDataFiles
-    user checks accordion is in position    Two    4    id:uploadedDataFiles
+    user waits until page contains data uploads table
+    user checks table body has x rows    count=4    parent=testid:Data files table
+
+    user checks table cell contains    row=1    column=1    expected=Four    parent=testid:Data files table
+    user checks table cell contains    row=2    column=1    expected=Three    parent=testid:Data files table
+    user checks table cell contains    row=3    column=1    expected=One    parent=testid:Data files table
+    user checks table cell contains    row=4    column=1    expected=Two    parent=testid:Data files table
 
 Validate order of subjects after refreshing Data and files page
     user reloads page
-    user waits until page contains element    id:uploadedDataFiles
+    user waits until page contains data uploads table
+    user checks table body has x rows    count=4    parent=testid:Data files table
 
-    user checks there are x accordion sections    4    id:uploadedDataFiles
-    user checks accordion is in position    Four    1    id:uploadedDataFiles
-    user checks accordion is in position    Three    2    id:uploadedDataFiles
-    user checks accordion is in position    One    3    id:uploadedDataFiles
-    user checks accordion is in position    Two    4    id:uploadedDataFiles
+    user checks table cell contains    row=1    column=1    expected=Four    parent=testid:Data files table
+    user checks table cell contains    row=2    column=1    expected=Three    parent=testid:Data files table
+    user checks table cell contains    row=3    column=1    expected=One    parent=testid:Data files table
+    user checks table cell contains    row=4    column=1    expected=Two    parent=testid:Data files table
 
 Order subjects
-    user clicks button    Reorder
-    user waits until page contains button    Save order
+    user clicks button    Reorder data files
+    user waits until page contains button    Confirm order
 
     click element    xpath://div[text()="Four"]    CTRL
     user presses keys    ${SPACE}
@@ -82,27 +84,25 @@ Order subjects
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
 
-    user clicks button    Save order
+    user clicks button    Confirm order
     user waits until page contains button    Reorder
 
-    user checks accordion is in position    One    1    id:uploadedDataFiles
-    user checks accordion is in position    Two    2    id:uploadedDataFiles
-    user checks accordion is in position    Four    3    id:uploadedDataFiles
-    user checks accordion is in position    Three    4    id:uploadedDataFiles
+    user checks table cell contains    row=1    column=1    expected=One    parent=testid:Data files table
+    user checks table cell contains    row=2    column=1    expected=Two    parent=testid:Data files table
+    user checks table cell contains    row=3    column=1    expected=Four    parent=testid:Data files table
+    user checks table cell contains    row=4    column=1    expected=Three    parent=testid:Data files table
 
 Validate new order is preserved after refresh
     user reloads page
-    user waits until page contains element    id:uploadedDataFiles
+    user waits until page contains data uploads table
 
-    user checks accordion is in position    One    1    id:uploadedDataFiles
-    user checks accordion is in position    Two    2    id:uploadedDataFiles
-    user checks accordion is in position    Four    3    id:uploadedDataFiles
-    user checks accordion is in position    Three    4    id:uploadedDataFiles
+    user checks table cell contains    row=1    column=1    expected=One    parent=testid:Data files table
+    user checks table cell contains    row=2    column=1    expected=Two    parent=testid:Data files table
+    user checks table cell contains    row=3    column=1    expected=Four    parent=testid:Data files table
+    user checks table cell contains    row=4    column=1    expected=Three    parent=testid:Data files table
 
 Start replacing last subject in order
-    user opens accordion section    Three
-    ${THREE_CONTENT}    user gets accordion section content element    Three    id:uploadedDataFiles
-    user clicks link    Replace data    ${THREE_CONTENT}
+    user clicks link in table cell    row=4    column=4    link_text=Replace data    parent=testid:Data files table
     user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}ordering-test-3-replacement.csv
     user chooses file    id:dataFileUploadForm-metadataFile
     ...    ${FILES_DIR}ordering-test-3-replacement.meta.csv
@@ -117,28 +117,26 @@ Start replacing last subject in order
 
 Reorder subject that is being replaced
     user clicks link    Data and files
-    user waits until page contains element    id:uploadedDataFiles
+    user waits until page contains data uploads table
 
-    user clicks button    Reorder
-    user waits until page contains button    Save order
+    user clicks button    Reorder data files
+    user waits until page contains button    Confirm order
 
     click element    xpath://div[text()="Three"]    CTRL
     user presses keys    ${SPACE}
     user presses keys    ARROW_UP
     user presses keys    ${SPACE}
 
-    user clicks button    Save order
-    user waits until page contains button    Reorder
+    user clicks button    Confirm order
+    user waits until page contains button    Reorder data files
 
-    user checks accordion is in position    One    1    id:uploadedDataFiles
-    user checks accordion is in position    Two    2    id:uploadedDataFiles
-    user checks accordion is in position    Three    3    id:uploadedDataFiles
-    user checks accordion is in position    Four    4    id:uploadedDataFiles
+    user checks table cell contains    row=1    column=1    expected=One    parent=testid:Data files table
+    user checks table cell contains    row=2    column=1    expected=Two    parent=testid:Data files table
+    user checks table cell contains    row=3    column=1    expected=Three    parent=testid:Data files table
+    user checks table cell contains    row=4    column=1    expected=Four    parent=testid:Data files table
 
 Complete data replacement
-    user opens accordion section    Three
-    ${THREE_CONTENT}    user gets accordion section content element    Three    id:uploadedDataFiles
-    user clicks link    Replace data    ${THREE_CONTENT}
+    user clicks link in table cell    row=3    column=4    link_text=Replace data    parent=testid:Data files table
 
     user waits until page contains    Data blocks: OK
     user waits until page contains    Footnotes: OK
@@ -147,12 +145,12 @@ Complete data replacement
 
 Validate subject order is correct after replacement
     user clicks link    Data and files
-    user waits until page contains element    id:uploadedDataFiles
+    user waits until page contains data uploads table
 
-    user checks accordion is in position    One    1    id:uploadedDataFiles
-    user checks accordion is in position    Two    2    id:uploadedDataFiles
-    user checks accordion is in position    Three    3    id:uploadedDataFiles
-    user checks accordion is in position    Four    4    id:uploadedDataFiles
+    user checks table cell contains    row=1    column=1    expected=One    parent=testid:Data files table
+    user checks table cell contains    row=2    column=1    expected=Two    parent=testid:Data files table
+    user checks table cell contains    row=3    column=1    expected=Three    parent=testid:Data files table
+    user checks table cell contains    row=4    column=1    expected=Four    parent=testid:Data files table
 
 Add data guidance for all subjects
     user clicks link    Data guidance
@@ -188,12 +186,12 @@ Publish release
 
 Check subjects can no longer be re-ordered after release has been published
     user clicks link    Data and files
-    user waits until page contains element    id:uploadedDataFiles
+    user waits until page contains data uploads table
 
-    user checks accordion is in position    One    1    id:uploadedDataFiles
-    user checks accordion is in position    Two    2    id:uploadedDataFiles
-    user checks accordion is in position    Three    3    id:uploadedDataFiles
-    user checks accordion is in position    Four    4    id:uploadedDataFiles
+    user checks table cell contains    row=1    column=1    expected=One    parent=testid:Data files table
+    user checks table cell contains    row=2    column=1    expected=Two    parent=testid:Data files table
+    user checks table cell contains    row=3    column=1    expected=Three    parent=testid:Data files table
+    user checks table cell contains    row=4    column=1    expected=Four    parent=testid:Data files table
 
     user checks element is not visible    testid:reorder-files    %{WAIT_SMALL}
 

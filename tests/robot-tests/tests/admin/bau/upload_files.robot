@@ -35,23 +35,19 @@ Upload a ZIP file subject
     user clicks button    Upload data files
 
     user waits until h2 is visible    Uploaded data files
-    user waits until page contains accordion section    Absence in PRUs
-    user opens accordion section    Absence in PRUs
-
-    ${section}=    user gets accordion section content element    Absence in PRUs
+    user waits until page contains data uploads table
 
     # To ensure "Data file size" and "Number of rows" will be filled
     user waits until page does not contain    Queued    %{WAIT_MEDIUM}
-
-    user checks headed table body row contains    Subject title    Absence in PRUs    ${section}
-    user checks headed table body row contains    Data file    absence_in_prus.csv    ${section}
-    user checks headed table body row contains    Metadata file    absence_in_prus.meta.csv    ${section}
-    user checks headed table body row contains    Data file size    141 Kb    ${section}
-    user checks headed table body row contains    Number of rows    612    ${section}
-    user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
+    user checks table cell contains    row=1    column=1    expected=Absence in PRUs    parent=testid:Data files table
+    user checks table cell contains    row=1    column=2    expected=141 Kb    parent=testid:Data files table
+    user checks table cell contains    row=1    column=3    expected=Complete    parent=testid:Data files table
+    user checks table cell contains    row=1    column=4    expected=View details    parent=testid:Data files table
+    user checks table cell contains    row=1    column=4    expected=Edit title    parent=testid:Data files table
+    user checks table cell contains    row=1    column=4    expected=Replace data    parent=testid:Data files table
+    user checks table cell contains    row=1    column=4    expected=Delete files    parent=testid:Data files table
 
 Change subject title
-    user waits until page contains accordion section    Absence in PRUs
     user clicks link    Edit title
 
     user waits until h2 is visible    Edit data file details
@@ -62,11 +58,9 @@ Change subject title
 
 Validate subject title has been updated
     user waits until h2 is visible    Uploaded data files
-    user waits until page contains accordion section    Updated Absence in PRUs
-    user opens accordion section    Absence in PRUs
 
-    ${section}=    user gets accordion section content element    Absence in PRUs
-    user checks headed table body row contains    Subject title    Updated Absence in PRUs    ${section}
+    user checks table cell contains    row=1    column=1    expected=Updated Absence in PRUs
+    ...    parent=testid:Data files table
 
 Check subject appears in 'Data blocks' page
     user clicks link    Data blocks
