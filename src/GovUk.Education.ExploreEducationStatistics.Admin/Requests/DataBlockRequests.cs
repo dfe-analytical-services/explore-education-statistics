@@ -70,8 +70,7 @@ public record DataBlockUpdateRequest
             {
                 chart
                     .RuleFor(request => request.Title)
-                    .NotEmpty()
-                    .MaximumLength(220);
+                    .Length(1, 220);
 
                 chart.RuleFor(request => request.Alt)
                     .NotEmpty()
