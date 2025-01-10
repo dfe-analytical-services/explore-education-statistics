@@ -55,6 +55,10 @@ type SiteMetric = {
   resourceType: 'Microsoft.Web/sites'
   metric:
     | 'HealthCheckStatus'
+    | 'Http401'
+    | 'Http403'
+    | 'Http4xx'
+    | 'Http5xx'
 }
 
 type StorageAccountMetric = {
