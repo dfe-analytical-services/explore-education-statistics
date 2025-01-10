@@ -81,6 +81,7 @@ param alerts {
   storageLatency: bool
   fileServiceAvailability: bool
   fileServiceLatency: bool
+  fileServiceCapacity: bool
   alertsGroupName: string
 }?
 
@@ -138,6 +139,7 @@ var fileServiceAlerts = alerts != null
   ? {
       availability: alerts!.fileServiceAvailability
       latency: alerts!.fileServiceLatency
+      capacity: alerts!.fileServiceCapacity
       alertsGroupName: alerts!.alertsGroupName
     }
   : null

@@ -26,10 +26,33 @@
       "location": "[resourceGroup().location]",
       "properties": {
         "state": "Enabled",
+        "parameters": {
+          "subscription": {
+              "type": "string",
+              "value": "[parameters('subscription')]"
+          },
+          "resourceGroup": {
+              "type": "string",
+              "value": "[parameters('resourceGroup')]"
+          }
+        },
         "definition": {
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
           "contentVersion": "1.0.0.0",
-          "parameters": {},
+          "parameters": {
+            "$connections": {
+                 "type": "Object",
+                "defaultValue": {}
+            },
+            "subscription": {
+              "type": "string",
+              "defaultValue": ""
+            },
+            "resourceGroup": {
+              "type": "string",
+              "defaultValue": ""
+            }
+          },
           "triggers": {
             "manual": {
               "type": "Request",
@@ -74,28 +97,16 @@
                         },
                         "essentials": {
                           "properties": {
-                            "alertContextVersion": {
-                              "type": "string"
-                            },
                             "alertId": {
                               "type": "string"
                             },
                             "alertRule": {
                               "type": "string"
                             },
-                            "alertTargetIDs": {
-                              "items": {
-                                "type": "string"
-                              },
-                              "type": "array"
-                            },
-                            "description": {
+                            "severity": {
                               "type": "string"
                             },
-                            "essentialsVersion": {
-                              "type": "string"
-                            },
-                            "firedDateTime": {
+                            "signalType": {
                               "type": "string"
                             },
                             "monitorCondition": {
@@ -104,16 +115,28 @@
                             "monitoringService": {
                               "type": "string"
                             },
+                            "alertTargetIDs": {
+                              "type": "array",
+                              "items": {
+                                  "type": "string"
+                              }
+                            },
                             "originAlertId": {
+                              "type": "string"
+                            },
+                            "firedDateTime": {
                               "type": "string"
                             },
                             "resolvedDateTime": {
                               "type": "string"
                             },
-                            "severity": {
+                            "description": {
                               "type": "string"
                             },
-                            "signalType": {
+                            "essentialsVersion": {
+                              "type": "string"
+                            },
+                            "alertContextVersion": {
                               "type": "string"
                             }
                           },
@@ -145,6 +168,71 @@
                 ]
               }
             },
+            "Initialize operator variable": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "operator",
+                    "type": "string",
+                    "value": "@{variables('operator')}"
+                  }
+                ]
+              }
+            },
+            "Initialize metricName variable": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "metricName",
+                    "type": "string",
+                    "value": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricName']}"
+                  }
+                ]
+              }
+            },
+            "Initialize timeAggregation variable": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "timeAggregation",
+                    "type": "string",
+                    "value": "@{variables('timeAggregation')}"
+                  }
+                ]
+              }
+            },
+            "Initialize metricValue variable": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "metricValue",
+                    "type": "string",
+                    "value": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricValue']}"
+                  }
+                ]
+              }
+            },
+            "Initialize threshold variable": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "threshold",
+                    "type": "string",
+                    "value": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['threshold']}"
+                  }
+                ]
+              }
+            },
             "Initialize monitorCondition variable": {
               "runAfter": {},
               "type": "InitializeVariable",
@@ -159,27 +247,59 @@
               }
             },
             "Initialize outsideThresholdMessage variable": {
-              "runAfter": {},
+              "runAfter": {
+                "Initialize operator variable": [
+                  "Succeeded"
+                ],
+                "Initialize metricName variable": [
+                  "Succeeded"
+                ],
+                "Initialize timeAggregation variable": [
+                  "Succeeded"
+                ],
+                "Initialize metricValue variable": [
+                  "Succeeded"
+                ],
+                "Initialize threshold variable": [
+                  "Succeeded"
+                ]
+              },
               "type": "InitializeVariable",
               "inputs": {
                 "variables": [
                   {
                     "name": "outsideThresholdMessage",
                     "type": "string",
-                    "value": "The @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['timeAggregation']} of @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricName']} is at @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricValue']}, which is @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['operator']} the threshold of @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['threshold']}"
+                    "value": "The @{variables('timeAggregation')} of @{variables('metricName')} is at @{variables('metricValue')}, which is @{variables('operator')} the threshold of @{variables('threshold')}"
                   }
                 ]
               }
             },
             "Initialize withinThresholdMessage variable": {
-              "runAfter": {},
+              "runAfter": {
+                "Initialize operator variable": [
+                  "Succeeded"
+                ],
+                "Initialize metricName variable": [
+                  "Succeeded"
+                ],
+                "Initialize timeAggregation variable": [
+                  "Succeeded"
+                ],
+                "Initialize metricValue variable": [
+                  "Succeeded"
+                ],
+                "Initialize threshold variable": [
+                  "Succeeded"
+                ]
+              },
               "type": "InitializeVariable",
               "inputs": {
                 "variables": [
                   {
                     "name": "withinThresholdMessage",
                     "type": "string",
-                    "value": "The @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['timeAggregation']} of @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricName']} is at @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricValue']}, and is no longer @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['operator']} the threshold of @{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['threshold']}"
+                    "value": "The @{variables('timeAggregation')} of @{variables('metricName')} is at @{coalesce(variables('metricValue'), 'an acceptable value'}, and is no longer @{variables('operator')} the @{coalesce(variables('threshold'), 'dynamic')} threshold"
                   }
                 ]
               }
@@ -287,8 +407,7 @@
             }
           },
           "outputs": {}
-        },
-        "parameters": {}
+        }
       }
     }
   ]

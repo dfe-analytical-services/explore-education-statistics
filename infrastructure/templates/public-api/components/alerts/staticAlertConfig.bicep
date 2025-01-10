@@ -63,6 +63,14 @@ var staticMaxGreaterThanZero = {
 }
 
 @export()
+var staticMinGreaterThanZero = {
+  ...defaultStaticAlertConfig
+  aggregation: 'Minimum'
+  operator: 'GreaterThan'
+  threshold: '0'
+}
+
+@export()
 var staticTotalGreaterThanZero = {
   ...defaultStaticAlertConfig
   aggregation: 'Total'

@@ -37,6 +37,11 @@ var severityLevel = severityMapping[config.severity]
 
 var resourceIds = [id != null ? id! : resourceId(resourceMetric.resourceType, resourceName)]
 
+var resourceMetricWithDimensions = {
+  dimensions: []
+  ...resourceMetric
+}
+
 resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
   name: alertsGroupName
 }
@@ -47,6 +52,7 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
   properties: {
     enabled: true
     scopes: resourceIds
+    targetResourceType: resourceMetric.resourceType
     severity: severityLevel
     evaluationFrequency: config.evaluationFrequency
     windowSize: config.windowSize
@@ -62,12 +68,18 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
           timeAggregation: config.aggregation
           operator: config.operator
           alertSensitivity: config.sensitivity
-          skipMetricValidation: false
           failingPeriods: {
             numberOfEvaluationPeriods: config.evaluationPeriods
             minFailingPeriodsToAlert: config.minFailingEvaluationPeriods
           }
           ignoreDataBefore: ignoreDataBefore
+
+          dimensions: length(resourceMetricWithDimensions.dimensions) > 0 ? map(resourceMetric.dimensions, dimension => {
+            operator: 'Include'
+            ...dimension
+          }) : null
+
+          skipMetricValidation: false
         }
       ]
     }
