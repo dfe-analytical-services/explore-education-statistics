@@ -28,6 +28,9 @@ type ContainerAppMetric = {
   metric:
     | 'CpuPercentage' 
     | 'MemoryPercentage'
+    | 'ResiliencyConnectTimeouts'
+    | 'ResiliencyRequestRetries'
+    | 'ResiliencyRequestTimeouts'
     | 'ResponseTime'
     | 'RestartCount'
 }

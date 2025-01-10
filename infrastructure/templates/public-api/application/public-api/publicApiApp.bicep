@@ -166,6 +166,9 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       responseTime: true
       cpuPercentage: true
       memoryPercentage: true
+      connectionTimeouts: true
+      requestRetries: true
+      requestTimeouts: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues
