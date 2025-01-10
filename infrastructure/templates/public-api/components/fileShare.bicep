@@ -1,5 +1,5 @@
 import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
-import { staticAverageLessThanHundred, staticMaxGreaterThanZero, staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
+import { staticAverageLessThanHundred, staticMaxGreaterThanZero, staticAverageGreaterThanZero, capacity } from 'alerts/staticAlertConfig.bicep'
 import { AllValuesForDimension } from 'alerts/types.bicep'
 import { percentage, gbsToBytes } from '../functions.bicep'
 
@@ -81,34 +81,24 @@ module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && al
   }
 }
 
-module fileCapacity85Alert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.capacity) {
-  name: '${storageAccountName}FsCapacity85Deploy'
-  params: {
-    resourceName: alertResourceName
-    id: fileServiceId
-    resourceMetric: {
-      resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
-      metric: 'FileCapacity'
-      dimensions: [{
-        name: 'FileShare'
-        values: AllValuesForDimension
-      }]
-    }
-    config: {
-      ...staticAverageGreaterThanZero
-      nameSuffix: 'file-service-85-capacity'
-      threshold: string(percentage(gbsToBytes(fileShareQuotaGbs), 85))
-      windowSize: 'PT1H'
-      severity: 'Informational'
-    }
-    fullDescription: 'File service is at 85% of its reserved capacity.  Consider raising its quota soon.'
-    alertsGroupName: alerts!.alertsGroupName
-    tagValues: tagValues
-  }
+var capacityAlertThresholds = [{
+  threshold: 85
+  severity: 'Informational'
+  description: 'File service is at 85% of its reserved capacity.  Consider raising its quota soon.'
 }
+{
+  threshold: 90
+  severity: 'Warning'
+  description: 'File service is at 90% of its reserved capacity.  Raise its quota as a priority.'
+}
+{
+  threshold: 95
+  severity: 'Critical'
+  description: 'File service is at 95% of its reserved capacity.  Raise its quote as soon as possible.'
+}]
 
-module fileCapacity95Alert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.capacity) {
-  name: '${storageAccountName}FsCapacityDeploy'
+module fileCapacityAlerts 'alerts/staticMetricAlert.bicep' = [for capacityThreshold in capacityAlertThresholds: if (alerts != null && alerts!.capacity) {
+  name: '${storageAccountName}FsCapacity${capacityThreshold.threshold}Deploy'
   params: {
     resourceName: alertResourceName
     id: fileServiceId
@@ -122,15 +112,15 @@ module fileCapacity95Alert 'alerts/staticMetricAlert.bicep' = if (alerts != null
     }
     config: {
       ...staticAverageGreaterThanZero
-      nameSuffix: 'file-service-95-capacity'
-      threshold: string(percentage(gbsToBytes(fileShareQuotaGbs), 95))
+      nameSuffix: 'file-service-${capacityThreshold.threshold}-capacity'
+      threshold: string(percentage(gbsToBytes(fileShareQuotaGbs), capacityThreshold.threshold))
       windowSize: 'PT1H'
-      severity: 'Warning'
+      severity: capacityThreshold.severity
     }
-    fullDescription: 'File service is at 95% of its reserved capacity.  Raise its quota immediately.'
+    fullDescription: capacityThreshold.description
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
-}
+}]
 
 output fileShareName string = fileShare.name
