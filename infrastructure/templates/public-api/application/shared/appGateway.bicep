@@ -55,6 +55,7 @@ module appGatewayModule '../../components/appGateway.bicep' = {
       health: true
       responseTime: true
       failedRequests: true
+      responseStatuses: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues

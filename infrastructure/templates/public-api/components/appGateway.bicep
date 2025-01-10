@@ -47,6 +47,7 @@ param alerts {
   health: bool
   responseTime: bool
   failedRequests: bool
+  responseStatuses: bool
   alertsGroupName: string
 }?
 
@@ -334,6 +335,28 @@ module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
     config: {
       ...dynamicTotalGreaterThan
       nameSuffix: 'failed-requests'
+      windowSize: 'PT30M'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module responseStatusAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
+  name: '${appGatewayName}ResponseStatusDeploy'
+  params: {
+    resourceName: appGatewayName
+    resourceMetric: {
+      resourceType: 'Microsoft.Network/applicationGateways'
+      metric: 'ResponseStatus'
+      dimensions: [{
+        name: 'HttpStatusGroup'
+        values: ['4xx', '5xx']
+      }]
+    }
+    config: {
+      ...dynamicTotalGreaterThan
+      nameSuffix: 'http-4xx-5xx'
       windowSize: 'PT30M'
     }
     alertsGroupName: alerts!.alertsGroupName

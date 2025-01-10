@@ -6,8 +6,11 @@ type AppGatewayMetric = {
     | 'ApplicationGatewayTotalTime'
     | 'FailedRequests'
     | 'UnhealthyHostCount'
+    | 'ResponseStatus'
   dimensions: {
-    name: 'BackendSettingsPool'
+    name: 
+      | 'BackendSettingsPool'
+      | 'HttpStatusGroup'
     operator: DimensionOperator?
     values: string[]
   }[]?
@@ -36,7 +39,9 @@ type FileServiceMetric = {
     | 'FileCapacity'
     | 'SuccessE2ELatency'
     dimensions: {
-      name: 'FileShare' | 'Tier'
+      name: 
+        | 'FileShare'
+        | 'Tier'
       operator: DimensionOperator?
       values: string[]
     }[]?
