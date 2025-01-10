@@ -159,11 +159,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             // performant as running individual queries, and revert this if required.
             return queryable
                 .AsSplitQuery()
-                .Include(rv => rv.Publication)
+                .Include(rv => rv.Release)
+                .ThenInclude(release => release.Publication)
                 .ThenInclude(publication => publication.Contact)
-                .Include(rv => rv.Publication)
-                .ThenInclude(publication => publication.ReleaseVersions)
-                .Include(rv => rv.Publication)
+                .Include(rv => rv.Release)
+                .ThenInclude(release => release.Publication)
                 .ThenInclude(publication => publication.Theme)
                 .Include(rv => rv.Content)
                 .ThenInclude(section => section.Content)
