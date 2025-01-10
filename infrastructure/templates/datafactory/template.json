@@ -41,7 +41,8 @@
       "defaultValue": "master",
       "allowedValues": [
         "master",
-        "dev"
+        "dev",
+        "test"
       ]
     },
     "actionGroupAlerts": {

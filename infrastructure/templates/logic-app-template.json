@@ -28,11 +28,11 @@
         "state": "Enabled",
         "parameters": {
           "subscription": {
-              "type": "string",
+              "type": "String",
               "value": "[parameters('subscription')]"
           },
           "resourceGroup": {
-              "type": "string",
+              "type": "String",
               "value": "[parameters('resourceGroup')]"
           }
         },
@@ -176,7 +176,7 @@
                   {
                     "name": "operator",
                     "type": "string",
-                    "value": "@{variables('operator')}"
+                    "value": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['operator']}"
                   }
                 ]
               }
@@ -202,7 +202,7 @@
                   {
                     "name": "timeAggregation",
                     "type": "string",
-                    "value": "@{variables('timeAggregation')}"
+                    "value": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['timeAggregation']}"
                   }
                 ]
               }
@@ -299,7 +299,7 @@
                   {
                     "name": "withinThresholdMessage",
                     "type": "string",
-                    "value": "The @{variables('timeAggregation')} of @{variables('metricName')} is at @{coalesce(variables('metricValue'), 'an acceptable value'}, and is no longer @{variables('operator')} the @{coalesce(variables('threshold'), 'dynamic')} threshold"
+                    "value": "The @{variables('timeAggregation')} of @{variables('metricName')} is at @{if(empty(variables('metricValue')), 'an acceptable value', variables('metricValue'))}, and is no longer @{variables('operator')} the @{if(empty(variables('threshold')), 'dynamic', variables('threshold')) } threshold"
                   }
                 ]
               }
@@ -363,7 +363,7 @@
                   "uri": "https://slack.com/api/chat.postMessage",
                   "body": {
                     "channel": "[parameters('slackAlertsChannel')]",
-                    "text": "*Alert @{variables('monitorCondition')}!*\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{triggerBody()?['data']?['essentials']?['description']}\n\n@{if(equals(variables('monitorCondition'), 'Resolved'), variables('withinThresholdMessage'), variables('outsideThresholdMessage'))}\n<https://portal.azure.com/#@platform.education.gov.uk/resource/subscriptions/[parameters('subscription')]/resourceGroups/[parameters('resourceGroup')]/providers/Microsoft.Insights/metricalerts/@{triggerBody()?['data']?['essentials']?['alertRule']}/ViewAlertRuleHistory|Link to alert>\n<https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]}|Link to resource>",
+                    "text": "*Alert @{variables('monitorCondition')}!*\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{if(equals(variables('monitorCondition'), 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(variables('monitorCondition'), 'Resolved'), variables('withinThresholdMessage'), variables('outsideThresholdMessage'))}\n<https://portal.azure.com/#@platform.education.gov.uk/resource/subscriptions/@parameters('subscription')/resourceGroups/@parameters('resourceGroup')/providers/Microsoft.Insights/metricalerts/@{triggerBody()?['data']?['essentials']?['alertRule']}/ViewAlertRuleHistory|Link to alert>\n<https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]}|Link to resource>",
                     "attachments": [
                       {
                         "color": "@{if(equals(variables('monitorCondition'), 'Resolved'), 'good', variables('severityColour'))}",
