@@ -21,3 +21,16 @@ var severityMapping = {
   Informational: 3
   Verbose: 4
 }
+
+@export()
+type DimensionOperator = 'Include' | 'Exclude'
+
+@export()
+type Dimension = {
+  name: string
+  operator: DimensionOperator
+  values: string[]
+}[]
+
+@export()
+var AllValuesForDimension = ['<All>']

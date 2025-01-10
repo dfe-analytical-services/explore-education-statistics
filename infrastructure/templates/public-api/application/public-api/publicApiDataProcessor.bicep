@@ -117,9 +117,10 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       cpuPercentage: true
       memoryPercentage: true
       storageAccountAvailability: true
-      storageLatency: true
+      storageLatency: false
       fileServiceAvailability: true
-      fileServiceLatency: true
+      fileServiceLatency: false
+      fileServiceCapacity: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues

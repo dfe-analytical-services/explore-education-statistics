@@ -8,7 +8,7 @@ param subscription string = ''
 param location string = resourceGroup().location
 
 @description('Public API Storage : Size of the file share in GB.')
-param publicApiDataFileShareQuota int = 1
+param publicApiDataFileShareQuotaGbs int = 1
 
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
@@ -231,7 +231,7 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
   params: {
     location: location
     resourceNames: resourceNames
-    publicApiDataFileShareQuota: publicApiDataFileShareQuota
+    publicApiDataFileShareQuotaGbs: publicApiDataFileShareQuotaGbs
     storageFirewallRules: maintenanceIpRanges
     deployAlerts: deployAlerts
     tagValues: tagValues

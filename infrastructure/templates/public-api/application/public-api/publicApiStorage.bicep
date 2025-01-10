@@ -7,7 +7,7 @@ param resourceNames ResourceNames
 param location string
 
 @description('Public API Storage : Size of the file share in GB.')
-param publicApiDataFileShareQuota int
+param publicApiDataFileShareQuotaGbs int
 
 @description('Public API Storage : Firewall rules.')
 param storageFirewallRules IpRange[]
@@ -65,12 +65,13 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
     fileShareName: resourceNames.publicApi.publicApiFileShare
-    fileShareQuota: publicApiDataFileShareQuota
+    fileShareQuotaGbs: publicApiDataFileShareQuotaGbs
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: 'TransactionOptimized'
     alerts: deployAlerts ? {
       availability: true
       latency: true
+      capacity: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues

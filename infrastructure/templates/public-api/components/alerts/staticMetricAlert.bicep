@@ -17,7 +17,8 @@ param resourceMetric ResourceMetric
 @description('Configuration for this alert.')
 param config StaticAlertConfig
 
-
+@description('Optional description of alert.')
+param fullDescription string?
 
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
@@ -29,6 +30,11 @@ var severityLevel = severityMapping[config.severity]
 
 var resourceIds = [id != null ? id! : resourceId(resourceMetric.resourceType, resourceName)]
 
+var resourceMetricWithDimensions = {
+  dimensions: []
+  ...resourceMetric
+}
+
 resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
   name: alertsGroupName
 }
@@ -39,10 +45,11 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
   properties: {
     enabled: true
     scopes: resourceIds
+    targetResourceType: resourceMetric.resourceType
     severity: severityLevel
     evaluationFrequency: config.evaluationFrequency
     windowSize: config.windowSize
-    description: description
+    description: fullDescription
     criteria: {
       'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria' 
       allOf: [{
@@ -58,6 +65,11 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
         // expects only ints.  
         #disable-next-line BCP036
         threshold: config.threshold
+
+        dimensions: length(resourceMetricWithDimensions.dimensions) > 0 ? map(resourceMetric.dimensions, dimension => {
+          operator: 'Include'
+            ...dimension
+        }) : null
 
         skipMetricValidation: false
       }]
