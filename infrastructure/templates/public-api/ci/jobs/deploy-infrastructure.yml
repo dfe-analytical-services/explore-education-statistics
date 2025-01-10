@@ -40,6 +40,7 @@ jobs:
                 deployContainerApp: false
                 deployDataProcessor: false
                 deployDocsSite: false
+                deployRecoveryVault: false
                 deployAlerts: false
                 dataProcessorExists: false
 
@@ -70,6 +71,7 @@ jobs:
                 deployContainerApp: $(deployContainerApp)
                 deployDataProcessor: $(deployDataProcessor)
                 deployDocsSite: $(deployDocsSite)
+                deployRecoveryVault: $(deployRecoveryVault)
                 deployAlerts: $(deployAlerts)
                 dataProcessorExists: $(dataProcessorExists)
 

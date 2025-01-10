@@ -1,3 +1,5 @@
+import { cpuPercentageConfig, memoryPercentageConfig, responseTimeConfig } from 'alerts/config.bicep'
+
 import { EntraIdAuthentication } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
@@ -102,6 +104,15 @@ param volumeMounts {
 @description('An existing App Registration registered with Entra ID that will be used to control access to this Container App')
 param entraIdAuthentication EntraIdAuthentication?
 
+@description('Whether to create or update Azure Monitor alerts during this deploy')
+param alerts {
+  restarts: bool
+  responseTime: bool
+  cpuPercentage: bool
+  memoryPercentage: bool
+  alertsGroupName: string
+}?
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
@@ -200,6 +211,57 @@ module privateDns 'containerAppPrivateDns.bicep' = if (deployPrivateDns) {
     domain: substring(containerAppFqdn, indexOf(containerAppFqdn, '.') + 1)
     ipAddress: environmentIpAddress
     vnetName: vnetName
+    tagValues: tagValues
+  }
+}
+
+module containerAppRestartsAlert 'alerts/containerApps/restartsAlert.bicep' = if (alerts != null && alerts!.restarts) {
+  name: '${containerAppName}RestartsDeploy'
+  params: {
+    resourceName: containerAppName
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
+  name: '${containerAppName}ResponseTimeDeploy'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'ResponseTime'
+    }
+    config: responseTimeConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+  name: '${containerAppName}CpuPercentageDeploy'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'CpuPercentage'
+    }
+    config: cpuPercentageConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+  name: '${containerAppName}MemoryPercentageDeploy'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'MemoryPercentage'
+    }
+    config: memoryPercentageConfig
+    alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }

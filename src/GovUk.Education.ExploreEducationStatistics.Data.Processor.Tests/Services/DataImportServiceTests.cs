@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -13,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -290,15 +292,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var updatedFile = contentDbContext.Files.Single(f => f.SubjectId == subject.Id);
+                var updatedFile = contentDbContext.Files
+                    .Include(f => f.DataSetFileVersionGeographicLevels)
+                    .Single(f => f.SubjectId == subject.Id);
+
+                var geogLvls = updatedFile.DataSetFileVersionGeographicLevels
+                    .Select(gl => gl.GeographicLevel)
+                    .ToList();
+                Assert.Equal(3, geogLvls.Count);
+                Assert.Contains(GeographicLevel.Country, geogLvls);
+                Assert.Contains(GeographicLevel.LocalAuthority, geogLvls);
+                Assert.Contains(GeographicLevel.Region, geogLvls);
 
                 Assert.NotNull(updatedFile.DataSetFileMeta);
-
                 var meta = updatedFile.DataSetFileMeta;
-                Assert.Equal(3, meta.GeographicLevels.Count);
-                Assert.Contains(GeographicLevel.Country, meta.GeographicLevels);
-                Assert.Contains(GeographicLevel.LocalAuthority, meta.GeographicLevels);
-                Assert.Contains(GeographicLevel.Region, meta.GeographicLevels);
 
                 Assert.Equal("2000", meta.TimePeriodRange.Start.Period);
                 Assert.Equal(TimeIdentifier.April, meta.TimePeriodRange.Start.TimeIdentifier);

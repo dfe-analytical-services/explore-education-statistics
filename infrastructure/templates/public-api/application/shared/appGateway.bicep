@@ -51,15 +51,11 @@ module appGatewayModule '../../components/appGateway.bicep' = {
     backends: backends
     routes: routes
     rewrites: rewrites
-    tagValues: tagValues
-  }
-}
-
-module backendPoolsHealthAlert '../../components/alerts/appGateways/backendPoolHealth.bicep' = if (deployAlerts) {
-  name: '${resourceNames.sharedResources.appGateway}BackendPoolsHealthDeploy'
-  params: {
-    resourceNames: [resourceNames.sharedResources.appGateway]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    alerts: deployAlerts ? {
+      health: true
+      responseTime: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }

@@ -13,6 +13,7 @@ jest.setTimeout(10000);
 if (typeof window !== 'undefined') {
   // fetch polyfill for making API calls.
   require('cross-fetch');
+  require('intersection-observer');
 }
 
 global.Request = jest.requireActual('node-fetch').Request;

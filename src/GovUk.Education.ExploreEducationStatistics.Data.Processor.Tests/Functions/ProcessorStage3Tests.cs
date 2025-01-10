@@ -287,14 +287,17 @@ public class ProcessorStage3Tests
             Assert.Equal("32", lastObservation.Measures[_subject.IndicatorGroups[0].Indicators[1].Id]);
 
             var file = contentDbContext.Files
+                .Include(f => f.DataSetFileVersionGeographicLevels)
                 .Single(f => f.Type == FileType.Data
                              && f.SubjectId == import.File.SubjectId);
 
-            Assert.NotNull(file.DataSetFileMeta);
-
-            // Checking against contents of small-csv.csv in Resources directory / _subject
-            var geographicLevel = Assert.Single(file.DataSetFileMeta.GeographicLevels);
+            Assert.NotNull(file.DataSetFileVersionGeographicLevels);
+            var geographicLevel = Assert.Single(file.DataSetFileVersionGeographicLevels
+                .Select(gl => gl.GeographicLevel)
+                .ToList());
             Assert.Equal(GeographicLevel.LocalAuthority, geographicLevel);
+
+            Assert.NotNull(file.DataSetFileMeta);
 
             Assert.Equal(TimeIdentifier.CalendarYear,
                 file.DataSetFileMeta.TimePeriodRange.Start.TimeIdentifier);

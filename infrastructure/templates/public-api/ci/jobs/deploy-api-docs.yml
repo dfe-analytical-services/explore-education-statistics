@@ -13,20 +13,46 @@ jobs:
     condition: and(succeeded(), eq(variables.deployDocsSite, true))
     dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
+    variables:
+      docsPath: $(Pipeline.Workspace)/MainBuild/public-api-docs
+      nodeVersion: '20.16.0'
+      rubyVersion: '3.2'
     strategy:
       runOnce:
         deploy:
           steps:
-            # Workaround for deprecation warning preventing deployment token for
-            # API docs from being fetched: https://github.com/Azure/azure-cli/issues/30048
-            - task: Bash@3
-              name: InstallAzureCLI
-              displayName: Install Azure CLI 2.64.0 as workaround
+            - download: MainBuild
+              displayName: Download Public API docs artifact
+              artifact: public-api-docs
+
+            - task: UseNode@1
+              displayName: Install Node.js $(nodeVersion)
               inputs:
+                version: $(nodeVersion)
+
+            - task: UseRubyVersion@0
+              displayName: Install Ruby $(rubyVersion)
+              inputs:
+                versionSpec: '>= $(rubyVersion)'
+
+            - task: Bash@3
+              displayName: Create middleman binary
+              inputs:
+                workingDirectory: $(docsPath)
+                targetType: inline
+                script: bundle binstubs middleman-cli
+
+            - task: Bash@3
+              displayName: Build API docs
+              env:
+                TECH_DOCS_API_URL: $(apiAppUrl)
+                TECH_DOCS_ALLOW_INDEXING: $(docsPreventIndexing)
+              inputs:
+                workingDirectory: $(docsPath)
                 targetType: inline
                 script: |
-                  set -e
-                  pip install --force-reinstall azure-cli==2.64.0
+                  chmod -R 755 vendor
+                  ./bin/middleman build
 
             - task: AzureCLI@2
               displayName: Get deployment token
@@ -39,17 +65,14 @@ jobs:
                   deploymentToken=`az staticwebapp secrets list -n $(docsAppName) --query "properties.apiKey" -o tsv`
                   echo "##vso[task.setvariable variable=docsDeploymentToken;]$deploymentToken"
 
-            - download: MainBuild
-              displayName: Download Public API docs artifact
-              artifact: public-api-docs
-
             - task: AzureStaticWebApp@0
               displayName: Deploy API docs
               inputs:
-                app_location: /
+                app_location: build
                 output_location: '' # Leave this empty
                 skip_app_build: true
                 skip_api_build: true
                 azure_static_web_apps_api_token: $(docsDeploymentToken)
-                cwd: $(Pipeline.Workspace)/MainBuild/public-api-docs
+                config_file_location: .
+                cwd: $(docsPath)
 

@@ -1,4 +1,25 @@
 @export()
+type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+
+@export()
+type WeekOfMonth = 'First' | 'Second' | 'Third' | 'Fourth' | 'Last'
+
+@export()
+type MonthOfYear =
+  | 'January'
+  | 'February'
+  | 'March'
+  | 'April'
+  | 'May'
+  | 'June'
+  | 'July'
+  | 'August'
+  | 'September'
+  | 'October'
+  | 'November'
+  | 'December'
+
+@export()
 type ResourceNames = {
   existingResources: {
     adminApp: string
@@ -25,6 +46,8 @@ type ResourceNames = {
     containerAppEnvironment: string
     logAnalyticsWorkspace: string
     postgreSqlFlexibleServer: string
+    recoveryVault: string
+    recoveryVaultFileShareBackupPolicy: string
   }
   publicApi: {
     apiApp: string
@@ -236,7 +259,7 @@ type ContainerAppResourceConfig = {
 @export()
 type ContainerAppWorkloadProfile = {
   name: string
-  workloadProfileType: 'D4' | 'D8' | 'D16' | 'D32' | 'E4' | 'E8' | 'E16' | 'E32' 
+  workloadProfileType: 'D4' | 'D8' | 'D16' | 'D32' | 'E4' | 'E8' | 'E16' | 'E32'
   minimumCount: int
   maximumCount: int
 }

@@ -39,11 +39,17 @@ param postgreSqlAutoGrowStatus string = 'Disabled'
 @description('Database : Entra ID admin  principal names for this resource')
 param postgreSqlEntraIdAdminPrincipals PrincipalNameAndId[] = []
 
+@description('Database : Is geo-redundant backup enabled?')
+param postgreSqlGeoRedundantBackupEnabled bool
+
 @description('ACR : Specifies the resource group in which the shared Container Registry lives.')
 param acrResourceGroupName string = ''
 
 @description('Public API docs app : SKU to use.')
 param docsAppSku StaticWebAppSku = 'Free'
+
+@description('Recovery Services Vault : specify if manual deletion of backups is allowed or not.')
+param recoveryVaultImmutable bool = false
 
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
@@ -67,9 +73,7 @@ param dockerImagesTag string = ''
 @description('Do the shared Private DNS Zones need creating or updating?')
 param deploySharedPrivateDnsZones bool = false
 
-// TODO EES-5128 - Note that this has been added temporarily to avoid 10+ minute deploys where it appears that PSQL
-// will redeploy even if no changes exist in this deploy from the previous one.
-@description('Does the PostgreSQL Flexible Server require any updates? False by default to avoid unnecessarily lengthy deploys.')
+@description('Does the PostgreSQL Flexible Server need creating or updating?')
 param deployPsqlFlexibleServer bool = false
 
 @description('Does the Public API Container App need creating or updating? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.')
@@ -81,7 +85,11 @@ param deployDataProcessor bool = true
 @description('Does the Public API static docs site need creating or updating?')
 param deployDocsSite bool = true
 
+@description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
+
+@description('Does the Recovery Services Vault need creating or updating?')
+param deployRecoveryVault bool = false
 
 @description('Public URLs of other components in the service.')
 param publicUrls {
@@ -103,11 +111,11 @@ param apiAppRegistrationClientId string = ''
 @secure()
 param devopsServicePrincipalId string = ''
 
-// TODO EES-5446 - reinstate pipelineRunnerCidr when the DevOps runners have a static IP range available. 
+// TODO EES-5446 - reinstate pipelineRunnerCidr when the DevOps runners have a static IP range available.
 // @description('Specifies the IP address range of the pipeline runners.')
 // param pipelineRunnerCidr string = ''
 
-@description('Specifies whether or not test Themes can be deleted in the environment.')
+@description('Enable deletion of data relating to a theme that is being deleted.')
 param enableThemeDeletion bool = false
 
 @description('Specifies the workload profiles for this Container App Environment - the default Consumption plan is always included')
@@ -122,6 +130,9 @@ param publicApiContainerAppConfig ContainerAppResourceConfig = {
   scaleAtConcurrentHttpRequests: 10
   workloadProfileName: 'Consumption'
 }
+
+@description('Enable the Swagger UI for public API.')
+param enableSwagger bool = false
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -168,6 +179,8 @@ var resourceNames = {
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
     logAnalyticsWorkspace: '${commonResourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
     postgreSqlFlexibleServer: '${commonResourcePrefix}-${abbreviations.dBforPostgreSQLServers}'
+    recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVault}'
+    recoveryVaultFileShareBackupPolicy: 'DailyPolicy'
   }
   publicApi: {
     apiApp: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
@@ -178,7 +191,7 @@ var resourceNames = {
     dataProcessorPlan: '${publicApiResourcePrefix}-${abbreviations.webServerFarms}-${abbreviations.webSitesFunctions}-processor'
     dataProcessorStorageAccountsPrefix: '${subscription}eessaprocessor'
     docsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
-    publicApiFileShare: '${publicApiResourcePrefix}-fs-data'
+    publicApiFileShare: '${publicApiResourcePrefix}-${abbreviations.fileShare}-data'
     publicApiStorageAccount: '${replace(publicApiResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}'
   }
 }
@@ -204,7 +217,7 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
-module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = 
+module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' =
   if (deploySharedPrivateDnsZones) {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
@@ -257,10 +270,35 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     sku: postgreSqlSkuName
     storageSizeGB: postgreSqlStorageSizeGB
     deployAlerts: deployAlerts
+    geoRedundantBackupEnabled: postgreSqlGeoRedundantBackupEnabled
     tagValues: tagValues
   }
   dependsOn: [
     privateDnsZonesModule
+  ]
+}
+
+module recoveryVaultModule 'application/shared/recoveryVault.bicep' = if (deployRecoveryVault) {
+  name: 'recoveryVaultApplicationModuleDeploy'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    immutable: recoveryVaultImmutable
+    tagValues: tagValues
+  }
+}
+
+module publicApiStorageBackupModule 'components/recoveryVaultFileShareRegistration.bicep' = if (deployRecoveryVault) {
+  name: 'publicApiStorageBackupModuleDeploy'
+  params: {
+    vaultName: resourceNames.sharedResources.recoveryVault
+    backupPolicyName: resourceNames.sharedResources.recoveryVaultFileShareBackupPolicy
+    storageAccountName: resourceNames.publicApi.publicApiStorageAccount
+    fileShareName: resourceNames.publicApi.publicApiFileShare
+    tagValues: tagValues
+  }
+  dependsOn: [
+    publicApiStorageModule
   ]
 }
 
@@ -304,6 +342,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
     deployAlerts: deployAlerts
     resourceAndScalingConfig: publicApiContainerAppConfig
+    enableSwagger: enableSwagger
     tagValues: tagValues
   }
   dependsOn: [
@@ -362,17 +401,6 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
             backendName: resourceNames.publicApi.docsApp
             rewriteSetName: docsRewriteSetName
           }
-          {
-            // Redirect non-rooted URL (has no trailing slash) to the
-            // rooted URL so that relative links in the docs site
-            // can resolve correctly.
-            name: 'docs-root-redirect'
-            paths: ['/docs']
-            type: 'redirect'
-            redirectUrl: '${publicUrls.publicApi}/docs/'
-            redirectType: 'Permanent'
-            includePath: false
-          }
         ]
       }
     ]
@@ -419,7 +447,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
         tag: 'Default'
         priority: 100
       }
-      // TODO EES-5446 - remove service tag whitelisting when runner scale set IP range reinstated 
+      // TODO EES-5446 - remove service tag whitelisting when runner scale set IP range reinstated
       {
         cidr: 'AzureCloud'
         tag: 'ServiceTag'
@@ -445,7 +473,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
 output dataProcessorPsqlConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
 
-output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor 
+output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor
   ? dataProcessorModule.outputs.managedIdentityClientId
   : ''
 

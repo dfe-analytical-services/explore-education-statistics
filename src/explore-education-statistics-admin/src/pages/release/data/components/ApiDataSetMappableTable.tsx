@@ -1,3 +1,4 @@
+import { mappableTableId } from '@admin/pages/release/data/utils/mappingTableIds';
 import {
   FilterOptionSource,
   LocationCandidate,
@@ -19,7 +20,6 @@ import ButtonText from '@common/components/ButtonText';
 import TagGroup from '@common/components/TagGroup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import kebabCase from 'lodash/kebabCase';
 import React, { ReactNode } from 'react';
 import classNames from 'classnames';
 
@@ -70,11 +70,13 @@ export default function ApiDataSetMappableTable({
   ).length;
   const totalManuallyMapped = mappableItems.length - totalUnmapped;
 
+  const tableId = mappableTableId(groupKey);
+
   return (
     <table
       className="dfe-table--vertical-align-middle dfe-table--row-highlights"
-      id={`mappable-table-${kebabCase(groupKey)}`}
-      data-testid={`mappable-table-${groupKey}`}
+      id={tableId}
+      data-testid={tableId}
     >
       <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
         {groupLabel}{' '}

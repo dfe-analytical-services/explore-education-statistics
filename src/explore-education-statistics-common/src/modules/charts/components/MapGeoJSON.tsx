@@ -157,7 +157,9 @@ export default function MapGeoJSON({
 
   return (
     <>
-      {ukGeometry && (
+      {ukGeometry && Leaflet.Browser.svg && (
+        // Don't render the UK's GeoJSON if the browser doesn't support SVGs.
+        // This is needed in Jest tests or an error is thrown.
         <GeoJSON
           data={ukGeometry}
           interactive={false}

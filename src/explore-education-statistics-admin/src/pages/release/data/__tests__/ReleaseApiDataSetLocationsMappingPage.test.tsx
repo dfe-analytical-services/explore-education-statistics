@@ -153,7 +153,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     ).toBeInTheDocument();
 
     const autoMappedAccordion = within(
-      screen.getByTestId('auto-mapped-accordion'),
+      screen.getByTestId('auto-mapped-locations-accordion'),
     );
 
     // auto mapped LA
@@ -297,10 +297,10 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       within(mappableSubItems[0]).getByRole('link', {
         name: 'Local Authorities',
       }),
-    ).toHaveAttribute('href', '#mappable-localAuthority');
+    ).toHaveAttribute('href', '#mappable-table-localAuthority');
     expect(
       within(mappableSubItems[1]).getByRole('link', { name: 'Regions' }),
-    ).toHaveAttribute('href', '#mappable-region');
+    ).toHaveAttribute('href', '#mappable-table-region');
 
     expect(
       within(navItems[3]).getByRole('link', { name: 'New locations' }),
@@ -328,15 +328,15 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       within(autoMappedSubItems[0]).getByRole('link', {
         name: 'English Devolved Areas',
       }),
-    ).toHaveAttribute('href', '#auto-mapped-englishDevolvedArea');
+    ).toHaveAttribute('href', '#auto-mapped-locations-englishDevolvedArea');
     expect(
       within(autoMappedSubItems[1]).getByRole('link', {
         name: 'Local Authorities',
       }),
-    ).toHaveAttribute('href', '#auto-mapped-localAuthority');
+    ).toHaveAttribute('href', '#auto-mapped-locations-localAuthority');
     expect(
       within(autoMappedSubItems[2]).getByRole('link', { name: 'Regions' }),
-    ).toHaveAttribute('href', '#auto-mapped-region');
+    ).toHaveAttribute('href', '#auto-mapped-locations-region');
   });
 
   test('renders the notification banner if there are mappable locations', async () => {
@@ -450,10 +450,12 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     expect(screen.getByText('No locations.')).toBeInTheDocument();
 
     expect(
-      screen.queryByTestId('mappable-localAuthority'),
+      screen.queryByTestId('mappable-locations-localAuthority'),
     ).not.toBeInTheDocument();
 
-    expect(screen.queryByTestId('mappable-region')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('mappable-locations-region'),
+    ).not.toBeInTheDocument();
   });
 
   test('renders a message if there are no new locations', async () => {
@@ -961,7 +963,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         }),
       ).toBeInTheDocument();
       const autoMappedAccordion = within(
-        screen.getByTestId('auto-mapped-accordion'),
+        screen.getByTestId('auto-mapped-locations-accordion'),
       );
       expect(
         autoMappedAccordion.getByRole('heading', {
@@ -1108,7 +1110,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         }),
       ).toBeInTheDocument();
       const autoMappedAccordion = within(
-        screen.getByTestId('auto-mapped-accordion'),
+        screen.getByTestId('auto-mapped-locations-accordion'),
       );
       expect(
         autoMappedAccordion.getByRole('heading', {

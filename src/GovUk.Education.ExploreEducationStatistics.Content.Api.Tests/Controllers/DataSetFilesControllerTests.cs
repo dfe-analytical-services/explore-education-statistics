@@ -1579,8 +1579,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .WithReleaseVersion(publication.ReleaseVersions[0])
                     .WithFile(_fixture.DefaultFile(FileType.Data)
                         .WithType(FileType.Data)
+                        .WithDataSetFileVersionGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority])
                         .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()
-                            .WithGeographicLevels([GeographicLevel.Country, GeographicLevel.LocalAuthority])
                             .WithTimePeriodRange(
                                 _fixture.DefaultTimePeriodRangeMeta()
                                     .WithStart("2000", TimeIdentifier.AcademicYear)
@@ -1618,12 +1618,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 var dataSetFileSummaryViewModel = Assert.Single(pagedResult.Results);
                 var dataSetFileMetaViewModel = dataSetFileSummaryViewModel.Meta;
 
-                var originalMeta = releaseFile.File.DataSetFileMeta;
+                var geographicLevels = releaseFile.File.DataSetFileVersionGeographicLevels
+                    .Select(gl => gl.GeographicLevel)
+                    .ToList();
+                Assert.True(ComparerUtils.SequencesAreEqualIgnoringOrder(
+                    [GeographicLevel.Country, GeographicLevel.LocalAuthority], geographicLevels));
 
-                Assert.Equal(originalMeta!.GeographicLevels
-                        .Select(gl => gl.GetEnumLabel())
-                        .ToList(),
-                    dataSetFileMetaViewModel.GeographicLevels);
+                var originalMeta = releaseFile.File.DataSetFileMeta;
 
                 Assert.Equal(new DataSetFileTimePeriodRangeViewModel
                 {
@@ -1792,6 +1793,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 .Returns((releaseVersions ?? Array.Empty<ReleaseVersion>()).AsQueryable().BuildMockDbSet().Object);
             contentDbContext.Setup(context => context.ReleaseFiles)
                 .Returns((releaseFiles ?? Array.Empty<ReleaseFile>()).AsQueryable().BuildMockDbSet().Object);
+            contentDbContext.Setup(context => context.Files)
+                .Returns((releaseFiles != null ? releaseFiles.Select(rf => rf.File).ToArray() : []).AsQueryable().BuildMockDbSet().Object);
             contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable(It.IsAny<string>()))
                 .Returns((freeTextRanks ?? Array.Empty<FreeTextRank>()).AsQueryable().BuildMockDbSet().Object);
             return contentDbContext;
@@ -2069,12 +2072,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 $"{releaseFile.PublicApiDataSetVersion!.Major}.{releaseFile.PublicApiDataSetVersion.Minor}",
                 viewModel.Api.Version);
 
-            var dataSetFileMeta = file.DataSetFileMeta;
-
-            Assert.Equal(dataSetFileMeta!.GeographicLevels
-                    .Select(gl => gl.GetEnumLabel())
-                    .ToList(),
+            Assert.Equal([
+                    GeographicLevel.Country.GetEnumLabel(),
+                    GeographicLevel.LocalAuthority.GetEnumLabel(),
+                    GeographicLevel.LocalAuthorityDistrict.GetEnumLabel()
+                ],
                 viewModel.File.Meta.GeographicLevels);
+
+            var dataSetFileMeta = file.DataSetFileMeta;
 
             Assert.Equal(new DataSetFileTimePeriodRangeViewModel
             {

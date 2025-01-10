@@ -13,6 +13,7 @@ param publicUrls = {
 param postgreSqlSkuName = 'Standard_B1ms'
 param postgreSqlStorageSizeGB = 32
 param postgreSqlAutoGrowStatus = 'Disabled'
+param postgreSqlGeoRedundantBackupEnabled = false
 
 param publicApiContainerAppConfig = {
   cpuCores: 4
@@ -31,3 +32,4 @@ param publicApiContainerAppWorkloadProfiles = [{
 }]
 
 param enableThemeDeletion = true
+param enableSwagger = true

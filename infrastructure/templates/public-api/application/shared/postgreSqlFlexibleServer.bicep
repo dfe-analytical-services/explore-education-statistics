@@ -31,6 +31,9 @@ param privateEndpointSubnetId string
 @description('An array of Entra ID admin principal names for this resource')
 param entraIdAdminPrincipals PrincipalNameAndId[] = []
 
+@description('Whether backups will be geo-redundant rather than zone-redundant')
+param geoRedundantBackupEnabled bool
+
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
 
@@ -58,6 +61,18 @@ module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
     firewallRules: formattedFirewallRules
     databaseNames: ['public_data']
     privateEndpointSubnetId: privateEndpointSubnetId
+    geoRedundantBackup: geoRedundantBackupEnabled ? 'Enabled' : 'Disabled'
+    alerts: deployAlerts ? {
+      availability: true
+      queryTime: true
+      transactionTime: true
+      clientConenctionsWaiting: true
+      cpuPercentage: true
+      diskBandwidth: true
+      diskIops: true
+      memoryPercentage: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }
@@ -71,15 +86,6 @@ resource maxPreparedTransactionsConfig 'Microsoft.DBforPostgreSQL/flexibleServer
   dependsOn: [
     postgreSqlServerModule
   ]
-}
-
-module databaseAliveAlert '../../components/alerts/flexibleServers/databaseAlive.bicep' = if (deployAlerts) {
-  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}DbAliveDeploy'
-  params: {
-    resourceNames: [resourceNames.sharedResources.postgreSqlFlexibleServer]
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
 }
 
 var managedIdentityConnectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate

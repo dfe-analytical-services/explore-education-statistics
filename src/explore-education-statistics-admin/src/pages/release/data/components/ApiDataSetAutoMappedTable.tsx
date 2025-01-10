@@ -8,6 +8,7 @@ import {
 } from '@admin/pages/release/data/utils/getApiDataSetFilterMappings';
 import ApiDataSetMappingModal from '@admin/pages/release/data/components/ApiDataSetMappingModal';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
+import { autoMappedTableId } from '@admin/pages/release/data/utils/mappingTableIds';
 import {
   FilterOptionSource,
   LocationCandidate,
@@ -81,6 +82,8 @@ export default function ApiDataSetAutoMappedTable({
   const totalFilteredItems = filteredItems.length;
   const totalPages = filteredItemsChunks.length;
 
+  const tableId = autoMappedTableId(groupKey);
+
   const [handleSearch] = useDebouncedCallback((term: string) => {
     setSearchTerm(term);
     setCurrentPage(1);
@@ -125,8 +128,9 @@ export default function ApiDataSetAutoMappedTable({
       </div>
       {filteredItemsChunks.length > 0 ? (
         <table
-          className="dfe-table--vertical-align-middl"
-          data-testid={`auto-mapped-table-${groupKey}`}
+          className="dfe-table--vertical-align-middle"
+          data-testid={tableId}
+          id={tableId}
         >
           <caption className="govuk-visually-hidden">
             {`Table showing auto mapped options for ${groupLabel}`}

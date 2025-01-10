@@ -1,4 +1,5 @@
 import { MappableLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
+import { mappableTableId } from '@admin/pages/release/data/utils/mappingTableIds';
 import { ErrorSummaryMessage } from '@common/components/ErrorSummary';
 import locationLevelsMap, {
   LocationLevelKey,
@@ -17,7 +18,7 @@ export default function getUnmappedLocationErrors(
 
     if (total) {
       errors.push({
-        id: `mappable-table-${level}`,
+        id: mappableTableId(level),
         message: `There ${total > 1 ? 'are' : 'is'} ${total} unmapped ${
           total > 1
             ? locationLevelsMap[level]?.plural.toLowerCase() ?? level

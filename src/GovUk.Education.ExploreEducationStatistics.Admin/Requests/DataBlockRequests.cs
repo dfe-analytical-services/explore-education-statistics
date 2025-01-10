@@ -65,6 +65,17 @@ public record DataBlockUpdateRequest
 
             RuleFor(request => request.Query)
                 .SetValidator(new FullTableQueryRequest.Validator());
+
+            RuleForEach(x => x.Charts).ChildRules(chart =>
+            {
+                chart
+                    .RuleFor(request => request.Title)
+                    .Length(1, 220);
+
+                chart.RuleFor(request => request.Alt)
+                    .NotEmpty()
+                    .MaximumLength(220);
+            });
         }
     }
 }

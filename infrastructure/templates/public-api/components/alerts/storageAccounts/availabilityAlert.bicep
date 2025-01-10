@@ -1,10 +1,7 @@
-import { Severity } from '../types.bicep'
+import { staticAverageLessThanHundred } from '../config.bicep'
 
-@description('Names of the resources that these alerts are being applied to.')
-param resourceNames string[]
-
-@description('The alert severity.')
-param severity Severity = 'Critical'
+@description('Name of the resource that these alerts are being applied to.')
+param resourceName string
 
 @description('Name of the Alerts Group used to send alert messages.')
 param alertsGroupName string
@@ -12,22 +9,19 @@ param alertsGroupName string
 @description('Tags with which to tag the resource in Azure.')
 param tagValues object
 
-module alerts '../staticMetricAlert.bicep' = [for name in resourceNames: {
-  name: '${name}AvailabilityAlertModule'
+module alert '../staticMetricAlert.bicep' = {
+  name: '${resourceName}AvailabilityAlertModule'
   params: {
-    alertName: '${name}-availability'
-    resourceIds: [resourceId('Microsoft.Storage/storageAccounts', name)]
-    resourceType: 'Microsoft.Storage/storageAccounts'
-    query: {
+    resourceName: resourceName
+    resourceMetric: {
+      resourceType: 'Microsoft.Storage/storageAccounts'
       metric: 'availability'
-      aggregation: 'Average'
-      operator: 'LessThan'
-      threshold: 100
     }
-    evaluationFrequency: 'PT1M'
-    windowSize: 'PT5M'
-    severity: severity
+    config: {
+      ...staticAverageLessThanHundred
+      nameSuffix: 'availability'
+    }
     alertsGroupName: alertsGroupName
     tagValues: tagValues
   }
-}]
+}
