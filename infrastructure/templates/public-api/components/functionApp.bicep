@@ -483,7 +483,7 @@ module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
       }
       config: {
         ...staticMinGreaterThanZero
-        nameSuffix: 'http-${httpStatusCode}'
+        nameSuffix: toLower(httpStatusCode)
       }
       alertsGroupName: alerts!.alertsGroupName
       tagValues: tagValues
@@ -504,7 +504,7 @@ module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
       }
       config: {
         ...dynamicAverageGreaterThan
-        nameSuffix: 'http-${httpStatusCode}'
+        nameSuffix: toLower(httpStatusCode)
       }
       alertsGroupName: alerts!.alertsGroupName
       tagValues: tagValues
