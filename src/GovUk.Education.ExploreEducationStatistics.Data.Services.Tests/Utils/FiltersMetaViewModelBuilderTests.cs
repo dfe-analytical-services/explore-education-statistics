@@ -215,10 +215,13 @@ public class FiltersMetaViewModelBuilderTests
     [Fact]
     public void BuildFilters_GetsTotalFilterItemId_TotalItemExistsAndSingleGroup()
     {
+        var totalFilterItemId = Guid.NewGuid();
         var filter = new Filter
         {
             Id = Guid.NewGuid(),
             Label = "Filter a",
+            DefaultFilterItemId = totalFilterItemId,
+            DefaultFilterItemLabel = "Total",
             FilterGroups = new List<FilterGroup>
             {
                 new()
@@ -234,7 +237,7 @@ public class FiltersMetaViewModelBuilderTests
                         },
                         new()
                         {
-                            Id = Guid.NewGuid(),
+                            Id = totalFilterItemId,
                             Label = "Total"
                         }
                     }
@@ -307,64 +310,6 @@ public class FiltersMetaViewModelBuilderTests
         // Verify the total item id is not present because there's multiple groups none of which are labelled "Total"
         // despite there being a "Total" filter item
         Assert.Null(filterA.TotalValue);
-    }
-
-    [Fact]
-    public void BuildFilters_GetsTotalFilterItemId_TotalItemExistsInTotalGroup()
-    {
-        var filter = new Filter
-        {
-            Id = Guid.NewGuid(),
-            Label = "Filter a",
-            FilterGroups = new List<FilterGroup>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    Label = "Group a",
-                    FilterItems = new List<FilterItem>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item a"
-                        },
-                        // Filter item is labelled "Total" but is not in the "Total" group so is ignored
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Total"
-                        }
-                    }
-                },
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    Label = "Total",
-                    FilterItems = new List<FilterItem>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item b"
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Total"
-                        }
-                    }
-                }
-            }
-        };
-
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(ListOf(filter));
-
-        Assert.Single(result);
-        var filterA = Assert.Contains("FilterA", result);
-
-        // Verify the total item id exists because there's a "Total" filter item in a "Total" group
-        Assert.Equal(filter.FilterGroups[1].FilterItems[1].Id, filterA.TotalValue);
     }
 
     [Fact]

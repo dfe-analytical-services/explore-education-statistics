@@ -145,13 +145,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var errors = new List<DataImportError>();
             
             // Check for unexpected column names
-            Array.ForEach(Enum.GetNames(typeof(MetaColumns)), col =>
-            {
-                if (!csvHeaders.Contains(col))
+            Array.ForEach(ImporterMetaService.RequiredMetaColumns,
+                col =>
                 {
-                    errors.Add(new DataImportError($"{MetaFileMissingExpectedColumn.GetEnumLabel()} : {col}"));
-                }
-            });
+                    if (!csvHeaders.Contains(col))
+                    {
+                        errors.Add(new DataImportError($"{MetaFileMissingExpectedColumn.GetEnumLabel()} : {col}"));
+                    }
+                });
 
             if (errors.Count > 0)
             {

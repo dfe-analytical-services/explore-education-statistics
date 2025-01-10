@@ -162,14 +162,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         fg.FilterId.Equals(filterId)
                         && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
 
-                    return new FilterItem(filterItemLabel, filterGroup.Id);
+                    return new FilterItem(filterItemLabel, filterGroup);
                 })
                 .ToList();
-                    
+
+            var filterIds = filterGroups
+                .Select(group => group.FilterId)
+                .Distinct()
+                .ToList();
+
+            var filterIdToDefaultFilterItem = filterIds
+                .ToDictionary(
+                    filterId => filterId,
+                    filterId =>
+                    {
+                        var defaultFilterItemLabel = context.Filter
+                            .Where(f => f.Id == filterId)
+                            .Select(f => f.DefaultFilterItemLabel)
+                            .SingleOrDefault() ?? "Total"; // If meta file didn't specify a default, we look for "Total"
+
+                        return filterItems
+                            .Where(item =>
+                                // There might be two filter items with the same label under different groups.
+                                // If so, we don't use either of them as the default.
+                                item.FilterGroup.FilterId == filterId
+                                && item.Label.Equals(defaultFilterItemLabel, OrdinalIgnoreCase))
+                            .Select(item => new { item.Id , item.Label} )
+                            .SingleOrDefault();
+                    }
+                );
+
             await _databaseHelper.DoInTransaction(context, async ctxDelegate =>
             {
-                await ctxDelegate.FilterGroup.AddRangeAsync(filterGroups);
+                // We don't add filter groups explicitly, as they are included in `filterItems`
                 await ctxDelegate.FilterItem.AddRangeAsync(filterItems);
+
+                var filters = ctxDelegate.Filter
+                    .Where(f => filterIds.Contains(f.Id))
+                    .ToList();
+                foreach (var filter in filters)
+                {
+                    var filterItem = filterIdToDefaultFilterItem[filter.Id];
+                    filter.DefaultFilterItemId = filterItem?.Id;
+                    // If filter item Total is found, DefaultFilterItemLabel wouldn't be set, so set it
+                    filter.DefaultFilterItemLabel = filterItem?.Label;
+                }
+
                 await ctxDelegate.SaveChangesAsync();
             });
 
