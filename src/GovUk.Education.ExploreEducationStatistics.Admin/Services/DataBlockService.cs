@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -217,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(dataBlock => _userService.CheckCanUpdateReleaseVersion(dataBlock.ReleaseVersion))
                 .OnSuccessDo(async dataBlockVersion =>
                 {
-                    // TODO EES-753 Alter this when multiple charts are supported
+                    // Remove old infographic file if using a new file
                     var infographicChart = dataBlockVersion.Charts.OfType<InfographicChart>().FirstOrDefault();
                     var updatedInfographicChart =
                         updateRequest.Charts.OfType<InfographicChart>().FirstOrDefault();
@@ -227,6 +228,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         await _releaseFileService.Delete(releaseVersionId: dataBlockVersion.ReleaseVersionId,
                             fileId: new Guid(infographicChart.FileId));
+                    }
+
+                    // If has map chart, remove geojson cache
+                    var mapChart = dataBlockVersion.Charts.OfType<MapChart>().FirstOrDefault();
+                    if (mapChart != null)
+                    {
+                        await _cacheService.DeleteItemAsync(
+                            new LocationsForDataBlockCacheKey(dataBlockVersion, mapChart.BoundaryLevel));
                     }
 
                     _mapper.Map(updateRequest, dataBlockVersion.ContentBlock);
