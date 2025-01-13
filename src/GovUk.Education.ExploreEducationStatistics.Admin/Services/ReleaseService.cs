@@ -110,7 +110,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseVersion)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId, q => q
+                    .Include(rv => rv.Release)
+                    .ThenInclude(r => r.Publication)
+                    .Include(rv => rv.ReleaseStatuses))
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(releaseVersion =>
                 {
@@ -611,12 +614,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await releases
                         .ToAsyncEnumerable()
-                        .SelectAwait(async release =>
+                        .SelectAwait(async releaseVersion => _mapper.Map<ReleaseSummaryViewModel>(releaseVersion) with
                         {
-                            var releaseViewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
-                            releaseViewModel.Permissions =
-                                await PermissionsUtils.GetReleasePermissions(_userService, release);
-                            return releaseViewModel;
+                            Permissions = await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion) 
                         }).ToListAsync();
                 });
         }
@@ -643,7 +643,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var releaseVersionsForApproval = await _context
                 .ReleaseVersions
-                .Include(releaseVersion => releaseVersion.Publication)
+                .Include(releaseVersion => releaseVersion.Release)
+                .ThenInclude(release => release.Publication)
                 .Where(releaseVersion =>
                     releaseVersion.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview
                     && releaseVersionIdsForApproval.Contains(releaseVersion.Id))
@@ -669,11 +670,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var approvedReleases = await releases
                         .ToAsyncEnumerable()
-                        .SelectAwait(async release =>
+                        .SelectAwait(async releaseVersion =>
                         {
-                            var releaseViewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
+                            var releaseViewModel = _mapper.Map<ReleaseSummaryViewModel>(releaseVersion);
                             releaseViewModel.Permissions =
-                                await PermissionsUtils.GetReleasePermissions(_userService, release);
+                                await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion);
                             return releaseViewModel;
                         }).ToListAsync();
 
@@ -781,14 +782,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return await _dataImportService.GetImportStatus(fileId);
                 });
-        }
-
-        private async Task<Either<ActionResult, ReleaseVersion>> CheckReleaseVersionExists(Guid releaseVersionId)
-        {
-            return await _context
-                .ReleaseVersions
-                .HydrateReleaseForChecklist()
-                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId);
         }
 
         private async Task<Either<ActionResult, ReleaseFile>> CheckReleaseDataFileExists(
@@ -954,16 +947,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return Unit.Instance;
-        }
-
-        public static IQueryable<ReleaseVersion> HydrateReleaseVersion(IQueryable<ReleaseVersion> values)
-        {
-            // Require publication / release graph to be able to work out:
-            // If the release is the latest
-            return values
-                .Include(rv => rv.Release)
-                .Include(rv => rv.Publication)
-                .Include(rv => rv.ReleaseStatuses);
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseVersionId)
