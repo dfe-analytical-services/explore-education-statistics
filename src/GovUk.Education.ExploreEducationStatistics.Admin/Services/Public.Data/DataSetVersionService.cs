@@ -225,6 +225,7 @@ public class DataSetVersionService(
         return await contentDbContext
             .ReleaseFiles
             .Include(rf => rf.ReleaseVersion)
+            .ThenInclude(rv => rv.Release)
             .Include(rf => rf.File)
             .Where(releaseFile => dataSetVersionsByReleaseFileId.Keys.Contains(releaseFile.Id))
             .ToDictionaryAsync(
@@ -356,6 +357,7 @@ public class DataSetVersionService(
             .AsNoTracking()
             .Where(rf => rf.Id == dataSetVersion.Release.ReleaseFileId)
             .Include(rf => rf.ReleaseVersion)
+            .ThenInclude(rv => rv.Release)
             .Include(rf => rf.File)
             .SingleAsync(cancellationToken);
     }
@@ -374,7 +376,7 @@ public class DataSetVersionService(
         return new IdTitleViewModel
         {
             Id = releaseVersion.Id,
-            Title = releaseVersion.Title,
+            Title = releaseVersion.Release.Title,
         };
     }
 }
