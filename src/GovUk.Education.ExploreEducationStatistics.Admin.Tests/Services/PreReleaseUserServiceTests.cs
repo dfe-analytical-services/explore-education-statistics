@@ -13,9 +13,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -30,6 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PreReleaseUserServiceTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         private const string PreReleaseTemplateId = "prerelease-template-id";
 
         private static readonly DateTime PublishedScheduledStartOfDay =
@@ -38,7 +42,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPreReleaseUsers()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -112,7 +119,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPreReleaseUsers_OrderedCorrectly()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -175,7 +185,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPreReleaseUsers_FiltersInvalidReleaseUsers()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
+            ReleaseVersion otherReleaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -194,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     // Different release user
                     new UserReleaseRole
                     {
-                        ReleaseVersion = new ReleaseVersion(),
+                        ReleaseVersion = otherReleaseVersion,
                         Role = ReleaseRole.PrereleaseViewer,
                         User = new User
                         {
@@ -220,7 +237,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPreReleaseUsers_FiltersInvalidReleaseInvites()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
+            ReleaseVersion otherReleaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -236,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     // Different release
                     new UserReleaseInvite
                     {
-                        ReleaseVersion = new ReleaseVersion(),
+                        ReleaseVersion = otherReleaseVersion,
                         Email = "invited.2@test.com",
                         Role = ReleaseRole.PrereleaseViewer,
                     }
@@ -259,7 +283,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPreReleaseUsersInvitePlan_Fails_InvalidEmail()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -301,7 +328,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPreReleaseUsersInvitePlan_Fails_NoInvitableEmails()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -348,7 +378,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPreReleaseUsersInvitePlan()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var existingReleaseInvites = new List<UserReleaseInvite>
             {
@@ -455,7 +487,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InvitePreReleaseUsers_Fails_InvalidEmail()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -497,7 +532,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InvitePreReleaseUsers_Fails_NoInvitableEmails()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -544,17 +582,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InvitePreReleaseUsers_InvitesExistingUser_ApprovedRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                PublishScheduled = PublishedScheduledStartOfDay,
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                },
-                ApprovalStatus = ReleaseApprovalStatus.Approved,
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublishScheduled(PublishedScheduledStartOfDay);
 
             var user = new User
             {
@@ -634,17 +666,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InvitePreReleaseUsers_FailsSendingEmail_ExistingUser_ApprovedRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                PublishScheduled = PublishedScheduledStartOfDay,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                ApprovalStatus = ReleaseApprovalStatus.Approved,
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublishScheduled(PublishedScheduledStartOfDay);
 
             var user = new User
             {
@@ -705,17 +731,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InvitePreReleaseUsers_InvitesExistingUser_DraftRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                PublishScheduled = PublishedScheduledStartOfDay,
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                },
-                ApprovalStatus = ReleaseApprovalStatus.Draft,
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .WithPublishScheduled(PublishedScheduledStartOfDay);
 
             var user = new User
             {
@@ -773,17 +793,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InvitePreReleaseUsers_InvitesNewUser_ApprovedRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                PublishScheduled = PublishedScheduledStartOfDay,
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                },
-                ApprovalStatus = ReleaseApprovalStatus.Approved,
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublishScheduled(PublishedScheduledStartOfDay);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -865,17 +879,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InvitePreReleaseUsers_FailsSendingEmail_NewUser_ApprovedRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                PublishScheduled = PublishedScheduledStartOfDay,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                ApprovalStatus = ReleaseApprovalStatus.Approved,
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublishScheduled(PublishedScheduledStartOfDay);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -933,17 +941,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InvitePreReleaseUsers_InvitesNewUser_DraftRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                PublishScheduled = PublishedScheduledStartOfDay,
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                },
-                ApprovalStatus = ReleaseApprovalStatus.Draft,
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .WithPublishScheduled(PublishedScheduledStartOfDay);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -998,17 +1000,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InvitePreReleaseUsers_InvitesMultipleUsers_ApprovedRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                PublishScheduled = PublishedScheduledStartOfDay,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                ApprovalStatus = ReleaseApprovalStatus.Approved
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublishScheduled(PublishedScheduledStartOfDay);
 
             var existingReleaseInvites = new List<UserReleaseInvite>
             {
@@ -1198,17 +1194,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InvitePreReleaseUsers_InvitesMultipleUsers_DraftRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                PublishScheduled = PublishedScheduledStartOfDay,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                ApprovalStatus = ReleaseApprovalStatus.Draft
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .WithPublishScheduled(PublishedScheduledStartOfDay);
 
             var existingReleaseInvites = new List<UserReleaseInvite>
             {
@@ -1358,7 +1348,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemovePreReleaseUser_Fails_InvalidEmail()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1380,7 +1373,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemovePreReleaseUser_ReleaseRoleRemoved()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1443,8 +1438,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemovePreReleaseUser_OtherReleaseRolesNotRemoved()
         {
-            var releaseVersion = new ReleaseVersion();
-            var otherRelease = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
+            ReleaseVersion otherReleaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1465,7 +1465,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     // Belongs to another release
                     new UserReleaseRole
                     {
-                        ReleaseVersion = otherRelease,
+                        ReleaseVersion = otherReleaseVersion,
                         Role = ReleaseRole.PrereleaseViewer,
                         User = new User
                         {
@@ -1522,7 +1522,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(2, savedUserReleaseRoles.Count);
 
-                Assert.Equal(otherRelease.Id, savedUserReleaseRoles[0].ReleaseVersionId);
+                Assert.Equal(otherReleaseVersion.Id, savedUserReleaseRoles[0].ReleaseVersionId);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRoles[0].Role);
 
                 Assert.Equal(releaseVersion.Id, savedUserReleaseRoles[1].ReleaseVersionId);
@@ -1533,7 +1533,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemovePreReleaseUser_AllInvitesRemoved()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1592,8 +1594,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemovePreReleaseUser_OtherReleaseInvitesNotRemoved()
         {
-            var releaseVersion = new ReleaseVersion();
-            var otherRelease = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
+            ReleaseVersion otherReleaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1610,7 +1617,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     // Invite for another release
                     new UserReleaseInvite
                     {
-                        ReleaseVersion = otherRelease,
+                        ReleaseVersion = otherReleaseVersion,
                         Role = ReleaseRole.PrereleaseViewer,
                         Email = "test@test.com"
                     },
@@ -1662,7 +1669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToListAsync();
 
                 Assert.Equal(2, savedUserReleaseInvites.Count);
-                Assert.Equal(otherRelease.Id, savedUserReleaseInvites[0].ReleaseVersionId);
+                Assert.Equal(otherReleaseVersion.Id, savedUserReleaseInvites[0].ReleaseVersionId);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseInvites[0].Role);
                 Assert.Equal("test@test.com", savedUserReleaseInvites[0].Email);
 
@@ -1681,7 +1688,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemovePreReleaseUser_AcceptedSystemInviteNotRemoved()
         {
-            var releaseVersion = new ReleaseVersion();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1744,11 +1753,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new()
             {
                 {"newUser", newUser ? "yes" : "no"},
-                {"release name", "Calendar year 2020"},
-                {"publication name", "Test publication"},
+                {"release name", releaseVersion.Release.Title},
+                {"publication name", releaseVersion.Release.Publication.Title},
                 {
                     "prerelease link",
-                    $"http://localhost/publication/{releaseVersion.PublicationId}/release/{releaseVersion.Id}/prerelease/content"
+                    $"http://localhost/publication/{releaseVersion.Release.PublicationId}/release/{releaseVersion.Id}/prerelease/content"
                 },
                 {"prerelease day", "Tuesday 08 September 2020"},
                 {"prerelease time", "09:30"},
