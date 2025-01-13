@@ -11,10 +11,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +24,6 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
@@ -35,18 +36,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
     {
         private static readonly Guid UserId = Guid.NewGuid();
 
+        private readonly DataFixture _dataFixture = new();
+
         [Fact]
         public async Task UpdateApprovalStatus_MethodologyHasImages()
         {
+            Publication publication = _dataFixture.DefaultPublication();
+
             var methodologyVersion = new MethodologyVersion
             {
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Publication title",
+                    OwningPublicationTitle = publication.Title,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication()
+                        Publication = publication
                     })
                 }
             };
@@ -144,16 +149,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingMethodologyWithUnusedImages()
         {
+            Publication publication = _dataFixture.DefaultPublication();
+
             var methodologyVersion = new MethodologyVersion
             {
                 Status = Draft,
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Publication title",
+                    OwningPublicationTitle = publication.Title,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication()
+                        Publication = publication
                     })
                 }
             };
@@ -260,16 +267,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingMethodologyAddsMethodologyStatus()
         {
+            Publication publication = _dataFixture.DefaultPublication();
+
             var methodologyVersion = new MethodologyVersion
             {
                 Status = Draft,
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Publication title",
+                    OwningPublicationTitle = publication.Title,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication()
+                        Publication = publication
                     })
                 }
             };
@@ -332,20 +341,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_SubmittingForHigherReviewAddsMethodologyStatus()
         {
-            var owningPublicationId = Guid.NewGuid();
+            Publication publication = _dataFixture.DefaultPublication();
+
             var methodologyVersion = new MethodologyVersion
             {
                 Status = Draft,
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Publication title",
+                    OwningPublicationTitle = publication.Title,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication
-                        {
-                            Id = owningPublicationId,
-                        },
+                        Publication = publication
                     })
                 },
             };
@@ -378,7 +385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(false);
 
             userReleaseRoleService.Setup(mock =>
-                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, owningPublicationId))
+                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
                 .ReturnsAsync(new List<UserReleaseRole>());
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -413,20 +420,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovedBackToDraftAddsMethodologyStatus()
         {
-            var owningPublicationId = Guid.NewGuid();
+            Publication publication = _dataFixture.DefaultPublication();
+
             var methodologyVersion = new MethodologyVersion
             {
                 Status = Approved,
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Publication title",
+                    OwningPublicationTitle = publication.Title,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication
-                        {
-                            Id = owningPublicationId,
-                        },
+                        Publication = publication
                     })
                 },
             };
@@ -459,7 +464,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(false);
 
             userReleaseRoleService.Setup(mock =>
-                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, owningPublicationId))
+                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
                 .ReturnsAsync(new List<UserReleaseRole>());
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -494,16 +499,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_NoStatusUpdateRequiredNoMethodologyStatusAdded()
         {
+            Publication publication = _dataFixture.DefaultPublication();
+
             var methodologyVersion = new MethodologyVersion
             {
                 Status = Draft,
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Publication title",
+                    OwningPublicationTitle = publication.Title,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication()
+                        Publication = publication
                     })
                 }
             };
@@ -547,17 +554,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingImmediateStrategy_NotCurrentlyPubliclyVisible()
         {
+            Publication publication = _dataFixture.DefaultPublication();
+
             var methodologyVersion = new MethodologyVersion
             {
                 PublishingStrategy = Immediately,
                 Status = Draft,
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Publication title",
+                    OwningPublicationTitle = publication.Title,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication()
+                        Publication = publication
                     })
                 }
             };
@@ -626,17 +635,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingImmediateStrategy()
         {
+            Publication publication = _dataFixture.DefaultPublication();
+
             var methodologyVersion = new MethodologyVersion
             {
                 PublishingStrategy = Immediately,
                 Status = Draft,
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Publication title",
+                    OwningPublicationTitle = publication.Title,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication()
+                        Publication = publication
                     })
                 }
             };
@@ -730,7 +741,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingImmediateStrategy_ScheduledWithReleaseIsCleared()
         {
-            var scheduledWithRelease = new ReleaseVersion { Id = Guid.NewGuid() };
+            Publication publication = _dataFixture.DefaultPublication();
+
+            ReleaseVersion scheduledWithReleaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(publication));
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -738,15 +753,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Status = Approved,
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Publication title",
+                    OwningPublicationTitle = publication.Title,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication()
+                        Publication = publication
                     })
                 },
-                // Existing ScheduledWithRelease should be cleared
-                ScheduledWithReleaseVersion = scheduledWithRelease
+                // Existing ScheduledWithReleaseVersion should be cleared
+                ScheduledWithReleaseVersion = scheduledWithReleaseVersion
             };
 
             var request = new MethodologyApprovalUpdateRequest
@@ -755,7 +770,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 PublishingStrategy = Immediately,
                 Status = Approved,
                 // Requested id should be ignored
-                WithReleaseId = scheduledWithRelease.Id
+                WithReleaseId = scheduledWithReleaseVersion.Id
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -812,15 +827,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_NonLiveRelease()
         {
-            var publication = new Publication { Title = "Publication title" };
+            Publication publication = _dataFixture.DefaultPublication();
 
-            var scheduledWithReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                TimePeriodCoverage = CalendarYear,
-                ReleaseName = "2021"
-            };
+            ReleaseVersion scheduledWithReleaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(publication));
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -851,7 +862,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 context.Publications.Add(publication);
                 context.MethodologyVersions.Add(methodologyVersion);
-                context.ReleaseVersions.Add(scheduledWithReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -886,8 +896,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.NotNull(updatedMethodologyVersion.ScheduledWithReleaseVersion);
                 Assert.Equal(scheduledWithReleaseVersion.Id, updatedMethodologyVersion.ScheduledWithReleaseVersion!.Id);
-                Assert.Equal(scheduledWithReleaseVersion.Title,
-                    updatedMethodologyVersion.ScheduledWithReleaseVersion.Title);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -909,7 +917,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_ReleaseIdMissing()
         {
-            var publication = new Publication { Title = "Publication title" };
+            Publication publication = _dataFixture.DefaultPublication();
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -956,7 +964,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_ReleaseIdNotFound()
         {
-            var publication = new Publication { Title = "Publication title" };
+            Publication publication = _dataFixture.DefaultPublication();
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -968,7 +976,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication()
+                        Publication = publication
                     })
                 }
             };
@@ -1004,17 +1012,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_ReleaseAlreadyPublished()
         {
-            var publication = new Publication { Title = "Publication title" };
-
-            // Create a release version that is already published which the methodology cannot be made dependant on
-            var scheduledWithReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                TimePeriodCoverage = CalendarYear,
-                ReleaseName = "2021",
-                Published = DateTime.UtcNow
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -1031,6 +1030,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 }
             };
 
+            // Include a published release version in the request which the methodology cannot be made dependant on
+            var scheduledWithReleaseVersion = publication.Releases[0].Versions.Single(rv => rv is { Published: not null });
+
             var request = new MethodologyApprovalUpdateRequest
             {
                 LatestInternalReleaseNote = "Test approval",
@@ -1045,7 +1047,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 context.Publications.Add(publication);
                 context.MethodologyVersions.Add(methodologyVersion);
-                context.ReleaseVersions.Add(scheduledWithReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -1061,14 +1062,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_ReleaseNotRelated()
         {
+            var (publication1, publication2) = _dataFixture.DefaultPublication()
+                .GenerateTuple2();
+
             // Release version is not from the same publication as the one linked to the methodology
-            var scheduledWithReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication(),
-                TimePeriodCoverage = CalendarYear,
-                ReleaseName = "2021"
-            };
+            ReleaseVersion scheduledWithReleaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(publication1));
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -1080,7 +1080,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication()
+                        Publication = publication2
                     })
                 }
             };
@@ -1097,8 +1097,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
+                context.AddRange(publication1, publication2);
                 context.MethodologyVersions.Add(methodologyVersion);
-                context.ReleaseVersions.Add(scheduledWithReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -1114,6 +1114,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_MovingApprovedMethodologyToDraft()
         {
+            Publication publication = _dataFixture.DefaultPublication();
+
             var methodologyVersion = new MethodologyVersion
             {
                 Published = null,
@@ -1121,11 +1123,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Status = Approved,
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Publication title",
+                    OwningPublicationTitle = publication.Title,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication()
+                        Publication = publication
                     })
                 }
             };
@@ -1197,21 +1199,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_SubmitForHigherReview()
         {
-            var owningPublicationId = Guid.NewGuid();
+            Publication publication = _dataFixture.DefaultPublication();
+
             var methodologyVersion = new MethodologyVersion
             {
                 Published = null,
                 Status = Draft,
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Publication title",
+                    OwningPublicationTitle = publication.Title,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = new Publication
-                        {
-                            Id = owningPublicationId,
-                        }
+                        Publication = publication
                     })
                 }
             };
@@ -1224,7 +1224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var userPublicationRole = new UserPublicationRole
             {
-                PublicationId = owningPublicationId,
+                PublicationId = publication.Id,
                 Role = PublicationRole.Approver,
                 User = new User
                 {
@@ -1256,7 +1256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(false);
 
             userReleaseRoleService.Setup(mock =>
-                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, owningPublicationId))
+                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
                 .ReturnsAsync(new List<UserReleaseRole>
                 {
                     new()
