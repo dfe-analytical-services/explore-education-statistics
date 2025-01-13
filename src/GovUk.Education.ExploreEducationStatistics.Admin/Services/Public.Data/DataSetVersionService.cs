@@ -188,8 +188,8 @@ public class DataSetVersionService(
 
     public async Task UpdateVersionsForReleaseVersion(
         Guid releaseVersionId,
-        string slug,
-        string title,
+        string releaseSlug,
+        string releaseTitle,
         CancellationToken cancellationToken = default)
     {
         var releaseFileIds = await contentDbContext
@@ -207,8 +207,8 @@ public class DataSetVersionService(
         {
             foreach (var dsv in dataSetVersions)
             {
-                dsv.Release.Slug = slug;
-                dsv.Release.Title = title;
+                dsv.Release.Slug = releaseSlug;
+                dsv.Release.Title = releaseTitle;
             }
 
             await publicDataDbContext.SaveChangesAsync(cancellationToken);
