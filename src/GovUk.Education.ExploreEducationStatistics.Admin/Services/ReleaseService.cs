@@ -578,20 +578,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, IdTitleViewModel>> GetLatestPublishedRelease(Guid publicationId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId, queryable =>
-                    queryable.Include(rv => rv.LatestPublishedReleaseVersion))
+            return await _context.Publications
+                .SingleOrNotFoundAsync(p => p.Id == publicationId)
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(publication =>
+                .OnSuccess(async publication =>
                 {
-                    var latestPublishedReleaseVersion = publication.LatestPublishedReleaseVersion;
-                    return latestPublishedReleaseVersion != null
-                        ? new IdTitleViewModel
-                        {
-                            Id = latestPublishedReleaseVersion.Id,
-                            Title = latestPublishedReleaseVersion.Title
-                        }
-                        : new Either<ActionResult, IdTitleViewModel>(new NotFoundResult());
+                    if (!publication.LatestPublishedReleaseVersionId.HasValue)
+                    {
+                        return new Either<ActionResult, IdTitleViewModel>(new NotFoundResult());
+                    }
+
+                    var latestPublishedReleaseVersion = await _context.ReleaseVersions
+                        .Include(rv => rv.Release)
+                        .SingleAsync(rv => rv.Id == publication.LatestPublishedReleaseVersionId.Value);
+
+                    return new IdTitleViewModel
+                    {
+                        Id = latestPublishedReleaseVersion.Id,
+                        Title = latestPublishedReleaseVersion.Release.Title
+                    };
                 });
         }
 
