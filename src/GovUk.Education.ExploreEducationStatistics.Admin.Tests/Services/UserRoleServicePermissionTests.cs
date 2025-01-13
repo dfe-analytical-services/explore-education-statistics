@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
@@ -187,32 +186,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole()
         {
-            var releaseVersion = new ReleaseVersion();
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                ReleaseVersions = new List<ReleaseVersion>
-                {
-                    releaseVersion,
-                }
-            };
-            var userReleaseRole = new UserReleaseRole
-            {
-                ReleaseVersion = releaseVersion,
-                Role = Contributor,
-                User = new User(),
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
+            UserReleaseRole userReleaseRole = _dataFixture.DefaultUserReleaseRole()
+                .WithReleaseVersion(releaseVersion)
+                .WithUser(new User())
+                .WithRole(Contributor);
 
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
-                    tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == Contributor,
+                    tuple => tuple.Item1.Id == releaseVersion.Release.PublicationId && tuple.Item2 == Contributor,
                     CanUpdateSpecificReleaseRole)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        await contentDbContext.AddRangeAsync(publication, userReleaseRole);
+                        contentDbContext.Add(userReleaseRole);
                         await contentDbContext.SaveChangesAsync();
                     }
 
