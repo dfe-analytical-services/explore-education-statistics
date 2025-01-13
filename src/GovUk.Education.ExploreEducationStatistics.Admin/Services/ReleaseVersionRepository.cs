@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -26,16 +26,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _statisticsDbContext = statisticsDbContext;
         }
 
-        public async Task<List<Content.Model.ReleaseVersion>> ListReleases(
+        public async Task<List<ReleaseVersion>> ListReleases(
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
-            return await
-                HydrateReleaseVersion(_contentDbContext.ReleaseVersions)
-                    .Where(rv => releaseApprovalStatuses.Contains(rv.ApprovalStatus))
-                    .ToListAsync();
+            return await _contentDbContext.ReleaseVersions
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .Include(rv => rv.ReleaseStatuses)
+                .Where(rv => releaseApprovalStatuses.Contains(rv.ApprovalStatus))
+                .ToListAsync();
         }
 
-        public async Task<List<Content.Model.ReleaseVersion>> ListReleasesForUser(Guid userId,
+        public async Task<List<ReleaseVersion>> ListReleasesForUser(Guid userId,
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             var userReleaseVersionIds = await _contentDbContext
@@ -62,11 +64,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             userReleaseVersionIds.AddRange(userPublicationRoleReleaseIds);
             userReleaseVersionIds = userReleaseVersionIds.Distinct().ToList();
 
-            return await
-                HydrateReleaseVersion(_contentDbContext.ReleaseVersions)
-                    .Where(rv =>
-                        userReleaseVersionIds.Contains(rv.Id) && releaseApprovalStatuses.Contains(rv.ApprovalStatus))
-                    .ToListAsync();
+            return await _contentDbContext.ReleaseVersions
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .Include(rv => rv.ReleaseStatuses)
+                .Where(rv =>
+                    userReleaseVersionIds.Contains(rv.Id) && releaseApprovalStatuses.Contains(rv.ApprovalStatus))
+                .ToListAsync();
         }
 
         public async Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseVersionId)

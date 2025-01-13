@@ -228,22 +228,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(result.Exists(pub => pub.Title == "Release PrereleaseViewer publication"));
 
                 Assert.Equal("Publication Owner publication", result[0].Title);
-                Assert.Empty(result[0].ReleaseVersions); // ListPublicationsForUser doesn't hydrate releases
-
                 Assert.Equal("Publication Approver publication", result[1].Title);
-                Assert.Empty(result[1].ReleaseVersions);
-
                 Assert.Equal("Publication Owner publication 2", result[2].Title);
-                Assert.Empty(result[2].ReleaseVersions);
-
                 Assert.Equal("Release Contributor publication", result[3].Title);
-                Assert.Empty(result[3].ReleaseVersions);
-
                 Assert.Equal("Release Viewer publication", result[4].Title);
-                Assert.Empty(result[4].ReleaseVersions);
-
                 Assert.Equal("Release Contributor publication 2", result[5].Title);
-                Assert.Empty(result[5].ReleaseVersions);
             }
         }
 
@@ -445,10 +434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publications = await service.ListPublicationsForUser(user.Id, theme.Id);
 
                 var resultPublication = Assert.Single(publications);
-                Assert.Equal("Publication", resultPublication.Title);
-
-                var resultReleaseVersion = Assert.Single(resultPublication.ReleaseVersions);
-                Assert.Equal("Academic year 2011/12", resultReleaseVersion.Title);
+                Assert.Equal(publication.Id, resultPublication.Id);
             }
         }
 
