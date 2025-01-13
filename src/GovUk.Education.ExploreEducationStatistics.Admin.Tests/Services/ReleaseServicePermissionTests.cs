@@ -12,11 +12,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -32,6 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseServicePermissionTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         private static readonly Publication Publication = new()
         {
             Id = Guid.NewGuid()
@@ -90,13 +94,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetLatestPublishedRelease()
         {
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(Publication, CanViewSpecificPublication)
+                .SetupResourceCheckToFailWithMatcher<Publication>(p => p.Id == publication.Id,
+                    CanViewSpecificPublication)
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = BuildReleaseService(userService.Object);
-                        return service.GetLatestPublishedRelease(Publication.Id);
+                        using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.Publications.Add(publication);
+                        contextDbContext.SaveChangesAsync();
+
+                        var service = BuildReleaseService(
+                            context: contextDbContext,
+                            userService: userService.Object);
+
+                        return service.GetLatestPublishedRelease(publication.Id);
                     }
                 );
         }

@@ -1198,21 +1198,14 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task Success()
         {
-            var publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion
-                {
-                    ReleaseName = "2022",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Published = DateTime.UtcNow
-                }
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(publication);
+                context.Publications.Add(publication);
                 await context.SaveChangesAsync();
             }
 
@@ -1224,21 +1217,21 @@ public abstract class ReleaseServiceTests
                 var latestIdTitleViewModel = result.AssertRight();
 
                 Assert.NotNull(latestIdTitleViewModel);
-                Assert.Equal(publication.LatestPublishedReleaseVersionId, latestIdTitleViewModel.Id);
-                Assert.Equal("Calendar year 2022", latestIdTitleViewModel.Title);
+                Assert.Equal(publication.Releases[0].Versions[0].Id, latestIdTitleViewModel.Id);
+                Assert.Equal(publication.Releases[0].Title, latestIdTitleViewModel.Title);
             }
         }
 
         [Fact]
         public async Task NoPublishedRelease()
         {
-            var publication = new Publication { LatestPublishedReleaseVersionId = null };
+            Publication publication = _dataFixture.DefaultPublication();
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(publication);
+                context.Publications.Add(publication);
                 await context.SaveChangesAsync();
             }
 
