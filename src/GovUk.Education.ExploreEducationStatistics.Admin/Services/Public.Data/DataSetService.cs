@@ -197,6 +197,7 @@ internal class DataSetService(
         var releaseFiles = await contentDbContext
             .ReleaseFiles
             .Include(rf => rf.ReleaseVersion)
+            .ThenInclude(rv => rv.Release)
             .Include(rf => rf.File)
             .Where(rf => dataSetsByPreviousReleaseFileId.Keys.Contains(rf.Id))
             .ToListAsync(cancellationToken);
@@ -227,6 +228,7 @@ internal class DataSetService(
         return await contentDbContext
             .ReleaseFiles
             .Include(rf => rf.ReleaseVersion)
+            .ThenInclude(rv => rv.Release)
             .Include(rf => rf.File)
             .Where(releaseFile => dataSetVersionsByReleaseFileId.Keys.Contains(releaseFile.Id))
             .ToDictionaryAsync(
@@ -305,7 +307,7 @@ internal class DataSetService(
         return new IdTitleViewModel
         {
             Id = releaseVersion.Id,
-            Title = releaseVersion.Title,
+            Title = releaseVersion.Release.Title,
         };
     }
 

@@ -156,13 +156,13 @@ public abstract class DataSetsControllerTests(
                 () => Assert.Equal(draftDataSetVersion.Status, dataSetViewModel.DraftVersion.Status),
                 () => Assert.Equal(draftDataSetVersion.VersionType, dataSetViewModel.DraftVersion.Type),
                 () => Assert.Equal(draftReleaseVersion.Id, dataSetViewModel.DraftVersion.ReleaseVersion.Id),
-                () => Assert.Equal(draftReleaseVersion.Title, dataSetViewModel.DraftVersion.ReleaseVersion.Title),
+                () => Assert.Equal(draftReleaseVersion.Release.Title, dataSetViewModel.DraftVersion.ReleaseVersion.Title),
                 () => Assert.Equal(liveDataSetVersion.Id, dataSetViewModel.LatestLiveVersion.Id),
                 () => Assert.Equal(liveDataSetVersion.PublicVersion, dataSetViewModel.LatestLiveVersion.Version),
                 () => Assert.Equal(liveDataSetVersion.Status, dataSetViewModel.LatestLiveVersion.Status),
                 () => Assert.Equal(liveDataSetVersion.VersionType, dataSetViewModel.LatestLiveVersion.Type),
                 () => Assert.Equal(liveReleaseVersion.Id, dataSetViewModel.LatestLiveVersion.ReleaseVersion.Id),
-                () => Assert.Equal(liveReleaseVersion.Title, dataSetViewModel.LatestLiveVersion.ReleaseVersion.Title),
+                () => Assert.Equal(liveReleaseVersion.Release.Title, dataSetViewModel.LatestLiveVersion.ReleaseVersion.Title),
                 () => Assert.Equal(liveDataSetVersion.Published.TruncateNanoseconds(),
                     dataSetViewModel.LatestLiveVersion?.Published),
                 () => Assert.Equal(new[]
@@ -189,12 +189,14 @@ public abstract class DataSetsControllerTests(
             var releaseFiles = DataFixture.DefaultReleaseFile()
                 .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => 
                     DataFixture.DefaultReleaseVersion()
-                        .WithPublication(publication)))
+                        .WithRelease(DataFixture.DefaultRelease()
+                            .WithPublication(publication))))
                 .ForInstance(s => s.Set(rf => rf.File, () => DataFixture.DefaultFile(FileType.Data)))
                 .GenerateList(numberOfAvailableDataSets);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
+                context.Publications.Add(publication);
                 context.ReleaseFiles.AddRange(releaseFiles);
             });
 
@@ -248,17 +250,21 @@ public abstract class DataSetsControllerTests(
         [Fact]
         public async Task PublicationHasMultipleDataSets_Success_CorrectOrdering()
         {
+            Publication publication = DataFixture.DefaultPublication();
+
             var releaseFiles = DataFixture.DefaultReleaseFile()
-                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => DataFixture.DefaultReleaseVersion()))
+                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => 
+                    DataFixture.DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease()
+                            .WithPublication(publication))))
                 .ForInstance(s => s.Set(rf => rf.File, () => DataFixture.DefaultFile(FileType.Data)))
                 .GenerateList(7);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
+                context.Publications.Add(publication);
                 context.ReleaseFiles.AddRange(releaseFiles);
             });
-
-            Publication publication = DataFixture.DefaultPublication();
 
             var dataSets = DataFixture
                 .DefaultDataSet()
@@ -268,7 +274,6 @@ public abstract class DataSetsControllerTests(
                 .ForIndex(5, s => s.SetTitle("Dataset A"))
                 .GenerateList(6);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
 
             var dataSetVersions = DataFixture
@@ -387,7 +392,8 @@ public abstract class DataSetsControllerTests(
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithPublication(DataFixture.DefaultPublication()))
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublication(DataFixture.DefaultPublication())))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -435,7 +441,8 @@ public abstract class DataSetsControllerTests(
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithPublication(DataFixture.DefaultPublication()))
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublication(DataFixture.DefaultPublication())))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -715,7 +722,7 @@ public abstract class DataSetsControllerTests(
                 viewModel.LatestLiveVersion.Indicators);
 
             Assert.Equal(liveReleaseVersion.Id, viewModel.LatestLiveVersion.ReleaseVersion.Id);
-            Assert.Equal(liveReleaseVersion.Title, viewModel.LatestLiveVersion.ReleaseVersion.Title);
+            Assert.Equal(liveReleaseVersion.Release.Title, viewModel.LatestLiveVersion.ReleaseVersion.Title);
 
             Assert.Equal(draftDataSetVersion.Id, viewModel.DraftVersion!.Id);
             Assert.Equal(draftDataSetVersion.PublicVersion, viewModel.DraftVersion.Version);
@@ -726,7 +733,7 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(draftReleaseFile.Name, viewModel.DraftVersion.File.Title);
 
             Assert.Equal(draftReleaseVersion.Id, viewModel.DraftVersion.ReleaseVersion.Id);
-            Assert.Equal(draftReleaseVersion.Title, viewModel.DraftVersion.ReleaseVersion.Title);
+            Assert.Equal(draftReleaseVersion.Release.Title, viewModel.DraftVersion.ReleaseVersion.Title);
             Assert.Equal(
                 draftDataSetVersion.MetaSummary!.GeographicLevels.Select(l => l.GetEnumLabel()),
                 viewModel.DraftVersion.GeographicLevels);
@@ -1171,7 +1178,7 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(releaseFile.File.DataSetFileId, content.DraftVersion!.File.Id);
             Assert.Equal(releaseFile.Name, content.DraftVersion!.File.Title);
             Assert.Equal(draftReleaseVersion.Id, content.DraftVersion!.ReleaseVersion.Id);
-            Assert.Equal(draftReleaseVersion.Title, content.DraftVersion!.ReleaseVersion.Title);
+            Assert.Equal(draftReleaseVersion.Release.Title, content.DraftVersion!.ReleaseVersion.Title);
             Assert.Null(content.DraftVersion!.GeographicLevels);
             Assert.Null(content.DraftVersion!.TimePeriods);
             Assert.Null(content.DraftVersion!.Filters);
