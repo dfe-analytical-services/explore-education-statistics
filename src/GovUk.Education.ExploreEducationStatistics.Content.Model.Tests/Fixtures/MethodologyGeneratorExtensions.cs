@@ -24,10 +24,15 @@ public static class MethodologyGeneratorExtensions
         Publication publication)
         => generator.ForInstance(s => s.SetOwningPublication(publication));
 
-    public static Generator<Methodology> WithAdoptingPublication(
+    public static Generator<Methodology> WithAdoptingPublications(
         this Generator<Methodology> generator,
-        Publication publication)
-        => generator.ForInstance(s => s.SetAdoptingPublication(publication));
+        IEnumerable<Publication> publications)
+        => generator.ForInstance(s => s.SetAdoptingPublications(publications));
+
+    public static Generator<Methodology> WithAdoptingPublications(
+        this Generator<Methodology> generator,
+        Func<SetterContext, IEnumerable<Publication>> publications)
+        => generator.ForInstance(s => s.SetAdoptingPublications(publications.Invoke));
 
     public static Generator<Methodology> WithMethodologyVersions(
         this Generator<Methodology> generator,
@@ -58,24 +63,24 @@ public static class MethodologyGeneratorExtensions
         this InstanceSetters<Methodology> setters,
         Func<SetterContext, IEnumerable<MethodologyVersion>> methodologyVersions)
         => setters.Set(
-                m => m.Versions,
-                (_, methodology, context) =>
-                {
-                    var list = methodologyVersions.Invoke(context).ToList();
+            m => m.Versions,
+            (_, methodology, context) =>
+            {
+                var list = methodologyVersions.Invoke(context).ToList();
 
-                    list.ForEach(methodologyVersion => methodologyVersion.Methodology = methodology);
+                list.ForEach(methodologyVersion => methodologyVersion.Methodology = methodology);
 
-                    var latestPublishedVersion = list
-                        .Where(mv => mv.Published.HasValue)
-                        .OrderBy(mv => mv.Published!)
-                        .LastOrDefault();
+                var latestPublishedVersion = list
+                    .Where(mv => mv.Published.HasValue)
+                    .OrderBy(mv => mv.Published!)
+                    .LastOrDefault();
 
-                    methodology.LatestPublishedVersion = latestPublishedVersion;
-                    methodology.LatestPublishedVersionId = latestPublishedVersion?.Id;
+                methodology.LatestPublishedVersion = latestPublishedVersion;
+                methodology.LatestPublishedVersionId = latestPublishedVersion?.Id;
 
-                    return list;
-                }
-            );
+                return list;
+            }
+        );
 
     private static InstanceSetters<Methodology> SetLatestPublishedVersion(
         this InstanceSetters<Methodology> setters,
@@ -99,12 +104,35 @@ public static class MethodologyGeneratorExtensions
     public static InstanceSetters<Methodology> SetOwningPublication(
         this InstanceSetters<Methodology> setters,
         Publication publication)
-        => setters.SetPublication(_ => publication, owner: true);
+        => setters.SetPublication(_ => publication, owner: true)
+            .Set(m => m.OwningPublicationSlug, publication.Slug)
+            .Set(m => m.OwningPublicationTitle, publication.Title);
 
-    public static InstanceSetters<Methodology> SetAdoptingPublication(
+    public static InstanceSetters<Methodology> SetAdoptingPublications(
         this InstanceSetters<Methodology> setters,
-        Publication publication)
-        => setters.SetPublication(_ => publication, owner: false);
+        IEnumerable<Publication> publications)
+        => setters.SetAdoptingPublications(_ => publications);
+
+    private static InstanceSetters<Methodology> SetAdoptingPublications(
+        this InstanceSetters<Methodology> setters,
+        Func<SetterContext, IEnumerable<Publication>> publications)
+        => setters.Set(
+            m => m.Publications,
+            (_, methodology, context) =>
+            {
+                var list = publications.Invoke(context).ToList();
+
+                return methodology
+                    .Publications
+                    .Concat(list.Select(publication => new PublicationMethodology
+                    {
+                        Methodology = methodology,
+                        Publication = publication,
+                        Owner = false
+                    }))
+                    .ToList();
+            }
+        );
 
     private static InstanceSetters<Methodology> SetPublication(
         this InstanceSetters<Methodology> setters,
