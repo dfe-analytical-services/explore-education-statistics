@@ -852,8 +852,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             await _dataSetVersionService.UpdateVersionsForReleaseVersion(
                 releaseVersion.Id,
-                slug: releaseVersion.Slug,
-                title: releaseVersion.Title);
+                releaseSlug: releaseVersion.Release.Slug,
+                releaseTitle: releaseVersion.Release.Title);
 
             return Unit.Instance;
         }
