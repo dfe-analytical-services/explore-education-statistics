@@ -198,6 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .Include(dbp => dbp.LatestPublishedVersion)
                 .ThenInclude(dbv => dbv.ReleaseVersion)
                 .ThenInclude(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
                 .SingleOrNotFoundAsync(dbp => dbp.Id == dataBlockParentId)
                 .OnSuccess(dbp => dbp.LatestPublishedVersion)
                 .OrNotFound();
@@ -209,6 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return await contextDbContext.Publications
                 .Include(p => p.LatestPublishedReleaseVersion)
                 .ThenInclude(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
                 .SingleOrNotFoundAsync(p => p.Id == dataBlockVersion.ReleaseVersion.Release.PublicationId)
                 .OnSuccess(p => p.LatestPublishedReleaseVersion)
                 .OrNotFound();

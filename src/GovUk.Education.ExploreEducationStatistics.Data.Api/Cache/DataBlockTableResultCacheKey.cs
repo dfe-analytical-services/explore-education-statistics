@@ -15,8 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache
 
         // ReSharper disable once UnusedMember.Global
         public DataBlockTableResultCacheKey(DataBlockVersion dataBlockVersion) : this(
-            publicationSlug: dataBlockVersion.ReleaseVersion.Publication.Slug,
-            releaseSlug: dataBlockVersion.ReleaseVersion.Slug,
+            publicationSlug: dataBlockVersion.ReleaseVersion.Release.Publication.Slug,
+            releaseSlug: dataBlockVersion.ReleaseVersion.Release.Slug,
             dataBlockParentId: dataBlockVersion.DataBlockParentId)
         {
         }
