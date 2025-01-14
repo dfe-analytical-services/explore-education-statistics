@@ -1,11 +1,12 @@
 import _metaService, {
   TimePeriodCoverageGroup,
 } from '@admin/services/metaService';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import noop from 'lodash/noop';
-import React from 'react';
+import createAxiosErrorMock from '@common-test/createAxiosErrorMock';
+import { ValidationProblemDetails } from '@common/services/types/problemDetails';
 import { releaseTypes } from '@common/services/types/releaseType';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import noop from 'lodash/noop';
 import ReleaseSummaryForm from '../ReleaseSummaryForm';
 
 const metaService = _metaService as jest.Mocked<typeof _metaService>;
@@ -694,4 +695,59 @@ describe('ReleaseSummaryForm', () => {
       expect(inputReleaseLabel).toBeDisabled();
     },
   );
+
+  test('Displays a validation error when the server responds with a slug not unique error', async () => {
+    metaService.getTimePeriodCoverageGroups.mockResolvedValue(
+      testTimeIdentifiers,
+    );
+
+    const onSubmit = jest.fn();
+
+    const error = createAxiosErrorMock<ValidationProblemDetails>({
+      data: {
+        errors: [{ code: 'SlugNotUnique', message: '' }],
+        title: '',
+        type: '',
+        status: 400,
+      },
+    });
+    onSubmit.mockRejectedValue(error);
+
+    render(
+      <ReleaseSummaryForm
+        submitText="Create new release"
+        initialValues={{
+          timePeriodCoverageCode: 'AYQ4',
+          timePeriodCoverageStartYear: '1966',
+          releaseType: 'ExperimentalStatistics',
+          releaseLabel: 'initial',
+        }}
+        releaseVersion={0}
+        onSubmit={onSubmit}
+        onCancel={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Select time period coverage'),
+      ).toBeInTheDocument();
+    });
+
+    const buttonCreate = screen.getByRole('button', {
+      name: 'Create new release',
+    });
+    await userEvent.click(buttonCreate);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'Choose a unique combination of type, start year and label',
+          { selector: 'a' },
+        ),
+      ).toBeInTheDocument();
+    });
+
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
 });
