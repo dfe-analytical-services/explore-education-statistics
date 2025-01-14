@@ -102,13 +102,16 @@ public abstract class ReleaseServiceTests
                         PublicationId = publication.Id,
                         Year = 2018,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Type = ReleaseType.OfficialStatistics
+                        Type = ReleaseType.OfficialStatistics,
+                        Label = "initial"
                     }
                 )).AssertRight();
                 newReleaseVersionId = result.Id;
 
                 Assert.Equal("Academic year 2018/19", result.Title);
                 Assert.Equal("2018/19", result.YearTitle);
+                Assert.Equal("initial", result.Label);
+                Assert.Equal(0, result.Version);
                 Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
                 Assert.Equal(ReleaseType.OfficialStatistics, result.Type);
                 Assert.Equal(ReleaseApprovalStatus.Draft, result.ApprovalStatus);
@@ -134,11 +137,11 @@ public abstract class ReleaseServiceTests
                 Assert.Equal(publication.Id, actualRelease.PublicationId);
                 Assert.Equal(2018, actualRelease.Year);
                 Assert.Equal(TimeIdentifier.AcademicYear, actualRelease.TimePeriodCoverage);
-                Assert.Equal("2018-19", actualRelease.Slug);
+                Assert.Equal("2018-19-initial", actualRelease.Slug);
 
                 Assert.Equal(2018, actualReleaseVersion.Year);
                 Assert.Equal(TimeIdentifier.AcademicYear, actualReleaseVersion.TimePeriodCoverage);
-                Assert.Equal("2018-19", actualReleaseVersion.Slug);
+                Assert.Equal("2018-19-initial", actualReleaseVersion.Slug);
                 Assert.Equal(ReleaseType.OfficialStatistics, actualReleaseVersion.Type);
                 Assert.Equal(ReleaseApprovalStatus.Draft, actualReleaseVersion.ApprovalStatus);
                 Assert.Equal(0, actualReleaseVersion.Version);
@@ -869,9 +872,12 @@ public abstract class ReleaseServiceTests
 
             var dataSetVersionService = new Mock<IDataSetVersionService>(Strict);
 
+            var newLabel = "initial";
+            var newReleaseSlug = $"{release.Slug}-{newLabel}";
+
             dataSetVersionService.Setup(service => service.UpdateVersionsForReleaseVersion(
                     releaseVersion.Id,
-                    release.Slug,
+                    newReleaseSlug,
                     release.Title,
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
@@ -894,7 +900,8 @@ public abstract class ReleaseServiceTests
                             Type = updatedType,
                             Year = release.Year,
                             TimePeriodCoverage = release.TimePeriodCoverage,
-                            PreReleaseAccessList = "New access list"
+                            PreReleaseAccessList = "New access list",
+                            Label = newLabel
                         }
                     );
 
@@ -910,6 +917,8 @@ public abstract class ReleaseServiceTests
                 Assert.Equal(release.TimePeriodCoverage, viewModel.TimePeriodCoverage);
                 Assert.Equal("New access list", viewModel.PreReleaseAccessList);
                 Assert.Equal(release.Title, viewModel.Title);
+                Assert.Equal("initial", viewModel.Label);
+                Assert.Equal(releaseVersion.Version, viewModel.Version);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -924,11 +933,11 @@ public abstract class ReleaseServiceTests
                 Assert.Equal(publication.Id, actualRelease.PublicationId);
                 Assert.Equal(release.Year, actualRelease.Year);
                 Assert.Equal(release.TimePeriodCoverage, actualRelease.TimePeriodCoverage);
-                Assert.Equal(release.Slug, actualRelease.Slug);
+                Assert.Equal(newReleaseSlug, actualRelease.Slug);
 
                 Assert.Equal(release.Year, actualReleaseVersion.Year);
                 Assert.Equal(release.TimePeriodCoverage, actualReleaseVersion.TimePeriodCoverage);
-                Assert.Equal(release.Slug, actualReleaseVersion.Slug);
+                Assert.Equal(newReleaseSlug, actualReleaseVersion.Slug);
                 Assert.Equal(releaseVersion.NextReleaseDate, actualReleaseVersion.NextReleaseDate);
                 Assert.Equal(updatedType, actualReleaseVersion.Type);
                 Assert.Equal("New access list", actualReleaseVersion.PreReleaseAccessList);
@@ -997,50 +1006,10 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task Success()
         {
-            var nextReleaseDate = new PartialDate
-            {
-                Day = "1",
-                Month = "1",
-                Year = "2040"
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Type = ReleaseType.AdHocStatistics,
-                TimePeriodCoverage = TimeIdentifier.January,
-                PublishScheduled = DateTime.Parse("2020-06-29T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                Published = DateTime.Parse("2020-06-29T02:00:00.00Z"),
-                NextReleaseDate = nextReleaseDate,
-                ReleaseName = "2035",
-                Slug = "2035-1",
-                Version = 0,
-                PreReleaseAccessList = "Test access list",
-                ReleaseStatuses = new List<ReleaseStatus>
-                {
-                    new()
-                    {
-                        InternalReleaseNote = "Latest release note - 1 day ago",
-                        Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1))
-                    },
-                    new()
-                    {
-                        InternalReleaseNote = "Release note 2 days ago",
-                        Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2))
-                    }
-                },
-                NotifySubscribers = true,
-                UpdatePublishedDate = true
-            };
-
-            var publication = new Publication
-            {
-                Id = new Guid("f7da23e2-304a-4b47-a8f5-dba28a554de9"),
-                Title = "Test publication",
-                Slug = "test-publication",
-                LatestPublishedReleaseVersion = releaseVersion,
-                ReleaseVersions = { releaseVersion }
-            };
+            var releaseVersion = publication.Releases[0].Versions[0];
 
             var nonPreReleaseUserRole = new UserReleaseRole
             {
@@ -1058,7 +1027,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Publications.AddAsync(publication);
+                await context.ReleaseVersions.AddAsync(releaseVersion);
                 await context.UserReleaseRoles.AddAsync(nonPreReleaseUserRole);
                 await context.UserReleaseInvites.AddAsync(nonPreReleaseUserInvite);
                 await context.SaveChangesAsync();
@@ -1073,27 +1042,29 @@ public abstract class ReleaseServiceTests
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(releaseVersion.Id, viewModel.Id);
-                Assert.Equal("January 2035", viewModel.Title);
-                Assert.Equal(2035, viewModel.Year);
-                Assert.Equal("2035", viewModel.YearTitle);
-                Assert.Equal("2035-1", viewModel.Slug);
-                Assert.Equal(publication.Id, viewModel.PublicationId);
-                Assert.Equal("Test publication", viewModel.PublicationTitle);
-                Assert.Equal("test-publication", viewModel.PublicationSlug);
-                Assert.Equal("Latest release note - 1 day ago", viewModel.LatestInternalReleaseNote);
-                Assert.Equal(DateTime.Parse("2020-06-29T01:00:00.00"), viewModel.PublishScheduled);
-                Assert.Equal(DateTime.Parse("2020-06-29T02:00:00.00Z"), viewModel.Published);
-                Assert.Equal("Test access list", viewModel.PreReleaseAccessList);
-                Assert.Equal(nextReleaseDate, viewModel.NextReleaseDate);
-                Assert.Equal(ReleaseType.AdHocStatistics, viewModel.Type);
-                Assert.Equal(TimeIdentifier.January, viewModel.TimePeriodCoverage);
+                Assert.Equal(releaseVersion.Title, viewModel.Title);
+                Assert.Equal(releaseVersion.Year, viewModel.Year);
+                Assert.Equal(releaseVersion.YearTitle, viewModel.YearTitle);
+                Assert.Equal(releaseVersion.Release.Label, viewModel.Label);
+                Assert.Equal(releaseVersion.Version, viewModel.Version);
+                Assert.Equal(releaseVersion.Slug, viewModel.Slug);
+                Assert.Equal(releaseVersion.Publication.Id, viewModel.PublicationId);
+                Assert.Equal(releaseVersion.Publication.Title, viewModel.PublicationTitle);
+                Assert.Equal(releaseVersion.Publication.Slug, viewModel.PublicationSlug);
+                Assert.Equal(releaseVersion.LatestInternalReleaseNote, viewModel.LatestInternalReleaseNote);
+                Assert.Equal(releaseVersion.PublishScheduled, viewModel.PublishScheduled);
+                Assert.Equal(releaseVersion.Published, viewModel.Published);
+                Assert.Equal(releaseVersion.PreReleaseAccessList, viewModel.PreReleaseAccessList);
+                Assert.Equal(releaseVersion.NextReleaseDate, viewModel.NextReleaseDate);
+                Assert.Equal(releaseVersion.Type, viewModel.Type);
+                Assert.Equal(releaseVersion.TimePeriodCoverage, viewModel.TimePeriodCoverage);
+                Assert.Equal(releaseVersion.NotifySubscribers, viewModel.NotifySubscribers);
+                Assert.Equal(releaseVersion.UpdatePublishedDate, viewModel.UpdatePublishedDate);
 
                 Assert.Null(viewModel.PreviousVersionId);
                 Assert.True(viewModel.LatestRelease);
                 Assert.True(viewModel.Live);
                 Assert.False(viewModel.Amendment);
-                Assert.True(viewModel.NotifySubscribers);
-                Assert.True(viewModel.UpdatePublishedDate);
                 Assert.False(viewModel.PreReleaseUsersOrInvitesAdded);
             }
         }
