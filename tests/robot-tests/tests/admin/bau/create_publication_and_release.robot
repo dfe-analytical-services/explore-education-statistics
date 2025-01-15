@@ -179,6 +179,7 @@ Edit release summary
     user clicks button    Update release summary
 
 Verify updated release summary
+    user waits until h2 is visible    Release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    Summer term
     ...    2026/27    Official statistics
