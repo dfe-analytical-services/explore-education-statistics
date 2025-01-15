@@ -1072,25 +1072,16 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task WithPreReleaseUsers()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                TimePeriodCoverage = TimeIdentifier.January,
-                ReleaseName = "2035",
-            };
-
-            var publication = new Publication { ReleaseVersions = { releaseVersion } };
-
-            var preReleaseUserRole = new UserReleaseRole
-            {
-                Role = ReleaseRole.PrereleaseViewer,
-                ReleaseVersion = releaseVersion
-            };
+            UserReleaseRole preReleaseUserRole = _dataFixture.DefaultUserReleaseRole()
+                .WithRole(ReleaseRole.PrereleaseViewer)
+                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
+                    .WithRelease(_dataFixture.DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication())));
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Publications.AddAsync(publication);
                 await context.UserReleaseRoles.AddAsync(preReleaseUserRole);
                 await context.SaveChangesAsync();
             }
@@ -1099,7 +1090,7 @@ public abstract class ReleaseServiceTests
             {
                 var releaseService = BuildReleaseService(context);
 
-                var result = await releaseService.GetRelease(releaseVersion.Id);
+                var result = await releaseService.GetRelease(preReleaseUserRole.ReleaseVersionId);
 
                 var viewModel = result.AssertRight();
                 Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
@@ -1109,25 +1100,16 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task WithPreReleaseInvites()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                TimePeriodCoverage = TimeIdentifier.January,
-                ReleaseName = "2035",
-            };
-
-            var publication = new Publication { ReleaseVersions = { releaseVersion } };
-
-            var preReleaseUserInvite = new UserReleaseInvite
-            {
-                Role = ReleaseRole.PrereleaseViewer,
-                ReleaseVersion = releaseVersion
-            };
+            UserReleaseInvite preReleaseUserInvite = _dataFixture.DefaultUserReleaseInvite()
+                .WithRole(ReleaseRole.PrereleaseViewer)
+                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
+                    .WithRelease(_dataFixture.DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication())));
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Publications.AddAsync(publication);
                 await context.UserReleaseInvites.AddAsync(preReleaseUserInvite);
                 await context.SaveChangesAsync();
             }
@@ -1136,7 +1118,7 @@ public abstract class ReleaseServiceTests
             {
                 var releaseService = BuildReleaseService(context);
 
-                var result = await releaseService.GetRelease(releaseVersion.Id);
+                var result = await releaseService.GetRelease(preReleaseUserInvite.ReleaseVersionId);
 
                 var viewModel = result.AssertRight();
                 Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
@@ -1146,30 +1128,16 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task NotLatestPublishedRelease()
         {
-            var publication = new Publication
-            {
-                LatestPublishedReleaseVersion = new ReleaseVersion
-                {
-                    ReleaseName = "2022",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Published = DateTime.UtcNow
-                }
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 2)]);
 
-            var notLatestReleaseVersion = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2021",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Published = DateTime.UtcNow
-            };
+            var notLatestReleaseVersion = publication.ReleaseVersions[0];
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Publications.Add(publication);
-                context.ReleaseVersions.Add(notLatestReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -1188,13 +1156,8 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task NoLatestInternalReleaseNote()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear
-            };
-
-            var publication = new Publication { ReleaseVersions = [releaseVersion] };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1207,7 +1170,7 @@ public abstract class ReleaseServiceTests
             {
                 var releaseService = BuildReleaseService(context);
 
-                var result = await releaseService.GetRelease(releaseVersion.Id);
+                var result = await releaseService.GetRelease(publication.ReleaseVersions[0].Id);
 
                 var releaseViewModel = result.AssertRight();
                 Assert.Null(releaseViewModel.LatestInternalReleaseNote);
