@@ -1,5 +1,5 @@
-import { StaticAlertConfig, severityMapping } from 'types.bicep'
-
+import { severityMapping } from 'types.bicep'
+import { StaticAlertConfig } from 'staticAlertConfig.bicep'
 import { ResourceMetric } from 'resourceMetrics.bicep'
 
 @description('Name of the resource that this alert is being applied to.')

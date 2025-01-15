@@ -1,4 +1,5 @@
-import { responseTimeConfig } from 'alerts/config.bicep'
+import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
+import { staticAverageLessThanHundred } from 'alerts/staticAlertConfig.bicep'
 
 @description('Size in GB of the file share')
 param fileShareQuota int = 6
@@ -42,10 +43,21 @@ resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-0
   }
 }
 
-module availabilityAlerts 'alerts/fileServices/availabilityAlert.bicep' = if (alerts != null && alerts!.availability) {
-  name: '${storageAccountName}FsAvailabilityDeploy'
+var fileShareId = resourceId('Microsoft.Storage/storageAccounts/fileServices', storageAccountName, 'default')
+
+module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
+  name: '${storageAccountName}FsAvailabilityAlertModule'
   params: {
     resourceName: storageAccountName
+    id: fileShareId
+    resourceMetric: {
+      resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
+      metric: 'availability'
+    }
+    config: {
+      ...staticAverageLessThanHundred
+      nameSuffix: 'file-service-availability'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
@@ -55,7 +67,7 @@ module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && al
   name: '${storageAccountName}FsLatencyDeploy'
   params: {
     resourceName: '${storageAccountName}-fs'
-    id: resourceId('Microsoft.Storage/storageAccounts/fileServices', storageAccountName, 'default')
+    id: fileShareId
     resourceMetric: {
       resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
       metric: 'SuccessE2ELatency'

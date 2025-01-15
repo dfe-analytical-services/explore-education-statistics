@@ -1,4 +1,11 @@
-import { cpuPercentageConfig, memoryPercentageConfig } from 'alerts/config.bicep'
+import {
+  cpuPercentageConfig
+  memoryPercentageConfig
+  dynamicMaxGreaterThan
+  dynamicAverageGreaterThan
+} from 'alerts/dynamicAlertConfig.bicep'
+
+import { staticAverageLessThanHundred } from 'alerts/staticAlertConfig.bicep'
 
 import { IpRange, PrincipalNameAndId } from '../types.bicep'
 
@@ -108,22 +115,26 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
     }
   }
 
-  resource database 'databases' = [for name in databaseNames: {
+  resource database 'databases' = [
+    for name in databaseNames: {
       name: name
-  }]
+    }
+  ]
 
   tags: tagValues
 }
 
 @batchSize(1)
-resource firewallRuleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-01' = [for rule in firewallRules: {
-  name: rule.name
-  parent: postgreSQLDatabase
-  properties: {
-    startIpAddress: parseCidr(rule.cidr).firstUsable
-    endIpAddress: parseCidr(rule.cidr).lastUsable
+resource firewallRuleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-01' = [
+  for rule in firewallRules: {
+    name: rule.name
+    parent: postgreSQLDatabase
+    properties: {
+      startIpAddress: parseCidr(rule.cidr).firstUsable
+      endIpAddress: parseCidr(rule.cidr).lastUsable
+    }
   }
-}]
+]
 
 module privateEndpointModule 'privateEndpoint.bicep' = {
   name: 'postgresPrivateEndpointDeploy'
@@ -138,50 +149,85 @@ module privateEndpointModule 'privateEndpoint.bicep' = {
 }
 
 @batchSize(1)
-resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/administrators@2022-12-01' = [for adminPrincipal in entraIdAdminPrincipals: {
-  name: adminPrincipal.objectId
-  parent: postgreSQLDatabase
-  properties: {
-    tenantId: tenant().tenantId
-    principalName: adminPrincipal.principalName
-    principalType: 'USER'
+resource adminRoleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/administrators@2022-12-01' = [
+  for adminPrincipal in entraIdAdminPrincipals: {
+    name: adminPrincipal.objectId
+    parent: postgreSQLDatabase
+    properties: {
+      tenantId: tenant().tenantId
+      principalName: adminPrincipal.principalName
+      principalType: 'USER'
+    }
+    dependsOn: [
+      firewallRuleAssignments
+    ]
   }
-  dependsOn: [
-    firewallRuleAssignments
-  ]
-}]
+]
 
-module databaseAliveAlert 'alerts/postgreSqlFlexibleServers/databaseAliveAlert.bicep' = if (alerts != null && alerts!.availability) {
-  name: '${databaseServerName}DbAliveDeploy'
+module databaseAliveAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
+  name: '${databaseServerName}DbAliveAlertModule'
   params: {
     resourceName: databaseServerName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'is_db_alive'
+    }
+    config: {
+      ...staticAverageLessThanHundred
+      nameSuffix: 'database-alive'
+      threshold: '1'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
 
-module queryTimeAlert 'alerts/postgreSqlFlexibleServers/queryTimeAlert.bicep' = if (alerts != null && alerts!.queryTime) {
-  name: '${databaseServerName}QueryTimeDeploy'
+module queryTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.queryTime) {
+  name: '${databaseServerName}QueryTimeAlertModule'
   params: {
     resourceName: databaseServerName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'longest_query_time_sec'
+    }
+    config: {
+      ...dynamicMaxGreaterThan
+      nameSuffix: 'max-query-time'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
 
-module transactionTimeAlert 'alerts/postgreSqlFlexibleServers/transactionTimeAlert.bicep' = if (alerts != null && alerts!.transactionTime) {
-  name: '${databaseServerName}TransactionTimeDeploy'
+module transactionTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.transactionTime) {
+  name: '${databaseServerName}TransactionTimeAlertModule'
   params: {
     resourceName: databaseServerName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'longest_transaction_time_sec'
+    }
+    config: {
+      ...dynamicMaxGreaterThan
+      nameSuffix: 'max-transaction-time'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
 
-module clientConnectionsWaitingAlert 'alerts/postgreSqlFlexibleServers/clientConnectionsWaitingAlert.bicep' = if (alerts != null && alerts!.clientConenctionsWaiting) {
-  name: '${databaseServerName}ClientConnectionsDeploy'
+module clientConnectionsWaitingAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.clientConenctionsWaiting) {
+  name: '${databaseServerName}ClientConnectionsAlertModule'
   params: {
     resourceName: databaseServerName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'client_connections_waiting'
+    }
+    config: {
+      ...dynamicMaxGreaterThan
+      nameSuffix: 'client-connections'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
@@ -201,19 +247,35 @@ module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null
   }
 }
 
-module diskBandwidthAlert 'alerts/postgreSqlFlexibleServers/diskBandwidthAlert.bicep' = if (alerts != null && alerts!.diskBandwidth) {
-  name: '${databaseServerName}DiskBandwidthDeploy'
+module diskBandwidthAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.diskBandwidth) {
+  name: '${databaseServerName}DiskBandwidthAlertModule'
   params: {
     resourceName: databaseServerName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'disk_bandwidth_consumed_percentage'
+    }
+    config: {
+      ...dynamicAverageGreaterThan
+      nameSuffix: 'disk-bandwidth'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
 
-module diskIopsAlert 'alerts/postgreSqlFlexibleServers/diskIopsAlert.bicep' = if (alerts != null && alerts!.diskIops) {
-  name: '${databaseServerName}DiskIopsDeploy'
+module diskIopsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.diskIops) {
+  name: '${databaseServerName}DiskIopsAlertModule'
   params: {
     resourceName: databaseServerName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'disk_iops_consumed_percentage'
+    }
+    config: {
+      ...dynamicAverageGreaterThan
+      nameSuffix: 'disk-iops'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
