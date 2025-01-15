@@ -120,7 +120,7 @@ public class PublicationService : IPublicationService
 
         // Publications must have a published release and not be superseded
         var baseQueryable = _contentDbContext.Publications
-            .Include(p => p.ReleaseVersions)
+            .Include(p => p.Releases)
             .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&
                         (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue));
 
@@ -180,9 +180,10 @@ public class PublicationService : IPublicationService
                 {
                     Id = result.Value.Id,
                     Slug = result.Value.Slug,
-                    ReleaseSlug = result.Value.ReleaseVersions
-                        .Where(r => r.Id == result.Value.LatestPublishedReleaseVersionId.Value)
-                        .Select(r => r.Slug).FirstOrDefault() ?? "",
+                    ReleaseSlug = result.Value.Releases
+                      .Where(v => v.Versions.Any(
+                                rv => rv.Id == result.Value.LatestPublishedReleaseVersionId))
+                      .Select(r => r.Slug).FirstOrDefault() ?? "",
                     Summary = result.Value.Summary,
                     Title = result.Value.Title,
                     Theme = result.Value.Theme.Title,
