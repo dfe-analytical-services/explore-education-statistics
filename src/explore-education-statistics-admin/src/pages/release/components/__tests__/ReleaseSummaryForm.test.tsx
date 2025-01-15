@@ -60,6 +60,9 @@ describe('ReleaseSummaryForm', () => {
     );
     expect(inputYear).toBeInTheDocument();
 
+    const inputReleaseLabel = screen.getByLabelText('Release label');
+    expect(inputReleaseLabel).toBeInTheDocument();
+
     const releaseTypeRadios = within(
       screen.getByRole('group', { name: 'Release type' }),
     ).getAllByRole('radio');
@@ -131,6 +134,9 @@ describe('ReleaseSummaryForm', () => {
       testTimeIdentifiers[0].category.label,
     );
     expect(inputYear).toBeInTheDocument();
+
+    const inputReleaseLabel = screen.getByLabelText('Release label');
+    expect(inputReleaseLabel).toBeInTheDocument();
 
     const releaseTypeRadios = within(
       screen.getByRole('group', { name: 'Release type' }),
