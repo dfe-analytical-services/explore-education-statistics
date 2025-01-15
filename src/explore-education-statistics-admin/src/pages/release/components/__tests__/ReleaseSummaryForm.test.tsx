@@ -43,6 +43,7 @@ describe('ReleaseSummaryForm', () => {
         releaseVersion={0}
         onSubmit={noop}
         onCancel={noop}
+        hideLabelField={false} // This will be removed in EES-5792
       />,
     );
 
@@ -59,6 +60,9 @@ describe('ReleaseSummaryForm', () => {
       testTimeIdentifiers[0].category.label,
     );
     expect(inputYear).toBeInTheDocument();
+
+    const inputReleaseLabel = screen.getByLabelText('Release label');
+    expect(inputReleaseLabel).toBeInTheDocument();
 
     const releaseTypeRadios = within(
       screen.getByRole('group', { name: 'Release type' }),
@@ -115,6 +119,7 @@ describe('ReleaseSummaryForm', () => {
         }}
         onSubmit={noop}
         onCancel={noop}
+        hideLabelField={false} // This will be removed in EES-5792
       />,
     );
 
@@ -131,6 +136,9 @@ describe('ReleaseSummaryForm', () => {
       testTimeIdentifiers[0].category.label,
     );
     expect(inputYear).toBeInTheDocument();
+
+    const inputReleaseLabel = screen.getByLabelText('Release label');
+    expect(inputReleaseLabel).toBeInTheDocument();
 
     const releaseTypeRadios = within(
       screen.getByRole('group', { name: 'Release type' }),
@@ -395,6 +403,7 @@ describe('ReleaseSummaryForm', () => {
         releaseVersion={0}
         onSubmit={noop}
         onCancel={noop}
+        hideLabelField={false} // This will be removed in EES-5792
       />,
     );
 
@@ -445,6 +454,7 @@ describe('ReleaseSummaryForm', () => {
         releaseVersion={0}
         onSubmit={onSubmit}
         onCancel={noop}
+        hideLabelField={false} // This will be removed in EES-5792
       />,
     );
 
@@ -502,6 +512,7 @@ describe('ReleaseSummaryForm', () => {
         releaseVersion={0}
         onSubmit={onSubmit}
         onCancel={noop}
+        hideLabelField={false} // This will be removed in EES-5792
       />,
     );
 
@@ -674,6 +685,7 @@ describe('ReleaseSummaryForm', () => {
           releaseVersion={releaseVersion}
           onSubmit={noop}
           onCancel={noop}
+          hideLabelField={false} // This will be removed in EES-5792
         />,
       );
 
@@ -696,58 +708,64 @@ describe('ReleaseSummaryForm', () => {
     },
   );
 
-  test('Displays a validation error when the server responds with a slug not unique error', async () => {
-    metaService.getTimePeriodCoverageGroups.mockResolvedValue(
-      testTimeIdentifiers,
-    );
+  test.each([true, false])(
+    'Displays a validation error when the server responds with a slug not unique error',
+    async hideLabelField => {
+      metaService.getTimePeriodCoverageGroups.mockResolvedValue(
+        testTimeIdentifiers,
+      );
 
-    const onSubmit = jest.fn();
+      const onSubmit = jest.fn();
 
-    const error = createAxiosErrorMock<ValidationProblemDetails>({
-      data: {
-        errors: [{ code: 'SlugNotUnique', message: '' }],
-        title: '',
-        type: '',
-        status: 400,
-      },
-    });
-    onSubmit.mockRejectedValue(error);
+      const error = createAxiosErrorMock<ValidationProblemDetails>({
+        data: {
+          errors: [{ code: 'SlugNotUnique', message: '' }],
+          title: '',
+          type: '',
+          status: 400,
+        },
+      });
+      onSubmit.mockRejectedValue(error);
 
-    render(
-      <ReleaseSummaryForm
-        submitText="Create new release"
-        initialValues={{
-          timePeriodCoverageCode: 'AYQ4',
-          timePeriodCoverageStartYear: '1966',
-          releaseType: 'ExperimentalStatistics',
-          releaseLabel: 'initial',
-        }}
-        releaseVersion={0}
-        onSubmit={onSubmit}
-        onCancel={noop}
-      />,
-    );
+      render(
+        <ReleaseSummaryForm
+          submitText="Create new release"
+          initialValues={{
+            timePeriodCoverageCode: 'AYQ4',
+            timePeriodCoverageStartYear: '1966',
+            releaseType: 'ExperimentalStatistics',
+            releaseLabel: 'initial',
+          }}
+          releaseVersion={0}
+          onSubmit={onSubmit}
+          onCancel={noop}
+          hideLabelField={hideLabelField} // This will be removed in EES-5792
+        />,
+      );
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('Select time period coverage'),
-      ).toBeInTheDocument();
-    });
+      await waitFor(() => {
+        expect(
+          screen.getByText('Select time period coverage'),
+        ).toBeInTheDocument();
+      });
 
-    const buttonCreate = screen.getByRole('button', {
-      name: 'Create new release',
-    });
-    await userEvent.click(buttonCreate);
+      const buttonCreate = screen.getByRole('button', {
+        name: 'Create new release',
+      });
+      await userEvent.click(buttonCreate);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          'Choose a unique combination of type, start year and label',
-          { selector: 'a' },
-        ),
-      ).toBeInTheDocument();
-    });
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            hideLabelField
+              ? 'Choose a unique combination of time period coverage type and start year'
+              : 'Choose a unique combination of time period coverage type, start year and label',
+            { selector: 'a' },
+          ),
+        ).toBeInTheDocument();
+      });
 
-    expect(onSubmit).toHaveBeenCalledTimes(1);
-  });
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+    },
+  );
 });

@@ -32,16 +32,6 @@ export interface ReleaseSummaryFormValues {
 
 const formId = 'releaseSummaryForm';
 
-const errorMappings = [
-  mapFieldErrors<ReleaseSummaryFormValues>({
-    target: 'releaseLabel',
-    messages: {
-      SlugNotUnique:
-        'Choose a unique combination of type, start year and label',
-    },
-  }),
-];
-
 interface Props {
   submitText: string;
   templateRelease?: IdTitlePair;
@@ -49,6 +39,7 @@ interface Props {
   releaseVersion: number;
   onSubmit: (values: ReleaseSummaryFormValues) => Promise<void> | void;
   onCancel: () => void;
+  hideLabelField?: boolean;
 }
 
 export default function ReleaseSummaryForm({
@@ -58,6 +49,7 @@ export default function ReleaseSummaryForm({
   templateRelease,
   onSubmit,
   onCancel,
+  hideLabelField = true, // This will be removed in EES-5792
 }: Props) {
   const { value: timePeriodCoverageGroups, isLoading } = useAsyncRetry<
     TimePeriodCoverageGroup[]
@@ -126,6 +118,18 @@ export default function ReleaseSummaryForm({
 
   const disableReleaseSlugChange = releaseVersion > 0;
 
+  // This will be moved to be stored outside of this component, and the conditional removed, in EES-5792
+  const errorMappings = [
+    mapFieldErrors<ReleaseSummaryFormValues>({
+      target: 'releaseLabel',
+      messages: {
+        SlugNotUnique: hideLabelField
+          ? 'Choose a unique combination of time period coverage type and start year'
+          : 'Choose a unique combination of time period coverage type, start year and label',
+      },
+    }),
+  ];
+
   return (
     <FormProvider
       enableReinitialize
@@ -171,15 +175,20 @@ export default function ReleaseSummaryForm({
                 disabled={disableReleaseSlugChange}
               />
             </FormFieldset>
-            <FormFieldTextInput
-              id="releaseLabel"
-              name="releaseLabel"
-              label="Release label"
-              labelSize="m"
-              hint="Unique label for the release, use if needed to distinguish it from other releases that share the same period."
-              width={20}
-              disabled={disableReleaseSlugChange}
-            />
+            {
+              // This conditional will be removed in EES-5792
+              !hideLabelField && (
+                <FormFieldTextInput
+                  id="releaseLabel"
+                  name="releaseLabel"
+                  label="Release label"
+                  labelSize="m"
+                  hint="Unique label for the release, use if needed to distinguish it from other releases that share the same period."
+                  width={20}
+                  disabled={disableReleaseSlugChange}
+                />
+              )
+            }
             <FormFieldRadioGroup<ReleaseSummaryFormValues>
               legend="Release type"
               name="releaseType"
