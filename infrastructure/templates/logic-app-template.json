@@ -299,7 +299,7 @@
                   {
                     "name": "withinThresholdMessage",
                     "type": "string",
-                    "value": "The @{variables('timeAggregation')} of @{variables('metricName')} is at @{if(empty(variables('metricValue')), 'an acceptable value', variables('metricValue'))}, and is no longer @{variables('operator')} the @{if(empty(variables('threshold')), 'dynamic', variables('threshold')) } threshold"
+                    "value": "The @{variables('timeAggregation')} of @{variables('metricName')} is at @{if(empty(variables('metricValue')), 'an acceptable value again', concat(variables('metricValue'), ' and is no longer ', variables('operator'), ' the ', variables('threshold'), ' threshold'))}"
                   }
                 ]
               }
