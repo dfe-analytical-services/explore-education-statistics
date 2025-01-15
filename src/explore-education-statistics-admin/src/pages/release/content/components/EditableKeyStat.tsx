@@ -11,7 +11,7 @@ import React from 'react';
 interface EditableKeyStatProps {
   isEditing?: boolean;
   keyStat: KeyStatistic;
-  keyStatisticGuidanceTitles?: (string | undefined)[];
+  keyStats: KeyStatistic[];
   releaseId: string;
   testId?: string;
 }
@@ -19,7 +19,7 @@ interface EditableKeyStatProps {
 const EditableKeyStat = ({
   isEditing = false,
   keyStat,
-  keyStatisticGuidanceTitles,
+  keyStats,
   releaseId,
   testId = 'keyStat',
 }: EditableKeyStatProps) => {
@@ -35,7 +35,7 @@ const EditableKeyStat = ({
       return (
         <EditableKeyStatDataBlock
           keyStat={keyStat}
-          keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
+          keyStats={keyStats}
           releaseId={releaseId}
           testId={testId}
           isEditing={isEditing}
@@ -65,7 +65,7 @@ const EditableKeyStat = ({
       return (
         <EditableKeyStatText
           keyStat={keyStat}
-          keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
+          keyStats={keyStats}
           testId={testId}
           isEditing={isEditing}
           onRemove={async () => {

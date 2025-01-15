@@ -16,7 +16,10 @@ export interface KeyStatisticsProps {
   isEditing?: boolean;
 }
 
-const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
+export default function KeyStatistics({
+  release,
+  isEditing,
+}: KeyStatisticsProps) {
   const { reorderKeyStatistics } = useReleaseContentActions();
   const [keyStatistics, setKeyStatistics] = useState(release.keyStatistics);
 
@@ -26,18 +29,11 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 
   const [isReordering, toggleIsReordering] = useToggle(false);
 
-  const keyStatisticGuidanceTitles = keyStatistics.map(
-    stat => stat.guidanceTitle?.toLowerCase(),
-  );
-
   return (
     <>
       {isEditing && (
         <>
-          <AddKeyStatistics
-            keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
-            release={release}
-          />
+          <AddKeyStatistics release={release} />
           <hr />
           {keyStatistics.length > 1 && !isReordering && (
             <Button variant="secondary" onClick={toggleIsReordering.on}>
@@ -62,6 +58,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                 <EditableKeyStatDataBlock
                   isReordering
                   keyStat={keyStat}
+                  keyStats={[]}
                   releaseId={release.id}
                 />
               ),
@@ -93,7 +90,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
       ) : (
         <div className="govuk-!-margin-bottom-9">
           <KeyStatContainer>
-            {keyStatistics.map(keyStat => (
+            {release.keyStatistics.map(keyStat => (
               <div
                 className={keyStatStyles.wrapper}
                 data-testid="keyStat"
@@ -101,7 +98,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
               >
                 <EditableKeyStat
                   keyStat={keyStat}
-                  keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
+                  keyStats={release.keyStatistics}
                   releaseId={release.id}
                   isEditing={isEditing}
                 />
@@ -112,6 +109,4 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
       )}
     </>
   );
-};
-
-export default KeyStatistics;
+}
