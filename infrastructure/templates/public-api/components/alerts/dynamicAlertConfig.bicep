@@ -76,6 +76,20 @@ var dynamicMaxGreaterThan = {
 }
 
 @export()
+var dynamicTotalGreaterThan = {
+  ...defaultDynamicAlertConfig
+  aggregation: 'Total'
+  operator: 'GreaterThan'
+}
+
+@export()
+var dynamicCountGreaterThan = {
+  ...defaultDynamicAlertConfig
+  aggregation: 'Count'
+  operator: 'GreaterThan'
+}
+
+@export()
 var cpuPercentageConfig = {
   ...dynamicAverageGreaterThan
   nameSuffix: 'cpu-percentage'

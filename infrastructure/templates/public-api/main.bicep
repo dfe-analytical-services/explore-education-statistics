@@ -243,6 +243,7 @@ module appInsightsModule 'application/public-api/publicApiAppInsights.bicep' = {
   params: {
     location: location
     resourceNames: resourceNames
+    tagValues: tagValues
   }
 }
 

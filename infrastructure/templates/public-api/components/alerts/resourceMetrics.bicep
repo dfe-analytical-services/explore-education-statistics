@@ -4,7 +4,24 @@ type AppGatewayMetric = {
   resourceType: 'Microsoft.Network/applicationGateways'
   metric:
     | 'ApplicationGatewayTotalTime'
+    | 'FailedRequests'
     | 'UnhealthyHostCount'
+    | 'ResponseStatus'
+  dimensions: {
+    name: 
+      | 'BackendSettingsPool'
+      | 'HttpStatusGroup'
+    operator: DimensionOperator?
+    values: string[]
+  }[]?
+}
+
+type AppInsightsMetric = {
+  resourceType: 'Microsoft.Insights/components'
+  metric:
+    | 'exceptions/count'
+    | 'exceptions/server'
+    | 'requests/failed'
 }
 
 type AppServicePlanMetric = {
@@ -19,29 +36,42 @@ type ContainerAppMetric = {
   metric:
     | 'CpuPercentage' 
     | 'MemoryPercentage'
+    | 'ResiliencyConnectTimeouts'
+    | 'ResiliencyRequestRetries'
+    | 'ResiliencyRequestTimeouts'
     | 'ResponseTime'
     | 'RestartCount'
 }
 
 type FileServiceMetric = {
   resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
-  dimensions: {
-    name: 'FileShare' | 'Tier'
-    operator: DimensionOperator?
-    values: string[]
-  }[]?
   metric:
     | 'availability'
     | 'FileCapacity'
     | 'SuccessE2ELatency'
+    dimensions: {
+      name: 
+        | 'FileShare'
+        | 'Tier'
+      operator: DimensionOperator?
+      values: string[]
+    }[]?
 }
 
 type PostgreSqlMetric = {
   resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+  dimensions: {
+    name: 
+      | 'DatabaseName'
+    operator: DimensionOperator?
+    values: string[]
+  }[]?
   metric:
     | 'backup_storage_used'
     | 'client_connections_waiting'
+    | 'connections_failed'
     | 'cpu_percent'
+    | 'deadlocks'
     | 'disk_bandwidth_consumed_percentage'
     | 'disk_iops_consumed_percentage'
     | 'is_db_alive'
@@ -55,6 +85,10 @@ type SiteMetric = {
   resourceType: 'Microsoft.Web/sites'
   metric:
     | 'HealthCheckStatus'
+    | 'Http401'
+    | 'Http403'
+    | 'Http4xx'
+    | 'Http5xx'
 }
 
 type StorageAccountMetric = {
@@ -68,8 +102,9 @@ type StorageAccountMetric = {
 @export()
 @discriminator('resourceType')
 type ResourceMetric = 
-| AppServicePlanMetric
 | AppGatewayMetric
+| AppInsightsMetric
+| AppServicePlanMetric
 | ContainerAppMetric
 | ContainerAppMetric
 | FileServiceMetric

@@ -72,6 +72,8 @@ module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
       diskIops: true
       memoryPercentage: true
       capacity: true
+      failedConnections: true
+      deadlocks: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues

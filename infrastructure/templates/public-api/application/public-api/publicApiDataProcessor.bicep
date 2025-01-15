@@ -121,6 +121,7 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
       fileServiceAvailability: true
       fileServiceLatency: false
       fileServiceCapacity: true
+      httpErrors: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues

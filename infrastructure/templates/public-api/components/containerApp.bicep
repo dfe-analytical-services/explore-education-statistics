@@ -111,6 +111,9 @@ param alerts {
   responseTime: bool
   cpuPercentage: bool
   memoryPercentage: bool
+  connectionTimeouts: bool
+  requestRetries: bool
+  requestTimeouts: bool
   alertsGroupName: string
 }?
 
@@ -270,6 +273,57 @@ module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != n
       metric: 'MemoryPercentage'
     }
     config: memoryPercentageConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module connectionTimeoutsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.connectionTimeouts) {
+  name: '${containerAppName}ConnectionTimeoutsAlertModule'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'ResiliencyConnectTimeouts'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'connection-timeouts'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module requestRetriesAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.requestRetries) {
+  name: '${containerAppName}RequestRetriesAlertModule'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'ResiliencyRequestRetries'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'request-retries'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module requestTimeoutsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.requestTimeouts) {
+  name: '${containerAppName}RequestTimeoutsAlertModule'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'ResiliencyRequestTimeouts'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'request-timeouts'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

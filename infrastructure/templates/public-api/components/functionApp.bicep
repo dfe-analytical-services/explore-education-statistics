@@ -1,5 +1,6 @@
 import { FirewallRule, IpRange, AzureFileShareMount, EntraIdAuthentication } from '../types.bicep'
-import { staticAverageLessThanHundred } from 'alerts/staticAlertConfig.bicep'
+import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
+import { dynamicAverageGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
 import { abbreviations } from '../abbreviations.bicep'
 
 @description('Specifies the location for all resources.')
@@ -75,6 +76,7 @@ param storageFirewallRules IpRange[] = []
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
   functionAppHealth: bool
+  httpErrors: bool
   cpuPercentage: bool
   memoryPercentage: bool
   storageAccountAvailability: bool
@@ -467,6 +469,48 @@ module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && aler
     tagValues: tagValues
   }
 }
+
+var unexpectedHttpStatusCodeMetrics = ['Http401', 'Http5xx']
+
+module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
+  for httpStatusCode in unexpectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
+    name: '${functionAppName}${httpStatusCode}Module'
+    params: {
+      resourceName: functionAppName
+      resourceMetric: {
+        resourceType: 'Microsoft.Web/sites'
+        metric: httpStatusCode
+      }
+      config: {
+        ...staticMinGreaterThanZero
+        nameSuffix: toLower(httpStatusCode)
+      }
+      alertsGroupName: alerts!.alertsGroupName
+      tagValues: tagValues
+    }
+  }
+]
+
+var expectedHttpStatusCodeMetrics = ['Http403', 'Http4xx']
+
+module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
+  for httpStatusCode in expectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
+    name: '${functionAppName}${httpStatusCode}Module'
+    params: {
+      resourceName: functionAppName
+      resourceMetric: {
+        resourceType: 'Microsoft.Web/sites'
+        metric: httpStatusCode
+      }
+      config: {
+        ...dynamicAverageGreaterThan
+        nameSuffix: toLower(httpStatusCode)
+      }
+      alertsGroupName: alerts!.alertsGroupName
+      tagValues: tagValues
+    }
+  }
+]
 
 output functionAppName string = functionApp.name
 output url string = 'https://${functionApp.name}.azurewebsites.net'
