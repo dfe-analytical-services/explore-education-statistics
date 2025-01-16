@@ -36,7 +36,7 @@ using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Valida
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
-    public class ReleasesControllerUnitTests
+    public class ReleaseVersionsControllerUnitTests
     {
         private readonly Guid _releaseVersionId = Guid.NewGuid();
         private readonly Guid _publicationId = Guid.NewGuid();
@@ -535,7 +535,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             return fileMock.Object;
         }
 
-        private static ReleasesController BuildController(
+        private static ReleaseVersionsController BuildController(
             IReleaseService? releaseService = null,
             IReleaseAmendmentService? releaseAmendmentService = null,
             IReleaseApprovalService? releaseApprovalService = null,
@@ -544,7 +544,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             IReleaseChecklistService? releaseChecklistService = null,
             IDataImportService? importService = null)
         {
-            return new ReleasesController(
+            return new ReleaseVersionsController(
                 releaseService ?? Mock.Of<IReleaseService>(Strict),
                 releaseAmendmentService ?? Mock.Of<IReleaseAmendmentService>(Strict),
                 releaseApprovalService ?? Mock.Of<IReleaseApprovalService>(Strict),
@@ -555,9 +555,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
     }
 
-    public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+    public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
     {
-        public class CreateReleaseTests(TestApplicationFactory testApp) : ReleasesControllerIntegrationTests(testApp)
+        public class CreateReleaseTests(TestApplicationFactory testApp) : ReleaseVersionsControllerIntegrationTests(testApp)
         {
             [Theory]
             [InlineData(2020, TimeIdentifier.AcademicYear, "initial", "initial", "2020-21-initial")]
@@ -759,7 +759,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             }
         }
 
-        public class UpdateReleaseTests(TestApplicationFactory testApp) : ReleasesControllerIntegrationTests(testApp)
+        public class UpdateReleaseTests(TestApplicationFactory testApp) : ReleaseVersionsControllerIntegrationTests(testApp)
         {
             [Fact]
             public async Task Success()
