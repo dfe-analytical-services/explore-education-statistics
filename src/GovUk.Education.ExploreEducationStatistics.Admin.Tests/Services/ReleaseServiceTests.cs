@@ -894,7 +894,7 @@ public abstract class ReleaseServiceTests
                 var result = await releaseService
                     .UpdateReleaseVersion(
                         releaseVersion.Id,
-                        new ReleaseUpdateRequest
+                        new ReleaseVersionUpdateRequest
                         {
                             Type = updatedType,
                             Year = release.Year,
@@ -969,7 +969,7 @@ public abstract class ReleaseServiceTests
                 var result = await releaseService
                     .UpdateReleaseVersion(
                         releaseVersion.Id,
-                        new ReleaseUpdateRequest
+                        new ReleaseVersionUpdateRequest
                         {
                             Year = otherRelease.Year,
                             TimePeriodCoverage = otherRelease.TimePeriodCoverage,
@@ -985,7 +985,7 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task ReleaseTypeExperimentalStatistics_ReturnsValidationActionResult()
         {
-            var releaseUpdateRequest = new ReleaseUpdateRequest
+            var releaseUpdateRequest = new ReleaseVersionUpdateRequest
             {
                 Type = ReleaseType.ExperimentalStatistics,
             };

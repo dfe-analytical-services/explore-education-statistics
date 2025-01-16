@@ -27,7 +27,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
+using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -367,7 +367,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>>
+        public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseVersionSummaryViewModel>>>
             ListLatestReleaseVersionsPaginated(
                 Guid publicationId,
                 int page = 1,
@@ -383,11 +383,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         // latest/active versions of releases. Ideally, we should be able to
                         // pagination entirely in the database, but this requires re-modelling of releases.
                         // TODO: EES-3663 Use database pagination when ReleaseVersions are introduced
-                        PaginatedListViewModel<ReleaseSummaryViewModel>.Paginate(releases, page, pageSize)
+                        PaginatedListViewModel<ReleaseVersionSummaryViewModel>.Paginate(releases, page, pageSize)
                 );
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
+        public async Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListLatestReleaseVersions(
             Guid publicationId,
             bool? live = null,
             bool includePermissions = false)
@@ -412,7 +412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 .Reference(rv => rv.Release)
                                 .LoadAsync();
 
-                            return mapper.Map<ReleaseSummaryViewModel>(releaseVersion) with
+                            return mapper.Map<ReleaseVersionSummaryViewModel>(releaseVersion) with
                             {
                                 Permissions = includePermissions
                                     ? await PermissionsUtils.GetReleasePermissions(userService, releaseVersion)

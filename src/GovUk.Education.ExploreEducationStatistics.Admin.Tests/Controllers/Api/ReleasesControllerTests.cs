@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task Create_Release_Returns_Ok()
         {
-            var returnedViewModel = new ReleaseViewModel();
+            var returnedViewModel = new ReleaseVersionViewModel();
 
             var releaseService = new Mock<IReleaseService>(Strict);
 
@@ -204,21 +204,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task UpdateRelease_Returns_Ok()
+        public async Task UpdateReleaseVersion_Returns_Ok()
         {
             var releaseService = new Mock<IReleaseService>(Strict);
 
             releaseService
                 .Setup(s => s.UpdateReleaseVersion(
                     It.Is<Guid>(id => id.Equals(_releaseVersionId)),
-                    It.IsAny<ReleaseUpdateRequest>())
+                    It.IsAny<ReleaseVersionUpdateRequest>())
                 )
-                .ReturnsAsync(new ReleaseViewModel { Id = _releaseVersionId });
+                .ReturnsAsync(new ReleaseVersionViewModel { Id = _releaseVersionId });
 
             var controller = BuildController(releaseService: releaseService.Object);
 
             // Method under test
-            var result = await controller.UpdateRelease(new ReleaseUpdateRequest(), _releaseVersionId);
+            var result = await controller.UpdateReleaseVersion(new ReleaseVersionUpdateRequest(), _releaseVersionId);
             VerifyAllMocks(releaseService);
 
             var unboxed = result.AssertOkResult();
@@ -393,7 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var releaseService = new Mock<IReleaseService>(Strict);
 
             var request = new ReleaseStatusCreateRequest();
-            var returnedReleaseViewModel = new ReleaseViewModel();
+            var returnedReleaseViewModel = new ReleaseVersionViewModel();
 
             releaseApprovalService
                 .Setup(s => s.CreateReleaseStatus(_releaseVersionId, request))
@@ -417,7 +417,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ListReleasesForApproval()
         {
-            var releases = ListOf(new ReleaseSummaryViewModel
+            var releases = ListOf(new ReleaseVersionSummaryViewModel
             {
                 Id = Guid.NewGuid()
             });
@@ -588,7 +588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     timePeriodCoverage: timePeriodCoverage,
                     label: label);
 
-                var viewModel = response.AssertOk<ReleaseViewModel>();
+                var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
                 var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
@@ -789,7 +789,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     label: newLabel,
                     preReleaseAccessList: newPreReleaseAccessList);
 
-                var viewModel = response.AssertOk<ReleaseViewModel>();
+                var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
                 var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
@@ -852,7 +852,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     timePeriodCoverage: TimeIdentifier.AcademicYear,
                     label: newLabel);
 
-                var viewModel = response.AssertOk<ReleaseViewModel>();
+                var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
                 var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 

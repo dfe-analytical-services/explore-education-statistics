@@ -31,7 +31,7 @@ public record ReleaseCreateRequest
     public Guid? TemplateReleaseId { get; init; }
 }
 
-public record ReleaseUpdateRequest
+public record ReleaseVersionUpdateRequest
 {
     [Required]
     public ReleaseType? Type { get; init; }
