@@ -48,17 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _dataImportService = dataImportService;
         }
 
-        [HttpPost("publications/{publicationId:guid}/releases")]
-        public async Task<ActionResult<ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest release,
-            Guid publicationId)
-        {
-            release.PublicationId = publicationId;
-
-            return await _releaseService
-                .CreateRelease(release)
-                .HandleFailuresOrOk();
-        }
-
         [HttpDelete("release/{releaseVersionId:guid}")]
         public async Task<ActionResult> DeleteReleaseVersion(
             Guid releaseVersionId,
@@ -189,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("releases/{releaseVersionId:guid}")]
+        [HttpPatch("releaseVersions/{releaseVersionId:guid}")]
         public async Task<ActionResult<ReleaseVersionViewModel>> UpdateReleaseVersion(ReleaseVersionUpdateRequest request,
             Guid releaseVersionId)
         {

@@ -214,7 +214,7 @@ const releaseVersionService = {
     createRequest: CreateReleaseVersionRequest,
   ): Promise<ReleaseVersion> {
     return client.post(
-      `/publications/${createRequest.publicationId}/releases`,
+      `/releases`,
       createRequest,
     );
   },
@@ -231,7 +231,7 @@ const releaseVersionService = {
     id: string,
     updateRequest: UpdateReleaseVersionRequest,
   ): Promise<ReleaseVersion> {
-    return client.put(`/releases/${id}`, updateRequest);
+    return client.put(`/releaseVersions/${id}`, updateRequest);
   },
 
   createReleaseVersionStatus(
