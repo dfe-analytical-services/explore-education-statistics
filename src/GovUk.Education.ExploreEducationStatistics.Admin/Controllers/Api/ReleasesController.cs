@@ -11,12 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 [Route("api")]
 [ApiController]
 [Authorize]
-public class ReleasesController(IReleaseVersionService releaseVersionService) : ControllerBase
+public class ReleasesController(IReleaseService releaseService) : ControllerBase
 {
     [HttpPost("releases")]
     public async Task<ActionResult<ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest release)
     {
-        return await releaseVersionService
+        return await releaseService
             .CreateRelease(release)
             .HandleFailuresOrOk();
     }
