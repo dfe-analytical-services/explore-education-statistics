@@ -375,7 +375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
-        private static ReleaseService BuildService(
+        private ReleaseVersionService BuildReleaseService(
             IUserService userService,
             ContentDbContext? contentDbContext = null,
             StatisticsDbContext? statisticsDbContext = null,
@@ -384,7 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             contentDbContext ??= Mock.Of<ContentDbContext>();
             statisticsDbContext ??= Mock.Of<StatisticsDbContext>();
 
-            return new ReleaseService(
+            return new ReleaseVersionService(
                 contentDbContext,
                 statisticsDbContext,
                 AdminMapper(),

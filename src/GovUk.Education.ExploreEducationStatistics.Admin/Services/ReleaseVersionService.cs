@@ -41,7 +41,7 @@ using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Valida
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class ReleaseService : IReleaseService
+    public class ReleaseVersionService : IReleaseVersionService
     {
         private readonly ContentDbContext _context;
         private readonly StatisticsDbContext _statisticsDbContext;
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
-        public ReleaseService(
+        public ReleaseVersionService(
             ContentDbContext context,
             StatisticsDbContext statisticsDbContext,
             IMapper mapper,

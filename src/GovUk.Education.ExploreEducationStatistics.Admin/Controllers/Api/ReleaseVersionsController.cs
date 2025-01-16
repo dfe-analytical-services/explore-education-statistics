@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     public class ReleaseVersionsController : ControllerBase
     {
-        private readonly IReleaseService _releaseService;
+        private readonly IReleaseVersionService _releaseVersionService;
         private readonly IReleaseAmendmentService _releaseAmendmentService;
         private readonly IReleaseApprovalService _releaseApprovalService;
         private readonly IReleaseDataFileService _releaseDataFileService;
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IDataImportService _dataImportService;
 
         public ReleaseVersionsController(
-            IReleaseService releaseService,
+            IReleaseVersionService releaseVersionService,
             IReleaseAmendmentService releaseAmendmentService,
             IReleaseApprovalService releaseApprovalService,
             IReleaseDataFileService releaseDataFileService,
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseChecklistService releaseChecklistService,
             IDataImportService dataImportService)
         {
-            _releaseService = releaseService;
+            _releaseVersionService = releaseVersionService;
             _releaseAmendmentService = releaseAmendmentService;
             _releaseApprovalService = releaseApprovalService;
             _releaseDataFileService = releaseDataFileService;
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid releaseVersionId,
             CancellationToken cancellationToken)
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .DeleteReleaseVersion(releaseVersionId, cancellationToken)
                 .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/{releaseVersionId:guid}")]
         public async Task<ActionResult<ReleaseVersionViewModel>> GetReleaseVersion(Guid releaseVersionId)
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .GetRelease(releaseVersionId)
                 .HandleFailuresOrOk();
         }
@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(
             Guid releaseVersionId)
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .GetReleasePublicationStatus(releaseVersionId)
                 .HandleFailuresOrOk();
         }
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ReleaseVersionViewModel>> UpdateReleaseVersion(ReleaseVersionUpdateRequest request,
             Guid releaseVersionId)
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .UpdateReleaseVersion(releaseVersionId, request)
                 .HandleFailuresOrOk();
         }
@@ -193,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseApprovalService
                 .CreateReleaseStatus(releaseVersionId, request)
-                .OnSuccess(_ => _releaseService.GetRelease(releaseVersionId))
+                .OnSuccess(_ => _releaseVersionService.GetRelease(releaseVersionId))
                 .HandleFailuresOrOk();
         }
 
@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IdTitleViewModel>> GetTemplateRelease(
             [Required] Guid publicationId)
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .GetLatestPublishedRelease(publicationId)
                 .HandleFailuresOrOk();
         }
@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/draft")]
         public async Task<ActionResult<List<ReleaseVersionSummaryViewModel>>> ListDraftReleases()
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .ListReleasesWithStatuses(ReleaseApprovalStatus.Draft, ReleaseApprovalStatus.HigherLevelReview)
                 .HandleFailuresOrOk();
         }
@@ -217,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/approvals")]
         public async Task<ActionResult<List<ReleaseVersionSummaryViewModel>>> ListUsersReleasesForApproval()
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .ListUsersReleasesForApproval()
                 .HandleFailuresOrOk();
         }
@@ -225,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/scheduled")]
         public async Task<ActionResult<List<ReleaseVersionSummaryViewModel>>> ListScheduledReleases()
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .ListScheduledReleases()
                 .HandleFailuresOrOk();
         }
@@ -233,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}/import/status")]
         public Task<ActionResult<DataImportStatusViewModel>> GetDataUploadStatus(Guid releaseVersionId, Guid fileId)
         {
-            return _releaseService
+            return _releaseVersionService
                 .GetDataFileImportStatus(releaseVersionId: releaseVersionId,
                     fileId: fileId)
                 .HandleFailuresOrOk();
@@ -244,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid releaseVersionId,
             CancellationToken cancellationToken)
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .GetDeleteReleaseVersionPlan(releaseVersionId, cancellationToken)
                 .HandleFailuresOrOk();
         }
@@ -255,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid fileId,
             CancellationToken cancellationToken = default)
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .GetDeleteDataFilePlan(
                     releaseVersionId: releaseVersionId,
                     fileId: fileId,
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpDelete("release/{releaseVersionId:guid}/data/{fileId:guid}")]
         public async Task<ActionResult> DeleteDataFiles(Guid releaseVersionId, Guid fileId)
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .RemoveDataFiles(releaseVersionId: releaseVersionId,
                     fileId: fileId)
                 .HandleFailuresOrNoContent();
@@ -301,7 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult> UpdateReleasePublished(Guid releaseVersionId,
             ReleasePublishedUpdateRequest request)
         {
-            return await _releaseService
+            return await _releaseVersionService
                 .UpdateReleasePublished(releaseVersionId, request)
                 .HandleFailuresOrNoContent();
         }
