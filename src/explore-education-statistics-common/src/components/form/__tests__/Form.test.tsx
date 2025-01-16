@@ -102,7 +102,7 @@ describe('Form', () => {
     await waitFor(() => {
       expect(screen.getByText('Line 1 of address is required')).toHaveAttribute(
         'href',
-        '#test-form-addressLine1',
+        '#test-form-address-line1',
       );
     });
   });
