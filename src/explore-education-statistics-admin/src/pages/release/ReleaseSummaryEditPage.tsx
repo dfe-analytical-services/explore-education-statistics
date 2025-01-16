@@ -38,7 +38,7 @@ export default function ReleaseSummaryEditPage({
       throw new Error('Could not update missing release');
     }
 
-    await releaseService.updateRelease(releaseId, {
+    await releaseService.updateReleaseVersion(releaseId, {
       year: Number(values.timePeriodCoverageStartYear),
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
