@@ -1,4 +1,4 @@
-import { Release } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseVersionService';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
 
 export const getReleaseApprovalStatusLabel = (

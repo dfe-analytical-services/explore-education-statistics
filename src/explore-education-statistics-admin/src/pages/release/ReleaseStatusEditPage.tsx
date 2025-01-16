@@ -1,7 +1,9 @@
 import ReleaseStatusChecklist from '@admin/pages/release/components/ReleaseStatusChecklist';
 import ReleaseStatusForm from '@admin/pages/release/components/ReleaseStatusForm';
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseVersionService, {
+  Release,
+} from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import { formatISO } from 'date-fns';
@@ -21,7 +23,7 @@ const ReleaseStatusEditPage = ({
   onUpdate,
 }: Props) => {
   const { value: checklist, isLoading } = useAsyncHandledRetry(
-    async () => releaseService.getReleaseChecklist(release.id),
+    async () => releaseVersionService.getReleaseChecklist(release.id),
     [release.id],
   );
 
@@ -38,7 +40,7 @@ const ReleaseStatusEditPage = ({
         statusPermissions={statusPermissions}
         onCancel={onCancel}
         onSubmit={async values => {
-          const nextRelease = await releaseService.createReleaseStatus(
+          const nextRelease = await releaseVersionService.createReleaseStatus(
             release.id,
             {
               ...values,

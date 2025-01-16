@@ -1,6 +1,6 @@
 import baseRender from '@common-test/render';
 import PublicationReleaseAccess from '@admin/pages/publication/components/PublicationReleaseAccess';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseSummary } from '@admin/services/releaseVersionService';
 import _userService from '@admin/services/userService';
 import _releasePermissionService, {
   UserReleaseInvite,

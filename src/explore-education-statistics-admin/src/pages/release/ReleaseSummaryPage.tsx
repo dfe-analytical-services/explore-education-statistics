@@ -6,7 +6,7 @@ import {
   releaseSummaryEditRoute,
 } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
-import releaseService from '@admin/services/releaseService';
+import releaseVersionService from '@admin/services/releaseVersionService';
 import Gate from '@common/components/Gate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
@@ -26,7 +26,7 @@ const ReleaseSummaryPage = () => {
   const { value: release, isLoading } = useAsyncRetry(
     async () =>
       lastLocation && lastLocation !== location
-        ? releaseService.getRelease(releaseId)
+        ? releaseVersionService.getRelease(releaseId)
         : contextRelease,
     [releaseId],
   );

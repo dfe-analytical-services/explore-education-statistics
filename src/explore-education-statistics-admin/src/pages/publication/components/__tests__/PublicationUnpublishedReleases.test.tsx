@@ -4,7 +4,7 @@ import _publicationService from '@admin/services/publicationService';
 import _releaseService, {
   ReleasePermissions,
   ReleaseSummaryWithPermissions,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -16,7 +16,7 @@ const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
 
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('PublicationUnpublishedReleases', () => {

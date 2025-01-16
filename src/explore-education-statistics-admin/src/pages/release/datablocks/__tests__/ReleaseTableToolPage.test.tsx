@@ -7,7 +7,7 @@ import {
 import _publicationService, {
   Publication,
 } from '@admin/services/publicationService';
-import { Release } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseVersionService';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';

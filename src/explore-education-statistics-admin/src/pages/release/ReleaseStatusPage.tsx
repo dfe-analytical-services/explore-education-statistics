@@ -7,10 +7,10 @@ import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
 import permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
-import releaseService, {
+import releaseVersionService, {
   ReleaseStageStatus,
   ReleaseStatus,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import Button from '@common/components/Button';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -51,13 +51,13 @@ export default function ReleaseStatusPage() {
   const { value: release, setState: setRelease } = useAsyncHandledRetry(
     async () =>
       lastLocation && lastLocation !== location
-        ? releaseService.getRelease(releaseId)
+        ? releaseVersionService.getRelease(releaseId)
         : contextRelease,
     [releaseId],
   );
 
   const { value: releaseStatuses } = useAsyncRetry<ReleaseStatus[]>(
-    () => releaseService.getReleaseStatuses(releaseId),
+    () => releaseVersionService.getReleaseStatuses(releaseId),
     [releaseId, release],
   );
 

@@ -19,7 +19,7 @@ import {
   ReleaseChecklist,
   ReleaseChecklistError,
   ReleaseChecklistWarning,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import InsetText from '@common/components/InsetText';
 import React, { useMemo } from 'react';
 import { generatePath } from 'react-router';

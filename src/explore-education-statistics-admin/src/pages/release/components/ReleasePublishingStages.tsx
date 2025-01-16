@@ -1,6 +1,6 @@
 import StatusBlock from '@admin/components/StatusBlock';
 import getStatusDetail from '@admin/pages/release/utils/getStatusDetail';
-import { ReleaseStageStatus } from '@admin/services/releaseService';
+import { ReleaseStageStatus } from '@admin/services/releaseVersionService';
 import Details from '@common/components/Details';
 import React from 'react';
 

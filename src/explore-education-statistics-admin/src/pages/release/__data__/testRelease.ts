@@ -1,4 +1,4 @@
-import { Release } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseVersionService';
 
 // eslint-disable-next-line import/prefer-default-export
 export const testRelease: Release = {

@@ -1,7 +1,7 @@
 import PublicationPublishedReleases from '@admin/pages/publication/components/PublicationPublishedReleases';
 import _releaseService, {
   ReleaseSummaryWithPermissions,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import _publicationService from '@admin/services/publicationService';
 import baseRender from '@common-test/render';
 import { PaginatedList } from '@common/services/types/pagination';
@@ -12,7 +12,7 @@ import { produce } from 'immer';
 import React, { ReactElement } from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 jest.mock('@admin/services/publicationService');

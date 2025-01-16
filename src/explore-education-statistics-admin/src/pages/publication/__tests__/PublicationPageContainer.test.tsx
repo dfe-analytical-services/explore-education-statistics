@@ -7,7 +7,7 @@ import {
 } from '@admin/routes/publicationRoutes';
 import { publicationRoute } from '@admin/routes/routes';
 import _publicationService from '@admin/services/publicationService';
-import { ReleaseSummaryWithPermissions } from '@admin/services/releaseService';
+import { ReleaseSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';

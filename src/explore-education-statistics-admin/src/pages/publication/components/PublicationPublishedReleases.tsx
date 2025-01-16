@@ -4,9 +4,9 @@ import {
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import publicationService from '@admin/services/publicationService';
-import releaseService, {
+import releaseVersionService, {
   ReleaseSummaryWithPermissions,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -106,7 +106,7 @@ export default function PublicationPublishedReleases({
               releases={allReleases}
               onAmend={async id => {
                 const { id: amendmentId } =
-                  await releaseService.createReleaseAmendment(id);
+                  await releaseVersionService.createReleaseAmendment(id);
                 history.push(
                   generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
                     publicationId,

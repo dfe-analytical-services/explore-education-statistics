@@ -5,7 +5,9 @@ import {
   publicationManageReleaseContributorsPageRoute,
   PublicationManageTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseService, {
+  Release,
+} from '@admin/services/releaseVersionService';
 import _releasePermissionService, {
   UserReleaseRole,
 } from '@admin/services/releasePermissionService';
@@ -15,7 +17,7 @@ import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
 
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 jest.mock('@admin/services/releasePermissionService');
