@@ -322,14 +322,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             {
                 await _context.Entry(loadedMethodologyVersion)
                     .Reference(m => m.ScheduledWithReleaseVersion)
+                    .Query()
+                    .Include(rv => rv.Release)
+                    .ThenInclude(r => r.Publication)
                     .LoadAsync();
 
                 if (loadedMethodologyVersion.ScheduledWithReleaseVersion != null)
                 {
-                    await _context.Entry(loadedMethodologyVersion.ScheduledWithReleaseVersion)
-                        .Reference(rv => rv.Release.Publication)
-                        .LoadAsync();
-
                     var title =
                         $"{loadedMethodologyVersion.ScheduledWithReleaseVersion.Release.Publication.Title} - {loadedMethodologyVersion.ScheduledWithReleaseVersion.Release.Title}";
                     viewModel.ScheduledWithRelease = new IdTitleViewModel(
