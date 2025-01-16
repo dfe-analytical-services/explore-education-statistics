@@ -91,7 +91,7 @@ export interface CreateReleaseRequest extends BaseReleaseRequest {
   templateReleaseId?: string;
 }
 
-export interface UpdateReleaseRequest extends BaseReleaseRequest {
+export interface UpdateReleaseVersionRequest extends BaseReleaseRequest {
   preReleaseAccessList?: string;
 }
 
@@ -209,10 +209,7 @@ export interface DeleteReleasePlan {
 
 const releaseService = {
   createRelease(createRequest: CreateReleaseRequest): Promise<Release> {
-    return client.post(
-      `/publications/${createRequest.publicationId}/releases`,
-      createRequest,
-    );
+    return client.post(`/releases`, createRequest);
   },
 
   getRelease(releaseId: string): Promise<Release> {
@@ -223,11 +220,11 @@ const releaseService = {
     return client.get(`/releases/${releaseId}/status`);
   },
 
-  updateRelease(
-    releaseId: string,
-    updateRequest: UpdateReleaseRequest,
+  updateReleaseVersion(
+    releaseVersionId: string,
+    updateRequest: UpdateReleaseVersionRequest,
   ): Promise<Release> {
-    return client.put(`/releases/${releaseId}`, updateRequest);
+    return client.patch(`/releaseVersions/${releaseVersionId}`, updateRequest);
   },
 
   createReleaseStatus(
