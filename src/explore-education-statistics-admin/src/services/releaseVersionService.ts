@@ -77,22 +77,14 @@ export interface ReleaseSummaryWithPermissions extends ReleaseSummary {
   permissions: ReleasePermissions;
 }
 
-interface BaseReleaseRequest {
+export interface UpdateReleaseVersionRequest {
+  preReleaseAccessList?: string;
   year: number;
   timePeriodCoverage: {
     value: string;
   };
   type: ReleaseType;
   label?: string;
-}
-
-export interface CreateReleaseRequest extends BaseReleaseRequest {
-  publicationId: string;
-  templateReleaseId?: string;
-}
-
-export interface UpdateReleaseVersionRequest extends BaseReleaseRequest {
-  preReleaseAccessList?: string;
 }
 
 export interface CreateReleaseStatusRequest {
@@ -208,10 +200,6 @@ export interface DeleteReleasePlan {
 }
 
 const releaseVersionService = {
-  createRelease(createRequest: CreateReleaseRequest): Promise<Release> {
-    return client.post(`/releases`, createRequest);
-  },
-
   getRelease(releaseId: string): Promise<Release> {
     return client.get(`/releases/${releaseId}`);
   },
