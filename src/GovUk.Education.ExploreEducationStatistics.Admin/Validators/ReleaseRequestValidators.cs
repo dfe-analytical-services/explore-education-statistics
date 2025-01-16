@@ -22,7 +22,7 @@ public static class ReleaseCreateRequestValidator
 
 public static class ReleaseUpdateRequestValidator
 {
-    public static Either<ActionResult, Unit> Validate(ReleaseUpdateRequest releaseUpdateRequest)
+    public static Either<ActionResult, Unit> Validate(ReleaseVersionUpdateRequest releaseUpdateRequest)
     {
         if (releaseUpdateRequest.Type == ReleaseType.ExperimentalStatistics)
         {

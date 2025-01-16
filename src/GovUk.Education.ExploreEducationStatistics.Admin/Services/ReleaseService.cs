@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _cacheService = cacheService;
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId)
+        public async Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId)
         {
             return await _context
                 .ReleaseVersions
@@ -128,14 +128,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .Any(role => role.ReleaseVersionId == releaseVersionId
                                          && role.Role == ReleaseRole.PrereleaseViewer);
 
-                    return _mapper.Map<ReleaseViewModel>(releaseVersion) with
+                    return _mapper.Map<ReleaseVersionViewModel>(releaseVersion) with
                     {
                         PreReleaseUsersOrInvitesAdded = prereleaseRolesOrInvitesAdded,
                     };
                 });
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
+        public async Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
         {
             return await ReleaseCreateRequestValidator.Validate(releaseCreate)
                 .OnSuccess(async () => await _context.Publications
@@ -506,8 +506,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_mapper.Map<ReleasePublicationStatusViewModel>);
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseVersion(
-            Guid releaseVersionId, ReleaseUpdateRequest request)
+        public async Task<Either<ActionResult, ReleaseVersionViewModel>> UpdateReleaseVersion(
+            Guid releaseVersionId, ReleaseVersionUpdateRequest request)
         {
             return await ReleaseUpdateRequestValidator.Validate(request)
                 .OnSuccess(async () => await _context.ReleaseVersions
@@ -592,7 +592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     : new Either<ActionResult, IdTitleViewModel>(new NotFoundResult()));
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListReleasesWithStatuses(
+        public async Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListReleasesWithStatuses(
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             return await _userService
@@ -606,18 +606,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _releaseVersionRepository.ListReleasesForUser(_userService.GetUserId(),
                                 releaseApprovalStatuses));
                 })
-                .OnSuccess(async releases =>
+                .OnSuccess(async releaseVersions =>
                 {
-                    return await releases
+                    return await releaseVersions
                         .ToAsyncEnumerable()
-                        .SelectAwait(async releaseVersion => _mapper.Map<ReleaseSummaryViewModel>(releaseVersion) with
+                        .SelectAwait(async releaseVersion => _mapper.Map<ReleaseVersionSummaryViewModel>(releaseVersion) with
                         {
                             Permissions = await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion) 
                         }).ToListAsync();
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListUsersReleasesForApproval()
+        public async Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListUsersReleasesForApproval()
         {
             var userId = _userService.GetUserId();
 
@@ -646,10 +646,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     && releaseVersionIdsForApproval.Contains(releaseVersion.Id))
                 .ToListAsync();
 
-            return _mapper.Map<List<ReleaseSummaryViewModel>>(releaseVersionsForApproval);
+            return _mapper.Map<List<ReleaseVersionSummaryViewModel>>(releaseVersionsForApproval);
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListScheduledReleases()
+        public async Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListScheduledReleases()
         {
             return await _userService
                 .CheckCanAccessSystem()
@@ -662,13 +662,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _releaseVersionRepository.ListReleasesForUser(_userService.GetUserId(),
                                 ReleaseApprovalStatus.Approved));
                 })
-                .OnSuccess(async releases =>
+                .OnSuccess(async releaseVersions =>
                 {
-                    var approvedReleases = await releases
+                    var approvedReleases = await releaseVersions
                         .ToAsyncEnumerable()
                         .SelectAwait(async releaseVersion =>
                         {
-                            var releaseViewModel = _mapper.Map<ReleaseSummaryViewModel>(releaseVersion);
+                            var releaseViewModel = _mapper.Map<ReleaseVersionSummaryViewModel>(releaseVersion);
                             releaseViewModel.Permissions =
                                 await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion);
                             return releaseViewModel;
@@ -807,7 +807,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 : Unit.Instance;
         }
 
-        private static Either<ActionResult, Unit> ValidateUpdateRequest(ReleaseVersion releaseVersion, ReleaseUpdateRequest request)
+        private static Either<ActionResult, Unit> ValidateUpdateRequest(ReleaseVersion releaseVersion, ReleaseVersionUpdateRequest request)
         {
             if (releaseVersion.Version == 0)
             {
@@ -824,7 +824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 : Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> UpdateReleaseAndVersion(ReleaseUpdateRequest request, ReleaseVersion releaseVersion)
+        private async Task<Either<ActionResult, Unit>> UpdateReleaseAndVersion(ReleaseVersionUpdateRequest request, ReleaseVersion releaseVersion)
         {
             releaseVersion.Release.Year = request.Year;
             releaseVersion.Release.TimePeriodCoverage = request.TimePeriodCoverage;

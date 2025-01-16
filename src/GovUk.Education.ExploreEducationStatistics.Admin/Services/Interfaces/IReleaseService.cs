@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseService
     {
-        Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
+        Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
 
         Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
             Guid releaseVersionId,
@@ -28,25 +28,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseVersionId,
             CancellationToken cancellationToken = default);
 
-        Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId);
+        Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId);
 
         Task<Either<ActionResult, ReleasePublicationStatusViewModel>>
             GetReleasePublicationStatus(Guid releaseVersionId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseVersion(Guid releaseVersionId,
-            ReleaseUpdateRequest request);
+        Task<Either<ActionResult, ReleaseVersionViewModel>> UpdateReleaseVersion(Guid releaseVersionId,
+            ReleaseVersionUpdateRequest request);
 
         Task<Either<ActionResult, Unit>> UpdateReleasePublished(Guid releaseVersionId,
             ReleasePublishedUpdateRequest request);
 
         Task<Either<ActionResult, IdTitleViewModel>> GetLatestPublishedRelease(Guid publicationId);
 
-        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListReleasesWithStatuses(
+        Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListReleasesWithStatuses(
             params ReleaseApprovalStatus[] releaseApprovalStatues);
 
-        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListUsersReleasesForApproval();
+        Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListUsersReleasesForApproval();
 
-        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListScheduledReleases();
+        Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListScheduledReleases();
 
         Task<Either<ActionResult, DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
             Guid releaseVersionId,

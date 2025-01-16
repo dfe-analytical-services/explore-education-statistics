@@ -24,8 +24,8 @@ using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admi
 using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.ReleaseNoteViewModel;
-using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
-using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
+using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
+using ReleaseVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionViewModel;
 using ThemeViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ThemeViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
         {
             CreateMap<User, UserDetailsViewModel>();
 
-            CreateMap<ReleaseVersion, ReleaseViewModel>()
+            CreateMap<ReleaseVersion, ReleaseVersionViewModel>()
                 .ForMember(dest => dest.ReleaseId,
                     m => m.MapFrom(rv => rv.ReleaseId))
                 .ForMember(dest => dest.Slug,
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Label,
                     m => m.MapFrom(rv => rv.Release.Label));
 
-            CreateMap<ReleaseVersion, ReleaseSummaryViewModel>()
+            CreateMap<ReleaseVersion, ReleaseVersionSummaryViewModel>()
                 .ForMember(dest => dest.Slug,
                     m => m.MapFrom(rv => rv.Release.Slug))
                 .ForMember(dest => dest.TimePeriodCoverage,
