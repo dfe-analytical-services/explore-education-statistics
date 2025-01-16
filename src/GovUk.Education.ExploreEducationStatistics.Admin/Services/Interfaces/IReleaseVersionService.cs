@@ -14,8 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IReleaseVersionService
 {
-    Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
-
     Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default);

@@ -36,7 +36,6 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Methodolog
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using IReleaseVersionRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -60,7 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IDataSetVersionService _dataSetVersionService;
         private readonly IProcessorClient _processorClient;
-        private readonly IGuidGenerator _guidGenerator;
         private readonly IBlobCacheService _cacheService;
 
         // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
@@ -83,7 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseSubjectRepository releaseSubjectRepository,
             IDataSetVersionService dataSetVersionService,
             IProcessorClient processorClient,
-            IGuidGenerator guidGenerator,
             IBlobCacheService cacheService)
         {
             _context = context;
@@ -103,7 +100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseSubjectRepository = releaseSubjectRepository;
             _dataSetVersionService = dataSetVersionService;
             _processorClient = processorClient;
-            _guidGenerator = guidGenerator;
             _cacheService = cacheService;
         }
 
@@ -132,77 +128,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         PreReleaseUsersOrInvitesAdded = prereleaseRolesOrInvitesAdded,
                     };
-                });
-        }
-
-        public async Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
-        {
-            return await ReleaseCreateRequestValidator.Validate(releaseCreate)
-                .OnSuccess(async () => await _context.Publications
-                    .SingleOrNotFoundAsync(p => p.Id == releaseCreate.PublicationId))
-                .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
-                .OnSuccessDo(async _ =>
-                    await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
-                .OnSuccess(async publication =>
-                {
-                    var release = new Release
-                    {
-                        PublicationId = releaseCreate.PublicationId,
-                        Year = releaseCreate.Year,
-                        TimePeriodCoverage = releaseCreate.TimePeriodCoverage,
-                        Slug = releaseCreate.Slug,
-                        Label = string.IsNullOrWhiteSpace(releaseCreate.Label) ? null : releaseCreate.Label.Trim(),
-                    };
-
-                    var newReleaseVersion = new ReleaseVersion
-                    {
-                        Id = _guidGenerator.NewGuid(),
-                        Release = release,
-                        Type = releaseCreate.Type!.Value,
-                        ApprovalStatus = ReleaseApprovalStatus.Draft,
-                        PublicationId = release.PublicationId,
-                    };
-
-                    if (releaseCreate.TemplateReleaseId.HasValue)
-                    {
-                        await CreateGenericContentFromTemplate(releaseCreate.TemplateReleaseId.Value,
-                            newReleaseVersion);
-                    }
-                    else
-                    {
-                        newReleaseVersion.GenericContent = new List<ContentSection>();
-                    }
-
-                    newReleaseVersion.SummarySection = new ContentSection
-                    {
-                        Type = ContentSectionType.ReleaseSummary,
-                    };
-                    newReleaseVersion.KeyStatisticsSecondarySection = new ContentSection
-                    {
-                        Type = ContentSectionType.KeyStatisticsSecondary,
-                    };
-                    newReleaseVersion.HeadlinesSection = new ContentSection
-                    {
-                        Type = ContentSectionType.Headlines,
-                    };
-                    newReleaseVersion.RelatedDashboardsSection = new ContentSection
-                    {
-                        Type = ContentSectionType.RelatedDashboards,
-                    };
-                    newReleaseVersion.Created = DateTime.UtcNow;
-                    newReleaseVersion.CreatedById = _userService.GetUserId();
-
-                    await _context.ReleaseVersions.AddAsync(newReleaseVersion);
-
-                    publication.ReleaseSeries.Insert(0, new ReleaseSeriesItem
-                    {
-                        Id = Guid.NewGuid(),
-                        ReleaseId = release.Id
-                    });
-                    _context.Publications.Update(publication);
-
-                    await _context.SaveChangesAsync();
-                    return await GetRelease(newReleaseVersion.Id);
                 });
         }
 
@@ -847,44 +772,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 releaseTitle: releaseVersion.Release.Title);
 
             return Unit.Instance;
-        }
-
-        private async Task CreateGenericContentFromTemplate(
-            Guid templateReleaseVersionId,
-            ReleaseVersion newReleaseVersion)
-        {
-            var templateReleaseVersion = await _context
-                .ReleaseVersions
-                .AsNoTracking()
-                .Include(releaseVersion => releaseVersion.Content)
-                .FirstAsync(rv => rv.Id == templateReleaseVersionId);
-
-            newReleaseVersion.Content = templateReleaseVersion
-                .Content
-                .Where(section => section.Type == ContentSectionType.Generic)
-                .Select(section => CloneContentSectionFromReleaseTemplate(section, newReleaseVersion))
-                .ToList();
-        }
-
-        private ContentSection CloneContentSectionFromReleaseTemplate(
-            ContentSection originalSection,
-            ReleaseVersion newReleaseVersion)
-        {
-            // Create a new ContentSection based upon the original template.
-            return new ContentSection
-            {
-                // Assign a new Id.
-                Id = Guid.NewGuid(),
-
-                // Assign it to the new release version.
-                ReleaseVersionId = newReleaseVersion.Id,
-
-                // Copy certain fields from the original.
-                Caption = originalSection.Caption,
-                Heading = originalSection.Heading,
-                Order = originalSection.Order,
-                Type = originalSection.Type
-            };
         }
 
         private async Task<bool> CanUpdateDataFiles(Guid releaseVersionId)

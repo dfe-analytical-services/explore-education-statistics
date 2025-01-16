@@ -125,6 +125,8 @@ using ReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.S
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -429,6 +431,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<IReleaseVersionService, ReleaseVersionService>();
+            services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseAmendmentService, ReleaseAmendmentService>();
             services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
             services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
