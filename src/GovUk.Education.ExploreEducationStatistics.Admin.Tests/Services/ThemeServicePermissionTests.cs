@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IMethodologyService? methodologyService = null,
             IPublishingService? publishingService = null,
-            IReleaseService? releaseService = null)
+            IReleaseVersionService? releaseVersionService = null)
         {
             var publicContext = publicDataDbContext ?? Mock.Of<PublicDataDbContext>();
             var contentContext = contentDbContext ?? Mock.Of<ContentDbContext>();
@@ -192,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
-                releaseService ?? Mock.Of<IReleaseService>(Strict)
+                releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict)
             );
         }
     }

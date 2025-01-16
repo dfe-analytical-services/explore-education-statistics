@@ -345,12 +345,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
-        private ReleaseService BuildReleaseService(
+        private ReleaseVersionService BuildReleaseService(
             IUserService userService,
             ContentDbContext? context = null,
             IReleaseVersionRepository? releaseVersionRepository = null)
         {
-            return new ReleaseService(
+            return new ReleaseVersionService(
                 context ?? Mock.Of<ContentDbContext>(),
                 Mock.Of<StatisticsDbContext>(),
                 AdminMapper(),
