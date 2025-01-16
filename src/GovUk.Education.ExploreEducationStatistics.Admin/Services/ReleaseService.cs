@@ -127,7 +127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return _mapper.Map<ReleaseViewModel>(releaseVersion) with
                     {
                         PreReleaseUsersOrInvitesAdded = prereleaseRolesOrInvitesAdded,
-                        Label = releaseVersion.Release.Label
                     };
                 });
         }

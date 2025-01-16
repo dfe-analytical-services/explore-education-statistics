@@ -1048,9 +1048,9 @@ public abstract class ReleaseServiceTests
                 Assert.Equal(releaseVersion.Release.Label, viewModel.Label);
                 Assert.Equal(releaseVersion.Version, viewModel.Version);
                 Assert.Equal(releaseVersion.Slug, viewModel.Slug);
-                Assert.Equal(releaseVersion.Publication.Id, viewModel.PublicationId);
-                Assert.Equal(releaseVersion.Publication.Title, viewModel.PublicationTitle);
-                Assert.Equal(releaseVersion.Publication.Slug, viewModel.PublicationSlug);
+                Assert.Equal(releaseVersion.Release.Publication.Id, viewModel.PublicationId);
+                Assert.Equal(releaseVersion.Release.Publication.Title, viewModel.PublicationTitle);
+                Assert.Equal(releaseVersion.Release.Publication.Slug, viewModel.PublicationSlug);
                 Assert.Equal(releaseVersion.LatestInternalReleaseNote, viewModel.LatestInternalReleaseNote);
                 Assert.Equal(releaseVersion.PublishScheduled, viewModel.PublishScheduled);
                 Assert.Equal(releaseVersion.Published, viewModel.Published);
@@ -1131,7 +1131,7 @@ public abstract class ReleaseServiceTests
             Publication publication = _dataFixture.DefaultPublication()
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 2)]);
 
-            var notLatestReleaseVersion = publication.ReleaseVersions[0];
+            var notLatestReleaseVersion = publication.Releases[0].Versions[0];
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1170,7 +1170,7 @@ public abstract class ReleaseServiceTests
             {
                 var releaseService = BuildReleaseService(context);
 
-                var result = await releaseService.GetRelease(publication.ReleaseVersions[0].Id);
+                var result = await releaseService.GetRelease(publication.Releases[0].Versions[0].Id);
 
                 var releaseViewModel = result.AssertRight();
                 Assert.Null(releaseViewModel.LatestInternalReleaseNote);
