@@ -190,7 +190,9 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublicationId(dataSet.PublicationId)))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await AddTestData<ContentDbContext>(context =>
@@ -233,6 +235,8 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
 
             var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
                 .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublicationId(dataSet.PublicationId))
                     .WithApprovalStatus(ReleaseApprovalStatus.Approved))
                 .WithFiles([
                     DataFixture
@@ -267,7 +271,9 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublicationId(dataSet.PublicationId)))
                 .WithFile(DataFixture.DefaultFile(FileType.Ancillary));
 
             await AddTestData<ContentDbContext>(context =>
@@ -293,7 +299,9 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
 
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublicationId(dataSet.PublicationId)))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await AddTestData<ContentDbContext>(context =>
@@ -374,10 +382,6 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
                 .DefaultReleaseVersion()
                 .WithReleaseId(releaseVersion.ReleaseId);
 
-            // Need to set this to override the default value assigned by the test data generator,
-            // until ReleaseVersion.PublicationId is removed.
-            releaseAmendment.PublicationId = dataSet.PublicationId;
-
             var subjectId = Guid.NewGuid();
 
             var (nextDataFile, nextMetaFile) = DataFixture
@@ -451,11 +455,9 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(
         {
             var subjectId = Guid.NewGuid();
 
-            // TODO EES-5365 Setup seems to be causing test failures
             var (dataFile, metaFile) = DataFixture
                 .DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture
-                    .DefaultReleaseVersion()
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
                     .WithRelease(DataFixture.DefaultRelease()
                         .WithPublicationId(publicationId)))
                 .WithFiles([
