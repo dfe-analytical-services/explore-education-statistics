@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Route("api")]
     [ApiController]
     [Authorize]
-    public class ReleasesController : ControllerBase
+    public class ReleaseVersionsController : ControllerBase
     {
         private readonly IReleaseService _releaseService;
         private readonly IReleaseAmendmentService _releaseAmendmentService;
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseChecklistService _releaseChecklistService;
         private readonly IDataImportService _dataImportService;
 
-        public ReleasesController(
+        public ReleaseVersionsController(
             IReleaseService releaseService,
             IReleaseAmendmentService releaseAmendmentService,
             IReleaseApprovalService releaseApprovalService,
