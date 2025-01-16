@@ -112,7 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId, q => q
                     .Include(rv => rv.Release)
-                    .ThenInclude(r => r.Publication))
+                    .ThenInclude(r => r.Publication)
+                    .Include(rv => rv.ReleaseStatuses))
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(releaseVersion =>
                 {
@@ -610,12 +611,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await releases
                         .ToAsyncEnumerable()
-                        .SelectAwait(async releaseVersion =>
+                        .SelectAwait(async releaseVersion => _mapper.Map<ReleaseSummaryViewModel>(releaseVersion) with
                         {
-                            var releaseViewModel = _mapper.Map<ReleaseSummaryViewModel>(releaseVersion);
-                            releaseViewModel.Permissions =
-                                await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion);
-                            return releaseViewModel;
+                            Permissions = await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion) 
                         }).ToListAsync();
                 });
         }

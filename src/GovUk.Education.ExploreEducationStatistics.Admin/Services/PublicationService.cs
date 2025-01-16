@@ -405,7 +405,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return await releaseVersions
                         .ToAsyncEnumerable()
-                        .SelectAwait(async rv => await HydrateReleaseListItemViewModel(rv, includePermissions))
+                        .SelectAwait(async releaseVersion =>
+                        {
+                            await context.ReleaseVersions
+                                .Entry(releaseVersion)
+                                .Reference(rv => rv.Release)
+                                .LoadAsync();
+
+                            return mapper.Map<ReleaseSummaryViewModel>(releaseVersion) with
+                            {
+                                Permissions = includePermissions
+                                    ? await PermissionsUtils.GetReleasePermissions(userService, releaseVersion)
+                                    : null
+                            };
+                        })
                         .ToListAsync();
                 });
         }
@@ -639,19 +652,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             publicationCreateViewModel.IsSuperseded = await publicationRepository.IsSuperseded(publication.Id);
 
             return publicationCreateViewModel;
-        }
-
-        private async Task<ReleaseSummaryViewModel> HydrateReleaseListItemViewModel(ReleaseVersion releaseVersion,
-            bool includePermissions)
-        {
-            var viewModel = mapper.Map<ReleaseSummaryViewModel>(releaseVersion);
-
-            if (includePermissions)
-            {
-                viewModel.Permissions = await PermissionsUtils.GetReleasePermissions(userService, releaseVersion);
-            }
-
-            return viewModel;
         }
     }
 }
