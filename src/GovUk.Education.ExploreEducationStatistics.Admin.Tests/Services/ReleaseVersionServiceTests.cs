@@ -55,12 +55,12 @@ using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public abstract class ReleaseServiceTests
+public abstract class ReleaseVersionServiceTests
 {
     private readonly DataFixture _dataFixture = new();
     private static readonly User User = new() { Id = Guid.NewGuid() };
 
-    public class CreateReleaseTests : ReleaseServiceTests
+    public class CreateReleaseTests : ReleaseVersionServiceTests
     {
         [Fact]
         public async Task ReleaseTypeExperimentalStatistics_ReturnsValidationActionResult()
@@ -70,9 +70,9 @@ public abstract class ReleaseServiceTests
                 Type = ReleaseType.ExperimentalStatistics,
             };
 
-            var releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
+            var releaseVersionService = BuildReleaseVersionService(Mock.Of<ContentDbContext>());
 
-            var result = await releaseService.CreateRelease(releaseCreateRequest);
+            var result = await releaseVersionService.CreateRelease(releaseCreateRequest);
 
             result.AssertBadRequest(ReleaseTypeInvalid);
         }
@@ -94,9 +94,9 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseVersionService = BuildReleaseVersionService(context);
 
-                var result = (await releaseService.CreateRelease(
+                var result = (await releaseVersionService.CreateRelease(
                     new ReleaseCreateRequest
                     {
                         PublicationId = publication.Id,
@@ -236,9 +236,9 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseVersionService = BuildReleaseVersionService(context);
 
-                var result = await releaseService.CreateRelease(
+                var result = await releaseVersionService.CreateRelease(
                     new ReleaseCreateRequest
                     {
                         PublicationId = publication.Id,
@@ -286,7 +286,7 @@ public abstract class ReleaseServiceTests
         }
     }
 
-    public class GetDeleteDataFilePlanTests : ReleaseServiceTests
+    public class GetDeleteDataFilePlanTests : ReleaseVersionServiceTests
     {
         [Fact]
         public async Task Success()
@@ -335,13 +335,13 @@ public abstract class ReleaseServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(
+                var releaseVersionService = BuildReleaseVersionService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     dataBlockService: dataBlockService.Object,
                     footnoteRepository: footnoteRepository.Object);
 
-                var result = await releaseService.GetDeleteDataFilePlan(
+                var result = await releaseVersionService.GetDeleteDataFilePlan(
                     releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
@@ -422,14 +422,14 @@ public abstract class ReleaseServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(
+                var releaseVersionService = BuildReleaseVersionService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     dataSetVersionService: dataSetVersionService.Object,
                     dataBlockService: dataBlockService.Object,
                     footnoteRepository: footnoteRepository.Object);
 
-                var result = await releaseService.GetDeleteDataFilePlan(
+                var result = await releaseVersionService.GetDeleteDataFilePlan(
                     releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
@@ -455,7 +455,7 @@ public abstract class ReleaseServiceTests
         }
     }
 
-    public class RemoveDataFilesTests : ReleaseServiceTests
+    public class RemoveDataFilesTests : ReleaseVersionServiceTests
     {
         [Fact]
         public async Task Success()
@@ -523,7 +523,7 @@ public abstract class ReleaseServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context,
+                var releaseVersionService = BuildReleaseVersionService(context,
                     statisticsDbContext,
                     cacheService: cacheService.Object,
                     dataBlockService: dataBlockService.Object,
@@ -532,7 +532,7 @@ public abstract class ReleaseServiceTests
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object);
 
-                var result = await releaseService.RemoveDataFiles(releaseVersionId: releaseVersion.Id,
+                var result = await releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
                 VerifyAllMocks(cacheService,
@@ -581,11 +581,11 @@ public abstract class ReleaseServiceTests
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.STAGE_1 });
 
             await using var context = InMemoryApplicationDbContext(contentDbContextId);
-            var releaseService = BuildReleaseService(
+            var releaseVersionService = BuildReleaseVersionService(
                 context,
                 dataImportService: dataImportService.Object);
 
-            var result = await releaseService.RemoveDataFiles(
+            var result = await releaseVersionService.RemoveDataFiles(
                 releaseVersionId: releaseVersion.Id,
                 fileId: file.Id);
 
@@ -685,7 +685,7 @@ public abstract class ReleaseServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(
+                var releaseVersionService = BuildReleaseVersionService(
                     context,
                     statisticsDbContext,
                     cacheService: cacheService.Object,
@@ -695,7 +695,7 @@ public abstract class ReleaseServiceTests
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object);
 
-                var result = await releaseService.RemoveDataFiles(
+                var result = await releaseVersionService.RemoveDataFiles(
                     releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
@@ -781,11 +781,11 @@ public abstract class ReleaseServiceTests
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.STAGE_1 });
 
             await using var context = InMemoryApplicationDbContext(contentDbContextId);
-            var releaseService = BuildReleaseService(
+            var releaseVersionService = BuildReleaseVersionService(
                 context,
                 dataImportService: dataImportService.Object);
 
-            var result = await releaseService.RemoveDataFiles(
+            var result = await releaseVersionService.RemoveDataFiles(
                 releaseVersionId: releaseVersion.Id,
                 fileId: file.Id);
 
@@ -826,11 +826,11 @@ public abstract class ReleaseServiceTests
                 .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
 
             await using var context = InMemoryApplicationDbContext(contentDbContextId);
-            var releaseService = BuildReleaseService(
+            var releaseVersionService = BuildReleaseVersionService(
                 context,
                 dataImportService: dataImportService.Object);
 
-            var result = await releaseService.RemoveDataFiles(
+            var result = await releaseVersionService.RemoveDataFiles(
                 releaseVersionId: releaseVersion.Id,
                 fileId: file.Id);
 
@@ -848,7 +848,7 @@ public abstract class ReleaseServiceTests
         }
     }
 
-    public class UpdateReleaseVersionTests : ReleaseServiceTests
+    public class UpdateReleaseVersionTests : ReleaseVersionServiceTests
     {
         [Fact]
         public async Task Success()
@@ -887,11 +887,11 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(
+                var releaseVersionService = BuildReleaseVersionService(
                     contentDbContext: context,
                     dataSetVersionService: dataSetVersionService.Object);
 
-                var result = await releaseService
+                var result = await releaseVersionService
                     .UpdateReleaseVersion(
                         releaseVersion.Id,
                         new ReleaseVersionUpdateRequest
@@ -964,9 +964,9 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseVersionService = BuildReleaseVersionService(context);
 
-                var result = await releaseService
+                var result = await releaseVersionService
                     .UpdateReleaseVersion(
                         releaseVersion.Id,
                         new ReleaseVersionUpdateRequest
@@ -990,15 +990,15 @@ public abstract class ReleaseServiceTests
                 Type = ReleaseType.ExperimentalStatistics,
             };
 
-            var releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
+            var releaseVersionService = BuildReleaseVersionService(Mock.Of<ContentDbContext>());
 
-            var result = await releaseService.UpdateReleaseVersion(It.IsAny<Guid>(), releaseUpdateRequest);
+            var result = await releaseVersionService.UpdateReleaseVersion(It.IsAny<Guid>(), releaseUpdateRequest);
 
             result.AssertBadRequest(ReleaseTypeInvalid);
         }
     }
 
-    public class GetReleaseTests : ReleaseServiceTests
+    public class GetReleaseTests : ReleaseVersionServiceTests
     {
         [Fact]
         public async Task Success()
@@ -1043,9 +1043,9 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseVersionService = BuildReleaseVersionService(context);
 
-                var result = await releaseService.GetRelease(releaseVersion.Id);
+                var result = await releaseVersionService.GetRelease(releaseVersion.Id);
 
                 var viewModel = result.AssertRight();
 
@@ -1097,9 +1097,9 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseVersionService = BuildReleaseVersionService(context);
 
-                var result = await releaseService.GetRelease(preReleaseUserRole.ReleaseVersionId);
+                var result = await releaseVersionService.GetRelease(preReleaseUserRole.ReleaseVersionId);
 
                 var viewModel = result.AssertRight();
                 Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
@@ -1125,9 +1125,9 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseVersionService = BuildReleaseVersionService(context);
 
-                var result = await releaseService.GetRelease(preReleaseUserInvite.ReleaseVersionId);
+                var result = await releaseVersionService.GetRelease(preReleaseUserInvite.ReleaseVersionId);
 
                 var viewModel = result.AssertRight();
                 Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
@@ -1152,8 +1152,8 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
-                var result = await releaseService.GetRelease(notLatestReleaseVersion.Id);
+                var releaseVersionService = BuildReleaseVersionService(context);
+                var result = await releaseVersionService.GetRelease(notLatestReleaseVersion.Id);
 
                 var viewModel = result.AssertRight();
 
@@ -1177,9 +1177,9 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseVersionService = BuildReleaseVersionService(context);
 
-                var result = await releaseService.GetRelease(publication.Releases[0].Versions[0].Id);
+                var result = await releaseVersionService.GetRelease(publication.Releases[0].Versions[0].Id);
 
                 var releaseViewModel = result.AssertRight();
                 Assert.Null(releaseViewModel.LatestInternalReleaseNote);
@@ -1187,7 +1187,7 @@ public abstract class ReleaseServiceTests
         }
     }
 
-    public class GetLatestPublishedReleaseTests : ReleaseServiceTests
+    public class GetLatestPublishedReleaseTests : ReleaseVersionServiceTests
     {
         [Fact]
         public async Task Success()
@@ -1205,9 +1205,9 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseVersionService = BuildReleaseVersionService(context);
 
-                var result = await releaseService.GetLatestPublishedRelease(publication.Id);
+                var result = await releaseVersionService.GetLatestPublishedRelease(publication.Id);
                 var latestIdTitleViewModel = result.AssertRight();
 
                 Assert.NotNull(latestIdTitleViewModel);
@@ -1231,15 +1231,15 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseVersionService = BuildReleaseVersionService(context);
 
-                var result = await releaseService.GetLatestPublishedRelease(publication.Id);
+                var result = await releaseVersionService.GetLatestPublishedRelease(publication.Id);
                 result.AssertNotFound();
             }
         }
     }
 
-    public class GetDeleteReleaseVersionPlanTests : ReleaseServiceTests
+    public class GetDeleteReleaseVersionPlanTests : ReleaseVersionServiceTests
     {
         [Fact]
         public async Task Success()
@@ -1287,9 +1287,9 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseVersionService = BuildReleaseVersionService(context);
 
-                var result = await releaseService.GetDeleteReleaseVersionPlan(releaseBeingDeleted.Id);
+                var result = await releaseVersionService.GetDeleteReleaseVersionPlan(releaseBeingDeleted.Id);
 
                 var plan = result.AssertRight();
 
@@ -1307,7 +1307,7 @@ public abstract class ReleaseServiceTests
         }
     }
 
-    public class DeleteReleaseVersionTests : ReleaseServiceTests
+    public class DeleteReleaseVersionTests : ReleaseVersionServiceTests
     {
         [Theory]
         [InlineData(true)]
@@ -1444,7 +1444,7 @@ public abstract class ReleaseServiceTests
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(
+                var releaseVersionService = BuildReleaseVersionService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     releaseDataFileService: releaseDataFilesService.Object,
@@ -1454,7 +1454,7 @@ public abstract class ReleaseServiceTests
                     processorClient: processorClient.Object);
 
                 // Act
-                var result = await releaseService.DeleteReleaseVersion(releaseVersion.Id);
+                var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
 
                 // Assert
                 releaseDataFilesService.Verify(mock =>
@@ -1666,11 +1666,11 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(
+                var releaseVersionService = BuildReleaseVersionService(
                     context,
                     processorClient: processorClient.Object);
 
-                var result = await releaseService.DeleteReleaseVersion(releaseVersion.Id);
+                var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
 
                 VerifyAllMocks(processorClient);
 
@@ -1711,19 +1711,19 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(
+                var releaseVersionService = BuildReleaseVersionService(
                     context,
                     processorClient: processorClient.Object);
 
                 await Assert.ThrowsAsync<HttpRequestException>(async () =>
-                    await releaseService.DeleteReleaseVersion(releaseVersion.Id));
+                    await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id));
 
                 VerifyAllMocks(processorClient);
             }
         }
     }
 
-    public class DeleteTestReleaseVersionTests : ReleaseServiceTests
+    public class DeleteTestReleaseVersionTests : ReleaseVersionServiceTests
     {
         [Theory]
         [InlineData(false)]
@@ -1867,7 +1867,7 @@ public abstract class ReleaseServiceTests
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(
+                var releaseVersionService = BuildReleaseVersionService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     releaseDataFileService: releaseDataFilesService.Object,
@@ -1878,7 +1878,7 @@ public abstract class ReleaseServiceTests
                     processorClient: processorClient.Object);
 
                 // Act
-                var result = await releaseService.DeleteTestReleaseVersion(releaseVersion.Id);
+                var result = await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id);
 
                 // Assert
                 releaseDataFilesService.Verify(mock =>
@@ -2010,12 +2010,12 @@ public abstract class ReleaseServiceTests
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
             {
-                var releaseService = BuildReleaseService(
+                var releaseVersionService = BuildReleaseVersionService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     processorClient: processorClient.Object);
 
-                var result = await releaseService.DeleteTestReleaseVersion(releaseVersion.Id);
+                var result = await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id);
 
                 VerifyAllMocks(processorClient);
 
@@ -2057,20 +2057,20 @@ public abstract class ReleaseServiceTests
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
             await using var contentDbContext = InMemoryApplicationDbContext(contextId);
             {
-                var releaseService = BuildReleaseService(
+                var releaseVersionService = BuildReleaseVersionService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     processorClient: processorClient.Object);
 
                 await Assert.ThrowsAsync<HttpRequestException>(async () =>
-                    await releaseService.DeleteTestReleaseVersion(releaseVersion.Id));
+                    await releaseVersionService.DeleteTestReleaseVersion(releaseVersion.Id));
 
                 VerifyAllMocks(processorClient);
             }
         }
     }
 
-    public class UpdateReleasePublishedTests : ReleaseServiceTests
+    public class UpdateReleasePublishedTests : ReleaseVersionServiceTests
     {
         [Fact]
         public async Task Success_NotLatestReleaseInPublication()
@@ -2107,7 +2107,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = BuildReleaseService(contentDbContext: context,
+                var service = BuildReleaseVersionService(contentDbContext: context,
                     releaseCacheService: releaseCacheService.Object);
 
                 var result = await service
@@ -2164,7 +2164,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = BuildReleaseService(contentDbContext: context,
+                var service = BuildReleaseVersionService(contentDbContext: context,
                     releaseCacheService: releaseCacheService.Object);
 
                 var result = await service
@@ -2205,7 +2205,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = BuildReleaseService(context);
+                var service = BuildReleaseVersionService(context);
 
                 var result = await service
                     .UpdateReleasePublished(
@@ -2235,7 +2235,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = BuildReleaseService(context);
+                var service = BuildReleaseVersionService(context);
 
                 var result = await service
                     .UpdateReleasePublished(
@@ -2282,7 +2282,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = BuildReleaseService(contentDbContext: context,
+                var service = BuildReleaseVersionService(contentDbContext: context,
                     releaseCacheService: releaseCacheService.Object);
 
                 var result = await service
@@ -2312,7 +2312,7 @@ public abstract class ReleaseServiceTests
         }
     }
 
-    public class ListUsersReleasesForApprovalTests : ReleaseServiceTests
+    public class ListUsersReleasesForApprovalTests : ReleaseVersionServiceTests
     {
         private readonly DataFixture _fixture = new();
 
@@ -2387,7 +2387,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = BuildReleaseService(context);
+                var service = BuildReleaseVersionService(context);
 
                 var result = await service.ListUsersReleasesForApproval();
 
@@ -2481,7 +2481,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = BuildReleaseService(context);
+                var service = BuildReleaseVersionService(context);
 
                 var result = await service.ListUsersReleasesForApproval();
 
@@ -2533,7 +2533,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = BuildReleaseService(context);
+                var service = BuildReleaseVersionService(context);
 
                 var result = await service.ListUsersReleasesForApproval();
 
@@ -2547,7 +2547,7 @@ public abstract class ReleaseServiceTests
         }
     }
 
-    private static ReleaseService BuildReleaseService(
+    private static ReleaseVersionService BuildReleaseVersionService(
         ContentDbContext contentDbContext,
         StatisticsDbContext? statisticsDbContext = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
@@ -2570,7 +2570,7 @@ public abstract class ReleaseServiceTests
             .Setup(s => s.GetUserId())
             .Returns(User.Id);
 
-        return new ReleaseService(
+        return new ReleaseVersionService(
             contentDbContext,
             statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),
             AdminMapper(),

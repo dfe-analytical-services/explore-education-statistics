@@ -27,7 +27,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
         private readonly ILocationRepository _locationRepository;
         private readonly IFootnoteRepository _footnoteRepository;
-        private readonly IReleaseService _releaseService;
+        private readonly IReleaseVersionService _releaseVersionService;
         private readonly IDataSetVersionService _dataSetVersionService;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IIndicatorGroupRepository indicatorGroupRepository,
             ILocationRepository locationRepository,
             IFootnoteRepository footnoteRepository,
-            IReleaseService releaseService,
+            IReleaseVersionService releaseVersionService,
             IDataSetVersionService dataSetVersionService,
             ITimePeriodService timePeriodService,
             IUserService userService,
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _indicatorGroupRepository = indicatorGroupRepository;
             _locationRepository = locationRepository;
             _footnoteRepository = footnoteRepository;
-            _releaseService = releaseService;
+            _releaseVersionService = releaseVersionService;
             _dataSetVersionService = dataSetVersionService;
             _timePeriodService = timePeriodService;
             _userService = userService;
@@ -1214,7 +1214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _contentDbContext.SaveChangesAsync();
 
-                    return await _releaseService.RemoveDataFiles(releaseVersionId: releaseVersionId,
+                    return await _releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersionId,
                         fileId: originalFileId);
                 });
         }

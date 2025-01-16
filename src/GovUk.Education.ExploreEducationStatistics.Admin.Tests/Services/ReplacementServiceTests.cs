@@ -37,7 +37,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using IReleaseVersionService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionService;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -3169,8 +3169,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var releaseService = new Mock<IReleaseService>(Strict);
-            releaseService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
                 .ReturnsAsync(Unit.Instance);
 
             var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
@@ -3192,7 +3192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobCacheService: blobCacheService.Object,
                     cacheKeyService: cacheKeyService.Object,
                     locationRepository: locationRepository.Object,
-                    releaseService: releaseService.Object,
+                    releaseVersionService: releaseVersionService.Object,
                     timePeriodService: timePeriodService.Object);
 
                 var result = await replacementService.Replace(
@@ -3203,7 +3203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(blobCacheService,
                     cacheKeyService,
                     locationRepository,
-                    releaseService,
+                    releaseVersionService,
                     timePeriodService);
 
                 result.AssertRight();
@@ -3672,8 +3672,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             blobCacheService.Setup(service => service.DeleteItemAsync(cacheKey))
                 .Returns(Task.CompletedTask);
 
-            var releaseService = new Mock<IReleaseService>(Strict);
-            releaseService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3684,7 +3684,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobCacheService: blobCacheService.Object,
                     cacheKeyService: cacheKeyService.Object,
                     locationRepository: locationRepository.Object,
-                    releaseService: releaseService.Object,
+                    releaseVersionService: releaseVersionService.Object,
                     timePeriodService: timePeriodService.Object);
 
                 var result = await replacementService.Replace(
@@ -3695,7 +3695,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(blobCacheService,
                     cacheKeyService,
                     locationRepository,
-                    releaseService,
+                    releaseVersionService,
                     timePeriodService);
 
                 result.AssertRight();
@@ -3963,8 +3963,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             blobCacheService.Setup(service => service.DeleteItemAsync(cacheKey))
                 .Returns(Task.CompletedTask);
 
-            var releaseService = new Mock<IReleaseService>(Strict);
-            releaseService.Setup(service => service.RemoveDataFiles(
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionService.Setup(service => service.RemoveDataFiles(
                 releaseVersion.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3975,7 +3975,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobCacheService: blobCacheService.Object,
                     cacheKeyService: cacheKeyService.Object,
                     locationRepository: locationRepository.Object,
-                    releaseService: releaseService.Object,
+                    releaseVersionService: releaseVersionService.Object,
                     timePeriodService: timePeriodService.Object);
 
                 var result = await replacementService.Replace(
@@ -3986,7 +3986,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(blobCacheService,
                     cacheKeyService,
                     locationRepository,
-                    releaseService,
+                    releaseVersionService,
                     timePeriodService);
 
                 result.AssertRight();
@@ -4173,8 +4173,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
                 .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-            var releaseService = new Mock<IReleaseService>(Strict);
-            releaseService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionService.Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -4183,7 +4183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var replacementService = BuildReplacementService(contentDbContext,
                     statisticsDbContext,
                     locationRepository: locationRepository.Object,
-                    releaseService: releaseService.Object,
+                    releaseVersionService: releaseVersionService.Object,
                     timePeriodService: timePeriodService.Object);
 
                 var result = await replacementService.Replace(
@@ -4192,7 +4192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacementFileId: replacementFile.Id);
 
                 VerifyAllMocks(locationRepository,
-                    releaseService,
+                    releaseVersionService,
                     timePeriodService);
 
                 result.AssertRight();
@@ -4367,8 +4367,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
                 .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-            var releaseService = new Mock<IReleaseService>(Strict);
-            releaseService.Setup(service => service.RemoveDataFiles(contentRelease.Id, originalFile.Id))
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionService.Setup(service => service.RemoveDataFiles(contentRelease.Id, originalFile.Id))
                 .ReturnsAsync(Unit.Instance);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -4377,7 +4377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var replacementService = BuildReplacementService(contentDbContext,
                     statisticsDbContext,
                     locationRepository: locationRepository.Object,
-                    releaseService: releaseService.Object,
+                    releaseVersionService: releaseVersionService.Object,
                     timePeriodService: timePeriodService.Object);
 
                 var result = await replacementService.Replace(
@@ -4386,7 +4386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     replacementFileId: replacementFile.Id);
 
                 VerifyAllMocks(locationRepository,
-                    releaseService,
+                    releaseVersionService,
                     timePeriodService);
 
                 result.AssertRight();
@@ -4467,7 +4467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             ILocationRepository? locationRepository = null,
-            IReleaseService? releaseService = null,
+            IReleaseVersionService? releaseVersionService = null,
             IDataSetVersionService dataSetVersionService = null,
             ITimePeriodService? timePeriodService = null,
             ICacheKeyService? cacheKeyService = null,
@@ -4481,7 +4481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new IndicatorGroupRepository(statisticsDbContext),
                 locationRepository ?? Mock.Of<ILocationRepository>(Strict),
                 new FootnoteRepository(statisticsDbContext),
-                releaseService ?? Mock.Of<IReleaseService>(Strict),
+                releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
                 dataSetVersionService ?? Mock.Of<IDataSetVersionService>(),
                 timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
                 AlwaysTrueUserService().Object,
