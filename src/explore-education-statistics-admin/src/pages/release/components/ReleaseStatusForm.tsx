@@ -2,7 +2,7 @@ import { ReleaseStatusPermissions } from '@admin/services/permissionService';
 import {
   Release,
   ReleaseChecklistErrorCode,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';

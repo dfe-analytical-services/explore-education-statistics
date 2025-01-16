@@ -9,7 +9,7 @@ import _apiDataSetService, {
   ApiDataSetSummary,
 } from '@admin/services/apiDataSetService';
 import { GlobalPermissions } from '@admin/services/authService';
-import { Release } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseVersionService';
 import render, { CustomRenderResult } from '@common-test/render';
 import { createMemoryHistory, History } from 'history';
 import { screen, waitFor, within } from '@testing-library/react';

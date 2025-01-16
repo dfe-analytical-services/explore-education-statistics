@@ -12,7 +12,7 @@ import _apiDataSetService, {
   ApiDataSetLiveVersion,
 } from '@admin/services/apiDataSetService';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
-import { Release } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';

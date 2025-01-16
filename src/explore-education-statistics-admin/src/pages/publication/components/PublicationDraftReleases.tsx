@@ -3,7 +3,7 @@ import {
   DraftStatusGuidanceModal,
   IssuesGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
-import { ReleaseSummaryWithPermissions } from '@admin/services/releaseService';
+import { ReleaseSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import InsetText from '@common/components/InsetText';
 import React from 'react';
 

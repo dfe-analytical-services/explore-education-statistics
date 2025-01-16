@@ -4,7 +4,9 @@ import { PublicationManageTeamRouteParams } from '@admin/routes/publicationRoute
 import releasePermissionService, {
   UserReleaseRole,
 } from '@admin/services/releasePermissionService';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseVersionService, {
+  Release,
+} from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
@@ -25,7 +27,7 @@ const PublicationManageReleaseContributorsPage = ({
 
   const { value, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [release, publicationContributors, releaseRoles] = await Promise.all([
-      releaseService.getRelease(releaseId),
+      releaseVersionService.getRelease(releaseId),
       releasePermissionService.listPublicationContributors(publicationId),
       releasePermissionService.listRoles(releaseId),
     ]);

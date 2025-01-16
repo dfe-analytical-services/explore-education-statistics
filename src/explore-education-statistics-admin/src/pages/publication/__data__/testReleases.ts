@@ -1,4 +1,4 @@
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseSummary } from '@admin/services/releaseVersionService';
 import { PaginatedList } from '@common/services/types/pagination';
 
 // eslint-disable-next-line import/prefer-default-export

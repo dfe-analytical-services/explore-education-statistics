@@ -1,7 +1,7 @@
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import _releaseService from '@admin/services/releaseService';
+import _releaseService from '@admin/services/releaseVersionService';
 import _permissionService from '@admin/services/permissionService';
 import _preReleaseUserService from '@admin/services/preReleaseUserService';
 import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
@@ -10,7 +10,7 @@ import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import ReleasePreReleaseAccessPage from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
 import userEvent from '@testing-library/user-event';
 
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 jest.mock('@admin/services/permissionService');
 const permissionService = _permissionService as jest.Mocked<

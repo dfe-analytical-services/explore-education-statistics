@@ -1,7 +1,7 @@
 import useReleasePublishingStatus from '@admin/pages/release/hooks/useReleasePublishingStatus';
 import ReleasePublishingStatusTag from '@admin/pages/release/components/ReleasePublishingStatusTag';
 import ReleasePublishingStages from '@admin/pages/release/components/ReleasePublishingStages';
-import { ReleaseStageStatus } from '@admin/services/releaseService';
+import { ReleaseStageStatus } from '@admin/services/releaseVersionService';
 import React from 'react';
 
 interface ReleasePublishingStatusProps {

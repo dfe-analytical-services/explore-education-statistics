@@ -1,5 +1,5 @@
 import StatusBlock, { StatusBlockColors } from '@admin/components/StatusBlock';
-import { ReleaseStageStatus } from '@admin/services/releaseService';
+import { ReleaseStageStatus } from '@admin/services/releaseVersionService';
 import React from 'react';
 import Tag from '@common/components/Tag';
 

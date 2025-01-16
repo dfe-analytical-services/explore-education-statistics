@@ -3,7 +3,7 @@ import {
   ScheduledStagesGuidanceModal,
   ScheduledStatusGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
-import { DashboardReleaseSummary } from '@admin/services/releaseService';
+import { DashboardReleaseSummary } from '@admin/services/releaseVersionService';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo } from 'react';

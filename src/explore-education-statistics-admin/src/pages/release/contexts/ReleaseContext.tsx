@@ -1,4 +1,4 @@
-import { Release } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseVersionService';
 import noop from 'lodash/noop';
 import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 

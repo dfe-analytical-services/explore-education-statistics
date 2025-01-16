@@ -1,10 +1,10 @@
 import Link from '@admin/components/Link';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import CancelAmendmentModal from '@admin/pages/admin-dashboard/components/CancelAmendmentModal';
-import releaseService, {
+import releaseVersionService, {
   DeleteReleasePlan,
   ReleaseSummaryWithPermissions,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -30,7 +30,9 @@ const DraftReleaseRow = ({
   onAmendmentDelete,
 }: Props) => {
   const { value: checklist, isLoading: isLoadingChecklist } =
-    useAsyncHandledRetry(() => releaseService.getReleaseChecklist(release.id));
+    useAsyncHandledRetry(() =>
+      releaseVersionService.getReleaseChecklist(release.id),
+    );
 
   const [deleteReleasePlan, setDeleteReleasePlan] = useState<
     DeleteReleasePlan & {
@@ -81,7 +83,7 @@ const DraftReleaseRow = ({
                 </ButtonText>
               }
               onConfirm={async () => {
-                await releaseService.deleteRelease(release.id);
+                await releaseVersionService.deleteRelease(release.id);
                 onAmendmentDelete?.();
               }}
             />
@@ -108,7 +110,9 @@ const DraftReleaseRow = ({
                 variant="warning"
                 onClick={async () => {
                   setDeleteReleasePlan({
-                    ...(await releaseService.getDeleteReleasePlan(release.id)),
+                    ...(await releaseVersionService.getDeleteReleasePlan(
+                      release.id,
+                    )),
                     releaseId: release.id,
                   });
                 }}
@@ -119,7 +123,9 @@ const DraftReleaseRow = ({
             }
             onConfirm={async () => {
               if (deleteReleasePlan) {
-                await releaseService.deleteRelease(deleteReleasePlan.releaseId);
+                await releaseVersionService.deleteRelease(
+                  deleteReleasePlan.releaseId,
+                );
                 setDeleteReleasePlan(undefined);
                 onAmendmentDelete?.();
               }

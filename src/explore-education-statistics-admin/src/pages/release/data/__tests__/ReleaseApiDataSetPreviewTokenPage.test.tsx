@@ -12,7 +12,7 @@ import _apiDataSetService, {
 import _previewTokenService, {
   PreviewToken,
 } from '@admin/services/previewTokenService';
-import { Release } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import addHours from 'date-fns/addHours';

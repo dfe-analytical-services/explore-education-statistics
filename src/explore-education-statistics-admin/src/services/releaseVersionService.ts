@@ -207,7 +207,7 @@ export interface DeleteReleasePlan {
   scheduledMethodologies: IdTitlePair[];
 }
 
-const releaseService = {
+const releaseVersionService = {
   createRelease(createRequest: CreateReleaseRequest): Promise<Release> {
     return client.post(`/releases`, createRequest);
   },
@@ -277,4 +277,4 @@ const releaseService = {
   },
 };
 
-export default releaseService;
+export default releaseVersionService;

@@ -1,9 +1,9 @@
 import ReleasePublishingStatus from '@admin/pages/release/components/ReleasePublishingStatus';
-import _releaseService from '@admin/services/releaseService';
+import _releaseService from '@admin/services/releaseVersionService';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 
 const releaseService = jest.mocked(_releaseService);
 

@@ -1,11 +1,11 @@
 import Link from '@admin/components/Link';
 import DraftReleaseRowIssues from '@admin/pages/admin-dashboard/components/DraftReleaseRowIssues';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import releaseService, {
+import releaseVersionService, {
   ReleaseSummaryWithPermissions,
   DashboardReleaseSummary,
   DeleteReleasePlan,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -73,7 +73,9 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
                 variant="warning"
                 onClick={async () => {
                   setDeleteReleasePlan({
-                    ...(await releaseService.getDeleteReleasePlan(release.id)),
+                    ...(await releaseVersionService.getDeleteReleasePlan(
+                      release.id,
+                    )),
                     releaseId: release.id,
                   });
                 }}
@@ -84,7 +86,9 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
             }
             onConfirm={async () => {
               if (deleteReleasePlan) {
-                await releaseService.deleteRelease(deleteReleasePlan.releaseId);
+                await releaseVersionService.deleteRelease(
+                  deleteReleasePlan.releaseId,
+                );
                 setDeleteReleasePlan(undefined);
                 onChangeRelease();
               }
