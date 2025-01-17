@@ -7,7 +7,7 @@ import compact from 'lodash/compact';
 export default function generateDataSetLabel(dataSet: ExpandedDataSet): string {
   const labels = compact([
     ...dataSet.filters
-      .filter(filter => !filter.isTotal)
+      .filter(filter => !filter.isAutoSelect)
       .map(filter => filter.label),
     dataSet.location?.label ?? 'All locations',
     dataSet.timePeriod?.label ?? 'All time periods',

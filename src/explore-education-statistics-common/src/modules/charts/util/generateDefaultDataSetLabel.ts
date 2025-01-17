@@ -20,9 +20,10 @@ export default function generateDefaultDataSetLabel(
 ): string {
   const filterLabels = compact([
     ...(!(excludeFilter instanceof CategoryFilter)
-      ? dataSet.filters.filter(filter => !filter.isTotal)
+      ? dataSet.filters.filter(filter => !filter.isAutoSelect)
       : dataSet.filters.filter(
-          filter => filter.value !== excludeFilter.value && !filter.isTotal,
+          filter =>
+            filter.value !== excludeFilter.value && !filter.isAutoSelect,
         )),
     !(excludeFilter instanceof LocationFilter) ? dataSet.location : undefined,
     !(excludeFilter instanceof TimePeriodFilter)

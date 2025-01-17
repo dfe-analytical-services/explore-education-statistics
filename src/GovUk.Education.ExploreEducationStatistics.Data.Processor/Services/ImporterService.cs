@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         fg.FilterId.Equals(filterId)
                         && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
 
-                    return new FilterItem(filterItemLabel, filterGroup); // includes filterGroups objects in filterItems
+                    return new FilterItem(filterItemLabel, filterGroup); // includes filterGroups objects in returned filterItems
                 })
                 .ToList();
 
@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     filterId => filterId,
                     filterId =>
                     {
-                        var defaultFilterItemLabel = context.Filter
+                        var autoSelectFilterItemLabel = context.Filter
                             .Where(f => f.Id == filterId)
                             .Select(f => f.AutoSelectFilterItemLabel)
                             .SingleOrDefault() ?? "Total"; // If meta file didn't specify a default, look for "Total"
@@ -184,10 +184,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         return filterItems
                             .Where(item =>
                                 item.FilterGroup.FilterId == filterId
-                                && item.Label.Equals(defaultFilterItemLabel, OrdinalIgnoreCase))
+                                && item.Label.Equals(autoSelectFilterItemLabel, OrdinalIgnoreCase))
                             .Select(item => new { item.Id , item.Label})
                             // There might be two filter items with the same label under different groups.
-                            // If so, we set no default.
+                            // If so, we set no autoSelectFilterItem.
                             .SingleOrDefault();
                     }
                 );

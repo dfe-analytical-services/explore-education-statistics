@@ -44,7 +44,7 @@ public class MetaDataFileReader
             Label = ReadMetaColumnValue(MetaColumns.label, rowValues),
             FilterGroupingColumn = ReadMetaColumnValue(MetaColumns.filter_grouping_column, rowValues),
             FilterHint = ReadMetaColumnValue(MetaColumns.filter_hint, rowValues),
-            DefaultFilterItemLabel = ReadMetaColumnValue(MetaColumns.filter_default, rowValues),
+            AutoSelectFilterItemLabel = ReadMetaColumnValue(MetaColumns.filter_default, rowValues),
             IndicatorGrouping = ReadMetaColumnValue(MetaColumns.indicator_grouping, rowValues),
             IndicatorUnit = EnumUtil.GetFromEnumValue<IndicatorUnit>(!indicatorUnit.IsNullOrEmpty() ? indicatorUnit : ""),
             DecimalPlaces = !indicatorDp.IsNullOrEmpty() ? int.Parse(indicatorDp!) : null
@@ -63,8 +63,8 @@ public class MetaDataFileReader
                     label: filterMetaRow.Label,
                     name: filterMetaRow.ColumnName,
                     groupCsvColumn: filterMetaRow.FilterGroupingColumn,
-                    defaultFilterItemLabel: filterMetaRow.DefaultFilterItemLabel,
-                    // NOTE: DefaultFilterItemId is set later, when filter items are created
+                    autoSelectFilterItemLabel: filterMetaRow.AutoSelectFilterItemLabel,
+                    // NOTE: AutoSelectFilterItemId is set later, after filter items are created
                     subjectId: subject.Id),
                 column: filterMetaRow.ColumnName))
             .ToList();

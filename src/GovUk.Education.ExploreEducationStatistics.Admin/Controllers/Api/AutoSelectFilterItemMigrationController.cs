@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 
@@ -21,9 +20,8 @@ public class AutoSelectFilterItemMigrationController(StatisticsDbContext statist
         public int Processed;
     }
 
-    [HttpPut("bau/auto-select-filter-item")] // @MarkFix test this
+    [HttpPut("bau/auto-select-filter-item")]
     public async Task<MigrationResult> AutoSelectFilterItemMigration(
-        [FromQuery] bool isDryRun = true,
         [FromQuery] int? num = null,
         CancellationToken cancellationToken = default)
     {
@@ -32,7 +30,7 @@ public class AutoSelectFilterItemMigrationController(StatisticsDbContext statist
                 f.AutoSelectFilterItemId == null
                 && f.FilterGroups.Count(
                     group => group.FilterItems.Count(
-                        item => item.Label.Equals("Total", CurrentCultureIgnoreCase)
+                        item => item.Label == "Total" // this will be case agnostic (i.e. also find "total")
                     ) == 1
                 ) == 1) // only one Total filter item across all filter items
             .Select(f => f.Id);
@@ -48,32 +46,26 @@ public class AutoSelectFilterItemMigrationController(StatisticsDbContext statist
 
         foreach (var filterId in filterIds)
         {
-            var defaultFilterItemId = statisticsDbContext.FilterItem
+            var autoSelectFilterItemId = statisticsDbContext.FilterItem
                 .Where(fi => fi.FilterGroup.FilterId == filterId
-                             && fi.Label.Equals("Total", CurrentCultureIgnoreCase))
+                             && fi.Label == "Total")
                 .Select(fi => fi.Id)
                 .SingleOrDefault();
 
-            if (defaultFilterItemId == default)
+            if (autoSelectFilterItemId == default)
                 continue;
 
             await statisticsDbContext.Filter
                 .Where(f => f.Id == filterId)
                 .ExecuteUpdateAsync(setters => setters
-                    .SetProperty(f => f.AutoSelectFilterItemId, defaultFilterItemId)
+                    .SetProperty(f => f.AutoSelectFilterItemId, autoSelectFilterItemId)
                     .SetProperty(f => f.AutoSelectFilterItemLabel, "Total"), cancellationToken);
 
             numProcessed++;
         }
 
-        if (!isDryRun)
-        {
-            await statisticsDbContext.SaveChangesAsync(cancellationToken);
-        }
-
         return new MigrationResult
         {
-            IsDryRun = isDryRun,
             Processed = numProcessed,
         };
     }

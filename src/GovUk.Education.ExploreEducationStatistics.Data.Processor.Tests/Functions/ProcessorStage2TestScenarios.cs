@@ -406,6 +406,8 @@ public class AutoSelectFilterItemCsvStage2Scenario : IProcessorStage2TestScenari
                 Label = "Filter with Total",
                 Name = "filter_with_total",
                 GroupCsvColumn = null,
+                AutoSelectFilterItemLabel = "Total",
+                // AutoSelectFilterItemId should also be set, but we cannot know what it is here
                 FilterGroups = ListOf(
                     new FilterGroup
                     {
@@ -431,6 +433,8 @@ public class AutoSelectFilterItemCsvStage2Scenario : IProcessorStage2TestScenari
                 Label = "Filter with default TwoTwo",
                 Name = "filter_with_default",
                 GroupCsvColumn = null,
+                AutoSelectFilterItemLabel = "TwoTwo",
+                // AutoSelectFilterItemId should also be set, but we cannot know what it is here
                 FilterGroups = ListOf(
                     new FilterGroup
                     {

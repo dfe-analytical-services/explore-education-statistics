@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             string label,
             string name,
             string? groupCsvColumn,
-            string? defaultFilterItemLabel,
+            string? autoSelectFilterItemLabel,
             Guid subjectId)
         {
             Id = Guid.NewGuid();
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             Label = label;
             Name = name;
             GroupCsvColumn = groupCsvColumn;
-            AutoSelectFilterItemLabel = defaultFilterItemLabel;
+            AutoSelectFilterItemLabel = autoSelectFilterItemLabel;
             SubjectId = subjectId;
             FilterGroups = new List<FilterGroup>();
         }

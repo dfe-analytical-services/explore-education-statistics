@@ -34,6 +34,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 column: "AutoSelectFilterItemId",
                 principalTable: "FilterItem",
                 principalColumn: "Id");
+
+            // Fix casing all all preexisting totals to "Total" - WHERE is case agonostic (i.e. matches any casing of "total")
+            migrationBuilder.Sql("""
+                                 UPDATE FilterItem
+                                 SET Label = 'Total'
+                                 WHERE Label = 'total';
+                                 """);
         }
 
         /// <inheritdoc />
