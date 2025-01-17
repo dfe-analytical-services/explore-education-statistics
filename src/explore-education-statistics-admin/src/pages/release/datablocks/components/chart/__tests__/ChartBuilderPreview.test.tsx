@@ -1,6 +1,6 @@
 import ChartBuilderPreview from '@admin/pages/release/datablocks/components/chart/ChartBuilderPreview';
 import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
-import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
+import { RenderrableChart } from '@common/modules/charts/components/ChartRenderer';
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -37,7 +37,7 @@ describe('ChartBuilderPreview', () => {
 
   const testFullTableMeta = mapFullTable(testChartTableData);
 
-  const testInfographicChartRenderer: ChartRendererProps = {
+  const testInfographicChart: RenderrableChart = {
     type: 'infographic',
     fileId: '1',
     data: [],
@@ -47,7 +47,7 @@ describe('ChartBuilderPreview', () => {
     axes: {},
   };
 
-  const testLineChartRenderer: ChartRendererProps = {
+  const testLineChart: RenderrableChart = {
     type: 'line',
     data: [],
     meta: testFullTableMeta.subjectMeta,
@@ -62,7 +62,7 @@ describe('ChartBuilderPreview', () => {
     },
   };
 
-  const testVerticalBarChartRenderer: ChartRendererProps = {
+  const testVerticalBarChart: RenderrableChart = {
     type: 'verticalbar',
     data: [],
     meta: testFullTableMeta.subjectMeta,
@@ -77,7 +77,7 @@ describe('ChartBuilderPreview', () => {
     },
   };
 
-  const testHorizontalBarChartRenderer: ChartRendererProps = {
+  const testHorizontalBarChart: RenderrableChart = {
     type: 'horizontalbar',
     data: [],
     meta: testFullTableMeta.subjectMeta,
@@ -92,9 +92,9 @@ describe('ChartBuilderPreview', () => {
     },
   };
 
-  const testMapChartRenderer: ChartRendererProps = {
+  const testMapChart: RenderrableChart = {
     type: 'map',
-    onBoundaryLevelChange: () => {},
+    onBoundaryLevelChange: async () => {},
     data: [],
     meta: testFullTableMeta.subjectMeta,
     alt: '',
@@ -110,21 +110,21 @@ describe('ChartBuilderPreview', () => {
   };
 
   test('renders the loading spinner when the loading flag is indicating that it is loading', () => {
-    render(<ChartBuilderPreview chart={testLineChartRenderer} loading />);
+    render(<ChartBuilderPreview chart={testLineChart} loading />);
     const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
     expect(detailsSection).toBeInTheDocument();
     expect(detailsSection).toHaveTextContent('Loading chart data');
   });
 
   [
-    testInfographicChartRenderer,
-    testLineChartRenderer,
-    testVerticalBarChartRenderer,
-    testHorizontalBarChartRenderer,
-    testMapChartRenderer,
-  ].forEach(chartRenderer => {
-    test(`renders chart of type '${chartRenderer.type}' when all mandatory fields are provided`, () => {
-      render(<ChartBuilderPreview chart={chartRenderer} loading={false} />);
+    testInfographicChart,
+    testLineChart,
+    testVerticalBarChart,
+    testHorizontalBarChart,
+    testMapChart,
+  ].forEach(chart => {
+    test(`renders chart of type '${chart.type}' when all mandatory fields are provided`, () => {
+      render(<ChartBuilderPreview chart={chart} loading={false} />);
       const detailsSection = screen.queryByTestId(
         'chartBuilderPreviewContainer',
       );
@@ -138,15 +138,15 @@ describe('ChartBuilderPreview', () => {
   });
 
   [
-    testLineChartRenderer,
-    testVerticalBarChartRenderer,
-    testHorizontalBarChartRenderer,
-    testMapChartRenderer,
-  ].forEach(chartRenderer => {
-    test(`renders preview help text for chart of type '${chartRenderer.type}' when no data sets are yet added`, () => {
+    testLineChart,
+    testVerticalBarChart,
+    testHorizontalBarChart,
+    testMapChart,
+  ].forEach(chart => {
+    test(`renders preview help text for chart of type '${chart.type}' when no data sets are yet added`, () => {
       render(
         <ChartBuilderPreview
-          chart={produce(chartRenderer, draft => {
+          chart={produce(chart, draft => {
             draft.axes.major.dataSets = [];
           })}
           loading={false}
@@ -157,7 +157,7 @@ describe('ChartBuilderPreview', () => {
       );
       expect(detailsSection).toBeInTheDocument();
       const expectedHelpText =
-        chartRenderer.type === 'map'
+        chart.type === 'map'
           ? 'Add data and choose a version of geographic data to view a preview'
           : 'Configure the chart and add data to view a preview';
       expect(detailsSection).toHaveTextContent(expectedHelpText);
@@ -167,7 +167,7 @@ describe('ChartBuilderPreview', () => {
   test(`renders preview help text for chart of type 'infographic' when no fileId is selected`, () => {
     render(
       <ChartBuilderPreview
-        chart={produce(testInfographicChartRenderer, draft => {
+        chart={produce(testInfographicChart, draft => {
           draft.fileId = '';
         })}
         loading={false}
@@ -183,7 +183,7 @@ describe('ChartBuilderPreview', () => {
   test(`renders preview help text for chart of type 'map' when no boundaryLevel is selected`, () => {
     render(
       <ChartBuilderPreview
-        chart={produce(testMapChartRenderer, draft => {
+        chart={produce(testMapChart, draft => {
           draft.boundaryLevel = 0;
         })}
         loading={false}

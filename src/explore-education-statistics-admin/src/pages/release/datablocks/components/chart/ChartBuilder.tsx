@@ -16,7 +16,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
-import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
+import { RenderrableChart } from '@common/modules/charts/components/ChartRenderer';
 import {
   horizontalBarBlockDefinition,
   HorizontalBarProps,
@@ -45,7 +45,7 @@ import {
   ReleaseTableDataQuery,
   TableDataResult,
 } from '@common/services/tableBuilderService';
-import { Chart, DataBlock } from '@common/services/types/blocks';
+import { Chart } from '@common/services/types/blocks';
 import { ValidationProblemDetails } from '@common/services/types/problemDetails';
 import parseNumber from '@common/utils/number/parseNumber';
 import { isServerValidationError } from '@common/validation/serverValidations';
@@ -60,7 +60,7 @@ const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
 ];
 
-type ChartBuilderChartProps = ChartRendererProps & {
+type ChartBuilderChartProps = RenderrableChart & {
   file?: File;
 };
 
@@ -151,7 +151,7 @@ export default function ChartBuilder({
     [axes.major?.dataSets, meta.indicators],
   );
 
-  const chartProps = useMemo<ChartBuilderChartProps | undefined>(() => {
+  const chart = useMemo<ChartBuilderChartProps | undefined>(() => {
     if (!definition || !options) {
       return undefined;
     }
@@ -198,7 +198,7 @@ export default function ChartBuilder({
           },
           boundaryLevel: options.boundaryLevel ?? 0,
           type: 'map',
-          onBoundaryLevelChange: boundaryLevel =>
+          onBoundaryLevelChange: (boundaryLevel: number) =>
             onTableQueryUpdate({ boundaryLevel }),
         };
       default:
@@ -217,7 +217,7 @@ export default function ChartBuilder({
   ]);
 
   const handleSubmit = useCallback(async () => {
-    if (!chartProps) {
+    if (!chart) {
       return;
     }
 
@@ -231,7 +231,7 @@ export default function ChartBuilder({
     }
 
     try {
-      await onChartSave(filterChartProps(chartProps), chartProps.file);
+      await onChartSave(filterChartProps(chart), chart.file);
     } catch (error) {
       if (isServerValidationError(error) && error.response?.data) {
         setSubmitError(error.response.data);
@@ -239,25 +239,25 @@ export default function ChartBuilder({
         throw error;
       }
     }
-  }, [chartProps, onChartSave]);
+  }, [chart, onChartSave]);
 
   const handleChartDelete = useCallback(async () => {
     toggleDeleteModal.off();
 
-    if (!chartProps) {
+    if (!chart) {
       return;
     }
 
     setDeleting(true);
 
     try {
-      await onChartDelete(filterChartProps(chartProps));
+      await onChartDelete(filterChartProps(chart));
 
       actions.resetState();
     } finally {
       setDeleting(false);
     }
-  }, [actions, chartProps, onChartDelete, toggleDeleteModal]);
+  }, [actions, chart, onChartDelete, toggleDeleteModal]);
 
   const handleChartDefinitionChange = useCallback(
     async (chartDefinition: ChartDefinition) => {
@@ -325,7 +325,7 @@ export default function ChartBuilder({
       />
 
       {definition && (
-        <ChartBuilderPreview chart={chartProps} loading={isDataLoading} />
+        <ChartBuilderPreview chart={chart} loading={isDataLoading} />
       )}
 
       {definition && (

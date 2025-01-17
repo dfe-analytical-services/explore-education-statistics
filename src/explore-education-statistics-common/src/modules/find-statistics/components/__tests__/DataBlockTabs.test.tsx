@@ -415,10 +415,9 @@ describe('DataBlockTabs', () => {
 
       // expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
     });
-    expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(1);
+    expect(tableBuilderService.getDataBlockTableData).toBeCalledTimes(1);
 
     await waitFor(() => {
-      expect(tableBuilderService.getLocationGeoJson).toBeCalled();
       expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(1);
     });
 
@@ -426,16 +425,16 @@ describe('DataBlockTabs', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByLabelText('1. Select data to view'),
+        screen.findByLabelText('1. Select data to view'),
       ).toBeInTheDocument();
     });
 
     // TODO: check for path/polygon node, save position(s) to compare later (EES-4902)
 
-    const dataSetSelectInput = screen.getByLabelText('1. Select data to view');
-    const dataSetOptions = within(dataSetSelectInput).getAllByRole('option');
-    expect(dataSetOptions).toHaveLength(2);
-    await userEvent.selectOptions(dataSetSelectInput, dataSetOptions[1]);
+    const select = screen.getByLabelText('1. Select data to view');
+    const options = within(select).getAllByRole('option');
+    expect(options).toHaveLength(2);
+    await userEvent.selectOptions(select, options[1]);
 
     await waitFor(() => {
       // EES-4902 map containing spinner isn't currently rendered in tests
@@ -448,7 +447,7 @@ describe('DataBlockTabs', () => {
       );
     });
 
-    expect(tableBuilderService.getLocationGeoJson).toHaveBeenCalledTimes(2);
+    expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(2);
 
     // TODO: check for path/polygon node position, compare with previous
     // should be different after rendering different location data (EES-4902)

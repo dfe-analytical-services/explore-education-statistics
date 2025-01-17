@@ -162,16 +162,16 @@ describe('MapBlock', () => {
 
     expect(onBoundaryLevelChange).not.toHaveBeenCalled();
 
-    const dataSetSelectInput = screen.getByLabelText('1. Select data to view');
-    const dataSetOptions = within(dataSetSelectInput).getAllByRole('option');
-    expect(dataSetOptions).toHaveLength(2);
+    const select = screen.getByLabelText('1. Select data to view');
+    const options = within(select).getAllByRole('option');
+    expect(options).toHaveLength(2);
 
     // Selecting another data set with different boundary level
-    await userEvent.selectOptions(dataSetSelectInput, dataSetOptions[1]);
+    await userEvent.selectOptions(select, options[1]);
 
     await waitFor(() => {
       // EES-4902 map containing spinner isn't currently rendered in tests
-      // expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
+      expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
     });
     expect(onBoundaryLevelChange).toHaveBeenCalledWith(2);
   });

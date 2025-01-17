@@ -16,9 +16,9 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 
 export const testMapConfiguration: Chart = {
+  id: 'test-id',
   type: 'map',
   boundaryLevel: 1,
-  onBoundaryLevelChange: () => {},
   axes: {
     major: {
       type: 'major',

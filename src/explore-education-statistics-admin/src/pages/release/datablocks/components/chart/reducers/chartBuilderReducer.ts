@@ -170,7 +170,9 @@ const getInitialState = ({
     (axisDefinition: ChartDefinitionAxis, axisType: AxisType) =>
       updateAxis(
         axisDefinition,
-        (initialAxes?.[axisType] ?? {}) as AxisConfiguration,
+        (initialAxes as { [key in AxisType]?: AxisConfiguration })?.[
+          axisType
+        ] ?? {},
       ),
   );
 

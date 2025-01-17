@@ -4,19 +4,20 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
 import withLazyLoad from '@common/hocs/withLazyLoad';
-import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
+import ChartRenderer, {
+  ChartRendererProps,
+} from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
 import getMapInitialBoundaryLevel from '@common/modules/charts/components/utils/getMapInitialBoundaryLevel';
-import { AxesConfiguration } from '@common/modules/charts/types/chart';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { DataBlock } from '@common/services/types/blocks';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import React, { ReactNode, useMemo, useState } from 'react';
-import tableBuilderQueries from '../queries/tableBuilderQueries';
+import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 
 const testId = (dataBlock: DataBlock) => `Data block - ${dataBlock.name}`;
 
@@ -43,6 +44,7 @@ const DataBlockTabs = ({
   releaseId,
   onToggle,
 }: DataBlockTabsProps) => {
+  const queryClient = useQueryClient();
   const [selectedBoundaryLevel, setSelectedBoundaryLevel] = useState(
     getMapInitialBoundaryLevel(dataBlock.charts),
   );
@@ -58,25 +60,39 @@ const DataBlockTabs = ({
     ),
   );
 
-  const { data: locationGeoJson, error: geoJsonError } = useQuery(
-    tableBuilderQueries.getDataBlockGeoJson(
-      releaseId,
-      dataBlock.dataBlockParentId,
-      selectedBoundaryLevel,
-    ),
+  const getDataBlockGeoJsonQuery = tableBuilderQueries.getDataBlockGeoJson(
+    releaseId,
+    dataBlock.dataBlockParentId,
+    selectedBoundaryLevel ?? -1,
   );
 
+  const {
+    data: locationGeoJson,
+    error: geoJsonError,
+    isFetching,
+  } = useQuery({
+    queryKey: getDataBlockGeoJsonQuery.queryKey,
+    queryFn: selectedBoundaryLevel
+      ? getDataBlockGeoJsonQuery.queryFn
+      : undefined,
+    staleTime: Infinity,
+    cacheTime: Infinity,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+
   const fullTable = useMemo(() => {
-    return !tableData
-      ? undefined
-      : mapFullTable({
+    return tableData && !isFetching
+      ? mapFullTable({
           ...tableData,
           subjectMeta: {
             ...tableData.subjectMeta,
             locations: locationGeoJson ?? tableData.subjectMeta.locations,
           },
-        });
-  }, [tableData, locationGeoJson]);
+        })
+      : undefined;
+  }, [tableData, locationGeoJson, isFetching]);
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
 
@@ -118,39 +134,70 @@ const DataBlockTabs = ({
                 {dataBlock.charts.map((chart, index) => {
                   const key = index;
 
-                  const commonChartProps = {
+                  const rendererProps: Omit<ChartRendererProps, 'chart'> = {
                     id: `${id}-chart`,
-                    axes: { ...chart.axes } as Required<AxesConfiguration>,
-                    data: fullTable?.results,
-                    meta: fullTable?.subjectMeta,
                     source: dataBlock?.source,
                   };
 
                   if (chart.type === 'infographic') {
                     return (
                       <ChartRenderer
-                        {...chart}
-                        {...commonChartProps}
+                        {...rendererProps}
                         key={key}
-                        getInfographic={getInfographic}
+                        chart={{
+                          ...chart,
+                          data: fullTable?.results,
+                          meta: fullTable?.subjectMeta,
+                          getInfographic,
+                        }}
                       />
                     );
                   }
+
                   if (chart.type === 'map') {
                     return (
                       <ChartRenderer
-                        {...chart}
-                        {...commonChartProps}
+                        {...rendererProps}
                         key={key}
-                        onBoundaryLevelChange={async boundaryLevel => {
-                          setSelectedBoundaryLevel(boundaryLevel);
+                        chart={{
+                          ...chart,
+                          data: fullTable?.results,
+                          meta: fullTable?.subjectMeta,
+                          onBoundaryLevelChange: async boundaryLevel => {
+                            const { queryKey, queryFn } =
+                              tableBuilderQueries.getDataBlockGeoJson(
+                                releaseId,
+                                dataBlock.dataBlockParentId,
+                                boundaryLevel,
+                              );
+                            const existingGeoJson =
+                              queryClient.getQueryData(queryKey);
+
+                            if (!existingGeoJson) {
+                              await queryClient.fetchQuery({
+                                queryKey,
+                                queryFn,
+                                staleTime: Infinity,
+                                cacheTime: Infinity,
+                              });
+                            }
+                            setSelectedBoundaryLevel(boundaryLevel);
+                          },
                         }}
                       />
                     );
                   }
 
                   return (
-                    <ChartRenderer {...chart} {...commonChartProps} key={key} />
+                    <ChartRenderer
+                      {...rendererProps}
+                      key={key}
+                      chart={{
+                        ...chart,
+                        data: fullTable?.results,
+                        meta: fullTable?.subjectMeta,
+                      }}
+                    />
                   );
                 })}
 
