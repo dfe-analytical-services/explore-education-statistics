@@ -958,7 +958,10 @@ describe('chartBuilderReducer', () => {
     });
 
     test('has default `axes.minor` state if initial configuration is missing it', () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const initialConfiguration: Chart = {
+        type: 'line',
         legend: {
           position: 'top',
           items: [],
@@ -977,7 +980,6 @@ describe('chartBuilderReducer', () => {
             visible: true,
           },
         },
-        type: 'line',
         height: 300,
         title: '',
         alt: '',
@@ -1140,8 +1142,8 @@ describe('chartBuilderReducer', () => {
 
     test('has correct state with initial configuration for a map', () => {
       const initialConfiguration: Chart = {
+        id: 'test-map',
         type: 'map',
-        onBoundaryLevelChange: () => {},
         legend: {
           position: 'top',
           items: [],
@@ -1251,7 +1253,7 @@ describe('chartBuilderReducer', () => {
     test('setting boundary levels does not change data groupings', () => {
       const initialConfiguration: Chart = {
         type: 'map',
-        onBoundaryLevelChange: () => {},
+        id: 'test-map',
         legend: {
           position: 'top',
           items: [],
@@ -1360,8 +1362,8 @@ describe('chartBuilderReducer', () => {
 
     test('setting data groupings does not change boundary levels', () => {
       const initialConfiguration: Chart = {
+        id: 'test-map',
         type: 'map',
-        onBoundaryLevelChange: () => {},
         legend: {
           position: 'top',
           items: [],

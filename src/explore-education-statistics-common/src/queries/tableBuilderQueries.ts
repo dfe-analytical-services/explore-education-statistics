@@ -14,18 +14,16 @@ const tableBuilderQueries = createQueryKeys('tableBuilder', {
   getDataBlockGeoJson(
     releaseId: string,
     dataBlockParentId: string,
-    boundaryLevelId?: number,
+    boundaryLevelId: number,
   ) {
     return {
       queryKey: [releaseId, dataBlockParentId, boundaryLevelId],
       queryFn: async () =>
-        boundaryLevelId !== undefined
-          ? tableBuilderService.getLocationGeoJson(
-              releaseId,
-              dataBlockParentId,
-              boundaryLevelId,
-            )
-          : undefined,
+        tableBuilderService.getLocationGeoJson(
+          releaseId,
+          dataBlockParentId,
+          boundaryLevelId,
+        ),
     };
   },
 

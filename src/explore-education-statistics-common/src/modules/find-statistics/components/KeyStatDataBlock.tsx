@@ -2,7 +2,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { ReactNode } from 'react';
 import KeyStat from '@common/modules/find-statistics/components/KeyStat';
 import { useQuery } from '@tanstack/react-query';
-import tableBuilderQueries from '../queries/tableBuilderQueries';
+import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 
 export interface KeyStatDataBlockProps {
   children?: ReactNode;

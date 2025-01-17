@@ -5,19 +5,16 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
-import { AxesConfiguration } from '@common/modules/charts/types/chart';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import ChartRenderer, {
+  ChartRendererProps,
+} from '@common/modules/charts/components/ChartRenderer';
+import getMapInitialBoundaryLevel from '@common/modules/charts/components/utils/getMapInitialBoundaryLevel';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 import tableBuilderService from '@common/services/tableBuilderService';
-import React from 'react';
-
-interface Model {
-  table: FullTable;
-  tableHeaders: TableHeadersConfig;
-}
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useMemo, useState } from 'react';
 
 interface Props {
   releaseId: string;
@@ -28,36 +25,77 @@ const testId = (dataBlock: ReleaseDataBlock) =>
   `Data block - ${dataBlock.name}`;
 
 const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
-  const { value: model, isLoading } = useAsyncRetry<Model>(async () => {
-    const tableData = await tableBuilderService.getTableData(
-      dataBlock.query,
-      releaseId,
-      dataBlock.charts[0]?.type === 'map'
-        ? dataBlock.charts[0].boundaryLevel
-        : undefined,
-    );
-    const table = mapFullTable(tableData);
+  const queryClient = useQueryClient();
+  const [selectedBoundaryLevel, setSelectedBoundaryLevel] = useState(
+    getMapInitialBoundaryLevel(dataBlock.charts),
+  );
 
-    const tableHeaders = mapTableHeadersConfig(
-      dataBlock.table.tableHeaders,
-      table,
-    );
+  const getDataBlockGeoJsonQuery = tableBuilderQueries.getDataBlockGeoJson(
+    releaseId,
+    dataBlock.dataBlockParentId,
+    selectedBoundaryLevel ?? -1,
+  );
+
+  const {
+    data: locationGeoJson,
+    error: geoJsonError,
+    isFetching,
+  } = useQuery({
+    queryKey: getDataBlockGeoJsonQuery.queryKey,
+    queryFn: selectedBoundaryLevel
+      ? getDataBlockGeoJsonQuery.queryFn
+      : undefined,
+    staleTime: Infinity,
+    cacheTime: Infinity,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+
+  const { value: tableData, isLoading } = useAsyncRetry(
+    async () =>
+      tableBuilderService.getTableData(
+        dataBlock.query,
+        releaseId,
+        dataBlock.charts[0]?.type === 'map'
+          ? dataBlock.charts[0].boundaryLevel
+          : undefined,
+      ),
+    [releaseId, dataBlock],
+  );
+
+  const { fullTable, tableHeaders } = useMemo(() => {
+    if (!tableData || isFetching) {
+      return {};
+    }
+
+    const table = mapFullTable({
+      ...tableData,
+      subjectMeta: {
+        ...tableData.subjectMeta,
+        locations: locationGeoJson ?? tableData.subjectMeta.locations,
+      },
+    });
 
     return {
-      table,
-      tableHeaders,
+      fullTable: table,
+      tableHeaders: mapTableHeadersConfig(dataBlock.table.tableHeaders, table),
     };
-  }, [releaseId, dataBlock]);
+  }, [tableData, locationGeoJson, isFetching, dataBlock.table.tableHeaders]);
 
   return (
-    <LoadingSpinner text="Loading data block" loading={isLoading}>
-      {model ? (
+    <LoadingSpinner text="Loading data block" loading={isLoading || isFetching}>
+      {!!geoJsonError && (
+        <WarningMessage>Could not load content</WarningMessage>
+      )}
+
+      {fullTable && !geoJsonError ? (
         <Tabs id="dataBlockTabs">
           <TabsSection title="Table" key="table" id="dataBlockTabs-table">
             <TableTabSection
               dataBlock={dataBlock}
-              table={model.table}
-              tableHeaders={model.tableHeaders}
+              table={fullTable}
+              tableHeaders={tableHeaders}
             />
           </TabsSection>
           {dataBlock.charts.length > 0 && [
@@ -71,17 +109,54 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
                 {dataBlock.charts.map((chart, index) => {
                   const key = index;
 
-                  const axes = { ...chart.axes } as Required<AxesConfiguration>;
+                  const rendererProps: Omit<ChartRendererProps, 'chart'> = {
+                    id: `dataBlockTabs-chart-${index}`,
+                    source: dataBlock?.source,
+                  };
+
+                  if (chart.type === 'map') {
+                    return (
+                      <ChartRenderer
+                        {...rendererProps}
+                        key={key}
+                        chart={{
+                          ...chart,
+                          data: fullTable.results,
+                          meta: fullTable.subjectMeta,
+                          onBoundaryLevelChange: async boundaryLevel => {
+                            const { queryKey, queryFn } =
+                              tableBuilderQueries.getDataBlockGeoJson(
+                                releaseId,
+                                dataBlock.dataBlockParentId,
+                                boundaryLevel,
+                              );
+                            const existingGeoJson =
+                              queryClient.getQueryData(queryKey);
+
+                            if (!existingGeoJson) {
+                              await queryClient.fetchQuery({
+                                queryKey,
+                                queryFn,
+                                staleTime: Infinity,
+                                cacheTime: Infinity,
+                              });
+                            }
+                            setSelectedBoundaryLevel(boundaryLevel);
+                          },
+                        }}
+                      />
+                    );
+                  }
 
                   return (
                     <ChartRenderer
-                      {...chart}
+                      {...rendererProps}
+                      chart={{
+                        ...chart,
+                        data: fullTable.results,
+                        meta: fullTable.subjectMeta,
+                      }}
                       key={key}
-                      id={`dataBlockTabs-chart-${index}`}
-                      axes={axes}
-                      data={model.table.results}
-                      meta={model.table.subjectMeta}
-                      source={dataBlock.source}
                     />
                   );
                 })}
