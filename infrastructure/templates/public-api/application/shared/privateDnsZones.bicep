@@ -27,8 +27,21 @@ module sitesPrivateDnsZoneModule '../../components/privateDnsZone.bicep' = {
   }
 }
 
+// Set up a Private DNS zone for handling private endpoints for Storage Account File Services.
+module fileServicePrivateDnsZoneModule '../../components/privateDnsZone.bicep' = {
+  name: 'fileServicePrivateDnsZoneDeploy'
+  params: {
+    zoneType: 'fileService'
+    vnetName: resourceNames.existingResources.vNet
+    tagValues: tagValues
+  }
+}
+
 output postgreSqlPrivateDnsZoneId string = postgreSqlPrivateDnsZoneModule.outputs.privateDnsZoneId
 output postgreSqlPrivateDnsZoneName string = postgreSqlPrivateDnsZoneModule.outputs.privateDnsZoneName
 
 output sitesPrivateDnsZoneId string = sitesPrivateDnsZoneModule.outputs.privateDnsZoneId
 output sitesPrivateDnsZoneName string = sitesPrivateDnsZoneModule.outputs.privateDnsZoneName
+
+output fileServicePrivateDnsZoneId string = fileServicePrivateDnsZoneModule.outputs.privateDnsZoneId
+output fileServicePrivateDnsZoneName string = fileServicePrivateDnsZoneModule.outputs.privateDnsZoneName

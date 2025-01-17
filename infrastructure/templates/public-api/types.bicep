@@ -38,6 +38,7 @@ type ResourceNames = {
       appGateway: string
       adminApp: string
       publisherFunction: string
+      storagePrivateEndpoints: string
     }
   }
   sharedResources: {
@@ -235,7 +236,11 @@ type PrincipalNameAndId = {
 }
 
 @export()
-type PrivateDnsZone = 'sites' | 'postgres' | 'custom'
+type PrivateDnsZone = 
+  | 'fileService'
+  | 'postgres'
+  | 'sites'
+  | 'custom'
 
 @export()
 type ContainerRegistryRole = 'AcrPull'
@@ -262,4 +267,11 @@ type ContainerAppWorkloadProfile = {
   workloadProfileType: 'D4' | 'D8' | 'D16' | 'D32' | 'E4' | 'E8' | 'E16' | 'E32'
   minimumCount: int
   maximumCount: int
+}
+
+@export()
+var dnsZoneNames = {
+  sites: 'privatelink.azurewebsites.net'
+  postgres: 'privatelink.postgres.database.azure.com'
+  fileService: 'privatelink.file.core.windows.net'
 }

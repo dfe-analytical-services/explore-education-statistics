@@ -21,6 +21,14 @@ param skuStorageResource 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'S
 @description('Storage Account Name')
 param keyVaultName string
 
+@description('Whether the storage account is accessible from the public internet')
+param publicNetworkAccess 'Enabled' | 'Disabled' = 'Enabled'
+
+@description('Private endpoint subnets')
+param privateEndpointSubnetIds {
+  file: string?
+}?
+
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
   availability: bool
@@ -43,6 +51,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   properties: {
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
+    publicNetworkAccess: publicNetworkAccess
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
@@ -58,6 +67,19 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     }
   }
   tags: tagValues
+}
+
+module fileServicePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetIds != null && privateEndpointSubnetIds!.file != null) {
+  name: '${storageAccountName}FileServicePrivateEndpointDeploy'
+  params: {
+    serviceId: storageAccount.id
+    serviceName: storageAccount.name
+    privateEndpointNameOverride: '${storageAccount.name}-file'
+    serviceType: 'fileService'
+    subnetId: privateEndpointSubnetIds!.file!
+    location: location
+    tagValues: tagValues
+  }
 }
 
 module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
