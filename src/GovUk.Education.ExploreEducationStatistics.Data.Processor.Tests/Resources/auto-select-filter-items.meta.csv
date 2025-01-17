@@ -1,0 +1,5 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column,filter_default
+ind_one,Indicator,Indicator one,,,,,,
+filter_with_total,Filter,Filter with Total,,,,,,
+filter_with_default,Filter,Filter with default TwoTwo,,,,,,TwoTwo
+filter_no_default,Filter,Filter with no default,,,,,,

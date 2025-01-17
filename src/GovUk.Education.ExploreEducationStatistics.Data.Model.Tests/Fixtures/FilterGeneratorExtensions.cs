@@ -36,6 +36,15 @@ public static class FilterGeneratorExtensions
     public static Generator<Filter> WithGroupCsvColumn(this Generator<Filter> generator, string groupCsvColumn)
         => generator.ForInstance(s => s.SetGroupCsvColumn(groupCsvColumn));
 
+    public static Generator<Filter> WithAutoSelectFilterItem(this Generator<Filter> generator, FilterItem autoSelectFilterItem)
+        => generator.ForInstance(s => s.SetAutoSelectFilterItem(autoSelectFilterItem));
+
+    public static Generator<Filter> WithAutoSelectFilterItemId(this Generator<Filter> generator, Guid autoSelectFilterItemId)
+        => generator.ForInstance(s => s.SetAutoSelectFilterItemId(autoSelectFilterItemId));
+
+    public static Generator<Filter> WithAutoSelectFilterItemLabel(this Generator<Filter> generator, string autoSelectFilterItemLabel)
+        => generator.ForInstance(s => s.SetAutoSelectFilterItemLabel(autoSelectFilterItemLabel));
+
     public static Generator<Filter> WithFilterGroups(
         this Generator<Filter> generator,
         IEnumerable<FilterGroup> filterGroups)
@@ -77,6 +86,26 @@ public static class FilterGeneratorExtensions
         string groupCsvColumn)
         => setters
             .Set(f => f.GroupCsvColumn, groupCsvColumn);
+
+    public static InstanceSetters<Filter> SetAutoSelectFilterItem(
+        this InstanceSetters<Filter> setters,
+        FilterItem autoSelectFilterItem)
+        => setters
+            .Set(f => f.AutoSelectFilterItem, autoSelectFilterItem)
+            .Set(f => f.AutoSelectFilterItemId, autoSelectFilterItem.Id)
+            .Set(f => f.AutoSelectFilterItemLabel, autoSelectFilterItem.Label);
+
+    public static InstanceSetters<Filter> SetAutoSelectFilterItemId(
+        this InstanceSetters<Filter> setters,
+        Guid autoSelectFilterItemId)
+        => setters
+            .Set(f => f.AutoSelectFilterItemId, autoSelectFilterItemId);
+
+    public static InstanceSetters<Filter> SetAutoSelectFilterItemLabel(
+        this InstanceSetters<Filter> setters,
+        string autoSelectFilterItemLabel)
+        => setters
+            .Set(f => f.AutoSelectFilterItemLabel, autoSelectFilterItemLabel);
 
     public static InstanceSetters<Filter> SetSubject(
         this InstanceSetters<Filter> setters,
