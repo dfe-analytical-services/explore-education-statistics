@@ -181,7 +181,7 @@ describe('ReleaseContentPage', () => {
     filters: {
       SchoolType: {
         id: 'school-type',
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by school type',
         legend: 'School type',
         name: 'school_type',
@@ -240,7 +240,7 @@ describe('ReleaseContentPage', () => {
     subjectMeta: {
       filters: {
         SchoolType: {
-          totalValue: '',
+          autoSelectFilterItemId: '',
           hint: 'Filter by school type',
           legend: 'School type',
           options: {

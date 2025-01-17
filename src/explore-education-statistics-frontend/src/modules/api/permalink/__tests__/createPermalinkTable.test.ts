@@ -92,7 +92,7 @@ describe('permalink api route', () => {
                   },
                 },
                 name: 'duration_days_fixed_exclusions',
-                totalValue: '22f4e671-2a07-4354-b811-f7bd0d3d55b7',
+                autoSelectFilterItemId: '22f4e671-2a07-4354-b811-f7bd0d3d55b7',
                 order: 0,
               },
               SchoolType: {
@@ -113,7 +113,7 @@ describe('permalink api route', () => {
                   },
                 },
                 name: 'school_type',
-                totalValue: '8428ded9-781e-4af6-adfc-628b12489696',
+                autoSelectFilterItemId: '8428ded9-781e-4af6-adfc-628b12489696',
                 order: 1,
               },
             },

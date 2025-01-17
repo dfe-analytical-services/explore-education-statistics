@@ -36,7 +36,7 @@ describe('TableToolPage', () => {
       subjectMeta: {
         filters: {
           SubjectStudied: {
-            totalValue: '',
+            autoSelectFilterItemId: '',
             hint: 'Filter by Subject studied',
             legend: 'Subject studied',
             options: {
@@ -167,7 +167,7 @@ describe('TableToolPage', () => {
     filters: {
       SubjectStudied: {
         id: 'subject-studied',
-        totalValue: '',
+        autoSelectFilterItemId: '',
         name: 'Subject studied',
         hint: 'Filter by Subject studied',
         legend: 'Subject studied',

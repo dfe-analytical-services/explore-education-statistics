@@ -222,7 +222,7 @@ describe('TimePeriodDataTable', () => {
       subjectMeta: {
         filters: {
           Characteristic: {
-            totalValue: '',
+            autoSelectFilterItemId: '',
             hint: 'Filter by pupil characteristic',
             legend: 'Characteristic',
             name: 'characteristic',

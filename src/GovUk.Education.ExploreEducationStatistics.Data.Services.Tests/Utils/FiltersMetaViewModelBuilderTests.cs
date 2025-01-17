@@ -133,7 +133,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Equal(filters[0].Hint, filterA.Hint);
         Assert.Equal(filters[0].Label, filterA.Legend);
         Assert.Equal(filters[0].Name, filterA.Name);
-        Assert.Null(filterA.TotalValue);
+        Assert.Null(filterA.AutoSelectFilterItemId);
 
         // Verify filter A's filter groups
         var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterA.Options;
@@ -175,7 +175,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Equal(filters[1].Hint, filterB.Hint);
         Assert.Equal(filters[1].Label, filterB.Legend);
         Assert.Equal(filters[1].Name, filterB.Name);
-        Assert.Null(filterB.TotalValue);
+        Assert.Null(filterB.AutoSelectFilterItemId);
 
         // Verify filter B's filter groups
         var filterBGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterB.Options;
@@ -251,7 +251,7 @@ public class FiltersMetaViewModelBuilderTests
         var filterA = Assert.Contains("FilterA", result);
 
         // Verify the total item id exists because there's only a single group despite it not being labelled "Total"
-        Assert.Equal(filter.FilterGroups[0].FilterItems[1].Id, filterA.TotalValue);
+        Assert.Equal(filter.FilterGroups[0].FilterItems[1].Id, filterA.AutoSelectFilterItemId); // @MarkFix check this test and others here
     }
 
     [Fact]
@@ -309,7 +309,7 @@ public class FiltersMetaViewModelBuilderTests
 
         // Verify the total item id is not present because there's multiple groups none of which are labelled "Total"
         // despite there being a "Total" filter item // @MarkFix remove this?
-        Assert.Null(filterA.TotalValue);
+        Assert.Null(filterA.AutoSelectFilterItemId);
     }
 
     [Fact]
@@ -367,7 +367,7 @@ public class FiltersMetaViewModelBuilderTests
 
         // Verify the total item id is not present because there's no "Total" filter item despite there being a
         // "Total" group
-        Assert.Null(filterA.TotalValue);
+        Assert.Null(filterA.AutoSelectFilterItemId);
     }
 
     [Fact]

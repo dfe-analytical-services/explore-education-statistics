@@ -187,7 +187,7 @@ export default function FiltersForm({
   }, [subjectMeta.filters]);
 
   const filtersIncludeTotal = Object.values(subjectMeta.filters).some(
-    filter => filter.totalValue,
+    filter => filter.autoSelectFilterItemId,
   );
 
   return (
@@ -322,15 +322,16 @@ export default function FiltersForm({
                 submittingText="Creating table"
                 onSubmit={() => {
                   const filterValues = getValues('filters');
-                  // Automatically select totalValue for filters that haven't had a selection made
+                  // Automatically select autoSelectFilterItemId for filters that haven't had a selection made
                   Object.keys(filterValues).forEach(filterName => {
                     if (
                       (!filterValues[filterName] ||
                         filterValues[filterName].length === 0) &&
-                      subjectMeta.filters[filterName].totalValue
+                      subjectMeta.filters[filterName].autoSelectFilterItemId
                     ) {
                       setValue(`filters.${filterName}`, [
-                        subjectMeta.filters[filterName].totalValue as string,
+                        subjectMeta.filters[filterName]
+                          .autoSelectFilterItemId as string,
                       ]);
                     }
                   });
