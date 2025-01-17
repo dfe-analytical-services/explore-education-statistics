@@ -69,14 +69,13 @@ type LineChart = {
   };
 };
 
-type MapChart = {
+export type MapChart = {
   type: 'map';
   axes: {
     major: AxisConfiguration;
   };
   dataGroups?: number;
   dataClassification?: DataGroupingType;
-  id: string;
   legend: LegendConfiguration;
   map?: MapConfig;
   position?: { lat: number; lng: number };

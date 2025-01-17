@@ -68,7 +68,15 @@ const filterChartProps = (props: ChartBuilderChartProps): Chart => {
   const excludedProps: (
     | keyof ChartBuilderChartProps
     | keyof InfographicChartProps
-  )[] = ['data', 'meta', 'getInfographic', 'file', 'titleType'];
+    | keyof MapBlockProps
+  )[] = [
+    'data',
+    'meta',
+    'getInfographic',
+    'file',
+    'titleType',
+    'onBoundaryLevelChange',
+  ];
 
   if (props.titleType === 'default') {
     excludedProps.push('title');
