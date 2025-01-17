@@ -480,7 +480,7 @@ describe('ReleaseDataGuidanceSection', () => {
           screen.getByRole('link', {
             name: 'Enter file guidance content for Data set 1',
           }),
-        ).toHaveAttribute('href', '#dataGuidanceForm-dataSets0Content');
+        ).toHaveAttribute('href', '#dataGuidanceForm-dataSets-0-content');
 
         expect(fileGuidanceContent).toHaveAttribute(
           'id',
@@ -555,7 +555,7 @@ describe('ReleaseDataGuidanceSection', () => {
           screen.getByRole('link', {
             name: 'Enter file guidance content for Data set 1',
           }),
-        ).toHaveAttribute('href', '#dataGuidanceForm-dataSets0Content');
+        ).toHaveAttribute('href', '#dataGuidanceForm-dataSets-0-content');
 
         expect(
           releaseDataGuidanceService.updateDataGuidance,
