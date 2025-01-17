@@ -1,4 +1,4 @@
-import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
+import { responseTimeConfig, dynamicTotalGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
 import { staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 
 import {
@@ -46,6 +46,8 @@ param availabilityZones ('1' | '2' | '3') [] = [
 param alerts {
   health: bool
   responseTime: bool
+  failedRequests: bool
+  responseStatuses: bool
   alertsGroupName: string
 }?
 
@@ -304,7 +306,6 @@ module backendPoolsHealthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != 
   }
 }
 
-
 module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
   name: '${appGatewayName}ResponseTimeDeploy'
   params: {
@@ -314,6 +315,50 @@ module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null 
       metric: 'ApplicationGatewayTotalTime'
     }
     config: responseTimeConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
+  name: '${appGatewayName}FailedRequestsDeploy'
+  params: {
+    resourceName: appGatewayName
+    resourceMetric: {
+      resourceType: 'Microsoft.Network/applicationGateways'
+      metric: 'FailedRequests'
+      dimensions: [{
+        name: 'BackendSettingsPool'
+        values: map(backends, backend => backend.name)
+      }]
+    }
+    config: {
+      ...dynamicTotalGreaterThan
+      nameSuffix: 'failed-requests'
+      windowSize: 'PT30M'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module responseStatusAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
+  name: '${appGatewayName}ResponseStatusDeploy'
+  params: {
+    resourceName: appGatewayName
+    resourceMetric: {
+      resourceType: 'Microsoft.Network/applicationGateways'
+      metric: 'ResponseStatus'
+      dimensions: [{
+        name: 'HttpStatusGroup'
+        values: ['4xx', '5xx']
+      }]
+    }
+    config: {
+      ...dynamicTotalGreaterThan
+      nameSuffix: 'http-4xx-5xx'
+      windowSize: 'PT30M'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

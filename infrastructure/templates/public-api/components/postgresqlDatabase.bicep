@@ -3,9 +3,10 @@ import {
   memoryPercentageConfig
   dynamicMaxGreaterThan
   dynamicAverageGreaterThan
+  dynamicTotalGreaterThan
 } from 'alerts/dynamicAlertConfig.bicep'
 
-import { staticAverageLessThanHundred, capacity } from 'alerts/staticAlertConfig.bicep'
+import { staticAverageLessThanHundred, capacity, staticTotalGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 
 import { IpRange, PrincipalNameAndId } from '../types.bicep'
 
@@ -65,6 +66,8 @@ param alerts {
   diskIops: bool
   memoryPercentage: bool
   capacity: bool
+  failedConnections: bool
+  deadlocks: bool
   alertsGroupName: string
 }?
 
@@ -330,6 +333,45 @@ module capacityAlerts 'alerts/staticMetricAlert.bicep' = [for capacityThreshold 
     tagValues: tagValues
   }
 }]
+
+module failedConnectionsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedConnections) {
+  name: '${databaseServerName}FailedConnectionsDeploy'
+  params: {
+    resourceName: databaseServerName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'connections_failed'
+    }
+    config: {
+      ...dynamicTotalGreaterThan
+      nameSuffix: 'failed-connections'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module deadlocksAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.deadlocks) {
+  name: '${databaseServerName}DeadlocksDeploy'
+  params: {
+    resourceName: databaseServerName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'deadlocks'
+      dimensions: [{
+        name: 'DatabaseName'
+        values: databaseNames
+      }]
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'deadlocks'
+      windowSize: 'PT5M'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
 
 @description('The fully qualified Azure resource ID of the Database Server.')
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)
