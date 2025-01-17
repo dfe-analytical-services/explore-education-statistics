@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 [Route("api")]
 [ApiController]
 [Authorize(Roles = GlobalRoles.RoleNames.BauUser)]
-public class DefaultFilterItemMigrationController(StatisticsDbContext statisticsDbContext) : ControllerBase
+public class AutoSelectFilterItemMigrationController(StatisticsDbContext statisticsDbContext) : ControllerBase
 {
     public class MigrationResult
     {
@@ -21,18 +21,18 @@ public class DefaultFilterItemMigrationController(StatisticsDbContext statistics
         public int Processed;
     }
 
-    [HttpPut("bau/default-filter-item")]
-    public async Task<MigrationResult> DefaultFilterItemMigration(
+    [HttpPut("bau/auto-select-filter-item")] // @MarkFix test this
+    public async Task<MigrationResult> AutoSelectFilterItemMigration(
         [FromQuery] bool isDryRun = true,
         [FromQuery] int? num = null,
         CancellationToken cancellationToken = default)
     {
         var queryable = statisticsDbContext.Filter
             .Where(f =>
-                f.DefaultFilterItemId == null
+                f.AutoSelectFilterItemId == null
                 && f.FilterGroups.Count(
                     group => group.FilterItems.Count(
-                        item => item.Label.Equals("total", CurrentCultureIgnoreCase)
+                        item => item.Label.Equals("Total", CurrentCultureIgnoreCase)
                     ) == 1
                 ) == 1) // only one Total filter item across all filter items
             .Select(f => f.Id);
@@ -50,7 +50,7 @@ public class DefaultFilterItemMigrationController(StatisticsDbContext statistics
         {
             var defaultFilterItemId = statisticsDbContext.FilterItem
                 .Where(fi => fi.FilterGroup.FilterId == filterId
-                             && fi.Label.Equals("total", CurrentCultureIgnoreCase))
+                             && fi.Label.Equals("Total", CurrentCultureIgnoreCase))
                 .Select(fi => fi.Id)
                 .SingleOrDefault();
 
@@ -60,8 +60,8 @@ public class DefaultFilterItemMigrationController(StatisticsDbContext statistics
             await statisticsDbContext.Filter
                 .Where(f => f.Id == filterId)
                 .ExecuteUpdateAsync(setters => setters
-                    .SetProperty(f => f.DefaultFilterItemId, defaultFilterItemId)
-                    .SetProperty(f => f.DefaultFilterItemLabel, "Total"), cancellationToken);
+                    .SetProperty(f => f.AutoSelectFilterItemId, defaultFilterItemId)
+                    .SetProperty(f => f.AutoSelectFilterItemLabel, "Total"), cancellationToken);
 
             numProcessed++;
         }

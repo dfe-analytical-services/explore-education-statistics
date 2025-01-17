@@ -215,13 +215,13 @@ public class FiltersMetaViewModelBuilderTests
     [Fact]
     public void BuildFilters_GetsTotalFilterItemId_TotalItemExistsAndSingleGroup()
     {
-        var totalFilterItemId = Guid.NewGuid();
+        var autoSelectFilterItemId = Guid.NewGuid();
         var filter = new Filter
         {
             Id = Guid.NewGuid(),
             Label = "Filter a",
-            DefaultFilterItemId = totalFilterItemId,
-            DefaultFilterItemLabel = "Total",
+            AutoSelectFilterItemId = autoSelectFilterItemId,
+            AutoSelectFilterItemLabel = "Total",
             FilterGroups = new List<FilterGroup>
             {
                 new()
@@ -237,7 +237,7 @@ public class FiltersMetaViewModelBuilderTests
                         },
                         new()
                         {
-                            Id = totalFilterItemId,
+                            Id = autoSelectFilterItemId,
                             Label = "Total"
                         }
                     }
@@ -308,7 +308,7 @@ public class FiltersMetaViewModelBuilderTests
         var filterA = Assert.Contains("FilterA", result);
 
         // Verify the total item id is not present because there's multiple groups none of which are labelled "Total"
-        // despite there being a "Total" filter item
+        // despite there being a "Total" filter item // @MarkFix remove this?
         Assert.Null(filterA.TotalValue);
     }
 

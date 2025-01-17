@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20250116123243_EES4735_AddDefaultFilterItemColToFiltersTable")]
-    partial class EES4735_AddDefaultFilterItemColToFiltersTable
+    [Migration("20250117112425_EES4735_AddAutoSelectFilterItemColToFiltersTable")]
+    partial class EES4735_AddAutoSelectFilterItemColToFiltersTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,10 +94,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("DefaultFilterItemId")
+                    b.Property<Guid?>("AutoSelectFilterItemId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("DefaultFilterItemLabel")
+                    b.Property<string>("AutoSelectFilterItemLabel")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GroupCsvColumn")
@@ -118,6 +118,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AutoSelectFilterItemId");
 
                     b.HasIndex("Name");
 
@@ -967,11 +969,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", b =>
                 {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", "AutoSelectFilterItem")
+                        .WithMany()
+                        .HasForeignKey("AutoSelectFilterItemId");
+
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", "Subject")
                         .WithMany("Filters")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AutoSelectFilterItem");
 
                     b.Navigation("Subject");
                 });

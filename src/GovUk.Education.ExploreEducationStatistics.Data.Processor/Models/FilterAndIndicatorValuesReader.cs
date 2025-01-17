@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 /// </summary>
 public class FilterAndIndicatorValuesReader
 {
-    private const string NotSpecifiedFilterItemLabel = "Not specified"; // @MarkFix
+    private const string NotSpecifiedFilterItemLabel = "Not specified";
 
     private readonly Dictionary<Guid, int> _indicatorColumnIndexes;
     private readonly Dictionary<Guid, int> _filterColumnIndexes;

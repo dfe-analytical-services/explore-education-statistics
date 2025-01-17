@@ -171,14 +171,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Distinct()
                 .ToList();
 
-            var filterIdToDefaultFilterItem = filterIds
+            var filterIdToAutoSelectFilterItem = filterIds
                 .ToDictionary(
                     filterId => filterId,
                     filterId =>
                     {
                         var defaultFilterItemLabel = context.Filter
                             .Where(f => f.Id == filterId)
-                            .Select(f => f.DefaultFilterItemLabel)
+                            .Select(f => f.AutoSelectFilterItemLabel)
                             .SingleOrDefault() ?? "Total"; // If meta file didn't specify a default, look for "Total"
 
                         return filterItems
@@ -202,10 +202,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     .ToList();
                 foreach (var filter in filters)
                 {
-                    var filterItem = filterIdToDefaultFilterItem[filter.Id];
-                    filter.DefaultFilterItemId = filterItem?.Id;
-                    // If filter item Total is found, DefaultFilterItemLabel wouldn't be set, so set it
-                    filter.DefaultFilterItemLabel = filterItem?.Label;
+                    var filterItem = filterIdToAutoSelectFilterItem[filter.Id];
+                    filter.AutoSelectFilterItemId = filterItem?.Id;
+                    // If filter item Total is found, AutoSelectFilterItemLabel wouldn't be set, so set it
+                    filter.AutoSelectFilterItemLabel = filterItem?.Label;
                 }
 
                 await ctxDelegate.SaveChangesAsync();

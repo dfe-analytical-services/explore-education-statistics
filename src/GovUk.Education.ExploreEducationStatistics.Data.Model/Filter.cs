@@ -11,10 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string Label { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string? GroupCsvColumn { get; set; }
-        public string? DefaultFilterItemLabel { get; set; }
-        public Guid? DefaultFilterItemId { get; set; }
+        public string? AutoSelectFilterItemLabel { get; set; }
+        public Guid? AutoSelectFilterItemId { get; set; }
 
-        public FilterItem? DefaultFilterItem { get; set; }
+        public FilterItem? AutoSelectFilterItem { get; set; }
         public Subject Subject { get; set; } = null!;
         public Guid SubjectId { get; set; }
         public List<FilterGroup> FilterGroups { get; set; } = new();
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             Label = label;
             Name = name;
             GroupCsvColumn = groupCsvColumn;
-            DefaultFilterItemLabel = defaultFilterItemLabel;
+            AutoSelectFilterItemLabel = defaultFilterItemLabel;
             SubjectId = subjectId;
             FilterGroups = new List<FilterGroup>();
         }
