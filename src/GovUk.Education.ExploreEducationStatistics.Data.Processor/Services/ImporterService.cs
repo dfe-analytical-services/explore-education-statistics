@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         fg.FilterId.Equals(filterId)
                         && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
 
-                    return new FilterItem(filterItemLabel, filterGroup);
+                    return new FilterItem(filterItemLabel, filterGroup); // includes filterGroups objects in filterItems
                 })
                 .ToList();
 
@@ -179,15 +179,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         var defaultFilterItemLabel = context.Filter
                             .Where(f => f.Id == filterId)
                             .Select(f => f.DefaultFilterItemLabel)
-                            .SingleOrDefault() ?? "Total"; // If meta file didn't specify a default, we look for "Total"
+                            .SingleOrDefault() ?? "Total"; // If meta file didn't specify a default, look for "Total"
 
                         return filterItems
                             .Where(item =>
-                                // There might be two filter items with the same label under different groups.
-                                // If so, we don't use either of them as the default.
                                 item.FilterGroup.FilterId == filterId
                                 && item.Label.Equals(defaultFilterItemLabel, OrdinalIgnoreCase))
-                            .Select(item => new { item.Id , item.Label} )
+                            .Select(item => new { item.Id , item.Label})
+                            // There might be two filter items with the same label under different groups.
+                            // If so, we set no default.
                             .SingleOrDefault();
                     }
                 );
