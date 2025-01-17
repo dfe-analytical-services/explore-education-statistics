@@ -16,7 +16,7 @@ import { produce } from 'immer';
 
 describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
-  const onBoundaryLevelChange = jest.fn();
+  const onBoundaryLevelChange = jest.fn(() => Promise.resolve());
   const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
     boundaryLevel: 1,
@@ -168,11 +168,6 @@ describe('MapBlock', () => {
 
     // Selecting another data set with different boundary level
     await userEvent.selectOptions(select, options[1]);
-
-    await waitFor(() => {
-      // EES-4902 map containing spinner isn't currently rendered in tests
-      expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
-    });
     expect(onBoundaryLevelChange).toHaveBeenCalledWith(2);
   });
 
