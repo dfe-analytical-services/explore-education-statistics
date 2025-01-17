@@ -1142,7 +1142,6 @@ describe('chartBuilderReducer', () => {
 
     test('has correct state with initial configuration for a map', () => {
       const initialConfiguration: Chart = {
-        id: 'test-map',
         type: 'map',
         legend: {
           position: 'top',
@@ -1253,7 +1252,6 @@ describe('chartBuilderReducer', () => {
     test('setting boundary levels does not change data groupings', () => {
       const initialConfiguration: Chart = {
         type: 'map',
-        id: 'test-map',
         legend: {
           position: 'top',
           items: [],
@@ -1362,7 +1360,6 @@ describe('chartBuilderReducer', () => {
 
     test('setting data groupings does not change boundary levels', () => {
       const initialConfiguration: Chart = {
-        id: 'test-map',
         type: 'map',
         legend: {
           position: 'top',

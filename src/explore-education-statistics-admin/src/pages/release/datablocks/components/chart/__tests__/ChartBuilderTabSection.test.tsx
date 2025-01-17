@@ -40,7 +40,6 @@ describe('ChartBuilderTabSection', () => {
   };
 
   const testChart: Chart = {
-    id: 'test-map',
     type: 'map',
     boundaryLevel: 2,
     map: {
