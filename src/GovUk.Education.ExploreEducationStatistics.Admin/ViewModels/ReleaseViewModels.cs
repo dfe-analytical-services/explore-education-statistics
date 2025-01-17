@@ -19,6 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Slug { get; set; } = string.Empty;
 
+        public string? Label { get; set;}
+
+        public int Version { get; set; }
+
         public Guid PublicationId { get; set; }
 
         public string PublicationTitle { get; set; } = string.Empty;

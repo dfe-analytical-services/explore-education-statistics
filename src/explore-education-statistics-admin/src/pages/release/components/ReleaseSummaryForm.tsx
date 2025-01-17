@@ -4,7 +4,7 @@ import metaService, {
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldset } from '@common/components/form';
+import { FormFieldset, FormFieldTextInput } from '@common/components/form';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import { SelectOption } from '@common/components/form/FormSelect';
 import FormProvider from '@common/components/form/FormProvider';
@@ -27,16 +27,17 @@ export interface ReleaseSummaryFormValues {
   templateReleaseId?: string;
   timePeriodCoverageCode: string;
   timePeriodCoverageStartYear: string;
+  releaseLabel?: string;
 }
 
 const formId = 'releaseSummaryForm';
 
 const errorMappings = [
   mapFieldErrors<ReleaseSummaryFormValues>({
-    target: 'timePeriodCoverageStartYear',
+    target: 'releaseLabel',
     messages: {
       SlugNotUnique:
-        'Choose a unique combination of time period and start year',
+        'Choose a unique combination of type, start year and label',
     },
   }),
 ];
@@ -45,12 +46,14 @@ interface Props {
   submitText: string;
   templateRelease?: IdTitlePair;
   initialValues: ReleaseSummaryFormValues;
+  releaseVersion: number;
   onSubmit: (values: ReleaseSummaryFormValues) => Promise<void> | void;
   onCancel: () => void;
 }
 
 export default function ReleaseSummaryForm({
   initialValues,
+  releaseVersion,
   submitText,
   templateRelease,
   onSubmit,
@@ -83,6 +86,11 @@ export default function ReleaseSummaryForm({
         .required('Choose a release type')
         .oneOf(permittedReleaseTypes),
       templateReleaseId: Yup.string(),
+      releaseLabel: Yup.string().max(
+        50,
+        /* eslint-disable no-template-curly-in-string */
+        'Release label must be no longer than ${max} characters',
+      ),
     });
   }, [permittedReleaseTypes]);
 
@@ -116,6 +124,8 @@ export default function ReleaseSummaryForm({
     );
   };
 
+  const disableReleaseSlugChange = releaseVersion > 0;
+
   return (
     <FormProvider
       enableReinitialize
@@ -140,6 +150,7 @@ export default function ReleaseSummaryForm({
                 label="Type"
                 name="timePeriodCoverageCode"
                 optGroups={timePeriodOptions}
+                disabled={disableReleaseSlugChange}
               />
               <FormFieldNumberInput<ReleaseSummaryFormValues>
                 name="timePeriodCoverageStartYear"
@@ -157,8 +168,18 @@ export default function ReleaseSummaryForm({
                       }
                     `}
                 width={4}
+                disabled={disableReleaseSlugChange}
               />
             </FormFieldset>
+            <FormFieldTextInput
+              id="releaseLabel"
+              name="releaseLabel"
+              label="Release label"
+              labelSize="m"
+              hint="Unique label for the release, use if needed to distinguish it from other releases that share the same period."
+              width={20}
+              disabled={disableReleaseSlugChange}
+            />
             <FormFieldRadioGroup<ReleaseSummaryFormValues>
               legend="Release type"
               name="releaseType"

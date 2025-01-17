@@ -23,6 +23,8 @@ export interface Release {
   id: string;
   releaseId: string;
   slug: string;
+  label?: string;
+  version: number;
   approvalStatus: ReleaseApprovalStatus;
   notifySubscribers?: boolean;
   updatePublishedDate: boolean;
@@ -81,6 +83,7 @@ interface BaseReleaseRequest {
     value: string;
   };
   type: ReleaseType;
+  label?: string;
 }
 
 export interface CreateReleaseRequest extends BaseReleaseRequest {

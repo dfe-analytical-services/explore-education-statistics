@@ -43,6 +43,8 @@ const testRelease: Release = {
     label: 'Academic year',
   },
   title: 'Release 1',
+  version: 0,
+  label: undefined,
   type: 'AdHocStatistics',
   year: 2000,
   yearTitle: '2000/01',

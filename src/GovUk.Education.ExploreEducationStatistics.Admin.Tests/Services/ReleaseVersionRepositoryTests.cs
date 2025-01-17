@@ -26,54 +26,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListReleasesForUser_ReleaseRole_Approved()
         {
-            var userId = Guid.NewGuid();
-            var userReleaseRole1 = new UserReleaseRole
+            var user = new User
             {
-                UserId = userId,
-                ReleaseVersion = new ReleaseVersion
-                {
-                    ApprovalStatus = ReleaseApprovalStatus.Approved,
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    ReleaseName = "2001",
-                    Publication = new Publication
-                    {
-                        Title = "Test publication 1",
-                        Slug = "test-publication-1"
-                    },
-                },
-                Role = ReleaseRole.Lead,
+                Id = Guid.NewGuid(),
             };
-            var userReleaseRole2 = new UserReleaseRole
-            {
-                UserId = userId,
-                ReleaseVersion = new ReleaseVersion
-                {
-                    ApprovalStatus = ReleaseApprovalStatus.Approved,
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    ReleaseName = "2001",
-                    Publication = new Publication
-                    {
-                        Title = "Test publication 2",
-                        Slug = "test-publication-2"
-                    },
-                },
-                Role = ReleaseRole.PrereleaseViewer,
-            };
+
+            var userReleaseRoles = _fixture.DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(_fixture.DefaultReleaseVersion()
+                    .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                    .WithRelease(_fixture.DefaultRelease()
+                        .WithPublication(_fixture.DefaultPublication())))
+                .ForIndex(0, s => s.SetRole(ReleaseRole.Lead))
+                .ForIndex(1, s => s.SetRole(ReleaseRole.PrereleaseViewer))
+                .GenerateList(2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(userReleaseRole1, userReleaseRole2);
+                await contentDbContext.AddRangeAsync(userReleaseRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = BuildRepository(contentDbContext);
-                var result = await repository.ListReleasesForUser(userId,
+
+                var result = await repository.ListReleasesForUser(user.Id,
                         ReleaseApprovalStatus.Approved);
+
                 Assert.Single(result);
-                Assert.Equal(userReleaseRole1.ReleaseVersionId, result[0].Id);
+                Assert.Equal(userReleaseRoles[0].ReleaseVersionId, result[0].Id);
             }
         }
 
@@ -133,41 +116,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListReleasesForUser_PublicationRole_Owner_Approved()
         {
-            var userId = Guid.NewGuid();
-            var userPublicationRole1 = new UserPublicationRole
+            var user = new User
             {
-                UserId = userId,
-                Publication = new Publication
-                {
-                    Title = "Test publication 1",
-                    Slug = "test-publication-1",
-                    ReleaseVersions = new List<ReleaseVersion>
-                    {
-                        new()
-                        {
-                            ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                            ReleaseName = "2001",
-                        },
-                    }
-                },
-                Role = PublicationRole.Owner,
+                Id = Guid.NewGuid(),
             };
 
-            var otherPublication = new Publication
-            {
-                Title = "Test publication 2",
-                Slug = "test-publication-2",
-                ReleaseVersions = new List<ReleaseVersion>
-                {
-                    new()
-                    {
-                        ApprovalStatus = ReleaseApprovalStatus.Approved,
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        ReleaseName = "2001",
-                    },
-                }
-            };
+            UserPublicationRole userPublicationRole1 = _fixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithRole(PublicationRole.Owner)
+                .WithPublication(_fixture.DefaultPublication()
+                    .WithReleases([_fixture.DefaultRelease()
+                        .WithVersions([_fixture.DefaultReleaseVersion()
+                            .WithApprovalStatus(ReleaseApprovalStatus.Approved)])]));
+
+            Publication otherPublication = _fixture.DefaultPublication()
+                .WithReleases([_fixture.DefaultRelease()
+                    .WithVersions([_fixture.DefaultReleaseVersion()
+                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)])]);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -179,8 +144,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = BuildRepository(contentDbContext);
-                var result = await repository.ListReleasesForUser(userId,
+
+                var result = await repository.ListReleasesForUser(user.Id,
                         ReleaseApprovalStatus.Approved);
+
                 Assert.Single(result);
                 Assert.Equal(userPublicationRole1.Publication.ReleaseVersions[0].Id, result[0].Id);
             }
@@ -229,41 +196,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListReleasesForUser_PublicationRole_Approver_Approved()
         {
-            var userId = Guid.NewGuid();
-            var userPublicationRole1 = new UserPublicationRole
+            var user = new User
             {
-                UserId = userId,
-                Publication = new Publication
-                {
-                    Title = "Test publication 1",
-                    Slug = "test-publication-1",
-                    ReleaseVersions = new List<ReleaseVersion>
-                    {
-                        new()
-                        {
-                            ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                            ReleaseName = "2001",
-                        },
-                    }
-                },
-                Role = PublicationRole.Approver,
+                Id = Guid.NewGuid(),
             };
 
-            var otherPublication = new Publication
-            {
-                Title = "Test publication 2",
-                Slug = "test-publication-2",
-                ReleaseVersions = new List<ReleaseVersion>
-                {
-                    new()
-                    {
-                        ApprovalStatus = ReleaseApprovalStatus.Approved,
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        ReleaseName = "2001",
-                    },
-                }
-            };
+            UserPublicationRole userPublicationRole1 = _fixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithRole(PublicationRole.Approver)
+                .WithPublication(_fixture.DefaultPublication()
+                    .WithReleases([_fixture.DefaultRelease()
+                        .WithVersions([_fixture.DefaultReleaseVersion()
+                            .WithApprovalStatus(ReleaseApprovalStatus.Approved)])]));
+
+            Publication otherPublication = _fixture.DefaultPublication()
+                .WithReleases([_fixture.DefaultRelease()
+                    .WithVersions([_fixture.DefaultReleaseVersion()
+                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)])]);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -275,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = BuildRepository(contentDbContext);
-                var result = await repository.ListReleasesForUser(userId,
+                var result = await repository.ListReleasesForUser(user.Id,
                         ReleaseApprovalStatus.Approved);
 
                 var resultRelease = Assert.Single(result);
