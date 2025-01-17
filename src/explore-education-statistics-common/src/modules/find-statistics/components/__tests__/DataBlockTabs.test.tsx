@@ -382,7 +382,6 @@ describe('DataBlockTabs', () => {
     });
   });
 
-  // EES-4902 react-leaflet now uses ESM so unable to test this currently
   test('selecting data set with boundaryLevel retrieves and renders new map polygons', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testMapTableData,
@@ -413,44 +412,37 @@ describe('DataBlockTabs', () => {
         1,
       );
 
-      // expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
+      expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
     });
+
     expect(tableBuilderService.getDataBlockTableData).toBeCalledTimes(1);
 
     await waitFor(() => {
       expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(1);
     });
 
-    userEvent.click(screen.getByRole('link', { name: 'Chart for' }));
-
-    await waitFor(() => {
-      expect(
-        screen.findByLabelText('1. Select data to view'),
-      ).toBeInTheDocument();
-    });
-
-    // TODO: check for path/polygon node, save position(s) to compare later (EES-4902)
+    const mapPathSelector =
+      '.leaflet-container svg:not(.leaflet-attribution-flag) path';
+    const initialPaths =
+      container.querySelectorAll<HTMLElement>(mapPathSelector);
+    expect(initialPaths[0]).toHaveAttribute('d', 'M1 -1L1 1L-1 1L-1 -1z');
 
     const select = screen.getByLabelText('1. Select data to view');
     const options = within(select).getAllByRole('option');
     expect(options).toHaveLength(2);
     await userEvent.selectOptions(select, options[1]);
 
-    await waitFor(() => {
-      // EES-4902 map containing spinner isn't currently rendered in tests
-      // expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
-
-      expect(tableBuilderService.getLocationGeoJson).toBeCalledWith(
-        'release-1',
-        'block-1-parent',
-        2,
-      );
-    });
-
+    expect(tableBuilderService.getLocationGeoJson).toBeCalledWith(
+      'release-1',
+      'block-1-parent',
+      2,
+    );
     expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(2);
 
-    // TODO: check for path/polygon node position, compare with previous
-    // should be different after rendering different location data (EES-4902)
+    const updatedPaths =
+      container.querySelectorAll<HTMLElement>(mapPathSelector);
+
+    expect(updatedPaths[1]).toHaveAttribute('d', 'M0 0');
   });
 
   test('re-rendering with new data block does not throw error', async () => {
