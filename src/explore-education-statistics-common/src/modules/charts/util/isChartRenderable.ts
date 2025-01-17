@@ -1,6 +1,6 @@
-import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
+import { RenderrableChart } from '@common/modules/charts/components/ChartRenderer';
 
-export default function isChartRenderable(props: ChartRendererProps): boolean {
+export default function isChartRenderable(props: RenderrableChart): boolean {
   if (props.type === 'infographic') {
     return props.fileId.length > 0;
   }
@@ -17,12 +17,10 @@ export default function isChartRenderable(props: ChartRendererProps): boolean {
   );
 }
 
-export function getChartPreviewText(
-  props: ChartRendererProps | undefined,
-): string | undefined {
+export function getChartPreviewText(props?: RenderrableChart): string {
   switch (props?.type) {
     case undefined:
-      return undefined;
+      return '';
     case 'map':
       return 'Add data and choose a version of geographic data to view a preview';
     case 'infographic':

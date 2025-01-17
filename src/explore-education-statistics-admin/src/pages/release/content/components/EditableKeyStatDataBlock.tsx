@@ -7,7 +7,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import tableBuilderQueries from '@common/modules/find-statistics/queries/tableBuilderQueries';
+import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback } from 'react';

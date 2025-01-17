@@ -23,7 +23,6 @@ import getMapDataSetCategoryConfigs, {
 } from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import { GeoJsonFeatureProperties } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
-import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, Polyline } from 'leaflet';
@@ -32,6 +31,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
 import useToggle from '@common/hooks/useToggle';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import orderMapLegendItems from './utils/orderMapLegendItems';
+import generateDataSetKey from '../util/generateDataSetKey';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -61,7 +62,7 @@ export interface MapBlockProps extends ChartProps {
   map?: MapConfig;
   position?: { lat: number; lng: number };
   boundaryLevel: number;
-  onBoundaryLevelChange?: (boundaryLevel: number) => void;
+  onBoundaryLevelChange: (boundaryLevel: number) => Promise<void>;
 }
 
 export const mapBlockDefinition: ChartDefinition = {
@@ -128,13 +129,8 @@ export default function MapBlock({
   boundaryLevel,
   onBoundaryLevelChange,
 }: MapBlockProps) {
-  const [isBoundaryLevelChanging, setIsBoundaryLevelChanging] =
+  const [isBoundaryLevelChanging, toggleBoundaryLevelChanging] =
     useToggle(false);
-
-  useEffect(() => {
-    // when meta.locations change:
-    setIsBoundaryLevelChanging.off();
-  }, [meta.locations, setIsBoundaryLevelChanging]);
 
   const axisMajor = useMemo<AxisConfiguration>(
     () => ({
@@ -173,14 +169,22 @@ export default function MapBlock({
   );
 
   const dataSetOptions = useMemo<SelectOption[]>(() => {
-    return naturalOrderBy(
-      Object.values(dataSetCategoryConfigs).map(dataSet => ({
+    const orderedLegendDataSetKeys = orderMapLegendItems(legend).map(
+      ({ dataSet }) => generateDataSetKey(dataSet),
+    );
+    const orderedDataSetCategoryConfigs = Object.values(dataSetCategoryConfigs)
+      .sort(
+        (a, b) =>
+          orderedLegendDataSetKeys.indexOf(a.dataKey) -
+          orderedLegendDataSetKeys.indexOf(b.dataKey),
+      )
+      .map(dataSet => ({
         label: dataSet.config.label,
         value: dataSet.dataKey,
-      })),
-      ['label'],
-    );
-  }, [dataSetCategoryConfigs]);
+      }));
+
+    return orderedDataSetCategoryConfigs;
+  }, [dataSetCategoryConfigs, legend]);
 
   const [selectedDataSetKey, setSelectedDataSetKey] = useState<string>(
     (dataSetOptions[0]?.value as string) ?? '',
@@ -225,27 +229,26 @@ export default function MapBlock({
   );
 
   const handleDataSetChange = useCallback(
-    (value: string) => {
+    async (value: string) => {
       setSelectedDataSetKey(value);
       if (!onBoundaryLevelChange) return;
 
-      const previouslyRenderredBoundaryLevel =
+      const prevBoundaryLevel =
         selectedDataSetConfig?.boundaryLevel ?? boundaryLevel;
-      const newBoundaryLevelToRender =
+      const nextBoundaryLevel =
         dataSetCategoryConfigs[value].boundaryLevel ?? boundaryLevel;
 
-      if (newBoundaryLevelToRender !== previouslyRenderredBoundaryLevel) {
-        setIsBoundaryLevelChanging.on();
-        onBoundaryLevelChange(
-          dataSetCategoryConfigs[value].boundaryLevel ?? boundaryLevel,
-        );
+      if (nextBoundaryLevel !== prevBoundaryLevel) {
+        toggleBoundaryLevelChanging.on();
+        await onBoundaryLevelChange(nextBoundaryLevel);
+        toggleBoundaryLevelChanging.off();
       }
     },
     [
       dataSetCategoryConfigs,
       boundaryLevel,
       onBoundaryLevelChange,
-      setIsBoundaryLevelChanging,
+      toggleBoundaryLevelChanging,
       selectedDataSetConfig,
     ],
   );
@@ -273,34 +276,40 @@ export default function MapBlock({
 
       <div className="govuk-grid-row govuk-!-margin-bottom-4">
         <div className="govuk-grid-column-two-thirds">
-          <MapContainer
-            style={{
-              width: (width && `${width}px`) || '100%',
-              height: `${height || 600}px`,
-            }}
-            className={classNames(styles.map, 'dfe-print-break-avoid')}
-            center={position}
-            minZoom={5}
-            zoom={5}
+          <div
+            className={classNames(styles.mapWrapper, {
+              [styles.mapLoading]: isBoundaryLevelChanging,
+            })}
           >
+            <MapContainer
+              style={{
+                width: (width && `${width}px`) || '100%',
+                height: `${height || 600}px`,
+              }}
+              className={classNames(styles.map, 'dfe-print-break-avoid')}
+              center={position}
+              minZoom={5}
+              zoom={5}
+            >
+              <MapGeoJSON
+                dataSetCategoryConfigs={dataSetCategoryConfigs}
+                features={features}
+                width={width}
+                height={height}
+                selectedDataSetKey={selectedDataSetKey}
+                selectedFeature={selectedFeature}
+                onSelectFeature={setSelectedFeature}
+              />
+            </MapContainer>
             <LoadingSpinner
-              className="govuk-!-margin-top-8"
+              className={styles.mapSpinner}
               loading={isBoundaryLevelChanging}
               text="Loading map"
-              size="lg"
+              size="xl"
               hideText
               alert
             />
-            <MapGeoJSON
-              dataSetCategoryConfigs={dataSetCategoryConfigs}
-              features={isBoundaryLevelChanging ? undefined : features}
-              width={width}
-              height={height}
-              selectedDataSetKey={selectedDataSetKey}
-              selectedFeature={selectedFeature}
-              onSelectFeature={setSelectedFeature}
-            />
-          </MapContainer>
+          </div>
         </div>
         {selectedDataSetConfig && (
           <div className="govuk-grid-column-one-third">

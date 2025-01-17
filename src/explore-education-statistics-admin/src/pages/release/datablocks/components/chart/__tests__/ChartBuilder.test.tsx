@@ -361,7 +361,7 @@ describe('ChartBuilder', () => {
 
   test('calls `onTableQueryUpdate` when change boundary level', async () => {
     const testInitialChart: Chart = {
-      onBoundaryLevelChange: jest.fn(),
+      id: 'test-map',
       type: 'map',
       boundaryLevel: 2,
       map: {
@@ -453,8 +453,40 @@ describe('ChartBuilder', () => {
 
   describe('data groupings tab', () => {
     const testInitialChart: Chart = {
+      id: 'test-map',
       type: 'map',
       boundaryLevel: 2,
+      legend: {
+        items: [
+          {
+            colour: '#12436D',
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2014_AY',
+            },
+            inlinePosition: undefined,
+            label:
+              'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2014/15)',
+            lineStyle: undefined,
+            symbol: undefined,
+          },
+          {
+            colour: '#F46A25',
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2015_AY',
+            },
+            inlinePosition: undefined,
+            label:
+              'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2015/16)',
+            lineStyle: undefined,
+            symbol: undefined,
+          },
+        ],
+        position: 'bottom',
+      },
       map: {
         dataSetConfigs: [
           {
@@ -499,19 +531,12 @@ describe('ChartBuilder', () => {
           dataSets: [
             {
               order: 0,
-              indicator: 'overall-absence-sessions',
-              filters: ['state-funded-primary'],
-              timePeriod: '2014_AY',
-            },
-
-            {
-              order: 1,
               filters: ['ethnicity-major-chinese', 'state-funded-primary'],
               indicator: 'authorised-absence-sessions',
               timePeriod: '2014_AY',
             },
             {
-              order: 2,
+              order: 1,
               filters: ['ethnicity-major-chinese', 'state-funded-primary'],
               indicator: 'authorised-absence-sessions',
               timePeriod: '2015_AY',
@@ -530,37 +555,6 @@ describe('ChartBuilder', () => {
           tickConfig: 'default',
           tickSpacing: 1,
         },
-      },
-      legend: {
-        items: [
-          {
-            colour: '#12436D',
-            dataSet: {
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-              timePeriod: '2014_AY',
-            },
-            inlinePosition: undefined,
-            label:
-              'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2014/15)',
-            lineStyle: undefined,
-            symbol: undefined,
-          },
-          {
-            colour: '#F46A25',
-            dataSet: {
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-              timePeriod: '2015_AY',
-            },
-            inlinePosition: undefined,
-            label:
-              'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2015/16)',
-            lineStyle: undefined,
-            symbol: undefined,
-          },
-        ],
-        position: 'bottom',
       },
     };
 
@@ -657,6 +651,7 @@ describe('ChartBuilder', () => {
                 },
               ],
             },
+            onBoundaryLevelChange: function onBoundaryLevelChange() {},
           },
           undefined,
         );
