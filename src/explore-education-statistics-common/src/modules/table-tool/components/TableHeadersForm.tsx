@@ -247,7 +247,7 @@ export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
                     header group to reorder the items within that group. To move
                     multiple items in one action, hold the Ctrl key while you
                     click the items you want to move, and then release Ctrl
-                    before dragging and dropping the items into place
+                    before dragging and dropping the items into place.
                   </p>
                   <h4>Using only a keyboard</h4>
                   <p className="govuk-hint">
