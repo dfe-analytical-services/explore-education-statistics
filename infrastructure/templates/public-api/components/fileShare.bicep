@@ -66,7 +66,7 @@ module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null &
   }
 }
 
-module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
+module latencyAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}FsLatencyDeploy'
   params: {
     resourceName: alertResourceName
@@ -75,7 +75,11 @@ module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && al
       resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
       metric: 'SuccessE2ELatency'
     }
-    config: responseTimeConfig
+    config: {
+      ...staticAverageGreaterThanZero
+      nameSuffix: 'response-time'
+      threshold: '250'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

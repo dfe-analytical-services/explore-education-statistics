@@ -505,6 +505,7 @@ module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
       config: {
         ...dynamicAverageGreaterThan
         nameSuffix: toLower(httpStatusCode)
+        severity: 'Informational'
       }
       alertsGroupName: alerts!.alertsGroupName
       tagValues: tagValues
