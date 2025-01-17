@@ -1,3 +1,5 @@
+import { DimensionOperator } from 'types.bicep'
+
 type AppGatewayMetric = {
   resourceType: 'Microsoft.Network/applicationGateways'
   metric:
@@ -23,14 +25,21 @@ type ContainerAppMetric = {
 
 type FileServiceMetric = {
   resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
+  dimensions: {
+    name: 'FileShare' | 'Tier'
+    operator: DimensionOperator?
+    values: string[]
+  }[]?
   metric:
     | 'availability'
+    | 'FileCapacity'
     | 'SuccessE2ELatency'
 }
 
 type PostgreSqlMetric = {
   resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
   metric:
+    | 'backup_storage_used'
     | 'client_connections_waiting'
     | 'cpu_percent'
     | 'disk_bandwidth_consumed_percentage'
@@ -39,6 +48,7 @@ type PostgreSqlMetric = {
     | 'longest_query_time_sec'
     | 'longest_transaction_time_sec'
     | 'memory_percent'
+    | 'storage_percent'
 }
 
 type SiteMetric = {
@@ -52,6 +62,7 @@ type StorageAccountMetric = {
   metric:
     | 'availability'
     | 'SuccessE2ELatency'
+    | 'UsedCapacity'
 }
 
 @export()

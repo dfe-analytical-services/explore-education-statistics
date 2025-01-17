@@ -5,7 +5,7 @@ import {
   dynamicAverageGreaterThan
 } from 'alerts/dynamicAlertConfig.bicep'
 
-import { staticAverageLessThanHundred } from 'alerts/staticAlertConfig.bicep'
+import { staticAverageLessThanHundred, capacity } from 'alerts/staticAlertConfig.bicep'
 
 import { IpRange, PrincipalNameAndId } from '../types.bicep'
 
@@ -64,6 +64,7 @@ param alerts {
   diskBandwidth: bool
   diskIops: bool
   memoryPercentage: bool
+  capacity: bool
   alertsGroupName: string
 }?
 
@@ -294,6 +295,41 @@ module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != n
     tagValues: tagValues
   }
 }
+
+var capacityAlertThresholds = [{
+  threshold: 85
+  severity: 'Informational'
+  description: 'PostgreSQL Flexible Server is at 85% of its storage capacity.'
+}
+{
+  threshold: 90
+  severity: 'Warning'
+  description: 'PostgreSQL Flexible Server is at 90% of its storage capacity.'
+}
+{
+  threshold: 95
+  severity: 'Critical'
+  description: 'PostgreSQL Flexible Server is at 95% of its storage capacity.'
+}]
+
+module capacityAlerts 'alerts/staticMetricAlert.bicep' = [for capacityThreshold in capacityAlertThresholds: if (alerts != null && alerts!.capacity) {
+  name: '${databaseServerName}Capacity${capacityThreshold.threshold}Deploy'
+  params: {
+    resourceName: databaseServerName
+    resourceMetric: {
+      resourceType: 'Microsoft.DBforPostgreSQL/flexibleServers'
+      metric: 'storage_percent'
+    }
+    config: {
+      ...capacity
+      nameSuffix: '${capacityThreshold.threshold}-capacity'
+      severity: capacityThreshold.severity
+    }
+    fullDescription: capacityThreshold.description
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}]
 
 @description('The fully qualified Azure resource ID of the Database Server.')
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)

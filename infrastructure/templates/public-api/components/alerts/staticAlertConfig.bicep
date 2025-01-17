@@ -63,9 +63,27 @@ var staticMaxGreaterThanZero = {
 }
 
 @export()
+var staticMinGreaterThanZero = {
+  ...defaultStaticAlertConfig
+  aggregation: 'Minimum'
+  operator: 'GreaterThan'
+  threshold: '0'
+}
+
+@export()
 var staticTotalGreaterThanZero = {
   ...defaultStaticAlertConfig
   aggregation: 'Total'
   operator: 'GreaterThan'
   threshold: '0'
 }
+
+@export()
+var capacity = union(defaultStaticAlertConfig, {
+  nameSuffix: 'capacity'
+  windowSize: 'PT1H'
+  aggregation: 'Average'
+  operator: 'GreaterThan'
+  severity: 'Warning'
+  threshold: '85'
+})
