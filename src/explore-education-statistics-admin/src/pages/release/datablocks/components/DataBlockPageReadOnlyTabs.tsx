@@ -13,6 +13,7 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 import tableBuilderService from '@common/services/tableBuilderService';
+import { MapChart } from '@common/services/types/blocks';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useMemo, useState } from 'react';
 
@@ -25,9 +26,12 @@ const testId = (dataBlock: ReleaseDataBlock) =>
   `Data block - ${dataBlock.name}`;
 
 const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
+  const isMapChart = dataBlock.charts[0]?.type === 'map';
   const queryClient = useQueryClient();
   const [selectedBoundaryLevel, setSelectedBoundaryLevel] = useState(
-    getMapInitialBoundaryLevel(dataBlock.charts),
+    isMapChart
+      ? getMapInitialBoundaryLevel(dataBlock.charts[0] as MapChart)
+      : undefined,
   );
 
   const getDataBlockGeoJsonQuery = tableBuilderQueries.getDataBlockGeoJson(
@@ -44,7 +48,7 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
     queryKey: getDataBlockGeoJsonQuery.queryKey,
     queryFn: selectedBoundaryLevel
       ? getDataBlockGeoJsonQuery.queryFn
-      : undefined,
+      : () => Promise.resolve({}),
     staleTime: Infinity,
     cacheTime: Infinity,
     keepPreviousData: true,
@@ -57,8 +61,8 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
       tableBuilderService.getTableData(
         dataBlock.query,
         releaseId,
-        dataBlock.charts[0]?.type === 'map'
-          ? dataBlock.charts[0].boundaryLevel
+        isMapChart
+          ? (dataBlock.charts[0] as MapChart).boundaryLevel
           : undefined,
       ),
     [releaseId, dataBlock],
@@ -73,7 +77,10 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
       ...tableData,
       subjectMeta: {
         ...tableData.subjectMeta,
-        locations: locationGeoJson ?? tableData.subjectMeta.locations,
+        locations:
+          selectedBoundaryLevel && locationGeoJson
+            ? locationGeoJson
+            : tableData.subjectMeta.locations,
       },
     });
 
@@ -81,7 +88,13 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
       fullTable: table,
       tableHeaders: mapTableHeadersConfig(dataBlock.table.tableHeaders, table),
     };
-  }, [tableData, locationGeoJson, isFetching, dataBlock.table.tableHeaders]);
+  }, [
+    tableData,
+    locationGeoJson,
+    isFetching,
+    dataBlock.table.tableHeaders,
+    selectedBoundaryLevel,
+  ]);
 
   return (
     <LoadingSpinner text="Loading data block" loading={isLoading || isFetching}>

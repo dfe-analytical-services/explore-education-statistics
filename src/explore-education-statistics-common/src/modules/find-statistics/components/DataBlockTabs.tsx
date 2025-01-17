@@ -46,7 +46,9 @@ const DataBlockTabs = ({
 }: DataBlockTabsProps) => {
   const queryClient = useQueryClient();
   const [selectedBoundaryLevel, setSelectedBoundaryLevel] = useState(
-    getMapInitialBoundaryLevel(dataBlock.charts),
+    dataBlock.charts[0]?.type === 'map'
+      ? getMapInitialBoundaryLevel(dataBlock.charts[0])
+      : undefined,
   );
 
   const {
@@ -74,7 +76,7 @@ const DataBlockTabs = ({
     queryKey: getDataBlockGeoJsonQuery.queryKey,
     queryFn: selectedBoundaryLevel
       ? getDataBlockGeoJsonQuery.queryFn
-      : undefined,
+      : () => Promise.resolve({}),
     staleTime: Infinity,
     cacheTime: Infinity,
     keepPreviousData: true,
@@ -88,11 +90,14 @@ const DataBlockTabs = ({
           ...tableData,
           subjectMeta: {
             ...tableData.subjectMeta,
-            locations: locationGeoJson ?? tableData.subjectMeta.locations,
+            locations:
+              selectedBoundaryLevel && locationGeoJson
+                ? locationGeoJson
+                : tableData.subjectMeta.locations,
           },
         })
       : undefined;
-  }, [tableData, locationGeoJson, isFetching]);
+  }, [tableData, locationGeoJson, isFetching, selectedBoundaryLevel]);
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
 

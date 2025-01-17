@@ -361,7 +361,6 @@ describe('ChartBuilder', () => {
 
   test('calls `onTableQueryUpdate` when change boundary level', async () => {
     const testInitialChart: Chart = {
-      id: 'test-map',
       type: 'map',
       boundaryLevel: 2,
       map: {
@@ -453,7 +452,6 @@ describe('ChartBuilder', () => {
 
   describe('data groupings tab', () => {
     const testInitialChart: Chart = {
-      id: 'test-map',
       type: 'map',
       boundaryLevel: 2,
       legend: {
@@ -651,7 +649,6 @@ describe('ChartBuilder', () => {
                 },
               ],
             },
-            onBoundaryLevelChange: function onBoundaryLevelChange() {},
           },
           undefined,
         );
