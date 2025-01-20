@@ -23,7 +23,6 @@ using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -34,6 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyServiceTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         private static readonly User User = new()
         {
             Id = Guid.NewGuid()
@@ -45,7 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             TeamEmail = "mockteam@mockteam.com",
             ContactName = "Mock Contact Name",
         };
-
 
         private static readonly Publication MockPublication = new()
         {
@@ -848,74 +848,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetMethodology()
         {
-            var methodology = new Methodology
-            {
-                OwningPublicationTitle = "Owning publication",
-                OwningPublicationSlug = "owning-publication",
-            };
+            Publication owningPublication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var owningPublication = new Publication
-            {
-                Title = "Owning publication",
-                Slug = "owning-publication",
-                Methodologies = new List<PublicationMethodology>
-                {
-                    new()
-                    {
-                        Methodology = methodology,
-                        Owner = true
-                    }
-                },
-                Contact = MockContact
-            };
+            var (adoptingPublication1, adoptingPublication2) = _dataFixture.DefaultPublication()
+                .GenerateTuple2();
 
-            var adoptingPublication1 = new Publication
-            {
-                Title = "Adopting publication 1",
-                Slug = "adopting-publication-1",
-                Methodologies = ListOf(
-                    new PublicationMethodology
-                    {
-                        Methodology = methodology,
-                        Owner = false
-                    }
-                ),
-                Contact = MockContact
-            };
-
-            var adoptingPublication2 = new Publication
-            {
-                Title = "Adopting publication 2",
-                Slug = "adopting-publication-2",
-                Methodologies = ListOf(
-                    new PublicationMethodology
-                    {
-                        Methodology = methodology,
-                        Owner = false
-                    }
-                ),
-                Contact = MockContact
-            };
-
-            var methodologyVersion = new MethodologyVersion
-            {
-                Methodology = methodology,
-                Published = new DateTime(2020, 5, 25),
-                PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
-                ScheduledWithReleaseVersion = new ReleaseVersion
-                {
-                    Publication = owningPublication,
-                    TimePeriodCoverage = CalendarYear,
-                    ReleaseName = "2021"
-                },
-                Status = Approved,
-                AlternativeTitle = "Alternative title",
-                AlternativeSlug = "alternative-title",
-            };
+            Methodology methodology = _dataFixture.DefaultMethodology()
+                .WithOwningPublication(owningPublication)
+                .WithAdoptingPublications([adoptingPublication1, adoptingPublication2])
+                .WithMethodologyVersions(_ => [
+                    _dataFixture.DefaultMethodologyVersion()
+                    .WithAlternativeSlug("alternative-title")
+                    .WithAlternativeTitle("Alternative title")
+                    .WithApprovalStatus(Approved)
+                    .WithPublished(new DateTime(2020, 5, 25))
+                    .WithPublishingStrategy(MethodologyPublishingStrategy.WithRelease)
+                    .WithScheduledWithReleaseVersion(owningPublication.Releases[0].Versions[0])
+                ]);
 
             var methodologyStatus = new MethodologyStatus
             {
-                MethodologyVersion = methodologyVersion,
+                MethodologyVersionId = methodology.Versions[0].Id,
                 InternalReleaseNote = "Test approval",
                 ApprovalStatus = Approved,
             };
@@ -924,11 +878,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.Methodologies.AddAsync(methodology);
-                await context.Publications.AddRangeAsync(owningPublication, adoptingPublication1, adoptingPublication2);
-                await context.Contacts.AddAsync(MockContact);
-                await context.MethodologyVersions.AddAsync(methodologyVersion);
-                await context.MethodologyStatus.AddAsync(methodologyStatus);
+                context.Methodologies.Add(methodology);
+                context.MethodologyStatus.Add(methodologyStatus);
                 await context.SaveChangesAsync();
             }
 
@@ -936,126 +887,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(contentDbContext: context);
 
-                var viewModel = (await service.GetMethodology(methodologyVersion.Id)).AssertRight();
+                var result = await service.GetMethodology(methodology.Versions[0].Id);
 
-                Assert.Equal(methodologyVersion.Id, viewModel.Id);
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(methodology.Versions[0].Id, viewModel.Id);
                 Assert.Equal("Alternative title", viewModel.Title);
                 Assert.Equal("alternative-title", viewModel.Slug);
                 Assert.False(viewModel.Amendment);
-                Assert.Equal("Test approval", viewModel.InternalReleaseNote);
-                Assert.Equal(methodologyVersion.MethodologyId, viewModel.MethodologyId);
-                Assert.Equal(new DateTime(2020, 5, 25), viewModel.Published);
+                Assert.Equal(methodologyStatus.InternalReleaseNote, viewModel.InternalReleaseNote);
+                Assert.Equal(methodology.Id, viewModel.MethodologyId);
+                Assert.Equal(methodology.Versions[0].Published, viewModel.Published);
                 Assert.Equal(MethodologyPublishingStrategy.WithRelease, viewModel.PublishingStrategy);
-                Assert.Equal(Approved, viewModel.Status);
+                Assert.Equal(methodology.Versions[0].Status, viewModel.Status);
 
                 Assert.Equal(owningPublication.Id, viewModel.OwningPublication.Id);
-                Assert.Equal("Owning publication", viewModel.OwningPublication.Title);
-
+                Assert.Equal(owningPublication.Title, viewModel.OwningPublication.Title);
+                
                 Assert.Equal(2, viewModel.OtherPublications.Count);
                 Assert.Equal(adoptingPublication1.Id, viewModel.OtherPublications[0].Id);
-                Assert.Equal("Adopting publication 1", viewModel.OtherPublications[0].Title);
+                Assert.Equal(adoptingPublication1.Title, viewModel.OtherPublications[0].Title);
                 Assert.Equal(adoptingPublication2.Id, viewModel.OtherPublications[1].Id);
-                Assert.Equal("Adopting publication 2", viewModel.OtherPublications[1].Title);
+                Assert.Equal(adoptingPublication2.Title, viewModel.OtherPublications[1].Title);
 
                 Assert.NotNull(viewModel.ScheduledWithRelease);
-                Assert.Equal(methodologyVersion.ScheduledWithReleaseVersionId, viewModel.ScheduledWithRelease!.Id);
-                Assert.Equal("Owning publication - Calendar year 2021", viewModel.ScheduledWithRelease.Title);
+                Assert.Equal(methodology.Versions[0].ScheduledWithReleaseVersionId, viewModel.ScheduledWithRelease!.Id);
+                Assert.Equal($"{owningPublication.Title} - {owningPublication.Releases[0].Title}", viewModel.ScheduledWithRelease.Title);
             }
         }
 
         [Fact]
         public async Task GetUnpublishedReleasesUsingMethodology()
         {
-            var methodologyVersion = new MethodologyVersion
-            {
-                Methodology = new Methodology()
-            };
-
             // Set up a randomly ordered mix of published and unpublished Releases on owning and adopting publications
+            Publication owningPublication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2018),
+                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2019),
+                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020),
+                ]);
 
-            var owningPublication = new Publication
-            {
-                Title = "Publication B",
-                Methodologies = ListOf(
-                    new PublicationMethodology
-                    {
-                        Methodology = methodologyVersion.Methodology,
-                        Owner = true
-                    }
-                ),
-                ReleaseVersions = ListOf(
-                    new ReleaseVersion
-                    {
-                        Published = DateTime.UtcNow,
-                        TimePeriodCoverage = CalendarYear,
-                        ReleaseName = "2018"
-                    },
-                    new ReleaseVersion
-                    {
-                        Published = null,
-                        TimePeriodCoverage = CalendarYear,
-                        ReleaseName = "2021"
-                    },
-                    new ReleaseVersion
-                    {
-                        Published = DateTime.UtcNow,
-                        TimePeriodCoverage = CalendarYear,
-                        ReleaseName = "2019"
-                    },
-                    new ReleaseVersion
-                    {
-                        Published = null,
-                        TimePeriodCoverage = CalendarYear,
-                        ReleaseName = "2020"
-                    }
-                )
-            };
+            Publication adoptingPublication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [
+                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2018),
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2019),
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                ]);
 
-            var adoptingPublication = new Publication
-            {
-                Title = "Publication A",
-                Methodologies = ListOf(
-                    new PublicationMethodology
-                    {
-                        Methodology = methodologyVersion.Methodology,
-                        Owner = false
-                    }
-                ),
-                ReleaseVersions = ListOf(
-                    new ReleaseVersion
-                    {
-                        Published = DateTime.UtcNow,
-                        TimePeriodCoverage = FinancialYearQ3,
-                        ReleaseName = "2020"
-                    },
-                    new ReleaseVersion
-                    {
-                        Published = null,
-                        TimePeriodCoverage = FinancialYearQ2,
-                        ReleaseName = "2021"
-                    },
-                    new ReleaseVersion
-                    {
-                        Published = null,
-                        TimePeriodCoverage = FinancialYearQ4,
-                        ReleaseName = "2020"
-                    },
-                    new ReleaseVersion
-                    {
-                        Published = null,
-                        TimePeriodCoverage = FinancialYearQ1,
-                        ReleaseName = "2021"
-                    }
-                )
-            };
+            Methodology methodology = _dataFixture.DefaultMethodology()
+                .WithOwningPublication(owningPublication)
+                .WithAdoptingPublications([adoptingPublication])
+                .WithMethodologyVersions(_ => [_dataFixture.DefaultMethodologyVersion()]);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
-                await contentDbContext.Publications.AddRangeAsync(owningPublication, adoptingPublication);
-                await contentDbContext.Contacts.AddAsync(MockContact);
+                contentDbContext.Methodologies.Add(methodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1063,39 +953,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(contentDbContext: contentDbContext);
 
-                var result = (await service.GetUnpublishedReleasesUsingMethodology(methodologyVersion.Id))
-                    .AssertRight();
+                var result = await service.GetUnpublishedReleasesUsingMethodology(methodology.Versions[0].Id);
+
+                var viewModel = result.AssertRight();
 
                 // Check that only unpublished Releases are included and that they are in the correct order
 
-                var expectedReleaseAtIndex0 = adoptingPublication.ReleaseVersions.Single(rv =>
-                    rv.Year == 2021 && rv.TimePeriodCoverage == FinancialYearQ2);
+                var expectedReleaseVersionAtIndex0 =
+                    owningPublication.Releases.Single(r => r.Year == 2021).Versions[0];
+                var expectedReleaseVersionAtIndex1 =
+                    owningPublication.Releases.Single(r => r.Year == 2020).Versions[0];
+                var expectedReleaseVersionAtIndex2 =
+                    adoptingPublication.Releases.Single(r => r.Year == 2019).Versions[0];
+                var expectedReleaseVersionAtIndex3 =
+                    adoptingPublication.Releases.Single(r => r.Year == 2018).Versions[0];
 
-                var expectedReleaseAtIndex1 = adoptingPublication.ReleaseVersions.Single(rv =>
-                    rv.Year == 2021 && rv.TimePeriodCoverage == FinancialYearQ1);
+                Assert.Equal(4, viewModel.Count);
 
-                var expectedReleaseAtIndex2 = adoptingPublication.ReleaseVersions.Single(rv =>
-                    rv.Year == 2020 && rv.TimePeriodCoverage == FinancialYearQ4);
+                Assert.Equal(expectedReleaseVersionAtIndex0.Id, viewModel[0].Id);
+                Assert.Equal(
+                    $"{expectedReleaseVersionAtIndex0.Release.Publication.Title} - {expectedReleaseVersionAtIndex0.Release.Title}",
+                    viewModel[0].Title);
 
-                var expectedReleaseAtIndex3 = owningPublication.ReleaseVersions.Single(rv =>
-                    rv.Year == 2021 && rv.TimePeriodCoverage == CalendarYear);
+                Assert.Equal(expectedReleaseVersionAtIndex1.Id, viewModel[1].Id);
+                Assert.Equal(
+                    $"{expectedReleaseVersionAtIndex1.Release.Publication.Title} - {expectedReleaseVersionAtIndex1.Release.Title}",
+                    viewModel[1].Title);
 
-                var expectedReleaseAtIndex4 = owningPublication.ReleaseVersions.Single(rv =>
-                    rv.Year == 2020 && rv.TimePeriodCoverage == CalendarYear);
+                Assert.Equal(expectedReleaseVersionAtIndex2.Id, viewModel[2].Id);
+                Assert.Equal(
+                    $"{expectedReleaseVersionAtIndex2.Release.Publication.Title} - {expectedReleaseVersionAtIndex2.Release.Title}",
+                    viewModel[2].Title);
 
-                Assert.Equal(5, result.Count);
-
-                Assert.Equal(expectedReleaseAtIndex0.Id, result[0].Id);
-                Assert.Equal(expectedReleaseAtIndex1.Id, result[1].Id);
-                Assert.Equal(expectedReleaseAtIndex2.Id, result[2].Id);
-                Assert.Equal(expectedReleaseAtIndex3.Id, result[3].Id);
-                Assert.Equal(expectedReleaseAtIndex4.Id, result[4].Id);
-
-                Assert.Equal("Publication A - Financial year Q2 2021-22", result[0].Title);
-                Assert.Equal("Publication A - Financial year Q1 2021-22", result[1].Title);
-                Assert.Equal("Publication A - Financial year Q4 2020-21", result[2].Title);
-                Assert.Equal("Publication B - Calendar year 2021", result[3].Title);
-                Assert.Equal("Publication B - Calendar year 2020", result[4].Title);
+                Assert.Equal(expectedReleaseVersionAtIndex3.Id, viewModel[3].Id);
+                Assert.Equal(
+                    $"{expectedReleaseVersionAtIndex3.Release.Publication.Title} - {expectedReleaseVersionAtIndex3.Release.Title}",
+                    viewModel[3].Title);
             }
         }
 
@@ -1114,42 +1007,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task GetUnpublishedReleasesUsingMethodology_PublicationsHaveNoReleases()
         {
-            var methodologyVersion = new MethodologyVersion
-            {
-                Methodology = new Methodology()
-            };
-
-            var owningPublication = new Publication
-            {
-                Title = "Owning publication",
-                Methodologies = ListOf(
-                    new PublicationMethodology
-                    {
-                        Methodology = methodologyVersion.Methodology,
-                        Owner = true
-                    }
-                )
-            };
-
-            var adoptingPublication = new Publication
-            {
-                Title = "Adopting publication",
-                Methodologies = ListOf(
-                    new PublicationMethodology
-                    {
-                        Methodology = methodologyVersion.Methodology,
-                        Owner = false
-                    }
-                )
-            };
+            Methodology methodology = _dataFixture.DefaultMethodology()
+                .WithOwningPublication(_dataFixture.DefaultPublication())
+                .WithAdoptingPublications(_ => [_dataFixture.DefaultPublication()])
+                .WithMethodologyVersions(_ => [_dataFixture.DefaultMethodologyVersion()]);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
-                await contentDbContext.Publications.AddRangeAsync(owningPublication, adoptingPublication);
-                await contentDbContext.Contacts.AddAsync(MockContact);
+                contentDbContext.Methodologies.Add(methodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1157,68 +1024,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(contentDbContext: contentDbContext);
 
-                var result = (await service.GetUnpublishedReleasesUsingMethodology(methodologyVersion.Id))
-                    .AssertRight();
+                var result = await service.GetUnpublishedReleasesUsingMethodology(methodology.Versions[0].Id);
 
-                Assert.Empty(result);
+                var viewModel = result.AssertRight();
+
+                Assert.Empty(viewModel);
             }
         }
 
         [Fact]
         public async Task GetUnpublishedReleasesUsingMethodology_PublicationsHaveNoUnpublishedReleases()
         {
-            var methodologyVersion = new MethodologyVersion
-            {
-                Methodology = new Methodology()
-            };
-
-            var owningPublication = new Publication
-            {
-                Title = "Owning publication",
-                Methodologies = ListOf(
-                    new PublicationMethodology
-                    {
-                        Methodology = methodologyVersion.Methodology,
-                        Owner = true
-                    }
-                ),
-                ReleaseVersions = ListOf(
-                    new ReleaseVersion
-                    {
-                        Published = DateTime.UtcNow,
-                        TimePeriodCoverage = CalendarYear,
-                        ReleaseName = "2021"
-                    }
-                )
-            };
-
-            var adoptingPublication = new Publication
-            {
-                Title = "Adopting publication",
-                Methodologies = ListOf(
-                    new PublicationMethodology
-                    {
-                        Methodology = methodologyVersion.Methodology,
-                        Owner = false
-                    }
-                ),
-                ReleaseVersions = ListOf(
-                    new ReleaseVersion
-                    {
-                        Published = DateTime.UtcNow,
-                        TimePeriodCoverage = CalendarYear,
-                        ReleaseName = "2021"
-                    }
-                )
-            };
+            Methodology methodology = _dataFixture.DefaultMethodology()
+                .WithOwningPublication(_dataFixture.DefaultPublication()
+                    .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]))
+                .WithAdoptingPublications(_ => [_dataFixture.DefaultPublication()
+                    .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)])])
+                .WithMethodologyVersions(_ => [_dataFixture.DefaultMethodologyVersion()]);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
-                await contentDbContext.Publications.AddRangeAsync(owningPublication, adoptingPublication);
-                await contentDbContext.Contacts.AddAsync(MockContact);
+                contentDbContext.Methodologies.Add(methodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1226,10 +1054,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(contentDbContext: contentDbContext);
 
-                var result = (await service.GetUnpublishedReleasesUsingMethodology(methodologyVersion.Id))
-                    .AssertRight();
+                var result = await service.GetUnpublishedReleasesUsingMethodology(methodology.Versions[0].Id);
 
-                Assert.Empty(result);
+                var viewModel = result.AssertRight();
+
+                Assert.Empty(viewModel);
             }
         }
 
@@ -3098,7 +2927,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // Create a Methodology that has only been adopted by the User's Publication.
                 var methodology = _fixture
                     .DefaultMethodology()
-                    .WithAdoptingPublication(publication)
+                    .WithAdoptingPublications([publication])
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)
@@ -3380,7 +3209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // Create a Methodology that has only been adopted by the User's Publication.
                 var methodology = _fixture
                     .DefaultMethodology()
-                    .WithAdoptingPublication(publication)
+                    .WithAdoptingPublications([publication])
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)

@@ -7,13 +7,14 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -23,32 +24,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseApprovalServicePermissionTests
     {
-        private readonly ReleaseVersion _releaseVersion = new()
-        {
-            Id = Guid.NewGuid(),
-            Publication = new Publication(),
-            Published = DateTime.Now,
-            TimePeriodCoverage = TimeIdentifier.April
-        };
+        private readonly DataFixture _dataFixture = new();
 
         [Fact]
         public async Task ListReleaseStatuses()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == _releaseVersion.Id, CanViewReleaseStatusHistory)
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id, CanViewReleaseStatusHistory)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        contentDbContext.ReleaseVersions.AddRange(_releaseVersion);
+                        contentDbContext.ReleaseVersions.Add(releaseVersion);
                         await contentDbContext.SaveChangesAsync();
                     }
 
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = BuildService(contentDbContext: contentDbContext, userService.Object);
-                        return await service.ListReleaseStatuses(_releaseVersion.Id);
+                        return await service.ListReleaseStatuses(releaseVersion.Id);
                     }
                 });
         }
@@ -56,14 +55,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateReleaseStatus_Draft()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == _releaseVersion.Id, CanMarkSpecificReleaseAsDraft)
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id, CanMarkSpecificReleaseAsDraft)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        contentDbContext.ReleaseVersions.AddRange(_releaseVersion);
+                        contentDbContext.ReleaseVersions.Add(releaseVersion);
                         await contentDbContext.SaveChangesAsync();
                     }
 
@@ -72,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = BuildService(contentDbContext: contentDbContext, userService.Object);
 
                         return await service.CreateReleaseStatus(
-                            _releaseVersion.Id,
+                            releaseVersion.Id,
                             new ReleaseStatusCreateRequest
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.Draft
@@ -85,14 +88,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateReleaseStatus_HigherLevelReview()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == _releaseVersion.Id, CanSubmitSpecificReleaseToHigherReview)
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id, CanSubmitSpecificReleaseToHigherReview)
                 .AssertForbidden(async userService =>
                     {
                         var contentDbContextId = Guid.NewGuid().ToString();
                         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                         {
-                            contentDbContext.ReleaseVersions.AddRange(_releaseVersion);
+                            contentDbContext.ReleaseVersions.Add(releaseVersion);
                             await contentDbContext.SaveChangesAsync();
                         }
 
@@ -101,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             var service = BuildService(contentDbContext: contentDbContext, userService.Object);
 
                             return await service.CreateReleaseStatus(
-                                _releaseVersion.Id,
+                                releaseVersion.Id,
                                 new ReleaseStatusCreateRequest
                                 {
                                     ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
@@ -115,14 +122,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateReleaseStatus_Approve()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == _releaseVersion.Id, CanApproveSpecificRelease)
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id, CanApproveSpecificRelease)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        contentDbContext.ReleaseVersions.AddRange(_releaseVersion);
+                        contentDbContext.ReleaseVersions.Add(releaseVersion);
                         await contentDbContext.SaveChangesAsync();
                     }
 
@@ -130,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = BuildService(contentDbContext: contentDbContext, userService.Object);
                         return await service.CreateReleaseStatus(
-                            _releaseVersion.Id,
+                            releaseVersion.Id,
                             new ReleaseStatusCreateRequest
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.Approved

@@ -98,7 +98,7 @@ public static class ReleaseVersionGeneratorExtensions
 
     public static Generator<ReleaseVersion> WithNextReleaseDate(
         this Generator<ReleaseVersion> generator,
-        PartialDate nextReleaseDate)
+        PartialDate? nextReleaseDate)
         => generator.ForInstance(releaseVersion => releaseVersion.SetNextReleaseDate(nextReleaseDate));
 
     public static Generator<ReleaseVersion> WithPreviousVersion(
@@ -302,7 +302,7 @@ public static class ReleaseVersionGeneratorExtensions
 
     public static InstanceSetters<ReleaseVersion> SetNextReleaseDate(
         this InstanceSetters<ReleaseVersion> setters,
-        PartialDate nextReleaseDate)
+        PartialDate? nextReleaseDate)
         => setters.Set(releaseVersion => releaseVersion.NextReleaseDate, nextReleaseDate);
 
     public static InstanceSetters<ReleaseVersion> SetCreated(

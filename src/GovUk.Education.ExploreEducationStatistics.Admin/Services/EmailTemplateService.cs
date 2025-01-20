@@ -27,17 +27,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var template = notifyOptions.Value.InviteWithRolesTemplateId;
 
             var releaseRoleList = userReleaseInvites
-                .OrderBy(invite => invite.ReleaseVersion.Publication.Title)
-                .ThenBy(invite => invite.ReleaseVersion.Title)
+                .OrderBy(invite => invite.ReleaseVersion.Release.Publication.Title)
+                .ThenBy(invite => invite.ReleaseVersion.Release.Title)
                 .ThenBy(invite => invite.Role.ToString())
                 .Select(invite =>
-                    $"* {invite.ReleaseVersion.Publication.Title}, {invite.ReleaseVersion.Title} - {invite.Role.ToString()}")
+                    $"* {invite.ReleaseVersion.Release.Publication.Title}, {invite.ReleaseVersion.Release.Title} - {invite.Role}")
                 .ToList();
 
             var publicationRoleList = userPublicationInvites
                 .OrderBy(invite => invite.Publication.Title)
                 .ThenBy(invite => invite.Role)
-                .Select(invite => $"* {invite.Publication.Title} - {invite.Role.ToString()}")
+                .Select(invite => $"* {invite.Publication.Title} - {invite.Role}")
                 .ToList();
 
             var emailValues = new Dictionary<string, dynamic>
@@ -91,17 +91,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 {
                     "url",
-                    $"{url}/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/{link}"
+                    $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/{link}"
                 },
                 { "role", role.ToString() },
-                { "publication", releaseVersion.Publication.Title },
-                { "release", releaseVersion.Title }
+                { "publication", releaseVersion.Release.Publication.Title },
+                { "release", releaseVersion.Release.Title }
             };
 
             return emailService.SendEmail(email, template, emailValues);
         }
 
-        public Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email,
+        public Either<ActionResult, Unit> SendReleaseHigherReviewEmail(
+            string email,
             ReleaseVersion releaseVersion)
         {
             var url = appOptions.Value.Url;
@@ -109,12 +110,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var emailValues = new Dictionary<string, dynamic>
             {
-                {
-                    "url",
-                    $"{url}/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/summary"
-                },
-                { "publication", releaseVersion.Publication.Title },
-                { "release", releaseVersion.Title },
+                { "url", $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/summary" },
+                { "publication", releaseVersion.Release.Publication.Title },
+                { "release", releaseVersion.Release.Title }
             };
 
             return emailService.SendEmail(email, template, emailValues);

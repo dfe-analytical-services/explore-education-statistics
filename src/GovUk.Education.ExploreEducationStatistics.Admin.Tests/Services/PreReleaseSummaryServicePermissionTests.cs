@@ -1,58 +1,64 @@
 #nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class PreReleaseSummaryServicePermissionTests
 {
-    public class PreReleaseSummaryServicePermissionTests
+    private readonly DataFixture _dataFixture = new();
+
+    [Fact]
+    public async Task GetPreReleaseSummaryViewModel()
     {
-        private readonly ReleaseVersion _releaseVersion = new()
-        {
-            Id = Guid.NewGuid()
-        };
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()));
 
-        [Fact]
-        public void GetPreReleaseSummaryViewModelAsync()
-        {
-            AssertSecurityPoliciesChecked(service =>
-                    service.GetPreReleaseSummaryViewModelAsync(_releaseVersion.Id),
-                _releaseVersion,
-                CanViewSpecificPreReleaseSummary);
-        }
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                CanViewSpecificPreReleaseSummary)
+            .AssertForbidden(async userService =>
+                {
+                    var contentDbContextId = Guid.NewGuid().ToString();
+                    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                    {
+                        contentDbContext.ReleaseVersions.Add(releaseVersion);
+                        await contentDbContext.SaveChangesAsync();
+                    }
 
-        private void AssertSecurityPoliciesChecked<T, TEntity>(
-            Func<PreReleaseSummaryService, Task<Either<ActionResult, T>>> protectedAction, TEntity protectedEntity,
-            params SecurityPolicies[] policies)
-            where TEntity : class
-        {
-            var (persistenceHelper, userService) = Mocks();
+                    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                    {
+                        var service = BuildService(
+                            contentDbContext: contentDbContext,
+                            userService: userService.Object);
 
-            var service = new PreReleaseSummaryService(persistenceHelper.Object, userService.Object);
+                        return await service.GetPreReleaseSummaryViewModel(releaseVersion.Id, CancellationToken.None);
+                    }
+                }
+            );
+    }
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, protectedEntity, userService, service,
-                policies);
-        }
-
-        private (
-            Mock<IPersistenceHelper<ContentDbContext>>,
-            Mock<IUserService>) Mocks()
-        {
-            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
-            MockUtils.SetupCall(persistenceHelper, _releaseVersion.Id, _releaseVersion);
-
-            return (persistenceHelper,
-                MockUtils.AlwaysTrueUserService());
-        }
+    private static PreReleaseSummaryService BuildService(
+        ContentDbContext? contentDbContext = null,
+        IUserService? userService = null)
+    {
+        return new PreReleaseSummaryService(
+            contentDbContext ?? Mock.Of<ContentDbContext>(),
+            userService ?? Mock.Of<IUserService>()
+        );
     }
 }

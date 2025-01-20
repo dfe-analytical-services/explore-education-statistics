@@ -51,7 +51,9 @@ public abstract class DataSetVersionsControllerTests(
         public async Task OnlyPreviouslyPublishedVersionsReturned(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublication(DataFixture.DefaultPublication())))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -108,7 +110,7 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(currentDataSetVersion.VersionType, liveVersion.Type);
 
             Assert.Equal(releaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
-            Assert.Equal(releaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
+            Assert.Equal(releaseFile.ReleaseVersion.Release.Title, liveVersion.ReleaseVersion.Title);
 
             Assert.Equal(releaseFile.File.DataSetFileId, liveVersion.File.Id);
             Assert.Equal(releaseFile.Name, liveVersion.File.Title);
@@ -169,7 +171,9 @@ public abstract class DataSetVersionsControllerTests(
             int numberOfPublishedDataSetVersions)
         {
             var releaseFiles = DataFixture.DefaultReleaseFile()
-                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => DataFixture.DefaultReleaseVersion()))
+                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => DataFixture.DefaultReleaseVersion()
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublication(DataFixture.DefaultPublication()))))
                 .ForInstance(s => s.Set(rf => rf.File, () => DataFixture.DefaultFile(FileType.Data)))
                 .GenerateList(numberOfPublishedDataSetVersions);
 
@@ -231,11 +235,15 @@ public abstract class DataSetVersionsControllerTests(
         public async Task VersionsForDifferentDataSetNotReturned()
         {
             ReleaseFile targetReleaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublication(DataFixture.DefaultPublication())))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             ReleaseFile otherReleaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublication(DataFixture.DefaultPublication())))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -298,7 +306,7 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(targetDataSetVersion.VersionType, liveVersion.Type);
 
             Assert.Equal(targetReleaseFile.ReleaseVersion.Id, liveVersion.ReleaseVersion.Id);
-            Assert.Equal(targetReleaseFile.ReleaseVersion.Title, liveVersion.ReleaseVersion.Title);
+            Assert.Equal(targetReleaseFile.ReleaseVersion.Release.Title, liveVersion.ReleaseVersion.Title);
 
             Assert.Equal(targetReleaseFile.File.DataSetFileId, liveVersion.File.Id);
             Assert.Equal(targetReleaseFile.Name, liveVersion.File.Title);
@@ -368,7 +376,9 @@ public abstract class DataSetVersionsControllerTests(
         public async Task Success()
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublication(DataFixture.DefaultPublication())))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -503,7 +513,9 @@ public abstract class DataSetVersionsControllerTests(
         {
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublication(DataFixture.DefaultPublication())))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -963,7 +975,9 @@ public abstract class DataSetVersionsControllerTests(
         public async Task Success(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
+                    .WithRelease(DataFixture.DefaultRelease()
+                        .WithPublication(DataFixture.DefaultPublication())))
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -1014,7 +1028,7 @@ public abstract class DataSetVersionsControllerTests(
             Assert.Equal(releaseFile.File.DataSetFileId!.Value, viewModel.File.Id);
             Assert.Equal(releaseFile.Name, viewModel.File.Title);
             Assert.Equal(releaseFile.ReleaseVersion.Id, viewModel.ReleaseVersion.Id);
-            Assert.Equal(releaseFile.ReleaseVersion.Title, viewModel.ReleaseVersion.Title);
+            Assert.Equal(releaseFile.ReleaseVersion.Release.Title, viewModel.ReleaseVersion.Title);
             Assert.Equal(nextDataSetVersion.TotalResults, viewModel.TotalResults);
             Assert.Equal("updated notes.", viewModel.Notes);
             Assert.Equal(

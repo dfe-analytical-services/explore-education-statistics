@@ -22,7 +22,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
@@ -1670,58 +1669,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetReleaseRoles()
         {
             var user = new User();
-            var publication = new Publication
-            {
-                Title = "Test Publication"
-            };
 
-            var userReleaseRole1 = new UserReleaseRole
-            {
-                User = user,
-                ReleaseVersion = new ReleaseVersion
-                {
-                    Publication = publication,
-                    ReleaseName = "2020",
-                    TimePeriodCoverage = December
-                },
-                Role = Contributor
-            };
+            var (publication1, publication2, publication3) = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+                .GenerateTuple3();
 
-            var userReleaseRole2 = new UserReleaseRole
-            {
-                User = user,
-                ReleaseVersion = new ReleaseVersion
-                {
-                    Publication = publication,
-                    ReleaseName = "2021",
-                    TimePeriodCoverage = June
-                },
-                Role = ReleaseRole.Approver
-            };
+            UserReleaseRole userReleaseRole1 = _dataFixture.DefaultUserReleaseRole()
+                .WithReleaseVersion(publication1.Releases[0].Versions[0])
+                .WithUser(user)
+                .WithRole(Contributor);
+
+            UserReleaseRole userReleaseRole2 = _dataFixture.DefaultUserReleaseRole()
+                .WithReleaseVersion(publication2.Releases[0].Versions[0])
+                .WithUser(user)
+                .WithRole(ReleaseRole.Approver);
 
             // Role assignment for a different user
-            var userReleaseRole3 = new UserReleaseRole
-            {
-                User = new User(),
-                ReleaseVersion = new ReleaseVersion
-                {
-                    Publication = publication,
-                    ReleaseName = "2022",
-                    TimePeriodCoverage = July
-                },
-                Role = Contributor
-            };
+            UserReleaseRole userReleaseRole3 = _dataFixture.DefaultUserReleaseRole()
+                .WithReleaseVersion(publication3.Releases[0].Versions[0])
+                .WithUser(new User())
+                .WithRole(ReleaseRole.Approver);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.UserReleaseRoles.AddRangeAsync(
-                    userReleaseRole1,
-                    userReleaseRole2,
-                    userReleaseRole3);
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRole1, userReleaseRole2, userReleaseRole3);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1731,19 +1704,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetReleaseRoles(user.Id);
 
-                result.AssertRight();
+                var userReleaseRoles = result.AssertRight();
 
-                var userReleaseRoles = result.Right;
                 Assert.Equal(2, userReleaseRoles.Count);
 
                 Assert.Equal(userReleaseRole1.Id, userReleaseRoles[0].Id);
-                Assert.Equal("Test Publication", userReleaseRoles[0].Publication);
-                Assert.Equal("December 2020", userReleaseRoles[0].Release);
+                Assert.Equal(publication1.Title, userReleaseRoles[0].Publication);
+                Assert.Equal(publication1.Releases[0].Title, userReleaseRoles[0].Release);
                 Assert.Equal(Contributor, userReleaseRoles[0].Role);
 
                 Assert.Equal(userReleaseRole2.Id, userReleaseRoles[1].Id);
-                Assert.Equal("Test Publication", userReleaseRoles[1].Publication);
-                Assert.Equal("June 2021", userReleaseRoles[1].Release);
+                Assert.Equal(publication2.Title, userReleaseRoles[1].Publication);
+                Assert.Equal(publication2.Releases[0].Title, userReleaseRoles[1].Release);
                 Assert.Equal(ReleaseRole.Approver, userReleaseRoles[1].Role);
             }
         }
@@ -2150,13 +2122,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var user = new User
             {
@@ -2229,13 +2197,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole_RemoveAssociatedUserReleaseInvite()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var user = new User
             {
@@ -2335,13 +2299,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole_HasHigherGlobalRoleThanAnalyst()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var user = new User
             {
@@ -2411,13 +2371,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole_AnalystRoleStillRequiredForOtherReleases()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var user = new User
             {
@@ -2496,13 +2452,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole_AnalystRoleStillRequiredForOtherPublications()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var user = new User
             {
@@ -2610,21 +2562,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole_DowngradeToPrereleaseRole()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
-            var anotherReleaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            ReleaseVersion anotherReleaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var user = new User
             {
@@ -2711,13 +2655,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRoleAsPrerelease_AnalystRoleRetained()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var user = new User
             {
@@ -2795,13 +2735,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveAllUserResourceRoles()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var user = new User
             {
@@ -2823,7 +2759,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userPublicationRole = new UserPublicationRole
             {
                 User = user,
-                Publication = releaseVersion.Publication,
+                Publication = releaseVersion.Release.Publication,
                 Role = PublicationRole.Approver
             };
 
@@ -2847,7 +2783,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userTwoPublicationRole = new UserPublicationRole
             {
                 User = userTwo,
-                Publication = releaseVersion.Publication,
+                Publication = releaseVersion.Release.Publication,
                 Role = PublicationRole.Approver
             };
 

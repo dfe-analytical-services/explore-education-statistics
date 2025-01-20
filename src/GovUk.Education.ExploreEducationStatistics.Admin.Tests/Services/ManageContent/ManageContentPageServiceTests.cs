@@ -1,13 +1,13 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -24,7 +24,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
 
@@ -215,7 +214,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
                 Assert.NotNull(contentRelease);
                 Assert.Equal(publishedReleaseVersion.Id, contentRelease.Id);
-                Assert.Equal("Academic year", contentRelease.CoverageTitle);
+                Assert.Equal(publishedReleaseVersion.Release.TimePeriodCoverage.GetEnumLabel(),
+                    contentRelease.CoverageTitle);
                 Assert.True(contentRelease.HasDataGuidance);
                 Assert.True(contentRelease.HasPreReleaseAccessList);
 
@@ -240,17 +240,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(publishedReleaseVersion.RelatedDashboardsSection.Id, contentRelease.RelatedDashboardsSection.Id);
                 Assert.True(contentRelease.LatestRelease);
                 Assert.Equal(publishedReleaseVersion.NextReleaseDate, contentRelease.NextReleaseDate);
-                Assert.Equal(publishedReleaseVersion.ReleaseName, contentRelease.ReleaseName);
+                Assert.Equal(publishedReleaseVersion.Release.Year.ToString(), contentRelease.ReleaseName);
                 Assert.Equal(publishedReleaseVersion.PublishScheduled, contentRelease.PublishScheduled);
                 Assert.Equal(publishedReleaseVersion.Published, contentRelease.Published);
                 Assert.Equal(publication.Id, contentRelease.PublicationId);
-                Assert.Equal(publishedReleaseVersion.Slug, contentRelease.Slug);
+                Assert.Equal(publishedReleaseVersion.Release.Slug, contentRelease.Slug);
+                Assert.Equal(publishedReleaseVersion.Release.Title, contentRelease.Title);
                 Assert.Equal(publishedReleaseVersion.SummarySection.Id, contentRelease.SummarySection.Id);
-                Assert.Equal(publishedReleaseVersion.Title, contentRelease.Title);
                 Assert.Equal(publishedReleaseVersion.Type, contentRelease.Type);
-                Assert.Equal(publishedReleaseVersion.YearTitle, contentRelease.YearTitle);
+                Assert.Equal(publishedReleaseVersion.Release.YearTitle, contentRelease.YearTitle);
                 Assert.Empty(contentRelease.Updates);
-
+                
                 var contentDownloadFiles = contentRelease.DownloadFiles.ToList();
                 Assert.Equal(2, contentDownloadFiles.Count);
                 Assert.Equal(files[0].Id, contentDownloadFiles[0].Id);
@@ -303,9 +303,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(3, contentPublicationReleaseSeries.Count);
 
                 Assert.False(contentPublicationReleaseSeries[0].IsLegacyLink);
-                Assert.Equal(publishedReleaseVersion.ReleaseId, contentPublicationReleaseSeries[0].ReleaseId);
-                Assert.Equal(publishedReleaseVersion.Slug, contentPublicationReleaseSeries[0].ReleaseSlug);
-                Assert.Equal(publishedReleaseVersion.Title, contentPublicationReleaseSeries[0].Description);
+                Assert.Equal(publishedReleaseVersion.Release.Id, contentPublicationReleaseSeries[0].ReleaseId);
+                Assert.Equal(publishedReleaseVersion.Release.Slug, contentPublicationReleaseSeries[0].ReleaseSlug);
+                Assert.Equal(publishedReleaseVersion.Release.Title, contentPublicationReleaseSeries[0].Description);
                 Assert.Null(contentPublicationReleaseSeries[0].LegacyLinkUrl);
 
                 Assert.True(contentPublicationReleaseSeries[1].IsLegacyLink);
@@ -335,26 +335,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public async Task GetManageContentPageViewModel_IsPrerelease()
         {
-            var publication = new Publication
-            {
-                Contact = new Contact(),
-                Slug = "test-publication",
-                Title = "Publication",
-                Theme = new Theme()
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+                .WithTheme(_dataFixture.DefaultTheme());
 
-            var releaseVersion = new ReleaseVersion
-            {
-                NextReleaseDate = new PartialDate { Day = "9", Month = "9", Year = "2040" },
-                PreReleaseAccessList = "Test access list",
-                Publication = publication,
-                PublishScheduled = DateTime.Parse("2020-09-08T23:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                Published = null,
-                ReleaseName = "2020",
-                Slug = "2020-21",
-                TimePeriodCoverage = AcademicYear,
-                Type = ReleaseType.OfficialStatistics,
-            };
+            var releaseVersion = publication.Releases.Single().Versions.Single(); 
 
             var previousMethodologyVersion = new MethodologyVersion
             {
@@ -400,7 +385,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.MethodologyVersions.AddRange(methodologyVersions);
                 contentDbContext.ContentSections.AddRange(
                     new()
@@ -492,32 +476,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Email = "rob@test.com"
             };
 
-            var publication = new Publication
-            {
-                Contact = new Contact
-                {
-                    ContactName = "Name",
-                    ContactTelNo = "01234 567890",
-                    TeamEmail = "test@test.com",
-                    TeamName = "Team Name"
-                },
-                Slug = "test-publication",
-                Title = "Publication",
-                Theme = new Theme
-                {
-                    Title = "Theme"
-                }
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+                .WithTheme(_dataFixture.DefaultTheme());
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                ReleaseName = "2020",
-                Slug = "2020-21",
-                TimePeriodCoverage = AcademicYear,
-                Type = ReleaseType.OfficialStatistics,
-            };
+            var releaseVersion = publication.Releases.Single().Versions.Single(); 
 
             var summaryContentSection = new ContentSection
             {
@@ -568,7 +531,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.ContentSections.AddRange(summaryContentSection, genericContentSection);
 
                 await contentDbContext.SaveChangesAsync();

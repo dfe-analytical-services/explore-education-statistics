@@ -19,7 +19,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using IReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -38,7 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IOptions<AppOptions> _appOptions;
         private readonly IOptions<NotifyOptions> _notifyOptions;
 
-        public ReleaseInviteService(ContentDbContext contentDbContext,
+        public ReleaseInviteService(
+            ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IReleaseVersionRepository releaseVersionRepository,
             IUserRepository userRepository,
@@ -66,7 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _notifyOptions = notifyOptions;
         }
 
-        public async Task<Either<ActionResult, Unit>> InviteContributor(string email, Guid publicationId,
+        public async Task<Either<ActionResult, Unit>> InviteContributor(
+            string email,
+            Guid publicationId,
             List<Guid> releaseVersionIds)
         {
             return await _contentPersistenceHelper
@@ -104,8 +108,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> CreateNewUserContributorInvite(List<Guid> releaseVersionIds,
-            string email, string publicationTitle)
+        private async Task<Either<ActionResult, Unit>> CreateNewUserContributorInvite(
+            List<Guid> releaseVersionIds,
+            string email,
+            string publicationTitle)
         {
             if (await _userReleaseInviteRepository.UserHasInvites(
                     releaseVersionIds: releaseVersionIds,
@@ -141,8 +147,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> CreateExistingUserContributorInvite(List<Guid> releaseVersionIds,
-            Guid userId, string email, string publicationTitle)
+        private async Task<Either<ActionResult, Unit>> CreateExistingUserContributorInvite(
+            List<Guid> releaseVersionIds,
+            Guid userId,
+            string email,
+            string publicationTitle)
         {
             // check the user doesn't already have the user release roles
             var existingReleaseRoleReleaseVersionIds = _contentDbContext.UserReleaseRoles
@@ -184,7 +193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _userRoleService.UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, userId);
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateReleaseVersionIds(Guid publicationId,
+        private async Task<Either<ActionResult, Unit>> ValidateReleaseVersionIds(
+            Guid publicationId,
             List<Guid> releaseVersionIds)
         {
             var distinctReleaseVersionIds = releaseVersionIds.Distinct().ToList();
@@ -216,23 +226,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var url = _appOptions.Value.Url;
             var template = _notifyOptions.Value.ContributorTemplateId;
 
-            var releaseVersions = await _contentDbContext.ReleaseVersions
-                .AsQueryable()
-                .Where(rv => releaseVersionIds.Contains(rv.Id))
+            var releases = await _contentDbContext.Releases
+                .Where(r => r.Versions.Any(rv => releaseVersionIds.Contains(rv.Id)))
                 .ToListAsync();
 
-            var releaseList = releaseVersions
-                .OrderBy(rv => rv.Year)
-                .ThenBy(rv => rv.TimePeriodCoverage)
-                .Select(rv => $"* {rv.Title}")
-                .ToList()
-                .JoinToString("\n");
+            var releaseTitles = releases
+                .OrderBy(r => r.Year)
+                .ThenBy(r => r.TimePeriodCoverage)
+                .Select(r => $"* {r.Title}")
+                .JoinToString('\n');
 
             var emailValues = new Dictionary<string, dynamic>
             {
                 { "url", url },
                 { "publication name", publicationTitle },
-                { "release list", releaseList },
+                { "release list", releaseTitles }
             };
 
             return _emailService.SendEmail(email, template, emailValues);

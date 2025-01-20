@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var warnings = new List<ReleaseChecklistIssue>();
 
             var methodologies = await _methodologyVersionRepository
-                .GetLatestVersionByPublication(releaseVersion.PublicationId);
+                .GetLatestVersionByPublication(releaseVersion.Release.PublicationId);
 
             if (!methodologies.Any())
             {
@@ -280,7 +280,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         public static IQueryable<ReleaseVersion> HydrateReleaseForChecklist(this IQueryable<ReleaseVersion> query)
         {
-            return query.Include(rv => rv.Publication)
+            return query.Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
                 .Include(rv => rv.Updates);
         }
     }
