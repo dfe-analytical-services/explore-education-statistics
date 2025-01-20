@@ -140,9 +140,11 @@ public abstract class ReleaseServiceTests
                 Assert.Equal(TimeIdentifier.AcademicYear, actualRelease.TimePeriodCoverage);
                 Assert.Equal("2018-19-initial", actualRelease.Slug);
 
-                Assert.Equal(2018, actualReleaseVersion.Year);
+                // TODO EES-5659 - Remove the ReleaseVersion assertions on ReleaseName, TimePeriodCoverage, Slug
+                Assert.Equal("2018", actualReleaseVersion.ReleaseName);
                 Assert.Equal(TimeIdentifier.AcademicYear, actualReleaseVersion.TimePeriodCoverage);
                 Assert.Equal("2018-19-initial", actualReleaseVersion.Slug);
+
                 Assert.Equal(ReleaseType.OfficialStatistics, actualReleaseVersion.Type);
                 Assert.Equal(ReleaseApprovalStatus.Draft, actualReleaseVersion.ApprovalStatus);
                 Assert.Equal(0, actualReleaseVersion.Version);
@@ -938,9 +940,11 @@ public abstract class ReleaseServiceTests
                 Assert.Equal(release.TimePeriodCoverage, actualRelease.TimePeriodCoverage);
                 Assert.Equal(newReleaseSlug, actualRelease.Slug);
 
-                Assert.Equal(release.Year, actualReleaseVersion.Year);
+                // TODO EES-5659 - Remove the ReleaseVersion assertions on Year, TimePeriodCoverage, Slug
+                Assert.Equal(release.Year.ToString(), actualReleaseVersion.ReleaseName);
                 Assert.Equal(release.TimePeriodCoverage, actualReleaseVersion.TimePeriodCoverage);
                 Assert.Equal(newReleaseSlug, actualReleaseVersion.Slug);
+
                 Assert.Equal(releaseVersion.NextReleaseDate, actualReleaseVersion.NextReleaseDate);
                 Assert.Equal(updatedType, actualReleaseVersion.Type);
                 Assert.Equal("New access list", actualReleaseVersion.PreReleaseAccessList);
