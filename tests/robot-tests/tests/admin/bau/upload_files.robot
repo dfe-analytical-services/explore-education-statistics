@@ -39,13 +39,13 @@ Upload a ZIP file subject
 
     # To ensure "Data file size" and "Number of rows" will be filled
     user waits until page does not contain    Queued    %{WAIT_MEDIUM}
-    user checks table cell contains    row=1    column=1    expected=Absence in PRUs    parent=testid:Data files table
-    user checks table cell contains    row=1    column=2    expected=141 Kb    parent=testid:Data files table
-    user checks table cell contains    row=1    column=3    expected=Complete    parent=testid:Data files table
-    user checks table cell contains    row=1    column=4    expected=View details    parent=testid:Data files table
-    user checks table cell contains    row=1    column=4    expected=Edit title    parent=testid:Data files table
-    user checks table cell contains    row=1    column=4    expected=Replace data    parent=testid:Data files table
-    user checks table cell contains    row=1    column=4    expected=Delete files    parent=testid:Data files table
+    user checks table cell contains    1    1    Absence in PRUs    testid:Data files table
+    user checks table cell contains    1    2    141 Kb    testid:Data files table
+    user waits until table cell contains    1    3    Complete    testid:Data files table
+    user checks table cell contains    1    4    View details    testid:Data files table
+    user checks table cell contains    1    4    Edit title    testid:Data files table
+    user checks table cell contains    1    4    Replace data    testid:Data files table
+    user checks table cell contains    1    4    Delete files    testid:Data files table
 
 Change subject title
     user clicks link    Edit title
@@ -58,9 +58,7 @@ Change subject title
 
 Validate subject title has been updated
     user waits until h2 is visible    Uploaded data files
-
-    user checks table cell contains    row=1    column=1    expected=Updated Absence in PRUs
-    ...    parent=testid:Data files table
+    user checks table cell contains    1    1    Updated Absence in PRUs    testid:Data files table
 
 Check subject appears in 'Data blocks' page
     user clicks link    Data blocks

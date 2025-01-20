@@ -582,12 +582,10 @@ user uploads subject
     END
 
     user waits until page contains data uploads table
-    ${row}=    user gets table row    row_cell_text=${SUBJECT_NAME}    parent=testid:Data files table
-    ...    wait=%{WAIT_SMALL}
-    ${status_cell}=    user gets testid element    id=Status    wait=%{WAIT_SMALL}    parent=${row}
+    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_SMALL}
+    ${status_cell}=    user gets testid element    Status    %{WAIT_SMALL}    ${row}
     user scrolls to element    ${status_cell}
-    user waits until element contains    element=${status_cell}    text=${IMPORT_STATUS}
-    ...    wait=%{WAIT_DATA_FILE_IMPORT}
+    user waits until element contains    ${status_cell}    ${IMPORT_STATUS}    %{WAIT_DATA_FILE_IMPORT}
 
 user waits until data upload is completed
     [Arguments]

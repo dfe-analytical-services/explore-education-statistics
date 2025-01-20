@@ -394,10 +394,9 @@ Revisit the Release after the cancellation to double check it remains unaffected
 Verify that the Data and Files are unchanged
     user clicks link    Data and files
     user waits until page contains data uploads table
-    user checks table cell contains    row=1    column=1    expected=Dates test subject
-    ...    parent=testid:Data files table
-    user checks table cell contains    row=1    column=2    expected=17 Kb    parent=testid:Data files table
-    user checks table cell contains    row=1    column=3    expected=Complete    parent=testid:Data files table
+    user checks table cell contains    1    1    Dates test subject    testid:Data files table
+    user checks table cell contains    1    2    17 Kb    testid:Data files table
+    user checks table cell contains    1    3    Complete    testid:Data files table
 
 Verify that the ancillary file is unchanged
     user clicks link    Data and files
