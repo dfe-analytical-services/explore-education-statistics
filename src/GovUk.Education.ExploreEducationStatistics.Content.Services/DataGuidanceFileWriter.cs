@@ -75,11 +75,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             IList<DataGuidanceDataSetViewModel> dataSets)
         {
             // Add header information including publication/release title
-            await file.WriteLineAsync(releaseVersion.Publication.Title);
+            await file.WriteLineAsync(releaseVersion.Release.Publication.Title);
             await file.WriteLineAsync(
                 TimePeriodLabelFormatter.Format(
-                    releaseVersion.Year,
-                    releaseVersion.TimePeriodCoverage,
+                    releaseVersion.Release.Year,
+                    releaseVersion.Release.TimePeriodCoverage,
                     TimePeriodLabelFormat.FullLabel
                 )
             );
