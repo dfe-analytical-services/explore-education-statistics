@@ -63,52 +63,60 @@ const SubscriptionPage: NextPage<Props> = ({
         <meta name="robots" content="noindex,nofollow" />
         <meta name="googlebot" content="noindex,nofollow" />
       </Head>
-      <FormProvider
-        enableReinitialize
-        initialValues={{
-          email: '',
-        }}
-        validationSchema={Yup.object({
-          email: Yup.string()
-            .required('Email is required')
-            .email('Enter a valid email'),
-        })}
-      >
-        {({ formState }) => (
-          <LoadingSpinner
-            loading={formState.isSubmitting || formState.isLoading}
-          >
-            {!formState.isSubmitSuccessful ? (
-              <>
-                <p>Subscribe to receive updates when:</p>
-                <ul className="govuk-list govuk-list--bullet">
-                  <li>new statistics and data are released</li>
-                  <li>existing statistics and data are changed or corrected</li>
-                </ul>
+      <div role="status">
+        <FormProvider
+          enableReinitialize
+          initialValues={{
+            email: '',
+          }}
+          validationSchema={Yup.object({
+            email: Yup.string()
+              .required('Email is required')
+              .email('Enter a valid email'),
+          })}
+        >
+          {({ formState }) => (
+            <LoadingSpinner
+              loading={formState.isSubmitting || formState.isLoading}
+              alert
+              text="Subscribing"
+            >
+              {!formState.isSubmitSuccessful ? (
+                <>
+                  <p>Subscribe to receive updates when:</p>
+                  <ul className="govuk-list govuk-list--bullet">
+                    <li>new statistics and data are released</li>
+                    <li>
+                      existing statistics and data are changed or corrected
+                    </li>
+                  </ul>
 
-                <Form id="subscriptionForm" onSubmit={handleFormSubmit}>
-                  <FormFieldTextInput<FormValues>
-                    label="Enter your email address"
-                    hint="This will only be used to subscribe you to updates. You can unsubscribe at any time"
-                    name="email"
-                    width={20}
-                  />
+                  <Form id="subscriptionForm" onSubmit={handleFormSubmit}>
+                    <FormFieldTextInput<FormValues>
+                      label="Enter your email address"
+                      hint="This will only be used to subscribe you to updates. You can unsubscribe at any time"
+                      name="email"
+                      width={20}
+                    />
 
-                  <Button type="submit" disabled={formState.isSubmitting}>
-                    {formState.isSubmitting && formState.isValid
-                      ? 'Submitting'
-                      : 'Subscribe'}
-                  </Button>
-                </Form>
-              </>
-            ) : (
-              <Panel headingTag="h2" title="Subscribed">
-                <p>Thank you. Check your email to confirm your subscription.</p>
-              </Panel>
-            )}
-          </LoadingSpinner>
-        )}
-      </FormProvider>
+                    <Button type="submit" disabled={formState.isSubmitting}>
+                      {formState.isSubmitting && formState.isValid
+                        ? 'Submitting'
+                        : 'Subscribe'}
+                    </Button>
+                  </Form>
+                </>
+              ) : (
+                <Panel headingTag="h2" title="Subscribed">
+                  <p>
+                    Thank you. Check your email to confirm your subscription.
+                  </p>
+                </Panel>
+              )}
+            </LoadingSpinner>
+          )}
+        </FormProvider>
+      </div>
     </Page>
   );
 };

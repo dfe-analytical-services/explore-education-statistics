@@ -6,11 +6,21 @@ param resourceNames ResourceNames
 @description('Specifies the location for all resources.')
 param location string
 
+@description('Specifies a set of tags with which to tag the resource in Azure.')
+param tagValues object
+
 module applicationInsightsModule '../../components/appInsights.bicep' = {
   name: 'appInsightsDeploy'
   params: {
     location: location
     appInsightsName: resourceNames.publicApi.appInsights
+    alerts: {
+      exceptionCount: true
+      exceptionServerCount: true
+      failedRequests: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    }
+    tagValues: tagValues
   }
 }
 

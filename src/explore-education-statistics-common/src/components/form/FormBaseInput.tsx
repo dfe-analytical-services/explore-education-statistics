@@ -17,6 +17,7 @@ export interface FormBaseInputProps
   extends Pick<FormLabelProps, 'hideLabel' | 'label' | 'labelSize'> {
   addOn?: ReactNode;
   addOnContainerClassName?: string;
+  announceError?: boolean;
   className?: string;
   disabled?: boolean;
   error?: ReactNode | string;
@@ -44,6 +45,7 @@ interface HiddenProps {
 function FormBaseInput({
   addOn,
   addOnContainerClassName,
+  announceError,
   className,
   error,
   hint,
@@ -125,8 +127,11 @@ function FormBaseInput({
           {hint}
         </div>
       )}
-
-      {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
+      {(announceError || error) && (
+        <ErrorMessage announceError={announceError} id={`${id}-error`}>
+          {error}
+        </ErrorMessage>
+      )}
       {addOn ? (
         <div className={classNames('dfe-flex', addOnContainerClassName)}>
           {input}

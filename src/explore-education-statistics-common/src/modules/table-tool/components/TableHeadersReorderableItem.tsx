@@ -59,7 +59,7 @@ export default function TableHeadersReorderableItem({
         {...draggableProvided.dragHandleProps}
         className={classNames(styles.option, {
           [styles.isDragging]: draggableSnapshot.isDragging,
-          [styles.isSelected]: isSelected && isInActive,
+          [styles.isSelected]: isSelected,
           [styles.isGhosted]: isGhosted || isInActive,
           [styles.isDraggedOutside]:
             draggableSnapshot.isDragging && !draggableSnapshot.draggingOver,

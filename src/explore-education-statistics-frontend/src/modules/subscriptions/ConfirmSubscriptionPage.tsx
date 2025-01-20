@@ -65,24 +65,26 @@ const ConfirmSubscriptionPage: NextPage<Props> = ({
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      {confirmedSubscription ? (
-        <Panel headingTag="h2" title="Subscribed">
-          <p>You have successfully subscribed to these updates.</p>
-          <p>
-            <Link to={`/find-statistics/${confirmedSubscription.slug}`}>
-              View {publicationTitle}
-            </Link>
-          </p>
-        </Panel>
-      ) : (
-        <>
-          <p>
-            Please confirm you wish to subscribe to notifications about this
-            publication.
-          </p>
-          <Button onClick={onConfirmClicked}>Confirm</Button>
-        </>
-      )}
+      <div role="status">
+        {confirmedSubscription ? (
+          <Panel headingTag="h2" title="Subscribed">
+            <p>You have successfully subscribed to these updates.</p>
+            <p>
+              <Link to={`/find-statistics/${confirmedSubscription.slug}`}>
+                View {publicationTitle}
+              </Link>
+            </p>
+          </Panel>
+        ) : (
+          <>
+            <p>
+              Please confirm you wish to subscribe to notifications about this
+              publication.
+            </p>
+            <Button onClick={onConfirmClicked}>Confirm</Button>
+          </>
+        )}
+      </div>
     </Page>
   );
 };
