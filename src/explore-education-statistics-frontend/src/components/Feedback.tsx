@@ -31,7 +31,7 @@ export default function Feedback() {
   const handleUsefulFeedback = async () => {
     await feedbackService.sendFeedback({
       url: window.location.pathname,
-      userAgent: navigator.userAgent,
+      userAgent: navigator.userAgent.substring(0, 250),
       response: 'Useful',
     });
 
@@ -44,10 +44,14 @@ export default function Feedback() {
   };
 
   const handleSubmit = async (values: FeedbackRequest) => {
+    if (!response) {
+      throw new Error('Response has not been set');
+    }
+
     await feedbackService.sendFeedback({
       url: window.location.pathname,
-      userAgent: navigator.userAgent,
-      response: response as FeedbackResponse,
+      userAgent: navigator.userAgent.substring(0, 250),
+      response,
       context: values.context,
       issue: values.issue,
       intent: values.intent,
@@ -148,7 +152,7 @@ export default function Feedback() {
                     label="What were you doing?"
                     name="context"
                     rows={3}
-                    maxLength={2000}
+                    maxLength={feedbackLimit}
                   />
                 )}
 
@@ -157,7 +161,7 @@ export default function Feedback() {
                     label="What were you hoping to achieve?"
                     name="intent"
                     rows={3}
-                    maxLength={2000}
+                    maxLength={feedbackLimit}
                   />
                 )}
 
@@ -166,7 +170,7 @@ export default function Feedback() {
                     label="What went wrong?"
                     name="issue"
                     rows={3}
-                    maxLength={2000}
+                    maxLength={feedbackLimit}
                   />
                 )}
 

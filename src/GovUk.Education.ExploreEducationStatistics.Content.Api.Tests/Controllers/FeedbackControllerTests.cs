@@ -1,9 +1,10 @@
 #nullable enable
-using FluentValidation.TestHelper;
 using GovUk.Education.ExploreEducationStatistics.Common;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Net.Http.Json;
@@ -43,28 +44,32 @@ public class FeedbackControllerTests(TestApplicationFactory testApp) : Integrati
     }
 
     [Fact]
-    public async Task FeedbackCreateRequestValidator_InvalidFields_IncludesRelevantErrors()
+    public async Task CreateFeedback_ValidationFailure_ReturnsBadRequest()
     {
         // Arrange
-        var validator = new FeedbackCreateRequest.Validator();
+        var client = TestApp.CreateClient();
 
         var request = new FeedbackCreateRequest
         {
+            UserAgent = new string('a', 251),
             Response = (FeedbackResponse)5,
-            Context = new string('a', 2001),
-            Intent = new string('b', 2001),
-            Issue = new string('c', 2001),
+            Context = new string('b', 2001),
+            Intent = new string('c', 2001),
+            Issue = new string('d', 2001),
         };
 
         // Act
-        var result = await validator.TestValidateAsync(request);
+        var response = await client.PostAsync(BaseUrl, JsonContent.Create(request));
 
         // Assert
-        Assert.Equal(5, result.Errors.Count);
-        result.ShouldHaveValidationErrorFor(feedback => feedback.Url);
-        result.ShouldHaveValidationErrorFor(feedback => feedback.Response);
-        result.ShouldHaveValidationErrorFor(feedback => feedback.Context);
-        result.ShouldHaveValidationErrorFor(feedback => feedback.Intent);
-        result.ShouldHaveValidationErrorFor(feedback => feedback.Issue);
+        var validationProblems = response.AssertValidationProblem();
+        Assert.Equal(6, validationProblems.Errors.Count);
+
+        validationProblems.AssertHasNotEmptyError(nameof(FeedbackCreateRequest.Url).ToLowerFirst());
+        validationProblems.AssertHasMaximumLengthError(nameof(FeedbackCreateRequest.UserAgent).ToLowerFirst(), maxLength: 250);
+        validationProblems.AssertHasEnumError(nameof(FeedbackCreateRequest.Response).ToLowerFirst());
+        validationProblems.AssertHasMaximumLengthError(nameof(FeedbackCreateRequest.Context).ToLowerFirst(), maxLength: 2000);
+        validationProblems.AssertHasMaximumLengthError(nameof(FeedbackCreateRequest.Intent).ToLowerFirst(), maxLength: 2000);
+        validationProblems.AssertHasMaximumLengthError(nameof(FeedbackCreateRequest.Issue).ToLowerFirst(), maxLength: 2000);
     }
 }

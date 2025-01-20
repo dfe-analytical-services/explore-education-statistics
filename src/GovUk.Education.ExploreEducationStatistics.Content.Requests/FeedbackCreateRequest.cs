@@ -1,12 +1,11 @@
-#nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Requests;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Requests;
 
 public record FeedbackCreateRequest
 {
-    public string Url { get; set; } = null!;
+    public string Url { get; set; } = string.Empty;
 
     public string? UserAgent { get; set; }
 
@@ -24,6 +23,9 @@ public record FeedbackCreateRequest
         {
             RuleFor(request => request.Url)
                 .NotEmpty();
+
+            RuleFor(request => request.UserAgent)
+                .MaximumLength(250);
 
             RuleFor(request => request.Response)
                 .IsInEnum();
