@@ -14,7 +14,7 @@ describe('ReleaseTypesModal', () => {
   test('renders data symbols table text', () => {
     render(<DataSymbolsModal />);
     expect(
-      screen.queryByText('When an observation is not applicable'),
+      screen.queryByText('Suppressed to protect confidential information'),
     ).not.toBeInTheDocument();
   });
 });
