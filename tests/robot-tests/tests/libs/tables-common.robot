@@ -23,6 +23,11 @@ user checks table row heading contains
     user waits until element contains    xpath://table/tbody/tr[${row}]/th[${column}]    ${expected}
 
 user checks table cell contains
+    [Arguments]    ${row}    ${column}    ${expected}    ${parent}=css:table
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//tbody/tr[${row}]/td[${column}][contains(., "${expected}")]
+
+user waits until table cell contains
     [Arguments]    ${row}    ${column}    ${expected}    ${parent}=css:table    ${wait}=%{WAIT_SMALL}
     user waits until parent contains element    ${parent}
     ...    xpath:.//tbody/tr[${row}]/td[${column}][contains(., "${expected}")]

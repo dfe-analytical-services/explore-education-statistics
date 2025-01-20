@@ -49,22 +49,22 @@ Upload subjects to release
 
 Validate order of subjects after upload
     user waits until page contains data uploads table
-    user checks table body has x rows    count=4    parent=testid:Data files table
+    user checks table body has x rows    4    testid:Data files table
 
-    user checks table cell contains    row=1    column=1    expected=Four    parent=testid:Data files table
-    user checks table cell contains    row=2    column=1    expected=Three    parent=testid:Data files table
-    user checks table cell contains    row=3    column=1    expected=One    parent=testid:Data files table
-    user checks table cell contains    row=4    column=1    expected=Two    parent=testid:Data files table
+    user checks table cell contains    1    1    Four    testid:Data files table
+    user checks table cell contains    2    1    Three    testid:Data files table
+    user checks table cell contains    3    1    One    testid:Data files table
+    user checks table cell contains    4    1    Two    testid:Data files table
 
 Validate order of subjects after refreshing Data and files page
     user reloads page
     user waits until page contains data uploads table
-    user checks table body has x rows    count=4    parent=testid:Data files table
+    user checks table body has x rows    4    testid:Data files table
 
-    user checks table cell contains    row=1    column=1    expected=Four    parent=testid:Data files table
-    user checks table cell contains    row=2    column=1    expected=Three    parent=testid:Data files table
-    user checks table cell contains    row=3    column=1    expected=One    parent=testid:Data files table
-    user checks table cell contains    row=4    column=1    expected=Two    parent=testid:Data files table
+    user checks table cell contains    1    1    Four    testid:Data files table
+    user checks table cell contains    2    1    Three    testid:Data files table
+    user checks table cell contains    3    1    One    testid:Data files table
+    user checks table cell contains    4    1    Two    testid:Data files table
 
 Order subjects
     user clicks button    Reorder data files
@@ -87,22 +87,22 @@ Order subjects
     user clicks button    Confirm order
     user waits until page contains button    Reorder
 
-    user checks table cell contains    row=1    column=1    expected=One    parent=testid:Data files table
-    user checks table cell contains    row=2    column=1    expected=Two    parent=testid:Data files table
-    user checks table cell contains    row=3    column=1    expected=Four    parent=testid:Data files table
-    user checks table cell contains    row=4    column=1    expected=Three    parent=testid:Data files table
+    user checks table cell contains    1    1    One    testid:Data files table
+    user checks table cell contains    2    1    Two    testid:Data files table
+    user checks table cell contains    3    1    Four    testid:Data files table
+    user checks table cell contains    4    1    Three    testid:Data files table
 
 Validate new order is preserved after refresh
     user reloads page
     user waits until page contains data uploads table
 
-    user checks table cell contains    row=1    column=1    expected=One    parent=testid:Data files table
-    user checks table cell contains    row=2    column=1    expected=Two    parent=testid:Data files table
-    user checks table cell contains    row=3    column=1    expected=Four    parent=testid:Data files table
-    user checks table cell contains    row=4    column=1    expected=Three    parent=testid:Data files table
+    user checks table cell contains    1    1    One    testid:Data files table
+    user checks table cell contains    2    1    Two    testid:Data files table
+    user checks table cell contains    3    1    Four    testid:Data files table
+    user checks table cell contains    4    1    Three    testid:Data files table
 
 Start replacing last subject in order
-    user clicks link in table cell    row=4    column=4    link_text=Replace data    parent=testid:Data files table
+    user clicks link in table cell    4    4    Replace data    testid:Data files table
     user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}ordering-test-3-replacement.csv
     user chooses file    id:dataFileUploadForm-metadataFile
     ...    ${FILES_DIR}ordering-test-3-replacement.meta.csv
@@ -130,13 +130,13 @@ Reorder subject that is being replaced
     user clicks button    Confirm order
     user waits until page contains button    Reorder data files
 
-    user checks table cell contains    row=1    column=1    expected=One    parent=testid:Data files table
-    user checks table cell contains    row=2    column=1    expected=Two    parent=testid:Data files table
-    user checks table cell contains    row=3    column=1    expected=Three    parent=testid:Data files table
-    user checks table cell contains    row=4    column=1    expected=Four    parent=testid:Data files table
+    user checks table cell contains    1    1    One    testid:Data files table
+    user checks table cell contains    2    1    Two    testid:Data files table
+    user checks table cell contains    3    1    Three    testid:Data files table
+    user checks table cell contains    4    1    Four    testid:Data files table
 
 Complete data replacement
-    user clicks link in table cell    row=3    column=4    link_text=Replace data    parent=testid:Data files table
+    user clicks link in table cell    3    4    Replace data    testid:Data files table
 
     user waits until page contains    Data blocks: OK
     user waits until page contains    Footnotes: OK
@@ -147,10 +147,10 @@ Validate subject order is correct after replacement
     user clicks link    Data and files
     user waits until page contains data uploads table
 
-    user checks table cell contains    row=1    column=1    expected=One    parent=testid:Data files table
-    user checks table cell contains    row=2    column=1    expected=Two    parent=testid:Data files table
-    user checks table cell contains    row=3    column=1    expected=Three    parent=testid:Data files table
-    user checks table cell contains    row=4    column=1    expected=Four    parent=testid:Data files table
+    user checks table cell contains    1    1    One    testid:Data files table
+    user checks table cell contains    2    1    Two    testid:Data files table
+    user checks table cell contains    3    1    Three    testid:Data files table
+    user checks table cell contains    4    1    Four    testid:Data files table
 
 Add data guidance for all subjects
     user clicks link    Data guidance
@@ -188,10 +188,10 @@ Check subjects can no longer be re-ordered after release has been published
     user clicks link    Data and files
     user waits until page contains data uploads table
 
-    user checks table cell contains    row=1    column=1    expected=One    parent=testid:Data files table
-    user checks table cell contains    row=2    column=1    expected=Two    parent=testid:Data files table
-    user checks table cell contains    row=3    column=1    expected=Three    parent=testid:Data files table
-    user checks table cell contains    row=4    column=1    expected=Four    parent=testid:Data files table
+    user checks table cell contains    1    1    One    testid:Data files table
+    user checks table cell contains    2    1    Two    testid:Data files table
+    user checks table cell contains    3    1    Three    testid:Data files table
+    user checks table cell contains    4    1    Four    testid:Data files table
 
     user checks element is not visible    testid:reorder-files    %{WAIT_SMALL}
 
