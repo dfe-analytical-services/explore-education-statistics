@@ -64,10 +64,14 @@ user gets table row with heading
     [Return]    ${elem}
 
 user gets table row
-    [Arguments]    ${row_cell_text}    ${parent}=css:table    ${wait}=%{WAIT_SMALL}
-    wait until page contains element    ${parent}    timeout=${wait}
+    [Arguments]    ${row_cell_text}    ${parent}=css:table
     ${elem}=    get child element    ${parent}    xpath:.//tbody/tr/td[text()="${row_cell_text}"]/..
     [Return]    ${elem}
+
+user waits until table contains row with
+    [Arguments]    ${row_cell_text}    ${parent}=css:table    ${wait}=%{WAIT_SMALL}
+    wait until page contains element    ${parent}    timeout=${wait}
+    get child element    ${parent}    xpath:.//tbody/tr/td[text()="${row_cell_text}"]/..
 
 user checks table body has x rows
     [Arguments]    ${count}    ${parent}=css:table    ${wait}=${timeout}
