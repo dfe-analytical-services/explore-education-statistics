@@ -142,7 +142,7 @@ const ImporterStatus = ({
           }
         >
           {dataFile.replacedBy
-            ? 'Data replacement in progress'
+            ? 'Replacement in progress'
             : getImportStatusLabel(currentStatus.status)}
         </Tag>
 

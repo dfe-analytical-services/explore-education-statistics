@@ -39,13 +39,11 @@ const DataFileDetailsTable = ({
       <tbody>
         <tr>
           <th scope="row" className="govuk-!-width-one-third">
-            Subject title
+            Title
           </th>
-          <td data-testid="Subject title">{dataFile.title}</td>
+          <td data-testid="Title">{dataFile.title}</td>
           {replacementDataFile && (
-            <td data-testid="Replacement Subject title">
-              {replacementDataFile.title}
-            </td>
+            <td data-testid="Replacement Title">{replacementDataFile.title}</td>
           )}
         </tr>
         <tr>

@@ -28,7 +28,7 @@ Navigate to 'Data and files' page
 
 Upload a ZIP file subject
     [Documentation]    EES-1397
-    user enters text into element    label:Subject title    Absence in PRUs
+    user enters text into element    label:Title    Absence in PRUs
     user clicks radio    ZIP file
     user waits until page contains element    label:Upload ZIP file
     user chooses file    label:Upload ZIP file    ${FILES_DIR}upload-zip-test.zip

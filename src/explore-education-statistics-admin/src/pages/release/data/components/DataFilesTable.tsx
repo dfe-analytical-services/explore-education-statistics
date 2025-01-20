@@ -40,7 +40,7 @@ interface Props {
   ) => Promise<void>;
 }
 
-const DataFilesTable = ({
+export default function DataFilesTable({
   dataFiles: initialDataFiles,
   publicationId,
   releaseId,
@@ -50,7 +50,7 @@ const DataFilesTable = ({
   onConfirmReordering,
   onDeleteFile,
   onStatusChange,
-}: Props) => {
+}: Props) {
   const [dataFiles, setDataFiles] = useState(initialDataFiles);
 
   useEffect(() => {
@@ -86,7 +86,7 @@ const DataFilesTable = ({
     <table className={styles.table} data-testid="Data files table">
       <thead>
         <tr>
-          <th scope="col">Subject title</th>
+          <th scope="col">Title</th>
           <th scope="col">Size</th>
           <th scope="col">Status</th>
           <th scope="col">Actions</th>
@@ -96,7 +96,9 @@ const DataFilesTable = ({
       <tbody>
         {dataFiles.map(dataFile => (
           <tr key={dataFile.title}>
-            <td data-testid="Subject title">{dataFile.title}</td>
+            <td data-testid="Title" className={styles.title}>
+              {dataFile.title}
+            </td>
             <td data-testid="Data file size" className={styles.fileSize}>
               {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
             </td>
@@ -234,6 +236,4 @@ const DataFilesTable = ({
       </tbody>
     </table>
   );
-};
-
-export default DataFilesTable;
+}

@@ -2,21 +2,35 @@
 
 .table {
   td {
-    padding-bottom: govuk-spacing(2);
-    padding-top: govuk-spacing(2);
     vertical-align: middle;
   }
+}
 
-  .fileSize {
-    width: 5rem;
-    text-align: right;
-  }
+.title {
+  max-width: 500px;
+}
 
-  .fileStatus {
-    max-width: 164px;
-  }
+.fileSize {
+  width: 5rem;
+  text-align: right;
+}
 
-  .actions {
-    margin-bottom: 0;
+.fileStatus {
+  max-width: 126px;
+}
+
+.actions {
+  margin-bottom: 0;
+
+  @include govuk-media-query($until: desktop) {
+    align-items: start;
+    flex-direction: column;
+
+    a,
+    button {
+      margin-bottom: 1rem;
+      margin-left: 0;
+      white-space: nowrap;
+    }
   }
 }
