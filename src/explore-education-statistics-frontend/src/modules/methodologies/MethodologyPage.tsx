@@ -114,11 +114,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                   {data.publications.map(publication => (
                     <li key={publication.id}>
                       <Link
-                        to={
-                          publication.releaseSlug
-                            ? `/find-statistics/${publication.slug}/${publication.releaseSlug}`
-                            : `/find-statistics/${publication.slug}`
-                        }
+                        to={`/find-statistics/${publication.slug}/${publication.releaseSlug}`}
                       >
                         {publication.title}
                       </Link>{' '}

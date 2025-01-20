@@ -17,15 +17,7 @@ const PublicationSummary = ({ publication }: Props) => {
   return (
     <li className={`${styles.container} govuk-!-margin-top-4`}>
       <h3 className="govuk-!-margin-bottom-2">
-        <Link
-          to={
-            publication.releaseSlug
-              ? `/find-statistics/${slug}/${releaseSlug}`
-              : `/find-statistics/${slug}`
-          }
-        >
-          {title}
-        </Link>
+        <Link to={`/find-statistics/${slug}/${releaseSlug}`}>{title}</Link>
       </h3>
       <p>{summary}</p>
 

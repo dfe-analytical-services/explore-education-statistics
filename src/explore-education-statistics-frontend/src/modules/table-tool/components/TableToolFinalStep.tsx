@@ -184,22 +184,11 @@ const TableToolFinalStep = ({
         contactDetails={publication?.contact}
         methodologyLinks={getMethodologyLinks()}
         releaseLink={
-          <>
-            {selectedPublication.selectedRelease.slug &&
-            selectedPublication.latestRelease ? (
-              <Link
-                to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
-              >
-                {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
-              </Link>
-            ) : (
-              <Link
-                to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
-              >
-                {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
-              </Link>
-            )}
-          </>
+          <Link
+            to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
+          >
+            {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
+          </Link>
         }
         releaseType={selectedPublication.selectedRelease.type}
       />

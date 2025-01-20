@@ -44,7 +44,7 @@ export interface ReleaseSeriesItem {
 export interface PublicationSummary {
   id: string;
   slug: string;
-  releaseSlug?: string;
+  releaseSlug: string;
   title: string;
   owner: boolean;
   contact: Contact;
@@ -55,7 +55,7 @@ export interface PublicationListSummary {
   published: Date;
   rank: number;
   slug: string;
-  releaseSlug?: string;
+  releaseSlug: string;
   summary?: string;
   theme: string;
   title: string;
