@@ -147,6 +147,7 @@ public class DataSetFileService(
                 LastUpdated = result.Value.Published!.Value,
                 Api = BuildDataSetFileApiViewModel(result.Value),
                 Meta = BuildDataSetFileMetaViewModel(
+                    result.Value.File.SubjectId,
                     includeGeographicLevels
                         ? result.Value.File.DataSetFileVersionGeographicLevels
                         : new List<DataSetFileVersionGeographicLevel>(),
@@ -249,6 +250,7 @@ public class DataSetFileService(
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
                 Meta = BuildDataSetFileMetaViewModel(
+                    releaseFile.File.SubjectId,
                     releaseFile.File.DataSetFileVersionGeographicLevels,
                     releaseFile.File.DataSetFileMeta,
                     releaseFile.FilterSequence,
@@ -292,6 +294,7 @@ public class DataSetFileService(
     }
 
     private static DataSetFileMetaViewModel BuildDataSetFileMetaViewModel(
+        Guid? subjectId,
         List<DataSetFileVersionGeographicLevel> dataSetFileVersionGeographicLevels,
         DataSetFileMeta? meta,
         List<FilterSequenceEntry>? filterSequence,
@@ -299,7 +302,7 @@ public class DataSetFileService(
     {
         if (meta == null)
         {
-            throw new InvalidDataException("DataSetMeta should not be null");
+            throw new InvalidDataException($"DataSetMeta should not be null. SubjectId: {subjectId}");
         }
 
         return new DataSetFileMetaViewModel
