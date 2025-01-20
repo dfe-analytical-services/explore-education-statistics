@@ -497,7 +497,7 @@ Navigate to data replacement page
     user clicks link    Replace data
 
     user waits until h2 is visible    Data file details
-    user checks headed table body row contains    Subject title    Dates test subject
+    user checks headed table body row contains    Title    Dates test subject
     user checks headed table body row contains    Data file    dates.csv
     user checks headed table body row contains    Metadata file    dates.meta.csv
     user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
@@ -510,18 +510,18 @@ Upload replacement data
     user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
     user clicks button    Upload data files
 
-    user waits until page contains element    testid:Replacement Subject title
+    user waits until page contains element    testid:Replacement Title
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
 
-    user checks headed table body row cell contains    Subject title    1    Dates test subject
+    user checks headed table body row cell contains    Title    1    Dates test subject
     user checks headed table body row cell contains    Data file    1    dates.csv
     user checks headed table body row cell contains    Metadata file    1    dates.meta.csv
     user checks headed table body row cell contains    Number of rows    1    118    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    1    Data replacement in progress    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Status    1    Replacement in progress    wait=%{WAIT_LONG}
 
-    user checks headed table body row cell contains    Subject title    2    Dates test subject
+    user checks headed table body row cell contains    Title    2    Dates test subject
     user checks headed table body row cell contains    Data file    2    dates-replacement.csv
     user checks headed table body row cell contains    Metadata file    2    dates-replacement.meta.csv
     user checks headed table body row cell contains    Number of rows    2    118    wait=%{WAIT_SMALL}

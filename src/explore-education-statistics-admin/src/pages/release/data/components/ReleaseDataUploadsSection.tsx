@@ -117,16 +117,14 @@ const ReleaseDataUploadsSection = ({
     );
   };
 
-  const handleDeleteFile = async (dataFile: DataFile) => {
-    releaseDataFileService
-      .getDeleteDataFilePlan(releaseId, dataFile)
-      .then(plan => {
-        setDeleteDataFile({
-          plan,
-          file: dataFile,
-        });
-      });
-  };
+  const handleDeleteFile = async (dataFile: DataFile) =>
+    setDeleteDataFile({
+      plan: await releaseDataFileService.getDeleteDataFilePlan(
+        releaseId,
+        dataFile,
+      ),
+      file: dataFile,
+    });
 
   const handleSubmit = useCallback(
     async (values: DataFileUploadFormValues) => {

@@ -35,9 +35,9 @@ const subjectErrorMappings = [
   mapFieldErrors<DataFileUploadFormValues>({
     target: 'subjectTitle',
     messages: {
-      SubjectTitleMustBeUnique: 'Subject title must be unique',
+      SubjectTitleMustBeUnique: 'Title must be unique',
       SubjectTitleCannotContainSpecialCharacters:
-        'Subject title cannot contain special characters',
+        'Title cannot contain special characters',
     },
   }),
 ];
@@ -200,7 +200,7 @@ export default function DataFileUploadForm({
               })
               .max(
                 titleMaxLength,
-                `Subject title must be ${titleMaxLength} characters or less`,
+                `Title must be ${titleMaxLength} characters or less`,
               ),
         }),
       });
@@ -239,7 +239,7 @@ export default function DataFileUploadForm({
               {!isDataReplacement && uploadType !== 'bulkZip' && (
                 <FormFieldTextInput<DataFileUploadFormValues>
                   name="subjectTitle"
-                  label="Subject title"
+                  label="Title"
                   className="govuk-!-width-two-thirds"
                   maxLength={titleMaxLength}
                 />

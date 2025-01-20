@@ -150,9 +150,7 @@ describe('ReleaseDataUploadsSection', () => {
     const fileTableRows = screen.getAllByRole('row');
     const fileTableRow1 = within(fileTableRows[1]);
 
-    expect(fileTableRow1.getByTestId('Subject title')).toHaveTextContent(
-      'Test data 1',
-    );
+    expect(fileTableRow1.getByTestId('Title')).toHaveTextContent('Test data 1');
     expect(fileTableRow1.getByTestId('Data file size')).toHaveTextContent(
       '50 Kb',
     );
@@ -160,9 +158,7 @@ describe('ReleaseDataUploadsSection', () => {
 
     const fileTableRow2 = within(fileTableRows[2]);
 
-    expect(fileTableRow2.getByTestId('Subject title')).toHaveTextContent(
-      'Test data 2',
-    );
+    expect(fileTableRow2.getByTestId('Title')).toHaveTextContent('Test data 2');
 
     expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
   });
@@ -198,12 +194,10 @@ describe('ReleaseDataUploadsSection', () => {
 
     const fileTableRow1 = getTableRow(1);
 
-    expect(fileTableRow1.getByTestId('Subject title')).toHaveTextContent(
-      'Test data 1',
-    );
+    expect(fileTableRow1.getByTestId('Title')).toHaveTextContent('Test data 1');
 
     expect(fileTableRow1.getByTestId('Status')).toHaveTextContent(
-      'Data replacement in progress',
+      'Replacement in progress',
     );
   });
 
@@ -427,7 +421,7 @@ describe('ReleaseDataUploadsSection', () => {
         expect(screen.getAllByRole('row')).toHaveLength(2);
       });
 
-      expect(getTableRow(1).getByTestId('Subject title')).toHaveTextContent(
+      expect(getTableRow(1).getByTestId('Title')).toHaveTextContent(
         'Test data 1',
       );
     });
@@ -647,7 +641,7 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await user.type(screen.getByLabelText('Subject title'), 'Test data 1');
+      await user.type(screen.getByLabelText('Title'), 'Test data 1');
 
       await user.click(
         screen.getByRole('button', {
@@ -655,7 +649,7 @@ describe('ReleaseDataUploadsSection', () => {
         }),
       );
 
-      await user.click(screen.getByLabelText('Subject title'));
+      await user.click(screen.getByLabelText('Title'));
 
       await waitFor(() => {
         expect(
@@ -809,7 +803,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      await user.type(screen.getByLabelText('Subject title'), 'Test title');
+      await user.type(screen.getByLabelText('Title'), 'Test title');
 
       await user.upload(screen.getByLabelText('Upload data file'), dataFile);
       await user.upload(
@@ -860,7 +854,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      await user.type(screen.getByLabelText('Subject title'), 'Test zip title');
+      await user.type(screen.getByLabelText('Title'), 'Test zip title');
 
       await user.click(screen.getByLabelText('ZIP file'));
 
@@ -1002,7 +996,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      await user.type(screen.getByLabelText('Subject title'), 'Test title');
+      await user.type(screen.getByLabelText('Title'), 'Test title');
 
       await user.upload(screen.getByLabelText('Upload data file'), dataFile);
       await user.upload(
@@ -1082,7 +1076,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      await user.type(screen.getByLabelText('Subject title'), 'Test title');
+      await user.type(screen.getByLabelText('Title'), 'Test title');
 
       await user.click(screen.getByLabelText('ZIP file'));
 

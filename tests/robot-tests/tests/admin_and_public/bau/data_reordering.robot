@@ -230,18 +230,18 @@ Replace subject data
     ...    ${FILES_DIR}grouped-filters-and-indicators-replacement.meta.csv
     user clicks button    Upload data files
 
-    user waits until page contains element    testid:Replacement Subject title
+    user waits until page contains element    testid:Replacement Title
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
 
-    user checks headed table body row cell contains    Subject title    1    ${SUBJECT_NAME}
+    user checks headed table body row cell contains    Title    1    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    1    grouped-filters-and-indicators.csv
     user checks headed table body row cell contains    Metadata file    1    grouped-filters-and-indicators.meta.csv
     user checks headed table body row cell contains    Number of rows    1    100    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    13 Kb
-    user checks headed table body row cell contains    Status    1    Data replacement in progress    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Status    1    Replacement in progress    wait=%{WAIT_LONG}
 
-    user checks headed table body row cell contains    Subject title    2    ${SUBJECT_NAME}
+    user checks headed table body row cell contains    Title    2    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    2    grouped-filters-and-indicators-replacement.csv
     user checks headed table body row cell contains    Metadata file    2
     ...    grouped-filters-and-indicators-replacement.meta.csv

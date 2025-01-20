@@ -108,10 +108,10 @@ Start replacing last subject in order
     ...    ${FILES_DIR}ordering-test-3-replacement.meta.csv
     user clicks button    Upload data files
 
-    user waits until page contains element    testid:Replacement Subject title
-    user checks headed table body row cell contains    Subject title    1    Three
+    user waits until page contains element    testid:Replacement Title
+    user checks headed table body row cell contains    Title    1    Three
     user checks headed table body row cell contains    Data file    1    ordering-test-3.csv
-    user checks headed table body row cell contains    Subject title    2    Three
+    user checks headed table body row cell contains    Title    2    Three
     user checks headed table body row cell contains    Data file    2    ordering-test-3-replacement.csv
     user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
 

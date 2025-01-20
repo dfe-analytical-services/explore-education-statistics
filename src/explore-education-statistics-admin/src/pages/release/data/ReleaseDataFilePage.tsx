@@ -82,7 +82,7 @@ export default function ReleaseDataFilePage({
                   .required('Enter a title')
                   .max(
                     titleMaxLength,
-                    `Subject title must be ${titleMaxLength} characters or less`,
+                    `Title must be ${titleMaxLength} characters or less`,
                   ),
               })}
             >
