@@ -582,7 +582,8 @@ user uploads subject
     END
 
     user waits until page contains data uploads table
-    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_SMALL}
+    user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_SMALL}
+    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
     ${status_cell}=    user gets testid element    Status    %{WAIT_SMALL}    ${row}
     user scrolls to element    ${status_cell}
     user waits until element contains    ${status_cell}    ${IMPORT_STATUS}    %{WAIT_DATA_FILE_IMPORT}
@@ -597,13 +598,15 @@ user waits until data upload is completed
 user waits until data files table contains subject
     [Arguments]
     ...    ${SUBJECT_NAME}
-    user gets table row    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_DATA_FILE_IMPORT}
+    user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_DATA_FILE_IMPORT}
+    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
 
 user waits until data file import is complete
     [Arguments]
     ...    ${SUBJECT_NAME}
     user waits until page contains data uploads table
-    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_DATA_FILE_IMPORT}
+    user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_DATA_FILE_IMPORT}
+    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
     user waits until element contains    ${row}    Complete
 
 user waits until page contains data uploads table
