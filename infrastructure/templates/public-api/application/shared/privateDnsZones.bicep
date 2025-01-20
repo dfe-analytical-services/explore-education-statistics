@@ -37,11 +37,32 @@ module fileServicePrivateDnsZoneModule '../../components/privateDnsZone.bicep' =
   }
 }
 
-output postgreSqlPrivateDnsZoneId string = postgreSqlPrivateDnsZoneModule.outputs.privateDnsZoneId
-output postgreSqlPrivateDnsZoneName string = postgreSqlPrivateDnsZoneModule.outputs.privateDnsZoneName
+// Set up a Private DNS zone for handling private endpoints for Storage Account Blob Storage.
+module blobStoragePrivateDnsZoneModule '../../components/privateDnsZone.bicep' = {
+  name: 'blobStoragePrivateDnsZoneDeploy'
+  params: {
+    zoneType: 'blobStorage'
+    vnetName: resourceNames.existingResources.vNet
+    tagValues: tagValues
+  }
+}
 
-output sitesPrivateDnsZoneId string = sitesPrivateDnsZoneModule.outputs.privateDnsZoneId
-output sitesPrivateDnsZoneName string = sitesPrivateDnsZoneModule.outputs.privateDnsZoneName
+// Set up a Private DNS zone for handling private endpoints for Storage Account Queues.
+module queuePrivateDnsZoneModule '../../components/privateDnsZone.bicep' = {
+  name: 'queuePrivateDnsZoneDeploy'
+  params: {
+    zoneType: 'queue'
+    vnetName: resourceNames.existingResources.vNet
+    tagValues: tagValues
+  }
+}
 
-output fileServicePrivateDnsZoneId string = fileServicePrivateDnsZoneModule.outputs.privateDnsZoneId
-output fileServicePrivateDnsZoneName string = fileServicePrivateDnsZoneModule.outputs.privateDnsZoneName
+// Set up a Private DNS zone for handling private endpoints for Storage Account Table Storage.
+module tableStoragePrivateDnsZoneModule '../../components/privateDnsZone.bicep' = {
+  name: 'tableStoragePrivateDnsZoneDeploy'
+  params: {
+    zoneType: 'tableStorage'
+    vnetName: resourceNames.existingResources.vNet
+    tagValues: tagValues
+  }
+}

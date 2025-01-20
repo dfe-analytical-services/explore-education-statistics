@@ -236,13 +236,6 @@ type PrincipalNameAndId = {
 }
 
 @export()
-type PrivateDnsZone = 
-  | 'fileService'
-  | 'postgres'
-  | 'sites'
-  | 'custom'
-
-@export()
 type ContainerRegistryRole = 'AcrPull'
 
 @export()
@@ -270,8 +263,47 @@ type ContainerAppWorkloadProfile = {
 }
 
 @export()
-var dnsZoneNames = {
-  sites: 'privatelink.azurewebsites.net'
-  postgres: 'privatelink.postgres.database.azure.com'
-  fileService: 'privatelink.file.core.windows.net'
+type PrivateDnsZone = 
+  | 'fileService'
+  | 'blobStorage'
+  | 'queue'
+  | 'tableStorage'
+  | 'postgres'
+  | 'sites'
+  | 'custom'
+
+@export()
+var dnsZones = {
+  sites: {
+    zoneName: 'privatelink.azurewebsites.net'
+    dnsGroup: 'sites'
+  }
+  postgres: {
+    zoneName: 'privatelink.postgres.database.azure.com'
+    dnsGroup: 'postgresqlServer'
+  }
+  fileService: {
+    zoneName: 'privatelink.file.${environment().suffixes.storage}'
+    dnsGroup: 'file'
+  }
+  blobStorage: {
+    zoneName: 'privatelink.blob.${environment().suffixes.storage}'
+    dnsGroup: 'blob'
+  }
+  queue: {
+    zoneName: 'privatelink.queue.${environment().suffixes.storage}'
+    dnsGroup: 'queue'
+  }
+  tableStorage: {
+    zoneName: 'privatelink.table.${environment().suffixes.storage}'
+    dnsGroup: 'table'
+  }
+}
+
+@export()
+type StorageAccountPrivateEndpoints = {
+  file: string?
+  blob: string?
+  queue: string?
+  table: string?
 }

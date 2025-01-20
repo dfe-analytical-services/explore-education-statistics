@@ -32,7 +32,7 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
   params: {
     location: location
     storageAccountName: resourceNames.publicApi.publicApiStorageAccount
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccessEnabled: false
     firewallRules: storageFirewallRules
     skuStorageResource: 'Standard_LRS'
     keyVaultName: resourceNames.existingResources.keyVault
