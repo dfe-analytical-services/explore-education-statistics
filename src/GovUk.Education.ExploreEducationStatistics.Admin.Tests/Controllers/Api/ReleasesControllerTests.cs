@@ -28,33 +28,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
 public class ReleasesControllerUnitTests
 {
-    private readonly Guid _releaseVersionId = Guid.NewGuid();
-    private readonly Guid _publicationId = Guid.NewGuid();
-
     [Fact]
     public async Task Create_Release_Returns_Ok()
     {
         var returnedViewModel = new ReleaseVersionViewModel();
 
-        var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
+        var releaseService = new Mock<IReleaseService>(Strict);
 
-        releaseVersionService
+        releaseService
             .Setup(s => s.CreateRelease(It.IsAny<ReleaseCreateRequest>()))
             .ReturnsAsync(returnedViewModel);
 
-        var controller = BuildController(releaseVersionService.Object);
+        var controller = BuildController(releaseService.Object);
 
         var result = await controller.CreateRelease(new ReleaseCreateRequest());
-        VerifyAllMocks(releaseVersionService);
+        VerifyAllMocks(releaseService);
 
         result.AssertOkResult(returnedViewModel);
     }
 
     private static ReleasesController BuildController(
-        IReleaseVersionService? releaseVersionService = null)
+        IReleaseService? releaseService = null)
     {
         return new ReleasesController(
-            releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict));
+            releaseService ?? Mock.Of<IReleaseService>(Strict));
     }
 }
 
