@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -59,13 +60,22 @@ public abstract class ReleaseServiceTests
                 await context.SaveChangesAsync();
             }
 
-            Guid? newReleaseVersionId;
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>();
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(
+                    contentDbContext: context, 
+                    releaseVersionService: releaseVersionServiceMock.Object);
 
-                var result = (await releaseService.CreateRelease(
+                var result = await releaseService.CreateRelease(
                     new ReleaseCreateRequest
                     {
                         PublicationId = publication.Id,
@@ -73,27 +83,10 @@ public abstract class ReleaseServiceTests
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         Type = ReleaseType.OfficialStatistics,
                         Label = "initial"
-                    }
-                )).AssertRight();
-                newReleaseVersionId = result.Id;
+                    });
 
-                Assert.Equal("2018-19-initial", result.Slug);
-                Assert.Equal("Academic year 2018/19 initial", result.Title);
-                Assert.Equal("2018/19", result.YearTitle);
-                Assert.Equal("initial", result.Label);
-                Assert.Equal(0, result.Version);
-                Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
-                Assert.Equal(ReleaseType.OfficialStatistics, result.Type);
-                Assert.Equal(ReleaseApprovalStatus.Draft, result.ApprovalStatus);
-
-                Assert.False(result.Amendment);
-                Assert.False(result.LatestRelease); // Most recent - but not published yet.
-                Assert.False(result.Live);
-                Assert.Null(result.NextReleaseDate);
-                Assert.Null(result.PublishScheduled);
-                Assert.Null(result.Published);
-                Assert.False(result.NotifySubscribers);
-                Assert.False(result.UpdatePublishedDate);
+                var viewModel = result.AssertRight();
+                Assert.Equal(releaseVersionViewModel, viewModel);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -201,11 +194,20 @@ public abstract class ReleaseServiceTests
                 await context.SaveChangesAsync();
             }
 
-            Guid? newReleaseVersionId;
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>();
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(context);
+                var releaseService = BuildReleaseService(
+                    contentDbContext: context, 
+                    releaseVersionService: releaseVersionServiceMock.Object);
 
                 var result = await releaseService.CreateRelease(
                     new ReleaseCreateRequest
@@ -218,8 +220,8 @@ public abstract class ReleaseServiceTests
                     }
                 );
 
-                var newReleaseVersion = result.AssertRight();
-                newReleaseVersionId = newReleaseVersion.Id;
+                var viewModel = result.AssertRight();
+                Assert.Equal(releaseVersionViewModel, viewModel);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
