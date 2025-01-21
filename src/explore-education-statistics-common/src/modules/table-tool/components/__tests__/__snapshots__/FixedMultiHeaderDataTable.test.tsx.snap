@@ -52,6 +52,22 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
       </tbody>
     </table>
   </div>
+  <p>
+    <button aria-disabled="false"
+            type="button"
+            class="button"
+    >
+      Data symbols
+      <span class="infoIcon"
+            aria-hidden="true"
+      >
+        ?
+      </span>
+      <span class="govuk-visually-hidden">
+        Data symbols guide
+      </span>
+    </button>
+  </p>
   <div>
   </div>
 </figure>
