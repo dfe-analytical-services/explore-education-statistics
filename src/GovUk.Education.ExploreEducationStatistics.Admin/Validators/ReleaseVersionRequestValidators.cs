@@ -7,11 +7,11 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 
-public static class ReleaseCreateRequestValidator
+public static class ReleaseVersionUpdateRequestValidator
 {
-    public static Either<ActionResult, Unit> Validate(ReleaseCreateRequest releaseCreateRequest)
+    public static Either<ActionResult, Unit> Validate(ReleaseVersionUpdateRequest releaseVersionUpdateRequest)
     {
-        if (releaseCreateRequest.Type == ReleaseType.ExperimentalStatistics)
+        if (releaseVersionUpdateRequest.Type == ReleaseType.ExperimentalStatistics)
         {
             return ValidationActionResult(ReleaseTypeInvalid);
         }
