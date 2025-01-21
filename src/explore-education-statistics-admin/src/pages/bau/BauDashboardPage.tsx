@@ -14,7 +14,7 @@ const BauDashboardPage = () => {
     >
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Content and data</h2>
 
-      <div className="govuk-grid-row govuk-!-margin-bottom-9">
+      <div className="govuk-grid-row govuk-!-margin-bottom-6">
         {user?.permissions.canAccessAllImports && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
@@ -48,6 +48,19 @@ const BauDashboardPage = () => {
             </h3>
             <p className="govuk-caption-m govuk-!-margin-top-1">
               Clear glossary cache.
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="govuk-grid-row govuk-!-margin-bottom-9">
+        {user?.permissions.isBauUser && (
+          <div className="govuk-grid-column-one-third">
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+              <Link to="/administration/feedback">View feedback</Link>
+            </h3>
+            <p className="govuk-caption-m govuk-!-margin-top-1">
+              View feedback submitted by consumers of the service.
             </p>
           </div>
         )}

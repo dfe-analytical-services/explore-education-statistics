@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -85,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<Comment> Comment { get; set; }
         public virtual DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
         public virtual DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
+        public virtual DbSet<Feedback> Feedback { get; set; }
 
         [DbFunction]
         public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string searchTerm) =>
@@ -131,6 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureKeyStatisticsText(modelBuilder);
             ConfigureDataBlockParent(modelBuilder);
             ConfigureDataBlockVersion(modelBuilder);
+            ConfigureFeedback(modelBuilder);
 
             // Apply model configuration for types which implement IEntityTypeConfiguration
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
@@ -835,6 +838,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         {
             modelBuilder.Entity<KeyStatisticText>()
                 .ToTable("KeyStatisticsText");
+        }
+
+        private static void ConfigureFeedback(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Feedback>()
+                .Property(feedback => feedback.Url)
+                .IsRequired()
+                .HasMaxLength(2000);
+
+            modelBuilder.Entity<Feedback>()
+                .Property(feedback => feedback.UserAgent)
+                .HasMaxLength(250);
+
+            modelBuilder.Entity<Feedback>()
+                .Property(feedback => feedback.Context)
+                .HasMaxLength(2000);
+
+            modelBuilder.Entity<Feedback>()
+                .Property(feedback => feedback.Issue)
+                .HasMaxLength(2000);
+
+            modelBuilder.Entity<Feedback>()
+                .Property(feedback => feedback.Intent)
+                .HasMaxLength(2000);
+
+            modelBuilder.Entity<Feedback>()
+                .Property(feedback => feedback.Response)
+                .HasConversion(new EnumToStringConverter<FeedbackResponse>())
+                .IsRequired()
+                .HasMaxLength(50);
         }
     }
 
