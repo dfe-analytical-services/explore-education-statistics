@@ -215,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(releaseVersion, CanUpdateSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificReleaseVersion))
                             .ReturnsAsync(true);
 
                         userService
@@ -274,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(releaseVersion, CanUpdateSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificReleaseVersion))
                             .ReturnsAsync(true);
 
                         userService
@@ -332,7 +332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
-                    CanUpdateSpecificRelease)
+                    CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     async userService =>
                     {

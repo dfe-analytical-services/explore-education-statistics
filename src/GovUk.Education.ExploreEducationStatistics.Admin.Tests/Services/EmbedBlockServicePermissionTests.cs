@@ -27,7 +27,7 @@ public class EmbedBlockServicePermissionTests
     public async Task Create()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {
@@ -47,7 +47,7 @@ public class EmbedBlockServicePermissionTests
     public async Task Update()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {
@@ -67,7 +67,7 @@ public class EmbedBlockServicePermissionTests
     public async Task Delete()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {

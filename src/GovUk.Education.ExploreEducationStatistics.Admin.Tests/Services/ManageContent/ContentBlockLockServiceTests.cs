@@ -465,7 +465,7 @@ public class ContentBlockLockServiceTests
             var userService = new Mock<IUserService>(Strict);
 
             userService
-                .Setup(s => s.MatchesPolicy(It.IsAny<ReleaseVersion>(), CanUpdateSpecificRelease))
+                .Setup(s => s.MatchesPolicy(It.IsAny<ReleaseVersion>(), CanUpdateSpecificReleaseVersion))
                 .ReturnsAsync(true);
 
             userService

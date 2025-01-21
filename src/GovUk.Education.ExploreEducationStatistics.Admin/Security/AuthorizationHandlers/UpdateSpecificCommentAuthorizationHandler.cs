@@ -33,9 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
             var releaseVersion = GetReleaseVersion(_contentDbContext, resource);
             var updateSpecificReleaseContext = new AuthorizationHandlerContext(
-                new[] { new UpdateSpecificReleaseRequirement() }, context.User, releaseVersion);
+                new[] { new UpdateSpecificReleaseVersionRequirement() }, context.User, releaseVersion);
 
-            await new UpdateSpecificReleaseAuthorizationHandler(_authorizationHandlerService)
+            await new UpdateSpecificReleaseVersionAuthorizationHandler(_authorizationHandlerService)
                 .HandleAsync(updateSpecificReleaseContext);
 
             if (!updateSpecificReleaseContext.HasSucceeded)

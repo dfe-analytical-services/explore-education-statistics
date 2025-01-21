@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             ApprovalStatus = status
                         };
 
-                        await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, UpdateSpecificReleaseRequirement>(
+                        await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, UpdateSpecificReleaseVersionRequirement>(
                             HandlerSupplier(releaseVersion),
                             releaseVersion,
                             SecurityClaimTypes.UpdateAllReleases
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ApprovalStatus = Approved
                 };
 
-                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, UpdateSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, UpdateSpecificReleaseVersionRequirement>(
                     HandlerSupplier(releaseVersion),
                     releaseVersion,
                     claimsExpectedToSucceed: Array.Empty<SecurityClaimTypes>());
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             // Assert that a Publication Owner or Approver can update the Release in any approval
                             // state other than Admin
                             await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
-                                UpdateSpecificReleaseRequirement>(
+                                UpdateSpecificReleaseVersionRequirement>(
                                 HandlerSupplier(releaseVersion),
                                 releaseVersion,
                                 rolesExpectedToSucceed: new[]
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 // Assert that no Publication Role can update the Release if it is Approved.
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
-                    UpdateSpecificReleaseRequirement>(
+                    UpdateSpecificReleaseVersionRequirement>(
                     HandlerSupplier(releaseVersion),
                     releaseVersion,
                     rolesExpectedToSucceed: Array.Empty<PublicationRole>());
@@ -154,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             // Assert that a Release Editor (Contributor, Lead, Approver) can update the Release
                             // in any approval state other than Approved.
                             await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
-                                UpdateSpecificReleaseRequirement>(
+                                UpdateSpecificReleaseVersionRequirement>(
                                 HandlerSupplier(releaseVersion),
                                 releaseVersion,
                                 rolesExpectedToSucceed: new[]
@@ -183,14 +183,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 // Assert that no Publication Role can update the Release if it is Approved.
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
-                    UpdateSpecificReleaseRequirement>(
+                    UpdateSpecificReleaseVersionRequirement>(
                     HandlerSupplier(releaseVersion),
                     releaseVersion,
                     rolesExpectedToSucceed: Array.Empty<ReleaseRole>());
             }
         }
 
-        private static Func<ContentDbContext, UpdateSpecificReleaseAuthorizationHandler> HandlerSupplier(
+        private static Func<ContentDbContext, UpdateSpecificReleaseVersionAuthorizationHandler> HandlerSupplier(
             ReleaseVersion releaseVersion,
             List<ReleasePublishingStatus>? publishingStatuses = null)
         {
@@ -210,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.SaveChanges();
 
-                return new UpdateSpecificReleaseAuthorizationHandler(
+                return new UpdateSpecificReleaseVersionAuthorizationHandler(
                     new AuthorizationHandlerService(
                         new ReleaseVersionRepository(contentDbContext),
                         new UserReleaseRoleRepository(contentDbContext),

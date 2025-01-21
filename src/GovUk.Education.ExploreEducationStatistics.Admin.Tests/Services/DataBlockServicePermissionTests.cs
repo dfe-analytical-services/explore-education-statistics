@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetDeletePlan()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Create()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Update()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Delete()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
