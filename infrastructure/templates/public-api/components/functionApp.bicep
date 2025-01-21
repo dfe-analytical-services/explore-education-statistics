@@ -280,6 +280,7 @@ var commonSiteProperties = {
     netFrameworkVersion: '8.0'
     linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
+    minTlsVersion: '1.3'
     publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
     ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
     ipSecurityRestrictionsDefaultAction: 'Deny'
