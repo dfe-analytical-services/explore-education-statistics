@@ -123,10 +123,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             IEnumerable<Guid>? fileIds = null,
             CancellationToken cancellationToken = default)
         {
-            return await persistenceHelper.CheckEntityExists<ReleaseVersion>(
-                    releaseVersionId,
-                    q => q.Include(rv => rv.Publication)
-                )
+            return await contentDbContext.ReleaseVersions
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
                 .OnSuccess(userService.CheckCanViewReleaseVersion)
                 .OnSuccessVoid(
                     async release =>

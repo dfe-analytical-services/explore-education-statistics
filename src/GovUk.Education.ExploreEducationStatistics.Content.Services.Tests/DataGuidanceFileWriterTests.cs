@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class DataGuidanceFileWriterTests : IDisposable
     {
+        private readonly DataFixture _dataFixture = new();
+
         private const string TestDataGuidance = @"
             <h2>Description</h2>
             <p>
@@ -61,17 +66,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_ListDataSetsReturnsNotFound()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestDataGuidance);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -84,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(new NotFoundResult());
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -112,17 +110,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_MultipleDataSets()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestDataGuidance);
 
             var dataSets = new List<DataGuidanceDataSetViewModel>
             {
@@ -197,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -221,17 +212,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_SingleDataSet()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestDataGuidance);
 
             var dataSets = new List<DataGuidanceDataSetViewModel>
             {
@@ -277,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -302,16 +286,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         public async Task WriteToStream_NoDataGuidance()
         {
             // Release has no data guidance (aka data guidance)
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(string.Empty);
 
             var dataSets = new List<DataGuidanceDataSetViewModel>
             {
@@ -352,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -376,17 +354,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_EmptyDataSets()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestDataGuidance);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -399,7 +370,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -423,17 +394,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithSingleProperties()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestBasicDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestBasicDataGuidance);
 
             var dataSets = new List<DataGuidanceDataSetViewModel>
             {
@@ -469,7 +433,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -493,17 +457,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithEmptyProperties()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestBasicDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestBasicDataGuidance);
 
             var dataSets = new List<DataGuidanceDataSetViewModel>
             {
@@ -525,7 +482,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -549,17 +506,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithEmptyTimePeriodStart()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestBasicDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestBasicDataGuidance);
 
             var dataSets = new List<DataGuidanceDataSetViewModel>
             {
@@ -585,7 +535,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -609,17 +559,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithEmptyTimePeriodEnd()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestBasicDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestBasicDataGuidance);
 
             var dataSets = new List<DataGuidanceDataSetViewModel>
             {
@@ -642,7 +585,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -666,17 +609,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithEmptyVariable()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestBasicDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestBasicDataGuidance);
 
             var dataSets = new List<DataGuidanceDataSetViewModel>
             {
@@ -703,7 +639,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -727,17 +663,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithOverTenFootnotesAndMultiline()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestBasicDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestBasicDataGuidance);
 
             var dataSets = new List<DataGuidanceDataSetViewModel>
             {
@@ -787,7 +716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -811,17 +740,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithHtmlFootnotes()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestBasicDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestBasicDataGuidance);
 
             var dataSets = new List<DataGuidanceDataSetViewModel>
             {
@@ -857,7 +779,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -881,17 +803,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithEmptyFootnote()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestBasicDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestBasicDataGuidance);
 
             var dataSets = new List<DataGuidanceDataSetViewModel>
             {
@@ -924,7 +839,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -948,17 +863,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileStream()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.ReportingYear,
-                Publication = new Publication
-                {
-                    Title = "Test publication"
-                },
-                DataGuidance = TestBasicDataGuidance
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithDataGuidance(TestBasicDataGuidance);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -971,7 +879,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
                 .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -990,7 +898,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var text = await File.ReadAllTextAsync(path);
 
-                Assert.Contains("Test publication", text);
+                Assert.Contains(releaseVersion.Release.Publication.Title, text);
             }
 
             VerifyAllMocks(dataGuidanceDataSetService);
