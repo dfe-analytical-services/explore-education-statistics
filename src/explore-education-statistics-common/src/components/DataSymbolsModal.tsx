@@ -11,7 +11,7 @@ export default function DataSymbolsModal() {
       title="Data symbols"
       triggerButton={
         <ButtonText>
-          Data symbols <InfoIcon />
+          Data symbols <InfoIcon description="Data symbols guide" />
         </ButtonText>
       }
     >

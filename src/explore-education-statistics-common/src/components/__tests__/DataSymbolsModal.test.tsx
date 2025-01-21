@@ -7,7 +7,7 @@ describe('ReleaseTypesModal', () => {
     render(<DataSymbolsModal />);
 
     expect(
-      screen.getByRole('button', { name: 'Data symbols' }),
+      screen.getByRole('button', { name: 'Data symbols Data symbols guide' }),
     ).toBeInTheDocument();
   });
 
