@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.AddRelatedInformationAsync(
                         _releaseVersion.Id,
                         new CreateUpdateLinkRequest()),
-                SecurityPolicies.CanUpdateSpecificRelease);
+                SecurityPolicies.CanUpdateSpecificReleaseVersion);
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.DeleteRelatedInformationAsync(
                         releaseVersionId: _releaseVersion.Id,
                         relatedInformationId: Guid.NewGuid()),
-                SecurityPolicies.CanUpdateSpecificRelease);
+                SecurityPolicies.CanUpdateSpecificReleaseVersion);
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.UpdateRelatedInformation(
                         _releaseVersion.Id,
                         []),
-                SecurityPolicies.CanUpdateSpecificRelease);
+                SecurityPolicies.CanUpdateSpecificReleaseVersion);
         }
 
         private void AssertSecurityPoliciesChecked<T>(

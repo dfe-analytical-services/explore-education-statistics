@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.AddReleaseNoteAsync(
                         _releaseVersion.Id,
                         new ReleaseNoteSaveRequest()),
-                SecurityPolicies.CanUpdateSpecificRelease);
+                SecurityPolicies.CanUpdateSpecificReleaseVersion);
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     service.DeleteReleaseNoteAsync(
                         releaseVersionId: _releaseVersion.Id,
                         releaseNoteId: Guid.NewGuid()),
-                SecurityPolicies.CanUpdateSpecificRelease);
+                SecurityPolicies.CanUpdateSpecificReleaseVersion);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         releaseVersionId: _releaseVersion.Id,
                         releaseNoteId: Guid.NewGuid(),
                         new ReleaseNoteSaveRequest()),
-                SecurityPolicies.CanUpdateSpecificRelease);
+                SecurityPolicies.CanUpdateSpecificReleaseVersion);
         }
 
         private void AssertSecurityPoliciesChecked<T>(

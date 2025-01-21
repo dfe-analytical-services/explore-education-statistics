@@ -8,16 +8,16 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApp
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class UpdateSpecificReleaseRequirement : IAuthorizationRequirement
+    public class UpdateSpecificReleaseVersionRequirement : IAuthorizationRequirement
     {
     }
 
-    public class UpdateSpecificReleaseAuthorizationHandler
-        : AuthorizationHandler<UpdateSpecificReleaseRequirement, ReleaseVersion>
+    public class UpdateSpecificReleaseVersionAuthorizationHandler
+        : AuthorizationHandler<UpdateSpecificReleaseVersionRequirement, ReleaseVersion>
     {
         private readonly AuthorizationHandlerService _authorizationHandlerService;
 
-        public UpdateSpecificReleaseAuthorizationHandler(
+        public UpdateSpecificReleaseVersionAuthorizationHandler(
             AuthorizationHandlerService authorizationHandlerService)
         {
             _authorizationHandlerService = authorizationHandlerService;
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
-            UpdateSpecificReleaseRequirement requirement,
+            UpdateSpecificReleaseVersionRequirement requirement,
             ReleaseVersion releaseVersion)
         {
             if (releaseVersion.ApprovalStatus == Approved)

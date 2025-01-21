@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificReleaseVersion))
                             .ReturnsAsync(true);
 
                         userService
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificReleaseVersion))
                             .ReturnsAsync(true);
 
                         userService
@@ -320,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task RemoveDataFiles()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     async userService =>
                     {
