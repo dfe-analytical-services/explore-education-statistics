@@ -11,11 +11,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Moq;
 using Xunit;
@@ -29,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class ReleaseFileServiceTests : IDisposable
     {
+        private readonly DataFixture _dataFixture = new();
         private readonly List<string> _filePaths = new();
 
         public void Dispose()
@@ -203,14 +206,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_ValidFileTypes()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var releaseFile1 = new ReleaseFile
             {
@@ -309,14 +307,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_DataGuidanceForMultipleDataFiles()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var releaseFile1 = new ReleaseFile
             {
@@ -415,14 +408,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_OrderedAlphabetically()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var releaseFile1 = new ReleaseFile
             {
@@ -519,14 +507,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_FiltersInvalidFileTypes()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var releaseFile1 = new ReleaseFile
             {
@@ -612,14 +595,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_FiltersFilesNotInBlobStorage()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var releaseFile1 = new ReleaseFile
             {
@@ -689,14 +667,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_FiltersFilesForOtherReleases()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             // Files are for other releases
             var releaseFile1 = new ReleaseFile
@@ -763,14 +736,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_Empty()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -808,14 +776,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_Cancelled()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var releaseFile1 = new ReleaseFile
             {
@@ -900,14 +863,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_NoFileIds_NoCachedAllFilesZip()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()
+                        .WithSlug("publication-slug")));
 
             var releaseFile1 = new ReleaseFile
             {
@@ -1024,14 +983,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_NoFileIds_CachedAllFilesZip()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()
+                        .WithSlug("publication-slug")));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -1087,14 +1042,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_NoFileIds_StaleCachedAllFilesZip()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()
+                        .WithSlug("publication-slug")));
 
             var releaseFile1 = new ReleaseFile
             {

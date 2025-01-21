@@ -78,6 +78,11 @@ public static class ReleaseVersionGeneratorExtensions
         IEnumerable<DataBlockVersion> dataBlockVersions)
         => generator.ForInstance(releaseVersion => releaseVersion.SetDataBlockVersions(dataBlockVersions));
 
+    public static Generator<ReleaseVersion> WithDataGuidance(
+        this Generator<ReleaseVersion> generator,
+        string dataGuidance)
+        => generator.ForInstance(releaseVersion => releaseVersion.SetDataGuidance(dataGuidance));
+
     public static Generator<ReleaseVersion> WithContent(
         this Generator<ReleaseVersion> generator,
         IEnumerable<ContentSection> content)
@@ -284,6 +289,11 @@ public static class ReleaseVersionGeneratorExtensions
                 });
             });
     }
+
+    public static InstanceSetters<ReleaseVersion> SetDataGuidance(
+        this InstanceSetters<ReleaseVersion> setters,
+        string dataGuidance)
+        => setters.Set(releaseVersion => releaseVersion.DataGuidance, dataGuidance);
 
     public static InstanceSetters<ReleaseVersion> SetContentBlocks(
         this InstanceSetters<ReleaseVersion> setters,
