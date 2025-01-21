@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,11 +53,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(rv => rv.Publication.Id))
                 .ForMember(dest => dest.PublicationSlug,
                     m => m.MapFrom(rv => rv.Publication.Slug))
-                .ForMember(model => model.PublishScheduled,
+                .ForMember(dest => dest.PublishScheduled,
                     m => m.MapFrom(rv =>
                         rv.PublishScheduled.HasValue
                             ? rv.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?)null));
+                    : (DateTime?)null))
+                .ForMember(dest => dest.Label,
+                    m => m.MapFrom(rv => rv.Release.Label));
 
             CreateMap<ReleaseVersion, ReleaseSummaryViewModel>()
                 .ForMember(model => model.PublishScheduled,

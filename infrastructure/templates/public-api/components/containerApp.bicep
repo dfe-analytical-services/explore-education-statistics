@@ -1,4 +1,5 @@
-import { cpuPercentageConfig, memoryPercentageConfig, responseTimeConfig } from 'alerts/config.bicep'
+import { cpuPercentageConfig, memoryPercentageConfig, responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
+import { staticTotalGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 
 import { EntraIdAuthentication } from '../types.bicep'
 
@@ -110,6 +111,9 @@ param alerts {
   responseTime: bool
   cpuPercentage: bool
   memoryPercentage: bool
+  connectionTimeouts: bool
+  requestRetries: bool
+  requestTimeouts: bool
   alertsGroupName: string
 }?
 
@@ -215,10 +219,18 @@ module privateDns 'containerAppPrivateDns.bicep' = if (deployPrivateDns) {
   }
 }
 
-module containerAppRestartsAlert 'alerts/containerApps/restartsAlert.bicep' = if (alerts != null && alerts!.restarts) {
-  name: '${containerAppName}RestartsDeploy'
+module containerAppRestartsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.restarts) {
+  name: '${containerAppName}RestartsAlertModule'
   params: {
     resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'RestartCount'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'restarts'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
@@ -261,6 +273,57 @@ module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != n
       metric: 'MemoryPercentage'
     }
     config: memoryPercentageConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module connectionTimeoutsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.connectionTimeouts) {
+  name: '${containerAppName}ConnectionTimeoutsAlertModule'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'ResiliencyConnectTimeouts'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'connection-timeouts'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module requestRetriesAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.requestRetries) {
+  name: '${containerAppName}RequestRetriesAlertModule'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'ResiliencyRequestRetries'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'request-retries'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module requestTimeoutsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.requestTimeouts) {
+  name: '${containerAppName}RequestTimeoutsAlertModule'
+  params: {
+    resourceName: containerAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.App/containerApps'
+      metric: 'ResiliencyRequestTimeouts'
+    }
+    config: {
+      ...staticTotalGreaterThanZero
+      nameSuffix: 'request-timeouts'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

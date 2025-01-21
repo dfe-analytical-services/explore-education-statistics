@@ -63,6 +63,7 @@ const ReleaseCreatePage = ({
       publicationId,
       templateReleaseId:
         values.templateReleaseId !== 'new' ? values.templateReleaseId : '',
+      label: values.releaseLabel,
     });
 
     history.push(
@@ -103,7 +104,9 @@ const ReleaseCreatePage = ({
             timePeriodCoverageStartYear: '',
             templateReleaseId: '',
             releaseType: undefined,
+            releaseLabel: '',
           }}
+          releaseVersion={0}
           templateRelease={model?.templateRelease}
           onSubmit={handleSubmit}
           onCancel={handleCancel}

@@ -7,7 +7,7 @@ param resourceNames ResourceNames
 param location string
 
 @description('Public API Storage : Size of the file share in GB.')
-param publicApiDataFileShareQuota int
+param publicApiDataFileShareQuotaGbs int
 
 @description('Public API Storage : Firewall rules.')
 param storageFirewallRules IpRange[]
@@ -52,6 +52,11 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
     firewallRules: storageFirewallRules
     skuStorageResource: 'Standard_LRS'
     keyVaultName: resourceNames.existingResources.keyVault
+    alerts: deployAlerts ? {
+      availability: true
+      latency: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }
@@ -60,27 +65,15 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
     fileShareName: resourceNames.publicApi.publicApiFileShare
-    fileShareQuota: publicApiDataFileShareQuota
+    fileShareQuotaGbs: publicApiDataFileShareQuotaGbs
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: 'TransactionOptimized'
-    tagValues: tagValues
-  }
-}
-
-module storageAccountAvailabilityAlert '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.publicApiStorageAccount}AvailabilityDeploy'
-  params: {
-    resourceName: resourceNames.publicApi.publicApiStorageAccount
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
-module fileServiceAvailabilityAlert '../../components/alerts/fileServices/availabilityAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.publicApiStorageAccount}FsAvailabilityDeploy'
-  params: {
-    resourceName: resourceNames.publicApi.publicApiStorageAccount
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    alerts: deployAlerts ? {
+      availability: true
+      latency: true
+      capacity: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }

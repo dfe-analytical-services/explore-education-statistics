@@ -724,7 +724,7 @@ describe('ChartLegendConfiguration', () => {
       ).toHaveAttribute(
         'href',
         // Item ids are zero indexed
-        '#chartLegendConfigurationForm-items1Label',
+        '#chartLegendConfigurationForm-items-1-label',
       );
     });
   });

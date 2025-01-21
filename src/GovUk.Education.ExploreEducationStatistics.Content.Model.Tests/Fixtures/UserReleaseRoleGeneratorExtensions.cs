@@ -10,11 +10,11 @@ public static class UserReleaseRoleGeneratorExtensions
         => fixture.Generator<UserReleaseRole>().WithDefaults();
 
     public static Generator<UserReleaseRole> WithDefaults(this Generator<UserReleaseRole> generator)
-        => generator.ForInstance(d => d.SetDefaults());
+        => generator.ForInstance(s => s.SetDefaults());
 
     public static Generator<UserReleaseRole> WithReleaseVersion(this Generator<UserReleaseRole> generator,
         ReleaseVersion releaseVersion)
-        => generator.ForInstance(d => d.SetReleaseVersion(releaseVersion));
+        => generator.ForInstance(s => s.SetReleaseVersion(releaseVersion));
 
     public static Generator<UserReleaseRole> WithReleaseVersions(this Generator<UserReleaseRole> generator,
         IEnumerable<ReleaseVersion> releaseVersions)
@@ -26,10 +26,10 @@ public static class UserReleaseRoleGeneratorExtensions
     }
 
     public static Generator<UserReleaseRole> WithUser(this Generator<UserReleaseRole> generator, User user)
-        => generator.ForInstance(d => d.SetUser(user));
+        => generator.ForInstance(s => s.SetUser(user));
 
     public static Generator<UserReleaseRole> WithRole(this Generator<UserReleaseRole> generator, ReleaseRole role)
-        => generator.ForInstance(d => d.SetRole(role));
+        => generator.ForInstance(s => s.SetRole(role));
 
     public static Generator<UserReleaseRole> WithRoles(this Generator<UserReleaseRole> generator,
         IEnumerable<ReleaseRole> roles)
@@ -42,22 +42,24 @@ public static class UserReleaseRoleGeneratorExtensions
 
     public static InstanceSetters<UserReleaseRole> SetDefaults(this InstanceSetters<UserReleaseRole> setters)
         => setters
-            .SetDefault(p => p.Id)
-            .SetDefault(p => p.ReleaseVersionId)
-            .SetDefault(p => p.UserId);
+            .SetDefault(urr => urr.Id)
+            .SetDefault(urr => urr.ReleaseVersionId)
+            .SetDefault(urr => urr.UserId);
 
     public static InstanceSetters<UserReleaseRole> SetReleaseVersion(
         this InstanceSetters<UserReleaseRole> setters,
         ReleaseVersion releaseVersion)
-        => setters.Set(d => d.ReleaseVersion, releaseVersion);
+        => setters
+            .Set(urr => urr.ReleaseVersion, releaseVersion)
+            .Set(urr => urr.ReleaseVersionId, releaseVersion.Id);
 
     public static InstanceSetters<UserReleaseRole> SetUser(
         this InstanceSetters<UserReleaseRole> setters,
         User user)
-        => setters.Set(d => d.User, user);
+        => setters.Set(urr => urr.User, user);
 
     public static InstanceSetters<UserReleaseRole> SetRole(
         this InstanceSetters<UserReleaseRole> setters,
         ReleaseRole role)
-        => setters.Set(d => d.Role, role);
+        => setters.Set(urr => urr.Role, role);
 }
