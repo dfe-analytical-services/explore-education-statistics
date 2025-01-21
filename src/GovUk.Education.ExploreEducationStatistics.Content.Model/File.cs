@@ -27,8 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DataSetFileMeta? DataSetFileMeta { get; set; }
 
-        public bool DataSetFileMetaGeogLvlMigrated { get; set; } = true;
-
         public List<DataSetFileFilterHierarchy>? FilterHierarchies { get; set; }
 
         public Guid? ReplacedById { get; set; }

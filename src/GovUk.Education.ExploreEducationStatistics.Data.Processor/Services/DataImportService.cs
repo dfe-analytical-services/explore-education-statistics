@@ -207,7 +207,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var dataSetFileMeta = new DataSetFileMeta
             {
-                GeographicLevels = null, // TODO: remove in EES-5750
                 TimePeriodRange = new TimePeriodRangeMeta
                 {
                     Start = timePeriods.First(),
