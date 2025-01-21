@@ -434,7 +434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseVersionViewModel>> UpdateReleaseVersion(
             Guid releaseVersionId, ReleaseVersionUpdateRequest request)
         {
-            return await ReleaseUpdateRequestValidator.Validate(request)
+            return await ReleaseVersionUpdateRequestValidator.Validate(request)
                 .OnSuccess(async () => await _context.ReleaseVersions
                     .Include(rv => rv.Release)
                     .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId))
