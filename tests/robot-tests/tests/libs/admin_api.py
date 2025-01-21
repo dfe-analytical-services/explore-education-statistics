@@ -169,7 +169,7 @@ def user_resets_user_roles_via_api_if_required(user_emails: list) -> None:
 
 
 def user_creates_test_release_via_api(
-    publication_id: str, time_period: str, year: str, type: str = "AccreditedOfficialStatistics"
+    publication_id: str, time_period: str, year: str, type: str = "AccreditedOfficialStatistics", label: str = None
 ):
     response = admin_client.post(
         f"/api/publications/{publication_id}/releases",
@@ -180,6 +180,7 @@ def user_creates_test_release_via_api(
             },
             "year": int(year),
             "type": type,
+            "label": label,
             "templateReleaseId": "",
         },
     )
