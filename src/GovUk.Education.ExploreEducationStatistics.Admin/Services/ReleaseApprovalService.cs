@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var user = await _userRepository.FindByEmail(invite.Email);
                     return await _preReleaseUserService.SendPreReleaseInviteEmail(
-                            releaseVersion,
+                            releaseVersion.Id,
                             invite.Email.ToLower(),
                             isNewUser: user == null)
                         .OnSuccessDo(() => _preReleaseUserService.MarkInviteEmailAsSent(invite));

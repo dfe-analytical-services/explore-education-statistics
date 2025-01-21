@@ -53,10 +53,10 @@ public record ReleaseSummaryViewModel
     public ReleaseSummaryViewModel(ReleaseVersion releaseVersion, bool latestPublishedRelease)
     {
         Id = releaseVersion.Id;
-        Title = releaseVersion.Title;
-        Slug = releaseVersion.Slug;
-        YearTitle = releaseVersion.YearTitle;
-        CoverageTitle = releaseVersion.TimePeriodCoverage.GetEnumLabel();
+        Title = releaseVersion.Release.Title;
+        Slug = releaseVersion.Release.Slug;
+        YearTitle = releaseVersion.Release.YearTitle;
+        CoverageTitle = releaseVersion.Release.TimePeriodCoverage.GetEnumLabel();
         Published = releaseVersion.Published;
         NextReleaseDate = releaseVersion.NextReleaseDate;
         Type = releaseVersion.Type;

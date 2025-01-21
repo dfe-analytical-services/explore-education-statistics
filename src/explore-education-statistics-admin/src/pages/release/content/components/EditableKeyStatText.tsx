@@ -3,13 +3,16 @@ import EditableKeyStatTextForm, {
   KeyStatTextFormValues,
 } from '@admin/pages/release/content/components/EditableKeyStatTextForm';
 import useToggle from '@common/hooks/useToggle';
-import { KeyStatisticText } from '@common/services/publicationService';
+import {
+  KeyStatistic,
+  KeyStatisticText,
+} from '@common/services/publicationService';
 import React, { useCallback } from 'react';
 
 export interface EditableKeyStatTextProps {
   isEditing?: boolean;
   keyStat: KeyStatisticText;
-  keyStatisticGuidanceTitles?: (string | undefined)[];
+  keyStats: KeyStatistic[];
   testId?: string;
   onRemove: () => void;
   onSubmit: (values: KeyStatTextFormValues) => void;
@@ -18,7 +21,7 @@ export interface EditableKeyStatTextProps {
 export default function EditableKeyStatText({
   isEditing = false,
   keyStat,
-  keyStatisticGuidanceTitles,
+  keyStats,
   testId = 'keyStat',
   onRemove,
   onSubmit,
@@ -37,9 +40,7 @@ export default function EditableKeyStatText({
     return (
       <EditableKeyStatTextForm
         keyStat={keyStat}
-        keyStatisticGuidanceTitles={keyStatisticGuidanceTitles?.filter(
-          keyStatTitle => keyStatTitle === keyStat.title,
-        )}
+        keyStats={keyStats}
         testId={testId}
         onSubmit={handleSubmit}
         onCancel={toggleShowForm.off}

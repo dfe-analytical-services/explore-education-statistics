@@ -45,15 +45,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
 
             CreateMap<ReleaseVersion, ReleaseCacheViewModel>()
                 .ForMember(dest => dest.CoverageTitle,
-                    m => m.MapFrom(rv => rv.TimePeriodCoverage.GetEnumLabel()))
-                .ForMember(
-                    dest => dest.Updates,
+                    m => m.MapFrom(rv => rv.Release.TimePeriodCoverage.GetEnumLabel()))
+                .ForMember(dest => dest.ReleaseName,
+                    m => m.MapFrom(rv => rv.Release.Year.ToString()))
+                .ForMember(dest => dest.Slug,
+                    m => m.MapFrom(rv => rv.Release.Slug))
+                .ForMember(dest => dest.Title,
+                    m => m.MapFrom(rv => rv.Release.Title))
+                .ForMember(dest => dest.YearTitle,
+                    m => m.MapFrom(rv => rv.Release.YearTitle))
+                .ForMember(dest => dest.Updates,
                     m => m.MapFrom(rv => rv.Updates.OrderByDescending(update => update.On)))
-                .ForMember(
-                    dest => dest.Content,
+                .ForMember(dest => dest.Content,
                     m => m.MapFrom(rv => rv.GenericContent.OrderBy(s => s.Order)))
-                .ForMember(
-                    dest => dest.KeyStatistics,
+                .ForMember(dest => dest.KeyStatistics,
                     m => m.MapFrom(rv => rv.KeyStatistics.OrderBy(ks => ks.Order)));
 
             CreateMap<Link, LinkViewModel>();

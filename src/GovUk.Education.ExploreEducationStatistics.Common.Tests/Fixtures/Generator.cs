@@ -157,6 +157,14 @@ public class Generator<T> where T : class
         return Generate(2).ToTuple2();
     }
 
+    /// <summary>
+    /// Generate a tuple of three instances of <see cref="T"/>.
+    /// </summary>
+    public Tuple<T, T, T> GenerateTuple3()
+    {
+        return Generate(3).ToTuple3();
+    }
+
     public List<T> GenerateList(int count) => Generate(count).ToList();
 
     public T[] GenerateArray(int count) => Generate(count).ToArray();

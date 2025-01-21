@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -14,13 +15,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         INotifierClient notifierClient)
         : INotificationsService
     {
-        public async Task NotifySubscribersIfApplicable(params Guid[] releaseVersionIds)
+        public async Task NotifySubscribersIfApplicable(IReadOnlyList<Guid> releaseVersionIds)
         {
-            var releaseVersionsToNotify = await context.ReleaseVersions
+            var releasesVersions = await context.ReleaseVersions
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
                 .Where(rv => releaseVersionIds.Contains(rv.Id) && rv.NotifySubscribers)
                 .ToListAsync();
 
-            var messages = await releaseVersionsToNotify
+            var messages = await releasesVersions
                 .ToAsyncEnumerable()
                 .SelectAwait(async releaseVersion => await BuildPublicationNotificationMessage(releaseVersion))
                 .ToListAsync();
@@ -28,12 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (messages.Count > 0)
             {
                 await notifierClient.NotifyPublicationSubscribers(messages);
-                releaseVersionsToNotify
-                    .ForEach(releaseVersion =>
-                    {
-                        context.ReleaseVersions.Update(releaseVersion);
-                        releaseVersion.NotifiedOn = DateTime.UtcNow;
-                    });
+                releasesVersions.ForEach(releaseVersion => releaseVersion.NotifiedOn = DateTime.UtcNow);
                 await context.SaveChangesAsync();
             }
         }
@@ -41,10 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task<ReleaseNotificationMessage> BuildPublicationNotificationMessage(
             ReleaseVersion releaseVersion)
         {
-            await context.Entry(releaseVersion)
-                .Reference(rv => rv.Publication)
-                .LoadAsync();
-
             var latestUpdateNoteReason = "No update note provided.";
             // NOTE: Only amendment email template displays an update note.
             if (releaseVersion.Version > 0)
@@ -58,13 +52,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 latestUpdateNoteReason = latestUpdateNote.Reason;
             }
 
+            var release = releaseVersion.Release;
+
             return new ReleaseNotificationMessage
             {
-                PublicationId = releaseVersion.Publication.Id,
-                PublicationName = releaseVersion.Publication.Title,
-                PublicationSlug = releaseVersion.Publication.Slug,
-                ReleaseName = releaseVersion.Title,
-                ReleaseSlug = releaseVersion.Slug,
+                PublicationId = release.Publication.Id,
+                PublicationName = release.Publication.Title,
+                PublicationSlug = release.Publication.Slug,
+                ReleaseName = release.Title,
+                ReleaseSlug = release.Slug,
                 Amendment = releaseVersion.Version > 0,
                 UpdateNote = latestUpdateNoteReason,
             };

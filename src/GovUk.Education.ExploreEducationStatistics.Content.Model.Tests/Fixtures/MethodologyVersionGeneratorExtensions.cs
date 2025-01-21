@@ -14,6 +14,11 @@ public static class MethodologyVersionGeneratorExtensions
     public static Generator<MethodologyVersion> WithDefaults(this Generator<MethodologyVersion> generator)
         => generator.ForInstance(d => d.SetDefaults());
 
+    public static Generator<MethodologyVersion> WithAlternativeSlug(
+        this Generator<MethodologyVersion> generator,
+        string alternativeSlug)
+        => generator.ForInstance(d => d.SetAlternativeSlug(alternativeSlug));
+
     public static Generator<MethodologyVersion> WithAlternativeTitle(
         this Generator<MethodologyVersion> generator,
         string alternativeTitle)
@@ -39,6 +44,21 @@ public static class MethodologyVersionGeneratorExtensions
         DateTime published)
         => generator.ForInstance(d => d.SetPublished(published));
 
+    public static Generator<MethodologyVersion> WithPublishingStrategy(
+        this Generator<MethodologyVersion> generator,
+        MethodologyPublishingStrategy publishingStrategy)
+        => generator.ForInstance(d => d.SetPublishingStrategy(publishingStrategy));
+
+    public static Generator<MethodologyVersion> WithScheduledWithReleaseVersion(
+        this Generator<MethodologyVersion> generator,
+        ReleaseVersion releaseVersion)
+        => generator.ForInstance(d => d.SetScheduledWithReleaseVersion(releaseVersion));
+
+    public static Generator<MethodologyVersion> WithScheduledWithReleaseVersionId(
+        this Generator<MethodologyVersion> generator,
+        Guid releaseVersionId)
+        => generator.ForInstance(d => d.SetScheduledWithReleaseVersionId(releaseVersionId));
+
     public static Generator<MethodologyVersion> WithRedirects(
         this Generator<MethodologyVersion> generator,
         IEnumerable<MethodologyRedirect> methodologyRedirects)
@@ -57,6 +77,11 @@ public static class MethodologyVersionGeneratorExtensions
             .SetDefault(p => p.Version)
             .SetApprovalStatus(MethodologyApprovalStatus.Draft);
 
+    public static InstanceSetters<MethodologyVersion> SetAlternativeSlug(
+        this InstanceSetters<MethodologyVersion> setters,
+        string alternativeSlug)
+        => setters.Set(mv => mv.AlternativeSlug, alternativeSlug);
+
     public static InstanceSetters<MethodologyVersion> SetAlternativeTitle(
         this InstanceSetters<MethodologyVersion> setters,
         string alternativeTitle)
@@ -71,6 +96,22 @@ public static class MethodologyVersionGeneratorExtensions
         this InstanceSetters<MethodologyVersion> setters,
         DateTime published)
         => setters.Set(mv => mv.Published, published);
+
+    public static InstanceSetters<MethodologyVersion> SetPublishingStrategy(
+        this InstanceSetters<MethodologyVersion> setters,
+        MethodologyPublishingStrategy publishingStrategy)
+        => setters.Set(mv => mv.PublishingStrategy, publishingStrategy);
+
+    public static InstanceSetters<MethodologyVersion> SetScheduledWithReleaseVersion(
+        this InstanceSetters<MethodologyVersion> setters,
+        ReleaseVersion releaseVersion)
+        => setters.Set(mv => mv.ScheduledWithReleaseVersion, releaseVersion)
+            .SetScheduledWithReleaseVersionId(releaseVersion.Id);
+
+    public static InstanceSetters<MethodologyVersion> SetScheduledWithReleaseVersionId(
+        this InstanceSetters<MethodologyVersion> setters,
+        Guid releaseVersionId)
+        => setters.Set(mv => mv.ScheduledWithReleaseVersionId, releaseVersionId);
 
     public static InstanceSetters<MethodologyVersion> SetRedirects(
         this InstanceSetters<MethodologyVersion> setters,
