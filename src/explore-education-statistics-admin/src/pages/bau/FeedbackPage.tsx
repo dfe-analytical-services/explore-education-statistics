@@ -68,7 +68,7 @@ const FeedbackPage = () => {
           to={{ search: showRead ? '' : 'showRead=true' }}
           onClick={() => reloadFeedbackItems()}
         >
-          {showRead ? 'Hide read' : 'Show read'}
+          {showRead ? 'Hide read' : 'Show all'}
         </ButtonLink>
 
         {feedbackItems.length === 0 ? (
