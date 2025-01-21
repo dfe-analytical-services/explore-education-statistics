@@ -9,16 +9,16 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtil
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
-public record ReleaseVersionUpdateRequest
+public record ReleaseCreateRequest
 {
+    public Guid PublicationId { get; set; }
+
     [Required]
     public ReleaseType? Type { get; init; }
 
-    [JsonConverter(typeof(TimeIdentifierJsonConverter))]
     [Required]
+    [JsonConverter(typeof(TimeIdentifierJsonConverter))]
     public TimeIdentifier TimePeriodCoverage { get; init; }
-
-    public string PreReleaseAccessList { get; init; } = string.Empty;
 
     public string Slug => CreateReleaseSlug(year: Year, timePeriodCoverage: TimePeriodCoverage, label: Label);
 
@@ -27,4 +27,6 @@ public record ReleaseVersionUpdateRequest
 
     [MaxLength(50)]
     public string? Label { get; init; }
+
+    public Guid? TemplateReleaseId { get; init; }
 }
