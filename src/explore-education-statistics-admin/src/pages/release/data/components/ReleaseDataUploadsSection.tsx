@@ -130,6 +130,32 @@ export default function ReleaseDataUploadsSection({
     [releaseId],
   );
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteDataFile) {
+      return;
+    }
+
+    const { file } = deleteDataFile;
+
+    setDeleteDataFile(undefined);
+    setFileDeleting(deleteDataFile, true);
+
+    try {
+      await releaseDataFileService.deleteDataFiles(releaseId, file.id);
+
+      setDataFiles(currentDataFiles =>
+        currentDataFiles.filter(dataFile => dataFile.id !== file.id),
+      );
+    } catch (err) {
+      logger.error(err);
+      setFileDeleting(deleteDataFile, false);
+    }
+  }, [deleteDataFile, releaseId, setFileDeleting]);
+
+  const handleDeleteExit = useCallback(() => {
+    setDeleteDataFile(undefined);
+  }, []);
+
   const handleSubmit = useCallback(
     async (values: DataFileUploadFormValues) => {
       switch (values.uploadType) {
@@ -264,88 +290,93 @@ export default function ReleaseDataUploadsSection({
       </LoadingSpinner>
 
       {deleteDataFile && (
-        <ModalConfirm
-          open
-          title="Confirm deletion of selected data files"
-          onExit={() => setDeleteDataFile(undefined)}
-          onCancel={() => setDeleteDataFile(undefined)}
-          onConfirm={async () => {
-            const { file } = deleteDataFile;
-
-            setDeleteDataFile(undefined);
-            setFileDeleting(deleteDataFile, true);
-
-            try {
-              await releaseDataFileService.deleteDataFiles(releaseId, file.id);
-
-              setDataFiles(currentDataFiles =>
-                currentDataFiles.filter(dataFile => dataFile.id !== file.id),
-              );
-            } catch (err) {
-              logger.error(err);
-              setFileDeleting(deleteDataFile, false);
-            }
-          }}
-        >
-          <p>Are you sure you want to delete {deleteDataFile.file.title}?</p>
-          <p>This data will no longer be available for use in this release.</p>
-
-          {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks.length >
-            0 && (
-            <>
-              <p>The following data blocks will also be deleted:</p>
-
-              <ul>
-                {deleteDataFile.plan.deleteDataBlockPlan.dependentDataBlocks.map(
-                  block => (
-                    <li key={block.name}>
-                      <p>{block.name}</p>
-                      {block.contentSectionHeading && (
-                        <p>
-                          {`It will also be removed from the "${block.contentSectionHeading}" content section.`}
-                        </p>
-                      )}
-                      {block.infographicFilesInfo.length > 0 && (
-                        <p>
-                          The following infographic files will also be removed:
-                          <ul>
-                            {block.infographicFilesInfo.map(fileInfo => (
-                              <li key={fileInfo.filename}>
-                                <p>{fileInfo.filename}</p>
-                              </li>
-                            ))}
-                          </ul>
-                        </p>
-                      )}
-                      {block.isKeyStatistic && (
-                        <p>
-                          A key statistic associated with this data block will
-                          be removed.
-                        </p>
-                      )}
-                      {block.featuredTable && (
-                        <p>
-                          The featured table "{`${block.featuredTable?.name}`}"
-                          using this data block will be removed.
-                        </p>
-                      )}
-                    </li>
-                  ),
-                )}
-              </ul>
-            </>
-          )}
-          {deleteDataFile.plan.footnoteIds.length > 0 && (
-            <p>
-              {`${deleteDataFile.plan.footnoteIds.length} ${
-                deleteDataFile.plan.footnoteIds.length > 1
-                  ? 'footnotes'
-                  : 'footnote'
-              } will be removed or updated.`}
-            </p>
-          )}
-        </ModalConfirm>
+        <DeleteDataFileModal
+          file={deleteDataFile.file}
+          plan={deleteDataFile.plan}
+          onConfirm={handleDeleteConfirm}
+          onExit={handleDeleteExit}
+        />
       )}
     </>
+  );
+}
+
+interface DeleteDataFileModalProps {
+  file: DataFile;
+  plan: DeleteDataFilePlan;
+  onConfirm: () => void;
+  onExit: () => void;
+}
+
+function DeleteDataFileModal({
+  file,
+  plan,
+  onConfirm,
+  onExit,
+}: DeleteDataFileModalProps) {
+  return (
+    <ModalConfirm
+      open
+      title="Confirm deletion of selected data files"
+      onExit={onExit}
+      onConfirm={onConfirm}
+    >
+      <p>
+        Are you sure you want to delete <strong>{file.title}</strong>?
+      </p>
+      <p>This data will no longer be available for use in this release.</p>
+
+      {plan.deleteDataBlockPlan.dependentDataBlocks.length > 0 && (
+        <>
+          <p>The following data blocks will also be deleted:</p>
+
+          <ul>
+            {plan.deleteDataBlockPlan.dependentDataBlocks.map(block => (
+              <li key={block.name}>
+                <p>{block.name}</p>
+
+                {block.contentSectionHeading && (
+                  <p>
+                    It will also be removed from the "
+                    {block.contentSectionHeading}" content section.
+                  </p>
+                )}
+                {block.infographicFilesInfo.length > 0 && (
+                  <p>
+                    The following infographic files will also be removed:
+                    <ul>
+                      {block.infographicFilesInfo.map(fileInfo => (
+                        <li key={fileInfo.filename}>
+                          <p>{fileInfo.filename}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </p>
+                )}
+                {block.isKeyStatistic && (
+                  <p>
+                    A key statistic associated with this data block will be
+                    removed.
+                  </p>
+                )}
+                {block.featuredTable && (
+                  <p>
+                    The featured table "{block.featuredTable.name}" using this
+                    data block will be removed.
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {plan.footnoteIds.length > 0 && (
+        <p>
+          {`${plan.footnoteIds.length} ${
+            plan.footnoteIds.length > 1 ? 'footnotes' : 'footnote'
+          } will be removed or updated.`}
+        </p>
+      )}
+    </ModalConfirm>
   );
 }
