@@ -199,13 +199,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IEnumerable<Guid>? fileIds = null,
             CancellationToken cancellationToken = default)
         {
-            return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(
-                    releaseVersionId,
-                    q => q.Include(rv => rv.Publication)
-                )
+            return await _contentDbContext.ReleaseVersions
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccessVoid(
-                    async release =>
+                    async releaseVersion =>
                     {
                         var query = QueryZipReleaseFiles(releaseVersionId);
 
@@ -214,11 +214,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             query = query.Where(rf => fileIds.Contains(rf.FileId));
                         }
 
-                        var releaseFiles = (await query.ToListAsync())
+                        var releaseFiles = (await query.ToListAsync(cancellationToken: cancellationToken))
                             .OrderBy(rf => rf.File.ZipFileEntryName())
                             .ToList();
 
-                        await DoZipFilesToStream(releaseFiles, release, outputStream, cancellationToken);
+                        await DoZipFilesToStream(releaseFiles, releaseVersion, outputStream, cancellationToken);
                     }
                 );
         }

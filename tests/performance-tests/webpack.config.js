@@ -34,7 +34,7 @@ module.exports = {
       patterns: [
         {
           context: path.join(__dirname, 'src/tests'),
-          from: '**/*.(csv|zip)',
+          from: '**/*.(csv|zip|json)',
           to: path.join(__dirname, 'dist'),
         },
         {

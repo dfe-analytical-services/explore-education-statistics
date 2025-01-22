@@ -1,6 +1,7 @@
 import KeyStatDataBlockSelectForm from '@admin/pages/release/content/components/KeyStatDataBlockSelectForm';
 import styles from '@admin/pages/release/content/components/KeyStatistics.module.scss';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
+import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
 import React, { useCallback, useState } from 'react';
@@ -8,13 +9,12 @@ import { KeyStatisticType } from '@common/services/publicationService';
 import { KeyStatisticTextCreateRequest } from '@admin/services/keyStatisticService';
 import EditableKeyStatTextForm from '@admin/pages/release/content/components/EditableKeyStatTextForm';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { KeyStatisticsProps } from '@admin/pages/release/content/components/KeyStatistics';
 
-interface Props extends KeyStatisticsProps {
-  keyStatisticGuidanceTitles?: (string | undefined)[];
+interface Props {
+  release: EditableRelease;
 }
 
-const AddKeyStatistics = ({ keyStatisticGuidanceTitles, release }: Props) => {
+export default function AddKeyStatistics({ release }: Props) {
   const [formType, setFormType] = useState<KeyStatisticType | undefined>(
     undefined,
   );
@@ -66,7 +66,7 @@ const AddKeyStatistics = ({ keyStatisticGuidanceTitles, release }: Props) => {
       return (
         <div className={styles.textFormContainer}>
           <EditableKeyStatTextForm
-            keyStatisticGuidanceTitles={keyStatisticGuidanceTitles}
+            keyStats={release.keyStatistics}
             testId="keyStatText-createForm"
             onSubmit={values => addKeyStatText(values)}
             onCancel={() => setFormType(undefined)}
@@ -95,6 +95,4 @@ const AddKeyStatistics = ({ keyStatisticGuidanceTitles, release }: Props) => {
         </ButtonGroup>
       );
   }
-};
-
-export default AddKeyStatistics;
+}

@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import FormSearchBar from '@common/components/form/FormSearchBar';
+import FormProvider from '@common/components/form/FormProvider';
+import { Form, FormFieldTextInput } from '@common/components/form';
+import SearchIcon from '@common/components/SearchIcon';
+import VisuallyHidden from '@common/components/VisuallyHidden';
+import styles from '@common/components/form/FormSearchBar.module.scss';
+import Yup from '@common/validation/yup';
+import React from 'react';
 
 const min = 3;
-const formId = 'searchForm';
 
 interface Props {
   label?: string;
@@ -10,38 +14,41 @@ interface Props {
   onSubmit: (value: string) => void;
 }
 
-const SearchForm = ({
+export default function SearchForm({
   label = 'Search',
   value: initialValue = '',
   onSubmit,
-}: Props) => {
-  const [searchTerm, setSearchTerm] = useState<string>(initialValue);
-
-  useEffect(() => {
-    setSearchTerm(initialValue);
-  }, [initialValue]);
-
+}: Props) {
   return (
-    <form
-      id={formId}
-      className="govuk-!-margin-bottom-2"
-      onSubmit={e => {
-        e.preventDefault();
-        if (searchTerm.length >= min) {
-          onSubmit(searchTerm);
-        }
+    <FormProvider
+      initialValues={{
+        search: initialValue,
       }}
+      validationSchema={Yup.object({
+        search: Yup.string()
+          .min(min, `Search must be at least ${min} characters`)
+          .required('Enter a search term'),
+      })}
     >
-      <FormSearchBar
-        id={`${formId}-search`}
-        label={label}
-        min={min}
-        name="search"
-        value={searchTerm}
-        onChange={setSearchTerm}
-      />
-    </form>
+      <Form
+        id="searchForm"
+        showErrorSummary={false}
+        onSubmit={({ search }) => onSubmit(search)}
+      >
+        <FormFieldTextInput
+          addOn={
+            <button type="submit" className={styles.button}>
+              <SearchIcon className={styles.icon} />
+              <VisuallyHidden>Search</VisuallyHidden>
+            </button>
+          }
+          announceError
+          id="search"
+          label={label}
+          labelSize="m"
+          name="search"
+        />
+      </Form>
+    </FormProvider>
   );
-};
-
-export default SearchForm;
+}

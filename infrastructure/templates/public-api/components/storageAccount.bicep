@@ -1,4 +1,5 @@
-import { responseTimeConfig } from 'alerts/config.bicep'
+import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
+import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 
 import { IpRange } from '../types.bicep'
 
@@ -59,16 +60,24 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   tags: tagValues
 }
 
-module availabilityAlerts 'alerts/storageAccounts/availabilityAlert.bicep' = if (alerts != null && alerts!.availability) {
-  name: '${storageAccountName}StorageAvailabilityDeploy'
+module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
+  name: '${storageAccountName}AvailabilityAlertModule'
   params: {
     resourceName: storageAccountName
+    resourceMetric: {
+      resourceType: 'Microsoft.Storage/storageAccounts'
+      metric: 'availability'
+    }
+    config: {
+      ...staticAverageLessThanHundred
+      nameSuffix: 'availability'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
 
-module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
+module latencyAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}LatencyDeploy'
   params: {
     resourceName: storageAccountName
@@ -76,7 +85,11 @@ module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && al
       resourceType: 'Microsoft.Storage/storageAccounts'
       metric: 'SuccessE2ELatency'
     }
-    config: responseTimeConfig
+    config: {
+      ...staticAverageGreaterThanZero
+      nameSuffix: 'response-time'
+      threshold: '250'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

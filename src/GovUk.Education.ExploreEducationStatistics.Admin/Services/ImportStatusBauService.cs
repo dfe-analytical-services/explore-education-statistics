@@ -20,7 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly ContentDbContext _contentDbContext;
 
-        public ImportStatusBauService(IUserService userService,
+        public ImportStatusBauService(
+            IUserService userService,
             ContentDbContext contentDbContext)
         {
             _userService = userService;
@@ -35,7 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var releaseFilesQueryable = _contentDbContext.ReleaseFiles
                         .Include(rf => rf.ReleaseVersion)
-                        .ThenInclude(rv => rv.Publication);
+                        .ThenInclude(rv => rv.Release)
+                        .ThenInclude(r => r.Publication);
 
                     return await _contentDbContext.DataImports
                         .Include(dataImport => dataImport.File)
@@ -54,11 +56,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private static ImportStatusBauViewModel BuildViewModel(DataImport dataImport,
+        private static ImportStatusBauViewModel BuildViewModel(
+            DataImport dataImport,
             ReleaseVersion releaseVersion)
         {
             var file = dataImport.File;
-            var publication = releaseVersion.Publication;
+            var release = releaseVersion.Release;
+            var publication = release.Publication;
             return new ImportStatusBauViewModel
             {
                 SubjectTitle = null, // EES-1655
@@ -66,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 PublicationId = publication.Id,
                 PublicationTitle = publication.Title,
                 ReleaseId = releaseVersion.Id,
-                ReleaseTitle = releaseVersion.Title,
+                ReleaseTitle = release.Title,
                 FileId = file.Id,
                 DataFileName = file.Filename,
                 TotalRows = dataImport.TotalRows,

@@ -1,0 +1,221 @@
+{
+  "publicationTitle": "Fixed Data Set Queries",
+  "dataSetName": "Performance tests - API test attendance",
+  "dataSetId": "88419401-29ac-5e75-94a6-66515ad97d45",
+  "query": {
+    "criteria": {
+      "filters": {
+        "eq": "yZfxa"
+      },
+      "locations": {
+        "in": [
+          {
+            "level": "LA",
+            "id": "axqLP"
+          },
+          {
+            "level": "LA",
+            "id": "1jki3"
+          },
+          {
+            "level": "REG",
+            "id": "RZoka"
+          },
+          {
+            "level": "LA",
+            "id": "EYgqF"
+          },
+          {
+            "level": "LA",
+            "id": "aMjLP"
+          },
+          {
+            "level": "LA",
+            "id": "BnU7J"
+          },
+          {
+            "level": "LA",
+            "id": "dkB0Z"
+          },
+          {
+            "level": "LA",
+            "id": "GHrgr"
+          },
+          {
+            "level": "LA",
+            "id": "V9j5X"
+          },
+          {
+            "level": "LA",
+            "id": "L1wWj"
+          },
+          {
+            "level": "LA",
+            "id": "lrocB"
+          },
+          {
+            "level": "LA",
+            "id": "mc49K"
+          },
+          {
+            "level": "LA",
+            "id": "eyduS"
+          },
+          {
+            "level": "LA",
+            "id": "m2B9K"
+          },
+          {
+            "level": "LA",
+            "id": "BpR7J"
+          },
+          {
+            "level": "LA",
+            "id": "PhIeb"
+          },
+          {
+            "level": "LA",
+            "id": "f5ZYF"
+          },
+          {
+            "level": "LA",
+            "id": "AYcGK"
+          },
+          {
+            "level": "LA",
+            "id": "R3eka"
+          },
+          {
+            "level": "LA",
+            "id": "UcpRF"
+          },
+          {
+            "level": "LA",
+            "id": "kZjhs"
+          },
+          {
+            "level": "LA",
+            "id": "GzNgr"
+          },
+          {
+            "level": "LA",
+            "id": "6Gfrf"
+          },
+          {
+            "level": "LA",
+            "id": "zT2FQ"
+          },
+          {
+            "level": "LA",
+            "id": "5RVdi"
+          },
+          {
+            "level": "LA",
+            "id": "mWo9K"
+          },
+          {
+            "level": "LA",
+            "id": "CnoId"
+          },
+          {
+            "level": "LA",
+            "id": "7SdXo"
+          },
+          {
+            "level": "LA",
+            "id": "5UNdi"
+          },
+          {
+            "level": "LA",
+            "id": "0R0T5"
+          },
+          {
+            "level": "LA",
+            "id": "qf0jG"
+          },
+          {
+            "level": "NAT",
+            "id": "dP0Zw"
+          },
+          {
+            "level": "LA",
+            "id": "jfhAM"
+          },
+          {
+            "level": "LA",
+            "id": "Ip0Bz"
+          },
+          {
+            "level": "LA",
+            "id": "YdkHK"
+          },
+          {
+            "level": "REG",
+            "id": "o2nmX"
+          },
+          {
+            "level": "LA",
+            "id": "uWwo4"
+          },
+          {
+            "level": "REG",
+            "id": "rg3Nj"
+          },
+          {
+            "level": "LA",
+            "id": "uLHo4"
+          },
+          {
+            "level": "LA",
+            "id": "U8VRF"
+          },
+          {
+            "level": "LA",
+            "id": "crH31"
+          },
+          {
+            "level": "LA",
+            "id": "m2m9K"
+          },
+          {
+            "level": "REG",
+            "id": "3Dh8u"
+          },
+          {
+            "level": "REG",
+            "id": "S4HVx"
+          },
+          {
+            "level": "REG",
+            "id": "O7CLF"
+          },
+          {
+            "level": "REG",
+            "id": "yM9aB"
+          },
+          {
+            "level": "LA",
+            "id": "21Zlz"
+          },
+          {
+            "level": "LA",
+            "id": "0h8T5"
+          },
+          {
+            "level": "LA",
+            "id": "hZYyW"
+          }
+        ]
+      },
+      "timePeriods": {
+        "lt": {
+          "code": "W7",
+          "period": "2024"
+        }
+      }
+    },
+    "indicators": [
+      "S0LnV"
+    ]
+  }
+}

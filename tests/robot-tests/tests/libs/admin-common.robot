@@ -168,7 +168,7 @@ user creates publication
     user waits until h1 is visible    Dashboard    %{WAIT_MEDIUM}
 
 user creates release from publication page
-    [Arguments]    ${publication}    ${time_period_coverage}    ${start_year}
+    [Arguments]    ${publication}    ${time_period_coverage}    ${start_year}    ${label}=${EMPTY}
     user waits until page contains title caption    Manage publication    %{WAIT_SMALL}
     user waits until h1 is visible    ${publication}
 
@@ -178,6 +178,7 @@ user creates release from publication page
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    %{WAIT_SMALL}
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    ${start_year}
+    user enters text into element    id:releaseSummaryForm-releaseLabel    ${label}
     user clicks radio    Accredited official statistics
     user clicks radio if exists    Create new template
     user waits until button is enabled    Create new release    %{WAIT_SMALL}
@@ -678,11 +679,12 @@ user waits for scheduled release to be published immediately
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
 user verifies release summary
-    [Arguments]    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${RELEASE_TYPE}
+    [Arguments]    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${RELEASE_TYPE}    ${RELEASE_LABEL}=${EMPTY}
     user waits until h2 is visible    Release summary
     user checks summary list contains    Time period    ${TIME_PERIOD}
     user checks summary list contains    Release period    ${RELEASE_PERIOD}
     user checks summary list contains    Release type    ${RELEASE_TYPE}
+    user checks summary list contains    Release label    ${RELEASE_LABEL}
 
 user changes methodology status to Approved
     [Arguments]

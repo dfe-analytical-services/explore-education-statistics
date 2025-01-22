@@ -398,7 +398,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var allReleaseRoles = await _contentDbContext.UserReleaseRoles
                         .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-                        .ThenInclude(releaseVersion => releaseVersion.Publication)
+                        .ThenInclude(releaseVersion => releaseVersion.Release)
+                        .ThenInclude(release => release.Publication)
                         .Where(userReleaseRole => userReleaseRole.UserId == userId)
                         .ToListAsync();
 
@@ -406,16 +407,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToAsyncEnumerable()
                         .WhereAwait(async userReleaseRole =>
                             await _releaseVersionRepository.IsLatestReleaseVersion(userReleaseRole.ReleaseVersionId))
-                        .OrderBy(userReleaseRole => userReleaseRole.ReleaseVersion.Publication.Title)
-                        .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.Year)
-                        .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.TimePeriodCoverage)
+                        .OrderBy(userReleaseRole => userReleaseRole.ReleaseVersion.Release.Publication.Title)
+                        .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.Release.Year)
+                        .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.Release.TimePeriodCoverage)
                         .ToListAsync();
 
                     return latestReleaseRoles.Select(userReleaseRole => new UserReleaseRoleViewModel
                         {
                             Id = userReleaseRole.Id,
-                            Publication = userReleaseRole.ReleaseVersion.Publication.Title,
-                            Release = userReleaseRole.ReleaseVersion.Title,
+                            Publication = userReleaseRole.ReleaseVersion.Release.Publication.Title,
+                            Release = userReleaseRole.ReleaseVersion.Release.Title,
                             Role = userReleaseRole.Role
                         })
                         .ToList();
@@ -446,11 +447,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<UserReleaseRole>(userReleaseRoleId, query => query
                     .Include(userReleaseRole => userReleaseRole.User)
                     .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-                    .ThenInclude(releaseVersion => releaseVersion.Publication))
+                    .ThenInclude(releaseVersion => releaseVersion.Release)
+                    .ThenInclude(release => release.Publication))
                 .OnSuccess(async userReleaseRole =>
                 {
                     return await _userService
-                        .CheckCanUpdateReleaseRole(userReleaseRole.ReleaseVersion.Publication, userReleaseRole.Role)
+                        .CheckCanUpdateReleaseRole(userReleaseRole.ReleaseVersion.Release.Publication, userReleaseRole.Role)
                         .OnSuccessVoid(async () =>
                         {
                             await _userReleaseInviteRepository.Remove(

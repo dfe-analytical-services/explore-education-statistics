@@ -2,6 +2,7 @@ import FigureFootnotes from '@common/components/FigureFootnotes';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { OmitStrict } from '@common/types';
 import React, { forwardRef, ReactNode, Ref, useEffect, useRef } from 'react';
+import DataSymbolsModal from '@common/components/DataSymbolsModal';
 import styles from './FixedMultiHeaderDataTable.module.scss';
 import MultiHeaderTable, { MultiHeaderTableProps } from './MultiHeaderTable';
 
@@ -113,7 +114,9 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
             ref={mainTableRef}
           />
         </div>
-
+        <p>
+          <DataSymbolsModal />
+        </p>
         <div className={footnotesClassName}>
           <FigureFootnotes
             footnotes={footnotes}

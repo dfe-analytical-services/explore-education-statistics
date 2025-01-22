@@ -157,16 +157,17 @@ Verify Release type options
 Create new release
     user chooses select option    name:timePeriodCoverageCode    Spring term
     user enters text into element    name:timePeriodCoverageStartYear    2025
+    user enters text into element    name:releaseLabel    provisional
     user clicks radio    Accredited official statistics
     user clicks button    Create new release
-    user waits until page contains title caption    Edit release for Spring term 2025/26
+    user waits until page contains title caption    Edit release for Spring term 2025/26 provisional
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Verify created release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
     user verifies release summary    Spring term
-    ...    2025/26    Accredited official statistics
+    ...    2025/26    Accredited official statistics    provisional
 
 Edit release summary
     user waits until page contains link    Edit release summary
@@ -175,13 +176,15 @@ Edit release summary
     user waits until page contains element    name:timePeriodCoverageStartYear
     user chooses select option    name:timePeriodCoverageCode    Summer term
     user enters text into element    name:timePeriodCoverageStartYear    2026
+    user enters text into element    name:releaseLabel    final
     user clicks radio    Official statistics
     user clicks button    Update release summary
 
 Verify updated release summary
+    user waits until h2 is visible    Release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    Summer term
-    ...    2026/27    Official statistics
+    ...    2026/27    Official statistics    final
 
 
 *** Keywords ***

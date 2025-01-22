@@ -6,6 +6,13 @@
   path:focus {
     outline: none;
   }
+
+  :global(.leaflet-control-zoom a:focus-visible) {
+    background: $govuk-focus-colour;
+    box-shadow: none;
+    color: govuk-colour('black');
+    outline: govuk-colour('black') solid $govuk-focus-width;
+  }
 }
 
 .tooltip {

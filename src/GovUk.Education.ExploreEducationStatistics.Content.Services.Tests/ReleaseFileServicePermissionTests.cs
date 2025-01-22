@@ -3,22 +3,26 @@ using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class ReleaseFileServicePermissionTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         private static readonly ReleaseVersion ReleaseVersion = new()
         {
             Id = Guid.NewGuid()
@@ -41,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         var persistenceHelper =
                             MockPersistenceHelper<ContentDbContext, ReleaseFile>(ReleaseFile);
 
-                        var service = BuildReleaseFileService(
+                        var service = BuildService(
                             userService: userService.Object,
                             persistenceHelper: persistenceHelper.Object
                         );
@@ -54,22 +58,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
+                    ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
-                    userService =>
+                    async userService =>
                     {
-                        var service = BuildReleaseFileService(userService: userService.Object);
-                        return service.ZipFilesToStream(
-                            releaseVersionId: ReleaseVersion.Id,
+                        await using var contextDbContext = InMemoryContentDbContext();
+                        contextDbContext.ReleaseVersions.Add(releaseVersion);
+                        await contextDbContext.SaveChangesAsync();
+
+                        var service = BuildService(
+                            contentDbContext: contextDbContext,
+                            userService: userService.Object);
+
+                        return await service.ZipFilesToStream(
+                            releaseVersionId: releaseVersion.Id,
                             outputStream: Stream.Null,
-                            fileIds: ListOf(Guid.NewGuid())
+                            fileIds: [Guid.NewGuid()]
                         );
                     }
                 );
         }
 
-        private ReleaseFileService BuildReleaseFileService(
+        private ReleaseFileService BuildService(
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IPublicBlobStorageService? publicBlobStorageService = null,

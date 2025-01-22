@@ -1,4 +1,5 @@
-import { responseTimeConfig } from 'alerts/config.bicep'
+import { responseTimeConfig, dynamicTotalGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
+import { staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 
 import {
   AppGatewayBackend
@@ -45,6 +46,8 @@ param availabilityZones ('1' | '2' | '3') [] = [
 param alerts {
   health: bool
   responseTime: bool
+  failedRequests: bool
+  responseStatuses: bool
   alertsGroupName: string
 }?
 
@@ -285,10 +288,19 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
   ]
 }
 
-module backendPoolsHealthAlert 'alerts/appGateways/backendPoolHealthAlert.bicep' = if (alerts != null && alerts!.health) {
-  name: '${appGatewayName}BackendPoolsHealthDeploy'
+module backendPoolsHealthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.health) {
+  name: '${appGatewayName}BackendHealthAlertModule'
   params: {
     resourceName: appGatewayName
+    resourceMetric: {
+      resourceType: 'Microsoft.Network/applicationGateways'
+      metric: 'UnhealthyHostCount'
+    }
+    config: {
+      ...staticAverageGreaterThanZero
+      nameSuffix: 'backend-pool-health'
+      threshold: '0.05'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
@@ -303,6 +315,50 @@ module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null 
       metric: 'ApplicationGatewayTotalTime'
     }
     config: responseTimeConfig
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
+  name: '${appGatewayName}FailedRequestsDeploy'
+  params: {
+    resourceName: appGatewayName
+    resourceMetric: {
+      resourceType: 'Microsoft.Network/applicationGateways'
+      metric: 'FailedRequests'
+      dimensions: [{
+        name: 'BackendSettingsPool'
+        values: map(backends, backend => backend.name)
+      }]
+    }
+    config: {
+      ...dynamicTotalGreaterThan
+      nameSuffix: 'failed-requests'
+      windowSize: 'PT30M'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}
+
+module responseStatusAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
+  name: '${appGatewayName}ResponseStatusDeploy'
+  params: {
+    resourceName: appGatewayName
+    resourceMetric: {
+      resourceType: 'Microsoft.Network/applicationGateways'
+      metric: 'ResponseStatus'
+      dimensions: [{
+        name: 'HttpStatusGroup'
+        values: ['4xx', '5xx']
+      }]
+    }
+    config: {
+      ...dynamicTotalGreaterThan
+      nameSuffix: 'http-4xx-5xx'
+      windowSize: 'PT30M'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

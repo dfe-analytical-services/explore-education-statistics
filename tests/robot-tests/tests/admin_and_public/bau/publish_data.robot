@@ -14,7 +14,7 @@ Force Tags          Admin    Local    Dev    AltersData
 *** Variables ***
 ${PUBLICATION_NAME}=                    UI tests - publish data %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=                      Financial year 3000-01
-${RELEASE_2_NAME}=                      Financial year 3001-02
+${RELEASE_2_NAME}=                      Financial year 3001-02 provisional
 ${SUBJECT_1_NAME}=                      UI test subject 1
 ${SUBJECT_2_NAME}=                      UI test subject 2
 ${FOOTNOTE_ALL}=                        Footnote for all subjects
@@ -62,14 +62,12 @@ Go to "Sign off" page and approve release
 
 Create another release for the same publication
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user creates release from publication page    ${PUBLICATION_NAME}    Financial year    3001
+    user creates release from publication page    ${PUBLICATION_NAME}    Financial year    3001    provisional
 
 Verify new release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user waits until h2 is visible    Release summary
-    user checks summary list contains    Time period    Financial year
-    user checks summary list contains    Release period    3001-02
-    user checks summary list contains    Release type    Accredited official statistics
+    user verifies release summary    Financial year
+    ...    3001-02    Accredited official statistics    provisional
 
 Upload subjects to release
     user uploads subject and waits until complete    ${SUBJECT_1_NAME}    tiny-two-filters.csv

@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -7,8 +7,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Requests;
 public record PublicationsListGetRequest(
     ReleaseType? ReleaseType,
     Guid? ThemeId,
-    [MinLength(3)] string? Search,
+    string? Search,
     PublicationsSortBy? Sort,
     SortDirection? SortDirection,
-    [Range(1, int.MaxValue)] int Page = 1,
-    [Range(1, int.MaxValue)] int PageSize = 10);
+    int Page = 1,
+    int PageSize = 10)
+{
+    public class Validator : AbstractValidator<PublicationsListGetRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Search)
+                .MinimumLength(3);
+            RuleFor(request => request.Page)
+                .InclusiveBetween(1, 9999);
+            RuleFor(request => request.PageSize)
+                .InclusiveBetween(1, 40);
+        }
+    }
+}

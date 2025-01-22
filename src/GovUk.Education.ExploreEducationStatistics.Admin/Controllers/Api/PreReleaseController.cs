@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -34,10 +35,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseVersionId:guid}/prerelease")]
-        public async Task<ActionResult<PreReleaseSummaryViewModel>> GetPreReleaseSummaryAsync(Guid releaseVersionId)
+        public async Task<ActionResult<PreReleaseSummaryViewModel>> GetPreReleaseSummary(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken = default)
         {
             return await _preReleaseSummaryService
-                .GetPreReleaseSummaryViewModelAsync(releaseVersionId)
+                .GetPreReleaseSummaryViewModel(releaseVersionId, cancellationToken)
                 .HandleFailuresOrOk();
         }
 
