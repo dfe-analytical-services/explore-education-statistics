@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             var allowedReleaseRoles = ReleaseEditorAndApproverRoles;
 
             if (await _authorizationHandlerService
-                    .HasRolesOnPublicationOrRelease(
+                    .HasRolesOnPublicationOrReleaseVersion(
                         context.User.GetUserId(),
                         releaseVersion.PublicationId,
                         releaseVersion.Id,
