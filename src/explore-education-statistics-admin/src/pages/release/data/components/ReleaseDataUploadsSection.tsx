@@ -130,6 +130,32 @@ export default function ReleaseDataUploadsSection({
     [releaseId],
   );
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteDataFile) {
+      return;
+    }
+
+    const { file } = deleteDataFile;
+
+    setDeleteDataFile(undefined);
+    setFileDeleting(deleteDataFile, true);
+
+    try {
+      await releaseDataFileService.deleteDataFiles(releaseId, file.id);
+
+      setDataFiles(currentDataFiles =>
+        currentDataFiles.filter(dataFile => dataFile.id !== file.id),
+      );
+    } catch (err) {
+      logger.error(err);
+      setFileDeleting(deleteDataFile, false);
+    }
+  }, [deleteDataFile, releaseId, setFileDeleting]);
+
+  const handleDeleteExit = useCallback(() => {
+    setDeleteDataFile(undefined);
+  }, []);
+
   const handleSubmit = useCallback(
     async (values: DataFileUploadFormValues) => {
       switch (values.uploadType) {
@@ -176,28 +202,6 @@ export default function ReleaseDataUploadsSection({
     },
     [releaseId, refetchDataFiles],
   );
-
-  const handleDeleteConfirm = useCallback(async () => {
-    if (!deleteDataFile) {
-      return;
-    }
-
-    const { file } = deleteDataFile;
-
-    setDeleteDataFile(undefined);
-    setFileDeleting(deleteDataFile, true);
-
-    try {
-      await releaseDataFileService.deleteDataFiles(releaseId, file.id);
-
-      setDataFiles(currentDataFiles =>
-        currentDataFiles.filter(dataFile => dataFile.id !== file.id),
-      );
-    } catch (err) {
-      logger.error(err);
-      setFileDeleting(deleteDataFile, false);
-    }
-  }, [deleteDataFile, releaseId, setFileDeleting]);
 
   return (
     <>
@@ -291,7 +295,7 @@ export default function ReleaseDataUploadsSection({
           file={deleteDataFile.file}
           plan={deleteDataFile.plan}
           onConfirm={handleDeleteConfirm}
-          onExit={() => setDeleteDataFile(undefined)}
+          onExit={handleDeleteExit}
         />
       )}
     </>
@@ -318,7 +322,9 @@ function DeleteDataFileModal({
       onExit={onExit}
       onConfirm={onConfirm}
     >
-      <p>Are you sure you want to delete {file.title}?</p>
+      <p>
+        Are you sure you want to delete <strong>{file.title}</strong>?
+      </p>
       <p>This data will no longer be available for use in this release.</p>
 
       {plan.deleteDataBlockPlan.dependentDataBlocks.length > 0 && (
@@ -329,9 +335,11 @@ function DeleteDataFileModal({
             {plan.deleteDataBlockPlan.dependentDataBlocks.map(block => (
               <li key={block.name}>
                 <p>{block.name}</p>
+
                 {block.contentSectionHeading && (
                   <p>
-                    {`It will also be removed from the "${block.contentSectionHeading}" content section.`}
+                    It will also be removed from the "
+                    {block.contentSectionHeading}" content section.
                   </p>
                 )}
                 {block.infographicFilesInfo.length > 0 && (
@@ -354,8 +362,8 @@ function DeleteDataFileModal({
                 )}
                 {block.featuredTable && (
                   <p>
-                    The featured table "{`${block.featuredTable?.name}`}" using
-                    this data block will be removed.
+                    The featured table "{block.featuredTable.name}" using this
+                    data block will be removed.
                   </p>
                 )}
               </li>
