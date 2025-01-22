@@ -39,7 +39,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandler
         }
 
         if (await _authorizationHandlerService
-                .HasRolesOnPublicationOrRelease(
+                .HasRolesOnPublicationOrReleaseVersion(
                     context.User.GetUserId(),
                     releaseVersion.PublicationId,
                     releaseVersion.Id,
