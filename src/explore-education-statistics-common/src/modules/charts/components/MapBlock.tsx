@@ -1,4 +1,6 @@
 import { SelectOption } from '@common/components/form/FormSelect';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import useToggle from '@common/hooks/useToggle';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import MapControls from '@common/modules/charts/components/MapControls';
 import MapGeoJSON from '@common/modules/charts/components/MapGeoJSON';
@@ -29,10 +31,8 @@ import { Layer, Path, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
-import useToggle from '@common/hooks/useToggle';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import orderMapLegendItems from './utils/orderMapLegendItems';
 import generateDataSetKey from '../util/generateDataSetKey';
+import orderMapLegendItems from './utils/orderMapLegendItems';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -169,21 +169,18 @@ export default function MapBlock({
   );
 
   const dataSetOptions = useMemo<SelectOption[]>(() => {
-    const orderedLegendDataSetKeys = orderMapLegendItems(legend).map(
-      ({ dataSet }) => generateDataSetKey(dataSet),
+    const dataSetKeys = orderMapLegendItems(legend).map(({ dataSet }) =>
+      generateDataSetKey(dataSet),
     );
-    const orderedDataSetCategoryConfigs = Object.values(dataSetCategoryConfigs)
+    return Object.values(dataSetCategoryConfigs)
       .sort(
         (a, b) =>
-          orderedLegendDataSetKeys.indexOf(a.dataKey) -
-          orderedLegendDataSetKeys.indexOf(b.dataKey),
+          dataSetKeys.indexOf(a.dataKey) - dataSetKeys.indexOf(b.dataKey),
       )
       .map(dataSet => ({
         label: dataSet.config.label,
         value: dataSet.dataKey,
       }));
-
-    return orderedDataSetCategoryConfigs;
   }, [dataSetCategoryConfigs, legend]);
 
   const [selectedDataSetKey, setSelectedDataSetKey] = useState<string>(

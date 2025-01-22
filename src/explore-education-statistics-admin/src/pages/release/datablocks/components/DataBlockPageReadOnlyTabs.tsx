@@ -9,6 +9,7 @@ import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
 import getMapInitialBoundaryLevel from '@common/modules/charts/components/utils/getMapInitialBoundaryLevel';
+import useDataBlock from '@common/modules/find-statistics/hooks/useDataBlock';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
@@ -26,92 +27,34 @@ const testId = (dataBlock: ReleaseDataBlock) =>
   `Data block - ${dataBlock.name}`;
 
 const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
-  const isMapChart = dataBlock.charts[0]?.type === 'map';
-  const queryClient = useQueryClient();
-  const [selectedBoundaryLevel, setSelectedBoundaryLevel] = useState(
-    isMapChart
-      ? getMapInitialBoundaryLevel(dataBlock.charts[0] as MapChart)
-      : undefined,
-  );
-
-  const getDataBlockGeoJsonQuery = tableBuilderQueries.getDataBlockGeoJson(
-    releaseId,
-    dataBlock.dataBlockParentId,
-    selectedBoundaryLevel ?? -1,
-  );
-
-  const {
-    data: locationGeoJson,
-    error: geoJsonError,
-    isFetching,
-  } = useQuery({
-    queryKey: getDataBlockGeoJsonQuery.queryKey,
-    queryFn: selectedBoundaryLevel
-      ? getDataBlockGeoJsonQuery.queryFn
-      : () => Promise.resolve({}),
-    staleTime: Infinity,
-    cacheTime: Infinity,
-    keepPreviousData: true,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-  });
-
-  const { value: tableData, isLoading } = useAsyncRetry(
-    async () =>
-      tableBuilderService.getTableData(
-        dataBlock.query,
-        releaseId,
-        isMapChart
-          ? (dataBlock.charts[0] as MapChart).boundaryLevel
-          : undefined,
-      ),
-    [releaseId, dataBlock],
-  );
-
-  const { fullTable, tableHeaders } = useMemo(() => {
-    if (!tableData || isFetching) {
-      return {};
-    }
-
-    const table = mapFullTable({
-      ...tableData,
-      subjectMeta: {
-        ...tableData.subjectMeta,
-        locations:
-          selectedBoundaryLevel && locationGeoJson
-            ? locationGeoJson
-            : tableData.subjectMeta.locations,
-      },
+  const { chart, fullTable, isTableDataLoading, onBoundaryLevelChange } =
+    useDataBlock({
+      dataBlock,
+      releaseId,
     });
 
-    return {
-      fullTable: table,
-      tableHeaders: mapTableHeadersConfig(dataBlock.table.tableHeaders, table),
-    };
-  }, [
-    tableData,
-    locationGeoJson,
-    isFetching,
-    dataBlock.table.tableHeaders,
-    selectedBoundaryLevel,
-  ]);
+  const tableHeaders = useMemo(
+    () =>
+      fullTable
+        ? mapTableHeadersConfig(dataBlock.table.tableHeaders, fullTable)
+        : undefined,
+    [dataBlock.table.tableHeaders, fullTable],
+  );
 
   return (
-    <LoadingSpinner text="Loading data block" loading={isLoading || isFetching}>
-      {!!geoJsonError && (
-        <WarningMessage>Could not load content</WarningMessage>
-      )}
-
-      {fullTable && !geoJsonError ? (
+    <LoadingSpinner text="Loading data block" loading={isTableDataLoading}>
+      {fullTable ? (
         <Tabs id="dataBlockTabs">
           <TabsSection title="Table" key="table" id="dataBlockTabs-table">
-            <TableTabSection
-              dataBlock={dataBlock}
-              table={fullTable}
-              tableHeaders={tableHeaders}
-            />
+            {tableHeaders && (
+              <TableTabSection
+                dataBlock={dataBlock}
+                table={fullTable}
+                tableHeaders={tableHeaders}
+              />
+            )}
           </TabsSection>
-          {dataBlock.charts.length > 0 && [
+          {chart && (
             <TabsSection
               title="Chart"
               key="chart"
@@ -119,63 +62,16 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
               testId={`${testId(dataBlock)}-chart-tab`}
             >
               <div className="govuk-width-container">
-                {dataBlock.charts.map((chart, index) => {
-                  const key = index;
-
-                  const rendererProps: Omit<ChartRendererProps, 'chart'> = {
-                    id: `dataBlockTabs-chart-${index}`,
-                    source: dataBlock?.source,
-                  };
-
-                  if (chart.type === 'map') {
-                    return (
-                      <ChartRenderer
-                        {...rendererProps}
-                        key={key}
-                        chart={{
-                          ...chart,
-                          data: fullTable.results,
-                          meta: fullTable.subjectMeta,
-                          onBoundaryLevelChange: async boundaryLevel => {
-                            const { queryKey, queryFn } =
-                              tableBuilderQueries.getDataBlockGeoJson(
-                                releaseId,
-                                dataBlock.dataBlockParentId,
-                                boundaryLevel,
-                              );
-                            const existingGeoJson =
-                              queryClient.getQueryData(queryKey);
-
-                            if (!existingGeoJson) {
-                              await queryClient.fetchQuery({
-                                queryKey,
-                                queryFn,
-                                staleTime: Infinity,
-                                cacheTime: Infinity,
-                              });
-                            }
-                            setSelectedBoundaryLevel(boundaryLevel);
-                          },
-                        }}
-                      />
-                    );
-                  }
-
-                  return (
-                    <ChartRenderer
-                      {...rendererProps}
-                      chart={{
-                        ...chart,
-                        data: fullTable.results,
-                        meta: fullTable.subjectMeta,
-                      }}
-                      key={key}
-                    />
-                  );
-                })}
+                <LoadingSpinner loading={fullTable || isInitialGeoJsonLoading}>
+                  <ChartRenderer
+                    id="dataBlockTabs-chart"
+                    source={dataBlock.source}
+                    chart={chart}
+                  />
+                </LoadingSpinner>
               </div>
-            </TabsSection>,
-          ]}
+            </TabsSection>
+          )}
         </Tabs>
       ) : (
         <WarningMessage>

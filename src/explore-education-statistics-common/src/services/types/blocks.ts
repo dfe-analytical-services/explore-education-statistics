@@ -12,103 +12,96 @@ import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 
-type HorizontalBarChart = {
-  type: 'horizontalbar';
-  title?: string;
-  titleType?: TitleType;
+export interface HorizontalBarChart {
   alt: string;
-  height: number;
-  width?: number;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
+  axes: {
+    major: AxisConfiguration;
+    minor: AxisConfiguration;
+  };
   barThickness?: number;
   dataLabelPosition?: BarChartDataLabelPosition;
+  height: number;
+  includeNonNumericData?: boolean;
+  legend: LegendConfiguration;
+  showDataLabels?: boolean;
   stacked?: boolean;
-  legend: LegendConfiguration;
-  axes: {
-    major: AxisConfiguration;
-    minor: AxisConfiguration;
-  };
-};
-
-type Infographic = {
-  type: 'infographic';
+  subtitle?: string;
   title?: string;
   titleType?: TitleType;
-  alt: string;
-  height: number;
+  type: 'horizontalbar';
   width?: number;
+}
+
+export interface Infographic {
+  alt: string;
   axes: AxesConfiguration;
-  legend?: LegendConfiguration;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
   fileId: string;
-  getInfographic?: GetInfographic;
-};
-
-type LineChart = {
-  type: 'line';
+  height: number;
+  legend: LegendConfiguration;
+  subtitle?: string;
   title?: string;
   titleType?: TitleType;
-  alt: string;
-  height: number;
+  type: 'infographic';
   width?: number;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
-  dataLabelPosition?: LineChartDataLabelPosition;
-  legend: LegendConfiguration;
+}
+
+export interface LineChart {
+  alt: string;
   axes: {
     major: AxisConfiguration;
     minor: AxisConfiguration;
   };
-};
+  dataLabelPosition?: LineChartDataLabelPosition;
+  height: number;
+  includeNonNumericData?: boolean;
+  legend: LegendConfiguration;
+  showDataLabels?: boolean;
+  subtitle?: string;
+  title?: string;
+  titleType?: TitleType;
+  type: 'line';
+  width?: number;
+}
 
 export type MapChart = {
-  type: 'map';
+  alt: string;
   axes: {
     major: AxisConfiguration;
   };
-  dataGroups?: number;
-  dataClassification?: DataGroupingType;
-  legend: LegendConfiguration;
-  map?: MapConfig;
-  position?: { lat: number; lng: number };
   boundaryLevel: number;
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
+  dataClassification?: DataGroupingType;
+  dataGroups?: number;
   height: number;
-  width?: number;
   includeNonNumericData?: boolean;
+  legend: LegendConfiguration;
+  map: MapConfig;
+  position?: { lat: number; lng: number };
   showDataLabels?: boolean;
   subtitle?: string;
+  title?: string;
+  titleType?: TitleType;
+  type: 'map';
+  width?: number;
 };
 
-type VerticalBarChart = {
-  type: 'verticalbar';
-  title?: string;
-  titleType?: TitleType;
+export type VerticalBarChart = {
   alt: string;
-  height: number;
-  width?: number;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
-  barThickness?: number;
-  dataLabelPosition?: BarChartDataLabelPosition;
-  stacked?: boolean;
-  legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;
     minor: AxisConfiguration;
   };
+  barThickness?: number;
+  dataLabelPosition?: BarChartDataLabelPosition;
+  height: number;
+  includeNonNumericData?: boolean;
+  legend: LegendConfiguration;
+  showDataLabels?: boolean;
+  stacked?: boolean;
+  subtitle?: string;
+  title?: string;
+  titleType?: TitleType;
+  type: 'verticalbar';
+  width?: number;
 };
 
 /**

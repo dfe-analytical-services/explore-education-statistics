@@ -40,7 +40,7 @@ export interface ChartOptions extends ChartDefinitionOptions {
 export interface ChartBuilderState {
   definition?: ChartDefinition;
   options?: ChartOptions;
-  axes: AxesConfiguration;
+  axes: Partial<AxesConfiguration>;
   legend?: LegendConfiguration;
   map?: MapConfig;
   titleType?: 'default' | 'alternative';
@@ -170,9 +170,7 @@ const getInitialState = ({
     (axisDefinition: ChartDefinitionAxis, axisType: AxisType) =>
       updateAxis(
         axisDefinition,
-        (initialAxes as { [key in AxisType]?: AxisConfiguration })?.[
-          axisType
-        ] ?? {},
+        (initialAxes as AxesConfiguration)?.[axisType] ?? {},
       ),
   );
 

@@ -120,9 +120,6 @@ export interface ChartProps {
   width?: number;
   axes: AxesConfiguration;
   legend?: LegendConfiguration;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
   subtitle?: string;
 }
 

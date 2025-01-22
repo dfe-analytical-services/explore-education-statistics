@@ -16,7 +16,7 @@ import { produce } from 'immer';
 
 describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
-  const onBoundaryLevelChange = jest.fn(() => Promise.resolve());
+  const onBoundaryLevelChange = jest.fn();
   const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
     boundaryLevel: 1,

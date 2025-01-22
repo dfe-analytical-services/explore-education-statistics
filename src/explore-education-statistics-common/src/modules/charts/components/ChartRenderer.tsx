@@ -3,6 +3,7 @@ import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
 import InfographicBlock, {
+  GetInfographic,
   InfographicChartProps,
 } from '@common/modules/charts/components/InfographicBlock';
 import LineChartBlock, {
