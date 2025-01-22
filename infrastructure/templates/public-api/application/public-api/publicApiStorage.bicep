@@ -22,33 +22,17 @@ resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: resourceNames.existingResources.vNet
 }
 
-resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.dataProcessor
+resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: resourceNames.existingResources.subnets.storagePrivateEndpoints
   parent: vNet
 }
 
-resource containerAppEnvironmentSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.containerAppEnvironment
-  parent: vNet
-}
-
-resource publisherSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.publisherFunction
-  parent: vNet
-}
-
-// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
-// Currently supported by subnet whitelisting and Storage service endpoints being enabled on the whitelisted subnets.
 module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
   name: 'publicApiStorageAccountDeploy'
   params: {
     location: location
     storageAccountName: resourceNames.publicApi.publicApiStorageAccount
-    allowedSubnetIds: [
-      dataProcessorSubnet.id
-      containerAppEnvironmentSubnet.id
-      publisherSubnet.id
-    ]
+    publicNetworkAccessEnabled: false
     firewallRules: storageFirewallRules
     skuStorageResource: 'Standard_LRS'
     keyVaultName: resourceNames.existingResources.keyVault
@@ -57,6 +41,9 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
       latency: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
+    privateEndpointSubnetIds: {
+      file: storagePrivateEndpointSubnet.id
+    }
     tagValues: tagValues
   }
 }

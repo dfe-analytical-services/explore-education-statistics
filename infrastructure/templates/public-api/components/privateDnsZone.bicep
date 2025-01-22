@@ -1,4 +1,4 @@
-import { PrivateDnsZone } from '../types.bicep'
+import { PrivateDnsZone, dnsZones } from '../types.bicep'
 
 @description('Specifies the type of zone to create')
 param zoneType PrivateDnsZone
@@ -12,12 +12,7 @@ param vnetName string
 @description('Specifies a set of tags with which to tag the resource in Azure')
 param tagValues object
 
-var zoneTypeToNames = {
-  sites: 'privatelink.azurewebsites.net'
-  postgres: 'privatelink.postgres.database.azure.com'
-}
-
-var zoneName = zoneType == 'custom' ? customName : zoneTypeToNames[zoneType]
+var zoneName = zoneType == 'custom' ? customName : dnsZones[zoneType].zoneName
 
 resource vnet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: vnetName
