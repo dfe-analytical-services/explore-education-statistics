@@ -1,10 +1,7 @@
 /* eslint-disable no-console */
 import { RefinedResponse } from 'k6/http';
 import { stringifySimplifiedQuery } from './queryGenerators';
-import {
-  DataSetQueryRequest,
-  Publication,
-} from '../../../utils/publicApiService';
+import { DataSetQueryRequest } from '../../../utils/publicApiService';
 import { Config } from './config';
 import { PublicationAndDataSets } from './publicApiDataSetQuery.test';
 import { stringifyWithoutNulls } from '../../../utils/utils';
@@ -33,15 +30,26 @@ export function logPublicationsAndDataSets(
   });
 }
 
+export function logQuery(query: {
+  publicationTitle: string;
+  dataSetName: string;
+  dataSetId: string;
+  query: DataSetQueryRequest;
+}) {
+  if (logQueries) {
+    console.log(JSON.stringify(query, null, 2));
+  }
+}
+
 export function logQueryResponse({
-  publication,
+  publicationTitle,
   dataSetName,
   query,
   totalResultsReturned,
   totalPagesReturned,
   totalResponsesTimeMillis,
 }: {
-  publication: Publication;
+  publicationTitle: string;
   dataSetName: string;
   query: DataSetQueryRequest;
   totalResultsReturned: number;
@@ -50,7 +58,7 @@ export function logQueryResponse({
 }) {
   if (logResponseSummaries) {
     console.log(`\n\n=============================`);
-    console.log(`Publication:  ${publication.title}`);
+    console.log(`Publication:  ${publicationTitle}`);
     console.log(`Data Set:     ${dataSetName}\n`);
 
     if (logQueries) {
