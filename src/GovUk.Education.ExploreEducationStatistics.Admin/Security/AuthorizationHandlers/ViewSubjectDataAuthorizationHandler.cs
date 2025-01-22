@@ -32,7 +32,7 @@ public class ViewSubjectDataAuthorizationHandler : AuthorizationHandler<
             .ReleaseVersions
             .FirstAsync(rv => rv.Id == releaseSubject.ReleaseVersionId);
 
-        if (await _authorizationHandlerService.IsReleaseViewableByUser(releaseVersion, context.User))
+        if (await _authorizationHandlerService.IsReleaseVersionViewableByUser(releaseVersion, context.User))
         {
             context.Succeed(requirement);
         }
