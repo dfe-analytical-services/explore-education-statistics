@@ -33,12 +33,12 @@ interface DeleteDataFile {
   file: DataFile;
 }
 
-const ReleaseDataUploadsSection = ({
+export default function ReleaseDataUploadsSection({
   publicationId,
   releaseId,
   canUpdateRelease,
   onDataFilesChange,
-}: Props) => {
+}: Props) {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [bulkUploadPlan, setBulkUploadPlan] = useState<ArchiveDataSetFile[]>();
@@ -60,18 +60,18 @@ const ReleaseDataUploadsSection = ({
     onDataFilesChange?.(dataFiles);
   }, [dataFiles, onDataFilesChange]);
 
-  const setFileDeleting = (dataFile: DeleteDataFile, deleting: boolean) => {
-    setDataFiles(currentDataFiles =>
-      currentDataFiles.map(file =>
-        file.fileName !== dataFile.file.fileName
-          ? file
-          : {
-              ...file,
-              isDeleting: deleting,
-            },
-      ),
-    );
-  };
+  const setFileDeleting = useCallback(
+    (dataFile: DeleteDataFile, deleting: boolean) => {
+      setDataFiles(currentDataFiles =>
+        currentDataFiles.map(file =>
+          file.fileName !== dataFile.file.fileName
+            ? file
+            : { ...file, isDeleting: deleting },
+        ),
+      );
+    },
+    [],
+  );
 
   const confirmBulkUploadPlan = useCallback(
     async (archiveDataSetFiles: ArchiveDataSetFile[]) => {
@@ -81,81 +81,82 @@ const ReleaseDataUploadsSection = ({
       );
 
       setBulkUploadPlan(undefined);
-      refetchDataFiles();
+      await refetchDataFiles();
     },
     [releaseId, setBulkUploadPlan, refetchDataFiles],
   );
 
-  const handleStatusChange = async (
-    dataFile: DataFile,
-    { totalRows, status }: DataFileImportStatus,
-  ) => {
-    // EES-5732 UI tests related to data replacement sometimes fail
-    // because of a permission call for the replaced file being called,
-    // probably caused by the speed of the tests.
-    // This prevents this happening.
-    if (status === 'NOT_FOUND') {
-      return;
-    }
+  const handleStatusChange = useCallback(
+    async (dataFile: DataFile, { totalRows, status }: DataFileImportStatus) => {
+      // EES-5732 UI tests related to data replacement sometimes fail
+      // because of a permission call for the replaced file being called,
+      // probably caused by the speed of the tests.
+      // This prevents this happening.
+      if (status === 'NOT_FOUND') {
+        return;
+      }
 
-    const permissions = await permissionService.getDataFilePermissions(
-      releaseId,
-      dataFile.id,
-    );
-
-    setDataFiles(currentDataFiles =>
-      currentDataFiles.map(file =>
-        file.fileName !== dataFile.fileName
-          ? file
-          : {
-              ...dataFile,
-              rows: totalRows,
-              status,
-              permissions,
-            },
-      ),
-    );
-  };
-
-  const handleDeleteFile = async (dataFile: DataFile) =>
-    setDeleteDataFile({
-      plan: await releaseDataFileService.getDeleteDataFilePlan(
+      const permissions = await permissionService.getDataFilePermissions(
         releaseId,
-        dataFile,
-      ),
-      file: dataFile,
-    });
+        dataFile.id,
+      );
+
+      setDataFiles(currentDataFiles =>
+        currentDataFiles.map(file =>
+          file.fileName !== dataFile.fileName
+            ? file
+            : {
+                ...dataFile,
+                rows: totalRows,
+                status,
+                permissions,
+              },
+        ),
+      );
+    },
+    [releaseId],
+  );
+
+  const handleDeleteFile = useCallback(
+    async (dataFile: DataFile) => {
+      setDeleteDataFile({
+        plan: await releaseDataFileService.getDeleteDataFilePlan(
+          releaseId,
+          dataFile,
+        ),
+        file: dataFile,
+      });
+    },
+    [releaseId],
+  );
 
   const handleSubmit = useCallback(
     async (values: DataFileUploadFormValues) => {
-      const newFiles: DataFile[] = [];
-
       switch (values.uploadType) {
         case 'csv': {
           if (!values.title) {
             return;
           }
-          newFiles.push(
-            await releaseDataFileService.uploadDataFiles(releaseId, {
-              title: values.title,
-              dataFile: values.dataFile as File,
-              metadataFile: values.metadataFile as File,
-            }),
-          );
-          refetchDataFiles();
+
+          await releaseDataFileService.uploadDataFiles(releaseId, {
+            title: values.title,
+            dataFile: values.dataFile as File,
+            metadataFile: values.metadataFile as File,
+          });
+
+          await refetchDataFiles();
           break;
         }
         case 'zip': {
           if (!values.title) {
             return;
           }
-          newFiles.push(
-            await releaseDataFileService.uploadZipDataFile(releaseId, {
-              title: values.title,
-              zipFile: values.zipFile as File,
-            }),
-          );
-          refetchDataFiles();
+          await releaseDataFileService.uploadZipDataFile(releaseId, {
+            title: values.title,
+            zipFile: values.zipFile as File,
+          });
+
+          await refetchDataFiles();
           break;
         }
         case 'bulkZip': {
@@ -178,6 +179,7 @@ const ReleaseDataUploadsSection = ({
   return (
     <>
       <h2>Add data file to release</h2>
+
       <InsetText>
         <h3>Before you start</h3>
         <p>
@@ -228,7 +230,8 @@ const ReleaseDataUploadsSection = ({
       <LoadingSpinner loading={isLoading}>
         {dataFiles.length > 0 ? (
           <>
-            <h2 className="govuk-heading-l">Uploaded data files</h2>
+            <h2>Uploaded data files</h2>
+
             <DataFilesTable
               canUpdateRelease={canUpdateRelease}
               dataFiles={dataFiles}
@@ -259,6 +262,7 @@ const ReleaseDataUploadsSection = ({
           <InsetText>No data files have been uploaded.</InsetText>
         )}
       </LoadingSpinner>
+
       {deleteDataFile && (
         <ModalConfirm
           open
@@ -344,6 +348,4 @@ const ReleaseDataUploadsSection = ({
       )}
     </>
   );
-};
-
-export default ReleaseDataUploadsSection;
+}
