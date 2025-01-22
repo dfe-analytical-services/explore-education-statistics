@@ -65,32 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateRelease()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(Publication, CanCreateReleaseForSpecificPublication)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        using var contextDbContext = InMemoryApplicationDbContext();
-                        contextDbContext.Publications.Add(Publication);
-                        contextDbContext.SaveChangesAsync();
-
-                        var service = BuildReleaseVersionService(
-                            context: contextDbContext,
-                            userService: userService.Object);
-
-                        return service.CreateRelease(
-                            new ReleaseCreateRequest
-                            {
-                                PublicationId = Publication.Id,
-                            }
-                        );
-                    }
-                );
-        }
-
-        [Fact]
         public async Task GetLatestPublishedRelease()
         {
             Publication publication = _dataFixture.DefaultPublication()
