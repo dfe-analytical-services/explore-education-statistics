@@ -55,6 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .DefaultReleaseVersion()
                 .WithRelease(_fixture
                     .DefaultRelease()
+                    .WithYear(2035)
+                    .WithTimePeriodCoverage(TimeIdentifier.March)
                     .WithPublication(_fixture
                         .DefaultPublication()))
                 .WithCreated(
@@ -70,13 +72,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithPublished(DateTime.UtcNow.AddDays(-1))
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                 .WithPreviousVersionId(Guid.NewGuid())
-                .WithYear(2035)
                 .WithType(ReleaseType.OfficialStatistics)
                 .WithReleaseStatuses(_fixture
                     .DefaultReleaseStatus()
                     .Generate(1))
                 .WithVersion(2)
-                .WithTimePeriodCoverage(TimeIdentifier.March)
                 .WithNotifiedOn(DateTime.UtcNow.AddDays(-4))
                 .WithNotifySubscribers(true)
                 .WithUpdatePublishedDate(true)

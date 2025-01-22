@@ -1,20 +1,17 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -36,31 +33,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     {
         private readonly DataFixture _dataFixture = new();
 
-        private static readonly Publication Publication = new()
-        {
-            Id = Guid.NewGuid()
-        };
-
-        private readonly ReleaseVersion _releaseVersion = new()
-        {
-            Id = Guid.NewGuid(),
-            PublicationId = Publication.Id,
-            Published = DateTime.Now,
-            TimePeriodCoverage = TimeIdentifier.April
-        };
-
         private readonly Guid _userId = Guid.NewGuid();
 
         [Fact]
         public async Task GetRelease()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
-                    userService =>
+                    async userService =>
                     {
-                        var service = BuildReleaseService(userService.Object);
-                        return service.GetRelease(_releaseVersion.Id);
+                        await using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.ReleaseVersions.Add(releaseVersion);
+                        await contextDbContext.SaveChangesAsync();
+
+                        var service = BuildService(
+                            contentDbContext: contextDbContext,
+                            userService: userService.Object);
+
+                        return await service.GetRelease(releaseVersion.Id);
                     }
                 );
         }
@@ -68,23 +63,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateRelease()
         {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(Publication, CanCreateReleaseForSpecificPublication)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        using var contextDbContext = InMemoryApplicationDbContext();
-                        contextDbContext.Publications.Add(Publication);
-                        contextDbContext.SaveChangesAsync();
+            Publication publication = _dataFixture.DefaultPublication();
 
-                        var service = BuildReleaseService(
-                            context: contextDbContext,
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFailWithMatcher<Publication>(p => p.Id == publication.Id,
+                    CanCreateReleaseForSpecificPublication)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        await using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.Publications.Add(publication);
+                        await contextDbContext.SaveChangesAsync();
+
+                        var service = BuildService(
+                            contentDbContext: contextDbContext,
                             userService: userService.Object);
 
-                        return service.CreateRelease(
+                        return await service.CreateRelease(
                             new ReleaseCreateRequest
                             {
-                                PublicationId = Publication.Id,
+                                PublicationId = publication.Id,
                             }
                         );
                     }
@@ -101,17 +99,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .SetupResourceCheckToFailWithMatcher<Publication>(p => p.Id == publication.Id,
                     CanViewSpecificPublication)
                 .AssertForbidden(
-                    userService =>
+                    async userService =>
                     {
-                        using var contextDbContext = InMemoryApplicationDbContext();
+                        await using var contextDbContext = InMemoryApplicationDbContext();
                         contextDbContext.Publications.Add(publication);
-                        contextDbContext.SaveChangesAsync();
+                        await contextDbContext.SaveChangesAsync();
 
-                        var service = BuildReleaseService(
-                            context: contextDbContext,
+                        var service = BuildService(
+                            contentDbContext: contextDbContext,
                             userService: userService.Object);
 
-                        return service.GetLatestPublishedRelease(publication.Id);
+                        return await service.GetLatestPublishedRelease(publication.Id);
                     }
                 );
         }
@@ -119,13 +117,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetDeleteReleaseVersionPlan()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanDeleteSpecificRelease)
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
+                    CanDeleteSpecificRelease)
                 .AssertForbidden(
-                    userService =>
+                    async userService =>
                     {
-                        var service = BuildReleaseService(userService.Object);
-                        return service.GetDeleteReleaseVersionPlan(_releaseVersion.Id);
+                        await using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.ReleaseVersions.Add(releaseVersion);
+                        await contextDbContext.SaveChangesAsync();
+
+                        var service = BuildService(
+                            contentDbContext: contextDbContext,
+                            userService: userService.Object);
+
+                        return await service.GetDeleteReleaseVersionPlan(releaseVersion.Id);
                     }
                 );
         }
@@ -133,20 +143,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task DeleteRelease()
         {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanDeleteSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        using var contextDbContext = InMemoryApplicationDbContext();
-                        contextDbContext.ReleaseVersions.Add(_releaseVersion);
-                        contextDbContext.SaveChangesAsync();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
-                        var service = BuildReleaseService(
-                            context: contextDbContext,
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
+                    CanDeleteSpecificRelease)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        await using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.ReleaseVersions.Add(releaseVersion);
+                        await contextDbContext.SaveChangesAsync();
+
+                        var service = BuildService(
+                            contentDbContext: contextDbContext,
                             userService: userService.Object);
-                        
-                        return service.DeleteReleaseVersion(_releaseVersion.Id);
+
+                        return await service.DeleteReleaseVersion(releaseVersion.Id);
                     }
                 );
         }
@@ -154,42 +169,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task DeleteTestRelease()
         {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanDeleteTestRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        using var contextDbContext = InMemoryApplicationDbContext();
-                        contextDbContext.ReleaseVersions.Add(_releaseVersion);
-                        contextDbContext.SaveChangesAsync();
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
-                        var service = BuildReleaseService(
-                            context: contextDbContext,
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
+                    CanDeleteTestRelease)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        await using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.ReleaseVersions.Add(releaseVersion);
+                        await contextDbContext.SaveChangesAsync();
+
+                        var service = BuildService(
+                            contentDbContext: contextDbContext,
                             userService: userService.Object);
                         
-                        return service.DeleteTestReleaseVersion(_releaseVersion.Id);
+                        return await service.DeleteTestReleaseVersion(releaseVersion.Id);
                     }
                 );
         }
-        
+
         [Fact]
         public async Task ListReleasesWithStatuses_CanViewAllReleases()
         {
-            var releaseVersionRepository = new Mock<IReleaseVersionRepository>();
-
-            var list = new List<ReleaseVersion>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    ReleaseName = "2000",
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                }
-            };
-
-            releaseVersionRepository
-                .Setup(s => s.ListReleases(ReleaseApprovalStatus.Approved))
-                .ReturnsAsync(list);
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved);
 
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupCheck(RegisteredUser)
@@ -198,61 +207,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     async userService =>
                     {
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanAssignPreReleaseUsersToSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(releaseVersion, CanAssignPreReleaseUsersToSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], ContentSecurityPolicies.CanViewSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(releaseVersion, CanUpdateSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanDeleteSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(releaseVersion, CanDeleteSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanMakeAmendmentOfSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(releaseVersion, CanMakeAmendmentOfSpecificRelease))
                             .ReturnsAsync(true);
 
-                        var service = BuildReleaseService(
-                            userService.Object,
-                            releaseVersionRepository: releaseVersionRepository.Object
-                        );
+                        await using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.ReleaseVersions.Add(releaseVersion);
+                        await contextDbContext.SaveChangesAsync();
+
+                        var service = BuildService(
+                            contentDbContext: contextDbContext,
+                            userService: userService.Object);
+
                         var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
                         var viewModel = result.AssertRight();
                         Assert.Single(viewModel);
-                        Assert.Equal(list[0].Id, viewModel[0].Id);
+                        Assert.Equal(releaseVersion.Id, viewModel[0].Id);
 
                         return result;
                     }
                 );
-
-            releaseVersionRepository.Verify(s => s.ListReleases(ReleaseApprovalStatus.Approved));
-            releaseVersionRepository.VerifyNoOtherCalls();
         }
 
         [Fact]
         public async Task ListReleasesWithStatuses_CanViewRelatedReleases()
         {
-            var repository = new Mock<IReleaseVersionRepository>();
+            var (releaseVersion, otherReleaseVersion) = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()))
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .GenerateTuple2();
 
-            var list = new List<ReleaseVersion>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    ReleaseName = "2000",
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                }
-            };
-
-            repository
-                .Setup(s => s.ListReleasesForUser(_userId, ReleaseApprovalStatus.Approved))
-                .ReturnsAsync(list);
+            UserReleaseRole userReleaseRole = _dataFixture.DefaultUserReleaseRole()
+                .WithReleaseVersion(releaseVersion)
+                .WithUser(new User { Id = _userId })
+                .WithRole(ReleaseRole.Contributor);
 
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupCheck(RegisteredUser)
@@ -261,45 +266,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     async userService =>
                     {
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanAssignPreReleaseUsersToSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(releaseVersion, CanAssignPreReleaseUsersToSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], ContentSecurityPolicies.CanViewSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(releaseVersion, CanUpdateSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanDeleteSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(releaseVersion, CanDeleteSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanMakeAmendmentOfSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(releaseVersion, CanMakeAmendmentOfSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService
                             .Setup(s => s.GetUserId())
                             .Returns(_userId);
 
-                        var service = BuildReleaseService(
-                            userService.Object,
-                            releaseVersionRepository: repository.Object
-                        );
+                        await using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.ReleaseVersions.AddRange(releaseVersion, otherReleaseVersion);
+                        contextDbContext.UserReleaseRoles.AddRange(userReleaseRole);
+                        await contextDbContext.SaveChangesAsync();
+
+                        var service = BuildService(
+                            contentDbContext: contextDbContext,
+                            userService: userService.Object);
+
                         var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
                         var viewModel = result.AssertRight();
                         Assert.Single(viewModel);
-                        Assert.Equal(list[0].Id, viewModel[0].Id);
+                        Assert.Equal(releaseVersion.Id, viewModel[0].Id);
 
                         return result;
                     }
                 );
-
-            repository.Verify(s => s.ListReleasesForUser(_userId, ReleaseApprovalStatus.Approved));
-            repository.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -310,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     async userService =>
                     {
-                        var service = BuildReleaseService(userService: userService.Object);
+                        var service = BuildService(userService: userService.Object);
                         return await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
                     }
                 );
@@ -319,13 +326,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveDataFiles()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
+                    CanUpdateSpecificRelease)
                 .AssertForbidden(
                     async userService =>
                     {
-                        var service = BuildReleaseService(userService.Object);
-                        return await service.RemoveDataFiles(_releaseVersion.Id, Guid.NewGuid());
+                        await using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.ReleaseVersions.Add(releaseVersion);
+                        await contextDbContext.SaveChangesAsync();
+
+                        var service = BuildService(
+                            contentDbContext: contextDbContext,
+                            userService: userService.Object);
+
+                        return await service.RemoveDataFiles(releaseVersion.Id, Guid.NewGuid());
                     }
                 );
         }
@@ -333,30 +352,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateReleasePublished()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(IsBauUser)
                 .AssertForbidden(
-                    userService =>
+                    async userService =>
                     {
-                        var service = BuildReleaseService(userService.Object);
-                        return service.UpdateReleasePublished(_releaseVersion.Id,
+                        await using var contextDbContext = InMemoryApplicationDbContext();
+                        contextDbContext.ReleaseVersions.Add(releaseVersion);
+                        await contextDbContext.SaveChangesAsync();
+
+                        var service = BuildService(
+                            contentDbContext: contextDbContext,
+                            userService: userService.Object);
+
+                        return await service.UpdateReleasePublished(releaseVersion.Id,
                             new ReleasePublishedUpdateRequest());
                     }
                 );
         }
 
-        private ReleaseService BuildReleaseService(
+        private static ReleaseService BuildService(
             IUserService userService,
-            ContentDbContext? context = null,
+            ContentDbContext? contentDbContext = null,
+            StatisticsDbContext? statisticsDbContext = null,
             IReleaseVersionRepository? releaseVersionRepository = null)
         {
+            contentDbContext ??= Mock.Of<ContentDbContext>();
+            statisticsDbContext ??= Mock.Of<StatisticsDbContext>();
+
             return new ReleaseService(
-                context ?? Mock.Of<ContentDbContext>(),
-                Mock.Of<StatisticsDbContext>(),
+                contentDbContext,
+                statisticsDbContext,
                 AdminMapper(),
-                DefaultPersistenceHelperMock().Object,
+                MockUtils.MockPersistenceHelper<ContentDbContext>().Object,
                 userService,
-                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
+                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext, statisticsDbContext),
                 Mock.Of<IReleaseCacheService>(),
                 Mock.Of<IReleaseFileRepository>(),
                 Mock.Of<IReleaseDataFileService>(),
@@ -371,15 +405,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new SequentialGuidGenerator(),
                 Mock.Of<IBlobCacheService>()
             );
-        }
-
-        private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
-        {
-            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
-            MockUtils.SetupCall(mock, _releaseVersion.Id, _releaseVersion);
-            MockUtils.SetupCall(mock, Publication.Id, Publication);
-
-            return mock;
         }
     }
 }

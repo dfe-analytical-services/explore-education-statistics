@@ -109,11 +109,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId, q => q
-                    .Include(rv => rv.Release)
-                    .ThenInclude(r => r.Publication)
-                    .Include(rv => rv.ReleaseStatuses))
+            return await _context
+                .ReleaseVersions
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .Include(rv => rv.ReleaseStatuses)
+                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
                 .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(releaseVersion =>
                 {
@@ -210,12 +211,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
+        public async Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
             Guid releaseVersionId,
             CancellationToken cancellationToken = default)
         {
-            return _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            return await _context
+                .ReleaseVersions
+                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
                 .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
                 .OnSuccess(_ =>
                 {
@@ -535,13 +537,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseVersionId,
             ReleasePublishedUpdateRequest request)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId,
-                    queryable => queryable.Include(rv => rv.Publication))
+            return await _context
+                .ReleaseVersions
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
                 .OnSuccessDo(_userService.CheckIsBauUser)
-                .OnSuccess<ActionResult, ReleaseVersion, Unit>(async release =>
+                .OnSuccess<ActionResult, ReleaseVersion, Unit>(async releaseVersion =>
                 {
-                    if (release.Published == null)
+                    if (releaseVersion.Published == null)
                     {
                         return ValidationActionResult(ReleaseNotPublished);
                     }
@@ -554,23 +558,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReleasePublishedCannotBeFutureDate);
                     }
 
-                    _context.ReleaseVersions.Update(release);
-                    release.Published = newPublishedDate;
+                    _context.ReleaseVersions.Update(releaseVersion);
+                    releaseVersion.Published = newPublishedDate;
                     await _context.SaveChangesAsync();
 
                     // Update the cached release version
                     await _releaseCacheService.UpdateRelease(
                         releaseVersionId,
-                        publicationSlug: release.Publication.Slug,
-                        releaseSlug: release.Slug);
+                        publicationSlug: releaseVersion.Release.Publication.Slug,
+                        releaseSlug: releaseVersion.Release.Slug);
 
-                    if (release.Publication.LatestPublishedReleaseVersionId == releaseVersionId)
+                    if (releaseVersion.Release.Publication.LatestPublishedReleaseVersionId == releaseVersionId)
                     {
                         // This is the latest published release version so also update the latest cached release version
                         // for the publication which is a separate cache entry
                         await _releaseCacheService.UpdateRelease(
                             releaseVersionId,
-                            publicationSlug: release.Publication.Slug);
+                            publicationSlug: releaseVersion.Release.Publication.Slug);
                     }
 
                     return Unit.Instance;
@@ -730,8 +734,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            return await _context.ReleaseVersions
+                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => CheckReleaseDataFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
                 .OnSuccessDo(releaseFile => CheckCanDeleteDataFiles(releaseVersionId, releaseFile))

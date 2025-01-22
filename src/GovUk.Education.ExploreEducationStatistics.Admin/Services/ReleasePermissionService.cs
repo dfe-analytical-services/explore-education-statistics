@@ -134,9 +134,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId,
                     query =>
-                        query.Include(rv => rv.Publication))
+                        query.Include(rv => rv.Release)
+                            .ThenInclude(r => r.Publication))
                 .OnSuccessDo(releaseVersion => _userService
-                    .CheckCanUpdateReleaseRole(releaseVersion.Publication, Contributor))
+                    .CheckCanUpdateReleaseRole(releaseVersion.Release.Publication, Contributor))
                 .OnSuccess(async releaseVersion =>
                 {
                     var releaseContributorReleaseRoles = await _contentDbContext.UserReleaseRoles

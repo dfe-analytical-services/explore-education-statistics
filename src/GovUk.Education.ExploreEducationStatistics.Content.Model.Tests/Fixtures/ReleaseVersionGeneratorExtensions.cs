@@ -139,11 +139,6 @@ public static class ReleaseVersionGeneratorExtensions
         DateTime notifiedOn)
         => generator.ForInstance(releaseVersion => releaseVersion.SetNotifiedOn(notifiedOn));
 
-    public static Generator<ReleaseVersion> WithTimePeriodCoverage(
-        this Generator<ReleaseVersion> generator,
-        TimeIdentifier timePeriodCoverage)
-        => generator.ForInstance(releaseVersion => releaseVersion.SetTimePeriodCoverage(timePeriodCoverage));
-
     public static Generator<ReleaseVersion> WithNotifySubscribers(
         this Generator<ReleaseVersion> generator,
         bool notifySubscribers)

@@ -1,14 +1,15 @@
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -18,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class MethodologyServiceTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         [Fact]
         public async Task GetFiles()
         {
@@ -77,16 +80,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task GetLatestVersionByRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Title = "Publication",
-                    Slug = "publication-slug"
-                },
-                ReleaseName = "2018",
-                TimePeriodCoverage = AcademicYearQ1
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var methodologies = AsList(
                 new MethodologyVersion
@@ -116,7 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
+            methodologyVersionRepository
+                .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.Release.PublicationId))
                 .ReturnsAsync(methodologies);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -151,21 +148,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task IsBeingPublishedAlongsideRelease_Immediately()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             var methodologyVersion = new MethodologyVersion
             {
                 Status = Approved,
                 PublishingStrategy = Immediately,
             };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                PublicationId = Guid.NewGuid(),
-            };
-
             await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
 
-            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
+            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.Release.PublicationId))
                 .ReturnsAsync(false);
 
             var methodologyService = SetupMethodologyService(contentDbContext,
@@ -179,21 +175,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task IsBeingPublishedAlongsideRelease_Immediately_PublicationAlreadyPublished()
         {
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
+
             var methodologyVersion = new MethodologyVersion
             {
                 Status = Approved,
                 PublishingStrategy = Immediately,
             };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                PublicationId = Guid.NewGuid(),
-            };
-
             await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
 
-            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
+            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.Release.PublicationId))
                 .ReturnsAsync(true);
 
             var methodologyService = SetupMethodologyService(contentDbContext,
@@ -207,11 +202,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task IsBeingPublishedAlongsideRelease_WithRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = Guid.NewGuid(),
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -223,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
 
-            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
+            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.Release.PublicationId))
                 .ReturnsAsync(false);
 
             var methodologyService = SetupMethodologyService(contentDbContext,
@@ -237,11 +230,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task IsBeingPublishedAlongsideRelease_WithRelease_IncorrectRelease()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = Guid.NewGuid(),
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -253,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
 
-            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
+            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.Release.PublicationId))
                 .ReturnsAsync(false);
 
             var methodologyService = SetupMethodologyService(contentDbContext,
