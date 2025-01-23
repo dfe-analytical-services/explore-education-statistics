@@ -336,7 +336,7 @@ public class ProcessorStage2Tests
                     Assert.Null(filter.AutoSelectFilterItemId);
                     Assert.Null(filter.AutoSelectFilterItemLabel);
 
-                    // There should either be no Total items, or more one than (in different groups).
+                    // There should either be no Total items, or more than one (in different groups).
                     // If there is more than one, neither is set as the AutoSelectFilterItem
                     Assert.NotEqual(1, allFilterItems.Count(fi =>
                         fi.Label.Equals("Total", StringComparison.CurrentCultureIgnoreCase)));
