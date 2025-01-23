@@ -1,0 +1,76 @@
+#nullable enable
+using System;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Moq;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    AuthorizationHandlersTestUtil;
+using static Moq.MockBehavior;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
+
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public class UpdateSpecificReleaseAuthorizationHandlerTests
+{
+    private static readonly DataFixture DataFixture = new();
+
+    public class ClaimTests
+    {
+        [Fact]
+        public async Task UpdateAllPublications_ClaimSucceeds()
+        {
+            Release release = DataFixture.DefaultRelease();
+
+            await AssertHandlerSucceedsWithCorrectClaims<Release, UpdateSpecificReleaseRequirement>(
+                HandlerSupplier(release),
+                release,
+                SecurityClaimTypes.UpdateAllPublications
+            );
+        }
+    }
+
+    public class PublicationRoleTests
+    {
+        [Fact]
+        public async Task PublicationOwnersCanUpdateRelease()
+        {
+            Release release = DataFixture.DefaultRelease();
+
+            await AssertHandlerSucceedsWithPublicationRoles<
+                Release,
+                UpdateSpecificReleaseRequirement>(
+                handlerSupplier: HandlerSupplier(release),
+                entity: release,
+                publicationId: release.PublicationId,
+                publicationRolesExpectedToPass: new[]
+                {
+                    PublicationRole.Owner
+                });
+        }
+    }
+
+    private static Func<ContentDbContext, UpdateSpecificReleaseAuthorizationHandler> HandlerSupplier(
+        Release release)
+    {
+        return contentDbContext =>
+        {
+            contentDbContext.Releases.Add(release);
+            contentDbContext.SaveChanges();
+
+            return new UpdateSpecificReleaseAuthorizationHandler(
+                new AuthorizationHandlerService(
+                    new ReleaseVersionRepository(contentDbContext),
+                    new UserReleaseRoleRepository(contentDbContext),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPreReleaseService>(Strict)));
+        };
+    }
+}

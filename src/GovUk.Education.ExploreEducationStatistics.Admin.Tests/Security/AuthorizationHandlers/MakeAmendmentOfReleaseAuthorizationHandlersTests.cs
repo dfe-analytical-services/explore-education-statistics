@@ -13,7 +13,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
+    ReleaseVersionAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 0 });
 
                 // Assert that no User Publication roles will allow an unpublished Release that is the only version to be amended
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                     MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
 
                 // Assert that a User who has the Publication Owner role on a Release can amend it if it is the only version published
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                     MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
@@ -208,7 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
 
                 // Assert that no User Publication roles will allow an amendment Release that is not yet approved to be amended
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                     MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
@@ -232,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 0);
 
                 // Assert that no User Publication roles will allow an amendment Release that is not the latest version to be amended
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                     MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
@@ -256,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 1);
 
                 // Assert that a User who has the Publication Owner role on a Release can amend it if it is the latest published version
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                     MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
@@ -284,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 0 });
 
                 // Assert that no User Release roles will allow an unpublished Release that is the only version to be amended
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Publications.Add(publication);
@@ -307,7 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
 
                 // Assert that no User Release roles will allow a published Release that is the only version to be amended
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Publications.Add(publication);
@@ -330,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
 
                 // Assert that no User Release roles will allow an amendment Release that is not yet approved to be amended
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Publications.Add(publication);
@@ -353,7 +353,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 0);
 
                 // Assert that no User Release roles will allow an amendment Release that is not the latest version to be amended
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Publications.Add(publication);
@@ -376,7 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 1);
 
                 // Assert that no User Release roles will allow an amendment Release that is the latest version to be amended
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Publications.Add(publication);
