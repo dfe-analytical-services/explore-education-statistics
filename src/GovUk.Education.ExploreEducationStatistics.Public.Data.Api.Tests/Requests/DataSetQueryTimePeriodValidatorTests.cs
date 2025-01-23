@@ -157,7 +157,7 @@ public class DataSetQueryTimePeriodValidatorTests
             .WithErrorMessage(ValidationMessages.TimePeriodAllowedCode.Message)
             .WithCustomState<TimePeriodAllowedCodeErrorDetail>(s => s.Value == code)
             .WithCustomState<TimePeriodAllowedCodeErrorDetail>(s =>
-                s.AllowedCodes.SequenceEqual(TimeIdentifierUtils.DataCodes.Order()))
+                s.AllowedCodes.SequenceEqual(TimeIdentifierUtils.Codes.Order()))
             .Only();
     }
 
