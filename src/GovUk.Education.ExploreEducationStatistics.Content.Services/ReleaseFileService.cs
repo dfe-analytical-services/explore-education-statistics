@@ -129,17 +129,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
                 .OnSuccess(userService.CheckCanViewReleaseVersion)
                 .OnSuccessVoid(
-                    async release =>
+                    async releaseVersion =>
                     {
                         if (fileIds is null
-                            && await TryStreamCachedAllFilesZip(release, outputStream, cancellationToken))
+                            && await TryStreamCachedAllFilesZip(releaseVersion, outputStream, cancellationToken))
                         {
                             return;
                         }
 
                         if (fileIds is null)
                         {
-                            await ZipAllFilesToStream(release, outputStream, cancellationToken);
+                            await ZipAllFilesToStream(releaseVersion, outputStream, cancellationToken);
                         }
                         else
                         {
@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                                 .OrderBy(rf => rf.File.ZipFileEntryName())
                                 .ToList();
 
-                            await DoZipFilesToStream(releaseFiles, release, outputStream, cancellationToken);
+                            await DoZipFilesToStream(releaseFiles, releaseVersion, outputStream, cancellationToken);
                         }
                     }
                 );

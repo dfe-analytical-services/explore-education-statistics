@@ -44,18 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task StreamFile()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
-
             var releaseFile = new ReleaseFile
             {
-                ReleaseVersion = releaseVersion,
+                ReleaseVersion = new ReleaseVersion(),
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -69,7 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -84,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object);
 
-                var result = await service.StreamFile(releaseVersionId: releaseVersion.Id,
+                var result = await service.StreamFile(releaseVersionId: releaseFile.ReleaseVersionId,
                     fileId: releaseFile.File.Id);
 
                 MockUtils.VerifyAllMocks(publicBlobStorageService);
@@ -156,18 +146,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task StreamFile_BlobDoesNotExist()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                },
-                Slug = "release-slug"
-            };
-
             var releaseFile = new ReleaseFile
             {
-                ReleaseVersion = releaseVersion,
+                ReleaseVersion = new ReleaseVersion(),
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -180,7 +161,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -194,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object);
 
-                var result = await service.StreamFile(releaseVersionId: releaseVersion.Id,
+                var result = await service.StreamFile(releaseVersionId: releaseFile.ReleaseVersionId,
                     fileId: releaseFile.File.Id);
 
                 MockUtils.VerifyAllMocks(publicBlobStorageService);

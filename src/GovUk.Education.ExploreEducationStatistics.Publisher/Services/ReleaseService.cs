@@ -21,23 +21,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task<ReleaseVersion> Get(Guid releaseVersionId)
         {
             return await contentDbContext.ReleaseVersions
+                .Include(rv => rv.Release)
                 .SingleAsync(releaseVersion => releaseVersion.Id == releaseVersionId);
-        }
-
-        public async Task<IEnumerable<ReleaseVersion>> List(IEnumerable<Guid> releaseVersionIds)
-        {
-            return await contentDbContext.ReleaseVersions
-                .Where(rv => releaseVersionIds.Contains(rv.Id))
-                .Include(rv => rv.Publication)
-                .Include(rv => rv.PreviousVersion)
-                .ToListAsync();
         }
 
         public async Task<IEnumerable<ReleaseVersion>> GetAmendedReleases(IEnumerable<Guid> releaseVersionIds)
         {
             return await contentDbContext.ReleaseVersions
                 .Include(rv => rv.PreviousVersion)
-                .Include(rv => rv.Publication)
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
                 .Where(rv => releaseVersionIds.Contains(rv.Id) && rv.PreviousVersionId != null)
                 .ToListAsync();
         }

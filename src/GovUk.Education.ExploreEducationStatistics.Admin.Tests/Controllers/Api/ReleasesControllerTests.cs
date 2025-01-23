@@ -877,6 +877,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal(expectedNewLabel, release.Label);
                 Assert.Equal(expectedNewSlug, release.Slug);
 
+                // TODO EES-5659 - Remove the assertion on ReleaseVersion.Slug
                 var releaseVersion = Assert.Single(release.Versions);
                 Assert.Equal(expectedNewSlug, releaseVersion.Slug);
             }

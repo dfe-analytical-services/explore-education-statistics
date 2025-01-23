@@ -62,7 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             // In future we should change the storage path for cached items to use Publication and Release id's in the
             // directory structure rather than slugs so that we don't need to lookup the Publication from the Content Release.
             return await _contentPersistenceHelper.CheckEntityExists<ReleaseVersion>(releaseSubject.ReleaseVersionId,
-                    q => q.Include(releaseVersion => releaseVersion.Publication))
+                    q => q.Include(rv => rv.Release)
+                        .ThenInclude(r => r.Publication))
                 .OnSuccess(releaseVersion => new CacheableReleaseSubject(releaseSubject, releaseVersion));
         }
 

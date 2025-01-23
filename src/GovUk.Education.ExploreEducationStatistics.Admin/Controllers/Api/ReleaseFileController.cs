@@ -63,14 +63,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(
                     releaseVersionId,
-                    q => q.Include(rv => rv.Publication)
+                    q => q.Include(rv => rv.Release)
+                        .ThenInclude(r => r.Publication)
                 )
                 .OnSuccess(
                     async releaseVersion =>
                     {
                         Response.ContentDispositionAttachment(
                             contentType: MediaTypeNames.Application.Octet,
-                            filename: $"{releaseVersion.Publication.Slug}_{releaseVersion.Slug}.zip");
+                            filename: $"{releaseVersion.Release.Publication.Slug}_{releaseVersion.Release.Slug}.zip");
 
                         // We start the response immediately, before all of the files have
                         // even downloaded from blob storage. As we download them, they are

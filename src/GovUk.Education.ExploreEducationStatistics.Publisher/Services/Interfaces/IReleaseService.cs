@@ -10,8 +10,6 @@ public interface IReleaseService
 {
     Task<ReleaseVersion> Get(Guid releaseVersionId);
 
-    Task<IEnumerable<ReleaseVersion>> List(IEnumerable<Guid> releaseVersionIds);
-
     Task<IEnumerable<ReleaseVersion>> GetAmendedReleases(IEnumerable<Guid> releaseVersionIds);
 
     Task<List<File>> GetFiles(Guid releaseVersionId, params FileType[] types);

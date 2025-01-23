@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _publicationCacheService = publicationCacheService;
         }
 
-        public async Task DeletePreviousVersionsContent(params Guid[] releaseVersionIds)
+        public async Task DeletePreviousVersionsContent(IReadOnlyList<Guid> releaseVersionIds)
         {
             var releaseVersions = await _releaseService.GetAmendedReleases(releaseVersionIds);
 
@@ -59,16 +60,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 }
 
                 // Delete any lazily-cached results that are owned by the previous Release
-                await DeleteLazilyCachedReleaseResults(previousReleaseVersion.Id, releaseVersion.Publication.Slug, previousReleaseVersion.Slug);
-
-                // Delete content which hasn't been overwritten because the Slug has changed
-                if (releaseVersion.Slug != previousReleaseVersion.Slug)
-                {
-                    await _publicBlobStorageService.DeleteBlob(
-                        PublicContent,
-                        PublicContentReleasePath(releaseVersion.Publication.Slug, previousReleaseVersion.Slug)
-                    );
-                }
+                await DeleteLazilyCachedReleaseResults(
+                    releaseVersionId: previousReleaseVersion.Id,
+                    publicationSlug: releaseVersion.Release.Publication.Slug,
+                    releaseSlug: previousReleaseVersion.Release.Slug);
             }
         }
 
@@ -83,9 +78,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _publicBlobCacheService.DeleteCacheFolderAsync(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
         }
 
-        public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseVersionIds)
+        public async Task DeletePreviousVersionsDownloadFiles(IReadOnlyList<Guid> releaseVersionIds)
         {
-            var releaseVersions = await _releaseService.List(releaseVersionIds);
+            var releaseVersions = await _contentDbContext.ReleaseVersions
+                .Where(rv => releaseVersionIds.Contains(rv.Id))
+                .Include(rv => rv.PreviousVersion)
+                .ToListAsync();
 
             foreach (var releaseVersion in releaseVersions)
             {

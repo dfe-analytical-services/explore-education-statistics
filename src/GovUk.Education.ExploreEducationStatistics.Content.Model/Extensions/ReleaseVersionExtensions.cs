@@ -19,13 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
         public static string AllFilesZipFileName(this ReleaseVersion releaseVersion)
         {
-            if (releaseVersion.Publication == null)
+            if (releaseVersion.Release?.Publication == null)
             {
                 throw new ArgumentException(
                     "ReleaseVersion must be hydrated with Publication to create All Files zip file name");
             }
 
-            return $"{releaseVersion.Publication.Slug}_{releaseVersion.Slug}.zip";
+            return $"{releaseVersion.Release.Publication.Slug}_{releaseVersion.Release.Slug}.zip";
         }
     }
 }
