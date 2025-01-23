@@ -671,7 +671,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 var error = Assert.Single(validationProblem.Errors);
 
-                Assert.Equal(UpdateRequestForPublishedReleaseInvalid.ToString(), error.Code);
+                Assert.Equal(UpdateRequestForPublishedReleaseVersionInvalid.ToString(), error.Code);
             }
 
             [Fact]
@@ -699,7 +699,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 var error = Assert.Single(validationProblem.Errors);
 
-                Assert.Equal(UpdateRequestForPublishedReleaseInvalid.ToString(), error.Code);
+                Assert.Equal(UpdateRequestForPublishedReleaseVersionInvalid.ToString(), error.Code);
             }
 
             [Fact]
@@ -727,7 +727,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
                 var error = Assert.Single(validationProblem.Errors);
 
-                Assert.Equal(UpdateRequestForPublishedReleaseInvalid.ToString(), error.Code);
+                Assert.Equal(UpdateRequestForPublishedReleaseVersionInvalid.ToString(), error.Code);
             }
 
             [Fact]

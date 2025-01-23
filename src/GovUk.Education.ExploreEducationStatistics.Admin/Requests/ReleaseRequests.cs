@@ -30,3 +30,9 @@ public record ReleaseCreateRequest
 
     public Guid? TemplateReleaseId { get; init; }
 }
+
+public record ReleaseUpdateRequest
+{
+    [MaxLength(50)]
+    public string? Label { get; init; }
+}

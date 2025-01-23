@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -99,18 +98,28 @@ public class ReleaseService(
             });
     }
 
-    private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(
-        string slug,
-        Guid publicationId,
-        Guid? releaseId = null)
+    public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, ReleaseUpdateRequest releaseUpdate)
     {
-        var slugAlreadyExists = await context.Releases
-            .Where(r => r.PublicationId == publicationId)
-            .AnyAsync(r => r.Slug == slug && r.Id != releaseId);
+        return await GetRelease(releaseId)
+            .OnSuccess(userService.CheckCanUpdateRelease)
+            .OnSuccessCombineWith(release => CalculateNewReleaseSlug(release, releaseUpdate))
+            .OnSuccess(async releaseAndNewSlug =>
+            {
+                var (release, newReleaseSlug) = releaseAndNewSlug;
 
-        return slugAlreadyExists 
-            ? ValidationActionResult(SlugNotUnique) 
-            : Unit.Instance;
+                return await ValidateReleaseSlugUniqueToPublication(
+                    slug: newReleaseSlug,
+                    publicationId: release.PublicationId,
+                    releaseId: releaseId)
+                    .OnSuccess(_ => (release, newReleaseSlug));
+            })
+            .OnSuccessDo(async _ => await ValidateReleaseIsNotUndergoingPublishing(releaseId))
+            .OnSuccessDo(async releaseAndNewSlug => await UpdateRelease(
+                release: releaseAndNewSlug.release,
+                newReleaseSlug: releaseAndNewSlug.newReleaseSlug,
+                releaseUpdate: releaseUpdate))
+            .OnSuccess(async () => await GetRelease(releaseId))
+            .OnSuccess(MapRelease);
     }
 
     private async Task CreateGenericContentFromTemplate(
@@ -148,6 +157,77 @@ public class ReleaseService(
             Heading = originalSection.Heading,
             Order = originalSection.Order,
             Type = originalSection.Type
+        };
+    }
+
+    private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(
+        string slug,
+        Guid publicationId,
+        Guid? releaseId = null)
+    {
+        var slugAlreadyExists = await context.Releases
+            .Where(r => r.PublicationId == publicationId)
+            .AnyAsync(r => r.Slug == slug && r.Id != releaseId);
+
+        return slugAlreadyExists 
+            ? ValidationActionResult(SlugNotUnique) 
+            : Unit.Instance;
+    }
+
+    private static Either<ActionResult, string> CalculateNewReleaseSlug(Release release, ReleaseUpdateRequest releaseUpdate)
+    {
+        return NamingUtils.CreateReleaseSlug(
+            year: release.Year,
+            timePeriodCoverage: release.TimePeriodCoverage,
+            label: releaseUpdate.Label);
+    }
+
+    private async Task<Either<ActionResult, Unit>> ValidateReleaseIsNotUndergoingPublishing(Guid releaseId)
+    {
+        var releaseVersions = await context.ReleaseVersions
+            .Where(rv => rv.ReleaseId == releaseId)
+            .Select(rv => new
+            {
+                rv.ApprovalStatus,
+                rv.Published
+            })
+            .ToListAsync();
+
+        var existsUnpublishedApprovedReleaseVersions = releaseVersions
+            .Any(rv => rv.ApprovalStatus == ReleaseApprovalStatus.Approved && rv.Published is null);
+
+        return existsUnpublishedApprovedReleaseVersions 
+            ? ValidationActionResult(ReleaseUndergoingPublishing) 
+            : Unit.Instance;
+    }
+
+    private async Task<Either<ActionResult, Unit>> UpdateRelease(Release release, string newReleaseSlug, ReleaseUpdateRequest releaseUpdate)
+    {
+        release.Label = releaseUpdate.Label;
+        release.Slug = newReleaseSlug;
+
+        await context.SaveChangesAsync();
+
+        return Unit.Instance;
+    }
+
+    private async Task<Either<ActionResult, Release>> GetRelease(Guid releaseId)
+    {
+        return await context.Releases
+            .SingleOrNotFoundAsync(p => p.Id == releaseId);
+    }
+
+    private static ReleaseViewModel MapRelease(Release release)
+    {
+        return new ReleaseViewModel
+        {
+            Id = release.Id,
+            PublicationId = release.PublicationId,
+            Slug = release.Slug,
+            TimePeriodCoverage = release.TimePeriodCoverage,
+            Year = release.Year,
+            Label = release.Label,
+            Title = release.Title,
         };
     }
 }
