@@ -96,11 +96,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             PreReleaseAccessList = originalReleaseVersion.PreReleaseAccessList,
             NextReleaseDate = originalReleaseVersion.NextReleaseDate,
 
-            // TODO EES-5659 Remove setting ReleaseName, TimePeriodCoverage, Slug
-            ReleaseName = originalReleaseVersion.ReleaseName,
-            TimePeriodCoverage = originalReleaseVersion.TimePeriodCoverage,
-            Slug = originalReleaseVersion.Slug,
-
             // Assign new amendment-specific values to various fields.
 
             // TODO EES-4637 - we need to decide on how we're being consistent with Created dates in Release Amendments.
