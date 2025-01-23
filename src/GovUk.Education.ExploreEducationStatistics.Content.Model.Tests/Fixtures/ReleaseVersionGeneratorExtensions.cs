@@ -116,11 +116,6 @@ public static class ReleaseVersionGeneratorExtensions
         Guid previousVersionId)
         => generator.ForInstance(releaseVersion => releaseVersion.SetPreviousVersionId(previousVersionId));
 
-    public static Generator<ReleaseVersion> WithYear(
-        this Generator<ReleaseVersion> generator,
-        int year)
-        => generator.ForInstance(releaseVersion => releaseVersion.SetYear(year));
-
     public static Generator<ReleaseVersion> WithSoftDeleted(this Generator<ReleaseVersion> generator)
         => generator.ForInstance(releaseVersion => releaseVersion.SetSoftDeleted());
 
@@ -340,11 +335,6 @@ public static class ReleaseVersionGeneratorExtensions
         this InstanceSetters<ReleaseVersion> setters,
         Guid? previousVersionId)
         => setters.Set(releaseVersion => releaseVersion.PreviousVersionId, previousVersionId);
-
-    public static InstanceSetters<ReleaseVersion> SetYear(
-        this InstanceSetters<ReleaseVersion> setters,
-        int year)
-        => setters.Set(releaseVersion => releaseVersion.ReleaseName, year.ToString());
 
     public static InstanceSetters<ReleaseVersion> SetSoftDeleted(this InstanceSetters<ReleaseVersion> setters)
         => setters.Set(releaseVersion => releaseVersion.SoftDeleted, true);

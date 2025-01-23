@@ -1787,19 +1787,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             const string dataFileName = "test-data.csv";
             const string metaFileName = "test-data.meta.csv";
 
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2000",
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                    Theme = new Theme
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test theme"
-                    }
-                }
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1927,19 +1917,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             const string dataFileName = "test-data.csv";
             const string metaFileName = "test-data.meta.csv";
 
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2000",
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                    Theme = new Theme
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test theme"
-                    }
-                }
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var originalSubject = new Subject
             {
@@ -2143,19 +2123,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             const string dataFileName = "test-data.csv";
             const string metaFileName = "test-data.meta.csv";
 
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2000",
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                    Theme = new Theme
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test theme"
-                    }
-                },
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var releaseFiles = new List<ReleaseFile>
             {
@@ -2296,20 +2266,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             const string metaFileName = "test-data.meta.csv";
             const string zipFileName = "test-data-archive.zip";
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2000",
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                    Theme = new Theme
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test theme"
-                    }
-                }
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2443,20 +2402,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             const string metaFileName = "test-data.meta.csv";
             const string zipFileName = "test-data-archive.zip";
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2000",
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                    Theme = new Theme
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test theme"
-                    }
-                }
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var releaseFiles = new List<ReleaseFile>
             {
@@ -2592,19 +2540,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             const string metaFileName = "test-data.meta.csv";
             const string zipFileName = "test-data-archive.zip";
 
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2000",
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                    Theme = new Theme
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test theme"
-                    }
-                }
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var originalSubject = new Subject
             {
@@ -2786,20 +2724,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ValidateAndUploadBulkZip_InvalidZipFile_ReturnsValidationResult()
         {
             // Arrange
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2000",
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                    Theme = new Theme
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test theme"
-                    }
-                }
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -2839,20 +2766,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateAndUploadBulkZip()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2000",
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                    Theme = new Theme
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test theme"
-                    }
-                }
-            };
+            ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease()
+                    .WithPublication(_fixture.DefaultPublication()));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
