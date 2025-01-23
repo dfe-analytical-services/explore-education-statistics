@@ -20,7 +20,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
+    ReleaseVersionAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task HasOwnerOrApproverRoleOnParentPublication()
             {
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Attach(ReleaseVersion);
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task UnrestrictedViewerRoleOnRelease()
             {
                 // Assert that a User who has any unrestricted viewer role on a Release can view the Release
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Attach(ReleaseVersion);
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 var userId = Guid.NewGuid();
 
-                var successScenario = new ReleaseHandlerTestScenario
+                var successScenario = new ReleaseVersionHandlerTestScenario
                 {
                     Entity = ReleaseVersion,
                     User = DataFixture.AuthenticatedUser(userId: userId),
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 // Assert that a User who specifically has the Pre Release role will cause this handler to succeed
                 // if the Pre Release window is currently open.
-                await AssertReleaseHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
+                await AssertReleaseVersionHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
                     contentDbContext => CreateHandler(contentDbContext, preReleaseService.Object),
                     successScenario);
 
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 var userId = Guid.NewGuid();
 
-                var failureScenario = new ReleaseHandlerTestScenario
+                var failureScenario = new ReleaseVersionHandlerTestScenario
                 {
                     Entity = ReleaseVersion,
                     User = DataFixture.AuthenticatedUser(userId: userId),
@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         // Assert that a User who specifically has the Pre Release role will cause this handler to fail
                         // IF the Pre Release window is NOT open
-                        await AssertReleaseHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
+                        await AssertReleaseVersionHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
                             contentDbContext =>
                             {
                                 contentDbContext.Attach(ReleaseVersion);
