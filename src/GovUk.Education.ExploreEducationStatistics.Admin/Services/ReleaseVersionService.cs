@@ -745,7 +745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var labelChanged = releaseVersion.Release.Label != request.Label;
 
             return yearChanged || timePeriodCoverageChanged || labelChanged
-                ? ValidationActionResult(UpdateRequestForPublishedReleaseInvalid)
+                ? ValidationActionResult(UpdateRequestForPublishedReleaseVersionInvalid)
                 : Unit.Instance;
         }
 

@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
@@ -18,6 +19,15 @@ public class ReleasesController(IReleaseService releaseService) : ControllerBase
     {
         return await releaseService
             .CreateRelease(release)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpPatch("releases/{releaseId:guid}")]
+    public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(ReleaseUpdateRequest request,
+        Guid releaseId)
+    {
+        return await releaseService
+            .UpdateRelease(releaseId, request)
             .HandleFailuresOrOk();
     }
 }
