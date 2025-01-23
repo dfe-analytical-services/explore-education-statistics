@@ -24,7 +24,7 @@ using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Cont
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class UpdateSpecificReleaseAuthorizationHandlerTests
+    public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
     {
         public class ClaimTests
         {
