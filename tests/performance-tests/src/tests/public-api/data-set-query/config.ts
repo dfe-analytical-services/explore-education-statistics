@@ -66,6 +66,7 @@ function getProfileConfig(): Options {
     }
     case 'stress': {
       return rampingRequestRateProfile({
+        rampingStageDurationMinutes: 10,
         mainStageDurationMinutes: 10,
         cooldownStageDurationMinutes: 10,
         maxRequestRatePerSecond: 40,
