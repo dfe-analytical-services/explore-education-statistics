@@ -14,7 +14,7 @@ using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
+    ReleaseVersionAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class PublicationRoleTests
         {
             [Fact]
-            public async Task PublicationOwnerAndApproversCanUpdateUnapprovedRelease()
+            public async Task PublicationOwnerAndApproversCanUpdateUnapprovedReleaseVersion()
             {
                 await GetEnums<ReleaseApprovalStatus>()
                     .Where(releaseStatus => releaseStatus != Approved)
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                             // Assert that a Publication Owner or Approver can update the Release in any approval
                             // state other than Admin
-                            await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                                 UpdateSpecificReleaseVersionRequirement>(
                                 HandlerSupplier(releaseVersion),
                                 releaseVersion,
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task NoRolesCanUpdateApprovedRelease()
+            public async Task NoRolesCanUpdateApprovedReleaseVersion()
             {
                 var releaseVersion = new ReleaseVersion
                 {
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 // Assert that no Publication Role can update the Release if it is Approved.
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                     UpdateSpecificReleaseVersionRequirement>(
                     HandlerSupplier(releaseVersion),
                     releaseVersion,
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ReleaseRoleTests
         {
             [Fact]
-            public async Task EditorsCanUpdateUnapprovedRelease()
+            public async Task EditorsCanUpdateUnapprovedReleaseVersion()
             {
                 await GetEnums<ReleaseApprovalStatus>()
                     .Where(releaseStatus => releaseStatus != Approved)
@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                             // Assert that a Release Editor (Contributor, Lead, Approver) can update the Release
                             // in any approval state other than Approved.
-                            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
                                 UpdateSpecificReleaseVersionRequirement>(
                                 HandlerSupplier(releaseVersion),
                                 releaseVersion,
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task NoRolesCanUpdateApprovedRelease()
+            public async Task NoRolesCanUpdateApprovedReleaseVersion()
             {
                 var releaseVersion = new ReleaseVersion
                 {
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 // Assert that no Publication Role can update the Release if it is Approved.
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
                     UpdateSpecificReleaseVersionRequirement>(
                     HandlerSupplier(releaseVersion),
                     releaseVersion,

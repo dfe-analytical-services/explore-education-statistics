@@ -217,6 +217,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(publication, SecurityPolicies.CanCreateReleaseForSpecificPublication);
         }
 
+        public static Task<Either<ActionResult, Release>> CheckCanUpdateRelease(
+            this IUserService userService,
+            Release release)
+        {
+            return userService.CheckPolicy(release, SecurityPolicies.CanUpdateSpecificRelease);
+        }
+
         public static Task<Either<ActionResult, Publication>> CheckCanViewPublication(
             this IUserService userService,
             Publication publication)

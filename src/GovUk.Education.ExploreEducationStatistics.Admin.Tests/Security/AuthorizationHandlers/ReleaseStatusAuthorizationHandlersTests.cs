@@ -16,7 +16,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
+    ReleaseVersionAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             // role on a Release can update its status if it is not Approved
                             if (status != ReleaseApprovalStatus.Approved)
                             {
-                                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
                                     MarkReleaseAsDraftRequirement>(
                                     context =>
                                     {
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             {
                                 // Assert that a user who has the "Approver" role on a
                                 // Release can update its status if it is Approved
-                                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
                                     MarkReleaseAsDraftRequirement>(
                                     context =>
                                     {
@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             // on a Release can mark its status as Draft if it is not yet Approved.
                             if (status != ReleaseApprovalStatus.Approved)
                             {
-                                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                                     MarkReleaseAsDraftRequirement>(
                                     context =>
                                     {
@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 // Assert that a User who has the Publication Approver role on a
                                 // Release can mark its status as draft if it is currently Approved
                                 // but not yet published, just as a Release Approver can.
-                                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                                     MarkReleaseAsDraftRequirement>(
                                     context =>
                                     {
@@ -272,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             // role on a Release can update its status if it is not Approved
                             if (status != ReleaseApprovalStatus.Approved)
                             {
-                                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
                                     MarkReleaseAsHigherLevelReviewRequirement>(
                                     context =>
                                     {
@@ -291,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             {
                                 // Assert that a user who has the "Approver" role on a
                                 // Release can update its status if it is Approved
-                                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
                                     MarkReleaseAsHigherLevelReviewRequirement>(
                                     context =>
                                     {
@@ -338,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             // Release can mark it for higher review if it is not Approved
                             if (status != ReleaseApprovalStatus.Approved)
                             {
-                                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                                     MarkReleaseAsHigherLevelReviewRequirement>(
                                     context =>
                                     {
@@ -356,7 +356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             {
                                 // Assert that a User who has the Publication Approver role on a
                                 // Release can mark it for higher review even if it is not Approved
-                                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                                     MarkReleaseAsHigherLevelReviewRequirement>(
                                     context =>
                                     {
@@ -455,7 +455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                             // Assert that a user who has the "Approver" role on a
                             // Release can update its status if it is Approved
-                            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsApprovedRequirement>(
+                            await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsApprovedRequirement>(
                                 context =>
                                 {
                                     context.ReleaseVersions.Add(releaseVersion);
@@ -498,7 +498,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                             // Assert that a user who has the "Approver" role on the
                             // Publication for the Release can update its status
-                            await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                            await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                                 MarkReleaseAsApprovedRequirement>(
                                 context =>
                                 {
@@ -711,7 +711,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             );
 
                         // Assert that no user release roles allow updating a Release status once it has started publishing
-                        await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(context =>
+                        await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(context =>
                             {
                                 context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
@@ -724,7 +724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         );
 
                         // Assert that no user publication roles allow updating a Release status once it has started publishing
-                        await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(context =>
+                        await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(context =>
                             {
                                 context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
@@ -769,7 +769,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that no user release roles allow updating a Release status once it has been published
-                        await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(context =>
+                        await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(context =>
                             {
                                 context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
@@ -782,7 +782,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         );
 
                         // Assert that no user publication roles allow updating a Release status once it has started publishing
-                        await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(context =>
+                        await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(context =>
                             {
                                 context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();

@@ -91,6 +91,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanCreateReleaseForSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new CreateReleaseForSpecificPublicationRequirement()));
 
+                options.AddPolicy(SecurityPolicies.CanUpdateSpecificRelease.ToString(), policy =>
+                    policy.Requirements.Add(new UpdateSpecificReleaseRequirement()));
+
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
 
