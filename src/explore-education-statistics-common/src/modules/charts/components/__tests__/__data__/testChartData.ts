@@ -1,5 +1,5 @@
+import { Chart } from '@common/modules/charts/types/chart';
 import { TableDataResponse } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 
 export const testChartConfiguration: Chart = {
   legend: {

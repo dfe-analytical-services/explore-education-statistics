@@ -16,7 +16,7 @@ import { produce } from 'immer';
 
 describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
-  const onBoundaryLevelChange = jest.fn(() => Promise.resolve());
+  const onBoundaryLevelChange = jest.fn();
   const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
     boundaryLevel: 1,
@@ -343,7 +343,7 @@ describe('MapBlock', () => {
       }),
     );
 
-    render(
+    const { container } = render(
       <MapBlock
         {...testBlockProps}
         meta={fullTable.subjectMeta}
@@ -357,17 +357,15 @@ describe('MapBlock', () => {
       ).toBeInTheDocument();
     });
 
-    // const paths = container.querySelectorAll<HTMLElement>(
-    //   '.leaflet-container svg:not(.leaflet-attribution-flag) path',
-    // );
+    const paths = container.querySelectorAll<HTMLElement>(
+      '.leaflet-container svg:not(.leaflet-attribution-flag) path',
+    );
 
-    // expect(paths).toHaveLength(4);
-    // // Location polygon
-    // expect(paths[0]).toHaveAttribute('fill', 'rgba(71, 99, 165, 1)');
-    // expect(paths[1]).toHaveAttribute('fill', 'rgba(218, 224, 237, 1)');
-    // expect(paths[2]).toHaveAttribute('fill', 'rgba(145, 161, 201, 1)');
-    // // UK polygon
-    // expect(paths[3]).toHaveAttribute('fill', '#003078');
+    expect(paths).toHaveLength(3);
+    // Location polygon
+    expect(paths[0]).toHaveAttribute('fill', 'rgba(71, 99, 165, 1)');
+    expect(paths[1]).toHaveAttribute('fill', 'rgba(218, 224, 237, 1)');
+    expect(paths[2]).toHaveAttribute('fill', 'rgba(145, 161, 201, 1)');
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 

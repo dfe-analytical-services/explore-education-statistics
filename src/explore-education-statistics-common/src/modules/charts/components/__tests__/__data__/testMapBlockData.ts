@@ -1,18 +1,17 @@
-import { DataGroupingConfig } from '@common/modules/charts/types/chart';
+import { Chart, DataGroupingConfig } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import {
-  LocationFilter,
   CategoryFilter,
   Indicator,
+  LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import {
   GeoJsonFeature,
   LocationGeoJsonOption,
   TableDataResponse,
 } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 
 export const testMapConfiguration: Chart = {

@@ -14,15 +14,14 @@ import _dataBlockService, {
 } from '@admin/services/dataBlockService';
 import _permissionService from '@admin/services/permissionService';
 import render from '@common-test/render';
+import { Chart } from '@common/modules/charts/types/chart';
 import _tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 import { waitFor } from '@testing-library/dom';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { produce } from 'immer';
-import React from 'react';
 import { MemoryRouter } from 'react-router';
 import { generatePath, Route } from 'react-router-dom';
 
@@ -181,6 +180,7 @@ describe('ReleaseDataBlockEditPage', () => {
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(testTableData);
 
     dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
     dataBlockService.listDataBlocks.mockResolvedValue(testDataBlockSummaries);

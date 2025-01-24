@@ -36,7 +36,7 @@ type VerticalBarRendererProps = {
   type: 'verticalbar';
 } & VerticalBarProps;
 
-export type RenderrableChart =
+export type RenderableChart =
   | HorizontalBarRendererProps
   | InfographicRendererProps
   | LineChartRendererProps
@@ -46,7 +46,7 @@ export type RenderrableChart =
 export interface ChartRendererProps {
   source?: string;
   id?: string;
-  chart: RenderrableChart;
+  chart: RenderableChart;
 }
 
 function ChartRenderer({ source, id, chart }: ChartRendererProps) {

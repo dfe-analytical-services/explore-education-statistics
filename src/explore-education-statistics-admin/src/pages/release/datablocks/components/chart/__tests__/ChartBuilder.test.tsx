@@ -5,11 +5,10 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import render from '@common-test/render';
-import { Chart } from '@common/services/types/blocks';
+import { Chart } from '@common/modules/charts/types/chart';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
 
 describe('ChartBuilder', () => {
   const testFormState: ChartBuilderForms = {

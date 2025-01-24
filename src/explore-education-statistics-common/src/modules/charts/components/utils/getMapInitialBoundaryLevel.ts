@@ -1,5 +1,5 @@
-import { MapChart } from '@common/services/types/blocks';
 import isEqual from 'lodash/isEqual';
+import { MapChart } from '../../types/chart';
 import orderMapLegendItems from './orderMapLegendItems';
 
 export default function getMapInitialBoundaryLevel(

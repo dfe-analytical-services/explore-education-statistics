@@ -16,7 +16,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
-import { RenderrableChart } from '@common/modules/charts/components/ChartRenderer';
+import { RenderableChart } from '@common/modules/charts/components/ChartRenderer';
 import {
   horizontalBarBlockDefinition,
   HorizontalBarProps,
@@ -36,6 +36,7 @@ import {
 } from '@common/modules/charts/components/VerticalBarBlock';
 import {
   AxisType,
+  Chart,
   ChartDefinition,
   ChartProps,
 } from '@common/modules/charts/types/chart';
@@ -45,7 +46,6 @@ import {
   ReleaseTableDataQuery,
   TableDataResult,
 } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 import { ValidationProblemDetails } from '@common/services/types/problemDetails';
 import parseNumber from '@common/utils/number/parseNumber';
 import { isServerValidationError } from '@common/validation/serverValidations';
@@ -60,7 +60,7 @@ const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
 ];
 
-type ChartBuilderChartProps = RenderrableChart & {
+type ChartBuilderChartProps = RenderableChart & {
   file?: File;
 };
 
