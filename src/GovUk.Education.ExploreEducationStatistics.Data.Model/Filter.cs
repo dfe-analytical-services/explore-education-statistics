@@ -13,7 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? GroupCsvColumn { get; set; }
         public string? AutoSelectFilterItemLabel { get; set; }
         public Guid? AutoSelectFilterItemId { get; set; }
-
         public FilterItem? AutoSelectFilterItem { get; set; }
         public Subject Subject { get; set; } = null!;
         public Guid SubjectId { get; set; }

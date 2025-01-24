@@ -1043,7 +1043,7 @@ describe('FiltersForm', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /If no options are selected from a category then a 'Total' option may be selected automatically when creating a table./,
+        /If no options are selected from a category then a default option \(often 'Total'\) may be selected automatically when creating a table./,
       ),
     ).toBeInTheDocument();
     expect(
@@ -1070,7 +1070,7 @@ describe('FiltersForm', () => {
 
     expect(
       screen.queryByText(
-        /If no options are selected from a category then a 'Total' option may be selected automatically when creating a table./,
+        /If no options are selected from a category then a default option \(often 'Total'\) may be selected automatically when creating a table./,
       ),
     ).not.toBeInTheDocument();
     expect(

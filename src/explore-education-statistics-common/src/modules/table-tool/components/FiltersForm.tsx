@@ -248,7 +248,7 @@ export default function FiltersForm({
                             ${
                               filtersIncludeTotal
                                 ? ` If no options are selected from a category then
-                                a 'Total' option may be selected automatically
+                                a default option (often 'Total') may be selected automatically
                                 when creating a table. Where present, the
                                 'Total' option is usually an aggregate of all
                                 other options within a category.`
