@@ -1,4 +1,4 @@
-import { ResourceNames, IpRange, PrincipalNameAndId } from '../../types.bicep'
+import { ResourceNames, IpRange, PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -13,14 +13,8 @@ param adminName string
 @secure()
 param adminPassword string
 
-@description('SKU name.')
-param sku string = 'Standard_B1ms'
-
-@description('Storage Size in GB.')
-param storageSizeGB int = 32
-
-@description('Autogrow setting.')
-param autoGrowStatus string = 'Disabled'
+@description('Server configuration.')
+param serverConfig PostgreSqlFlexibleServerConfig
 
 @description('Firewall rules.')
 param firewallRules IpRange[] = []
@@ -30,9 +24,6 @@ param privateEndpointSubnetId string
 
 @description('An array of Entra ID admin principal names for this resource')
 param entraIdAdminPrincipals PrincipalNameAndId[] = []
-
-@description('Whether backups will be geo-redundant rather than zone-redundant')
-param geoRedundantBackupEnabled bool
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
@@ -54,14 +45,10 @@ module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' 
     adminName: adminName
     adminPassword: adminPassword
     entraIdAdminPrincipals: entraIdAdminPrincipals
-    dbSkuName: sku
-    dbStorageSizeGB: storageSizeGB
-    dbAutoGrowStatus: autoGrowStatus
-    postgreSqlVersion: '16'
+    serverConfig: serverConfig
     firewallRules: formattedFirewallRules
     databaseNames: ['public_data']
     privateEndpointSubnetId: privateEndpointSubnetId
-    geoRedundantBackup: geoRedundantBackupEnabled ? 'Enabled' : 'Disabled'
     alerts: deployAlerts ? {
       availability: true
       queryTime: true
@@ -83,7 +70,7 @@ module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' 
 resource maxPreparedTransactionsConfig 'Microsoft.DBforPostgreSQL/flexibleServers/configurations@2022-12-01' = {
   name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}/max_prepared_transactions'
   properties: {
-    value: '100'
+    value: string(serverConfig.settings.maxPreparedTransactions)
     source: 'user-override'
   }
   dependsOn: [
