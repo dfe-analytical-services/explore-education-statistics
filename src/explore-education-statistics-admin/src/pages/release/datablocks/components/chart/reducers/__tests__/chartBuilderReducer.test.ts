@@ -15,7 +15,7 @@ import {
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
-import { Chart } from '@common/services/types/blocks';
+import { Chart, LineChart } from '@common/services/types/blocks';
 import { renderHook } from '@testing-library/react';
 import { produce } from 'immer';
 import { testFullTable } from '../../__tests__/__data__/testTableData';
@@ -958,8 +958,6 @@ describe('chartBuilderReducer', () => {
     });
 
     test('has default `axes.minor` state if initial configuration is missing it', () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       const initialConfiguration: Chart = {
         type: 'line',
         legend: {
@@ -979,7 +977,7 @@ describe('chartBuilderReducer', () => {
             referenceLines: [],
             visible: true,
           },
-        },
+        } as never as LineChart['axes'],
         height: 300,
         title: '',
         alt: '',
@@ -1165,7 +1163,6 @@ describe('chartBuilderReducer', () => {
             referenceLines: [],
           },
         },
-
         height: 300,
         title: 'Chart title',
         alt: '',

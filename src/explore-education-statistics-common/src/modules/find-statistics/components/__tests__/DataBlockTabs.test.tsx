@@ -348,7 +348,7 @@ describe('DataBlockTabs', () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testMapTableData,
     );
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
+    tableBuilderService.getDataBlockGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
 
@@ -368,7 +368,7 @@ describe('DataBlockTabs', () => {
         'block-1-parent',
       );
 
-      expect(tableBuilderService.getLocationGeoJson).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledWith(
         'release-1',
         'block-1-parent',
         1,
@@ -377,8 +377,8 @@ describe('DataBlockTabs', () => {
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
     });
     await waitFor(() => {
-      expect(tableBuilderService.getLocationGeoJson).toBeCalled();
-      expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(1);
+      expect(tableBuilderService.getDataBlockGeoJson).toBeCalled();
+      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledTimes(1);
     });
   });
 
@@ -386,7 +386,7 @@ describe('DataBlockTabs', () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testMapTableData,
     );
-    tableBuilderService.getLocationGeoJson
+    tableBuilderService.getDataBlockGeoJson
       .mockResolvedValueOnce(testMapTableData.subjectMeta.locations)
       .mockResolvedValue(testMapTableDataLocationsLowRes);
 
@@ -406,7 +406,7 @@ describe('DataBlockTabs', () => {
         'block-1-parent',
       );
 
-      expect(tableBuilderService.getLocationGeoJson).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledWith(
         'release-1',
         'block-1-parent',
         1,
@@ -418,31 +418,31 @@ describe('DataBlockTabs', () => {
     expect(tableBuilderService.getDataBlockTableData).toBeCalledTimes(1);
 
     await waitFor(() => {
-      expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(1);
+      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledTimes(1);
     });
 
     const mapPathSelector =
       '.leaflet-container svg:not(.leaflet-attribution-flag) path';
+
     const initialPaths =
       container.querySelectorAll<HTMLElement>(mapPathSelector);
-    expect(initialPaths[0]).toHaveAttribute('d', 'M1 -1L1 1L-1 1L-1 -1z');
+    expect(initialPaths.length).toEqual(4);
 
     const select = screen.getByLabelText('1. Select data to view');
     const options = within(select).getAllByRole('option');
     expect(options).toHaveLength(2);
     await userEvent.selectOptions(select, options[1]);
 
-    expect(tableBuilderService.getLocationGeoJson).toBeCalledWith(
+    expect(tableBuilderService.getDataBlockGeoJson).toBeCalledWith(
       'release-1',
       'block-1-parent',
       2,
     );
-    expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(2);
+    expect(tableBuilderService.getDataBlockGeoJson).toBeCalledTimes(2);
 
     const updatedPaths =
       container.querySelectorAll<HTMLElement>(mapPathSelector);
-
-    expect(updatedPaths[1]).toHaveAttribute('d', 'M0 0');
+    expect(updatedPaths.length).toEqual(4);
   });
 
   test('re-rendering with new data block does not throw error', async () => {

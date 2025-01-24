@@ -12,7 +12,7 @@ import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 
-type HorizontalBarChart = {
+interface HorizontalBarChart {
   type: 'horizontalbar';
   title?: string;
   titleType?: TitleType;
@@ -31,9 +31,9 @@ type HorizontalBarChart = {
     major: AxisConfiguration;
     minor: AxisConfiguration;
   };
-};
+}
 
-type Infographic = {
+interface Infographic {
   type: 'infographic';
   title?: string;
   titleType?: TitleType;
@@ -47,10 +47,9 @@ type Infographic = {
   map?: MapConfig;
   subtitle?: string;
   fileId: string;
-  getInfographic?: GetInfographic;
-};
+}
 
-type LineChart = {
+export interface LineChart {
   type: 'line';
   title?: string;
   titleType?: TitleType;
@@ -67,9 +66,9 @@ type LineChart = {
     major: AxisConfiguration;
     minor: AxisConfiguration;
   };
-};
+}
 
-export type MapChart = {
+export interface MapChart {
   type: 'map';
   axes: {
     major: AxisConfiguration;
@@ -88,9 +87,9 @@ export type MapChart = {
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
   subtitle?: string;
-};
+}
 
-type VerticalBarChart = {
+interface VerticalBarChart {
   type: 'verticalbar';
   title?: string;
   titleType?: TitleType;
@@ -109,7 +108,7 @@ type VerticalBarChart = {
     major: AxisConfiguration;
     minor: AxisConfiguration;
   };
-};
+}
 
 /**
  * This is the chart type that will be returned by the API.

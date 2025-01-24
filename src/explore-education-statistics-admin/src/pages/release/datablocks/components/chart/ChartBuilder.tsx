@@ -16,7 +16,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
-import { RenderrableChart } from '@common/modules/charts/components/ChartRenderer';
+import { RenderableChart } from '@common/modules/charts/components/ChartRenderer';
 import {
   horizontalBarBlockDefinition,
   HorizontalBarProps,
@@ -60,7 +60,7 @@ const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
 ];
 
-type ChartBuilderChartProps = RenderrableChart & {
+type ChartBuilderChartProps = RenderableChart & {
   file?: File;
 };
 

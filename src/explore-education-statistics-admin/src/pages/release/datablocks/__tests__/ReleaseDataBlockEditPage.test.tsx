@@ -180,7 +180,7 @@ describe('ReleaseDataBlockEditPage', () => {
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-    tableBuilderService.getTableData.mockResolvedValue(testTableData);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(testTableData);
 
     dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
     dataBlockService.listDataBlocks.mockResolvedValue(testDataBlockSummaries);

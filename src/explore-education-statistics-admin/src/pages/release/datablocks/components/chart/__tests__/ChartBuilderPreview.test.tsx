@@ -1,6 +1,6 @@
 import ChartBuilderPreview from '@admin/pages/release/datablocks/components/chart/ChartBuilderPreview';
 import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
-import { RenderrableChart } from '@common/modules/charts/components/ChartRenderer';
+import { RenderableChart } from '@common/modules/charts/components/ChartRenderer';
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -37,7 +37,7 @@ describe('ChartBuilderPreview', () => {
 
   const testFullTableMeta = mapFullTable(testChartTableData);
 
-  const testInfographicChart: RenderrableChart = {
+  const testInfographicChart: RenderableChart = {
     type: 'infographic',
     fileId: '1',
     data: [],
@@ -47,7 +47,7 @@ describe('ChartBuilderPreview', () => {
     axes: {},
   };
 
-  const testLineChart: RenderrableChart = {
+  const testLineChart: RenderableChart = {
     type: 'line',
     data: [],
     meta: testFullTableMeta.subjectMeta,
@@ -62,7 +62,7 @@ describe('ChartBuilderPreview', () => {
     },
   };
 
-  const testVerticalBarChart: RenderrableChart = {
+  const testVerticalBarChart: RenderableChart = {
     type: 'verticalbar',
     data: [],
     meta: testFullTableMeta.subjectMeta,
@@ -77,7 +77,7 @@ describe('ChartBuilderPreview', () => {
     },
   };
 
-  const testHorizontalBarChart: RenderrableChart = {
+  const testHorizontalBarChart: RenderableChart = {
     type: 'horizontalbar',
     data: [],
     meta: testFullTableMeta.subjectMeta,
@@ -92,7 +92,7 @@ describe('ChartBuilderPreview', () => {
     },
   };
 
-  const testMapChart: RenderrableChart = {
+  const testMapChart: RenderableChart = {
     type: 'map',
     onBoundaryLevelChange: async () => {},
     data: [],
