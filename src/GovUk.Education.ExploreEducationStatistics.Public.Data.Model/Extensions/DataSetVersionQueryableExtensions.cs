@@ -12,17 +12,12 @@ public static class DataSetVersionQueryableExtensions
         this IQueryable<DataSetVersion> queryable,
         Guid dataSetId,
         string version,
+        IWildCardDataSetVersionQueryHelper wildcardDataSetVersionQueryHelper,
         CancellationToken cancellationToken = default)
     {
-
         if (version.Contains("*")) 
         {
-            if (!version.Contains('.'))
-                //TODO: Question for Cam, sorry if these questions become to seem pedantic but do we want to support just v* or *?
-                return new NotFoundResult();
-
-            return await DataSetVersionWildCardQueryHelper.FetchDatasetUsingWildCardVersion(queryable, dataSetId, version, cancellationToken);
-            //todo throw an exception here and run the automated tests to see if this is actually being called beyond this point for something we havent addressed?
+            return await wildcardDataSetVersionQueryHelper.GetDatasetVersionUsingWildCard(queryable, dataSetId, version, cancellationToken);
         }
 
         if (!VersionUtils.TryParse(version, out var semVersion))

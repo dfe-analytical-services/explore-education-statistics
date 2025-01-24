@@ -8,9 +8,14 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 
-public static class DataSetVersionWildCardQueryHelper
+public interface IWildCardDataSetVersionQueryHelper
 {
-    public static async Task<Either<ActionResult, DataSetVersion>> FetchDatasetUsingWildCardVersion(IQueryable<DataSetVersion> queryable, Guid dataSetId, string version, CancellationToken cancellationToken)
+    public Task<Either<ActionResult, DataSetVersion>> GetDatasetVersionUsingWildCard(IQueryable<DataSetVersion> queryable, Guid dataSetId, string version, CancellationToken cancellationToken);
+}
+
+public class WildCardDataSetVersionQueryHelper : IWildCardDataSetVersionQueryHelper
+{
+    public async Task<Either<ActionResult, DataSetVersion>> GetDatasetVersionUsingWildCard(IQueryable<DataSetVersion> queryable, Guid dataSetId, string version, CancellationToken cancellationToken)
     {
         var parts = version.Trim('v').Split('.');
         int? major = parts[0] == "*" ? null : int.Parse(parts[0]);

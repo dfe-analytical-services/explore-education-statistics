@@ -23,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Securi
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
@@ -238,6 +239,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IDataSetService, DataSetService>();
         services.AddScoped<IDataSetQueryService, DataSetQueryService>();
         services.AddScoped<IDataSetQueryParser, DataSetQueryParser>();
+        services.AddScoped<IWildCardDataSetVersionQueryHelper, WildCardDataSetVersionQueryHelper>();
         services.AddScoped<IDataSetVersionChangeService, DataSetVersionChangeService>();
 
         services.AddScoped<IParquetDataRepository, ParquetDataRepository>();

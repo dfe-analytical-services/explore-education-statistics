@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 internal class DataSetService(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IUserService userService)
+    IUserService userService,
+    IWildCardDataSetVersionQueryHelper wildcardDataSetVersionQueryHelper
+    )
     : IDataSetService
 {
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
@@ -101,6 +104,7 @@ internal class DataSetService(
             .FindByVersion(
                 dataSetId: dataSetId,
                 version: dataSetVersion,
+                wildcardDataSetVersionQueryHelper: wildcardDataSetVersionQueryHelper,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
             .OnSuccess(MapDataSetVersion);
@@ -259,6 +263,7 @@ internal class DataSetService(
             .FindByVersion(
                 dataSetId: dataSetId,
                 version: dataSetVersion,
+                wildcardDataSetVersionQueryHelper: wildcardDataSetVersionQueryHelper,
                 cancellationToken: cancellationToken);
     }
 

@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 public class DataSetVersionChangeService(
     PublicDataDbContext publicDataDbContext,
+    IWildCardDataSetVersionQueryHelper wildcardDataSetVersionQueryHelper,
     IUserService userService)
     : IDataSetVersionChangeService
 {
@@ -27,6 +29,7 @@ public class DataSetVersionChangeService(
             .FindByVersion(
                 dataSetId: dataSetId,
                 version: dataSetVersion,
+                wildcardDataSetVersionQueryHelper: wildcardDataSetVersionQueryHelper,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
             .OnSuccess(dsv => LoadChanges(dsv, cancellationToken))

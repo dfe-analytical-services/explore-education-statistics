@@ -46,20 +46,20 @@ public class WildCardDatasetVersionTests
         var dataSetId = Guid.NewGuid();
         var queryable = SetupDataSetVersions(dataSetId);
 
-        // Act
-        var result = await DataSetVersionWildCardQueryHelper.FetchDatasetUsingWildCardVersion(queryable, dataSetId, versionString, CancellationToken.None);
+        // Act 
+        var actualResult = await new WildCardDataSetVersionQueryHelper().GetDatasetVersionUsingWildCard(queryable, dataSetId, versionString, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsRight);
-        Assert.Equal(expectedMajor, result.Right.VersionMajor);
-        Assert.Equal(expectedMinor, result.Right.VersionMinor);
-        Assert.Equal(expectedPatch, result.Right.VersionPatch);
+        Assert.True(actualResult.IsRight);
+        Assert.Equal(expectedMajor, actualResult.Right.VersionMajor);
+        Assert.Equal(expectedMinor, actualResult.Right.VersionMinor);
+        Assert.Equal(expectedPatch, actualResult.Right.VersionPatch);
     }
 
     private static IQueryable<DataSetVersion> SetupDataSetVersions(Guid dataSetId)
     {
         var publicDataDbContextMock = new Mock<PublicDataDbContext>();
-        
+
         var release = new Release()
         {
             DataSetFileId = Guid.NewGuid(),
@@ -67,6 +67,7 @@ public class WildCardDatasetVersionTests
             Slug = "test",
             Title = "Test"
         };
+
         var versions = new List<DataSetVersion>
             {
                 new() {
@@ -127,7 +128,7 @@ public class WildCardDatasetVersionTests
                     VersionMajor = 5, VersionMinor = 0
                 }
             };
-        
+
         publicDataDbContextMock.SetupGet(dbContext => dbContext.DataSetVersions).ReturnsDbSet(versions);
 
         return publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
