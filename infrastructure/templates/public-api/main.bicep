@@ -26,9 +26,12 @@ param postgreSqlServerConfig PostgreSqlFlexibleServerConfig = {
     pricingTier: 'Burstable'
     compute: 'Standard_B1ms'
   }
-  settings: {
-    maxPreparedTransactions: 100
-  }
+  settings: [
+    {
+      name: 'max_prepared_transactions'
+      value: '100'
+    }
+  ]
   backups: {
     retentionDays: 7
     geoRedundantBackup: false

@@ -329,7 +329,7 @@ type PostgreSqlFlexibleServerConfig = {
   }
   server: {
     @description('PostgreSQL version')
-    postgreSqlVersion: '16' | '17'
+    postgreSqlVersion: '16'
   }
   backups: {
     @description('Backup retention duration in days')
@@ -339,9 +339,12 @@ type PostgreSqlFlexibleServerConfig = {
     geoRedundantBackup: bool
   }
   settings: {
-    @description('Maximum number of prepared transactions.')
-    maxPreparedTransactions: int
-  }
+    @description('Name of the database setting.')
+    name: string
+    
+    @description('Value of the database setting.')
+    value: string
+  }[]
   storage: {
     @description('Storage Size in GB.')
     storageSizeGB: int

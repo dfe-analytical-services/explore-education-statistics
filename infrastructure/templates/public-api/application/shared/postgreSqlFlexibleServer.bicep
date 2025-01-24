@@ -67,17 +67,6 @@ module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' 
   }
 }
 
-resource maxPreparedTransactionsConfig 'Microsoft.DBforPostgreSQL/flexibleServers/configurations@2022-12-01' = {
-  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}/max_prepared_transactions'
-  properties: {
-    value: string(serverConfig.settings.maxPreparedTransactions)
-    source: 'user-override'
-  }
-  dependsOn: [
-    postgreSqlServerModule
-  ]
-}
-
 var managedIdentityConnectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
 
 var dataProcessorPsqlConnectionStringSecretKey = 'ees-publicapi-data-processor-connectionstring-publicdatadb'

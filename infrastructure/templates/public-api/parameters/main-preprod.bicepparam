@@ -22,9 +22,12 @@ param postgreSqlServerConfig = {
     retentionDays: 7
     geoRedundantBackup: true
   }
-  settings: {
-    maxPreparedTransactions: 100
-  }
+  settings: [
+    {
+      name: 'max_prepared_transactions'
+      value: '100'
+    }
+  ]
   storage: {
     storageSizeGB: 32
     autoGrow: true

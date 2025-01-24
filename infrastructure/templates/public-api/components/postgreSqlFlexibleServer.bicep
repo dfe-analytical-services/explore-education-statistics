@@ -110,6 +110,15 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
   tags: tagValues
 }
 
+resource settings 'Microsoft.DBforPostgreSQL/flexibleServers/configurations@2022-12-01' = [for setting in serverConfig.settings: {
+  parent: postgreSQLDatabase
+  name: setting.name
+  properties: {
+    value: setting.value
+    source: 'user-override'
+  }
+}]
+
 @batchSize(1)
 resource firewallRuleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-01' = [
   for rule in firewallRules: {
