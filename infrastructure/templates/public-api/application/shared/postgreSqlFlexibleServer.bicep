@@ -45,7 +45,7 @@ var formattedFirewallRules = map(firewallRules, rule => {
   cidr: rule.cidr
 })
 
-module postgreSqlServerModule '../../components/postgresqlDatabase.bicep' = {
+module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' = {
   name: 'postgreSQLDatabaseDeploy'
   params: {
     databaseServerName: resourceNames.sharedResources.postgreSqlFlexibleServer

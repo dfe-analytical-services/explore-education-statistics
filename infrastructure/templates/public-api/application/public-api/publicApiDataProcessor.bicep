@@ -68,7 +68,7 @@ resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-
 }
 
 // Deploy Data Processor Function.
-module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
+module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
     functionAppName: resourceNames.publicApi.dataProcessor
