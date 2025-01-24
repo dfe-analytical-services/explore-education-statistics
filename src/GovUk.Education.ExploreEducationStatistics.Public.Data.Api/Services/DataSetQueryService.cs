@@ -126,6 +126,14 @@ internal class DataSetQueryService(
                 .Select(ds => ds.LatestLiveVersion!)
                 .SingleOrNotFoundAsync(cancellationToken);
         }
+        if (dataSetVersion.Contains("*"))
+        {
+            if (!dataSetVersion.Contains('.'))
+                return new NotFoundResult();
+
+            var queryable = publicDataDbContext.DataSetVersions.AsNoTracking();
+            return await Data.Model.Utils.DataSetVersionWildCardQueryHelper.FetchDatasetUsingWildCardVersion(queryable, dataSetId, dataSetVersion, cancellationToken);
+        }
 
         if (!VersionUtils.TryParse(dataSetVersion, out var version))
         {
