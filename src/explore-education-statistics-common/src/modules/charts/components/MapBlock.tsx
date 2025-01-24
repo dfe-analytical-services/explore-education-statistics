@@ -169,21 +169,21 @@ export default function MapBlock({
   );
 
   const dataSetOptions = useMemo<SelectOption[]>(() => {
-    const orderedLegendDataSetKeys = orderMapLegendItems(legend).map(
-      ({ dataSet }) => generateDataSetKey(dataSet),
+    const dataSetKeys = orderMapLegendItems(legend).map(({ dataSet }) =>
+      generateDataSetKey(dataSet),
     );
-    const orderedDataSetCategoryConfigs = Object.values(dataSetCategoryConfigs)
-      .sort(
-        (a, b) =>
-          orderedLegendDataSetKeys.indexOf(a.dataKey) -
-          orderedLegendDataSetKeys.indexOf(b.dataKey),
-      )
-      .map(dataSet => ({
-        label: dataSet.config.label,
-        value: dataSet.dataKey,
-      }));
-
-    return orderedDataSetCategoryConfigs;
+    return dataSetKeys
+      .map(key => {
+        const dataSet: MapDataSetCategoryConfig | undefined =
+          dataSetCategoryConfigs[key];
+        return dataSet
+          ? {
+              label: dataSet.config.label,
+              value: dataSet.dataKey,
+            }
+          : undefined;
+      })
+      .filter(item => item !== undefined);
   }, [dataSetCategoryConfigs, legend]);
 
   const [selectedDataSetKey, setSelectedDataSetKey] = useState<string>(
@@ -231,7 +231,6 @@ export default function MapBlock({
   const handleDataSetChange = useCallback(
     async (value: string) => {
       setSelectedDataSetKey(value);
-      if (!onBoundaryLevelChange) return;
 
       const prevBoundaryLevel =
         selectedDataSetConfig?.boundaryLevel ?? boundaryLevel;
@@ -275,42 +274,45 @@ export default function MapBlock({
       />
 
       <div className="govuk-grid-row govuk-!-margin-bottom-4">
-        <div className="govuk-grid-column-two-thirds">
-          <div
-            className={classNames(styles.mapWrapper, {
+        <div
+          className={classNames(
+            'govuk-grid-column-two-thirds',
+            styles.mapWrapper,
+            {
               [styles.mapLoading]: isBoundaryLevelChanging,
-            })}
+            },
+          )}
+        >
+          <MapContainer
+            style={{
+              width: (width && `${width}px`) || '100%',
+              height: `${height || 600}px`,
+            }}
+            className={classNames(styles.map, 'dfe-print-break-avoid')}
+            center={position}
+            minZoom={5}
+            zoom={5}
           >
-            <MapContainer
-              style={{
-                width: (width && `${width}px`) || '100%',
-                height: `${height || 600}px`,
-              }}
-              className={classNames(styles.map, 'dfe-print-break-avoid')}
-              center={position}
-              minZoom={5}
-              zoom={5}
-            >
-              <MapGeoJSON
-                dataSetCategoryConfigs={dataSetCategoryConfigs}
-                features={features}
-                width={width}
-                height={height}
-                selectedDataSetKey={selectedDataSetKey}
-                selectedFeature={selectedFeature}
-                onSelectFeature={setSelectedFeature}
-              />
-            </MapContainer>
-            <LoadingSpinner
-              className={styles.mapSpinner}
-              loading={isBoundaryLevelChanging}
-              text="Loading map"
-              size="xl"
-              hideText
-              alert
+            <MapGeoJSON
+              dataSetCategoryConfigs={dataSetCategoryConfigs}
+              features={features}
+              width={width}
+              height={height}
+              selectedDataSetKey={selectedDataSetKey}
+              selectedFeature={selectedFeature}
+              onSelectFeature={setSelectedFeature}
             />
-          </div>
+          </MapContainer>
+          <LoadingSpinner
+            className={styles.mapSpinner}
+            loading={isBoundaryLevelChanging}
+            text="Loading map"
+            size="xl"
+            hideText
+            alert
+          />
         </div>
+
         {selectedDataSetConfig && (
           <div className="govuk-grid-column-one-third">
             <MapLegend

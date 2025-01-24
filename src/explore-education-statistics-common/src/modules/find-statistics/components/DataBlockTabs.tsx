@@ -4,20 +4,15 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
 import withLazyLoad from '@common/hocs/withLazyLoad';
-import ChartRenderer, {
-  ChartRendererProps,
-} from '@common/modules/charts/components/ChartRenderer';
+import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
-import getMapInitialBoundaryLevel from '@common/modules/charts/components/utils/getMapInitialBoundaryLevel';
+import useDataBlock from '@common/modules/find-statistics/hooks/useDataBlock';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { DataBlock } from '@common/services/types/blocks';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import React, { ReactNode, useMemo, useState } from 'react';
-import tableBuilderQueries from '@common/queries/tableBuilderQueries';
+import React, { ReactNode } from 'react';
 
 const testId = (dataBlock: DataBlock) => `Data block - ${dataBlock.name}`;
 
@@ -44,77 +39,28 @@ const DataBlockTabs = ({
   releaseId,
   onToggle,
 }: DataBlockTabsProps) => {
-  const queryClient = useQueryClient();
-  const [selectedBoundaryLevel, setSelectedBoundaryLevel] = useState(
-    dataBlock.charts[0]?.type === 'map'
-      ? getMapInitialBoundaryLevel(dataBlock.charts[0])
-      : undefined,
-  );
-
   const {
-    data: tableData,
-    error: tableDataError,
-    isLoading: tableDataIsLoading,
-  } = useQuery(
-    tableBuilderQueries.getDataBlockTable(
-      releaseId,
-      dataBlock.dataBlockParentId,
-    ),
-  );
-
-  const getDataBlockGeoJsonQuery = tableBuilderQueries.getDataBlockGeoJson(
+    chart,
+    isTableDataLoading,
+    isTableDataError,
+    fullTable,
+    isGeoJsonError,
+    isGeoJsonInitialLoading,
+  } = useDataBlock({
+    dataBlock,
     releaseId,
-    dataBlock.dataBlockParentId,
-    selectedBoundaryLevel ?? -1,
-  );
-
-  const {
-    data: locationGeoJson,
-    error: geoJsonError,
-    isFetching,
-  } = useQuery({
-    queryKey: getDataBlockGeoJsonQuery.queryKey,
-    queryFn: selectedBoundaryLevel
-      ? getDataBlockGeoJsonQuery.queryFn
-      : () => Promise.resolve({}),
-    staleTime: Infinity,
-    cacheTime: Infinity,
-    keepPreviousData: true,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    getInfographic,
   });
 
-  const fullTable = useMemo(() => {
-    return tableData && !isFetching
-      ? mapFullTable({
-          ...tableData,
-          subjectMeta: {
-            ...tableData.subjectMeta,
-            locations:
-              selectedBoundaryLevel && locationGeoJson
-                ? locationGeoJson
-                : tableData.subjectMeta.locations,
-          },
-        })
-      : undefined;
-  }, [tableData, locationGeoJson, isFetching, selectedBoundaryLevel]);
-
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
-
-  if (
-    tableDataError &&
-    isAxiosError(tableDataError) &&
-    tableDataError.response?.status === 403
-  ) {
-    return null;
-  }
+  if (isTableDataError) return errorMessage;
 
   const additionTabContentElement =
     typeof additionalTabContent === 'function'
       ? additionalTabContent({ dataBlock })
       : additionalTabContent;
   return (
-    <LoadingSpinner loading={tableDataIsLoading}>
+    <LoadingSpinner loading={isTableDataLoading || isGeoJsonInitialLoading}>
       <Tabs id={id} testId={testId(dataBlock)} onToggle={onToggle}>
         {firstTabs}
 
@@ -132,80 +78,16 @@ const DataBlockTabs = ({
             }
             title="Chart"
           >
-            {(!!tableDataError || !!geoJsonError) && errorMessage}
-
+            {isGeoJsonError && errorMessage}
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
-                {dataBlock.charts.map((chart, index) => {
-                  const key = index;
-
-                  const rendererProps: Omit<ChartRendererProps, 'chart'> = {
-                    id: `${id}-chart`,
-                    source: dataBlock?.source,
-                  };
-
-                  if (chart.type === 'infographic') {
-                    return (
-                      <ChartRenderer
-                        {...rendererProps}
-                        key={key}
-                        chart={{
-                          ...chart,
-                          data: fullTable?.results,
-                          meta: fullTable?.subjectMeta,
-                          getInfographic,
-                        }}
-                      />
-                    );
-                  }
-
-                  if (chart.type === 'map') {
-                    return (
-                      <ChartRenderer
-                        {...rendererProps}
-                        key={key}
-                        chart={{
-                          ...chart,
-                          data: fullTable?.results,
-                          meta: fullTable?.subjectMeta,
-                          onBoundaryLevelChange: async boundaryLevel => {
-                            const { queryKey, queryFn } =
-                              tableBuilderQueries.getDataBlockGeoJson(
-                                releaseId,
-                                dataBlock.dataBlockParentId,
-                                boundaryLevel,
-                              );
-                            const existingGeoJson =
-                              queryClient.getQueryData(queryKey);
-
-                            if (!existingGeoJson) {
-                              await queryClient.fetchQuery({
-                                queryKey,
-                                queryFn,
-                                staleTime: Infinity,
-                                cacheTime: Infinity,
-                              });
-                            }
-                            setSelectedBoundaryLevel(boundaryLevel);
-                          },
-                        }}
-                      />
-                    );
-                  }
-
-                  return (
-                    <ChartRenderer
-                      {...rendererProps}
-                      key={key}
-                      chart={{
-                        ...chart,
-                        data: fullTable?.results,
-                        meta: fullTable?.subjectMeta,
-                      }}
-                    />
-                  );
-                })}
-
+                {chart && (
+                  <ChartRenderer
+                    id="dataBlockTabs-chart"
+                    source={dataBlock.source}
+                    chart={chart}
+                  />
+                )}
                 {additionTabContentElement}
               </ErrorBoundary>
             )}
@@ -228,8 +110,6 @@ const DataBlockTabs = ({
             }
             title="Table"
           >
-            {!!tableDataError && errorMessage}
-
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
                 <TimePeriodDataTable

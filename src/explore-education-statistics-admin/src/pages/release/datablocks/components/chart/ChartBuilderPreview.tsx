@@ -2,7 +2,7 @@ import styles from '@admin/pages/release/datablocks/components/chart/ChartBuilde
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ChartRenderer, {
-  RenderrableChart,
+  RenderableChart,
 } from '@common/modules/charts/components/ChartRenderer';
 import isChartRenderable, {
   getChartPreviewText,
@@ -10,7 +10,7 @@ import isChartRenderable, {
 import React, { useRef } from 'react';
 
 interface Props {
-  chart?: RenderrableChart;
+  chart?: RenderableChart;
   loading: boolean;
 }
 
