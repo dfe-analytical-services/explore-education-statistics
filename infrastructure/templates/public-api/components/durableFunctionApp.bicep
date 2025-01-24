@@ -165,7 +165,6 @@ module manamementStorageAccountModule 'storageAccount.bicep' = {
     location: location
     storageAccountName: managementStorageAccountName
     allowedSubnetIds: [subnetId]
-    skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
@@ -187,7 +186,6 @@ module slot1StorageAccountModule 'storageAccount.bicep' = {
     location: location
     storageAccountName: slot1StorageAccountName
     allowedSubnetIds: [subnetId]
-    skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
@@ -224,7 +222,6 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
     location: location
     storageAccountName: slot2StorageAccountName
     allowedSubnetIds: [subnetId]
-    skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
