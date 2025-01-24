@@ -8,11 +8,6 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 
-public interface IWildCardDataSetVersionQueryHelper
-{
-    public Task<Either<ActionResult, DataSetVersion>> GetDatasetVersionUsingWildCard(IQueryable<DataSetVersion> queryable, Guid dataSetId, string version, CancellationToken cancellationToken);
-}
-
 public class WildCardDataSetVersionQueryHelper : IWildCardDataSetVersionQueryHelper
 {
     public async Task<Either<ActionResult, DataSetVersion>> GetDatasetVersionUsingWildCard(IQueryable<DataSetVersion> queryable, Guid dataSetId, string version, CancellationToken cancellationToken)

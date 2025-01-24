@@ -129,6 +129,7 @@ internal class DataSetQueryService(
                 .Select(ds => ds.LatestLiveVersion!)
                 .SingleOrNotFoundAsync(cancellationToken);
         }
+
         if (dataSetVersion.Contains("*"))
         {
             var queryable = publicDataDbContext.DataSetVersions.AsNoTracking();
