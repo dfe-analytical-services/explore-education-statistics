@@ -54,7 +54,7 @@ public class DataSetsController(
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetMetaViewModel>> GetDataSetMeta(
         [FromQuery] DataSetMetaRequest request,
-        [FromQuery, SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc. This supports wildcard data set versions so that you can retreive the latest minor version automatically. e.g., dataSetVersion=v2.* or dataSetVersion=2.* would return the latest minor version in the v2 series.")] string? dataSetVersion,
+        [FromQuery, SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc. \n\n This supports wildcard data set versions so that you can retreive the latest minor version automatically. \n\n For example: dataSetVersion=v2.* or dataSetVersion=2.* would return the latest minor version in the v2 series.")] string? dataSetVersion,
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
         CancellationToken cancellationToken)
     {
@@ -215,7 +215,7 @@ public class DataSetsController(
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetQueryPaginatedResultsViewModel>> QueryDataSetGet(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc. This supports wildcard data set versions so that you can retreive the latest minor version automatically. e.g., dataSetVersion=v2.* or dataSetVersion=2.* would return the latest minor version in the v2 series.")][FromQuery] string? dataSetVersion,
+        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc. \n\n This supports wildcard data set versions so that you can retreive the latest minor version automatically. \n\n For example: dataSetVersion=v2.* or dataSetVersion=2.* would return the latest minor version in the v2 series.")][FromQuery] string? dataSetVersion,
         [FromQuery] DataSetGetQueryRequest request,
         CancellationToken cancellationToken)
     {
@@ -246,7 +246,7 @@ public class DataSetsController(
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetQueryPaginatedResultsViewModel>> QueryDataSetPost(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc. This supports wildcard data set versions so that you can retreive the latest minor version automatically. e.g., dataSetVersion=v2.* or dataSetVersion=2.* would return the latest minor version in the v2 series.")][FromQuery] string? dataSetVersion,
+        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc. \n\n This supports wildcard data set versions so that you can retreive the latest minor version automatically. \n\n For example: dataSetVersion=v2.* or dataSetVersion=2.* would return the latest minor version in the v2 series.")][FromQuery] string? dataSetVersion,
         [FromBody] DataSetQueryRequest request,
         CancellationToken cancellationToken)
     {
@@ -274,7 +274,7 @@ public class DataSetsController(
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel), contentTypes: MediaTypeNames.Application.Json)]
     public async Task<ActionResult> DownloadDataSetCsv(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc. This supports wildcard data set versions so that you can retreive the latest minor version automatically. e.g., dataSetVersion=v2.* or dataSetVersion=2.* would return the latest minor version in the v2 series.")][FromQuery] string? dataSetVersion,
+        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc. \n\n This supports wildcard data set versions so that you can retreive the latest minor version automatically. \n\n For example: dataSetVersion=v2.* or dataSetVersion=2.* would return the latest minor version in the v2 series.")][FromQuery] string? dataSetVersion,
         CancellationToken cancellationToken)
     {
         return await dataSetService
