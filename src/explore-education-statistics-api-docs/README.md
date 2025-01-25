@@ -22,7 +22,7 @@ Ruby and its required gems:
 sudo apt install build-essential zlib1g-dev libssl-dev libyaml-dev
 ```
 To run the API docs locally for the first time, install Ruby 3.2.6 currently required by the API Docs App as per: `/explore-education-statistics/src/explore-education-statistics-api-docs/.ruby-version`. 
-The following the instructions below describe sing rbenv [rbenv](https://github.com/rbenv/rbenv) to install Ruby 3.2.6 on Ubuntu (if you're on windows, use `wsl`!):
+The following the instructions below describe using [rbenv](https://github.com/rbenv/rbenv) to install Ruby 3.2.6 on Ubuntu (if you're on windows, use `wsl`!):
 
 1. Download Ruby tarball 3.2.6 from https://www.ruby-lang.org/en/news/2024/10/30/ruby-3-2-6-released/
   Unzip and go to that location
