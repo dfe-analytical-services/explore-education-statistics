@@ -16,7 +16,7 @@ param postgreSqlServerConfig = {
     compute: 'Standard_B1ms'
   }
   server: {
-    postgreSqlVersion: '17'
+    postgreSqlVersion: '16'
   }
   backups: {
     retentionDays: 7
