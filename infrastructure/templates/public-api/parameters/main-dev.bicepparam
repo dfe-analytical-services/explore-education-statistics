@@ -9,18 +9,12 @@ param publicUrls = {
   publicApi: 'https://dev.statistics.api.education.gov.uk'
 }
 
-// PostgreSQL Database Params
-param postgreSqlSkuName = 'Standard_B1ms'
-param postgreSqlStorageSizeGB = 32
-param postgreSqlAutoGrowStatus = 'Disabled'
-param postgreSqlGeoRedundantBackupEnabled = false
-
 param publicApiContainerAppConfig = {
   cpuCores: 4
   memoryGis: 8
   minReplicas: 1
   maxReplicas: 100
-  scaleAtConcurrentHttpRequests: 5
+  scaleAtConcurrentHttpRequests: 10
   workloadProfileName: 'Consumption'
 }
 

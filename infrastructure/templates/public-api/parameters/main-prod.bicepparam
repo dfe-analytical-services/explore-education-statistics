@@ -9,11 +9,43 @@ param publicUrls = {
   publicApi: 'https://statistics.api.education.gov.uk'
 }
 
+param publicApiContainerAppConfig = {
+  cpuCores: 4
+  memoryGis: 8
+  minReplicas: 1
+  maxReplicas: 100
+  scaleAtConcurrentHttpRequests: 10
+  workloadProfileName: 'Consumption'
+}
+
 // PostgreSQL Database Params
-param postgreSqlSkuName = 'Standard_B1ms'
-param postgreSqlStorageSizeGB = 32
-param postgreSqlAutoGrowStatus = 'Disabled'
-param postgreSqlGeoRedundantBackupEnabled = true
+param postgreSqlServerConfig = {
+  sku: {
+    pricingTier: 'Burstable'
+    compute: 'Standard_B2s'
+  }
+  server: {
+    postgreSqlVersion: '16'
+  }
+  backups: {
+    retentionDays: 7
+    geoRedundantBackup: true
+  }
+  settings: [
+    {
+      name: 'max_prepared_transactions'
+      value: '100'
+    }
+    {
+      name: 'max_connections'
+      value: '100'
+    }
+  ]
+  storage: {
+    storageSizeGB: 32
+    autoGrow: true
+  }
+}
 
 param docsAppSku = 'Standard'
 

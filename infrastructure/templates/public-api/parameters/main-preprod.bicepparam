@@ -10,10 +10,29 @@ param publicUrls = {
 }
 
 // PostgreSQL Database Params
-param postgreSqlSkuName = 'Standard_B1ms'
-param postgreSqlStorageSizeGB = 32
-param postgreSqlAutoGrowStatus = 'Disabled'
-param postgreSqlGeoRedundantBackupEnabled = true
+param postgreSqlServerConfig = {
+  sku: {
+    pricingTier: 'Burstable'
+    compute: 'Standard_B1ms'
+  }
+  server: {
+    postgreSqlVersion: '16'
+  }
+  backups: {
+    retentionDays: 7
+    geoRedundantBackup: true
+  }
+  settings: [
+    {
+      name: 'max_prepared_transactions'
+      value: '100'
+    }
+  ]
+  storage: {
+    storageSizeGB: 32
+    autoGrow: true
+  }
+}
 
 param recoveryVaultImmutable = true
 
