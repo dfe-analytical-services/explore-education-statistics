@@ -461,13 +461,13 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   ]
 }
 
-module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.functionApp != null) {
+module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
   name: '${functionAppName}PrivateEndpointDeploy'
   params: {
     serviceId: functionApp.id
     serviceName: functionApp.name
     serviceType: 'sites'
-    subnetId: privateEndpoints.functionApp!
+    subnetId: privateEndpoints.?functionApp!
     location: location
     tagValues: tagValues
   }

@@ -3,27 +3,51 @@ trigger: none
 parameters:
   - name: deploySharedPrivateDnsZones
     displayName: Do the shared Private DNS Zones need creating or updating?
+    values:
+      - true
+      - false
     default: false
   - name: deployPsqlFlexibleServer
     displayName: Does the PostgreSQL Flexible Server need creating or updating?
+    values:
+      - true
+      - false
     default: false
   - name: deployContainerApp
     displayName: Does the Public API Container App need creating or updating? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.
+    values:
+      - true
+      - false
     default: true
   - name: deployDataProcessor
     displayName: Does the Data Processor need creating or updating?
+    values:
+      - true
+      - false
     default: true
   - name: deployDocsSite
     displayName: Does the Public API static docs site need creating or updating?
+    values:
+      - true
+      - false
     default: true
   - name: deployRecoveryVault
     displayName: Does the Recovery Services Vault need creating or updating?
+    values:
+      - true
+      - false
     default: false
   - name: deployAlerts
-    displayName: Whether to create or update Azure Monitor alerts during this deploy.
+    displayName: Do the Azure Monitor alerts need creating or updating?
+    values:
+      - true
+      - false
     default: false
   - name: awaitActiveOrchestrations
     displayName: Should this deploy wait for active orchestrations in Function Apps to complete prior to deploying?
+    values:
+      - true
+      - false
     default: true
   - name: forceDeployToEnvironment
     displayName: Set to either dev or test to force a deploy to that environment from the chosen branch.
@@ -32,6 +56,7 @@ parameters:
       - none
       - dev
       - test
+      - preprod
     default: 'none'
 
 resources:
@@ -52,6 +77,8 @@ variables:
     value: $[or(eq(variables['forceDeployToEnvironment'], 'dev'), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))]
   - name: isTest
     value: $[or(eq(variables['forceDeployToEnvironment'], 'test'), eq(variables['Build.SourceBranch'], 'refs/heads/test'))]
+  - name: isPreProd
+    value: $[or(eq(variables['forceDeployToEnvironment'], 'preprod'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
@@ -89,19 +116,19 @@ stages:
     parameters:
       stageName: DeployTest
       condition: eq(variables.isTest, true)
-      dependsOn: DeployDev
+      trigger: manual
       environment: Test
       serviceConnection: $(serviceConnectionTest)
       bicepParamFile: test
 
-#  - template: stages/deploy.yml
-#    parameters:
-#      stageName: DeployPreProd
-#      condition: eq(variables.isMaster, true)
-#      trigger: manual
-#      environment: Pre-Prod
-#      serviceConnection: $(serviceConnectionPreProd)
-#      bicepParamFile: preprod
+  - template: stages/deploy.yml
+    parameters:
+      stageName: DeployPreProd
+      condition: eq(variables.isPreProd, true)
+      trigger: manual
+      environment: Pre-Prod
+      serviceConnection: $(serviceConnectionPreProd)
+      bicepParamFile: preprod
 #
 #  - template: stages/deploy.yml
 #    parameters:
