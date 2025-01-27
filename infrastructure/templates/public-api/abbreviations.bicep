@@ -5,8 +5,7 @@ var abbreviations = {
   appManagedEnvironments: 'cae'
   // TODO - remove the "-flexibleserver" suffix and change the suffix of our PSQL instance to "-01"
   dBforPostgreSQLServers: 'psql-flexibleserver'
-  // 'fs' is non-standard - it should be 'share'
-  fileShare: 'fs'
+  fileShare: 'share'
   // 'ai' is non-standard - it should be 'appi'
   insightsComponents: 'ai'
   managedIdentityUserAssignedIdentities: 'id'

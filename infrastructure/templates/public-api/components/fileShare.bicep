@@ -45,13 +45,12 @@ resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-0
   }
 }
 
-var alertResourceName = '${storageAccountName}-fs'
 var fileServiceId = resourceId('Microsoft.Storage/storageAccounts/fileServices', storageAccountName, 'default')
 
 module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
   name: '${storageAccountName}FsAvailabilityAlertModule'
   params: {
-    resourceName: alertResourceName
+    resourceName: storageAccountName
     id: fileServiceId
     resourceMetric: {
       resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
@@ -69,7 +68,7 @@ module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null &
 module latencyAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}FsLatencyDeploy'
   params: {
-    resourceName: alertResourceName
+    resourceName: storageAccountName
     id: fileServiceId
     resourceMetric: {
       resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
@@ -104,7 +103,7 @@ var capacityAlertThresholds = [{
 module fileCapacityAlerts 'alerts/staticMetricAlert.bicep' = [for capacityThreshold in capacityAlertThresholds: if (alerts != null && alerts!.capacity) {
   name: '${storageAccountName}FsCapacity${capacityThreshold.threshold}Deploy'
   params: {
-    resourceName: alertResourceName
+    resourceName: storageAccountName
     id: fileServiceId
     resourceMetric: {
       resourceType: 'Microsoft.Storage/storageAccounts/fileServices'
