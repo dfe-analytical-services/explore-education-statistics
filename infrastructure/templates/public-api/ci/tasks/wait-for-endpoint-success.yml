@@ -4,6 +4,9 @@ parameters:
   - name: displayName
     type: string
     default: Waiting for a successful response from endpoint
+  - name: condition
+    type: string
+    default: succeeded()
   - name: accessTokenScope
     type: string
     default: null
@@ -15,12 +18,19 @@ parameters:
     default: 50
   - name: endpoint
     type: string
+  - name: endpointStatusCodeVariableName
+    type: string
+    default: endpointStatusCode
+  - name: allow404s
+    type: boolean
+    default: false
 
 steps:
   - task: AzureCLI@2
     displayName: ${{ parameters.displayName }}
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
+      condition: ${{ parameters.condition }}
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
@@ -32,11 +42,13 @@ steps:
             -o tsv`
         fi
 
+        allow404s=${{ parameters.allow404s }}
+
         for attempt in $(seq 1 ${{ parameters.maxAttempts }});
         do
 
           echo "Attempt number $attempt of ${{ parameters.maxAttempts }} - calling ${{ parameters.endpoint }} to check for successful response."
-          
+
           if [ -n "$accessToken" ]; then
             httpStatusCode=`curl --write-out '%{http_code}' -H "Authorization: Bearer $accessToken" -s --output /dev/null ${{ parameters.endpoint }}`
           else 
@@ -45,6 +57,13 @@ steps:
 
           if (( $httpStatusCode >= 200 && $httpStatusCode <= 204 )); then
             echo "Received successful response with status code $httpStatusCode."
+            echo "##vso[task.setvariable variable=${{ parameters.endpointStatusCodeVariableName }};]$httpStatusCode"
+            exit 0
+          fi
+
+          if [[ "${allow404s,,}" == "true" && "$httpStatusCode" == "404" ]]; then
+            echo "Received allowed 404 status code."
+            echo "##vso[task.setvariable variable=${{ parameters.endpointStatusCodeVariableName }};]$httpStatusCode"
             exit 0
           fi
 
@@ -53,5 +72,6 @@ steps:
         
         done
 
+        echo "##vso[task.setvariable variable=${{ parameters.endpointStatusCodeVariableName }};]$httpStatusCode"
         echo "Timed out waiting for successful response."
         exit 1
