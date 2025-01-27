@@ -151,7 +151,7 @@ public record DataSetQueryTimePeriod
         }
 
         private static readonly HashSet<TimeIdentifier> AllowedTimeIdentifiers =
-            TimeIdentifierUtils.DataEnums.ToHashSet();
+            TimeIdentifierUtils.Enums.ToHashSet();
 
         private static readonly HashSet<TimeIdentifier> AllowedRangeTimeIdentifiers =
             AllowedTimeIdentifiers
@@ -162,7 +162,7 @@ public record DataSetQueryTimePeriod
                 .ToHashSet();
 
         private static readonly IReadOnlyList<string> AllowedCodes =
-            TimeIdentifierUtils.DataCodes
+            TimeIdentifierUtils.Codes
                 .Order()
                 .ToList();
 

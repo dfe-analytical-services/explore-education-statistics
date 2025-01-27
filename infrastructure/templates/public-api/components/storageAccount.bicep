@@ -15,7 +15,10 @@ param allowedSubnetIds string[] = []
 param firewallRules IpRange[] = []
 
 @description('Storage Account SKU')
-param skuStorageResource 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 'Premium_LRS' | 'Premium_ZRS' | 'Standard_GZRS' | 'Standard_RAGZRS' = 'Standard_LRS'
+param sku 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 'Premium_LRS' | 'Premium_ZRS' | 'Standard_GZRS' | 'Standard_RAGZRS' = 'Standard_LRS'
+
+@description('Storage Account kind')
+param kind 'StorageV2' | 'FileStorage' = 'StorageV2'
 
 @description('Storage Account Name')
 param keyVaultName string
@@ -41,9 +44,9 @@ var endpointSuffix = environment().suffixes.storage
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: storageAccountName
   location: location
-  kind: 'StorageV2'
+  kind: kind
   sku: {
-    name: skuStorageResource
+    name: sku
   }
   properties: {
     supportsHttpsTrafficOnly: true

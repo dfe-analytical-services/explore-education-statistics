@@ -7,8 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -25,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
     public class TableBuilderMetaControllerTests : CacheServiceTestFixture
     {
+        private readonly DataFixture _dataFixture = new();
+
         private static readonly Guid ReleaseVersionId = Guid.NewGuid();
         private static readonly Guid SubjectId = Guid.NewGuid();
 
@@ -36,15 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task GetSubjectMeta_LatestRelease()
         {
-            var contentReleaseVersion = new ReleaseVersion
-            {
-                Id = ReleaseVersionId,
-                Slug = "release-slug",
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                }
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var releaseSubject = new ReleaseSubject
             {
@@ -54,11 +50,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var subjectMetaViewModel = new SubjectMetaViewModel();
 
-            var cacheKey = GetCacheKey(contentReleaseVersion, releaseSubject);
+            var cacheKey = GetCacheKey(releaseVersion, releaseSubject);
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, contentReleaseVersion);
+            SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, releaseVersion);
 
             mocks.cacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
@@ -85,15 +81,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task GetSubjectMeta_SpecificRelease()
         {
-            var contentReleaseVersion = new ReleaseVersion
-            {
-                Id = ReleaseVersionId,
-                Slug = "release-slug",
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                }
-            };
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication()));
 
             var releaseSubject = new ReleaseSubject
             {
@@ -103,11 +93,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var subjectMetaViewModel = new SubjectMetaViewModel();
 
-            var cacheKey = GetCacheKey(contentReleaseVersion, releaseSubject);
+            var cacheKey = GetCacheKey(releaseVersion, releaseSubject);
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, contentReleaseVersion);
+            SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, releaseVersion);
 
             mocks.cacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
@@ -201,8 +191,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         private static SubjectMetaCacheKey GetCacheKey(ReleaseVersion releaseVersion, ReleaseSubject releaseSubject)
         {
-            return new SubjectMetaCacheKey(publicationSlug: releaseVersion.Publication.Slug,
-                releaseSlug: releaseVersion.Slug,
+            return new SubjectMetaCacheKey(publicationSlug: releaseVersion.Release.Publication.Slug,
+                releaseSlug: releaseVersion.Release.Slug,
                 releaseSubject.SubjectId);
         }
 

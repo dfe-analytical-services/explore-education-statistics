@@ -816,7 +816,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = AccreditedOfficialStatistics,
-                        Published = new DateTime(2020, 1, 1)
+                        Published = new DateTime(2020, 1, 1),
+                        Release = new Release
+                        {
+                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                            PublicationId = Guid.NewGuid(),
+                            Year = 2021,
+                            Slug = "latest-release-slug A"
+                        }
                     }
                 };
 
@@ -828,7 +835,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = OfficialStatistics,
-                        Published = new DateTime(2021, 1, 1)
+                        Published = new DateTime(2021, 1, 1),
+                        Release = new Release
+                        {
+                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                            PublicationId = Guid.NewGuid(),
+                            Year = 2021,
+                            Slug = "latest-release-slug B"
+                        }
                     }
                 };
 
@@ -840,7 +854,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = AdHocStatistics,
-                        Published = new DateTime(2022, 1, 1)
+                        Published = new DateTime(2022, 1, 1),
+                        Release = new Release
+                        {
+                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                            PublicationId = Guid.NewGuid(),
+                            Year = 2021,
+                            Slug = "latest-release-slug C"
+                        }
                     }
                 };
 
@@ -888,6 +909,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(new DateTime(2020, 1, 1), results[0].Published);
                     Assert.Equal("Publication A", results[0].Title);
                     Assert.Equal("Publication A summary", results[0].Summary);
+                    Assert.Equal("latest-release-slug A", results[0].LatestReleaseSlug);
                     Assert.Equal("Theme 1 title", results[0].Theme);
                     Assert.Equal(AccreditedOfficialStatistics, results[0].Type);
 
@@ -896,6 +918,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(new DateTime(2021, 1, 1), results[1].Published);
                     Assert.Equal("Publication B", results[1].Title);
                     Assert.Equal("Publication B summary", results[1].Summary);
+                    Assert.Equal("latest-release-slug B", results[1].LatestReleaseSlug);
                     Assert.Equal("Theme 1 title", results[1].Theme);
                     Assert.Equal(OfficialStatistics, results[1].Type);
 
@@ -904,6 +927,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(new DateTime(2022, 1, 1), results[2].Published);
                     Assert.Equal("Publication C", results[2].Title);
                     Assert.Equal("Publication C summary", results[2].Summary);
+                    Assert.Equal("latest-release-slug C", results[2].LatestReleaseSlug);
                     Assert.Equal("Theme 2 title", results[2].Theme);
                     Assert.Equal(AdHocStatistics, results[2].Type);
                 }
@@ -1299,21 +1323,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug A"
+                    }
                 };
 
                 var releaseVersionB = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug B"
+                    }
                 };
 
                 var releasedVersionC = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug C"
+                    }
                 };
 
                 var theme = new Theme
@@ -1392,21 +1437,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug A"
+                    }
                 };
 
                 var releaseVersionB = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug B"
+                    }
                 };
 
                 var releaseVersionC = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug C"
+                    }
                 };
 
                 var theme = new Theme
@@ -1847,70 +1913,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             [Fact]
             public async Task ListSitemapItems()
             {
-                var publicationUpdated = "2018-04-06T13:46:11";
-                var publicationId = Guid.NewGuid();
-
-                var firstReleaseId = Guid.NewGuid();
-                var firstReleaseSlug = "first-release-slug";
-
-                var secondReleaseId = Guid.NewGuid();
-                var secondReleaseSlug = "second-release-slug";
-
-                var firstReleaseVersionPublishedDate = "2019-02-03T07:34:12";
-                var firstReleaseVersionUpdateDate = "2019-02-04T08:29:54";
-
-                var publicationUpdatedDate = DateTime.Parse(publicationUpdated);
-                var firstReleaseVersionPublished = DateTime.Parse(firstReleaseVersionPublishedDate);
-                var firstReleaseVersionUpdated = DateTime.Parse(firstReleaseVersionUpdateDate);
-
-                var releaseOneVersionOne = new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Slug = firstReleaseSlug,
-                    ReleaseId = firstReleaseId,
-                    Published = firstReleaseVersionPublished
-                };
-
-                var releaseOneVersionTwo = new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Slug = firstReleaseSlug,
-                    ReleaseId = firstReleaseId,
-                    Published = firstReleaseVersionUpdated // Two versions with same slug to test de-duping
-                };
-
-                var releaseTwoVersionOne = new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Slug = secondReleaseSlug,
-                    ReleaseId = secondReleaseId,
-                    Published = null // still in draft
-                };
-
-                var publication = new Publication
-                {
-                    Id = publicationId,
-                    Updated = publicationUpdatedDate,
-                    ReleaseSeries =
-                    [
-                        new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = firstReleaseId },
-                        new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = secondReleaseId }
-                    ],
-                    ReleaseVersions =
-                    [
-                        releaseOneVersionOne,
-                        releaseOneVersionTwo,
-                        releaseTwoVersionOne
-                    ],
-                    LatestPublishedReleaseVersionId = firstReleaseId
-                };
+                Publication publication = _dataFixture.DefaultPublication()
+                    .WithReleases([
+                        _dataFixture.DefaultRelease(publishedVersions: 2), // Two versions to test de-duping
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+                    ])
+                    .WithUpdated(DateTime.UtcNow.AddDays(-1));
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
                     contentDbContext.Publications.Add(publication);
-                    contentDbContext.ReleaseVersions.AddRange(releaseOneVersionOne, releaseOneVersionTwo,
-                        releaseTwoVersionOne);
                     await contentDbContext.SaveChangesAsync();
                 }
 
@@ -1918,17 +1931,95 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     var service = SetupPublicationService(contentDbContext);
 
-                    var result = (await service.ListSitemapItems()).AssertRight();
+                    var result = await service.ListSitemapItems();
+                    var viewModel = result.AssertRight();
 
-                    var item = Assert.Single(result);
-                    Assert.Equal(publication.Slug, item.Slug);
-                    Assert.Equal(publicationUpdatedDate, item.LastModified);
+                    var publicationItem = Assert.Single(viewModel);
+                    Assert.Equal(publication.Slug, publicationItem.Slug);
+                    Assert.Equal(publication.Updated, publicationItem.LastModified);
 
-                    Assert.NotNull(item.Releases);
-                    var nonDraftReleaseVersion = Assert.Single(item.Releases);
+                    Assert.NotNull(publicationItem.Releases);
+                    var releaseItem = Assert.Single(publicationItem.Releases);
 
-                    Assert.Equal(firstReleaseSlug, nonDraftReleaseVersion.Slug);
-                    Assert.Equal(firstReleaseVersionUpdated, nonDraftReleaseVersion.LastModified);
+                    Assert.Equal(publication.Releases[0].Slug, releaseItem.Slug);
+                    Assert.Equal(publication.Releases[0].Versions[1].Published, releaseItem.LastModified);
+                }
+            }
+
+            [Fact]
+            public async Task ListSitemapItems_ExcludesSupersededPublications()
+            {
+                Publication publication = _dataFixture.DefaultPublication()
+                    .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithSupersededBy(_dataFixture
+                        .DefaultPublication()
+                        .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]));
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    contentDbContext.Publications.Add(publication);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    var service = SetupPublicationService(contentDbContext);
+
+                    var result = await service.ListSitemapItems();
+                    var viewModel = result.AssertRight();
+
+                    // The sitemap should only include the superseding publication,
+                    // not the superseded publication
+                    var publicationItem = Assert.Single(viewModel);
+                    Assert.Equal(publication.SupersededBy!.Slug, publicationItem.Slug);
+                }
+            }
+
+            [Fact]
+            public async Task ListSitemapItems_ExcludesPublicationsWithNoPublishedReleases()
+            {
+                Publication publication = _dataFixture.DefaultPublication()
+                    .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    contentDbContext.Publications.Add(publication);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    var service = SetupPublicationService(contentDbContext);
+
+                    var result = await service.ListSitemapItems();
+                    var viewModel = result.AssertRight();
+
+                    Assert.Empty(viewModel);
+                }
+            }
+
+            [Fact]
+            public async Task ListSitemapItems_PublicationHasNoReleases()
+            {
+                Publication publication = _dataFixture.DefaultPublication();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    contentDbContext.Publications.Add(publication);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    var service = SetupPublicationService(contentDbContext);
+
+                    var result = await service.ListSitemapItems();
+                    var viewModel = result.AssertRight();
+
+                    Assert.Empty(viewModel);
                 }
             }
         }

@@ -31,8 +31,8 @@ public static class ReleaseVersionPredicates
         }
 
         var maxVersionsQueryable = releaseVersions
-            .Where(releaseVersion => publicationId == null || releaseVersion.PublicationId == publicationId)
-            .Where(releaseVersion => releaseSlug == null || releaseVersion.Slug == releaseSlug)
+            .Where(releaseVersion => publicationId == null || releaseVersion.Release.PublicationId == publicationId)
+            .Where(releaseVersion => releaseSlug == null || releaseVersion.Release.Slug == releaseSlug)
             .Where(releaseVersion => !publishedOnly || releaseVersion.Published.HasValue)
             .GroupBy(releaseVersion => releaseVersion.ReleaseId)
             .Select(groupedVersions =>

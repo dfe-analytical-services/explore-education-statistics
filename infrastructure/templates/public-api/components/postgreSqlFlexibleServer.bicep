@@ -8,7 +8,7 @@ import {
 
 import { staticAverageLessThanHundred, capacity, staticTotalGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 
-import { IpRange, PrincipalNameAndId } from '../types.bicep'
+import { IpRange, PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -25,31 +25,13 @@ param adminName string
 @secure()
 param adminPassword string
 
-@description('Azure Database for PostgreSQL sku name, typically, tier + family + cores, e.g. Standard_D4s_v3 ')
-param dbSkuName string
+@description('Server configuration.')
+param serverConfig PostgreSqlFlexibleServerConfig
 
-@description('Azure Database for PostgreSQL Storage Size ')
-param dbStorageSizeGB int
-
-@description('Azure Database for PostgreSQL Autogrow setting')
-param dbAutoGrowStatus string
-
-@description('Azure Database for PostgreSQL pricing tier')
-param dbSkuTier 'Burstable' | 'GeneralPurpose' | 'MemoryOptimized' = 'Burstable'
-
-@description('PostgreSQL version')
-param postgreSqlVersion '11' | '12' | '13' | '14' | '15' | '16' = '16'
-
-@description('PostgreSQL Server backup retention days')
-param backupRetentionDays int = 7
-
-@description('Geo-Redundant Backup setting')
-param geoRedundantBackup string = 'Disabled'
-
-@description('An array of database names')
+@description('An array of database names to create within this server')
 param databaseNames string[]
 
-@description('An array of firewall rules containing IP address ranges')
+@description('An array of firewall rules containing IP address ranges that can access this server')
 param firewallRules IpRange[] = []
 
 @description('An array of Entra ID admin principal names for this resource')
@@ -93,12 +75,12 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
   name: databaseServerName
   location: location
   sku: {
-    name: dbSkuName
-    tier: dbSkuTier
+    tier: serverConfig.sku.pricingTier
+    name: serverConfig.sku.compute
   }
   properties: {
     createMode: createMode
-    version: postgreSqlVersion
+    version: serverConfig.server.postgreSqlVersion
     administratorLogin: adminName
     administratorLoginPassword: adminPassword
     authConfig: {
@@ -107,12 +89,12 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
       tenantId: tenant().tenantId
     }
     storage: {
-      storageSizeGB: dbStorageSizeGB
-      autoGrow: dbAutoGrowStatus
+      storageSizeGB: serverConfig.storage.storageSizeGB
+      autoGrow: serverConfig.storage.autoGrow ? 'Enabled' : 'Disabled'
     }
     backup: {
-      backupRetentionDays: backupRetentionDays
-      geoRedundantBackup: geoRedundantBackup
+      backupRetentionDays: serverConfig.backups.retentionDays
+      geoRedundantBackup: serverConfig.backups.geoRedundantBackup ? 'Enabled' : 'Disabled'
     }
     highAvailability: {
       mode: 'Disabled'
@@ -127,6 +109,15 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
 
   tags: tagValues
 }
+
+resource settings 'Microsoft.DBforPostgreSQL/flexibleServers/configurations@2022-12-01' = [for setting in serverConfig.settings: {
+  parent: postgreSQLDatabase
+  name: setting.name
+  properties: {
+    value: setting.value
+    source: 'user-override'
+  }
+}]
 
 @batchSize(1)
 resource firewallRuleAssignments 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2022-12-01' = [

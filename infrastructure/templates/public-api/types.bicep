@@ -307,3 +307,59 @@ type StorageAccountPrivateEndpoints = {
   queue: string?
   table: string?
 }
+
+@export()
+type PostgreSqlFlexibleServerConfig = {
+
+  @discriminator('pricingTier')
+  @description('''
+  Available compute options per pricing tier. Note that this is not an exhaustive list.
+  A full list of options can be found at 
+  https://azure.microsoft.com/en-us/pricing/details/postgresql/flexible-server.
+  ''')
+  sku: {
+    pricingTier: 'Burstable'
+    compute: 'Standard_B1ms' | 'Standard_B2s'
+  } | {
+    pricingTier: 'GeneralPurpose'
+    compute: ''
+  } | {
+    pricingTier: 'MemoryOptimized'
+    compute: ''
+  }
+  server: {
+    @description('PostgreSQL version')
+    postgreSqlVersion: '16'
+  }
+  backups: {
+    @description('Backup retention duration in days')
+    retentionDays: int
+  
+    @description('If the database server is restorable in a paired region from its backups.')
+    geoRedundantBackup: bool
+  }
+  settings: {
+    @description('Name of the database setting.')
+    name: string
+    
+    @description('Value of the database setting.')
+    value: string
+  }[]
+  storage: {
+    @description('Storage Size in GB.')
+    storageSizeGB: int
+
+    @description('Whether the server storage will automatically grow when maximum capacity is reached or become read-only.')
+    autoGrow: bool
+  }
+}
+
+@export()
+type PublicApiStorageAccountConfig = {
+  sku: 'Standard_LRS' | 'Premium_LRS' | 'Premium_ZRS'
+  kind: 'StorageV2' | 'FileStorage'
+  fileShare: {
+    quotaGbs: int
+    accessTier: 'Cool' | 'Hot' | 'TransactionOptimized' | 'Premium'
+  }
+}

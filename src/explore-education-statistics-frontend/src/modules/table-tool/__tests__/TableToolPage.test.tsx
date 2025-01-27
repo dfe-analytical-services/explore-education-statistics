@@ -508,7 +508,7 @@ describe('TableToolPage', () => {
 
     expect(latestDataLink).toBeInTheDocument();
     expect(latestDataLink.href).toEqual(
-      'http://localhost/find-statistics/test-publication',
+      'http://localhost/find-statistics/test-publication/selected-release-slug',
     );
     expect(latestDataLink.text).toContain('View latest data');
     expect(latestDataLink.text).toContain('Latest Release Title');

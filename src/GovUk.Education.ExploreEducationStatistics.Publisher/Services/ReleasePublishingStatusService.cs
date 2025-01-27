@@ -41,15 +41,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var releaseVersion = await _context.ReleaseVersions
                 .AsNoTracking()
-                .Include(rv => rv.Publication)
+                .Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
                 .FirstAsync(rv => rv.Id == releasePublishingKey.ReleaseVersionId);
 
             var releaseStatus = new ReleasePublishingStatus(
                 releaseVersionId: releaseVersion.Id,
                 releaseStatusId: releasePublishingKey.ReleaseStatusId,
-                publicationSlug: releaseVersion.Publication.Slug,
+                publicationSlug: releaseVersion.Release.Publication.Slug,
                 publish: immediate ? null : releaseVersion.PublishScheduled,
-                releaseSlug: releaseVersion.Slug,
+                releaseSlug: releaseVersion.Release.Slug,
                 state,
                 immediate: immediate,
                 logMessages);

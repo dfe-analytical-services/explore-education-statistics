@@ -143,7 +143,7 @@ public class TimePeriodStringValidatorsTests
                 .WithMessageArgument("Property", "code")
                 .WithCustomState<TimePeriodAllowedCodeErrorDetail>(d => d.Value == code)
                 .WithCustomState<TimePeriodAllowedCodeErrorDetail>(d =>
-                    d.AllowedCodes.SequenceEqual(TimeIdentifierUtils.DataCodes.Order()))
+                    d.AllowedCodes.SequenceEqual(TimeIdentifierUtils.Codes.Order()))
                 .Only();
         }
 

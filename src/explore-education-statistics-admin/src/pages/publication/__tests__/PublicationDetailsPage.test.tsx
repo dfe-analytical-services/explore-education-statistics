@@ -42,6 +42,7 @@ describe('PublicationDetailsPage', () => {
     {
       id: 'publication-1',
       slug: 'publication-1-slug',
+      latestReleaseSlug: 'latest-release-slug-1',
       title: 'Publication 1',
       owner: false,
       contact: {
@@ -53,6 +54,7 @@ describe('PublicationDetailsPage', () => {
     {
       id: 'publication-2',
       slug: 'publication-2-slug',
+      latestReleaseSlug: 'latest-release-slug-2',
       title: 'Publication 2',
       owner: false,
       contact: {
@@ -64,6 +66,7 @@ describe('PublicationDetailsPage', () => {
     {
       id: 'publication-3',
       slug: 'publication-3-slug',
+      latestReleaseSlug: 'latest-release-slug-3',
       title: 'Publication 3',
       owner: false,
       contact: {
