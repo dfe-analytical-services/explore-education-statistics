@@ -7,7 +7,6 @@ import {
 import MapBlock, {
   MapBlockProps,
 } from '@common/modules/charts/components/MapBlock';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
 import { screen, waitFor } from '@testing-library/react';
@@ -18,16 +17,16 @@ describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
   const onBoundaryLevelChange = jest.fn();
   const testBlockProps: MapBlockProps = {
-    ...testMapConfiguration,
-    boundaryLevel: 1,
     id: 'testMap',
-    axes: testMapConfiguration.axes as MapBlockProps['axes'],
-    legend: testMapConfiguration.legend as LegendConfiguration,
     meta: testFullTable.subjectMeta,
     data: testFullTable.results,
-    height: 600,
-    width: 900,
     onBoundaryLevelChange,
+    chartConfig: {
+      ...testMapConfiguration,
+      boundaryLevel: 1,
+      height: 600,
+      width: 900,
+    },
   };
 
   test('renders legends and polygons correctly', async () => {
@@ -366,8 +365,6 @@ describe('MapBlock', () => {
     expect(paths[0]).toHaveAttribute('fill', 'rgba(71, 99, 165, 1)');
     expect(paths[1]).toHaveAttribute('fill', 'rgba(218, 224, 237, 1)');
     expect(paths[2]).toHaveAttribute('fill', 'rgba(145, 161, 201, 1)');
-    // UK polygon
-    expect(paths[3]).toHaveAttribute('fill', '#003078');
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 

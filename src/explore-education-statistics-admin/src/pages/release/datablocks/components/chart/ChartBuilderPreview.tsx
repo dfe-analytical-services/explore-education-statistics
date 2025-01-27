@@ -1,20 +1,19 @@
 import styles from '@admin/pages/release/datablocks/components/chart/ChartBuilder.module.scss';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import ChartRenderer, {
-  RenderableChart,
-} from '@common/modules/charts/components/ChartRenderer';
+import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
+import { DraftFullChart } from '@common/modules/charts/types/chart';
 import isChartRenderable, {
   getChartPreviewText,
 } from '@common/modules/charts/util/isChartRenderable';
 import React, { useRef } from 'react';
 
 interface Props {
-  chart?: RenderableChart;
+  fullChart?: DraftFullChart;
   loading: boolean;
 }
 
-const ChartBuilderPreview = ({ chart, loading }: Props) => {
+const ChartBuilderPreview = ({ fullChart, loading }: Props) => {
   const renderCount = useRef(0);
 
   return (
@@ -23,11 +22,11 @@ const ChartBuilderPreview = ({ chart, loading }: Props) => {
         className="govuk-width-container govuk-!-margin-bottom-6"
         data-testid="chartBuilderPreviewContainer"
       >
-        {chart && isChartRenderable(chart) ? (
+        {fullChart && isChartRenderable(fullChart) ? (
           <LoadingSpinner loading={loading} text="Loading chart data">
             <div className="govuk-width-container govuk-!-padding-4 dfe-border">
               <ChartRenderer
-                chart={chart}
+                fullChart={fullChart}
                 key={renderCount.current}
                 id="chartBuilderPreview"
               />
@@ -35,7 +34,7 @@ const ChartBuilderPreview = ({ chart, loading }: Props) => {
           </LoadingSpinner>
         ) : (
           <div className={styles.previewPlaceholder}>
-            <p>{getChartPreviewText(chart)}</p>
+            <p>{getChartPreviewText(fullChart?.chartConfig)}</p>
           </div>
         )}
       </div>

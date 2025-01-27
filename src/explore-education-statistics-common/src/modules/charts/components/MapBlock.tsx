@@ -1,4 +1,6 @@
 import { SelectOption } from '@common/components/form/FormSelect';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import useToggle from '@common/hooks/useToggle';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import MapControls from '@common/modules/charts/components/MapControls';
 import MapGeoJSON from '@common/modules/charts/components/MapGeoJSON';
@@ -12,12 +14,10 @@ import { LegendDataGroup } from '@common/modules/charts/components/utils/generat
 import {
   AxisConfiguration,
   ChartDefinition,
-  ChartProps,
-  DataGroupingType,
-  MapConfig,
+  FullChart,
+  MapChartConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import getMapDataSetCategoryConfigs, {
   MapDataSetCategoryConfig,
 } from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
@@ -29,10 +29,8 @@ import { Layer, Path, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
-import useToggle from '@common/hooks/useToggle';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import orderMapLegendItems from './utils/orderMapLegendItems';
 import generateDataSetKey from '../util/generateDataSetKey';
+import orderMapLegendItems from './utils/orderMapLegendItems';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -48,20 +46,9 @@ export type MapFeatureCollection = FeatureCollection<
   MapFeatureProperties
 >;
 
-export interface MapBlockProps extends ChartProps {
-  axes: {
-    major: AxisConfiguration;
-  };
-  // dataGroups & dataClassification to be removed when
-  // migrate old maps to use the new config
-  // https://dfedigital.atlassian.net/browse/EES-4271
-  dataGroups?: number;
-  dataClassification?: DataGroupingType;
+export interface MapBlockProps extends FullChart {
   id: string;
-  legend: LegendConfiguration;
-  map?: MapConfig;
-  position?: { lat: number; lng: number };
-  boundaryLevel: number;
+  chartConfig: MapChartConfig;
   onBoundaryLevelChange: (boundaryLevel: number) => Promise<void>;
 }
 
@@ -115,20 +102,22 @@ export const mapBlockDefinition: ChartDefinition = {
 
 export default function MapBlock({
   id,
-  dataGroups: deprecatedDataGroups,
-  dataClassification: deprecatedDataClassification,
+  chartConfig,
   data,
-  map,
   meta,
-  legend,
-  position = { lat: 53.00986, lng: -3.2524038 },
-  width,
-  height,
-  axes,
-  title,
-  boundaryLevel,
   onBoundaryLevelChange,
 }: MapBlockProps) {
+  const {
+    dataGroups: deprecatedDataGroups,
+    dataClassification: deprecatedDataClassification,
+    map,
+    legend,
+    width,
+    height,
+    axes,
+    title,
+    boundaryLevel,
+  } = chartConfig;
   const [isBoundaryLevelChanging, toggleBoundaryLevelChanging] =
     useToggle(false);
 
@@ -289,7 +278,7 @@ export default function MapBlock({
               height: `${height || 600}px`,
             }}
             className={classNames(styles.map, 'dfe-print-break-avoid')}
-            center={position}
+            center={{ lat: 53.00986, lng: -3.2524038 }}
             minZoom={5}
             zoom={5}
           >

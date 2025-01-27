@@ -1,8 +1,23 @@
-import { horizontalBarBlockDefinition } from '@common/modules/charts/components/HorizontalBarBlock';
-import { infographicBlockDefinition } from '@common/modules/charts/components/InfographicBlock';
-import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
-import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
-import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
+import {
+  horizontalBarBlockDefinition,
+  HorizontalBarProps,
+} from '@common/modules/charts/components/HorizontalBarBlock';
+import {
+  infographicBlockDefinition,
+  InfographicChartProps,
+} from '@common/modules/charts/components/InfographicBlock';
+import {
+  lineChartBlockDefinition,
+  LineChartProps,
+} from '@common/modules/charts/components/LineChartBlock';
+import {
+  mapBlockDefinition,
+  MapBlockProps,
+} from '@common/modules/charts/components/MapBlock';
+import {
+  verticalBarBlockDefinition,
+  VerticalBarProps,
+} from '@common/modules/charts/components/VerticalBarBlock';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
@@ -110,28 +125,6 @@ export interface MapConfig {
   dataSetConfigs: MapDataSetConfig[];
 }
 
-export interface ChartProps {
-  data: TableDataResult[];
-  meta: FullTableMeta;
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
-  height: number;
-  width?: number;
-  axes: AxesConfiguration;
-  legend?: LegendConfiguration;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
-}
-
-export interface StackedBarProps extends ChartProps {
-  barThickness?: number;
-  dataLabelPosition?: BarChartDataLabelPosition;
-  stacked?: boolean;
-}
-
 export interface ChartCapabilities {
   canIncludeNonNumericData: boolean;
   canPositionLegendInline: boolean;
@@ -209,3 +202,120 @@ export const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
   infographicBlockDefinition,
 ];
+
+interface BaseChartConfig {
+  type: 'horizontalbar' | 'infographic' | 'line' | 'map' | 'verticalbar';
+  title?: string;
+  subtitle?: string;
+  alt: string;
+  height: number;
+  width?: number;
+  includeNonNumericData: boolean;
+  titleType?: TitleType;
+}
+
+export interface HorizontalBarChartConfig extends BaseChartConfig {
+  type: 'horizontalbar';
+  barThickness?: number;
+  stacked: boolean;
+  showDataLabels: boolean;
+  dataLabelPosition?: BarChartDataLabelPosition;
+  legend: LegendConfiguration;
+  axes: {
+    major: AxisConfiguration;
+    minor: AxisConfiguration;
+  };
+  map?: undefined;
+}
+
+export interface InfographicConfig extends BaseChartConfig {
+  type: 'infographic';
+  fileId: string;
+  axes?: undefined;
+  legend?: undefined;
+  map?: undefined;
+}
+
+export interface LineChartConfig extends BaseChartConfig {
+  type: 'line';
+  showDataLabels: boolean;
+  dataLabelPosition?: LineChartDataLabelPosition;
+  legend: LegendConfiguration;
+  axes: {
+    major: AxisConfiguration;
+    minor: AxisConfiguration;
+  };
+  map?: undefined;
+}
+
+export interface MapChartConfig extends BaseChartConfig {
+  type: 'map';
+  boundaryLevel: number;
+  dataGroups?: number;
+  dataClassification?: DataGroupingType;
+  map: MapConfig;
+  legend: LegendConfiguration;
+  axes: {
+    major: AxisConfiguration;
+  };
+}
+
+export interface VerticalBarChartConfig extends BaseChartConfig {
+  type: 'verticalbar';
+  barThickness?: number;
+  stacked: boolean;
+  showDataLabels: boolean;
+  dataLabelPosition?: BarChartDataLabelPosition;
+  legend: LegendConfiguration;
+  axes: {
+    major: AxisConfiguration;
+    minor: AxisConfiguration;
+  };
+  map?: undefined;
+}
+
+/**
+ * This is the chart type that will be returned by the API.
+ * It differs from {@see RenderableChart} as we need to
+ * progressively migrate parts of its old data structure,
+ * to our newer one that is being used by {@see ChartRendererProps}.
+ */
+export type ChartConfig =
+  | InfographicConfig
+  | LineChartConfig
+  | MapChartConfig
+  | HorizontalBarChartConfig
+  | VerticalBarChartConfig;
+
+export type DraftChartConfig = Partial<ChartConfig>;
+
+/**
+ * FullChart, a {@see ChartConfig} alongside related all data and meta.
+ */
+export interface FullChart {
+  data: TableDataResult[];
+  meta: FullTableMeta;
+  chartConfig: ChartConfig;
+}
+
+export type DraftFullChart<
+  T extends { chartConfig: { type: string } } = FullChart,
+> = Omit<T, 'chartConfig'> & {
+  chartConfig: DraftChartConfig;
+};
+
+export interface StackedBarProps extends FullChart {
+  chartConfig: VerticalBarChartConfig | HorizontalBarChartConfig;
+}
+
+/**
+ * RenderableChart,
+ * All appropriate props bundled together to fit any chart renderer component.
+ * a {@see FullChart} & some additional helpers and {@see WithChartConfigType} hoisted(copied)
+ */
+export type RenderableChart =
+  | HorizontalBarProps
+  | LineChartProps
+  | VerticalBarProps
+  | InfographicChartProps
+  | Omit<MapBlockProps, 'id'>;

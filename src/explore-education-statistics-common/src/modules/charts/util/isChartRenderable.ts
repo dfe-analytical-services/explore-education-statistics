@@ -1,24 +1,32 @@
-import { RenderableChart } from '@common/modules/charts/components/ChartRenderer';
+import {
+  DraftChartConfig,
+  DraftFullChart,
+  RenderableChart,
+} from '../types/chart';
 
-export default function isChartRenderable(props: RenderableChart): boolean {
-  if (props.type === 'infographic') {
-    return props.fileId.length > 0;
+export default function isChartRenderable(
+  draftFullChart: DraftFullChart | RenderableChart,
+): draftFullChart is RenderableChart {
+  const { chartConfig, data, meta } = draftFullChart;
+
+  if (chartConfig.type === 'infographic') {
+    return Boolean(chartConfig.fileId && chartConfig.fileId.length > 0);
   }
 
-  if (props.type === 'map' && !props.boundaryLevel) {
+  if (chartConfig.type === 'map' && !chartConfig.boundaryLevel) {
     return false;
   }
 
   return Boolean(
-    props.type &&
-      props.axes?.major?.dataSets.length &&
-      props.data &&
-      props.meta,
+    chartConfig.type &&
+      chartConfig.axes?.major?.dataSets.length &&
+      data &&
+      meta,
   );
 }
 
-export function getChartPreviewText(props?: RenderableChart): string {
-  switch (props?.type) {
+export function getChartPreviewText(chartConfig?: DraftChartConfig): string {
+  switch (chartConfig?.type) {
     case undefined:
       return '';
     case 'map':

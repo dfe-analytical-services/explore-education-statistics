@@ -1,6 +1,6 @@
 import render from '@common-test/render';
 import {
-  testChartConfiguration,
+  testLineChartConfig,
   testChartTableData,
 } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import {
@@ -8,12 +8,13 @@ import {
   testMapTableData,
   testMapTableDataLocationsLowRes,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
+import { ChartConfig } from '@common/modules/charts/types/chart';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import _tableBuilderService from '@common/services/tableBuilderService';
-import { Chart, DataBlock } from '@common/services/types/blocks';
+import { DataBlock } from '@common/services/types/blocks';
 import { screen, waitFor, within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import { AxiosError } from 'axios';
@@ -152,7 +153,7 @@ describe('DataBlockTabs', () => {
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
-          charts: [testChartConfiguration],
+          charts: [testLineChartConfig],
         }}
       />,
     );
@@ -185,7 +186,7 @@ describe('DataBlockTabs', () => {
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
-          charts: [testChartConfiguration],
+          charts: [testLineChartConfig],
         }}
       />,
     );
@@ -216,7 +217,7 @@ describe('DataBlockTabs', () => {
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
-          charts: [testChartConfiguration],
+          charts: [testLineChartConfig],
         }}
       />,
     );
@@ -248,9 +249,9 @@ describe('DataBlockTabs', () => {
           ...testDataBlock,
           charts: [
             {
-              ...testChartConfiguration,
+              ...testLineChartConfig,
               type: 'horizontalbar',
-            } as Chart,
+            } as ChartConfig,
           ],
         }}
       />,
@@ -282,9 +283,9 @@ describe('DataBlockTabs', () => {
           ...testDataBlock,
           charts: [
             {
-              ...testChartConfiguration,
+              ...testLineChartConfig,
               type: 'verticalbar',
-            } as Chart,
+            } as ChartConfig,
           ],
         }}
       />,

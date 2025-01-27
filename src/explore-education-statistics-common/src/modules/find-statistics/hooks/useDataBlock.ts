@@ -1,12 +1,18 @@
-import { RenderableChart } from '@common/modules/charts/components/ChartRenderer';
+import { HorizontalBarProps } from '@common/modules/charts/components/HorizontalBarBlock';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
+import { LineChartProps } from '@common/modules/charts/components/LineChartBlock';
 import getMapInitialBoundaryLevel from '@common/modules/charts/components/utils/getMapInitialBoundaryLevel';
+import { VerticalBarProps } from '@common/modules/charts/components/VerticalBarBlock';
+import {
+  ChartConfig,
+  RenderableChart,
+} from '@common/modules/charts/types/chart';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
-import { Chart, DataBlock } from '@common/services/types/blocks';
+import { DataBlock } from '@common/services/types/blocks';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState, useCallback } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 interface Options {
   dataBlock: Pick<DataBlock, 'id' | 'charts' | 'query' | 'dataBlockParentId'>;
@@ -22,11 +28,11 @@ export default function useDataBlock({
   const getChartFile = useGetReleaseFile(releaseId);
   const queryClient = useQueryClient();
 
-  const chart = dataBlock.charts[0] as Chart | undefined;
-  const isMapChart = chart?.type === 'map';
+  const chartConfig = dataBlock.charts[0] as ChartConfig | undefined;
+  const isMapChart = chartConfig?.type === 'map';
 
   const [selectedBoundaryLevel, setSelectedBoundaryLevel] = useState(
-    isMapChart ? getMapInitialBoundaryLevel(chart) : undefined,
+    isMapChart ? getMapInitialBoundaryLevel(chartConfig) : undefined,
   );
 
   const {
@@ -85,33 +91,44 @@ export default function useDataBlock({
     });
   }, [tableData, isGeoJsonInitialLoading, selectedBoundaryLevel, geoJson]);
 
-  const chartProps = useMemo<RenderableChart | undefined>(() => {
-    if (!fullTable || !chart) return undefined;
-    if (chart.type === 'infographic') {
-      return {
-        ...chart,
-        data: fullTable.results,
-        meta: fullTable.subjectMeta,
-        getInfographic: getInfographic ?? getChartFile,
-      };
+  const fullChart = useMemo<RenderableChart | undefined>(() => {
+    if (!fullTable || !chartConfig) return undefined;
+
+    switch (chartConfig.type) {
+      case 'infographic':
+        return {
+          type: chartConfig.type,
+          chartConfig,
+          data: fullTable.results,
+          meta: fullTable.subjectMeta,
+          getInfographic: getInfographic ?? getChartFile,
+        };
+      case 'map':
+        return {
+          type: chartConfig.type,
+          chartConfig,
+          data: fullTable.results,
+          meta: fullTable.subjectMeta,
+          onBoundaryLevelChange,
+        };
+      default:
+        return {
+          type: chartConfig.type,
+          chartConfig,
+          data: fullTable.results,
+          meta: fullTable.subjectMeta,
+        } as HorizontalBarProps | LineChartProps | VerticalBarProps;
     }
-    if (chart.type === 'map') {
-      return {
-        ...chart,
-        data: fullTable.results,
-        meta: fullTable.subjectMeta,
-        onBoundaryLevelChange,
-      };
-    }
-    return {
-      ...chart,
-      data: fullTable.results,
-      meta: fullTable.subjectMeta,
-    };
-  }, [chart, fullTable, getInfographic, onBoundaryLevelChange, getChartFile]);
+  }, [
+    chartConfig,
+    fullTable,
+    getInfographic,
+    onBoundaryLevelChange,
+    getChartFile,
+  ]);
 
   return {
-    chart: chartProps,
+    fullChart,
     isTableDataLoading,
     isTableDataError,
     fullTable,

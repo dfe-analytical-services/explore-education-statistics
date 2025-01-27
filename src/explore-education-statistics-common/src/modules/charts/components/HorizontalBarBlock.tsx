@@ -4,12 +4,11 @@ import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import useLegend from '@common/modules/charts/components/hooks/useLegend';
 import createReferenceLine from '@common/modules/charts/components/utils/createReferenceLine';
 import {
-  AxisConfiguration,
   ChartDefinition,
+  HorizontalBarChartConfig,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
@@ -18,13 +17,14 @@ import {
   getMajorAxisDomainTicks,
   getMinorAxisDomainTicks,
 } from '@common/modules/charts/util/domainTicks';
-import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
-import getUnit from '@common/modules/charts/util/getUnit';
+import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
-import parseNumber from '@common/utils/number/parseNumber';
-import formatPretty from '@common/utils/number/formatPretty';
+import getUnit from '@common/modules/charts/util/getUnit';
 import getAccessibleTextColour from '@common/utils/colour/getAccessibleTextColour';
+import formatPretty from '@common/utils/number/formatPretty';
+import parseNumber from '@common/utils/number/parseNumber';
+import groupBy from 'lodash/groupBy';
 import React, { memo } from 'react';
 import {
   Bar,
@@ -37,33 +37,31 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import groupBy from 'lodash/groupBy';
 
 const defaultLabelTextColour = '#0B0C0C';
 
 export interface HorizontalBarProps extends StackedBarProps {
-  legend: LegendConfiguration;
-  axes: {
-    major: AxisConfiguration;
-    minor: AxisConfiguration;
-  };
+  chartConfig: HorizontalBarChartConfig;
 }
 
 const HorizontalBarBlock = ({
-  alt,
+  chartConfig,
   data,
   meta,
-  height,
-  barThickness,
-  width,
-  stacked = false,
-
-  axes,
-  legend,
-  includeNonNumericData,
-  showDataLabels,
-  dataLabelPosition,
 }: HorizontalBarProps) => {
+  const {
+    alt,
+    height,
+    barThickness,
+    width,
+    stacked = false,
+    axes,
+    legend,
+    includeNonNumericData,
+    showDataLabels,
+    dataLabelPosition,
+  } = chartConfig;
+
   const [legendProps, renderLegend] = useLegend();
   const { isMedia: isMobileMedia } = useMobileMedia();
 

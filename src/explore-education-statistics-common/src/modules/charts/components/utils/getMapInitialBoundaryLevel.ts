@@ -1,9 +1,9 @@
-import { MapChart } from '@common/services/types/blocks';
+import { MapChartConfig } from '@common/modules/charts/types/chart';
 import isEqual from 'lodash/isEqual';
 import orderMapLegendItems from './orderMapLegendItems';
 
 export default function getMapInitialBoundaryLevel(
-  map: MapChart,
+  map: MapChartConfig,
 ): number | undefined {
   const { dataSet: firstDataSet } = orderMapLegendItems(map.legend)[0];
   const firstDataSetConfig = map.map?.dataSetConfigs.find(({ dataSet }) => {

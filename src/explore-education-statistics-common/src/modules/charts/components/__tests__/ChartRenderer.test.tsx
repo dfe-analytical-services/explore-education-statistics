@@ -41,21 +41,24 @@ describe('ChartRenderer', () => {
   const testFullTableMeta = mapFullTable(testChartTableData);
   const testMapChartRenderer: ChartRendererProps = {
     id: 'test-id',
-    chart: {
-      type: 'map',
+    fullChart: {
       meta: testFullTableMeta.subjectMeta,
       data: testFullTableMeta.results,
-      alt: '',
-      height: 100,
-      axes: {
-        major: testAxisConfiguration,
-      },
-      legend: {
-        items: [],
-      },
-      boundaryLevel: 1,
-      map: { dataSetConfigs: [] },
       onBoundaryLevelChange: async () => undefined,
+      chartConfig: {
+        type: 'map',
+        alt: '',
+        includeNonNumericData: false,
+        height: 100,
+        axes: {
+          major: testAxisConfiguration,
+        },
+        legend: {
+          items: [],
+        },
+        boundaryLevel: 1,
+        map: { dataSetConfigs: [] },
+      },
     },
   };
 

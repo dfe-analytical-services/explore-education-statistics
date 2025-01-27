@@ -11,7 +11,6 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { DataBlock } from '@common/services/types/blocks';
-import { isAxiosError } from 'axios';
 import React, { ReactNode } from 'react';
 
 const testId = (dataBlock: DataBlock) => `Data block - ${dataBlock.name}`;
@@ -40,7 +39,7 @@ const DataBlockTabs = ({
   onToggle,
 }: DataBlockTabsProps) => {
   const {
-    chart,
+    fullChart,
     isTableDataLoading,
     isTableDataError,
     fullTable,
@@ -81,11 +80,11 @@ const DataBlockTabs = ({
             {isGeoJsonError && errorMessage}
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
-                {chart && (
+                {fullChart && (
                   <ChartRenderer
                     id="dataBlockTabs-chart"
                     source={dataBlock.source}
-                    chart={chart}
+                    fullChart={fullChart}
                   />
                 )}
                 {additionTabContentElement}
