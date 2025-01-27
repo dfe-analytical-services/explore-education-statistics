@@ -120,6 +120,7 @@ public class PublicationService : IPublicationService
 
         // Publications must have a published release and not be superseded
         var baseQueryable = _contentDbContext.Publications
+            .Include(p => p.ReleaseVersions)
             .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&
                         (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue));
 
