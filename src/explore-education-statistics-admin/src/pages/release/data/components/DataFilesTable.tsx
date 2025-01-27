@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
+import DataFileSummaryList from '@admin/pages/release/data/components/DataFileSummaryList';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
 import ImporterStatus, {
   terminalImportStatuses,
@@ -66,7 +66,7 @@ export default function DataFilesTable({
             <td data-testid="Title" className={styles.title}>
               {dataFile.title}
             </td>
-            <td data-testid="Data file size" className={styles.fileSize}>
+            <td data-testid="Size" className={styles.fileSize}>
               {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
             </td>
             <td data-testid="Status">
@@ -84,7 +84,7 @@ export default function DataFilesTable({
                   title="Data file details"
                   triggerButton={<ButtonText>View details</ButtonText>}
                 >
-                  <DataFileDetailsTable
+                  <DataFileSummaryList
                     dataFile={dataFile}
                     releaseId={releaseId}
                     onStatusChange={onStatusChange}
