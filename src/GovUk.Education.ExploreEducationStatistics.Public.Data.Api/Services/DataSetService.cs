@@ -21,8 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 internal class DataSetService(
     PublicDataDbContext publicDataDbContext,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IUserService userService
-    )
+    IUserService userService)
     : IDataSetService
 {
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
