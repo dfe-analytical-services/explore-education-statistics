@@ -114,7 +114,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                   {data.publications.map(publication => (
                     <li key={publication.id}>
                       <Link
-                        to={`/find-statistics/${publication.slug}/${publication.releaseSlug}`}
+                        to={`/find-statistics/${publication.slug}/${publication.latestReleaseSlug}`}
                       >
                         {publication.title}
                       </Link>{' '}

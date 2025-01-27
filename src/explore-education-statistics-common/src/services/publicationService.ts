@@ -37,14 +37,14 @@ export interface ReleaseSeriesItem {
   isLegacyLink: boolean;
   description: string;
   releaseId?: string;
-  releaseSlug?: string;
+  releaseSlug: string;
   legacyLinkUrl?: string;
 }
 
 export interface PublicationSummary {
   id: string;
   slug: string;
-  releaseSlug: string;
+  latestReleaseSlug: string;
   title: string;
   owner: boolean;
   contact: Contact;
@@ -55,7 +55,7 @@ export interface PublicationListSummary {
   published: Date;
   rank: number;
   slug: string;
-  releaseSlug: string;
+  latestReleaseSlug: string;
   summary?: string;
   theme: string;
   title: string;

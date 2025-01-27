@@ -52,6 +52,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Slug = "publication-title",
                 Title = "Publication title",
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
+                LatestPublishedReleaseVersion = new ReleaseVersion
+                {
+                    Release = new Release
+                    { 
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug"
+                    }
+                },
                 Methodologies = new List<PublicationMethodology>
                 {
                     new()
@@ -73,8 +83,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Methodologies.AddAsync(methodology);
                 await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Methodologies.AddAsync(methodology);              
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -97,6 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Single(result.Publications);
                 Assert.Equal(publication.Id, result.Publications[0].Id);
                 Assert.Equal(publication.Slug, result.Publications[0].Slug);
+                Assert.Equal(publication.LatestPublishedReleaseVersion!.Release.Slug, result.Publications[0].LatestReleaseSlug);
                 Assert.Equal(publication.Title, result.Publications[0].Title);
                 Assert.True(result.Publications[0].Owner);
                 Assert.NotNull(result.Publications[0].Contact);
@@ -129,6 +140,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Slug = "publication-a",
                 Title = "Publication A",
+                LatestPublishedReleaseVersion = new ReleaseVersion
+                {
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug"
+                    }
+                },
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
                 Methodologies = new List<PublicationMethodology>
                 {
@@ -152,6 +173,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Slug = "publication-b",
                 Title = "Publication B",
+                LatestPublishedReleaseVersion = new ReleaseVersion
+                {
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug"
+                    }
+                },
                 LatestPublishedReleaseVersionId = null,
                 Methodologies = new List<PublicationMethodology>
                 {
@@ -185,6 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Single(result.Publications);
                 Assert.Equal(publicationA.Id, result.Publications[0].Id);
                 Assert.Equal(publicationA.Slug, result.Publications[0].Slug);
+                Assert.Equal(publicationA.LatestPublishedReleaseVersion!.Release.Slug, result.Publications[0].LatestReleaseSlug);
                 Assert.Equal(publicationA.Title, result.Publications[0].Title);
             }
         }

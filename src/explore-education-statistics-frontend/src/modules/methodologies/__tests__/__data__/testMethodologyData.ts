@@ -96,6 +96,7 @@ export const testMethodology: Methodology = {
       id: 'publication-1',
       title: 'Publication 1',
       slug: 'publication-1-slug',
+      latestReleaseSlug: 'latest-release-slug-1',
       owner: false,
       contact: {
         teamName: 'Mock Team Name',
@@ -108,6 +109,7 @@ export const testMethodology: Methodology = {
       id: 'publication-2',
       title: 'Publication 2',
       slug: 'publication-2-slug',
+      latestReleaseSlug: 'latest-release-slug-2',
       owner: true,
       contact: {
         teamName: 'Mock Team Name',

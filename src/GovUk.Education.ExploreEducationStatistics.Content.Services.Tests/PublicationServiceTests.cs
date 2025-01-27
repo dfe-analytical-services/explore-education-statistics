@@ -817,7 +817,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = AccreditedOfficialStatistics,
-                        Published = new DateTime(2020, 1, 1)
+                        Published = new DateTime(2020, 1, 1),
+                        Release = new Release
+                        {
+                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                            PublicationId = Guid.NewGuid(),
+                            Year = 2021,
+                            Slug = "latest-release-slug A"
+                        }
                     }
                 };
 
@@ -829,7 +836,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = OfficialStatistics,
-                        Published = new DateTime(2021, 1, 1)
+                        Published = new DateTime(2021, 1, 1),
+                        Release = new Release
+                        {
+                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                            PublicationId = Guid.NewGuid(),
+                            Year = 2021,
+                            Slug = "latest-release-slug B"
+                        }
                     }
                 };
 
@@ -841,7 +855,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = AdHocStatistics,
-                        Published = new DateTime(2022, 1, 1)
+                        Published = new DateTime(2022, 1, 1),
+                        Release = new Release
+                        {
+                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                            PublicationId = Guid.NewGuid(),
+                            Year = 2021,
+                            Slug = "latest-release-slug C"
+                        }
                     }
                 };
 
@@ -889,6 +910,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(new DateTime(2020, 1, 1), results[0].Published);
                     Assert.Equal("Publication A", results[0].Title);
                     Assert.Equal("Publication A summary", results[0].Summary);
+                    Assert.Equal("latest-release-slug A", results[0].LatestReleaseSlug);
                     Assert.Equal("Theme 1 title", results[0].Theme);
                     Assert.Equal(AccreditedOfficialStatistics, results[0].Type);
 
@@ -897,6 +919,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(new DateTime(2021, 1, 1), results[1].Published);
                     Assert.Equal("Publication B", results[1].Title);
                     Assert.Equal("Publication B summary", results[1].Summary);
+                    Assert.Equal("latest-release-slug B", results[1].LatestReleaseSlug);
                     Assert.Equal("Theme 1 title", results[1].Theme);
                     Assert.Equal(OfficialStatistics, results[1].Type);
 
@@ -905,6 +928,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(new DateTime(2022, 1, 1), results[2].Published);
                     Assert.Equal("Publication C", results[2].Title);
                     Assert.Equal("Publication C summary", results[2].Summary);
+                    Assert.Equal("latest-release-slug C", results[2].LatestReleaseSlug);
                     Assert.Equal("Theme 2 title", results[2].Theme);
                     Assert.Equal(AdHocStatistics, results[2].Type);
                 }
@@ -1300,21 +1324,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug A"
+                    }
                 };
 
                 var releaseVersionB = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug B"
+                    }
                 };
 
                 var releasedVersionC = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug C"
+                    }
                 };
 
                 var theme = new Theme
@@ -1393,21 +1438,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug A"
+                    }
                 };
 
                 var releaseVersionB = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug B"
+                    }
                 };
 
                 var releaseVersionC = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug C"
+                    }
                 };
 
                 var theme = new Theme

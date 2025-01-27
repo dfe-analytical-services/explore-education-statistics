@@ -97,12 +97,7 @@ const TableToolFinalStep = ({
                     <Link
                       className="govuk-!-display-none-print"
                       unvisited
-                      to={
-                        selectedPublication.selectedRelease &&
-                        selectedPublication.latestRelease
-                          ? `/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`
-                          : `/find-statistics/${selectedPublication.slug}`
-                      }
+                      to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
                       testId="View latest data link"
                     >
                       View latest data:{' '}

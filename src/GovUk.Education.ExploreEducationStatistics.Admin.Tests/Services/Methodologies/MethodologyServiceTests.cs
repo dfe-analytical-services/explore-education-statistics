@@ -51,7 +51,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             Title = "Test publication",
             Slug = "test-publication",
-            Contact = MockContact
+            Contact = MockContact,
+            LatestPublishedReleaseVersion = new ReleaseVersion
+            {
+                Release = new Release
+                {
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    PublicationId = Guid.NewGuid(),
+                    Year = 2021,
+                    Slug = "latest-release-slug"
+                }
+            }
         };
 
         [Fact]
@@ -661,6 +671,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 Title = "Owning publication",
                 Slug = "owning-publication",
+                LatestPublishedReleaseVersion = new ReleaseVersion
+                {
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug"
+                    }
+                },
                 Methodologies = new List<PublicationMethodology>
                 {
                     new()
@@ -858,6 +878,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 Title = "Owning publication",
                 Slug = "owning-publication",
+                LatestPublishedReleaseVersion = new ReleaseVersion
+                {
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug"
+                    }
+                },
                 Methodologies = new List<PublicationMethodology>
                 {
                     new()
@@ -873,6 +903,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 Title = "Adopting publication 1",
                 Slug = "adopting-publication-1",
+                LatestPublishedReleaseVersion = new ReleaseVersion
+                {
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug-1"
+                    }
+                },
                 Methodologies = ListOf(
                     new PublicationMethodology
                     {
@@ -887,6 +927,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 Title = "Adopting publication 2",
                 Slug = "adopting-publication-2",
+                LatestPublishedReleaseVersion = new ReleaseVersion
+                {
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug-2"
+                    }
+                },
                 Methodologies = ListOf(
                     new PublicationMethodology
                     {
@@ -950,12 +1000,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal(owningPublication.Id, viewModel.OwningPublication.Id);
                 Assert.Equal("Owning publication", viewModel.OwningPublication.Title);
+                Assert.Equal(owningPublication.LatestPublishedReleaseVersion.Release.Slug, viewModel.OwningPublication.LatestReleaseSlug);
 
                 Assert.Equal(2, viewModel.OtherPublications.Count);
                 Assert.Equal(adoptingPublication1.Id, viewModel.OtherPublications[0].Id);
                 Assert.Equal("Adopting publication 1", viewModel.OtherPublications[0].Title);
                 Assert.Equal(adoptingPublication2.Id, viewModel.OtherPublications[1].Id);
                 Assert.Equal("Adopting publication 2", viewModel.OtherPublications[1].Title);
+
+                Assert.Equal(adoptingPublication1.LatestPublishedReleaseVersion.Release.Slug, viewModel.OtherPublications[0].LatestReleaseSlug);
+                Assert.Equal(adoptingPublication2.LatestPublishedReleaseVersion.Release.Slug, viewModel.OtherPublications[1].LatestReleaseSlug);
 
                 Assert.NotNull(viewModel.ScheduledWithRelease);
                 Assert.Equal(methodologyVersion.ScheduledWithReleaseVersionId, viewModel.ScheduledWithRelease!.Id);
@@ -1641,6 +1695,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var publication = new Publication
             {
+                LatestPublishedReleaseVersion = new ReleaseVersion
+                {
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug"
+                    }
+                },
                 Title = "Test publication",
                 Slug = "test-publication",
                 Contact = MockContact
@@ -1906,6 +1970,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var publication = new Publication
             {
+                LatestPublishedReleaseVersion = new ReleaseVersion
+                {
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug"
+                    }
+                },
                 Title = "Test publication",
                 Slug = "test-publication",
                 Contact = MockContact
@@ -2021,6 +2095,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var publication = new Publication
             {
+                LatestPublishedReleaseVersion = new ReleaseVersion
+                {
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug"
+                    }
+                },
                 Title = "Test publication",
                 Slug = "test-publication",
                 Contact = MockContact
@@ -2316,6 +2400,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var publication = new Publication
             {
+                LatestPublishedReleaseVersion = new ReleaseVersion
+                {
+                    Release = new Release
+                    {
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = Guid.NewGuid(),
+                        Year = 2021,
+                        Slug = "latest-release-slug"
+                    }
+                },
                 Title = "Test publication",
                 Slug = "test-publication",
                 Contact = MockContact,
