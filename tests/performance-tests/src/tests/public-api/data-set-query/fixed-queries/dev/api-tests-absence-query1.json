@@ -1,0 +1,33 @@
+{
+  "publicationTitle": "Fixed Data Set Queries",
+  "dataSetName": "Performance tests - API test absence",
+  "dataSetId": "87419401-36d5-e076-ae6a-1ecb7d07d56e",
+  "query": {
+    "criteria": {
+      "filters": {
+        "in": [
+          "mLGT9",
+          "h87my"
+        ]
+      },
+      "locations": {
+        "in": [
+          {
+            "level": "NAT",
+            "id": "dP0Zw"
+          }
+        ]
+      },
+      "timePeriods": {
+        "gte": {
+          "code": "AY",
+          "period": "2024/2025"
+        }
+      }
+    },
+    "indicators": [
+      "oUxdm",
+      "GI5Eg"
+    ]
+  }
+}

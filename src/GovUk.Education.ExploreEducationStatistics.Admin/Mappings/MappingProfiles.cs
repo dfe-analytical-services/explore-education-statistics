@@ -40,26 +40,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<User, UserDetailsViewModel>();
 
             CreateMap<ReleaseVersion, ReleaseViewModel>()
-                .ForMember(
-                    dest => dest.ReleaseId,
+                .ForMember(dest => dest.ReleaseId,
                     m => m.MapFrom(rv => rv.ReleaseId))
-                .ForMember(
-                    dest => dest.LatestRelease,
-                    m => m.MapFrom(rv => rv.Publication.LatestPublishedReleaseVersionId == rv.Id))
+                .ForMember(dest => dest.Slug,
+                    m => m.MapFrom(rv => rv.Release.Slug))
+                .ForMember(dest => dest.TimePeriodCoverage,
+                    m => m.MapFrom(rv => rv.Release.TimePeriodCoverage))
+                .ForMember(dest => dest.Title,
+                    m => m.MapFrom(rv => rv.Release.Title))
+                .ForMember(dest => dest.Year,
+                    m => m.MapFrom(rv => rv.Release.Year))
+                .ForMember(dest => dest.YearTitle,
+                    m => m.MapFrom(rv => rv.Release.YearTitle))
+                .ForMember(dest => dest.LatestRelease,
+                    m => m.MapFrom(rv => rv.Release.Publication.LatestPublishedReleaseVersionId == rv.Id))
                 .ForMember(dest => dest.PublicationTitle,
-                    m => m.MapFrom(rv => rv.Publication.Title))
+                    m => m.MapFrom(rv => rv.Release.Publication.Title))
                 .ForMember(dest => dest.PublicationId,
-                    m => m.MapFrom(rv => rv.Publication.Id))
+                    m => m.MapFrom(rv => rv.Release.Publication.Id))
                 .ForMember(dest => dest.PublicationSlug,
                     m => m.MapFrom(rv => rv.Publication.Slug))
-                .ForMember(model => model.PublishScheduled,
+                .ForMember(dest => dest.PublishScheduled,
                     m => m.MapFrom(rv =>
                         rv.PublishScheduled.HasValue
                             ? rv.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?)null));
+                    : (DateTime?)null))
+                .ForMember(dest => dest.Label,
+                    m => m.MapFrom(rv => rv.Release.Label));
 
             CreateMap<ReleaseVersion, ReleaseSummaryViewModel>()
-                .ForMember(model => model.PublishScheduled,
+                .ForMember(dest => dest.Slug,
+                    m => m.MapFrom(rv => rv.Release.Slug))
+                .ForMember(dest => dest.TimePeriodCoverage,
+                    m => m.MapFrom(rv => rv.Release.TimePeriodCoverage))
+                .ForMember(dest => dest.Title,
+                    m => m.MapFrom(rv => rv.Release.Title))
+                .ForMember(dest => dest.Year,
+                    m => m.MapFrom(rv => rv.Release.Year))
+                .ForMember(dest => dest.YearTitle,
+                    m => m.MapFrom(rv => rv.Release.YearTitle))
+                .ForMember(dest => dest.PublishScheduled,
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
                             ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
@@ -114,6 +134,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
             CreateMap<ReleaseVersion, ManageContentPageViewModel.ReleaseViewModel>()
+                .ForMember(dest => dest.CoverageTitle,
+                    m => m.MapFrom(rv => rv.Release.TimePeriodCoverage.GetEnumLabel()))
+                .ForMember(dest => dest.ReleaseName,
+                    m => m.MapFrom(rv => rv.Release.Year.ToString()))
+                .ForMember(dest => dest.Slug,
+                    m => m.MapFrom(rv => rv.Release.Slug))
+                .ForMember(dest => dest.Title,
+                    m => m.MapFrom(rv => rv.Release.Title))
+                .ForMember(dest => dest.YearTitle,
+                    m => m.MapFrom(rv => rv.Release.YearTitle))
                 .ForMember(dest => dest.Content,
                     m => m.MapFrom(rv => rv.GenericContent.OrderBy(s => s.Order)))
                 .ForMember(dest => dest.KeyStatistics,
@@ -124,24 +154,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Publication,
                     m => m.MapFrom(rv => new ManageContentPageViewModel.PublicationViewModel
                     {
-                        Id = rv.Publication.Id,
-                        Title = rv.Publication.Title,
-                        Slug = rv.Publication.Slug,
-                        Contact = rv.Publication.Contact,
+                        Id = rv.Release.Publication.Id,
+                        Title = rv.Release.Publication.Title,
+                        Slug = rv.Release.Publication.Slug,
+                        Contact = rv.Release.Publication.Contact,
                         ReleaseSeries = new List<ReleaseSeriesItemViewModel>(), // Must be hydrated after mapping
-                        ExternalMethodology = rv.Publication.ExternalMethodology != null
+                        ExternalMethodology = rv.Release.Publication.ExternalMethodology != null
                             ? new ExternalMethodology
                             {
-                                Title = rv.Publication.ExternalMethodology.Title,
-                                Url = rv.Publication.ExternalMethodology.Url
+                                Title = rv.Release.Publication.ExternalMethodology.Title,
+                                Url = rv.Release.Publication.ExternalMethodology.Url
                             }
                             : null
                     }))
                 .ForMember(
                     dest => dest.LatestRelease,
-                    m => m.MapFrom(rv => rv.Publication.LatestPublishedReleaseVersionId == rv.Id))
-                .ForMember(dest => dest.CoverageTitle,
-                    m => m.MapFrom(rv => rv.TimePeriodCoverage.GetEnumLabel()))
+                    m => m.MapFrom(rv => rv.Release.Publication.LatestPublishedReleaseVersionId == rv.Id))
                 .ForMember(
                     dest => dest.HasPreReleaseAccessList,
                     m => m.MapFrom(rv => !rv.PreReleaseAccessList.IsNullOrEmpty()))

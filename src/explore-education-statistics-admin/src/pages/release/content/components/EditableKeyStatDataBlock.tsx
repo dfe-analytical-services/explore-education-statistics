@@ -8,7 +8,10 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import tableBuilderQueries from '@common/modules/find-statistics/queries/tableBuilderQueries';
-import { KeyStatisticDataBlock } from '@common/services/publicationService';
+import {
+  KeyStatistic,
+  KeyStatisticDataBlock,
+} from '@common/services/publicationService';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
 
@@ -16,7 +19,7 @@ export interface EditableKeyStatDataBlockProps {
   isEditing?: boolean;
   isReordering?: boolean;
   keyStat: KeyStatisticDataBlock;
-  keyStatisticGuidanceTitles?: (string | undefined)[];
+  keyStats: KeyStatistic[];
   releaseId: string;
   testId?: string;
   onRemove?: () => void;
@@ -27,7 +30,7 @@ export default function EditableKeyStatDataBlock({
   isEditing = false,
   isReordering = false,
   keyStat,
-  keyStatisticGuidanceTitles,
+  keyStats,
   releaseId,
   testId = 'keyStat',
   onRemove,
@@ -76,9 +79,7 @@ export default function EditableKeyStatDataBlock({
     return (
       <EditableKeyStatDataBlockForm
         keyStat={keyStat}
-        keyStatisticGuidanceTitles={keyStatisticGuidanceTitles?.filter(
-          keyStatTitle => keyStatTitle === keyStat.guidanceTitle,
-        )}
+        keyStats={keyStats}
         title={title}
         statistic={statistic}
         testId={testId}

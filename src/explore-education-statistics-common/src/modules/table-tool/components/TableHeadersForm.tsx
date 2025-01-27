@@ -240,21 +240,30 @@ export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                   <h3>Move and reorder table headers</h3>
-                  <h4>Using a mouse, track pad, touch screen or keyboard</h4>
+                  <h4>Using a mouse, track pad, touch screen and a keyboard</h4>
                   <p className="govuk-hint">
-                    Drag and drop, use the keyboard or use the 'Move' buttons to
-                    reorder headers within or between columns and rows. Click
-                    the Reorder button on a header group to reorder the items
-                    within that group. Hold the Ctrl key and click to select
-                    multiple items to drag and drop.
+                    Drag and drop or use the keyboard to reorder headers within
+                    or between columns and rows. Click the Reorder button on a
+                    header group to reorder the items within that group.
+                  </p>
+                  <p className="govuk-hint">
+                    To move multiple items in one action, hold the Ctrl key
+                    while you click the items you want to move, and then release
+                    Ctrl before dragging and dropping the items into place.
                   </p>
                   <h4>Using only a keyboard</h4>
                   <p className="govuk-hint">
                     For keyboard users, use the Tab key to navigate to items or
-                    groups, select and deselect a draggable item with Space and
-                    use the arrow keys to move a selected item. To move multiple
-                    items, you can press Ctrl and Enter to add an item to your
-                    selected items.
+                    groups, select and deselect a draggable item by pressing the
+                    Spacebar once to start and once to finish the move. Use the
+                    arrow keys to move a selected item.
+                  </p>
+                  <p className="govuk-hint">
+                    To move multiple items in one action, press both Ctrl and
+                    Enter keys together to add an item to your selected items.
+                    Then press the Spacebar to start the move, use the arrow
+                    keys to move the selected items and press the Spacebar again
+                    to complete the move.
                   </p>
                   <div className="govuk-visually-hidden">
                     <p>

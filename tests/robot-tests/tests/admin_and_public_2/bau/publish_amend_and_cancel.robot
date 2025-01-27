@@ -118,8 +118,11 @@ Add three accordion sections to release
     user changes accordion section title    3    Test embedded dashboard section
 
 Add data block to first accordion section
+    user scrolls to accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${datablock}=    user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user scrolls to element    ${datablock}
+    user waits until page contains element    ${datablock}    %{WAIT_SMALL}
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text
@@ -201,6 +204,7 @@ Change the Release type
     user checks page contains radio    Official statistics in development
     user clicks radio    Official statistics in development
     user clicks button    Update release summary
+    user waits until h2 is visible    Release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    Financial year
     ...    3000-01

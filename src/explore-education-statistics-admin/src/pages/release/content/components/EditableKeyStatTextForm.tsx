@@ -5,7 +5,10 @@ import Form from '@common/components/form/Form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
-import { KeyStatisticText } from '@common/services/publicationService';
+import {
+  KeyStatistic,
+  KeyStatisticText,
+} from '@common/services/publicationService';
 import React from 'react';
 import Yup from '@common/validation/yup';
 
@@ -19,7 +22,7 @@ export interface KeyStatTextFormValues {
 
 interface EditableKeyStatTextFormProps {
   keyStat?: KeyStatisticText;
-  keyStatisticGuidanceTitles?: (string | undefined)[];
+  keyStats: KeyStatistic[];
   onSubmit: (values: KeyStatTextFormValues) => void;
   onCancel: () => void;
   testId: string;
@@ -27,11 +30,15 @@ interface EditableKeyStatTextFormProps {
 
 export default function EditableKeyStatTextForm({
   keyStat,
-  keyStatisticGuidanceTitles,
+  keyStats,
   onSubmit,
   onCancel,
   testId,
 }: EditableKeyStatTextFormProps) {
+  const guidanceTitles = keyStats
+    .filter(stat => stat.id !== keyStat?.id && !!stat.guidanceTitle)
+    .map(stat => stat.guidanceTitle) as string[];
+
   const handleSubmit = async (values: KeyStatTextFormValues) => {
     await onSubmit({
       ...values,
@@ -61,14 +68,18 @@ export default function EditableKeyStatTextForm({
               then: s => s.required('Enter a guidance title'),
             })
             .test({
-              name: 'duplicateGuidanceTitles',
-              message: 'Guidance titles must be unique',
-              test: (value?: string) =>
-                !(
-                  value !== undefined &&
-                  value !== '' &&
-                  keyStatisticGuidanceTitles?.includes(value?.toLowerCase())
-                ),
+              name: 'duplicateGuidanceTitle',
+              message: 'Guidance title must be unique',
+              test: (value?: string) => {
+                if (!value) {
+                  return true;
+                }
+
+                return !guidanceTitles?.some(
+                  guidanceTitle =>
+                    guidanceTitle.toLowerCase() === value.toLowerCase(),
+                );
+              },
             }),
           guidanceText: Yup.string(),
         })}

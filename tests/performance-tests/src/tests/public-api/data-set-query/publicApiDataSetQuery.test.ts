@@ -6,18 +6,51 @@ import loggingUtils from '../../../utils/loggingUtils';
 import { isRefinedResponse, pickRandom } from '../../../utils/utils';
 import createPublicApiService, {
   DataSetMeta,
+  DataSetQueryRequest,
   Publication,
 } from '../../../utils/publicApiService';
 import grafanaService from '../../../utils/grafanaService';
 import createQueryGenerator from './queryGenerators';
-import config, { Config } from './config';
+import config, { Config, FixedQuery } from './config';
 import {
   logErrorObject,
   logErrorResponse,
   logPublicationsAndDataSets,
+  logQuery,
   logQueryResponse,
   logTestStart,
 } from './logging';
+
+interface NamedDataSetMeta extends DataSetMeta {
+  id: string;
+  name: string;
+}
+
+interface QueryAndDataSetDetails {
+  publicationTitle: string;
+  dataSetName: string;
+  dataSetId: string;
+  query: DataSetQueryRequest;
+}
+
+export interface PublicationAndDataSets extends Publication {
+  dataSets: NamedDataSetMeta[];
+}
+
+type RandomQuerySetupData = {
+  queryGenerationMode: 'random';
+  publications: PublicationAndDataSets[];
+};
+
+type FixedQuerySetupData = {
+  queryGenerationMode: 'fixed';
+  queries: FixedQuery[];
+};
+
+type SetupData = {
+  queryGenerationMode: 'fixed' | 'random';
+  testConfig: Config;
+} & (FixedQuerySetupData | RandomQuerySetupData);
 
 const name = 'publicApiDataSetQuery.test.ts';
 
@@ -52,18 +85,6 @@ export const gatewayTimeoutErrorRate = new Rate(
   'ees_public_api_query_gateway_timeout_error_count',
 );
 
-export interface PublicationAndDataSets extends Publication {
-  dataSets: (DataSetMeta & {
-    id: string;
-    name: string;
-  })[];
-}
-
-interface SetupData {
-  testConfig: Config;
-  publications: PublicationAndDataSets[];
-}
-
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
@@ -82,65 +103,93 @@ export function setup(): SetupData {
 
   logTestStart(testConfig);
 
-  const { publications } = publicApiService.listPublications();
+  let setupData: SetupData;
 
-  const publicationsAndDataSets: PublicationAndDataSets[] = publications.map(
-    publication => {
-      const { dataSets } = publicApiService.listDataSets(publication.id);
+  switch (dataSetConfig.queryGenerationMode) {
+    case 'random': {
+      const { publications } = publicApiService.listPublications();
 
-      const dataSetsFilteredByName = dataSets.filter(dataSet => {
-        if (dataSetConfig.excludeTitles?.includes(dataSet.title)) {
-          console.log(`Excluding data set "${dataSet.title}" based on title.`);
-          return false;
-        }
+      const publicationsAndDataSets: PublicationAndDataSets[] =
+        publications.map(publication => {
+          const { dataSets } = publicApiService.listDataSets(publication.id);
 
-        if (!dataSetConfig.includeTitles) {
-          console.log(`Including data set "${dataSet.title}".`);
-          return true;
-        }
+          const dataSetsFilteredByName = dataSets.filter(dataSet => {
+            if (dataSetConfig.excludeTitles?.includes(dataSet.title)) {
+              console.log(
+                `Excluding data set "${dataSet.title}" based on title.`,
+              );
+              return false;
+            }
 
-        if (dataSetConfig.includeTitles.includes(dataSet.title)) {
-          console.log(`Including data set "${dataSet.title}" based on title.`);
-          return true;
-        }
+            if (!dataSetConfig.includeTitles) {
+              console.log(`Including data set "${dataSet.title}".`);
+              return true;
+            }
 
-        return false;
-      });
+            if (dataSetConfig.includeTitles.includes(dataSet.title)) {
+              console.log(
+                `Including data set "${dataSet.title}" based on title.`,
+              );
+              return true;
+            }
 
-      const dataSetMeta = dataSetsFilteredByName.map(dataSet => {
-        const { meta } = publicApiService.getDataSetMeta(dataSet.id);
-        return {
-          ...meta,
-          id: dataSet.id,
-          name: dataSet.title,
-          totalResults: dataSet.latestVersion.totalResults,
-        };
-      });
+            return false;
+          });
 
-      const dataSetsFilteredBySize = dataSetMeta.filter(meta => {
-        if (
-          dataSetConfig.maxRows &&
-          meta.totalResults <= dataSetConfig.maxRows
-        ) {
-          console.log(`Excluding data set "${meta.name}" based on max rows.`);
-          return false;
-        }
-        return true;
-      });
+          const dataSetMeta = dataSetsFilteredByName.map(dataSet => {
+            const { meta } = publicApiService.getDataSetMeta(dataSet.id);
+            return {
+              ...meta,
+              id: dataSet.id,
+              name: dataSet.title,
+              totalResults: dataSet.latestVersion.totalResults,
+            };
+          });
 
-      return {
-        ...publication,
-        dataSets: dataSetsFilteredBySize,
+          const dataSetsFilteredBySize = dataSetMeta.filter(meta => {
+            if (
+              dataSetConfig.maxRows &&
+              meta.totalResults <= dataSetConfig.maxRows
+            ) {
+              console.log(
+                `Excluding data set "${meta.name}" based on max rows.`,
+              );
+              return false;
+            }
+            return true;
+          });
+
+          return {
+            ...publication,
+            dataSets: dataSetsFilteredBySize,
+          };
+        });
+
+      const filteredPublications = publicationsAndDataSets.filter(
+        publication => publication.dataSets.length,
+      );
+
+      console.log('Found the following Publications and Data Sets:\n\n');
+      logPublicationsAndDataSets(filteredPublications);
+
+      setupData = {
+        queryGenerationMode: 'random',
+        testConfig,
+        publications: filteredPublications,
       };
-    },
-  );
-
-  const filteredPublications = publicationsAndDataSets.filter(
-    publication => publication.dataSets.length,
-  );
-
-  console.log('Found the following Publications and Data Sets:\n\n');
-  logPublicationsAndDataSets(filteredPublications);
+      break;
+    }
+    case 'fixed': {
+      setupData = {
+        queryGenerationMode: 'fixed',
+        testConfig,
+        queries: dataSetConfig.queries,
+      };
+      break;
+    }
+    default:
+      throw new Error('Unknown query generation strategy');
+  }
 
   loggingUtils.logDashboardUrls();
 
@@ -149,19 +198,37 @@ export function setup(): SetupData {
     config: testConfig,
   });
 
-  return {
-    testConfig,
-    publications: filteredPublications,
-  };
+  return setupData;
 }
 
 const queryGenerator = createQueryGenerator(queryConfig);
 
-const performTest = ({ publications }: SetupData) => {
-  const publication = pickRandom(publications);
-  const dataSetMeta = pickRandom(publication.dataSets);
+const performTest = (setupData: SetupData) => {
+  let queryAndDataSet: QueryAndDataSetDetails;
+  let dataSetMeta: NamedDataSetMeta | undefined;
 
-  const query = queryGenerator.generateQuery(dataSetMeta);
+  switch (setupData.queryGenerationMode) {
+    case 'random': {
+      const publication = pickRandom(setupData.publications);
+      dataSetMeta = pickRandom(publication.dataSets);
+      queryAndDataSet = {
+        publicationTitle: publication.title,
+        dataSetName: dataSetMeta.name,
+        dataSetId: dataSetMeta.id,
+        query: queryGenerator.generateQuery(dataSetMeta),
+      };
+      break;
+    }
+    case 'fixed': {
+      const fixedQuery = pickRandom(setupData.queries);
+      queryAndDataSet = fixedQuery;
+      break;
+    }
+    default:
+      throw new Error('Unknown query generation strategy');
+  }
+
+  logQuery(queryAndDataSet);
 
   const startTime = Date.now();
 
@@ -169,8 +236,8 @@ const performTest = ({ publications }: SetupData) => {
     individualQueryRequestCount.add(1);
 
     const { results } = publicApiService.queryDataSet({
-      dataSetId: dataSetMeta.id,
-      query,
+      dataSetId: queryAndDataSet.dataSetId,
+      query: queryAndDataSet.query,
     });
 
     const requestTime = Date.now() - startTime;
@@ -184,9 +251,9 @@ const performTest = ({ publications }: SetupData) => {
     const totalResponsesTimeMillis = Date.now() - startTime;
 
     logQueryResponse({
-      publication,
-      dataSetName: dataSetMeta.name,
-      query,
+      publicationTitle: queryAndDataSet.publicationTitle,
+      dataSetName: queryAndDataSet.dataSetName,
+      query: queryAndDataSet.query,
       totalResultsReturned: results.results.length,
       totalPagesReturned: 1,
       totalResponsesTimeMillis,
@@ -214,10 +281,14 @@ const performTest = ({ publications }: SetupData) => {
 
       if (error.status === 400 || error.status === 500) {
         console.log('Error from query endpoint.\n');
-        console.log('Metadata was:\n');
-        console.log(JSON.stringify(dataSetMeta, null, 2));
+
+        if (dataSetMeta != null) {
+          console.log('Metadata was:\n');
+          console.log(JSON.stringify(dataSetMeta, null, 2));
+        }
+
         console.log('Query was:\n');
-        console.log(JSON.stringify(query, null, 2));
+        console.log(JSON.stringify(queryAndDataSet.query, null, 2));
         console.log('Error was:\n');
         console.log(JSON.stringify(error, null, 2));
       }
@@ -232,7 +303,7 @@ const performTest = ({ publications }: SetupData) => {
     } else {
       logErrorObject(error);
 
-      const url = `/v1/data-sets/${dataSetMeta.id}/query`;
+      const url = `/v1/data-sets/${queryAndDataSet.dataSetId}/query`;
 
       queryFailureCount.add(1);
       errorRate.add(1);
@@ -241,7 +312,7 @@ const performTest = ({ publications }: SetupData) => {
         name,
         error,
         url,
-        requestBody: query,
+        requestBody: queryAndDataSet.query,
       });
     }
   }

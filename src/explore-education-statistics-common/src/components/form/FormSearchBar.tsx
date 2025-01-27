@@ -65,6 +65,7 @@ const FormSearchBar = ({
             <VisuallyHidden>Search</VisuallyHidden>
           </button>
         }
+        announceError
         className={styles.input}
         error={
           showError ? `Search must be at least ${min} characters` : undefined

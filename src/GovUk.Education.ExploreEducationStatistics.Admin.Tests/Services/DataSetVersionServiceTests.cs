@@ -114,8 +114,9 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
         [Fact]
         public async Task Success()
         {
-            ReleaseVersion releaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion()
+                .WithRelease(DataFixture.DefaultRelease()
+                    .WithPublication(DataFixture.DefaultPublication()));
 
             var (releaseDataFile1, releaseDataFile2) = DataFixture
                 .DefaultReleaseFile()
@@ -134,16 +135,16 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
                 .WithDataSet(DataFixture.DefaultDataSet())
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease()
                     .WithReleaseFileId(releaseDataFile1.Id)
-                    .WithSlug(releaseVersion.Slug)
-                    .WithTitle(releaseVersion.Title));
+                    .WithSlug(releaseVersion.Release.Slug)
+                    .WithTitle(releaseVersion.Release.Title));
 
             DataSetVersion dataSetVersion2 = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(DataFixture.DefaultDataSet())
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease()
                     .WithReleaseFileId(releaseDataFile2.Id)
-                    .WithSlug(releaseVersion.Slug)
-                    .WithTitle(releaseVersion.Title));
+                    .WithSlug(releaseVersion.Release.Slug)
+                    .WithTitle(releaseVersion.Release.Title));
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -152,13 +153,13 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
 
             var service = TestApp.Services.GetRequiredService<IDataSetVersionService>();
 
-            const string updatedSlug = "2024-25";
-            const string updatedTitle = "Academic year 2024/25";
+            const string updatedReleaseSlug = "2024-25";
+            const string updatedReleaseTitle = "Academic year 2024/25";
 
             await service.UpdateVersionsForReleaseVersion(
                 releaseVersion.Id,
-                slug: updatedSlug,
-                title: updatedTitle);
+                releaseSlug: updatedReleaseSlug,
+                releaseTitle: updatedReleaseTitle);
 
             await using var publicDataDbContext = TestApp.GetDbContext<PublicDataDbContext>();
 
@@ -171,17 +172,21 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
             Assert.All(actualDataSetVersions,
                 dataSetVersion =>
                 {
-                    Assert.Equal(updatedSlug, dataSetVersion.Release.Slug);
-                    Assert.Equal(updatedTitle, dataSetVersion.Release.Title);
+                    Assert.Equal(updatedReleaseSlug, dataSetVersion.Release.Slug);
+                    Assert.Equal(updatedReleaseTitle, dataSetVersion.Release.Title);
                 });
         }
 
         [Fact]
         public async Task UnrelatedDataSetVersionsAreNotUpdated()
         {
-            var (releaseVersion1, releaseVersion2) = DataFixture
-                .DefaultReleaseVersion()
-                .GenerateTuple2();
+            ReleaseVersion releaseVersion1 = DataFixture.DefaultReleaseVersion()
+                .WithRelease(DataFixture.DefaultRelease()
+                    .WithPublication(DataFixture.DefaultPublication()));
+
+            ReleaseVersion releaseVersion2 = DataFixture.DefaultReleaseVersion()
+                .WithRelease(DataFixture.DefaultRelease()
+                    .WithPublication(DataFixture.DefaultPublication()));
 
             ReleaseFile releaseVersion1DataFile = DataFixture
                 .DefaultReleaseFile()
@@ -204,16 +209,16 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
                 .WithDataSet(DataFixture.DefaultDataSet())
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease()
                     .WithReleaseFileId(releaseVersion1DataFile.Id)
-                    .WithSlug(releaseVersion1.Slug)
-                    .WithTitle(releaseVersion1.Title));
+                    .WithSlug(releaseVersion1.Release.Slug)
+                    .WithTitle(releaseVersion1.Release.Title));
 
             DataSetVersion dataSetVersion2 = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(DataFixture.DefaultDataSet())
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease()
                     .WithReleaseFileId(releaseVersion2DataFile.Id)
-                    .WithSlug(releaseVersion2.Slug)
-                    .WithTitle(releaseVersion2.Title));
+                    .WithSlug(releaseVersion2.Release.Slug)
+                    .WithTitle(releaseVersion2.Release.Title));
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -222,13 +227,13 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
 
             var service = TestApp.Services.GetRequiredService<IDataSetVersionService>();
 
-            const string updatedSlug = "2024-25";
-            const string updatedTitle = "Academic year 2024/25";
+            const string updatedReleaseSlug = "2024-25";
+            const string updatedReleaseTitle = "Academic year 2024/25";
 
             await service.UpdateVersionsForReleaseVersion(
                 releaseVersion1.Id,
-                slug: updatedSlug,
-                title: updatedTitle);
+                releaseSlug: updatedReleaseSlug,
+                releaseTitle: updatedReleaseTitle);
 
             await using var publicDataDbContext = TestApp.GetDbContext<PublicDataDbContext>();
 
@@ -236,16 +241,16 @@ public abstract class DataSetVersionServiceTests(TestApplicationFactory testApp)
                 .AsNoTracking()
                 .SingleAsync(dsv => dsv.Id == dataSetVersion1.Id);
 
-            Assert.Equal(updatedSlug, actualDataSetVersion1.Release.Slug);
-            Assert.Equal(updatedTitle, actualDataSetVersion1.Release.Title);
+            Assert.Equal(updatedReleaseSlug, actualDataSetVersion1.Release.Slug);
+            Assert.Equal(updatedReleaseTitle, actualDataSetVersion1.Release.Title);
 
             // Assert that the data set version unrelated to the release version has not been updated
             var actualDataSetVersion2 = await publicDataDbContext.DataSetVersions
                 .AsNoTracking()
                 .SingleAsync(dsv => dsv.Id == dataSetVersion2.Id);
 
-            Assert.Equal(releaseVersion2.Slug, actualDataSetVersion2.Release.Slug);
-            Assert.Equal(releaseVersion2.Title, actualDataSetVersion2.Release.Title);
+            Assert.Equal(releaseVersion2.Release.Slug, actualDataSetVersion2.Release.Slug);
+            Assert.Equal(releaseVersion2.Release.Title, actualDataSetVersion2.Release.Title);
         }
     }
 }

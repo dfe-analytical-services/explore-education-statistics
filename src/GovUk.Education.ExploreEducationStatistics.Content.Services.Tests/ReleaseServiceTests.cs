@@ -75,8 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             Id = Release1Version1Id,
             Release = Release1,
-            ReleaseName = "2018",
-            TimePeriodCoverage = AcademicYearQ1,
             DataGuidance = "Release 1 v1 Guidance",
             RelatedInformation = new List<Link>
             {
@@ -87,7 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Url = "https://example.com"
                 }
             },
-            Slug = "2018-19-q1",
             ApprovalStatus = Approved,
             Published = new DateTime(2019, 2, 1),
             Updates = new List<Update>
@@ -117,11 +114,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             Id = Guid.NewGuid(),
             Release = Release1,
-            ReleaseName = "2018",
-            TimePeriodCoverage = AcademicYearQ1,
             DataGuidance = "Release 1 v2 Guidance",
             RelatedInformation = new List<Link>(),
-            Slug = "2018-19-q1",
             ApprovalStatus = Approved,
             Published = null,
             Version = 1,
@@ -133,11 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             Id = Guid.NewGuid(),
             Release = Release1,
-            ReleaseName = "2018",
-            TimePeriodCoverage = AcademicYearQ1,
             DataGuidance = "Release 1 v3 Guidance",
             RelatedInformation = new List<Link>(),
-            Slug = "2018-19-q1",
             ApprovalStatus = Approved,
             Published = null,
             Updates = new List<Update>
@@ -347,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(Release1V1.Id, viewModel.Id);
-                Assert.Equal("Academic year Q1 2018/19", viewModel.Title);
+                Assert.Equal(Release1V1.Release.Title, viewModel.Title);
                 Assert.Equal(Release1V1.Published, viewModel.Published);
 
                 Assert.Equal(2, viewModel.KeyStatistics.Count);
@@ -705,7 +696,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(Release1V3NotPublished.Id, viewModel.Id);
-                Assert.Equal("Academic year Q1 2018/19", viewModel.Title);
+                Assert.Equal(Release1V3NotPublished.Release.Title, viewModel.Title);
 
                 Assert.Equal(2, viewModel.Updates.Count);
                 Assert.Equal(new DateTime(2020, 2, 1), viewModel.Updates[0].On);
@@ -725,7 +716,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     .DefaultRelease(publishedVersions: 1)
                     .Generate(2));
 
-            var (release1Version1, release2Version1) = publication.ReleaseVersions.ToTuple2();
+            var release1Version1 = publication.Releases[0].Versions[0];
+            var release2Version1 = publication.Releases[1].Versions[0];
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -746,20 +738,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 // Ordered from newest to oldest
                 Assert.Equal(release2Version1.Id, releases[0].Id);
-                Assert.Equal(release2Version1.Title, releases[0].Title);
-                Assert.Equal(release2Version1.Slug, releases[0].Slug);
-                Assert.Equal(release2Version1.TimePeriodCoverage.GetEnumLabel(), releases[0].CoverageTitle);
-                Assert.Equal(release2Version1.YearTitle, releases[0].YearTitle);
+                Assert.Equal(release2Version1.Release.Title, releases[0].Title);
+                Assert.Equal(release2Version1.Release.Slug, releases[0].Slug);
+                Assert.Equal(release2Version1.Release.TimePeriodCoverage.GetEnumLabel(), releases[0].CoverageTitle);
+                Assert.Equal(release2Version1.Release.YearTitle, releases[0].YearTitle);
                 Assert.Equal(release2Version1.Published, releases[0].Published);
                 Assert.Equal(release2Version1.NextReleaseDate, releases[0].NextReleaseDate);
                 Assert.Equal(release2Version1.Type, releases[0].Type);
                 Assert.True(releases[0].LatestRelease);
 
                 Assert.Equal(release1Version1.Id, releases[1].Id);
-                Assert.Equal(release1Version1.Title, releases[1].Title);
-                Assert.Equal(release1Version1.Slug, releases[1].Slug);
-                Assert.Equal(release1Version1.TimePeriodCoverage.GetEnumLabel(), releases[1].CoverageTitle);
-                Assert.Equal(release1Version1.YearTitle, releases[1].YearTitle);
+                Assert.Equal(release1Version1.Release.Title, releases[1].Title);
+                Assert.Equal(release1Version1.Release.Slug, releases[1].Slug);
+                Assert.Equal(release1Version1.Release.TimePeriodCoverage.GetEnumLabel(), releases[1].CoverageTitle);
+                Assert.Equal(release1Version1.Release.YearTitle, releases[1].YearTitle);
                 Assert.Equal(release1Version1.Published, releases[1].Published);
                 Assert.Equal(release1Version1.NextReleaseDate, releases[1].NextReleaseDate);
                 Assert.Equal(release1Version1.Type, releases[1].Type);
@@ -780,7 +772,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -794,7 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(new[]
                 {
-                    publication.ReleaseVersions.Single(rv => rv is { Version: 2 }).Id
+                    publication.Releases[0].Versions.Single(rv => rv is { Version: 2 }).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }
@@ -825,8 +817,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(new[]
                 {
-                    publication.ReleaseVersions.Single(rv => rv is { Year: 2001, Published: not null }).Id,
-                    publication.ReleaseVersions.Single(rv => rv is { Year: 2000, Published: not null }).Id
+                    publication.Releases.Single(r => r.Year == 2001).Versions.Single(rv => rv is { Published: not null }).Id,
+                    publication.Releases.Single(r => r.Year == 2000).Versions.Single(rv => rv is { Published: not null }).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }

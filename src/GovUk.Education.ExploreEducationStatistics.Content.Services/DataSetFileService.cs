@@ -126,27 +126,28 @@ public class DataSetFileService(
                 Content = result.Value.Summary ?? "",
                 Theme = new IdTitleViewModel
                 {
-                    Id = result.Value.ReleaseVersion.Publication.ThemeId,
-                    Title = result.Value.ReleaseVersion.Publication.Theme.Title
+                    Id = result.Value.ReleaseVersion.Release.Publication.ThemeId,
+                    Title = result.Value.ReleaseVersion.Release.Publication.Theme.Title
                 },
                 Publication = new IdTitleViewModel
                 {
-                    Id = result.Value.ReleaseVersion.PublicationId,
-                    Title = result.Value.ReleaseVersion.Publication.Title
+                    Id = result.Value.ReleaseVersion.Release.Publication.Id,
+                    Title = result.Value.ReleaseVersion.Release.Publication.Title
                 },
                 Release = new IdTitleViewModel
                 {
                     Id = result.Value.ReleaseVersionId,
-                    Title = result.Value.ReleaseVersion.Title
+                    Title = result.Value.ReleaseVersion.Release.Title
                 },
                 LatestData = result.Value.ReleaseVersionId ==
-                             result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
-                IsSuperseded = result.Value.ReleaseVersion.Publication.SupersededBy != null
-                    && result.Value.ReleaseVersion.Publication.SupersededBy.LatestPublishedReleaseVersionId != null,
+                             result.Value.ReleaseVersion.Release.Publication.LatestPublishedReleaseVersionId,
+                IsSuperseded = result.Value.ReleaseVersion.Release.Publication.SupersededBy != null
+                    && result.Value.ReleaseVersion.Release.Publication.SupersededBy.LatestPublishedReleaseVersionId != null,
                 Published = result.Value.ReleaseVersion.Published!.Value,
                 LastUpdated = result.Value.Published!.Value,
                 Api = BuildDataSetFileApiViewModel(result.Value),
                 Meta = BuildDataSetFileMetaViewModel(
+                    result.Value.File.SubjectId,
                     includeGeographicLevels
                         ? result.Value.File.DataSetFileVersionGeographicLevels
                         : new List<DataSetFileVersionGeographicLevel>(),
@@ -192,8 +193,8 @@ public class DataSetFileService(
     public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(Guid dataSetFileId)
     {
         var releaseFile = await contentDbContext.ReleaseFiles
-            .Include(rf => rf.ReleaseVersion.Publication.Theme)
-            .Include(rf => rf.ReleaseVersion.Publication.SupersededBy)
+            .Include(rf => rf.ReleaseVersion.Release.Publication.Theme)
+            .Include(rf => rf.ReleaseVersion.Release.Publication.SupersededBy)
             .Include(rf => rf.File.DataSetFileVersionGeographicLevels)
             .Where(rf =>
                 rf.File.DataSetFileId == dataSetFileId
@@ -225,22 +226,22 @@ public class DataSetFileService(
             Release = new DataSetFileReleaseViewModel
             {
                 Id = releaseFile.ReleaseVersionId,
-                Title = releaseFile.ReleaseVersion.Title,
-                Slug = releaseFile.ReleaseVersion.Slug,
+                Title = releaseFile.ReleaseVersion.Release.Title,
+                Slug = releaseFile.ReleaseVersion.Release.Slug,
                 Type = releaseFile.ReleaseVersion.Type,
                 IsLatestPublishedRelease =
-                    releaseFile.ReleaseVersion.Publication.LatestPublishedReleaseVersionId ==
+                    releaseFile.ReleaseVersion.Release.Publication.LatestPublishedReleaseVersionId ==
                     releaseFile.ReleaseVersionId,
-                IsSuperseded = releaseFile.ReleaseVersion.Publication.SupersededBy != null
-                    && releaseFile.ReleaseVersion.Publication.SupersededBy.LatestPublishedReleaseVersionId != null,
+                IsSuperseded = releaseFile.ReleaseVersion.Release.Publication.SupersededBy != null
+                    && releaseFile.ReleaseVersion.Release.Publication.SupersededBy.LatestPublishedReleaseVersionId != null,
                 Published = releaseFile.ReleaseVersion.Published!.Value,
                 LastUpdated = releaseFile.Published!.Value,
                 Publication = new DataSetFilePublicationViewModel
                 {
-                    Id = releaseFile.ReleaseVersion.PublicationId,
-                    Title = releaseFile.ReleaseVersion.Publication.Title,
-                    Slug = releaseFile.ReleaseVersion.Publication.Slug,
-                    ThemeTitle = releaseFile.ReleaseVersion.Publication.Theme.Title,
+                    Id = releaseFile.ReleaseVersion.Release.Publication.Id,
+                    Title = releaseFile.ReleaseVersion.Release.Publication.Title,
+                    Slug = releaseFile.ReleaseVersion.Release.Publication.Slug,
+                    ThemeTitle = releaseFile.ReleaseVersion.Release.Publication.Theme.Title,
                 },
             },
             File = new DataSetFileFileViewModel
@@ -249,6 +250,7 @@ public class DataSetFileService(
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
                 Meta = BuildDataSetFileMetaViewModel(
+                    releaseFile.File.SubjectId,
                     releaseFile.File.DataSetFileVersionGeographicLevels,
                     releaseFile.File.DataSetFileMeta,
                     releaseFile.FilterSequence,
@@ -292,6 +294,7 @@ public class DataSetFileService(
     }
 
     private static DataSetFileMetaViewModel BuildDataSetFileMetaViewModel(
+        Guid? subjectId,
         List<DataSetFileVersionGeographicLevel> dataSetFileVersionGeographicLevels,
         DataSetFileMeta? meta,
         List<FilterSequenceEntry>? filterSequence,
@@ -299,7 +302,7 @@ public class DataSetFileService(
     {
         if (meta == null)
         {
-            throw new InvalidDataException("DataSetMeta should not be null");
+            throw new InvalidDataException($"DataSetMeta should not be null. SubjectId: {subjectId}");
         }
 
         return new DataSetFileMetaViewModel
@@ -472,7 +475,7 @@ internal static class ReleaseFileQueryableExtensions
         Guid? themeId)
     {
         return themeId.HasValue
-            ? query.Where(rf => rf.ReleaseVersion.Publication.ThemeId == themeId.Value)
+            ? query.Where(rf => rf.ReleaseVersion.Release.Publication.ThemeId == themeId.Value)
             : query;
     }
 
@@ -490,15 +493,15 @@ internal static class ReleaseFileQueryableExtensions
         Guid? publicationId)
     {
         return publicationId.HasValue
-            ? query.Where(rf => rf.ReleaseVersion.PublicationId == publicationId.Value)
+            ? query.Where(rf => rf.ReleaseVersion.Release.PublicationId == publicationId.Value)
             : query;
     }
 
     private static IQueryable<ReleaseFile> HavingNoSupersededPublication(
         this IQueryable<ReleaseFile> query)
     {
-        return query.Where(rf => rf.ReleaseVersion.Publication.SupersededById == null ||
-                                 !rf.ReleaseVersion.Publication.SupersededBy!.LatestPublishedReleaseVersionId.HasValue);
+        return query.Where(rf => rf.ReleaseVersion.Release.Publication.SupersededById == null ||
+                                 !rf.ReleaseVersion.Release.Publication.SupersededBy!.LatestPublishedReleaseVersionId.HasValue);
     }
 
     internal static IQueryable<ReleaseFile> HavingReleaseVersionId(
@@ -542,7 +545,7 @@ internal static class ReleaseFileQueryableExtensions
         {
             // Restrict data set files to be from the latest published release version of the publication
             return query.Where(rf =>
-                rf.ReleaseVersionId == rf.ReleaseVersion.Publication.LatestPublishedReleaseVersionId);
+                rf.ReleaseVersionId == rf.ReleaseVersion.Release.Publication.LatestPublishedReleaseVersionId);
         }
 
         // Restrict data set files to be for *any* latest published release version

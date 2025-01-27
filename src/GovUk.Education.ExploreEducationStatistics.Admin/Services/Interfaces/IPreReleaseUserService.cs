@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             string email);
 
         Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(
-            ReleaseVersion releaseVersion,
+            Guid releaseVersionId,
             string email,
             bool isNewUser);
 

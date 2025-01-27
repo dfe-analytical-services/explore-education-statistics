@@ -2400,9 +2400,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(new[]
                 {
-                    publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 }).Id,
-                    publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 }).Id,
-                    publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 1 }).Id
+                    publication.Releases.Single(r => r.Year == 2022).Versions.Single(rv => rv.Version == 1).Id,
+                    publication.Releases.Single(r => r.Year == 2021).Versions.Single(rv => rv.Version == 0).Id,
+                    publication.Releases.Single(r => r.Year == 2020).Versions.Single(rv => rv.Version == 1).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }
@@ -2416,7 +2416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.ReleaseVersions.Single();
+            var releaseVersion = publication.Releases.Single().Versions.Single();
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2437,12 +2437,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var summaryViewModel = Assert.Single(releases);
 
                 Assert.Equal(releaseVersion.Id, summaryViewModel.Id);
-                Assert.Equal(releaseVersion.Title, summaryViewModel.Title);
-                Assert.Equal(releaseVersion.Slug, summaryViewModel.Slug);
+                Assert.Equal(releaseVersion.Release.Title, summaryViewModel.Title);
+                Assert.Equal(releaseVersion.Release.Slug, summaryViewModel.Slug);
                 Assert.Equal(releaseVersion.Type, summaryViewModel.Type);
-                Assert.Equal(releaseVersion.Year, summaryViewModel.Year);
-                Assert.Equal(releaseVersion.YearTitle, summaryViewModel.YearTitle);
-                Assert.Equal(releaseVersion.TimePeriodCoverage, summaryViewModel.TimePeriodCoverage);
+                Assert.Equal(releaseVersion.Release.Year, summaryViewModel.Year);
+                Assert.Equal(releaseVersion.Release.YearTitle, summaryViewModel.YearTitle);
+                Assert.Equal(releaseVersion.Release.TimePeriodCoverage, summaryViewModel.TimePeriodCoverage);
                 Assert.Equal(releaseVersion.Published, summaryViewModel.Published);
                 Assert.Equal(releaseVersion.Live, summaryViewModel.Live);
                 Assert.Equal(releaseVersion.PublishScheduled, summaryViewModel.PublishScheduled);
@@ -2485,7 +2485,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(new[]
                 {
-                    publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 }).Id
+                    publication.Releases.Single(r => r.Year == 2022).Versions.Single(rv => rv.Version == 1).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }
@@ -2521,8 +2521,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(new[]
                 {
-                    publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 }).Id,
-                    publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 1 }).Id
+                    publication.Releases.Single(r => r.Year == 2021).Versions.Single(rv => rv.Version == 0).Id,
+                    publication.Releases.Single(r => r.Year == 2020).Versions.Single(rv => rv.Version == 1).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }
@@ -2611,8 +2611,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var expectedPagesAndYears = new Dictionary<int, int[]>
             {
-                { 1, new[] { 2003, 2002 } },
-                { 2, new[] { 2001, 2000 } }
+                { 1, [2003, 2002] },
+                { 2, [2001, 2000] }
             };
             var expectedTotalPages = expectedPagesAndYears.Count;
             var expectedTotalResults = expectedPagesAndYears.SelectMany(pair => pair.Value).Count();
@@ -2638,7 +2638,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Assert.Equal(expectedTotalResults, pagedResult.Paging.TotalResults);
 
                     var expectedLatestReleaseVersionIds = years.Select(year =>
-                        publication.ReleaseVersions.Single(rv => rv.Year == year && rv.Version == 1).Id).ToArray();
+                            publication.Releases.Single(r => r.Year == year)
+                                .Versions.Single(rv => rv.Version == 1).Id)
+                        .ToArray();
 
                     Assert.Equal(expectedLatestReleaseVersionIds, pagedResult.Results.Select(r => r.Id).ToArray());
                 }

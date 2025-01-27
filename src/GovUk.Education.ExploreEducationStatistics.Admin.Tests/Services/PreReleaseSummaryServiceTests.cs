@@ -1,66 +1,62 @@
 #nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class PreReleaseSummaryServiceTests
 {
-    public class PreReleaseSummaryServiceTests
+    private readonly DataFixture _dataFixture = new();
+
+    [Fact]
+    public async Task GetPreReleaseSummaryViewModel()
     {
-        [Fact]
-        public async Task GetPreReleaseSummaryViewModelAsync()
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()));
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var contact = new Contact
-            {
-                Id = Guid.NewGuid(),
-                TeamEmail = "first.last@education.gov.uk"
-            };
-
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                Slug = "prerelease-publication",
-                Title = "PreRelease Publication",
-                ContactId = contact.Id
-            };
-
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2020",
-                Slug = "2020",
-                TimePeriodCoverage = TimeIdentifier.AutumnSpringTerm,
-                PublicationId = publication.Id
-            };
-
-            await using (var context = InMemoryApplicationDbContext("PreReleaseSummaryViewModel"))
-            {
-                context.Contacts.Add(contact);
-                context.Publications.Add(publication);
-                context.ReleaseVersions.Add(releaseVersion);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext("PreReleaseSummaryViewModel"))
-            {
-                var preReleaseSummaryService = new PreReleaseSummaryService(
-                    new PersistenceHelper<ContentDbContext>(context),
-                    MockUtils.AlwaysTrueUserService().Object);
-
-                var viewModel = (await preReleaseSummaryService.GetPreReleaseSummaryViewModelAsync(releaseVersion.Id))
-                    .Right;
-                Assert.Equal(contact.TeamEmail, viewModel.ContactEmail);
-                Assert.Equal(publication.Slug, viewModel.PublicationSlug);
-                Assert.Equal(publication.Title, viewModel.PublicationTitle);
-                Assert.Equal(releaseVersion.Title, viewModel.ReleaseTitle);
-                Assert.Equal(releaseVersion.Slug, viewModel.ReleaseSlug);
-            }
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = BuildService(contentDbContext);
+
+            var result = await service.GetPreReleaseSummaryViewModel(releaseVersion.Id, CancellationToken.None);
+
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(releaseVersion.Release.Publication.Contact.TeamEmail, viewModel.ContactEmail);
+            Assert.Equal(releaseVersion.Release.Publication.Contact.TeamName, viewModel.ContactTeam);
+            Assert.Equal(releaseVersion.Release.Publication.Slug, viewModel.PublicationSlug);
+            Assert.Equal(releaseVersion.Release.Publication.Title, viewModel.PublicationTitle);
+            Assert.Equal(releaseVersion.Release.Slug, viewModel.ReleaseSlug);
+            Assert.Equal(releaseVersion.Release.Title, viewModel.ReleaseTitle);
+        }
+    }
+
+    private static PreReleaseSummaryService BuildService(
+        ContentDbContext? contentDbContext = null,
+        UserService? userService = null)
+    {
+        return new PreReleaseSummaryService(
+            contentDbContext ?? Mock.Of<ContentDbContext>(),
+            userService ?? MockUtils.AlwaysTrueUserService().Object
+        );
     }
 }

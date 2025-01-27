@@ -30,10 +30,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         [EnumLabelValue("Financial year part")]
         FinancialYearPart,
-
-        // EES-3959 Temporary category for the National tutoring programme publication
-        // TODO remove this once we've got a solution for ordering releases which mix categories of time periods
-        [EnumLabelValue("National tutoring programme")]
-        NationalTutoringProgramme,
     }
 }

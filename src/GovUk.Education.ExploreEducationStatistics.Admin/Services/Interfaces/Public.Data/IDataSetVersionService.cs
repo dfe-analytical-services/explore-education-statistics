@@ -56,7 +56,7 @@ public interface IDataSetVersionService
 
     Task UpdateVersionsForReleaseVersion(
         Guid releaseVersionId,
-        string slug,
-        string title,
+        string releaseSlug,
+        string releaseTitle,
         CancellationToken cancellationToken = default);
 }

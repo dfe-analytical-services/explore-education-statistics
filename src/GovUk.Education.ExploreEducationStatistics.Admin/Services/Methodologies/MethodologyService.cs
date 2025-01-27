@@ -233,16 +233,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     // Get the Releases of those publications
                     var releaseVersions = await _context.ReleaseVersions
-                        .Include(rv => rv.Publication)
+                        .Include(rv => rv.Release)
+                        .ThenInclude(r => r.Publication)
                         .Where(rv => publicationIds.Contains(rv.PublicationId))
                         .ToListAsync();
 
                     // Return an ordered list of the Releases that are not published
                     return releaseVersions.Where(rv => !rv.Live)
-                        .OrderBy(rv => rv.Publication.Title)
-                        .ThenByDescending(rv => rv.Year)
-                        .ThenByDescending(rv => rv.TimePeriodCoverage)
-                        .Select(rv => new IdTitleViewModel(rv.Id, $"{rv.Publication.Title} - {rv.Title}"))
+                        .OrderBy(rv => rv.Release.Publication.Title)
+                        .ThenByDescending(rv => rv.Release.Year)
+                        .ThenByDescending(rv => rv.Release.TimePeriodCoverage)
+                        .Select(rv => new IdTitleViewModel(rv.Id, $"{rv.Release.Publication.Title} - {rv.Release.Title}"))
                         .ToList();
                 });
         }
@@ -326,16 +327,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             {
                 await _context.Entry(loadedMethodologyVersion)
                     .Reference(m => m.ScheduledWithReleaseVersion)
+                    .Query()
+                    .Include(rv => rv.Release)
+                    .ThenInclude(r => r.Publication)
                     .LoadAsync();
 
                 if (loadedMethodologyVersion.ScheduledWithReleaseVersion != null)
                 {
-                    await _context.Entry(loadedMethodologyVersion.ScheduledWithReleaseVersion)
-                        .Reference(rv => rv.Publication)
-                        .LoadAsync();
-
                     var title =
-                        $"{loadedMethodologyVersion.ScheduledWithReleaseVersion.Publication.Title} - {loadedMethodologyVersion.ScheduledWithReleaseVersion.Title}";
+                        $"{loadedMethodologyVersion.ScheduledWithReleaseVersion.Release.Publication.Title} - {loadedMethodologyVersion.ScheduledWithReleaseVersion.Release.Title}";
                     viewModel.ScheduledWithRelease = new IdTitleViewModel(
                         loadedMethodologyVersion.ScheduledWithReleaseVersion.Id,
                         title);

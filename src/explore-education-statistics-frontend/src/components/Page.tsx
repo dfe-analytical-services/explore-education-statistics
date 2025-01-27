@@ -8,6 +8,7 @@ import PageFooter from './PageFooter';
 import PageHeader from './PageHeader';
 import PageMeta, { PageMetaProps } from './PageMeta';
 import PageTitle from './PageTitle';
+import Feedback from './Feedback';
 
 type Props = {
   includeDefaultMetaTitle?: boolean;
@@ -74,6 +75,7 @@ const Page = ({
         </main>
       </div>
 
+      <Feedback />
       <PageFooter wide={wide} />
     </>
   );

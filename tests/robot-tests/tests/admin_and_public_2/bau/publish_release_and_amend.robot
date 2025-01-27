@@ -15,14 +15,15 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - publish release and amend %{RUN_IDENTIFIER}
-${RELEASE_NAME}=        Financial year 3000-01
+${RELEASE_LABEL}=       provisional
+${RELEASE_NAME}=        Financial year 3000-01 ${RELEASE_LABEL}
 ${DATABLOCK_NAME}=      Dates data block name
 
 
 *** Test Cases ***
 Create new publication for "UI tests theme" theme
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user creates test release via api    ${PUBLICATION_ID}    FY    3000
+    user creates test release via api    ${PUBLICATION_ID}    FY    3000    label=${RELEASE_LABEL}
 
 Go to "Release summary" page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -30,7 +31,8 @@ Go to "Release summary" page
 
 Verify release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    Financial year    3000-01    Accredited official statistics
+    user verifies release summary    Financial year
+    ...    3000-01    Accredited official statistics    ${RELEASE_LABEL}
 
 Upload subject
     user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
@@ -141,6 +143,7 @@ Add three accordion sections to release
     user changes accordion section title    3    Test embedded dashboard section
 
 Add data block to first accordion section
+    user scrolls to accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
@@ -482,6 +485,7 @@ Change the Release type
     user checks page contains radio    Official statistics in development
     user clicks radio    Official statistics in development
     user clicks button    Update release summary
+    user waits until h2 is visible    Release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    Financial year
     ...    3000-01

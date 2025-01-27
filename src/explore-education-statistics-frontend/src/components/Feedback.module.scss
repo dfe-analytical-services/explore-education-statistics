@@ -1,0 +1,78 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.container {
+  border-top: 1px govuk-colour('mid-grey') solid;
+
+  @include govuk-media-query($until: tablet) {
+    margin: 0;
+  }
+}
+
+.banner {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background: govuk-colour('light-grey');
+  padding: 0 govuk-spacing(3);
+  gap: govuk-spacing(3);
+
+  @include govuk-media-query($until: tablet) {
+    flex-direction: column;
+    align-items: normal;
+    padding: 0 govuk-spacing(3);
+  }
+}
+
+.heading {
+  margin: 0;
+  @include govuk-font($size: 16, $weight: bold);
+
+  @include govuk-media-query($until: tablet) {
+    @include govuk-font($size: 24, $weight: bold);
+  }
+}
+
+.promptQuestion {
+  display: flex;
+  align-items: center;
+  gap: govuk-spacing(3);
+  padding: govuk-spacing(4) 0;
+}
+
+.reportContainer {
+  composes: promptQuestion;
+
+  @include govuk-media-query($until: tablet) {
+    border-top: 1px govuk-colour('mid-grey') solid;
+  }
+}
+
+.button {
+  border: 1px govuk-colour('black') solid;
+  box-shadow: 0 3px 0 govuk-colour('black');
+  margin: 0;
+  white-space: nowrap;
+
+  @include govuk-font($size: 16);
+
+  @include govuk-media-query($until: tablet) {
+    @include govuk-font($size: 24);
+  }
+}
+
+.buttonYesNo {
+  composes: button;
+  min-width: 100px;
+
+  @include govuk-media-query($until: tablet) {
+    min-width: 80px;
+    max-width: 80px;
+  }
+}
+
+.buttonReport {
+  composes: button;
+  min-width: none;
+  max-width: none;
+}

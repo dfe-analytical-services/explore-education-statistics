@@ -1,9 +1,8 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -23,263 +22,157 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     {
         private readonly DataFixture _fixture = new();
 
-        [Fact]
-        public async Task ListReleasesForUser_ReleaseRole_Approved()
+        public class ListReleasesForUserTests : ReleaseVersionRepositoryTests
         {
-            var userId = Guid.NewGuid();
-            var userReleaseRole1 = new UserReleaseRole
+            [Theory]
+            [InlineData(ReleaseApprovalStatus.Approved)]
+            [InlineData(ReleaseApprovalStatus.HigherLevelReview)]
+            [InlineData(ReleaseApprovalStatus.Draft)]
+            public async Task ListReleasesForUser_Success(ReleaseApprovalStatus releaseApprovalStatus)
             {
-                UserId = userId,
-                ReleaseVersion = new ReleaseVersion
+                var user = new User { Id = Guid.NewGuid() };
+
+                var userReleaseRoles = _fixture.DefaultUserReleaseRole()
+                    .WithUser(user)
+                    .WithReleaseVersion(_fixture.DefaultReleaseVersion()
+                        .WithApprovalStatus(releaseApprovalStatus)
+                        .WithRelease(_fixture.DefaultRelease()
+                            .WithPublication(_fixture.DefaultPublication())))
+                    .ForIndex(0, s => s.SetRole(ReleaseRole.Contributor))
+                    .ForIndex(1, s => s.SetRole(ReleaseRole.PrereleaseViewer))
+                    .GenerateList(2);
+
+                UserPublicationRole userPublicationRole = _fixture.DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(_fixture.DefaultPublication()
+                        .WithReleases([
+                            _fixture.DefaultRelease()
+                                .WithVersions([
+                                    _fixture.DefaultReleaseVersion()
+                                        .WithApprovalStatus(releaseApprovalStatus)
+                                ])
+                        ]));
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    ApprovalStatus = ReleaseApprovalStatus.Approved,
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    ReleaseName = "2001",
-                    Publication = new Publication
-                    {
-                        Title = "Test publication 1",
-                        Slug = "test-publication-1"
-                    },
-                },
-                Role = ReleaseRole.Lead,
-            };
-            var userReleaseRole2 = new UserReleaseRole
-            {
-                UserId = userId,
-                ReleaseVersion = new ReleaseVersion
-                {
-                    ApprovalStatus = ReleaseApprovalStatus.Approved,
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    ReleaseName = "2001",
-                    Publication = new Publication
-                    {
-                        Title = "Test publication 2",
-                        Slug = "test-publication-2"
-                    },
-                },
-                Role = ReleaseRole.PrereleaseViewer,
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(userReleaseRole1, userReleaseRole2);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = BuildRepository(contentDbContext);
-                var result = await repository.ListReleasesForUser(userId,
-                        ReleaseApprovalStatus.Approved);
-                Assert.Single(result);
-                Assert.Equal(userReleaseRole1.ReleaseVersionId, result[0].Id);
-            }
-        }
-
-        [Fact]
-        public async Task ListReleasesForUser_ReleaseRole_Draft()
-        {
-            var userId = Guid.NewGuid();
-            var userReleaseRole1 = new UserReleaseRole
-            {
-                UserId = userId,
-                ReleaseVersion = new ReleaseVersion
-                {
-                    ApprovalStatus = ReleaseApprovalStatus.Draft,
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    ReleaseName = "2001",
-                    Publication = new Publication
-                    {
-                        Title = "Test publication 1",
-                        Slug = "test-publication-1"
-                    },
-                },
-                Role = ReleaseRole.Lead,
-            };
-            var userReleaseRole2 = new UserReleaseRole
-            {
-                UserId = userId,
-                ReleaseVersion = new ReleaseVersion
-                {
-                    ApprovalStatus = ReleaseApprovalStatus.Draft,
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    ReleaseName = "2001",
-                    Publication = new Publication
-                    {
-                        Title = "Test publication 2",
-                        Slug = "test-publication-2"
-                    },
-                },
-                Role = ReleaseRole.PrereleaseViewer,
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(userReleaseRole1, userReleaseRole2);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = BuildRepository(contentDbContext);
-                var result = await repository.ListReleasesForUser(userId,
-                        ReleaseApprovalStatus.Approved);
-                Assert.Empty(result);
-            }
-        }
-
-        [Fact]
-        public async Task ListReleasesForUser_PublicationRole_Owner_Approved()
-        {
-            var userId = Guid.NewGuid();
-            var userPublicationRole1 = new UserPublicationRole
-            {
-                UserId = userId,
-                Publication = new Publication
-                {
-                    Title = "Test publication 1",
-                    Slug = "test-publication-1",
-                    ReleaseVersions = new List<ReleaseVersion>
-                    {
-                        new()
-                        {
-                            ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                            ReleaseName = "2001",
-                        },
-                    }
-                },
-                Role = PublicationRole.Owner,
-            };
-
-            var otherPublication = new Publication
-            {
-                Title = "Test publication 2",
-                Slug = "test-publication-2",
-                ReleaseVersions = new List<ReleaseVersion>
-                {
-                    new()
-                    {
-                        ApprovalStatus = ReleaseApprovalStatus.Approved,
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        ReleaseName = "2001",
-                    },
+                    contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
+                    contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                    await contentDbContext.SaveChangesAsync();
                 }
-            };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(userPublicationRole1, otherPublication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = BuildRepository(contentDbContext);
-                var result = await repository.ListReleasesForUser(userId,
-                        ReleaseApprovalStatus.Approved);
-                Assert.Single(result);
-                Assert.Equal(userPublicationRole1.Publication.ReleaseVersions[0].Id, result[0].Id);
-            }
-        }
-
-        [Fact]
-        public async Task ListReleasesForUser_PublicationRole_Owner_Draft()
-        {
-            var userId = Guid.NewGuid();
-            var userPublicationRole1 = new UserPublicationRole
-            {
-                UserId = userId,
-                Publication = new Publication
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    Title = "Test publication 1",
-                    Slug = "test-publication-1",
-                    ReleaseVersions = new List<ReleaseVersion>
-                    {
-                        new()
-                        {
-                            ApprovalStatus = ReleaseApprovalStatus.Draft,
-                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                            ReleaseName = "2001",
-                        },
-                    }
-                },
-                Role = PublicationRole.Owner,
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(userPublicationRole1);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = BuildRepository(contentDbContext);
-                var result = await repository.ListReleasesForUser(userId,
-                        ReleaseApprovalStatus.Approved);
-                Assert.Empty(result);
-            }
-        }
-
-        [Fact]
-        public async Task ListReleasesForUser_PublicationRole_Approver_Approved()
-        {
-            var userId = Guid.NewGuid();
-            var userPublicationRole1 = new UserPublicationRole
-            {
-                UserId = userId,
-                Publication = new Publication
-                {
-                    Title = "Test publication 1",
-                    Slug = "test-publication-1",
-                    ReleaseVersions = new List<ReleaseVersion>
-                    {
-                        new()
-                        {
-                            ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                            ReleaseName = "2001",
-                        },
-                    }
-                },
-                Role = PublicationRole.Approver,
-            };
-
-            var otherPublication = new Publication
-            {
-                Title = "Test publication 2",
-                Slug = "test-publication-2",
-                ReleaseVersions = new List<ReleaseVersion>
-                {
-                    new()
-                    {
-                        ApprovalStatus = ReleaseApprovalStatus.Approved,
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        ReleaseName = "2001",
-                    },
+                    var repository = BuildRepository(contentDbContext);
+                    var result = await repository.ListReleasesForUser(userId: user.Id,
+                        releaseApprovalStatus);
+                    Assert.Equal([
+                            userReleaseRoles[0].ReleaseVersionId,
+                            userPublicationRole.Publication.Releases[0].Versions[0].Id
+                        ],
+                        result.Select(rv => rv.Id));
                 }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(userPublicationRole1, otherPublication);
-                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            [Theory]
+            [InlineData(ReleaseApprovalStatus.Approved)]
+            [InlineData(ReleaseApprovalStatus.HigherLevelReview)]
+            [InlineData(ReleaseApprovalStatus.Draft)]
+            public async Task ListReleasesForUser_ExcludesOtherReleaseApprovalStatuses(
+                ReleaseApprovalStatus releaseApprovalStatus)
             {
-                var repository = BuildRepository(contentDbContext);
-                var result = await repository.ListReleasesForUser(userId,
-                        ReleaseApprovalStatus.Approved);
+                var user = new User { Id = Guid.NewGuid() };
 
-                var resultRelease = Assert.Single(result);
-                Assert.Equal(userPublicationRole1.Publication.ReleaseVersions[0].Id, resultRelease.Id);
+                var otherReleaseApprovalStatus = Enum.GetValues<ReleaseApprovalStatus>()
+                    .Except([releaseApprovalStatus])
+                    .ToList();
+
+                var userReleaseRoles = otherReleaseApprovalStatus
+                    .Select(status => _fixture.DefaultUserReleaseRole()
+                        .WithUser(user)
+                        .WithReleaseVersion(_fixture.DefaultReleaseVersion()
+                            .WithApprovalStatus(status)
+                            .WithRelease(_fixture.DefaultRelease()
+                                .WithPublication(_fixture.DefaultPublication())))
+                        .WithRole(ReleaseRole.Contributor)
+                        .Generate())
+                    .ToList();
+
+                var userPublicationRoles = otherReleaseApprovalStatus
+                    .Select(status => _fixture.DefaultUserPublicationRole()
+                        .WithUser(user)
+                        .WithRole(PublicationRole.Owner)
+                        .WithPublication(_fixture.DefaultPublication()
+                            .WithReleases(_ =>
+                            [
+                                _fixture.DefaultRelease()
+                                    .WithVersions(_ =>
+                                    [
+                                        _fixture.DefaultReleaseVersion()
+                                            .WithApprovalStatus(status)
+                                    ])
+                            ]))
+                        .Generate())
+                    .ToList();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
+                    contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var repository = BuildRepository(contentDbContext);
+                    var result = await repository.ListReleasesForUser(userId: user.Id,
+                        releaseApprovalStatus);
+                    Assert.Empty(result);
+                }
+            }
+
+            [Fact]
+            public async Task ListReleasesForUser_ExcludesOtherUsers()
+            {
+                var user = new User { Id = Guid.NewGuid() };
+
+                UserReleaseRole userReleaseRole = _fixture.DefaultUserReleaseRole()
+                    .WithUser(user)
+                    .WithReleaseVersion(_fixture.DefaultReleaseVersion()
+                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                        .WithRelease(_fixture.DefaultRelease()
+                            .WithPublication(_fixture.DefaultPublication())))
+                    .WithRole(ReleaseRole.Contributor);
+
+                UserPublicationRole userPublicationRole = _fixture.DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(_fixture.DefaultPublication()
+                        .WithReleases([
+                            _fixture.DefaultRelease()
+                                .WithVersions([
+                                    _fixture.DefaultReleaseVersion()
+                                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                                ])
+                        ]));
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    contentDbContext.UserReleaseRoles.Add(userReleaseRole);
+                    contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var repository = BuildRepository(contentDbContext);
+                    var result = await repository.ListReleasesForUser(userId: Guid.NewGuid(),
+                        ReleaseApprovalStatus.Approved);
+                    Assert.Empty(result);
+                }
             }
         }
 

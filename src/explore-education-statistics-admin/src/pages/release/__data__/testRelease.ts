@@ -16,6 +16,8 @@ export const testRelease: Release = {
   publicationSlug: 'publication-1-slug',
   timePeriodCoverage: { value: 'W51', label: 'Week 51' },
   title: 'Release Title',
+  label: undefined,
+  version: 1,
   type: 'OfficialStatistics',
   previousVersionId: '',
   preReleaseAccessList: '',

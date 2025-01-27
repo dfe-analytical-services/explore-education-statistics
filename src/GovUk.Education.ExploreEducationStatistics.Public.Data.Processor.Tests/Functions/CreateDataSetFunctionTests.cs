@@ -34,9 +34,13 @@ public abstract class CreateDataSetFunctionTests(
         {
             var subjectId = Guid.NewGuid();
 
+            Publication publication = DataFixture.DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+            var release = publication.Releases.Single();
+
             var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithPublication(DataFixture.DefaultPublication()))
+                .WithReleaseVersion(release.Versions.Single())
                 .WithFiles([
                     DataFixture
                         .DefaultFile(FileType.Data)
@@ -91,7 +95,7 @@ public abstract class CreateDataSetFunctionTests(
             Assert.Equal(DataSetStatus.Draft, dataSet.Status);
             Assert.Equal(releaseFile.Name, dataSet.Title);
             Assert.Equal(releaseFile.Summary, dataSet.Summary);
-            Assert.Equal(releaseFile.ReleaseVersion.PublicationId, dataSet.PublicationId);
+            Assert.Equal(publication.Id, dataSet.PublicationId);
             Assert.Null(dataSet.LatestLiveVersion);
 
             // Assert the data set has a single version and that it is the latest draft version
@@ -106,8 +110,8 @@ public abstract class CreateDataSetFunctionTests(
 
             Assert.Equal(releaseFile.File.DataSetFileId, dataSetVersion.Release.DataSetFileId);
             Assert.Equal(releaseFile.Id, dataSetVersion.Release.ReleaseFileId);
-            Assert.Equal(releaseFile.ReleaseVersion.Slug, dataSetVersion.Release.Slug);
-            Assert.Equal(releaseFile.ReleaseVersion.Title, dataSetVersion.Release.Title);
+            Assert.Equal(release.Slug, dataSetVersion.Release.Slug);
+            Assert.Equal(release.Title, dataSetVersion.Release.Title);
 
             // Assert a single import was created
             var dataSetVersionImport = Assert.Single(dataSetVersion.Imports);
@@ -156,8 +160,11 @@ public abstract class CreateDataSetFunctionTests(
         [Fact]
         public async Task ReleaseFileIdHasDataSetVersion_ReturnsValidationProblem()
         {
+            Publication publication = DataFixture.DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(publication.Releases.Single().Versions.Single())
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             DataSet dataSet = DataFixture.DefaultDataSet();
@@ -193,9 +200,11 @@ public abstract class CreateDataSetFunctionTests(
         {
             var subjectId = Guid.NewGuid();
 
+            Publication publication = DataFixture.DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
+
             var (releaseFile, releaseMetaFile) = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithApprovalStatus(ReleaseApprovalStatus.Approved))
+                .WithReleaseVersion(publication.Releases.Single().Versions.Single())
                 .WithFiles([
                     DataFixture
                         .DefaultFile(FileType.Data)
@@ -224,8 +233,11 @@ public abstract class CreateDataSetFunctionTests(
         [Fact]
         public async Task ReleaseFileTypeNotData_ReturnsValidationProblem()
         {
+            Publication publication = DataFixture.DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(publication.Releases.Single().Versions.Single())
                 .WithFile(DataFixture.DefaultFile(FileType.Ancillary));
 
             await AddTestData<ContentDbContext>(context =>
@@ -246,8 +258,11 @@ public abstract class CreateDataSetFunctionTests(
         [Fact]
         public async Task ReleaseFileHasNoMetaFile_ReturnsValidationProblem()
         {
+            Publication publication = DataFixture.DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
             ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion())
+                .WithReleaseVersion(publication.Releases.Single().Versions.Single())
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await AddTestData<ContentDbContext>(context =>

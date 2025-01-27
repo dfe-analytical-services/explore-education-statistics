@@ -34,8 +34,9 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public DateTime? Updated { get; set; }
 
-    public string Title =>
-        TimePeriodLabelFormatter.Format(Year, TimePeriodCoverage, TimePeriodLabelFormat.FullLabelBeforeYear);
+    public string TimePeriod => TimePeriodLabelFormatter.Format(Year, TimePeriodCoverage, TimePeriodLabelFormat.FullLabelBeforeYear);
+
+    public string Title => string.IsNullOrEmpty(Label) ? TimePeriod : $"{TimePeriod} {Label}";
 
     public string YearTitle => TimePeriodLabelFormatter.FormatYear(Year, TimePeriodCoverage);
 
