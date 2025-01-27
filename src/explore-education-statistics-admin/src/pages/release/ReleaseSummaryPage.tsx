@@ -51,6 +51,9 @@ const ReleaseSummaryPage = () => {
             <SummaryListItem term="Release type">
               {releaseTypes[release.type]}
             </SummaryListItem>
+            <SummaryListItem term="Release label">
+              {release.label ?? ''}
+            </SummaryListItem>
           </SummaryList>
 
           <Gate condition={() => permissionService.canUpdateRelease(releaseId)}>

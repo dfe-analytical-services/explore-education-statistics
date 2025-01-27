@@ -2,28 +2,52 @@ import EditableKeyStatTextForm, {
   KeyStatTextFormValues,
 } from '@admin/pages/release/content/components/EditableKeyStatTextForm';
 import render from '@common-test/render';
-import { KeyStatisticText } from '@common/services/publicationService';
+import {
+  KeyStatistic,
+  KeyStatisticText,
+} from '@common/services/publicationService';
 import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
 describe('EditableKeyStatTextForm', () => {
-  const keyStatText: KeyStatisticText = {
+  const testKeyStat: KeyStatisticText = {
+    id: 'keyStat-1',
     type: 'KeyStatisticText',
-    id: 'keyStatDataBlock-1',
-    trend: 'Text trend',
-    guidanceTitle: 'Text guidance title',
-    guidanceText: 'Text guidance text',
     order: 0,
-    created: '2023-01-01',
-    title: 'Text title',
-    statistic: 'Over 9000',
+    title: 'Key stat 1 title',
+    statistic: '1000',
+    trend: 'Key stat 1 trend',
+    guidanceTitle: 'Key stat 1 guidance title',
+    guidanceText: 'Key stat 1 guidance text',
+    created: '2023-01-01T12:00:00Z',
   };
+
+  const testOtherKeyStats: KeyStatistic[] = [
+    {
+      id: 'keyStat-2',
+      type: 'KeyStatisticDataBlock',
+      order: 1,
+      guidanceTitle: 'Key stat 2 guidance title',
+      dataBlockParentId: 'block-2',
+      created: '2025-01-01T12:00:00Z',
+    },
+    {
+      id: 'keyStat-3',
+      type: 'KeyStatisticText',
+      order: 2,
+      title: 'Key stat 3 title',
+      statistic: 'Key stat 3 stat',
+      guidanceTitle: 'Key stat 3 guidance title',
+      created: '2025-01-01T12:00:00Z',
+    },
+  ];
 
   test('renders correctly without initial values', async () => {
     render(
       <EditableKeyStatTextForm
         testId="test-id"
+        keyStats={[]}
         onCancel={noop}
         onSubmit={noop}
       />,
@@ -42,21 +66,22 @@ describe('EditableKeyStatTextForm', () => {
   test('renders correctly with initial values', async () => {
     render(
       <EditableKeyStatTextForm
-        keyStat={keyStatText}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat, ...testOtherKeyStats]}
         testId="test-id"
         onCancel={noop}
         onSubmit={noop}
       />,
     );
 
-    expect(screen.getByLabelText('Title')).toHaveValue('Text title');
-    expect(screen.getByLabelText('Statistic')).toHaveValue('Over 9000');
-    expect(screen.getByLabelText('Trend')).toHaveValue('Text trend');
+    expect(screen.getByLabelText('Title')).toHaveValue('Key stat 1 title');
+    expect(screen.getByLabelText('Statistic')).toHaveValue('1000');
+    expect(screen.getByLabelText('Trend')).toHaveValue('Key stat 1 trend');
     expect(screen.getByLabelText('Guidance title')).toHaveValue(
-      'Text guidance title',
+      'Key stat 1 guidance title',
     );
     expect(screen.getByLabelText('Guidance text')).toHaveValue(
-      'Text guidance text',
+      'Key stat 1 guidance text',
     );
 
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
@@ -68,7 +93,8 @@ describe('EditableKeyStatTextForm', () => {
 
     const { user } = render(
       <EditableKeyStatTextForm
-        keyStat={keyStatText}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat, ...testOtherKeyStats]}
         testId="test-id"
         onCancel={noop}
         onSubmit={handleSubmit}
@@ -114,7 +140,8 @@ describe('EditableKeyStatTextForm', () => {
 
     const { user } = render(
       <EditableKeyStatTextForm
-        keyStat={keyStatText}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat, ...testOtherKeyStats]}
         testId="test-id"
         onCancel={noop}
         onSubmit={handleSubmit}
@@ -131,11 +158,11 @@ describe('EditableKeyStatTextForm', () => {
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith<KeyStatTextFormValues[]>({
-        title: 'Text title',
-        statistic: 'Over 9000',
-        trend: 'Text trend',
+        title: 'Key stat 1 title',
+        statistic: '1000',
+        trend: 'Key stat 1 trend',
         guidanceTitle: 'New guidance title',
-        guidanceText: 'Text guidance text',
+        guidanceText: 'Key stat 1 guidance text',
       });
     });
   });
@@ -145,6 +172,7 @@ describe('EditableKeyStatTextForm', () => {
 
     const { user } = render(
       <EditableKeyStatTextForm
+        keyStats={testOtherKeyStats}
         testId="test-id"
         onCancel={noop}
         onSubmit={handleSubmit}
@@ -169,6 +197,7 @@ describe('EditableKeyStatTextForm', () => {
 
     const { user } = render(
       <EditableKeyStatTextForm
+        keyStats={testOtherKeyStats}
         testId="test-id"
         onCancel={noop}
         onSubmit={handleSubmit}
@@ -188,11 +217,12 @@ describe('EditableKeyStatTextForm', () => {
     ).toHaveTextContent('Enter a statistic');
   });
 
-  test('shows a validation error when have guidance text without a guidance title', async () => {
+  test('shows a validation error when there is guidance text without a guidance title', async () => {
     const handleSubmit = jest.fn();
 
     const { user } = render(
       <EditableKeyStatTextForm
+        keyStats={testOtherKeyStats}
         testId="test-id"
         onCancel={noop}
         onSubmit={handleSubmit}
@@ -218,34 +248,45 @@ describe('EditableKeyStatTextForm', () => {
     ).toHaveTextContent('Enter a guidance title');
   });
 
-  test('shows a validation error when the guidance title is not unique', async () => {
-    const handleSubmit = jest.fn();
+  test.each([
+    [testOtherKeyStats[0].guidanceTitle!],
+    [testOtherKeyStats[1].guidanceTitle!],
+  ])(
+    "shows a validation error when the guidance title is not unique using '%s'",
+    async () => {
+      const handleSubmit = jest.fn();
 
-    const { user } = render(
-      <EditableKeyStatTextForm
-        keyStatisticGuidanceTitles={['test guidance title', 'something else']}
-        testId="test-id"
-        onCancel={noop}
-        onSubmit={handleSubmit}
-      />,
-    );
+      const { user } = render(
+        <EditableKeyStatTextForm
+          keyStats={[testKeyStat, ...testOtherKeyStats]}
+          testId="test-id"
+          onCancel={noop}
+          onSubmit={handleSubmit}
+        />,
+      );
 
-    await user.type(screen.getByLabelText('Title'), 'Test title');
-    await user.type(screen.getByLabelText('Statistic'), 'Test stat');
-    await user.type(
-      screen.getByLabelText('Guidance title'),
-      'test guidance title',
-    );
-    await user.click(screen.getByRole('button', { name: 'Save' }));
+      await user.type(screen.getByLabelText('Title'), 'Test title');
+      await user.type(screen.getByLabelText('Statistic'), 'Test stat');
+      await user.type(
+        screen.getByLabelText('Guidance title'),
+        'Key stat 2 guidance title',
+      );
+      await user.click(screen.getByRole('button', { name: 'Save' }));
 
-    expect(await screen.findByText('There is a problem')).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId('errorSummary')).getByRole('link', {
-        name: 'Guidance titles must be unique',
-      }),
-    ).toHaveAttribute('href', '#editableKeyStatTextForm-create-guidanceTitle');
-    expect(
-      screen.getByTestId('editableKeyStatTextForm-create-guidanceTitle-error'),
-    ).toHaveTextContent('Guidance titles must be unique');
-  });
+      expect(await screen.findByText('There is a problem')).toBeInTheDocument();
+      expect(
+        within(screen.getByTestId('errorSummary')).getByRole('link', {
+          name: 'Guidance title must be unique',
+        }),
+      ).toHaveAttribute(
+        'href',
+        '#editableKeyStatTextForm-create-guidanceTitle',
+      );
+      expect(
+        screen.getByTestId(
+          'editableKeyStatTextForm-create-guidanceTitle-error',
+        ),
+      ).toHaveTextContent('Guidance title must be unique');
+    },
+  );
 });

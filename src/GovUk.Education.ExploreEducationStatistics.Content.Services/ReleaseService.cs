@@ -74,14 +74,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             // Note this method is allowed to return a view model for an unpublished release version so that Publisher
             // can use it to cache a release version in advance of it going live.
 
-            var releaseVersion = _contentDbContext
+            var releaseVersion = await _contentDbContext
                 .ReleaseVersions
+                .Include(rv => rv.Release)
                 .Include(rv => rv.Content)
-                .ThenInclude(section => section.Content)
-                .ThenInclude(block => (block as EmbedBlockLink)!.EmbedBlock)
+                .ThenInclude(cs => cs.Content)
+                .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
                 .Include(rv => rv.Updates)
                 .Include(rv => rv.KeyStatistics)
-                .Single(rv => rv.Id == releaseVersionId);
+                .SingleAsync(rv => rv.Id == releaseVersionId);
 
             var releaseViewModel = _mapper.Map<ReleaseCacheViewModel>(releaseVersion);
 
@@ -111,10 +112,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 {
                     var publishedReleaseVersions =
                         await _releaseVersionRepository.ListLatestReleaseVersions(publication.Id, publishedOnly: true);
-                    return publishedReleaseVersions
-                        .Select(releaseVersion => new ReleaseSummaryViewModel(releaseVersion,
-                            latestPublishedRelease: releaseVersion.Id == publication.LatestPublishedReleaseVersionId))
-                        .ToList();
+
+                    return await publishedReleaseVersions
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async releaseVersion =>
+                        {
+                            await _contentDbContext.ReleaseVersions
+                                .Entry(releaseVersion)
+                                .Reference(rv => rv.Release)
+                                .LoadAsync();
+
+                            return new ReleaseSummaryViewModel(releaseVersion,
+                                latestPublishedRelease:
+                                releaseVersion.Id == publication.LatestPublishedReleaseVersionId);
+                        })
+                        .ToListAsync();
                 });
         }
 

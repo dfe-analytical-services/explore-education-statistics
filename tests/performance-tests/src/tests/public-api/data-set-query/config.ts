@@ -3,6 +3,7 @@ import { QueryGeneratorConfig } from './queryGenerators';
 import {
   dataSetQueryComparableOperators,
   dataSetQueryIdOperators,
+  DataSetQueryRequest,
 } from '../../../utils/publicApiService';
 import steadyRequestRateProfile from '../../../configuration/steadyRequestRateProfile';
 import spikeProfile from '../../../configuration/spikeProfile';
@@ -10,19 +11,42 @@ import rampingRequestRateProfile from '../../../configuration/rampingRequestRate
 import sequentialRequestProfile from '../../../configuration/sequentialRequestsProfile';
 import { parseIntOptional } from '../../../utils/utils';
 
-const profile = (__ENV.PROFILE ?? 'sequential') as
-  | 'load'
-  | 'spike'
-  | 'stress'
-  | 'sequential';
+export interface FixedQuery {
+  publicationTitle: string;
+  dataSetName: string;
+  dataSetId: string;
+  query: DataSetQueryRequest;
+}
 
-const queries = (__ENV.QUERIES ?? 'simple') as 'simple' | 'complex';
+export interface Config {
+  options: Options;
+  queryConfig: QueryGeneratorConfig;
+  dataSetConfig: DataSetConfig;
+}
 
-const dataSetTitlesToInclude = __ENV.DATA_SET_TITLES_TO_INCLUDE?.split(',');
-const dataSetTitlesToExclude = __ENV.DATA_SET_TITLES_TO_EXCLUDE?.split(',');
-const maxDataSetRows = parseIntOptional(__ENV.DATA_SET_MAX_ROWS);
+type RandomDataSetConfig = {
+  queryGenerationMode: 'random';
+  includeTitles?: string[];
+  excludeTitles?: string[];
+  maxRows?: number;
+};
 
-function getOptions(): Options {
+type FixedDataSetConfig = {
+  queryGenerationMode: 'fixed';
+  queries: FixedQuery[];
+};
+
+type DataSetConfig = {
+  queryGenerationMode: 'fixed' | 'random';
+} & (RandomDataSetConfig | FixedDataSetConfig);
+
+function getProfileConfig(): Options {
+  const profile = (__ENV.PROFILE ?? 'sequential') as
+    | 'load'
+    | 'spike'
+    | 'stress'
+    | 'sequential';
+
   switch (profile) {
     case 'load': {
       return steadyRequestRateProfile({
@@ -42,6 +66,7 @@ function getOptions(): Options {
     }
     case 'stress': {
       return rampingRequestRateProfile({
+        rampingStageDurationMinutes: 10,
         mainStageDurationMinutes: 10,
         cooldownStageDurationMinutes: 10,
         maxRequestRatePerSecond: 40,
@@ -58,7 +83,11 @@ function getOptions(): Options {
 }
 
 function getQueryConfig(): QueryGeneratorConfig {
-  switch (queries) {
+  const queryType = (__ENV.QUERY_COMPLEXITY ?? 'simple') as
+    | 'simple'
+    | 'complex';
+
+  switch (queryType) {
     case 'simple': {
       return {
         idOperators: ['eq', 'in'],
@@ -76,30 +105,47 @@ function getQueryConfig(): QueryGeneratorConfig {
       };
     }
     default:
-      throw Error(`Unknown query configuration '${queries}'`);
+      throw Error(`Unknown query configuration '${queryType}'`);
   }
 }
 
-export interface DataSetConfig {
-  includeTitles?: string[];
-  excludeTitles?: string[];
-  maxRows?: number;
+function getDataSetConfig(): DataSetConfig {
+  const fixedQueryFiles = __ENV.QUERY_FILES?.split(',');
+
+  if (fixedQueryFiles?.length) {
+    const fixedQueries: FixedQuery[] = fixedQueryFiles.map(filename => {
+      /* eslint-disable no-restricted-globals */
+      const file = open(`public-api/data-set-query/fixed-queries/${filename}`);
+      /* eslint-enable no-restricted-globals */
+      return JSON.parse(file) as FixedQuery;
+    });
+
+    return {
+      queryGenerationMode: 'fixed',
+      queries: fixedQueries,
+    };
+  }
+
+  const includeTitles = __ENV.DATA_SET_TITLES_TO_INCLUDE?.split(',');
+  const excludeTitles = __ENV.DATA_SET_TITLES_TO_EXCLUDE?.split(',');
+  const maxRows = parseIntOptional(__ENV.DATA_SET_MAX_ROWS);
+
+  return {
+    queryGenerationMode: 'random',
+    includeTitles,
+    excludeTitles,
+    maxRows,
+  };
 }
 
-export interface Config {
-  options: Options;
-  queryConfig: QueryGeneratorConfig;
-  dataSetConfig: DataSetConfig;
+function getConfig(): Config {
+  return {
+    options: getProfileConfig(),
+    queryConfig: getQueryConfig(),
+    dataSetConfig: getDataSetConfig(),
+  };
 }
 
-const config: Config = {
-  options: getOptions(),
-  queryConfig: getQueryConfig(),
-  dataSetConfig: {
-    includeTitles: dataSetTitlesToInclude,
-    excludeTitles: dataSetTitlesToExclude,
-    maxRows: maxDataSetRows,
-  },
-};
+const config: Config = getConfig();
 
 export default config;

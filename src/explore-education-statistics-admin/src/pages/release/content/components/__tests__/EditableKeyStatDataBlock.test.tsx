@@ -63,7 +63,7 @@ describe('EditableKeyStatDataBlock', () => {
     ],
   };
 
-  const keyStatDataBlock: KeyStatisticDataBlock = {
+  const testKeyStat: KeyStatisticDataBlock = {
     type: 'KeyStatisticDataBlock',
     id: 'keyStatDataBlock-1',
     trend: 'DataBlock trend',
@@ -82,7 +82,8 @@ describe('EditableKeyStatDataBlock', () => {
     render(
       <EditableKeyStatDataBlock
         releaseId="release-1"
-        keyStat={keyStatDataBlock}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat]}
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -123,7 +124,8 @@ describe('EditableKeyStatDataBlock', () => {
       <EditableKeyStatDataBlock
         isEditing
         releaseId="release-1"
-        keyStat={keyStatDataBlock}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat]}
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -158,7 +160,8 @@ describe('EditableKeyStatDataBlock', () => {
     render(
       <EditableKeyStatDataBlock
         releaseId="release-1"
-        keyStat={{ ...keyStatDataBlock, trend: undefined }}
+        keyStat={{ ...testKeyStat, trend: undefined }}
+        keyStats={[testKeyStat]}
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -177,7 +180,8 @@ describe('EditableKeyStatDataBlock', () => {
     render(
       <EditableKeyStatDataBlock
         releaseId="release-1"
-        keyStat={{ ...keyStatDataBlock, guidanceTitle: undefined }}
+        keyStat={{ ...testKeyStat, guidanceTitle: undefined }}
+        keyStats={[testKeyStat]}
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -203,7 +207,8 @@ describe('EditableKeyStatDataBlock', () => {
     render(
       <EditableKeyStatDataBlock
         releaseId="release-1"
-        keyStat={{ ...keyStatDataBlock, guidanceText: undefined }}
+        keyStat={{ ...testKeyStat, guidanceText: undefined }}
+        keyStats={[testKeyStat]}
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -232,7 +237,8 @@ describe('EditableKeyStatDataBlock', () => {
     render(
       <EditableKeyStatDataBlock
         releaseId="release-1"
-        keyStat={keyStatDataBlock}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat]}
         isEditing
         onRemove={onRemove}
         onSubmit={noop}
@@ -261,7 +267,8 @@ describe('EditableKeyStatDataBlock', () => {
     render(
       <EditableKeyStatDataBlock
         releaseId="release-1"
-        keyStat={keyStatDataBlock}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat]}
         isEditing
         onRemove={noop}
         onSubmit={noop}
@@ -287,15 +294,17 @@ describe('EditableKeyStatDataBlock', () => {
   });
 
   test('clicking the cancel button toggles back to preview', async () => {
-    const user = userEvent.setup();
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testTableDataResponse,
     );
 
+    const user = userEvent.setup();
+
     render(
       <EditableKeyStatDataBlock
         releaseId="release-1"
-        keyStat={keyStatDataBlock}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat]}
         isEditing
         onRemove={noop}
         onSubmit={noop}
@@ -326,18 +335,19 @@ describe('EditableKeyStatDataBlock', () => {
   });
 
   test('can click the remove button when data block fails to load', async () => {
-    const user = userEvent.setup();
     tableBuilderService.getDataBlockTableData.mockRejectedValue(
       new Error('Something went wrong'),
     );
 
-    const onRemove = jest.fn();
+    const user = userEvent.setup();
+    const handleRemove = jest.fn();
 
     render(
       <EditableKeyStatDataBlock
         releaseId="release-1"
-        keyStat={keyStatDataBlock}
-        onRemove={onRemove}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat]}
+        onRemove={handleRemove}
         onSubmit={noop}
       />,
     );
@@ -357,7 +367,7 @@ describe('EditableKeyStatDataBlock', () => {
       screen.queryByRole('button', { name: 'Edit' }),
     ).not.toBeInTheDocument();
 
-    expect(onRemove).not.toHaveBeenCalled();
+    expect(handleRemove).not.toHaveBeenCalled();
 
     await user.click(
       screen.getByRole('button', {
@@ -365,6 +375,6 @@ describe('EditableKeyStatDataBlock', () => {
       }),
     );
 
-    expect(onRemove).toBeCalledTimes(1);
+    expect(handleRemove).toBeCalledTimes(1);
   });
 });

@@ -6,7 +6,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 describe('EditableKeyStatText', () => {
-  const keyStatText: KeyStatisticText = {
+  const testKeyStat: KeyStatisticText = {
     type: 'KeyStatisticText',
     id: 'keyStatDataBlock-1',
     trend: 'Text trend',
@@ -21,7 +21,8 @@ describe('EditableKeyStatText', () => {
   test('renders correctly when `isEditing` is false', async () => {
     render(
       <EditableKeyStatText
-        keyStat={keyStatText}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat]}
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -57,7 +58,8 @@ describe('EditableKeyStatText', () => {
     render(
       <EditableKeyStatText
         isEditing
-        keyStat={keyStatText}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat]}
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -88,7 +90,8 @@ describe('EditableKeyStatText', () => {
   test('does not render the trend when `trend` is undefined', async () => {
     render(
       <EditableKeyStatText
-        keyStat={{ ...keyStatText, trend: undefined }}
+        keyStat={{ ...testKeyStat, trend: undefined }}
+        keyStats={[testKeyStat]}
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -100,7 +103,8 @@ describe('EditableKeyStatText', () => {
   test('renders the default guidance title when `guidanceTitle` is undefined', async () => {
     render(
       <EditableKeyStatText
-        keyStat={{ ...keyStatText, guidanceTitle: undefined }}
+        keyStat={{ ...testKeyStat, guidanceTitle: undefined }}
+        keyStats={[testKeyStat]}
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -120,7 +124,8 @@ describe('EditableKeyStatText', () => {
   test('does not render the guidance when `guidanceText` is undefined', async () => {
     render(
       <EditableKeyStatText
-        keyStat={{ ...keyStatText, guidanceText: undefined }}
+        keyStat={{ ...testKeyStat, guidanceText: undefined }}
+        keyStats={[testKeyStat]}
         onRemove={noop}
         onSubmit={noop}
       />,
@@ -139,9 +144,11 @@ describe('EditableKeyStatText', () => {
 
   test('clicking the edit button shows the form', async () => {
     const user = userEvent.setup();
+
     render(
       <EditableKeyStatText
-        keyStat={keyStatText}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat]}
         isEditing
         onRemove={noop}
         onSubmit={noop}
@@ -182,9 +189,11 @@ describe('EditableKeyStatText', () => {
 
   test('clicking the cancel button toggles back to preview', async () => {
     const user = userEvent.setup();
+
     render(
       <EditableKeyStatText
-        keyStat={keyStatText}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat]}
         isEditing
         onRemove={noop}
         onSubmit={noop}
@@ -217,18 +226,20 @@ describe('EditableKeyStatText', () => {
   });
 
   test('clicking the remove button calls the onRemove handler', async () => {
-    const handleOnRemove = jest.fn();
+    const handleRemove = jest.fn();
     const user = userEvent.setup();
+
     render(
       <EditableKeyStatText
-        keyStat={keyStatText}
+        keyStat={testKeyStat}
+        keyStats={[testKeyStat]}
         isEditing
-        onRemove={handleOnRemove}
+        onRemove={handleRemove}
         onSubmit={noop}
       />,
     );
 
-    expect(handleOnRemove).not.toHaveBeenCalled();
+    expect(handleRemove).not.toHaveBeenCalled();
 
     await user.click(
       screen.getByRole('button', {
@@ -236,6 +247,6 @@ describe('EditableKeyStatText', () => {
       }),
     );
 
-    expect(handleOnRemove).toHaveBeenCalled();
+    expect(handleRemove).toHaveBeenCalled();
   });
 });

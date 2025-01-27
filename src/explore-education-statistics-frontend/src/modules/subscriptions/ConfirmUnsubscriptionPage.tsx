@@ -56,24 +56,26 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      {unsubscribedSubscription ? (
-        <Panel headingTag="h2" title="Unsubscribed">
-          <p>You have successfully unsubscribed from these updates.</p>
-          <p>
-            <Link to={`/find-statistics/${unsubscribedSubscription.slug}`}>
-              View {publicationTitle}
-            </Link>
-          </p>
-        </Panel>
-      ) : (
-        <>
-          <p>
-            Please confirm you wish to unsubscribe to notifications about this
-            publication.
-          </p>
-          <Button onClick={onConfirmClicked}>Confirm</Button>
-        </>
-      )}
+      <div role="status">
+        {unsubscribedSubscription ? (
+          <Panel headingTag="h2" title="Unsubscribed">
+            <p>You have successfully unsubscribed from these updates.</p>
+            <p>
+              <Link to={`/find-statistics/${unsubscribedSubscription.slug}`}>
+                View {publicationTitle}
+              </Link>
+            </p>
+          </Panel>
+        ) : (
+          <>
+            <p>
+              Please confirm you wish to unsubscribe to notifications about this
+              publication.
+            </p>
+            <Button onClick={onConfirmClicked}>Confirm</Button>
+          </>
+        )}
+      </div>
     </Page>
   );
 };

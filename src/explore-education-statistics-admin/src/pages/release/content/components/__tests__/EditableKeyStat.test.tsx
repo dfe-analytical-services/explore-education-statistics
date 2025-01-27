@@ -32,7 +32,7 @@ const dataBlockService = _dataBlockService as jest.Mocked<
 
 describe('EditableKeyStat', () => {
   describe('for `KeyStatisticText` type', () => {
-    const keyStatText: KeyStatisticText = {
+    const testKeyStat: KeyStatisticText = {
       type: 'KeyStatisticText',
       id: 'keyStatDataBlock-1',
       title: 'Text title',
@@ -45,7 +45,13 @@ describe('EditableKeyStat', () => {
     };
 
     test('renders correctly', async () => {
-      render(<EditableKeyStat releaseId="release-1" keyStat={keyStatText} />);
+      render(
+        <EditableKeyStat
+          releaseId="release-1"
+          keyStat={testKeyStat}
+          keyStats={[testKeyStat]}
+        />,
+      );
 
       await waitFor(() => {
         expect(
@@ -133,7 +139,7 @@ describe('EditableKeyStat', () => {
       ],
     };
 
-    const keyStatDataBlock: KeyStatisticDataBlock = {
+    const testKeyStat: KeyStatisticDataBlock = {
       type: 'KeyStatisticDataBlock',
       id: 'keyStatDataBlock-1',
       trend: 'Trend',
@@ -150,11 +156,15 @@ describe('EditableKeyStat', () => {
       );
 
       keyStatisticService.updateKeyStatisticDataBlock.mockResolvedValue(
-        keyStatDataBlock,
+        testKeyStat,
       );
 
       render(
-        <EditableKeyStat releaseId="release-1" keyStat={keyStatDataBlock} />,
+        <EditableKeyStat
+          releaseId="release-1"
+          keyStat={testKeyStat}
+          keyStats={[testKeyStat]}
+        />,
       );
 
       await waitFor(() => {
@@ -188,13 +198,14 @@ describe('EditableKeyStat', () => {
       );
 
       keyStatisticService.updateKeyStatisticDataBlock.mockResolvedValue(
-        keyStatDataBlock,
+        testKeyStat,
       );
 
       render(
         <EditableKeyStat
           releaseId="release-1"
-          keyStat={keyStatDataBlock}
+          keyStat={testKeyStat}
+          keyStats={[testKeyStat]}
           isEditing
         />,
       );
@@ -241,13 +252,14 @@ describe('EditableKeyStat', () => {
       );
 
       keyStatisticService.updateKeyStatisticDataBlock.mockResolvedValue(
-        keyStatDataBlock,
+        testKeyStat,
       );
 
       render(
         <EditableKeyStat
           releaseId="release-1"
-          keyStat={keyStatDataBlock}
+          keyStat={testKeyStat}
+          keyStats={[testKeyStat]}
           isEditing
         />,
       );
@@ -288,6 +300,7 @@ describe('EditableKeyStat', () => {
               created: '2023-01-01',
             } as never
           }
+          keyStats={[]}
         />,
       );
 

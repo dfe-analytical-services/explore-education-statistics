@@ -1,4 +1,4 @@
-import { cpuPercentageConfig, memoryPercentageConfig } from 'alerts/config.bicep'
+import { cpuPercentageConfig, memoryPercentageConfig } from 'alerts/dynamicAlertConfig.bicep'
 
 @description('Specifies the App Service plan name')
 param planName string

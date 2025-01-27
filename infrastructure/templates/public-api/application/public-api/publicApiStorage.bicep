@@ -7,7 +7,7 @@ param resourceNames ResourceNames
 param location string
 
 @description('Public API Storage : Size of the file share in GB.')
-param publicApiDataFileShareQuota int
+param publicApiDataFileShareQuotaGbs int
 
 @description('Public API Storage : Firewall rules.')
 param storageFirewallRules IpRange[]
@@ -22,36 +22,28 @@ resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: resourceNames.existingResources.vNet
 }
 
-resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.dataProcessor
+resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: resourceNames.existingResources.subnets.storagePrivateEndpoints
   parent: vNet
 }
 
-resource containerAppEnvironmentSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.containerAppEnvironment
-  parent: vNet
-}
-
-resource publisherSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.publisherFunction
-  parent: vNet
-}
-
-// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
-// Currently supported by subnet whitelisting and Storage service endpoints being enabled on the whitelisted subnets.
 module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
   name: 'publicApiStorageAccountDeploy'
   params: {
     location: location
     storageAccountName: resourceNames.publicApi.publicApiStorageAccount
-    allowedSubnetIds: [
-      dataProcessorSubnet.id
-      containerAppEnvironmentSubnet.id
-      publisherSubnet.id
-    ]
+    publicNetworkAccessEnabled: false
     firewallRules: storageFirewallRules
     skuStorageResource: 'Standard_LRS'
     keyVaultName: resourceNames.existingResources.keyVault
+    alerts: deployAlerts ? {
+      availability: true
+      latency: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
+    privateEndpointSubnetIds: {
+      file: storagePrivateEndpointSubnet.id
+    }
     tagValues: tagValues
   }
 }
@@ -60,27 +52,15 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
     fileShareName: resourceNames.publicApi.publicApiFileShare
-    fileShareQuota: publicApiDataFileShareQuota
+    fileShareQuotaGbs: publicApiDataFileShareQuotaGbs
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: 'TransactionOptimized'
-    tagValues: tagValues
-  }
-}
-
-module storageAccountAvailabilityAlert '../../components/alerts/storageAccounts/availabilityAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.publicApiStorageAccount}AvailabilityDeploy'
-  params: {
-    resourceName: resourceNames.publicApi.publicApiStorageAccount
-    alertsGroupName: resourceNames.existingResources.alertsGroup
-    tagValues: tagValues
-  }
-}
-
-module fileServiceAvailabilityAlert '../../components/alerts/fileServices/availabilityAlert.bicep' = if (deployAlerts) {
-  name: '${resourceNames.publicApi.publicApiStorageAccount}FsAvailabilityDeploy'
-  params: {
-    resourceName: resourceNames.publicApi.publicApiStorageAccount
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    alerts: deployAlerts ? {
+      availability: true
+      latency: true
+      capacity: true
+      alertsGroupName: resourceNames.existingResources.alertsGroup
+    } : null
     tagValues: tagValues
   }
 }

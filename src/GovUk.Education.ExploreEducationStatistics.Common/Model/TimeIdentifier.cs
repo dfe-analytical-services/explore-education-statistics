@@ -1,6 +1,6 @@
 #nullable enable
-using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using System.Diagnostics.CodeAnalysis;
 using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
 using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodYearFormat;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifierCategory;
@@ -285,14 +285,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         [TimeIdentifierMeta("December", "M12", Month)]
         December,
-
-        // EES-3959 Temporary time identifier added to give the correct order to this release
-        // The publication is made up of months and academic years, so by placing this last, the release
-        // is ordered after all the other monthly releases
-        // https://explore-education-statistics.service.gov.uk/find-statistics/national-tutoring-programme/2022-23,
-        // TODO remove this once we've got a solution for ordering releases which mix categories of time periods
-        [TimeIdentifierMeta("Academic year ", "AYNTP", NationalTutoringProgramme, Academic, NoLabel)]
-        AcademicYearNationalTutoringProgramme,
-
     }
 }

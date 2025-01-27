@@ -1,6 +1,6 @@
 // import the breakpoints before govuk/all so our extra values are picked up in the build.
 @import '~explore-education-statistics-common/src/styles/breakpoints';
-@import '~govuk-frontend/dist/govuk/all';
+@import '~govuk-frontend/dist/govuk/index';
 @import '~explore-education-statistics-common/src/styles/all';
 @import './variables';
 @import './layout';

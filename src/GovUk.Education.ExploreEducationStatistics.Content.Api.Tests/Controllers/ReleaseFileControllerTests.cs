@@ -43,7 +43,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
 
             var releaseFiles = DataFixture.DefaultReleaseFile()
                 .WithFile(() => DataFixture.DefaultFile(FileType.Data))
-                .WithReleaseVersion(publication.ReleaseVersions[0])
+                .WithReleaseVersion(publication.Releases[0].Versions[0])
                 .GenerateList(4);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -64,11 +64,8 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
             Assert.Equal(2, viewModels.Count);
 
             var expectedReleaseSummary = new ReleaseSummaryViewModel(
-                publication.ReleaseVersions[0],
-                latestPublishedRelease: true)
-            {
-                Publication = new PublicationSummaryViewModel(publication)
-            };
+                publication.Releases[0].Versions[0],
+                latestPublishedRelease: true) { Publication = new PublicationSummaryViewModel(publication) };
 
             Assert.Equal(releaseFiles[0].Id, viewModels[0].Id);
             Assert.Equal(releaseFiles[0].ToPublicFileInfo(), viewModels[0].File);
@@ -86,8 +83,8 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                 .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)
                     .GenerateList(1));
 
-            var publishedReleaseVersion = publication.ReleaseVersions[0];
-            var unpublishedReleaseVersion = publication.ReleaseVersions[1];
+            var publishedReleaseVersion = publication.Releases[0].Versions[0];
+            var unpublishedReleaseVersion = publication.Releases[0].Versions[1];
 
             var releaseFiles = DataFixture.DefaultReleaseFile()
                 .WithFile(() => DataFixture.DefaultFile(FileType.Data))
@@ -139,16 +136,16 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                 .WithReleases(DataFixture.DefaultRelease(publishedVersions: 3)
                     .GenerateList(1));
 
-            var latestPublishedReleaseVersion = publication.ReleaseVersions[2];
+            var latestPublishedReleaseVersion = publication.Releases[0].Versions[2];
 
             var releaseFiles = DataFixture.DefaultReleaseFile()
                 .WithFile(() => DataFixture.DefaultFile(FileType.Data))
                 .ForRange(..2, rf => rf
-                    .SetReleaseVersion(publication.ReleaseVersions[0]))
+                        .SetReleaseVersion(publication.Releases[0].Versions[0]))
                 .ForRange(2..4, rf => rf
-                    .SetReleaseVersion(publication.ReleaseVersions[1]))
+                        .SetReleaseVersion(publication.Releases[0].Versions[1]))
                 .ForRange(4..6, rf => rf
-                    .SetReleaseVersion(latestPublishedReleaseVersion))
+                        .SetReleaseVersion(latestPublishedReleaseVersion))
                 .GenerateList();
 
             await TestApp.AddTestData<ContentDbContext>(context =>

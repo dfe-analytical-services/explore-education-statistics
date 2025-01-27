@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -136,10 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .OnSuccessCombineWith(async tuple =>
                 {
                     var (dataBlockVersion, _) = tuple;
-                    return await contextDbContext.Publications
-                        .Where(p => p.Id == dataBlockVersion.ReleaseVersion.PublicationId)
-                        .Select(p => p.LatestPublishedReleaseVersion)
-                        .SingleOrNotFoundAsync();
+                    return await GetLatestPublishedReleaseVersion(dataBlockVersion);
                 })
                 .OnSuccess(tuple =>
                 {
@@ -184,12 +180,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 DataBlockParentId = dataBlockVersion.DataBlockParentId,
                 Configuration = dataBlock.Table,
                 FullTable = tableResult,
-                Query = new TableBuilderQueryViewModel(releaseVersion.PublicationId, dataBlock.Query),
+                Query = new TableBuilderQueryViewModel(releaseVersion.Release.PublicationId, dataBlock.Query),
                 ReleaseId = releaseVersion.Id,
-                ReleaseSlug = releaseVersion.Slug,
+                ReleaseSlug = releaseVersion.Release.Slug,
                 ReleaseType = releaseVersion.Type,
                 LatestData = latestReleaseVersion.Id == releaseVersion.Id,
-                LatestReleaseTitle = latestReleaseVersion.Title
+                LatestReleaseTitle = latestReleaseVersion.Release.Title
             };
         }
 
@@ -201,9 +197,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return await contextDbContext.DataBlockParents
                 .Include(dbp => dbp.LatestPublishedVersion)
                 .ThenInclude(dbv => dbv.ReleaseVersion)
-                .ThenInclude(rv => rv.Publication)
+                .ThenInclude(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
                 .SingleOrNotFoundAsync(dbp => dbp.Id == dataBlockParentId)
                 .OnSuccess(dbp => dbp.LatestPublishedVersion)
+                .OrNotFound();
+        }
+
+        private async Task<Either<ActionResult, ReleaseVersion>> GetLatestPublishedReleaseVersion(
+            DataBlockVersion dataBlockVersion)
+        {
+            return await contextDbContext.Publications
+                .Include(p => p.LatestPublishedReleaseVersion)
+                .ThenInclude(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+                .SingleOrNotFoundAsync(p => p.Id == dataBlockVersion.ReleaseVersion.Release.PublicationId)
+                .OnSuccess(p => p.LatestPublishedReleaseVersion)
                 .OrNotFound();
         }
     }

@@ -93,7 +93,10 @@ export default function Form<TFormValues extends FieldValues>({
       return {
         id:
           field !== 'root' && !field.startsWith('root.')
-            ? `${id}-${camelCase(field)}`
+            ? `${id}-${field
+                .split('.') // nested fields in react hook form use the format `field.NestedField`
+                .map(fieldPart => camelCase(fieldPart))
+                .join('-')}`
             : submitId,
         message: typeof message === 'string' ? message : '',
       };

@@ -1,5 +1,13 @@
-import { FirewallRule, IpRange, AzureFileShareMount, EntraIdAuthentication } from '../types.bicep'
+import {
+  FirewallRule
+  IpRange
+  AzureFileShareMount
+  EntraIdAuthentication
+  StorageAccountPrivateEndpoints
+} from '../types.bicep'
 
+import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
+import { dynamicAverageGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
 import { abbreviations } from '../abbreviations.bicep'
 
 @description('Specifies the location for all resources.')
@@ -30,7 +38,10 @@ param applicationInsightsKey string
 param subnetId string
 
 @description('Specifies the optional subnet id for function app inbound traffic from the VNet')
-param privateEndpointSubnetId string?
+param privateEndpoints {
+  functionApp: string?
+  storageAccounts: string
+}
 
 @description('Specifies whether this Function App is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
@@ -75,12 +86,14 @@ param storageFirewallRules IpRange[] = []
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
   functionAppHealth: bool
+  httpErrors: bool
   cpuPercentage: bool
   memoryPercentage: bool
   storageAccountAvailability: bool
   storageLatency: bool
   fileServiceAvailability: bool
   fileServiceLatency: bool
+  fileServiceCapacity: bool
   alertsGroupName: string
 }?
 
@@ -106,53 +119,60 @@ module appServicePlanModule 'appServicePlan.bicep' = {
     kind: 'functionapp'
     sku: sku
     operatingSystem: operatingSystem
-    alerts: alerts != null ? {
-      cpuPercentage: alerts!.cpuPercentage
-      memoryPercentage: alerts!.memoryPercentage
-      alertsGroupName: alerts!.alertsGroupName
-    } : null
+    alerts: alerts != null
+      ? {
+          cpuPercentage: alerts!.cpuPercentage
+          memoryPercentage: alerts!.memoryPercentage
+          alertsGroupName: alerts!.alertsGroupName
+        }
+      : null
     tagValues: tagValues
   }
 }
 
-// Configure a single shared storage account for access key storage, and 2 individual storage accounts to be split
+// Configure a single management storage account for access key storage, and 2 individual storage accounts to be split
 // between the production slot and staging slot for reliable execution. See
 // https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-zero-downtime-deployment#status-check-with-slot
-var sharedStorageAccountName = '${storageAccountsNamePrefix}mg'
+var managementStorageAccountName = '${storageAccountsNamePrefix}mg'
 var slot1StorageAccountName = '${storageAccountsNamePrefix}s1'
 var slot2StorageAccountName = '${storageAccountsNamePrefix}s2'
 var functionAppCodeFileShareName = '${functionAppName}-${abbreviations.fileShare}'
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
 
-var storageAlerts = alerts != null ? {
-  availability: alerts!.storageAccountAvailability
-  latency: alerts!.storageLatency
-  alertsGroupName: alerts!.alertsGroupName
-} : null
+var storageAlerts = alerts != null
+  ? {
+      availability: alerts!.storageAccountAvailability
+      latency: alerts!.storageLatency
+      alertsGroupName: alerts!.alertsGroupName
+    }
+  : null
 
-var fileServiceAlerts = alerts != null ? {
-  availability: alerts!.fileServiceAvailability
-  latency: alerts!.fileServiceLatency
-  alertsGroupName: alerts!.alertsGroupName
-} : null
+var fileServiceAlerts = alerts != null
+  ? {
+      availability: alerts!.fileServiceAvailability
+      latency: alerts!.fileServiceLatency
+      capacity: alerts!.fileServiceCapacity
+      alertsGroupName: alerts!.alertsGroupName
+    }
+  : null
 
 // This is the shared Storage Account for this Durable Function App that is used for key management, timer trigger
-// management etc.
-//
-// The Durable Function App is granted access by whitelisting its subnet for inbound traffic.
-//
-// For performance, it is considered good practice for each Function App to have its own dedicated Storage Account. See
-// https://learn.microsoft.com/en-us/azure/azure-functions/storage-considerations?tabs=azure-cli#optimize-storage-performance.
-
-// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
-module sharedStorageAccountModule 'storageAccount.bicep' = {
-  name: '${sharedStorageAccountName}StorageAccountDeploy'
+// management etc.  For performance, it is considered good practice for each Function App to have its own dedicated 
+// Storage Account. See https://learn.microsoft.com/en-us/azure/azure-functions/storage-considerations?tabs=azure-cli#optimize-storage-performance.
+module manamementStorageAccountModule 'storageAccount.bicep' = {
+  name: '${managementStorageAccountName}StorageAccountDeploy'
   params: {
     location: location
-    storageAccountName: sharedStorageAccountName
+    storageAccountName: managementStorageAccountName
     allowedSubnetIds: [subnetId]
     skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
+    publicNetworkAccessEnabled: false
+    privateEndpointSubnetIds: {
+      blob: privateEndpoints.storageAccounts
+      queue: privateEndpoints.storageAccounts
+      table: privateEndpoints.storageAccounts
+    }
     firewallRules: storageFirewallRules
     alerts: storageAlerts
     tagValues: tagValues
@@ -161,7 +181,6 @@ module sharedStorageAccountModule 'storageAccount.bicep' = {
 
 // This is a storage account dedicated to slot 1. It uses this for its own reliable execution.
 // It also contains a file share where its slot-specific version of the code lives.
-// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
 module slot1StorageAccountModule 'storageAccount.bicep' = {
   name: '${slot1StorageAccountName}StorageAccountDeploy'
   params: {
@@ -170,6 +189,13 @@ module slot1StorageAccountModule 'storageAccount.bicep' = {
     allowedSubnetIds: [subnetId]
     skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
+    publicNetworkAccessEnabled: false
+    privateEndpointSubnetIds: {
+      file: privateEndpoints.storageAccounts
+      blob: privateEndpoints.storageAccounts
+      queue: privateEndpoints.storageAccounts
+      table: privateEndpoints.storageAccounts
+    }
     firewallRules: storageFirewallRules
     alerts: storageAlerts
     tagValues: tagValues
@@ -192,7 +218,6 @@ module slot1FileShareModule 'fileShare.bicep' = {
 
 // This is a storage account dedicated to slot 2. It uses this for its own reliable execution.
 // It also contains a file share where its slot-specific version of the code lives.
-// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
 module slot2StorageAccountModule 'storageAccount.bicep' = {
   name: '${slot2StorageAccountName}StorageAccountDeploy'
   params: {
@@ -201,6 +226,13 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
     allowedSubnetIds: [subnetId]
     skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
+    publicNetworkAccessEnabled: false
+    privateEndpointSubnetIds: {
+      file: privateEndpoints.storageAccounts
+      blob: privateEndpoints.storageAccounts
+      queue: privateEndpoints.storageAccounts
+      table: privateEndpoints.storageAccounts
+    }
     firewallRules: storageFirewallRules
     alerts: storageAlerts
     tagValues: tagValues
@@ -221,13 +253,15 @@ module slot2FileShareModule 'fileShare.bicep' = {
   ]
 }
 
-var firewallRules = [for (firewallRule, index) in functionAppFirewallRules: {
-  name: firewallRule.name
-  ipAddress: firewallRule.cidr
-  action: 'Allow'
-  tag: firewallRule.tag != null ? firewallRule.tag : 'Default'
-  priority: firewallRule.priority != null ? firewallRule.priority : 100 + index
-}]
+var firewallRules = [
+  for (firewallRule, index) in functionAppFirewallRules: {
+    name: firewallRule.name
+    ipAddress: firewallRule.cidr
+    action: 'Allow'
+    tag: firewallRule.tag != null ? firewallRule.tag : 'Default'
+    priority: firewallRule.priority != null ? firewallRule.priority : 100 + index
+  }
+]
 
 var commonSiteProperties = {
   enabled: true
@@ -246,6 +280,7 @@ var commonSiteProperties = {
     netFrameworkVersion: '8.0'
     linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
+    minTlsVersion: '1.3'
     publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
     ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
     ipSecurityRestrictionsDefaultAction: 'Deny'
@@ -322,17 +357,22 @@ module functionAppKeyVaultRoleAssignments 'keyVaultRoleAssignment.bicep' = {
 }
 
 resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
-   name: 'azurestorageaccounts'
-   parent: functionApp
-   properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
-     '${next.storageName}': {
-       type: 'AzureFiles'
-       shareName: next.fileShareName
-       mountPath: next.mountPath
-       accountName: next.storageAccountName
-       accessKey: next.storageAccountKey
-     }
-   }))
+  name: 'azurestorageaccounts'
+  parent: functionApp
+  properties: reduce(
+    azureFileShares,
+    {},
+    (cur, next) =>
+      union(cur, {
+        '${next.storageName}': {
+          type: 'AzureFiles'
+          shareName: next.fileShareName
+          mountPath: next.mountPath
+          accountName: next.storageAccountName
+          accessKey: next.storageAccountKey
+        }
+      })
+  )
 }
 
 // We determine any pre-existing appsettings for both the production and the staging slots during this infrastructure
@@ -340,8 +380,12 @@ resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
 // appsettings back to their original values by allowing existing ones to take precedence.
 //
 // See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
-var existingStagingAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/slots/config', functionApp.name, 'staging', 'appsettings'), '2021-03-01').properties : {}
-var existingProductionAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/config', functionApp.name, 'appsettings'), '2021-03-01').properties : {}
+var existingStagingAppSettings = functionAppExists
+  ? list(resourceId('Microsoft.Web/sites/slots/config', functionApp.name, 'staging', 'appsettings'), '2021-03-01').properties
+  : {}
+var existingProductionAppSettings = functionAppExists
+  ? list(resourceId('Microsoft.Web/sites/config', functionApp.name, 'appsettings'), '2021-03-01').properties
+  : {}
 
 // Create staging and production deploy slots, and set base app settings on both.
 // These will be infrastructure-specific appsettings, and the YAML pipeline will handle the deployment of
@@ -360,9 +404,8 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       'SLOT_NAME'
     ]
     commonSettings: union(appSettings, {
-
       // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
-      AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${sharedStorageAccountModule.outputs.connectionStringSecretName})'
+      AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${manamementStorageAccountModule.outputs.connectionStringSecretName})'
 
       // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
       // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
@@ -421,30 +464,81 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   ]
 }
 
-module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetId != null) {
+module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.functionApp != null) {
   name: '${functionAppName}PrivateEndpointDeploy'
   params: {
     serviceId: functionApp.id
     serviceName: functionApp.name
     serviceType: 'sites'
-    subnetId: privateEndpointSubnetId!
+    subnetId: privateEndpoints.functionApp!
     location: location
     tagValues: tagValues
   }
 }
 
-module healthAlert 'alerts/sites/healthAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
-  name: '${functionAppName}HealthDeploy'
+module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
+  name: '${functionAppName}HealthAlertModule'
   params: {
     resourceName: functionAppName
+    resourceMetric: {
+      resourceType: 'Microsoft.Web/sites'
+      metric: 'HealthCheckStatus'
+    }
+    config: {
+      ...staticAverageLessThanHundred
+      nameSuffix: 'health'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
 
+var unexpectedHttpStatusCodeMetrics = ['Http401', 'Http5xx']
+
+module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
+  for httpStatusCode in unexpectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
+    name: '${functionAppName}${httpStatusCode}Module'
+    params: {
+      resourceName: functionAppName
+      resourceMetric: {
+        resourceType: 'Microsoft.Web/sites'
+        metric: httpStatusCode
+      }
+      config: {
+        ...staticMinGreaterThanZero
+        nameSuffix: toLower(httpStatusCode)
+      }
+      alertsGroupName: alerts!.alertsGroupName
+      tagValues: tagValues
+    }
+  }
+]
+
+var expectedHttpStatusCodeMetrics = ['Http403', 'Http4xx']
+
+module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
+  for httpStatusCode in expectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
+    name: '${functionAppName}${httpStatusCode}Module'
+    params: {
+      resourceName: functionAppName
+      resourceMetric: {
+        resourceType: 'Microsoft.Web/sites'
+        metric: httpStatusCode
+      }
+      config: {
+        ...dynamicAverageGreaterThan
+        nameSuffix: toLower(httpStatusCode)
+        severity: 'Informational'
+      }
+      alertsGroupName: alerts!.alertsGroupName
+      tagValues: tagValues
+    }
+  }
+]
+
 output functionAppName string = functionApp.name
 output url string = 'https://${functionApp.name}.azurewebsites.net'
 output stagingUrl string = 'https://${functionApp.name}-staging.azurewebsites.net'
-output managementStorageAccountName string = sharedStorageAccountName
+output managementStorageAccountName string = managementStorageAccountName
 output slot1StorageAccountName string = slot1StorageAccountName
 output slot2StorageAccountName string = slot2StorageAccountName

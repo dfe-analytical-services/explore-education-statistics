@@ -1,6 +1,6 @@
-import { responseTimeConfig } from 'alerts/config.bicep'
-
-import { IpRange } from '../types.bicep'
+import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
+import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
+import { IpRange, StorageAccountPrivateEndpoints } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -19,6 +19,12 @@ param skuStorageResource 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'S
 
 @description('Storage Account Name')
 param keyVaultName string
+
+@description('Whether the storage account is accessible from the public internet')
+param publicNetworkAccessEnabled bool = false
+
+@description('Private endpoint subnets')
+param privateEndpointSubnetIds StorageAccountPrivateEndpoints?
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
@@ -42,6 +48,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   properties: {
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
+    publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
@@ -59,16 +66,84 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   tags: tagValues
 }
 
-module availabilityAlerts 'alerts/storageAccounts/availabilityAlert.bicep' = if (alerts != null && alerts!.availability) {
-  name: '${storageAccountName}StorageAvailabilityDeploy'
+var servicePrivateSubnetIds = {
+  file: ''
+  blob: ''
+  queue: ''
+  table: ''
+  ...(privateEndpointSubnetIds ?? {})
+}
+
+module fileServicePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.file != '') {
+  name: '${storageAccountName}FileServicePrivateEndpointDeploy'
+  params: {
+    serviceId: storageAccount.id
+    serviceName: storageAccount.name
+    privateEndpointNameOverride: '${storageAccount.name}-file'
+    serviceType: 'fileService'
+    subnetId: servicePrivateSubnetIds.file
+    location: location
+    tagValues: tagValues
+  }
+}
+
+module blobStoragePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.blob != '') {
+  name: '${storageAccountName}BlobStoragePrivateEndpointDeploy'
+  params: {
+    serviceId: storageAccount.id
+    serviceName: storageAccount.name
+    privateEndpointNameOverride: '${storageAccount.name}-blob'
+    serviceType: 'blobStorage'
+    subnetId: servicePrivateSubnetIds.blob
+    location: location
+    tagValues: tagValues
+  }
+}
+
+module queuePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.queue != '') {
+  name: '${storageAccountName}QueuePrivateEndpointDeploy'
+  params: {
+    serviceId: storageAccount.id
+    serviceName: storageAccount.name
+    privateEndpointNameOverride: '${storageAccount.name}-queue'
+    serviceType: 'queue'
+    subnetId: servicePrivateSubnetIds.queue
+    location: location
+    tagValues: tagValues
+  }
+}
+
+module tableStoragePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.table != '') {
+  name: '${storageAccountName}TableStoragePrivateEndpointDeploy'
+  params: {
+    serviceId: storageAccount.id
+    serviceName: storageAccount.name
+    privateEndpointNameOverride: '${storageAccount.name}-table'
+    serviceType: 'tableStorage'
+    subnetId: servicePrivateSubnetIds.table
+    location: location
+    tagValues: tagValues
+  }
+}
+
+module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {
+  name: '${storageAccountName}AvailabilityAlertModule'
   params: {
     resourceName: storageAccountName
+    resourceMetric: {
+      resourceType: 'Microsoft.Storage/storageAccounts'
+      metric: 'availability'
+    }
+    config: {
+      ...staticAverageLessThanHundred
+      nameSuffix: 'availability'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
 }
 
-module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
+module latencyAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
   name: '${storageAccountName}LatencyDeploy'
   params: {
     resourceName: storageAccountName
@@ -76,7 +151,11 @@ module latencyAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && al
       resourceType: 'Microsoft.Storage/storageAccounts'
       metric: 'SuccessE2ELatency'
     }
-    config: responseTimeConfig
+    config: {
+      ...staticAverageGreaterThanZero
+      nameSuffix: 'response-time'
+      threshold: '250'
+    }
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }

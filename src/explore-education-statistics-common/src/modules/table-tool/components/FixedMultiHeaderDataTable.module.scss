@@ -28,6 +28,8 @@
   width: 100%;
 
   &:focus {
-    outline: none;
+    box-shadow: 0 0 0 4px;
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline-offset: 4px;
   }
 }
