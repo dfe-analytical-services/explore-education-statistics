@@ -14,10 +14,10 @@ import _dataBlockService, {
 } from '@admin/services/dataBlockService';
 import _permissionService from '@admin/services/permissionService';
 import render from '@common-test/render';
+import { ChartConfig } from '@common/modules/charts/types/chart';
 import _tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 import { waitFor } from '@testing-library/dom';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -51,7 +51,10 @@ jest.mock('@common/hooks/useMedia', () => ({
 }));
 
 describe('ReleaseDataBlockEditPage', () => {
-  const chart: Chart = {
+  const chart: ChartConfig = {
+    stacked: false,
+    includeNonNumericData: false,
+    showDataLabels: false,
     title: 'Test chart title',
     alt: 'Test chart alt',
     type: 'verticalbar',

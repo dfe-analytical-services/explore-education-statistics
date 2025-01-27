@@ -1,127 +1,6 @@
-import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
-import {
-  AxesConfiguration,
-  AxisConfiguration,
-  BarChartDataLabelPosition,
-  DataGroupingType,
-  LineChartDataLabelPosition,
-  MapConfig,
-  TitleType,
-} from '@common/modules/charts/types/chart';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import { ChartConfig } from '@common/modules/charts/types/chart';
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
-
-interface HorizontalBarChart {
-  type: 'horizontalbar';
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
-  height: number;
-  width?: number;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
-  barThickness?: number;
-  dataLabelPosition?: BarChartDataLabelPosition;
-  stacked?: boolean;
-  legend: LegendConfiguration;
-  axes: {
-    major: AxisConfiguration;
-    minor: AxisConfiguration;
-  };
-}
-
-interface Infographic {
-  type: 'infographic';
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
-  height: number;
-  width?: number;
-  axes: AxesConfiguration;
-  legend?: LegendConfiguration;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
-  fileId: string;
-}
-
-export interface LineChart {
-  type: 'line';
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
-  height: number;
-  width?: number;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
-  dataLabelPosition?: LineChartDataLabelPosition;
-  legend: LegendConfiguration;
-  axes: {
-    major: AxisConfiguration;
-    minor: AxisConfiguration;
-  };
-}
-
-export interface MapChart {
-  type: 'map';
-  axes: {
-    major: AxisConfiguration;
-  };
-  dataGroups?: number;
-  dataClassification?: DataGroupingType;
-  legend: LegendConfiguration;
-  map?: MapConfig;
-  position?: { lat: number; lng: number };
-  boundaryLevel: number;
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
-  height: number;
-  width?: number;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  subtitle?: string;
-}
-
-interface VerticalBarChart {
-  type: 'verticalbar';
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
-  height: number;
-  width?: number;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
-  barThickness?: number;
-  dataLabelPosition?: BarChartDataLabelPosition;
-  stacked?: boolean;
-  legend: LegendConfiguration;
-  axes: {
-    major: AxisConfiguration;
-    minor: AxisConfiguration;
-  };
-}
-
-/**
- * This is the chart type that will be returned by the API.
- * It differs from {@see ChartRendererProps} as we need to
- * progressively migrate parts of its old data structure,
- * to our newer one that is being used by {@see ChartRendererProps}.
- */
-export type Chart =
-  | Infographic
-  | LineChart
-  | MapChart
-  | HorizontalBarChart
-  | VerticalBarChart;
 
 export interface Table {
   indicators: string[];
@@ -168,7 +47,7 @@ export interface DataBlock extends BaseBlock {
   heading: string;
   source?: string;
   query: TableDataQuery;
-  charts: Chart[];
+  charts: ChartConfig[];
   table: Table;
   dataBlockParentId: string;
 }

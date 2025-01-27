@@ -9,11 +9,11 @@ import {
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import render from '@common-test/render';
+import { ChartConfig } from '@common/modules/charts/types/chart';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import _tableBuilderService, {
   TableDataQuery,
 } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 import { screen } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -39,7 +39,7 @@ describe('ChartBuilderTabSection', () => {
     },
   };
 
-  const testChart: Chart = {
+  const testChart: ChartConfig = {
     type: 'map',
     boundaryLevel: 2,
     map: {

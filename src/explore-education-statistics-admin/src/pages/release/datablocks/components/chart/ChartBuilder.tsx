@@ -16,7 +16,6 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
-import { RenderableChart } from '@common/modules/charts/components/ChartRenderer';
 import {
   horizontalBarBlockDefinition,
   HorizontalBarProps,
@@ -37,7 +36,10 @@ import {
 import {
   AxisType,
   ChartDefinition,
-  ChartProps,
+  ChartConfig,
+  InfographicConfig,
+  DraftFullChart,
+  DraftChartConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
@@ -45,7 +47,6 @@ import {
   ReleaseTableDataQuery,
   TableDataResult,
 } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 import { ValidationProblemDetails } from '@common/services/types/problemDetails';
 import parseNumber from '@common/utils/number/parseNumber';
 import { isServerValidationError } from '@common/validation/serverValidations';
@@ -60,37 +61,41 @@ const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
 ];
 
-type ChartBuilderChartProps = RenderableChart & {
+type ChartBuilderChartProps = DraftFullChart & {
   file?: File;
 };
 
-const filterChartProps = (props: ChartBuilderChartProps): Chart => {
+const filterChartProps = (props: ChartBuilderChartProps): ChartConfig => {
   const excludedProps: (
     | keyof ChartBuilderChartProps
     | keyof InfographicChartProps
     | keyof MapBlockProps
-  )[] = [
-    'data',
-    'meta',
-    'getInfographic',
-    'file',
-    'titleType',
-    'onBoundaryLevelChange',
-  ];
+  )[] = ['data', 'meta', 'getInfographic', 'file', 'onBoundaryLevelChange'];
 
-  if (props.titleType === 'default') {
-    excludedProps.push('title');
+  const excludedChartConfigProps: (
+    | keyof ChartConfig
+    | keyof InfographicConfig
+  )[] = ['titleType'];
+
+  if (props.chartConfig.titleType === 'default') {
+    excludedChartConfigProps.push('title');
   }
 
-  if (props.type !== 'infographic') {
-    excludedProps.push('fileId');
+  if (props.chartConfig.type !== 'infographic') {
+    excludedChartConfigProps.push('fileId');
   }
 
-  let filteredProps = omit(props, excludedProps) as Chart;
+  let filteredProps = omit(
+    {
+      ...props,
+      chartConfig: omit(props.chartConfig, excludedChartConfigProps),
+    },
+    excludedProps,
+  ) as ChartConfig;
 
   // Filter out deprecated data set configurations
   filteredProps = produce(filteredProps, draft => {
-    if (draft.axes.major) {
+    if (draft.axes?.major) {
       draft.axes.major.dataSets = draft.axes.major.dataSets.map(
         dataSet => omit(dataSet, ['config']) as DataSet,
       );
@@ -108,10 +113,10 @@ interface Props {
   data: TableDataResult[];
   meta: FullTableMeta;
   releaseId: string;
-  initialChart?: Chart;
+  initialChart?: ChartConfig;
   tableTitle: string;
-  onChartSave: (chart: Chart, file?: File) => Promise<void>;
-  onChartDelete: (chart: Chart) => void;
+  onChartSave: (chart: ChartConfig, file?: File) => Promise<void>;
+  onChartDelete: (chart: ChartConfig) => void;
   onTableQueryUpdate: TableQueryUpdateHandler;
 }
 
@@ -164,13 +169,15 @@ export default function ChartBuilder({
       return undefined;
     }
 
-    const baseProps: ChartProps = {
+    const baseProps: DraftFullChart = {
       ...options,
       data,
-      map,
-      legend,
-      axes,
       meta,
+      chartConfig: {
+        map,
+        legend,
+        axes: axes as DraftChartConfig['axes'],
+      },
     };
 
     switch (definition.type) {
@@ -333,7 +340,7 @@ export default function ChartBuilder({
       />
 
       {definition && (
-        <ChartBuilderPreview chart={chart} loading={isDataLoading} />
+        <ChartBuilderPreview fullChart={chart} loading={isDataLoading} />
       )}
 
       {definition && (

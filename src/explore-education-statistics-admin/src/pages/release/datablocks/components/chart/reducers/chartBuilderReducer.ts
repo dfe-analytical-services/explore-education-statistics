@@ -11,6 +11,7 @@ import {
   ChartDefinitionAxis,
   ChartDefinitionOptions,
   chartDefinitions,
+  DraftChartConfig,
   MapConfig,
   MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
@@ -20,13 +21,12 @@ import createDataSetCategories from '@common/modules/charts/util/createDataSetCa
 import getMapDataSetCategoryConfigs from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 import deepMerge from 'deepmerge';
 import mapValues from 'lodash/mapValues';
 import { Reducer, useCallback, useMemo } from 'react';
 
 export interface ChartBuilderReducerOptions {
-  chart?: Chart;
+  chart?: DraftChartConfig;
   data: TableDataResult[];
   meta: FullTableMeta;
   tableTitle?: string;
@@ -307,7 +307,7 @@ export function chartBuilderReducer(
         draft.axes = mapValues(
           action.payload.axes,
           (axisDefinition: ChartDefinitionAxis, type: AxisType) => {
-            return updateAxis(axisDefinition, draft.axes[type]);
+            return updateAxis(axisDefinition, action.payload.axes[type]);
           },
         );
 
@@ -326,15 +326,17 @@ export function chartBuilderReducer(
         break;
       }
       case 'UPDATE_CHART_AXIS': {
-        const axisDefinition = draft?.definition?.axes?.[action.payload.type];
+        const axisDefinition = draft.definition?.axes?.[action.payload.type];
 
-        if (!axisDefinition) {
+        if (draft.axes === undefined || !axisDefinition) {
           throw new Error(
             `Could not find chart axis definition for type '${action.payload.type}'`,
           );
         }
 
-        if (!draft.axes[action.payload.type]) {
+        if (
+          !(draft.axes[action.payload.type] as AxisConfiguration | undefined)
+        ) {
           throw new Error(
             `Could not find axis configuration for type '${action.payload.type}'`,
           );

@@ -5,7 +5,7 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import render from '@common-test/render';
-import { Chart } from '@common/services/types/blocks';
+import { ChartConfig } from '@common/modules/charts/types/chart';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -360,7 +360,7 @@ describe('ChartBuilder', () => {
   });
 
   test('calls `onTableQueryUpdate` when change boundary level', async () => {
-    const testInitialChart: Chart = {
+    const testInitialChart: ChartConfig = {
       type: 'map',
       boundaryLevel: 2,
       map: {
@@ -451,7 +451,7 @@ describe('ChartBuilder', () => {
   });
 
   describe('data groupings tab', () => {
-    const testInitialChart: Chart = {
+    const testInitialChart: ChartConfig = {
       type: 'map',
       boundaryLevel: 2,
       legend: {

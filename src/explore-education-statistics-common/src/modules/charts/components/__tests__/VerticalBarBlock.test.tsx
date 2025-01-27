@@ -1,12 +1,11 @@
 import {
-  testChartConfiguration,
   testChartTableData,
+  testVerticalBarChartConfig,
 } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -16,15 +15,16 @@ jest.mock('recharts/lib/util/LogUtils');
 describe('VerticalBarBlock', () => {
   const fullTable = mapFullTable(testChartTableData);
   const props: VerticalBarProps = {
-    ...testChartConfiguration,
-    axes: testChartConfiguration.axes as VerticalBarProps['axes'],
-    legend: testChartConfiguration.legend as LegendConfiguration,
     meta: fullTable.subjectMeta,
     data: fullTable.results,
-    dataLabelPosition: 'outside',
+    chartConfig: {
+      ...testVerticalBarChartConfig,
+      dataLabelPosition: 'outside',
+    },
   };
 
-  const { axes } = props;
+  const { chartConfig } = props;
+  const { axes, legend } = chartConfig;
 
   test('renders basic chart correctly', async () => {
     const { container } = render(<VerticalBarBlock {...props} />);
@@ -70,11 +70,14 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          ...axes,
-          major: {
-            ...axes.major,
-            visible: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            major: {
+              ...axes.major,
+              visible: false,
+            },
           },
         }}
       />,
@@ -89,11 +92,14 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          ...axes,
-          minor: {
-            ...axes.minor,
-            visible: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            minor: {
+              ...axes.minor,
+              visible: false,
+            },
           },
         }}
       />,
@@ -108,15 +114,18 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          ...axes,
-          minor: {
-            ...axes.minor,
-            visible: false,
-          },
-          major: {
-            ...axes.major,
-            visible: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            minor: {
+              ...axes.minor,
+              visible: false,
+            },
+            major: {
+              ...axes.major,
+              visible: false,
+            },
           },
         }}
       />,
@@ -135,9 +144,12 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        legend={{
-          ...props.legend,
-          position: 'none',
+        chartConfig={{
+          ...chartConfig,
+          legend: {
+            ...legend,
+            position: 'none',
+          },
         }}
       />,
     );
@@ -151,15 +163,18 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          ...props.axes,
-          minor: {
-            ...props.axes.minor,
-            min: -10,
-            max: 20,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            minor: {
+              ...axes.minor,
+              min: -10,
+              max: 20,
+            },
           },
+          stacked: true,
         }}
-        stacked
       />,
     );
 
@@ -172,16 +187,19 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          ...props.axes,
-          major: {
-            ...props.axes.major,
-            referenceLines: [
-              {
-                label: 'hello',
-                position: '2014_AY',
-              },
-            ],
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            major: {
+              ...axes.major,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: '2014_AY',
+                },
+              ],
+            },
           },
         }}
       />,
@@ -195,16 +213,19 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          ...props.axes,
-          minor: {
-            ...props.axes.minor,
-            referenceLines: [
-              {
-                label: 'hello',
-                position: 0,
-              },
-            ],
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            minor: {
+              ...axes.minor,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: 0,
+                },
+              ],
+            },
           },
         }}
       />,
@@ -216,7 +237,12 @@ describe('VerticalBarBlock', () => {
   });
 
   test('can change width of chart', () => {
-    const { container } = render(<VerticalBarBlock {...props} width={200} />);
+    const { container } = render(
+      <VerticalBarBlock
+        {...props}
+        chartConfig={{ ...chartConfig, width: 200 }}
+      />,
+    );
 
     const responsiveContainer = container.querySelector(
       '.recharts-responsive-container',
@@ -231,7 +257,12 @@ describe('VerticalBarBlock', () => {
   });
 
   test('can change height of chart', () => {
-    const { container } = render(<VerticalBarBlock {...props} height={200} />);
+    const { container } = render(
+      <VerticalBarBlock
+        {...props}
+        chartConfig={{ ...chartConfig, height: 200 }}
+      />,
+    );
 
     const responsiveContainer = container.querySelector(
       '.recharts-responsive-container',
@@ -249,11 +280,14 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          major: props.axes.major,
-          minor: {
-            ...props.axes.minor,
-            tickConfig: 'default',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            major: axes.major,
+            minor: {
+              ...axes.minor,
+              tickConfig: 'default',
+            },
           },
         }}
       />,
@@ -265,11 +299,14 @@ describe('VerticalBarBlock', () => {
   test('can limit range of minor ticks to start and end', () => {
     const propsWithTicks: VerticalBarProps = {
       ...props,
-      axes: {
-        major: props.axes.major,
-        minor: {
-          ...props.axes.minor,
-          tickConfig: 'startEnd',
+      chartConfig: {
+        ...chartConfig,
+        axes: {
+          major: axes.major,
+          minor: {
+            ...axes.minor,
+            tickConfig: 'startEnd',
+          },
         },
       },
     };
@@ -283,12 +320,15 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          major: props.axes.major,
-          minor: {
-            ...props.axes.minor,
-            tickConfig: 'custom',
-            tickSpacing: 1,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            major: axes.major,
+            minor: {
+              ...axes.minor,
+              tickConfig: 'custom',
+              tickSpacing: 1,
+            },
           },
         }}
       />,
@@ -301,11 +341,14 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            tickConfig: 'default',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: axes.minor,
+            major: {
+              ...axes.major,
+              tickConfig: 'default',
+            },
           },
         }}
       />,
@@ -326,11 +369,14 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            tickConfig: 'startEnd',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: axes.minor,
+            major: {
+              ...axes.major,
+              tickConfig: 'startEnd',
+            },
           },
         }}
       />,
@@ -343,12 +389,15 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            tickConfig: 'custom',
-            tickSpacing: 2,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: axes.minor,
+            major: {
+              ...axes.major,
+              tickConfig: 'custom',
+              tickSpacing: 2,
+            },
           },
         }}
       />,
@@ -361,12 +410,15 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            sortBy: 'name',
-            sortAsc: true,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: axes.minor,
+            major: {
+              ...axes.major,
+              sortBy: 'name',
+              sortAsc: true,
+            },
           },
         }}
       />,
@@ -387,12 +439,15 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            sortBy: 'name',
-            sortAsc: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: axes.minor,
+            major: {
+              ...axes.major,
+              sortBy: 'name',
+              sortAsc: false,
+            },
           },
         }}
       />,
@@ -413,14 +468,17 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            sortBy: 'name',
-            sortAsc: true,
-            min: 0,
-            max: 1,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: axes.minor,
+            major: {
+              ...axes.major,
+              sortBy: 'name',
+              sortAsc: true,
+              min: 0,
+              max: 1,
+            },
           },
         }}
       />,
@@ -433,18 +491,21 @@ describe('VerticalBarBlock', () => {
     render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          ...axes,
-          major: {
-            ...axes.major,
-            label: {
-              text: 'Test axis label 1',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            major: {
+              ...axes.major,
+              label: {
+                text: 'Test axis label 1',
+              },
             },
-          },
-          minor: {
-            ...axes.minor,
-            label: {
-              text: 'Test axis label 2',
+            minor: {
+              ...axes.minor,
+              label: {
+                text: 'Test axis label 2',
+              },
             },
           },
         }}
@@ -463,15 +524,18 @@ describe('VerticalBarBlock', () => {
     const { container } = render(
       <VerticalBarBlock
         {...props}
-        axes={{
-          ...axes,
-          major: {
-            ...axes.major,
-            referenceLines: [{ label: 'Test label 1', position: '2015_AY' }],
-          },
-          minor: {
-            ...axes.minor,
-            referenceLines: [{ label: 'Test label 2', position: 3.4 }],
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            major: {
+              ...axes.major,
+              referenceLines: [{ label: 'Test label 1', position: '2015_AY' }],
+            },
+            minor: {
+              ...axes.minor,
+              referenceLines: [{ label: 'Test label 2', position: 3.4 }],
+            },
           },
         }}
       />,

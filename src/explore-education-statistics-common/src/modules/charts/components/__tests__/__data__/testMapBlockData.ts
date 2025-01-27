@@ -1,4 +1,7 @@
-import { DataGroupingConfig } from '@common/modules/charts/types/chart';
+import {
+  DataGroupingConfig,
+  MapChartConfig,
+} from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import {
   LocationFilter,
@@ -11,13 +14,13 @@ import {
   LocationGeoJsonOption,
   TableDataResponse,
 } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 
-export const testMapConfiguration: Chart = {
+export const testMapConfiguration: MapChartConfig = {
   type: 'map',
   boundaryLevel: 1,
+  includeNonNumericData: false,
   axes: {
     major: {
       type: 'major',

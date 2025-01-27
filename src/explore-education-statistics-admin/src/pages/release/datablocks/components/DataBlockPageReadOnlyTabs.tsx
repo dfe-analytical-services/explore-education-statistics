@@ -22,7 +22,7 @@ const testId = (dataBlock: ReleaseDataBlock) =>
 const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
   const getChartFile = useGetChartFile(releaseId);
   const {
-    chart,
+    fullChart,
     isTableDataLoading,
     isTableDataError,
     fullTable,
@@ -79,11 +79,11 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
                     <WarningMessage>Could not load chart</WarningMessage>
                   }
                 >
-                  {chart && (
+                  {fullChart && (
                     <ChartRenderer
                       id="dataBlockTabs-chart"
                       source={dataBlock.source}
-                      chart={chart}
+                      fullChart={fullChart}
                     />
                   )}
                 </ErrorBoundary>

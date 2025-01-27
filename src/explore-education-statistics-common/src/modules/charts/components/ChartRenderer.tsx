@@ -1,84 +1,49 @@
 import FigureFootnotes from '@common/components/FigureFootnotes';
-import HorizontalBarBlock, {
-  HorizontalBarProps,
-} from '@common/modules/charts/components/HorizontalBarBlock';
-import InfographicBlock, {
-  InfographicChartProps,
-} from '@common/modules/charts/components/InfographicBlock';
-import LineChartBlock, {
-  LineChartProps,
-} from '@common/modules/charts/components/LineChartBlock';
-import MapBlock, {
-  MapBlockProps,
-} from '@common/modules/charts/components/MapBlock';
-import VerticalBarBlock, {
-  VerticalBarProps,
-} from '@common/modules/charts/components/VerticalBarBlock';
-import React, { memo, useMemo } from 'react';
-
-type HorizontalBarRendererProps = {
-  type: 'horizontalbar';
-} & HorizontalBarProps;
-
-type InfographicRendererProps = {
-  type: 'infographic';
-} & InfographicChartProps;
-
-type LineChartRendererProps = {
-  type: 'line';
-} & LineChartProps;
-
-type MapBlockRendererProps = {
-  type: 'map';
-} & Omit<MapBlockProps, 'id'>;
-
-type VerticalBarRendererProps = {
-  type: 'verticalbar';
-} & VerticalBarProps;
-
-export type RenderableChart =
-  | HorizontalBarRendererProps
-  | InfographicRendererProps
-  | LineChartRendererProps
-  | MapBlockRendererProps
-  | VerticalBarRendererProps;
+import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
+import InfographicBlock from '@common/modules/charts/components/InfographicBlock';
+import LineChartBlock from '@common/modules/charts/components/LineChartBlock';
+import MapBlock from '@common/modules/charts/components/MapBlock';
+import VerticalBarBlock from '@common/modules/charts/components/VerticalBarBlock';
+import { RenderableChart } from '@common/modules/charts/types/chart';
+import { memo, useMemo } from 'react';
 
 export interface ChartRendererProps {
   source?: string;
   id?: string;
-  chart: RenderableChart;
+  fullChart: RenderableChart;
 }
 
-function ChartRenderer({ source, id, chart }: ChartRendererProps) {
-  const { data, meta, subtitle, title, type } = chart;
+function ChartRenderer({ source, id, fullChart }: ChartRendererProps) {
+  const { data, meta, chartConfig } = fullChart;
+  const { subtitle, title } = fullChart.chartConfig;
 
   const chartComponent = useMemo(() => {
-    switch (chart.type) {
+    switch (fullChart.type) {
       case 'line':
-        return <LineChartBlock {...chart} />;
+        return <LineChartBlock {...fullChart} />;
       case 'verticalbar':
-        return <VerticalBarBlock {...chart} />;
+        return <VerticalBarBlock {...fullChart} />;
       case 'horizontalbar':
-        return <HorizontalBarBlock {...chart} />;
+        return <HorizontalBarBlock {...fullChart} />;
       case 'map':
-        return <MapBlock {...chart} id={`${id}-map`} />;
+        return <MapBlock {...fullChart} id={`${id}-map`} />;
       case 'infographic':
-        return <InfographicBlock {...chart} />;
+        return <InfographicBlock {...fullChart} />;
       default:
         return <p>Unable to render invalid chart type</p>;
     }
-  }, [id, chart]);
+  }, [id, fullChart]);
 
   if (data?.length > 0 && meta) {
     const footnotes = [...meta.footnotes];
 
     const boundaryFootnoteId = 'map-footnote';
     if (
-      type === 'map' &&
+      chartConfig.type === 'map' &&
       footnotes.findIndex(footnote => footnote.id === boundaryFootnoteId) === -1
     ) {
       const selectedBoundaryLevel = meta.boundaryLevels.find(
-        boundaryLevel => boundaryLevel.id === chart.boundaryLevel,
+        boundaryLevel => boundaryLevel.id === chartConfig.boundaryLevel,
       );
       if (selectedBoundaryLevel) {
         footnotes.push({

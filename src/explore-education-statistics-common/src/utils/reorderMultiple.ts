@@ -1,5 +1,4 @@
 import reorder from '@common/utils/reorder';
-import max from 'lodash/max';
 
 interface ReorderMultipleOptions<T> {
   list: T[];
