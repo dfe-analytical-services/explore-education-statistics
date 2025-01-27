@@ -34,5 +34,6 @@ export const testReleaseSeries: ReleaseSeriesTableEntry[] = [
     isLegacyLink: true,
     description: 'Legacy link 1',
     legacyLinkUrl: 'http://gov.uk/1',
+    releaseSlug: 'latest-release-slug',
   },
 ];

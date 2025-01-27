@@ -97,7 +97,7 @@ const TableToolFinalStep = ({
                     <Link
                       className="govuk-!-display-none-print"
                       unvisited
-                      to={`/find-statistics/${selectedPublication.slug}`}
+                      to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
                       testId="View latest data link"
                     >
                       View latest data:{' '}
@@ -179,19 +179,11 @@ const TableToolFinalStep = ({
         contactDetails={publication?.contact}
         methodologyLinks={getMethodologyLinks()}
         releaseLink={
-          <>
-            {selectedPublication.selectedRelease.latestData ? (
-              <Link to={`/find-statistics/${selectedPublication.slug}`}>
-                {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
-              </Link>
-            ) : (
-              <Link
-                to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
-              >
-                {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
-              </Link>
-            )}
-          </>
+          <Link
+            to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
+          >
+            {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
+          </Link>
         }
         releaseType={selectedPublication.selectedRelease.type}
       />

@@ -10,7 +10,10 @@ describe('PublicationSummary', () => {
     const heading = screen.getByRole('heading', { name: 'Publication 1' });
     expect(
       within(heading).getByRole('link', { name: 'Publication 1' }),
-    ).toHaveAttribute('href', '/find-statistics/publication-1-slug');
+    ).toHaveAttribute(
+      'href',
+      '/find-statistics/publication-1-slug/latest-release-slug-1',
+    );
     expect(screen.getByText('Publication 1 summary')).toBeInTheDocument();
 
     expect(screen.getByTestId('Release type')).toHaveTextContent(

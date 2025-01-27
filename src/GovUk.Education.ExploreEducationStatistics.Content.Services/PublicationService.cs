@@ -179,6 +179,7 @@ public class PublicationService : IPublicationService
                 {
                     Id = result.Value.Id,
                     Slug = result.Value.Slug,
+                    LatestReleaseSlug = result.Value.LatestPublishedReleaseVersion!.Release.Slug,
                     Summary = result.Value.Summary,
                     Title = result.Value.Title,
                     Theme = result.Value.Theme.Title,

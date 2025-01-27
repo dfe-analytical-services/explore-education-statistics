@@ -97,6 +97,7 @@ const defaultPublication: Publication = {
       isLegacyLink: true,
       description: 'legacy link 1',
       legacyLinkUrl: 'https://test.com/1',
+      releaseSlug: 'test-release-slug',
     },
   ],
   slug: 'publication-slug',

@@ -126,7 +126,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     <Link
                       className="govuk-!-display-none-print govuk-!-display-block govuk-!-margin-bottom-3"
                       unvisited
-                      to={`/find-statistics/${release.publication.slug}`}
+                      to={`/data-tables/${release.publication.slug}/${release.slug}`}
                     >
                       View latest data:{' '}
                       <span className="govuk-!-font-weight-bold">

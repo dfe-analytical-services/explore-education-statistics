@@ -18,6 +18,7 @@ const testMethodologyVersion: MethodologyVersion = {
         contactName: 'mock contact name 2',
       },
       slug: 'mock-slug',
+      latestReleaseSlug: 'mock-latest-release-slug',
       owner: false,
     },
     {
@@ -29,6 +30,7 @@ const testMethodologyVersion: MethodologyVersion = {
         contactName: 'mock contact name 3',
       },
       slug: 'mock-slug',
+      latestReleaseSlug: 'mock-latest-release-slug',
       owner: false,
     },
   ],
@@ -41,6 +43,7 @@ const testMethodologyVersion: MethodologyVersion = {
       contactName: 'mock contact name 1',
     },
     slug: 'mock-slug',
+    latestReleaseSlug: 'mock-latest-release-slug',
     owner: true,
   },
   published: '',

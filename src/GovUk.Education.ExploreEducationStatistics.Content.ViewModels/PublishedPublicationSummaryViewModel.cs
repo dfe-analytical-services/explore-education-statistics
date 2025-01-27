@@ -7,7 +7,7 @@ public record PublishedPublicationSummaryViewModel
     public string Title { get; init; } = string.Empty;
 
     public string Slug { get; init; } = string.Empty;
-    
+
     public string Summary { get; init; } = string.Empty;
 
     public DateTime Published { get; init; }

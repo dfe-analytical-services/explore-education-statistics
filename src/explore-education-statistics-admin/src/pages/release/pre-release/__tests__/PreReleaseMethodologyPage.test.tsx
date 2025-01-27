@@ -43,6 +43,7 @@ describe('PreReleaseMethodologyPage', () => {
         contactName: 'Mock Contact Name',
       },
       slug: 'mock slug',
+      latestReleaseSlug: 'mock-latest-release-slug',
       owner: false,
     },
     slug: 'pupil-absence-in-schools-in-england',

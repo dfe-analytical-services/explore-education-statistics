@@ -37,6 +37,7 @@ describe('PublicationAdoptMethodologyPage', () => {
         contactName: 'Mock Contact Name',
       },
       slug: 'mock-slug',
+      latestReleaseSlug: 'mock-latest-release-slug',
       owner: false,
     },
   };
@@ -58,6 +59,7 @@ describe('PublicationAdoptMethodologyPage', () => {
         contactName: 'Mock Contact Name',
       },
       slug: 'mock-slug',
+      latestReleaseSlug: 'mock-latest-release-slug',
       owner: false,
     },
   };
@@ -79,6 +81,7 @@ describe('PublicationAdoptMethodologyPage', () => {
         contactName: 'Mock Contact Name',
       },
       slug: 'mock-slug',
+      latestReleaseSlug: 'mock-latest-release-slug',
       owner: false,
     },
   };
