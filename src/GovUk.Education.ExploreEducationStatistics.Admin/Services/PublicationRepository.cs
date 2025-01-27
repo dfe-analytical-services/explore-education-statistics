@@ -34,7 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var publicationsGrantedByPublicationRoleQueryable = _context
                 .UserPublicationRoles
-                .AsQueryable()
                 .Where(userPublicationRole => userPublicationRole.UserId == userId &&
                                               ListOf(PublicationRole.Owner, PublicationRole.Approver)
                                                   .Contains(userPublicationRole.Role));
@@ -55,7 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
 
             var releasesGrantedByReleaseRolesQueryable = _context.UserReleaseRoles
-                .Include(userReleaseRole => userReleaseRole.ReleaseVersion.Publication)
+                .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
+                .ThenInclude(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
                 .Where(userReleaseRole => userReleaseRole.UserId == userId &&
                                           userReleaseRole.Role != ReleaseRole.PrereleaseViewer);
 
@@ -63,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 releasesGrantedByReleaseRolesQueryable =
                     releasesGrantedByReleaseRolesQueryable.Where(userReleaseRole =>
-                        userReleaseRole.ReleaseVersion.Publication.ThemeId == themeId.Value);
+                        userReleaseRole.ReleaseVersion.Release.Publication.ThemeId == themeId.Value);
             }
 
             var releasesGrantedByReleaseRoles = await releasesGrantedByReleaseRolesQueryable
@@ -80,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             // Add publication view models for the Publications granted indirectly via Release roles
             publications.AddRange(await releasesGrantedByReleaseRoles
-                .GroupBy(releaseVersion => releaseVersion.Publication)
+                .GroupBy(releaseVersion => releaseVersion.Release.Publication)
                 .Where(publicationWithReleases =>
                 {
                     // Don't include a publication that's already been included by Publication roles

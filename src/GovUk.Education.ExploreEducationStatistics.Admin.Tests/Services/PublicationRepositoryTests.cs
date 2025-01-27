@@ -3,102 +3,81 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PublicationRepositoryTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         [Fact]
         public async Task ListPublicationsForUser()
         {
-            var user = new User();
-            var theme = new Theme();
+            var user = new User { Id = Guid.NewGuid() };
 
-            var userReleaseRoles = new List<UserReleaseRole>();
-            var userPublicationRoles = new List<UserPublicationRole>();
+            Theme theme = _dataFixture.DefaultTheme();
 
-            // Set up a publication and releases related to the theme that will be granted via different release roles
-            var relatedPublication1 = new Publication
-            {
-                Title = "Related publication 1",
-                Theme = theme,
-            };
-            userReleaseRoles.AddRange(new List<UserReleaseRole>
-            {
-                new()
-                {
-                    ReleaseVersion = new ReleaseVersion
-                    {
-                        ReleaseName = "2012",
-                        TimePeriodCoverage = AcademicYear,
-                        Publication = relatedPublication1
-                    },
-                    User = user,
-                    Role = ReleaseRole.Viewer
-                },
-            });
+            // Set up publication and release roles for the user
 
-            // Set up a publication and releases related to the theme that will be granted via the Publication
-            // Owner role
-            userPublicationRoles.Add(new UserPublicationRole
-            {
-                Publication = new Publication
-                {
-                    Title = "Related publication 2",
-                    Theme = theme,
-                },
-                User = user,
-                Role = PublicationRole.Owner
-            });
+            UserPublicationRole userPublicationRoleApprover = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
+                .WithRole(PublicationRole.Approver);
 
-            // Set up a publication and releases related to the theme that will be granted via the Publication
-            // Approver role
-            userPublicationRoles.Add(new UserPublicationRole
-            {
-                Publication = new Publication
-                {
-                    Title = "Related publication 3",
-                    Theme = theme,
-                },
-                User = user,
-                Role = PublicationRole.Approver
-            });
+            UserPublicationRole userPublicationRoleOwner = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
+                .WithRole(PublicationRole.Owner);
+
+            UserReleaseRole userReleaseRoleContributor = _dataFixture.DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
+                    .WithRelease(_dataFixture.DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication()
+                            .WithTheme(theme))))
+                .WithRole(ReleaseRole.Contributor);
+
+            UserReleaseRole userReleaseRolePreRelease = _dataFixture.DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
+                    .WithRelease(_dataFixture.DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication()
+                            .WithTheme(theme))))
+                .WithRole(ReleaseRole.PrereleaseViewer);
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.Themes.AddAsync(theme);
-                await contentDbContext.Publications.AddAsync(relatedPublication1);
-                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRoles);
-                await contentDbContext.UserPublicationRoles.AddRangeAsync(userPublicationRoles);
+                contentDbContext.Users.Add(user);
+                contentDbContext.Themes.Add(theme);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoleApprover, userPublicationRoleOwner);
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoleContributor, userReleaseRolePreRelease);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id, theme.Id);
+                var result = await service.ListPublicationsForUser(userId: user.Id, themeId: theme.Id);
 
-                // Result should contain Related publication 1, Related publication 2 and Related publication 3.
-                // Related publication 4 is excluded because it's only granted via the PrereleaseViewer release role
-                // Unrelated publications are excluded since they are for different themes
+                // Result should contain all publications except the one associated with the
+                // Release.PrereleaseViewer role
                 Assert.Equal(3, result.Count);
 
-                Assert.Equal("Related publication 2", result[0].Title);
+                Assert.Equal(userPublicationRoleApprover.PublicationId, result[0].Id);
                 Assert.Empty(result[0].ReleaseVersions); // ListPublicationsForUser doesn't hydrate releases
                 Assert.Empty(result[0].Methodologies); // ListPublicationsForUser doesn't hydrate methodologies
 
-                Assert.Equal("Related publication 3", result[1].Title);
+                Assert.Equal(userPublicationRoleOwner.PublicationId, result[1].Id);
                 Assert.Empty(result[1].ReleaseVersions);
                 Assert.Empty(result[1].Methodologies);
 
-                Assert.Equal("Related publication 1", result[2].Title);
+                Assert.Equal(userReleaseRoleContributor.ReleaseVersion.Release.PublicationId, result[2].Id);
                 Assert.Empty(result[2].ReleaseVersions);
                 Assert.Empty(result[2].Methodologies);
             }
@@ -107,195 +86,102 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListPublicationsForUser_NoThemeIdProvided()
         {
-            var user = new User();
+            var user = new User { Id = Guid.NewGuid() };
 
-            var userPublicationRoles = new List<UserPublicationRole>
-            {
-                new()
-                {
-                    Publication = new Publication
-                    {
-                        Title = "Publication Owner publication",
-                        Theme = new Theme(),
-                    },
-                    User = user,
-                    Role = PublicationRole.Owner,
-                },
-                new()
-                {
-                    Publication = new Publication
-                    {
-                        Title = "Publication Approver publication",
-                        Theme = new Theme(),
-                    },
-                    User = user,
-                    Role = PublicationRole.Approver,
-                },
-                new()
-                {
-                    Publication = new Publication
-                    {
-                        Title = "Publication Owner publication 2",
-                        Theme = new Theme(),
-                    },
-                    User = user,
-                    Role = PublicationRole.Owner,
-                },
-            };
+            // Set up publication and release roles for the user
+            // Publications are all in different themes
 
-            var userReleaseRoles = new List<UserReleaseRole>
-            {
-                new()
-                {
-                    ReleaseVersion = new ReleaseVersion
-                    {
-                        ReleaseName = "2014",
-                        TimePeriodCoverage = AcademicYear,
-                        Publication = new Publication
-                        {
-                            Title = "Release Contributor publication",
-                            Theme = new Theme(),
-                        },
-                    },
-                    User = user,
-                    Role = ReleaseRole.Contributor,
-                },
-                new()
-                {
-                    ReleaseVersion = new ReleaseVersion
-                    {
-                        ReleaseName = "2012",
-                        TimePeriodCoverage = AcademicYear,
-                        Publication = new Publication
-                        {
-                            Title = "Release Viewer publication",
-                            Theme = new Theme(),
-                        },
-                    },
-                    User = user,
-                    Role = ReleaseRole.Viewer,
-                },
-                new()
-                {
-                    ReleaseVersion = new ReleaseVersion
-                    {
-                        ReleaseName = "2020",
-                        TimePeriodCoverage = AcademicYear,
-                        Publication = new Publication
-                        {
-                            Title = "Release PrereleaseViewer publication",
-                            Theme = new Theme(),
-                        }
-                    },
-                    User = user,
-                    Role = ReleaseRole.PrereleaseViewer,
-                },
-                new()
-                {
-                    ReleaseVersion = new ReleaseVersion
-                    {
-                        ReleaseName = "2011",
-                        TimePeriodCoverage = AcademicYear,
-                        Publication = new Publication
-                        {
-                            Title = "Release Contributor publication 2",
-                            Theme = new Theme(),
-                        }
-                    },
-                    User = user,
-                    Role = ReleaseRole.Contributor,
-                },
-            };
+            UserPublicationRole userPublicationRoleApprover = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication()
+                    .WithTheme(_dataFixture.DefaultTheme()))
+                .WithRole(PublicationRole.Approver);
+
+            UserPublicationRole userPublicationRoleOwner = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication()
+                    .WithTheme(_dataFixture.DefaultTheme()))
+                .WithRole(PublicationRole.Owner);
+
+            UserReleaseRole userReleaseRoleContributor = _dataFixture.DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
+                    .WithRelease(_dataFixture.DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication()
+                            .WithTheme(_dataFixture.DefaultTheme()))))
+                .WithRole(ReleaseRole.Contributor);
+
+            UserReleaseRole userReleaseRolePreRelease = _dataFixture.DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
+                    .WithRelease(_dataFixture.DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication()
+                            .WithTheme(_dataFixture.DefaultTheme()))))
+                .WithRole(ReleaseRole.PrereleaseViewer);
 
             var contextId = Guid.NewGuid().ToString();
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRoles);
-                await contentDbContext.UserPublicationRoles.AddRangeAsync(userPublicationRoles);
+                contentDbContext.Users.Add(user);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoleApprover, userPublicationRoleOwner);
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoleContributor, userReleaseRolePreRelease);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id, themeId: null);
+                var result = await service.ListPublicationsForUser(userId: user.Id, themeId: null);
 
                 // Result should contain all publications except the one associated with the
                 // Release.PrereleaseViewer role
-                Assert.Equal(6, result.Count);
+                Assert.Equal(3, result.Count);
 
-                Assert.False(result.Exists(pub => pub.Title == "Release PrereleaseViewer publication"));
-
-                Assert.Equal("Publication Owner publication", result[0].Title);
-                Assert.Equal("Publication Approver publication", result[1].Title);
-                Assert.Equal("Publication Owner publication 2", result[2].Title);
-                Assert.Equal("Release Contributor publication", result[3].Title);
-                Assert.Equal("Release Viewer publication", result[4].Title);
-                Assert.Equal("Release Contributor publication 2", result[5].Title);
+                Assert.Equal(userPublicationRoleApprover.PublicationId, result[0].Id);
+                Assert.Equal(userPublicationRoleOwner.PublicationId, result[1].Id);
+                Assert.Equal(userReleaseRoleContributor.ReleaseVersion.Release.PublicationId, result[2].Id);
             }
         }
 
         [Fact]
         public async Task ListPublicationsForUser_NoPublicationsForTheme()
         {
-            var user = new User();
-            var theme = new Theme();
+            var user = new User { Id = Guid.NewGuid() };
 
-            // Set up a publication and release unrelated to the theme that will be granted via a release role
+            Theme theme = _dataFixture.DefaultTheme();
 
-            var userReleaseRole = new UserReleaseRole
-            {
-                ReleaseVersion = new ReleaseVersion
-                {
-                    ReleaseName = "2011",
-                    TimePeriodCoverage = AcademicYear,
-                    Publication = new Publication
-                    {
-                        Title = "Unrelated publication 1",
-                        Theme = new Theme(),
-                    }
-                },
-                User = user,
-                Role = ReleaseRole.Contributor
-            };
+            // Set up other publication and release roles unrelated to this theme
 
-            // Set up publication and release unrelated to the theme that will be granted via a publication role
+            UserPublicationRole userPublicationRole = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_dataFixture.DefaultPublication()
+                    .WithTheme(_dataFixture.DefaultTheme()))
+                .WithRole(PublicationRole.Owner);
 
-            var userPublicationRole = new UserPublicationRole
-            {
-                Publication = new Publication
-                {
-                    Title = "Unrelated publication 2",
-                    ReleaseVersions =
-                    [
-                        new()
-                        {
-                            ReleaseName = "2012",
-                            TimePeriodCoverage = AcademicYear
-                        }
-                    ],
-                    Theme = new Theme()
-                },
-                User = user,
-                Role = PublicationRole.Owner
-            };
+            UserReleaseRole userReleaseRole = _dataFixture.DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
+                    .WithRelease(_dataFixture.DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication()
+                            .WithTheme(_dataFixture.DefaultTheme()))))
+                .WithRole(ReleaseRole.Contributor);
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.Themes.AddAsync(theme);
-                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
-                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
+                contentDbContext.Users.Add(user);
+                contentDbContext.Themes.Add(theme);
+                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id, theme.Id);
+                var result = await service.ListPublicationsForUser(userId: user.Id, themeId: theme.Id);
 
                 Assert.Empty(result);
             }
@@ -304,63 +190,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListPublicationsForUser_NoPublicationsForUser()
         {
-            var user = new User();
-            var theme = new Theme();
+            var user = new User { Id = Guid.NewGuid() };
 
-            // Set up a publication and release related to the theme that is granted via a release role but not for this user
+            Theme theme = _dataFixture.DefaultTheme();
 
-            var userReleaseRole = new UserReleaseRole
-            {
-                ReleaseVersion = new ReleaseVersion
-                {
-                    ReleaseName = "2011",
-                    TimePeriodCoverage = AcademicYear,
-                    Publication = new Publication
-                    {
-                        Title = "Related publication 1",
-                        Theme = theme,
-                    }
-                },
-                UserId = Guid.NewGuid(),
-                Role = ReleaseRole.Contributor
-            };
+            // Set up other publication and release roles unrelated to this user
 
-            // Set up a publication and release related to the theme that is granted via a publication role but not for this user
+            UserPublicationRole userPublicationRole = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(new User { Id = Guid.NewGuid() })
+                .WithPublication(_dataFixture.DefaultPublication()
+                    .WithTheme(theme))
+                .WithRole(PublicationRole.Owner);
 
-            var userPublicationRole = new UserPublicationRole
-            {
-                Publication = new Publication
-                {
-                    Title = "Related publication 2",
-                    ReleaseVersions =
-                    [
-                        new()
-                        {
-                            ReleaseName = "2012",
-                            TimePeriodCoverage = AcademicYear
-                        }
-                    ],
-                    Theme = theme,
-                },
-                UserId = Guid.NewGuid(),
-                Role = PublicationRole.Owner
-            };
+            UserReleaseRole userReleaseRole = _dataFixture.DefaultUserReleaseRole()
+                .WithUser(new User { Id = Guid.NewGuid() })
+                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
+                    .WithRelease(_dataFixture.DefaultRelease()
+                        .WithPublication(_dataFixture.DefaultPublication()
+                            .WithTheme(theme))))
+                .WithRole(ReleaseRole.Contributor);
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.Themes.AddAsync(theme);
-                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
-                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
+                contentDbContext.Users.Add(user);
+                contentDbContext.Themes.Add(theme);
+                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id, theme.Id);
+                var result = await service.ListPublicationsForUser(userId: user.Id, themeId: theme.Id);
 
                 Assert.Empty(result);
             }
@@ -369,69 +233,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListPublicationsForUser_PublicationGrantedByBothPublicationAndReleaseRoles()
         {
-            var user = new User();
-            var theme = new Theme();
+            var user = new User { Id = Guid.NewGuid() };
+
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme());
 
             // Check a Publication granted via the owner role is only returned once where it has a Release
             // also granted with roles to the same user
-            // Set up a publication and releases related to the theme that will be granted via different roles
 
-            var userReleaseRoles = new List<UserReleaseRole>();
-            var userPublicationRoles = new List<UserPublicationRole>();
+            UserPublicationRole userPublicationRole = _dataFixture.DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(PublicationRole.Owner);
 
-            var publication = new Publication
-            {
-                Title = "Publication",
-                Theme = theme,
-            };
-
-            var releaseVersion = new ReleaseVersion
-            {
-                ReleaseName = "2011",
-                TimePeriodCoverage = AcademicYear,
-                Publication = publication
-            };
-
-            userReleaseRoles.AddRange(new List<UserReleaseRole>
-            {
-                new()
-                {
-                    ReleaseVersion = releaseVersion,
-                    User = user,
-                    Role = ReleaseRole.Contributor
-                },
-                new()
-                {
-                    ReleaseVersion = releaseVersion,
-                    User = user,
-                    Role = ReleaseRole.Lead
-                }
-            });
-
-            userPublicationRoles.Add(new UserPublicationRole
-            {
-                Publication = publication,
-                User = user,
-                Role = PublicationRole.Owner
-            });
+            UserReleaseRole userReleaseRole = _dataFixture.DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
+                    .WithRelease(_dataFixture.DefaultRelease()
+                        .WithPublication(publication)))
+                .WithRole(ReleaseRole.Contributor);
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 contentDbContext.Users.Add(user);
-                contentDbContext.Themes.Add(theme);
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
-                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var publications = await service.ListPublicationsForUser(user.Id, theme.Id);
+                var publications = await service.ListPublicationsForUser(userId: user.Id, themeId: publication.ThemeId);
 
                 var resultPublication = Assert.Single(publications);
                 Assert.Equal(publication.Id, resultPublication.Id);

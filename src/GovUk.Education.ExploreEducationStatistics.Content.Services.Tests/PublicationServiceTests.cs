@@ -1913,70 +1913,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             [Fact]
             public async Task ListSitemapItems()
             {
-                var publicationUpdated = "2018-04-06T13:46:11";
-                var publicationId = Guid.NewGuid();
-
-                var firstReleaseId = Guid.NewGuid();
-                var firstReleaseSlug = "first-release-slug";
-
-                var secondReleaseId = Guid.NewGuid();
-                var secondReleaseSlug = "second-release-slug";
-
-                var firstReleaseVersionPublishedDate = "2019-02-03T07:34:12";
-                var firstReleaseVersionUpdateDate = "2019-02-04T08:29:54";
-
-                var publicationUpdatedDate = DateTime.Parse(publicationUpdated);
-                var firstReleaseVersionPublished = DateTime.Parse(firstReleaseVersionPublishedDate);
-                var firstReleaseVersionUpdated = DateTime.Parse(firstReleaseVersionUpdateDate);
-
-                var releaseOneVersionOne = new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Slug = firstReleaseSlug,
-                    ReleaseId = firstReleaseId,
-                    Published = firstReleaseVersionPublished
-                };
-
-                var releaseOneVersionTwo = new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Slug = firstReleaseSlug,
-                    ReleaseId = firstReleaseId,
-                    Published = firstReleaseVersionUpdated // Two versions with same slug to test de-duping
-                };
-
-                var releaseTwoVersionOne = new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Slug = secondReleaseSlug,
-                    ReleaseId = secondReleaseId,
-                    Published = null // still in draft
-                };
-
-                var publication = new Publication
-                {
-                    Id = publicationId,
-                    Updated = publicationUpdatedDate,
-                    ReleaseSeries =
-                    [
-                        new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = firstReleaseId },
-                        new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = secondReleaseId }
-                    ],
-                    ReleaseVersions =
-                    [
-                        releaseOneVersionOne,
-                        releaseOneVersionTwo,
-                        releaseTwoVersionOne
-                    ],
-                    LatestPublishedReleaseVersionId = firstReleaseId
-                };
+                Publication publication = _dataFixture.DefaultPublication()
+                    .WithReleases([
+                        _dataFixture.DefaultRelease(publishedVersions: 2), // Two versions to test de-duping
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+                    ])
+                    .WithUpdated(DateTime.UtcNow.AddDays(-1));
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
                     contentDbContext.Publications.Add(publication);
-                    contentDbContext.ReleaseVersions.AddRange(releaseOneVersionOne, releaseOneVersionTwo,
-                        releaseTwoVersionOne);
                     await contentDbContext.SaveChangesAsync();
                 }
 
@@ -1984,17 +1931,95 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     var service = SetupPublicationService(contentDbContext);
 
-                    var result = (await service.ListSitemapItems()).AssertRight();
+                    var result = await service.ListSitemapItems();
+                    var viewModel = result.AssertRight();
 
-                    var item = Assert.Single(result);
-                    Assert.Equal(publication.Slug, item.Slug);
-                    Assert.Equal(publicationUpdatedDate, item.LastModified);
+                    var publicationItem = Assert.Single(viewModel);
+                    Assert.Equal(publication.Slug, publicationItem.Slug);
+                    Assert.Equal(publication.Updated, publicationItem.LastModified);
 
-                    Assert.NotNull(item.Releases);
-                    var nonDraftReleaseVersion = Assert.Single(item.Releases);
+                    Assert.NotNull(publicationItem.Releases);
+                    var releaseItem = Assert.Single(publicationItem.Releases);
 
-                    Assert.Equal(firstReleaseSlug, nonDraftReleaseVersion.Slug);
-                    Assert.Equal(firstReleaseVersionUpdated, nonDraftReleaseVersion.LastModified);
+                    Assert.Equal(publication.Releases[0].Slug, releaseItem.Slug);
+                    Assert.Equal(publication.Releases[0].Versions[1].Published, releaseItem.LastModified);
+                }
+            }
+
+            [Fact]
+            public async Task ListSitemapItems_ExcludesSupersededPublications()
+            {
+                Publication publication = _dataFixture.DefaultPublication()
+                    .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithSupersededBy(_dataFixture
+                        .DefaultPublication()
+                        .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]));
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    contentDbContext.Publications.Add(publication);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    var service = SetupPublicationService(contentDbContext);
+
+                    var result = await service.ListSitemapItems();
+                    var viewModel = result.AssertRight();
+
+                    // The sitemap should only include the superseding publication,
+                    // not the superseded publication
+                    var publicationItem = Assert.Single(viewModel);
+                    Assert.Equal(publication.SupersededBy!.Slug, publicationItem.Slug);
+                }
+            }
+
+            [Fact]
+            public async Task ListSitemapItems_ExcludesPublicationsWithNoPublishedReleases()
+            {
+                Publication publication = _dataFixture.DefaultPublication()
+                    .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    contentDbContext.Publications.Add(publication);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    var service = SetupPublicationService(contentDbContext);
+
+                    var result = await service.ListSitemapItems();
+                    var viewModel = result.AssertRight();
+
+                    Assert.Empty(viewModel);
+                }
+            }
+
+            [Fact]
+            public async Task ListSitemapItems_PublicationHasNoReleases()
+            {
+                Publication publication = _dataFixture.DefaultPublication();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    contentDbContext.Publications.Add(publication);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+                {
+                    var service = SetupPublicationService(contentDbContext);
+
+                    var result = await service.ListSitemapItems();
+                    var viewModel = result.AssertRight();
+
+                    Assert.Empty(viewModel);
                 }
             }
         }

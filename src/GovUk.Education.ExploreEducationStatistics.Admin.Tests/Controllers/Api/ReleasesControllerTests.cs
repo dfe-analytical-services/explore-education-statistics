@@ -612,8 +612,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 var releaseVersion = Assert.Single(release.Versions);
                 Assert.Equal(publication.Id, releaseVersion.PublicationId);
                 Assert.Equal(release.Id, releaseVersion.ReleaseId);
+
+                // TODO EES-5659 - Remove the ReleaseVersion assertions on ReleaseName, TimePeriodCoverage, Slug
                 Assert.Equal(year.ToString(), releaseVersion.ReleaseName);
-                Assert.Equal(year, releaseVersion.Year);
                 Assert.Equal(timePeriodCoverage, releaseVersion.TimePeriodCoverage);
                 Assert.Equal(expectedSlug, releaseVersion.Slug);
 
@@ -817,8 +818,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 var releaseVersion = Assert.Single(release.Versions);
                 Assert.Equal(publication.Id, releaseVersion.PublicationId);
                 Assert.Equal(release.Id, releaseVersion.ReleaseId);
+
+                // TODO EES-5659 - Remove the ReleaseVersion assertions on ReleaseName, TimePeriodCoverage, Slug
                 Assert.Equal(newYear.ToString(), releaseVersion.ReleaseName);
-                Assert.Equal(newYear, releaseVersion.Year);
                 Assert.Equal(newTimePeriodCoverage, releaseVersion.TimePeriodCoverage);
                 Assert.Equal(expectedNewSlug, releaseVersion.Slug);
 
@@ -875,6 +877,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Assert.Equal(expectedNewLabel, release.Label);
                 Assert.Equal(expectedNewSlug, release.Slug);
 
+                // TODO EES-5659 - Remove the assertion on ReleaseVersion.Slug
                 var releaseVersion = Assert.Single(release.Versions);
                 Assert.Equal(expectedNewSlug, releaseVersion.Slug);
             }

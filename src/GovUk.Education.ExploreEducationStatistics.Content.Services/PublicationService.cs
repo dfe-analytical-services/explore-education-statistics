@@ -331,9 +331,10 @@ public class PublicationService : IPublicationService
         CancellationToken cancellationToken = default) =>
         await
             _contentDbContext.Publications
+                .Include(p => p.Releases)
+                .ThenInclude(r => r.Versions)
                 .Where(p => p.LatestPublishedReleaseVersionId.HasValue &&
                             (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseVersionId.HasValue))
-                .Include(p => p.ReleaseVersions)
                 .Select(p => new PublicationSitemapItemViewModel
                 {
                     Slug = p.Slug,
@@ -343,11 +344,15 @@ public class PublicationService : IPublicationService
                 .ToListAsync(cancellationToken);
 
     private static List<ReleaseSitemapItemViewModel> ListUniqueReleaseVersionSitemapItems(Publication publication) =>
-        publication.ReleaseVersions
-            .Where(r => r.Published != null) // r.Live cannot be translated by LINQ
-            .OrderByDescending(r => r.Published)
-            .GroupBy(r => r.Slug)
-            .Select(slugGroup => slugGroup.First())
-            .Select(r => new ReleaseSitemapItemViewModel { Slug = r.Slug, LastModified = r.Published })
+        publication.Releases
+            .SelectMany(r => r.Versions)
+            .Where(rv => rv.Published != null) // r.Live cannot be translated by LINQ
+            .OrderByDescending(rv => rv.Published)
+            .GroupBy(rv => rv.Release)
+            .Select(grouping => new ReleaseSitemapItemViewModel
+            {
+                Slug = grouping.Key.Slug,
+                LastModified = grouping.First().Published
+            })
             .ToList();
 }

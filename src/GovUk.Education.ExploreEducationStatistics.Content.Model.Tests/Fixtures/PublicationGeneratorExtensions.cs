@@ -85,6 +85,13 @@ public static class PublicationGeneratorExtensions
         string slug)
         => generator.ForInstance(s => s.SetSlug(slug));
 
+    public static Generator<Publication> WithUpdated(
+        this Generator<Publication> generator,
+        DateTime? updated = null)
+    {
+        return generator.ForInstance(s => s.SetUpdated(updated));
+    }
+
     public static InstanceSetters<Publication> SetId(
         this InstanceSetters<Publication> setters,
         Guid id)
@@ -211,26 +218,6 @@ public static class PublicationGeneratorExtensions
             .Set(p => p.LatestPublishedReleaseVersionId,
                 (_, publication, _) => publication.LatestPublishedReleaseVersion?.Id);
 
-    public static InstanceSetters<Publication> SetReleaseVersions(
-        this InstanceSetters<Publication> setters,
-        IEnumerable<ReleaseVersion> releaseVersions)
-        => setters.SetReleaseVersions(_ => releaseVersions);
-
-    private static InstanceSetters<Publication> SetReleaseVersions(
-        this InstanceSetters<Publication> setters,
-        Func<SetterContext, IEnumerable<ReleaseVersion>> releaseVersions)
-        => setters.Set(
-            p => p.ReleaseVersions,
-            (_, publication, context) =>
-            {
-                var list = releaseVersions.Invoke(context).ToList();
-
-                list.ForEach(releaseVersion => releaseVersion.Publication = publication);
-
-                return list;
-            }
-        );
-
     private static InstanceSetters<Publication> SetContact(
         this InstanceSetters<Publication> setters,
         Contact contact)
@@ -313,4 +300,9 @@ public static class PublicationGeneratorExtensions
 
                 return list;
             });
+
+    private static InstanceSetters<Publication> SetUpdated(
+        this InstanceSetters<Publication> setters,
+        DateTime? updated)
+        => setters.Set(p => p.Updated, updated);
 }
