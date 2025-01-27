@@ -218,26 +218,6 @@ public static class PublicationGeneratorExtensions
             .Set(p => p.LatestPublishedReleaseVersionId,
                 (_, publication, _) => publication.LatestPublishedReleaseVersion?.Id);
 
-    public static InstanceSetters<Publication> SetReleaseVersions(
-        this InstanceSetters<Publication> setters,
-        IEnumerable<ReleaseVersion> releaseVersions)
-        => setters.SetReleaseVersions(_ => releaseVersions);
-
-    private static InstanceSetters<Publication> SetReleaseVersions(
-        this InstanceSetters<Publication> setters,
-        Func<SetterContext, IEnumerable<ReleaseVersion>> releaseVersions)
-        => setters.Set(
-            p => p.ReleaseVersions,
-            (_, publication, context) =>
-            {
-                var list = releaseVersions.Invoke(context).ToList();
-
-                list.ForEach(releaseVersion => releaseVersion.Publication = publication);
-
-                return list;
-            }
-        );
-
     private static InstanceSetters<Publication> SetContact(
         this InstanceSetters<Publication> setters,
         Contact contact)

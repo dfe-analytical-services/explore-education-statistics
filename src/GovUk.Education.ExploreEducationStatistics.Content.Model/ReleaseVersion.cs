@@ -49,8 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Slug { get; set; }
 
+        [Obsolete("Use ReleaseVersion.Release.PublicationId. This will be removed in EES-5818")]
         public Guid PublicationId { get; set; }
 
+        [Obsolete("Use ReleaseVersion.Release.Publication. This will be removed in EES-5818")]
         public Publication Publication { get; set; }
 
         public List<Update> Updates { get; set; } = new();

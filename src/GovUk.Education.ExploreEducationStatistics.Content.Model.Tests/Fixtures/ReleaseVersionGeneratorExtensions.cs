@@ -32,7 +32,7 @@ public static class ReleaseVersionGeneratorExtensions
         return generator;
     }
 
-    [Obsolete("Provide relationship with Publication via Release. This will be removed in EES-5658/EES-5659")]
+    [Obsolete("Provide relationship with Publication via Release. This will be removed in EES-5818")]
     public static Generator<ReleaseVersion> WithPublication(
         this Generator<ReleaseVersion> generator,
         Publication publication)
@@ -207,7 +207,7 @@ public static class ReleaseVersionGeneratorExtensions
         Guid id)
         => setters.Set(releaseVersion => releaseVersion.Id, id);
 
-    [Obsolete("Set relationship with Publication via Release. This will be removed in EES-5658/EES-5659")]
+    [Obsolete("Set relationship with Publication via Release. This will be removed in EES-5818")]
     public static InstanceSetters<ReleaseVersion> SetPublication(
         this InstanceSetters<ReleaseVersion> setters,
         Publication publication)
@@ -221,7 +221,7 @@ public static class ReleaseVersionGeneratorExtensions
                 })
             .SetPublicationId(publication.Id);
 
-    [Obsolete("Set relationship with Publication via Release. This will be removed in EES-5658/EES-5659")]
+    [Obsolete("Set relationship with Publication via Release. This will be removed in EES-5818")]
     public static InstanceSetters<ReleaseVersion> SetPublicationId(
         this InstanceSetters<ReleaseVersion> setters,
         Guid publicationId)
