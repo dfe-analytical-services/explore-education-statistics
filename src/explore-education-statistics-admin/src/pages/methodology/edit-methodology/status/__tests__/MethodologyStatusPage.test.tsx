@@ -41,6 +41,7 @@ describe('MethodologyStatusPage', () => {
         contactName: 'Mock Contact Name',
       },
       slug: 'mock-slug',
+      latestReleaseSlug: 'mock-latest-release-slug',
       owner: true,
     },
     status: 'Draft',
@@ -59,6 +60,7 @@ describe('MethodologyStatusPage', () => {
           contactName: 'Mock Contact Name',
         },
         slug: 'mock-slug',
+        latestReleaseSlug: 'mock-latest-release-slug',
         owner: false,
       },
       {
@@ -70,6 +72,7 @@ describe('MethodologyStatusPage', () => {
           contactName: 'Mock Contact Name',
         },
         slug: 'mock-slug',
+        latestReleaseSlug: 'mock-latest-release-slug',
         owner: false,
       },
     ],

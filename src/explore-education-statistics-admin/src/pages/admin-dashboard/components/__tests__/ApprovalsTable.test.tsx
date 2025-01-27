@@ -20,6 +20,7 @@ describe('ApprovalsTable', () => {
           contactName: 'Mock Contact Name',
         },
         slug: 'mock-slug',
+        latestReleaseSlug: 'latest-release-slug-1',
         owner: true,
       },
       otherPublications: [],
@@ -41,6 +42,7 @@ describe('ApprovalsTable', () => {
         id: 'publication-1',
         title: 'Publication 1 title',
         slug: 'publication-1-slug',
+        latestReleaseSlug: 'latest-release-slug-1',
         owner: true,
         contact: {
           teamName: 'Mock Contact Team Name',
@@ -80,6 +82,7 @@ describe('ApprovalsTable', () => {
         id: 'publication-2',
         title: 'Publication 2 title',
         slug: 'publication-2-slug',
+        latestReleaseSlug: 'latest-release-slug-1',
         owner: true,
         contact: {
           teamName: 'Mock Contact Team Name',
