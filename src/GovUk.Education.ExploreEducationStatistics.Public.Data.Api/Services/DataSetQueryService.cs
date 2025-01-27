@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
@@ -32,7 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 internal class DataSetQueryService(
     PublicDataDbContext publicDataDbContext,
     IDuckDbConnection duckDbConnection,
-    IWildCardDataSetVersionQueryHelper wildcardDataSetVersionQueryHelper,
     IUserService userService,
     IDataSetQueryParser dataSetQueryParser,
     IParquetDataRepository dataRepository,
@@ -77,7 +77,7 @@ internal class DataSetQueryService(
             PageSize = request.PageSize,
         };
 
-        return await FindDataSetVersion(dataSetId, dataSetVersion, wildcardDataSetVersionQueryHelper, cancellationToken)
+        return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
             .OnSuccess(dsv => RunQuery(
                 dataSetVersion: dsv,
@@ -101,7 +101,7 @@ internal class DataSetQueryService(
         string? dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        return await FindDataSetVersion(dataSetId, dataSetVersion, wildcardDataSetVersionQueryHelper, cancellationToken)
+        return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
             .OnSuccess(dsv => RunQuery(
                 dataSetVersion: dsv,
@@ -114,7 +114,6 @@ internal class DataSetQueryService(
     private async Task<Either<ActionResult, DataSetVersion>> FindDataSetVersion(
         Guid dataSetId,
         string? dataSetVersion,
-        IWildCardDataSetVersionQueryHelper wildcardDataSetVersionQueryHelper,
         CancellationToken cancellationToken)
     {
         using var _ = MiniProfiler.Current
@@ -130,23 +129,8 @@ internal class DataSetQueryService(
                 .SingleOrNotFoundAsync(cancellationToken);
         }
 
-        if (dataSetVersion.Contains("*"))
-        {
-            var queryable = publicDataDbContext.DataSetVersions.AsNoTracking();
-            return await wildcardDataSetVersionQueryHelper.GetDatasetVersionUsingWildCard(queryable, dataSetId, dataSetVersion, cancellationToken);
-        }
-
-        if (!VersionUtils.TryParse(dataSetVersion, out var version))
-        {
-            return new NotFoundResult();
-        }
-
-        return await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
-            .Where(dsv => dsv.DataSetId == dataSetId)
-            .Where(dsv => dsv.VersionMajor == version.Major)
-            .Where(dsv => dsv.VersionMinor == version.Minor)
-            .SingleOrNotFoundAsync(cancellationToken);
+        return await publicDataDbContext.DataSetVersions.AsNoTracking()
+            .FindByVersion(dataSetId, dataSetVersion, cancellationToken);
     }
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(

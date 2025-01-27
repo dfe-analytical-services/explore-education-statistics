@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -26,7 +27,7 @@ public class WildCardDatasetVersionTests
     [InlineData("v1.2.*", 1, 2, 0)]
     [InlineData("v1.1.*", 1, 1, 1)]
     [InlineData("v1.*", 1, 3, 0)]
-    public async Task TestDataSetVersions(string versionString,
+    public async Task TestDataSetVersions_ReturnsExpectedVersion(string versionString,
             int expectedMajor,
             int expectedMinor = default,
             int expectedPatch = default)
@@ -36,7 +37,7 @@ public class WildCardDatasetVersionTests
         var queryable = SetupDataSetVersions(dataSetId);
 
         // Act 
-        var actualResult = await new WildCardDataSetVersionQueryHelper().GetDatasetVersionUsingWildCard(queryable, dataSetId, versionString, CancellationToken.None);
+        var actualResult = await queryable.FindByWildcardVersion(dataSetId, versionString, CancellationToken.None);
 
         // Assert
         Assert.True(actualResult.IsRight);
@@ -44,7 +45,25 @@ public class WildCardDatasetVersionTests
         Assert.Equal(expectedMinor, actualResult.Right.VersionMinor);
         Assert.Equal(expectedPatch, actualResult.Right.VersionPatch);
     }
+    [Theory]
+    [InlineData("2.1*.0")]
+    [InlineData("2.**.*")]
+    [InlineData("2*.*.0")]
+    [InlineData("2*.1.0")]
+    [InlineData("*.1.0")]
+    [InlineData("1.*.4")]
+    public async Task TestDataSetVersions_ReturnsNotFound(string versionString)
+    {
+        // Arrange
+        var dataSetId = Guid.NewGuid();
+        var queryable = SetupDataSetVersions(dataSetId);
 
+        // Act 
+        var actualResult = await queryable.FindByWildcardVersion(dataSetId, versionString, CancellationToken.None);
+
+        // Assert
+        Assert.True(actualResult.IsLeft);
+    }
     private static IQueryable<DataSetVersion> SetupDataSetVersions(Guid dataSetId)
     {
         var publicDataDbContextMock = new Mock<PublicDataDbContext>();

@@ -15,7 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 public class DataSetVersionChangeService(
     PublicDataDbContext publicDataDbContext,
-    IWildCardDataSetVersionQueryHelper wildcardDataSetVersionQueryHelper,
     IUserService userService)
     : IDataSetVersionChangeService
 {
@@ -29,7 +28,6 @@ public class DataSetVersionChangeService(
             .FindByVersion(
                 dataSetId: dataSetId,
                 version: dataSetVersion,
-                wildcardDataSetVersionQueryHelper: wildcardDataSetVersionQueryHelper,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSetVersion)
             .OnSuccess(dsv => LoadChanges(dsv, cancellationToken))

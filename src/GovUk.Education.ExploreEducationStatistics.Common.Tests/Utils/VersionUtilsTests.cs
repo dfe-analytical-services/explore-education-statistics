@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Xunit;
 
@@ -67,6 +68,33 @@ public static class VersionUtilsTests
         public void InvalidVersion_FailsToParse(string versionString)
         {
             Assert.False(VersionUtils.TryParse(versionString, out _));
+        }
+        [Theory]
+        [InlineData("*")]
+        [InlineData("1.*.*")]
+        [InlineData("  1.*.*")]
+        [InlineData("  1.*.*  ")]
+        [InlineData("1.*")]
+        [InlineData("1.2.*")]
+        [InlineData("v*")]
+        [InlineData("v1.*.*")]
+        [InlineData("v1.*")]
+        [InlineData("v1.2.*")]
+        public void ValidWildCardVersion_SuccessfullyParsed(
+            string versionString)
+        {
+            Assert.True(VersionUtils.TryParseWildcard(versionString, out var version));
+        }
+        [Theory]
+        [InlineData("2.1*.0")]
+        [InlineData("2.**.*")]
+        [InlineData("2*.*.0")]
+        [InlineData("2*.1.0")]
+        [InlineData("*.1.0")]
+        [InlineData("1.*.4")]
+        public void InValidWildCardVersion_FailsToParse(string versionString)
+        {
+            Assert.False(VersionUtils.TryParseWildcard(versionString, out var version));
         }
     }
 }
