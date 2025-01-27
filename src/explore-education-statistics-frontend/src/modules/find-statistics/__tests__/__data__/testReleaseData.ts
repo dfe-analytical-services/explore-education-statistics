@@ -13,6 +13,7 @@ export const testPublication: Publication = {
     {
       isLegacyLink: true,
       description: 'Academic year 2014/15',
+      releaseSlug: '2014-15',
       legacyLinkUrl:
         'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
     },
@@ -24,12 +25,14 @@ export const testPublication: Publication = {
     {
       isLegacyLink: true,
       description: 'Academic year 2013/14',
+      releaseSlug: '2013-14',
       legacyLinkUrl:
         'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
     },
     {
       isLegacyLink: true,
       description: 'Academic year 2012/13',
+      releaseSlug: '2012-13',
       legacyLinkUrl:
         'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
     },

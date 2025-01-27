@@ -29,7 +29,7 @@ public class TimeIdentifierSchemaFilterTests
     {
         var schema = GenerateSchema();
 
-        var codes = TimeIdentifierUtils.DataCodes.ToHashSet();
+        var codes = TimeIdentifierUtils.Codes.ToHashSet();
 
         Assert.Equal("string", schema.Type);
         Assert.Equal(codes.Count, schema.Enum.Count);

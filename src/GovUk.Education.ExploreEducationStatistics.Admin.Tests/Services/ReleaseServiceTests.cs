@@ -140,9 +140,11 @@ public abstract class ReleaseServiceTests
                 Assert.Equal(TimeIdentifier.AcademicYear, actualRelease.TimePeriodCoverage);
                 Assert.Equal("2018-19-initial", actualRelease.Slug);
 
-                Assert.Equal(2018, actualReleaseVersion.Year);
+                // TODO EES-5659 - Remove the ReleaseVersion assertions on ReleaseName, TimePeriodCoverage, Slug
+                Assert.Equal("2018", actualReleaseVersion.ReleaseName);
                 Assert.Equal(TimeIdentifier.AcademicYear, actualReleaseVersion.TimePeriodCoverage);
                 Assert.Equal("2018-19-initial", actualReleaseVersion.Slug);
+
                 Assert.Equal(ReleaseType.OfficialStatistics, actualReleaseVersion.Type);
                 Assert.Equal(ReleaseApprovalStatus.Draft, actualReleaseVersion.ApprovalStatus);
                 Assert.Equal(0, actualReleaseVersion.Version);
@@ -938,9 +940,11 @@ public abstract class ReleaseServiceTests
                 Assert.Equal(release.TimePeriodCoverage, actualRelease.TimePeriodCoverage);
                 Assert.Equal(newReleaseSlug, actualRelease.Slug);
 
-                Assert.Equal(release.Year, actualReleaseVersion.Year);
+                // TODO EES-5659 - Remove the ReleaseVersion assertions on Year, TimePeriodCoverage, Slug
+                Assert.Equal(release.Year.ToString(), actualReleaseVersion.ReleaseName);
                 Assert.Equal(release.TimePeriodCoverage, actualReleaseVersion.TimePeriodCoverage);
                 Assert.Equal(newReleaseSlug, actualReleaseVersion.Slug);
+
                 Assert.Equal(releaseVersion.NextReleaseDate, actualReleaseVersion.NextReleaseDate);
                 Assert.Equal(updatedType, actualReleaseVersion.Type);
                 Assert.Equal("New access list", actualReleaseVersion.PreReleaseAccessList);
@@ -2079,24 +2083,19 @@ public abstract class ReleaseServiceTests
     public class UpdateReleasePublishedTests : ReleaseServiceTests
     {
         [Fact]
-        public async Task Success()
+        public async Task Success_NotLatestReleaseInPublication()
         {
-            var releaseVersionId = Guid.NewGuid();
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025)
+                ]);
 
-            var publication = new Publication
-            {
-                LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                ReleaseVersions =
-                [
-                    new ReleaseVersion
-                    {
-                        Id = releaseVersionId,
-                        Slug = "release-slug",
-                        Published = DateTime.UtcNow
-                    }
-                ],
-                Slug = "publication-slug"
-            };
+            var release2024 = publication.Releases.Single(r => r.Year == 2024);
+            var release2025 = publication.Releases.Single(r => r.Year == 2025);
+
+            // Check the publication's latest published release version in the generated test data setup
+            Assert.Equal(release2025.Versions[0].Id, publication.LatestPublishedReleaseVersionId);
 
             var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(-1) };
 
@@ -2110,10 +2109,11 @@ public abstract class ReleaseServiceTests
 
             var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
 
-            releaseCacheService.Setup(s => s.UpdateRelease(releaseVersionId,
+            releaseCacheService.Setup(s => s.UpdateRelease(
+                release2024.Versions[0].Id,
                 publication.Slug,
-                publication.ReleaseVersions[0].Slug
-            )).ReturnsAsync(new ReleaseCacheViewModel(releaseVersionId));
+                release2024.Slug
+            )).ReturnsAsync(new ReleaseCacheViewModel(release2024.Versions[0].Id));
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -2122,7 +2122,7 @@ public abstract class ReleaseServiceTests
 
                 var result = await service
                     .UpdateReleasePublished(
-                        releaseVersionId,
+                        release2024.Versions[0].Id,
                         request
                     );
 
@@ -2134,31 +2134,17 @@ public abstract class ReleaseServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context.ReleaseVersions
-                    .SingleAsync(rv => rv.Id == releaseVersionId);
+                    .SingleAsync(rv => rv.Id == release2024.Versions[0].Id);
 
                 Assert.Equal(request.Published, saved.Published);
             }
         }
 
         [Fact]
-        public async Task LatestReleaseInPublication()
+        public async Task Success_LatestReleaseInPublication()
         {
-            var releaseVersionId = Guid.NewGuid();
-
-            var publication = new Publication
-            {
-                LatestPublishedReleaseVersionId = releaseVersionId,
-                ReleaseVersions =
-                [
-                    new ReleaseVersion
-                    {
-                        Id = releaseVersionId,
-                        Slug = "release-slug",
-                        Published = DateTime.UtcNow
-                    }
-                ],
-                Slug = "publication-slug"
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
             var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(-1) };
 
@@ -2172,17 +2158,19 @@ public abstract class ReleaseServiceTests
 
             var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
 
-            releaseCacheService.Setup(s => s.UpdateRelease(releaseVersionId,
+            releaseCacheService.Setup(s => s.UpdateRelease(
+                publication.Releases[0].Versions[0].Id,
                 publication.Slug,
-                publication.ReleaseVersions[0].Slug
-            )).ReturnsAsync(new ReleaseCacheViewModel(releaseVersionId));
+                publication.Releases[0].Slug
+            )).ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
 
             // As the release is the latest for the publication the separate cache entry for the publication's latest
             // release should also be updated
-            releaseCacheService.Setup(s => s.UpdateRelease(releaseVersionId,
+            releaseCacheService.Setup(s => s.UpdateRelease(
+                publication.Releases[0].Versions[0].Id,
                 publication.Slug,
                 null
-            )).ReturnsAsync(new ReleaseCacheViewModel(releaseVersionId));
+            )).ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -2191,7 +2179,7 @@ public abstract class ReleaseServiceTests
 
                 var result = await service
                     .UpdateReleasePublished(
-                        releaseVersionId,
+                        publication.Releases[0].Versions[0].Id,
                         request
                     );
 
@@ -2203,7 +2191,7 @@ public abstract class ReleaseServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context.ReleaseVersions
-                    .SingleAsync(rv => rv.Id == releaseVersionId);
+                    .SingleAsync(rv => rv.Id == publication.Releases[0].Versions[0].Id);
 
                 Assert.Equal(request.Published, saved.Published);
             }
@@ -2212,22 +2200,8 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task ReleaseNotPublished()
         {
-            var releaseVersionId = Guid.NewGuid();
-
-            var publication = new Publication
-            {
-                LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                ReleaseVersions =
-                [
-                    new ReleaseVersion
-                    {
-                        Id = releaseVersionId,
-                        Slug = "release-slug",
-                        Published = null
-                    }
-                ],
-                Slug = "publication-slug"
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
             var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(-1) };
 
@@ -2245,7 +2219,7 @@ public abstract class ReleaseServiceTests
 
                 var result = await service
                     .UpdateReleasePublished(
-                        releaseVersionId,
+                        publication.Releases[0].Versions[0].Id,
                         request
                     );
 
@@ -2256,22 +2230,8 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task FutureDate()
         {
-            var releaseVersionId = Guid.NewGuid();
-
-            var publication = new Publication
-            {
-                LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                ReleaseVersions =
-                [
-                    new ReleaseVersion
-                    {
-                        Id = releaseVersionId,
-                        Slug = "release-slug",
-                        Published = DateTime.UtcNow
-                    }
-                ],
-                Slug = "publication-slug"
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
             var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(1) };
 
@@ -2289,7 +2249,7 @@ public abstract class ReleaseServiceTests
 
                 var result = await service
                     .UpdateReleasePublished(
-                        releaseVersionId,
+                        publication.Releases[0].Versions[0].Id,
                         request
                     );
 
@@ -2300,22 +2260,8 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task ConvertsPublishedFromLocalToUniversalTimezone()
         {
-            var releaseVersionId = Guid.NewGuid();
-
-            var publication = new Publication
-            {
-                LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                ReleaseVersions =
-                [
-                    new ReleaseVersion
-                    {
-                        Id = releaseVersionId,
-                        Slug = "release-slug",
-                        Published = DateTime.UtcNow
-                    }
-                ],
-                Slug = "publication-slug"
-            };
+            Publication publication = _dataFixture.DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
             var request = new ReleasePublishedUpdateRequest
             {
@@ -2332,10 +2278,17 @@ public abstract class ReleaseServiceTests
 
             var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
 
-            releaseCacheService.Setup(s => s.UpdateRelease(releaseVersionId,
+            releaseCacheService.Setup(s => s.UpdateRelease(
+                publication.Releases[0].Versions[0].Id,
                 publication.Slug,
-                publication.ReleaseVersions[0].Slug
-            )).ReturnsAsync(new ReleaseCacheViewModel(releaseVersionId));
+                publication.Releases[0].Slug
+            )).ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
+
+            releaseCacheService.Setup(s => s.UpdateRelease(
+                publication.Releases[0].Versions[0].Id,
+                publication.Slug,
+                null
+            )).ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -2344,7 +2297,7 @@ public abstract class ReleaseServiceTests
 
                 var result = await service
                     .UpdateReleasePublished(
-                        releaseVersionId,
+                        publication.Releases[0].Versions[0].Id,
                         request
                     );
 
@@ -2356,7 +2309,7 @@ public abstract class ReleaseServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context.ReleaseVersions
-                    .SingleAsync(rv => rv.Id == releaseVersionId);
+                    .SingleAsync(rv => rv.Id == publication.Releases[0].Versions[0].Id);
 
                 // The published date retrieved from the database should always be represented in UTC
                 // because of the conversion setup in the database context config.

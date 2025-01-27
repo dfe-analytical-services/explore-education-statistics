@@ -17,6 +17,6 @@ public record CacheableReleaseSubject
     }
 
     public Guid SubjectId => ReleaseSubject.SubjectId;
-    public string ReleaseSlug => ContentReleaseVersion.Slug;
-    public string PublicationSlug => ContentReleaseVersion.Publication.Slug;
+    public string ReleaseSlug => ContentReleaseVersion.Release.Slug;
+    public string PublicationSlug => ContentReleaseVersion.Release.Publication.Slug;
 }

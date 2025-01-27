@@ -173,7 +173,10 @@ describe('TableToolFinalStep', () => {
       screen.getByRole('link', {
         name: 'Test publication, Latest Release Title',
       }),
-    ).toHaveAttribute('href', '/find-statistics/test-publication');
+    ).toHaveAttribute(
+      'href',
+      '/find-statistics/test-publication/latest-release-slug',
+    );
   });
 
   test('renders correctly when this is the latest data', async () => {
@@ -224,7 +227,10 @@ describe('TableToolFinalStep', () => {
       screen.getByRole('link', {
         name: 'View latest data: Latest Release Title',
       }),
-    ).toHaveAttribute('href', '/find-statistics/test-publication');
+    ).toHaveAttribute(
+      'href',
+      '/find-statistics/test-publication/selected-release-slug',
+    );
 
     expect(
       screen.getByRole('link', {

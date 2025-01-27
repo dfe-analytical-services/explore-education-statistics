@@ -62,36 +62,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 }
             );
         }
-
-        [Fact]
-        public void ReleaseName_Ok()
-        {
-            // None should throw
-            new ReleaseVersion { ReleaseName = "1990" };
-            new ReleaseVersion { ReleaseName = "2011" };
-            new ReleaseVersion { ReleaseName = "3000" };
-            new ReleaseVersion { ReleaseName = "" }; // considered not set
-            new ReleaseVersion { ReleaseName = null }; // considered not set
-        }
-
-        [Fact]
-        public void ReleaseName_InvalidFormats()
-        {
-            Assert.Throws<FormatException>(
-                () => new ReleaseVersion { ReleaseName = "Hello" }
-            );
-
-            Assert.Throws<FormatException>(
-                () => new ReleaseVersion { ReleaseName = "190" }
-            );
-
-            Assert.Throws<FormatException>(
-                () => new ReleaseVersion { ReleaseName = "ABC123" }
-            );
-
-            Assert.Throws<FormatException>(
-                () => new ReleaseVersion { ReleaseName = "20000" }
-            );
-        }
     }
 }

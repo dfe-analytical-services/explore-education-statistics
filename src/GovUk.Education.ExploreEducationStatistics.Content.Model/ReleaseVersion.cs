@@ -5,10 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Newtonsoft.Json;
 using static System.DateTime;
-using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.PartialDate;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -16,10 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class ReleaseVersion : ICreatedTimestamp<DateTime>
     {
         public Guid Id { get; set; }
-
-        public int Year => int.Parse(_releaseName);
-
-        public string YearTitle => TimePeriodLabelFormatter.FormatYear(Year, TimePeriodCoverage);
 
         private string _releaseName;
 
@@ -55,8 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Slug { get; set; }
 
+        [Obsolete("Use ReleaseVersion.Release.PublicationId. This will be removed in EES-5818")]
         public Guid PublicationId { get; set; }
 
+        [Obsolete("Use ReleaseVersion.Release.Publication. This will be removed in EES-5818")]
         public Publication Publication { get; set; }
 
         public List<Update> Updates { get; set; } = new();

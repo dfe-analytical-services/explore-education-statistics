@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             {
                 return await persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionIdGuid)
                     .OnSuccessDo(rv => this.CacheWithLastModified(rv.Published))
-                    .OnSuccess(rv =>  releaseFileService.StreamFile(releaseVersionId: rv.Id,
+                    .OnSuccess(rv => releaseFileService.StreamFile(releaseVersionId: rv.Id,
                         fileId: fileIdGuid))
                     .OnSuccessDo(result => this.CacheWithETag(result.FileStream.ComputeMd5Hash()))
                     .HandleFailures();
@@ -61,7 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         {
             return await persistenceHelper.CheckEntityExists<ReleaseVersion>(
                     releaseVersionId,
-                    q => q.Include(rv => rv.Publication)
+                    q => q.Include(rv => rv.Release)
+                        .ThenInclude(r => r.Publication)
                 )
                 .OnSuccessDo(releaseVersion => this.CacheWithLastModified(releaseVersion.Published))
                 .OnSuccess(
@@ -69,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     {
                         Response.ContentDispositionAttachment(
                             contentType: MediaTypeNames.Application.Octet,
-                            filename: $"{releaseVersion.Publication.Slug}_{releaseVersion.Slug}.zip");
+                            filename: $"{releaseVersion.Release.Publication.Slug}_{releaseVersion.Release.Slug}.zip");
 
                         // We start the response immediately, before all of the files have
                         // even downloaded from blob storage. As we download them, they are

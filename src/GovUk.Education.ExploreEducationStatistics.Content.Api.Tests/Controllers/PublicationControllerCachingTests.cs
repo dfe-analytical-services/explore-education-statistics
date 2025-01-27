@@ -54,6 +54,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
             Published = DateTime.UtcNow,
             Rank = 4,
             Slug = "slug",
+            LatestReleaseSlug = "latest-release-slug",
             Summary = "summary",
             Theme = "theme",
             Title = "title",

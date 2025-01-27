@@ -90,14 +90,16 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             // Copy various fields directly from the originalRelease.
             Release = originalReleaseVersion.Release,
             Publication = originalReleaseVersion.Publication,
-            Slug = originalReleaseVersion.Slug,
             Type = originalReleaseVersion.Type,
             ApprovalStatus = ReleaseApprovalStatus.Draft,
             DataGuidance = originalReleaseVersion.DataGuidance,
-            ReleaseName = originalReleaseVersion.ReleaseName,
-            TimePeriodCoverage = originalReleaseVersion.TimePeriodCoverage,
             PreReleaseAccessList = originalReleaseVersion.PreReleaseAccessList,
             NextReleaseDate = originalReleaseVersion.NextReleaseDate,
+
+            // TODO EES-5659 Remove setting ReleaseName, TimePeriodCoverage, Slug
+            ReleaseName = originalReleaseVersion.ReleaseName,
+            TimePeriodCoverage = originalReleaseVersion.TimePeriodCoverage,
+            Slug = originalReleaseVersion.Slug,
 
             // Assign new amendment-specific values to various fields.
 
