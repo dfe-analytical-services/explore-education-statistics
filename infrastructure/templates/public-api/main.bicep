@@ -6,6 +6,7 @@ import {
   StaticWebAppSku
   ContainerAppWorkloadProfile
   PostgreSqlFlexibleServerConfig
+  PublicApiStorageAccountConfig
 } from 'types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
@@ -14,8 +15,15 @@ param subscription string = ''
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
 
-@description('Public API Storage : Size of the file share in GB.')
-param publicApiDataFileShareQuotaGbs int = 1
+@description('Public API Storage configuration.')
+param publicApiStorageConfig PublicApiStorageAccountConfig = {
+  kind: 'FileStorage'
+  sku: 'Premium_ZRS'
+  fileShare: {
+    quotaGbs: 100
+    accessTier: 'Premium'
+  }
+}
 
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
@@ -250,7 +258,7 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
   params: {
     location: location
     resourceNames: resourceNames
-    publicApiDataFileShareQuotaGbs: publicApiDataFileShareQuotaGbs
+    config: publicApiStorageConfig
     storageFirewallRules: maintenanceIpRanges
     deployAlerts: deployAlerts
     tagValues: tagValues

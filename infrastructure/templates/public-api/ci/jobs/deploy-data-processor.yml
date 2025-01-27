@@ -24,7 +24,7 @@ jobs:
             - template: ../tasks/bicep-output-variables.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
-
+                
             # We do config updates out of Bicep template so we can implement slot swapping.
             # Changes are first deployed to the staging slot and combined with a fresh
             # code deploy prior to being swapped with the production slot.
@@ -73,6 +73,9 @@ jobs:
                 maxAttempts: 20
                 accessTokenScope: $(dataProcessorAppRegistrationClientId)
                 endpoint: $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck
+                # We allow 404s because if this is the first time the Function App is being deployed, there won't be any
+                # deployed code yet in the staging slot.
+                allow404s: true
 
             - task: AzureCLI@2
               displayName: Deploy to staging slot

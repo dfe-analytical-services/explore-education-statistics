@@ -44,21 +44,12 @@ jobs:
                 deployAlerts: false
                 dataProcessorExists: false
 
-            - task: AzureCLI@2
-              displayName: Check if Data Processor Function App exists
-              inputs:
-                azureSubscription: ${{ parameters.serviceConnection }}
-                scriptType: bash
-                scriptLocation: inlineScript
-                inlineScript: |
-                  set -e
-                  dataProcessorExists=`az functionapp list --resource-group $(resourceGroupName) --query "[?name=='$(dataProcessorFunctionAppName)']" | jq '. != []'`
-      
-                  if [[ "$dataProcessorExists" == "true" ]]; then
-                    echo "Data Processor Function App exists"
-                  fi
-      
-                  echo "##vso[task.setvariable variable=dataProcessorExists;]$dataProcessorExists"
+            - template: ../tasks/check-function-app-exists.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                functionAppName: $(dataProcessorFunctionAppName)
+                variableName: dataProcessorExists
 
             - template: ../tasks/deploy-bicep.yml
               parameters:

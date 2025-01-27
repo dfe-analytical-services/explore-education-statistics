@@ -1,4 +1,4 @@
-import { ResourceNames, IpRange } from '../../types.bicep'
+import { ResourceNames, IpRange, PublicApiStorageAccountConfig } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -6,10 +6,10 @@ param resourceNames ResourceNames
 @description('Specifies the location for all resources.')
 param location string
 
-@description('Public API Storage : Size of the file share in GB.')
-param publicApiDataFileShareQuotaGbs int
+@description('Public API storage account and file share configuration.')
+param config PublicApiStorageAccountConfig
 
-@description('Public API Storage : Firewall rules.')
+@description('Firewall rules.')
 param storageFirewallRules IpRange[]
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
@@ -34,7 +34,8 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
     storageAccountName: resourceNames.publicApi.publicApiStorageAccount
     publicNetworkAccessEnabled: false
     firewallRules: storageFirewallRules
-    skuStorageResource: 'Standard_LRS'
+    sku: config.sku
+    kind: config.kind
     keyVaultName: resourceNames.existingResources.keyVault
     alerts: deployAlerts ? {
       availability: true
@@ -52,9 +53,9 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
   name: 'fileShareDeploy'
   params: {
     fileShareName: resourceNames.publicApi.publicApiFileShare
-    fileShareQuotaGbs: publicApiDataFileShareQuotaGbs
+    fileShareQuotaGbs: config.fileShare.quotaGbs
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
-    fileShareAccessTier: 'TransactionOptimized'
+    fileShareAccessTier: config.fileShare.accessTier
     alerts: deployAlerts ? {
       availability: true
       latency: true
