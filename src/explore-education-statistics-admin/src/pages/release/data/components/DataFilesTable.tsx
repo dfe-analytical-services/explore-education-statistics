@@ -19,71 +19,38 @@ import {
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
-import ReorderableList from '@common/components/ReorderableList';
-import reorder from '@common/utils/reorder';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { generatePath } from 'react-router';
 import styles from './DataFilesTable.module.scss';
 
 interface Props {
+  canUpdateRelease?: boolean;
+  caption: string;
   dataFiles: DataFile[];
   publicationId: string;
   releaseId: string;
-  canUpdateRelease?: boolean;
-  isReordering: boolean;
-  onCancelReordering: () => void;
-  onConfirmReordering: (nextSeries: DataFile[]) => void;
+  testId?: string;
   onDeleteFile: (dataFile: DataFile) => Promise<void>;
   onStatusChange: (
     dataFile: DataFile,
-    { totalRows, status }: DataFileImportStatus,
+    importStatus: DataFileImportStatus,
   ) => Promise<void>;
 }
 
 export default function DataFilesTable({
-  dataFiles: initialDataFiles,
+  canUpdateRelease,
+  caption,
+  dataFiles,
   publicationId,
   releaseId,
-  canUpdateRelease,
-  isReordering,
-  onCancelReordering,
-  onConfirmReordering,
+  testId,
   onDeleteFile,
   onStatusChange,
 }: Props) {
-  const [dataFiles, setDataFiles] = useState(initialDataFiles);
-
-  useEffect(() => {
-    setDataFiles(initialDataFiles);
-  }, [initialDataFiles]);
-
-  if (isReordering) {
-    return (
-      <ReorderableList
-        heading="Reorder data files"
-        id="dataFiles"
-        list={dataFiles.map(({ id, title }) => ({
-          id,
-          label: title,
-        }))}
-        onCancel={() => {
-          setDataFiles(initialDataFiles);
-          onCancelReordering();
-        }}
-        onConfirm={() => onConfirmReordering(dataFiles)}
-        onMoveItem={({ prevIndex, nextIndex }) => {
-          const reordered = reorder(dataFiles, prevIndex, nextIndex);
-          setDataFiles(reordered);
-        }}
-        onReverse={() => {
-          setDataFiles(dataFiles.toReversed());
-        }}
-      />
-    );
-  }
-
   return (
-    <table className={styles.table} data-testid="Data files table">
+    <table className={styles.table} data-testid={testId}>
+      <caption className="govuk-table__caption--m">{caption}</caption>
+
       <thead>
         <tr>
           <th scope="col">Title</th>
