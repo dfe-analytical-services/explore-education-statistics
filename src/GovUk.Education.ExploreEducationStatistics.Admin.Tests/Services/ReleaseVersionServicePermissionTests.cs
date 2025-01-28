@@ -185,7 +185,7 @@ public class ReleaseVersionServicePermissionTests
                         .ReturnsAsync(true);
 
                     userService
-                        .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificReleaseVersion))
+                        .Setup(s => s.MatchesPolicy(releaseVersion, CanUpdateSpecificReleaseVersion))
                         .ReturnsAsync(true);
 
                     userService
@@ -244,7 +244,7 @@ public class ReleaseVersionServicePermissionTests
                         .ReturnsAsync(true);
 
                     userService
-                        .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificReleaseVersion))
+                        .Setup(s => s.MatchesPolicy(releaseVersion, CanUpdateSpecificReleaseVersion))
                         .ReturnsAsync(true);
 
                     userService
@@ -360,7 +360,7 @@ public class ReleaseVersionServicePermissionTests
             AdminMapper(),
             MockUtils.MockPersistenceHelper<ContentDbContext>().Object,
             userService,
-            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
+            releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext, statisticsDbContext),
             Mock.Of<IReleaseCacheService>(),
             Mock.Of<IReleaseFileRepository>(),
             Mock.Of<IReleaseDataFileService>(),
