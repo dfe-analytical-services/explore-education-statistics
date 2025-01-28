@@ -175,6 +175,7 @@ export default function MapGeoJSON({
           ref={ukRef}
         />
       )}
+
       {features && (
         <GeoJSON
           ref={geometryRef}

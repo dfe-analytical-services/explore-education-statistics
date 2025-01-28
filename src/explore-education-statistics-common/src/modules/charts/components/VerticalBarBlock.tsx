@@ -4,12 +4,11 @@ import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import useLegend from '@common/modules/charts/components/hooks/useLegend';
 import createReferenceLine from '@common/modules/charts/components/utils/createReferenceLine';
 import {
-  AxisConfiguration,
   ChartDefinition,
   StackedBarProps,
+  VerticalBarChartConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
@@ -51,26 +50,21 @@ import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 const chartBottomMargin = 20;
 
 export interface VerticalBarProps extends StackedBarProps {
-  legend: LegendConfiguration;
-  axes: {
-    major: AxisConfiguration;
-    minor: AxisConfiguration;
-  };
+  chartConfig: VerticalBarChartConfig;
 }
 
-const VerticalBarBlock = ({
-  alt,
-  axes,
-  barThickness,
-  data,
-  height,
-  includeNonNumericData,
-  legend,
-  meta,
-  showDataLabels,
-  stacked,
-  width,
-}: VerticalBarProps) => {
+const VerticalBarBlock = ({ chartConfig, data, meta }: VerticalBarProps) => {
+  const {
+    alt,
+    axes,
+    barThickness,
+    height,
+    includeNonNumericData,
+    legend,
+    showDataLabels,
+    stacked,
+    width,
+  } = chartConfig;
   const { isMedia: isDesktopMedia } = useDesktopMedia();
   const [xAxisTickWidth, setXAxisTickWidth] = useState<number>();
   const containerRef = useRef<RefObject<HTMLDivElement>>(null);

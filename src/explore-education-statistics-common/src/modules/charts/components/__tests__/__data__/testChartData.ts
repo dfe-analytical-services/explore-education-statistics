@@ -1,7 +1,18 @@
+import {
+  HorizontalBarChartConfig,
+  LineChartConfig,
+  VerticalBarChartConfig,
+} from '@common/modules/charts/types/chart';
 import { TableDataResponse } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 
-export const testChartConfiguration: Chart = {
+export const testLineChartConfig: LineChartConfig = {
+  type: 'line',
+  title: 'Aggregated results chart',
+  alt: 'Some alt text',
+  height: 300,
+  width: 600,
+  includeNonNumericData: false,
+  showDataLabels: false,
   legend: {
     position: 'top',
     items: [
@@ -87,11 +98,107 @@ export const testChartConfiguration: Chart = {
       tickConfig: 'default',
     },
   },
-  type: 'line',
+};
+
+export const testHorizontalBarChartConfig: HorizontalBarChartConfig = {
+  type: 'horizontalbar',
   title: 'Aggregated results chart',
   alt: 'Some alt text',
   height: 300,
   width: 600,
+  stacked: false,
+  includeNonNumericData: false,
+  showDataLabels: false,
+  legend: {
+    position: 'top',
+    items: [
+      {
+        dataSet: {
+          indicator: 'unauthorised-absence-rate',
+          filters: ['characteristic-total', 'school-type-total'],
+        },
+        label: 'Unauthorised absence rate',
+        colour: '#4763a5',
+        symbol: 'circle',
+        lineStyle: 'solid',
+      },
+      {
+        dataSet: {
+          indicator: 'overall-absence-rate',
+          filters: ['characteristic-total', 'school-type-total'],
+        },
+        label: 'Overall absence rate',
+        colour: '#f5a450',
+        symbol: 'cross',
+        lineStyle: 'solid',
+      },
+      {
+        dataSet: {
+          indicator: 'authorised-absence-rate',
+          filters: ['characteristic-total', 'school-type-total'],
+        },
+        label: 'Authorised absence rate',
+        colour: '#005ea5',
+        symbol: 'diamond',
+        lineStyle: 'solid',
+      },
+    ],
+  },
+  axes: {
+    major: {
+      type: 'major',
+      groupBy: 'timePeriod',
+      sortAsc: true,
+      referenceLines: [],
+      dataSets: [
+        {
+          indicator: 'unauthorised-absence-rate',
+          filters: ['characteristic-total', 'school-type-total'],
+          location: {
+            level: 'country',
+            value: 'england',
+          },
+        },
+        {
+          indicator: 'overall-absence-rate',
+          filters: ['characteristic-total', 'school-type-total'],
+          location: {
+            level: 'country',
+            value: 'england',
+          },
+        },
+        {
+          indicator: 'authorised-absence-rate',
+          filters: ['characteristic-total', 'school-type-total'],
+          location: {
+            level: 'country',
+            value: 'england',
+          },
+        },
+      ],
+      visible: true,
+      size: 50,
+      showGrid: true,
+      tickConfig: 'default',
+    },
+    minor: {
+      type: 'major',
+      groupBy: 'timePeriod',
+      referenceLines: [],
+      dataSets: [],
+      sortAsc: true,
+      visible: true,
+      size: 50,
+      showGrid: true,
+      min: 0,
+      tickConfig: 'default',
+    },
+  },
+};
+
+export const testVerticalBarChartConfig: VerticalBarChartConfig = {
+  ...testHorizontalBarChartConfig,
+  type: 'verticalbar',
 };
 
 export const testChartTableData: TableDataResponse = {

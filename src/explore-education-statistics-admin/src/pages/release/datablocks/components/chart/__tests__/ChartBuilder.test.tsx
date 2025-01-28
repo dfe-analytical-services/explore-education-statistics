@@ -5,7 +5,7 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import render from '@common-test/render';
-import { Chart } from '@common/services/types/blocks';
+import { ChartConfig } from '@common/modules/charts/types/chart';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -360,7 +360,7 @@ describe('ChartBuilder', () => {
   });
 
   test('calls `onTableQueryUpdate` when change boundary level', async () => {
-    const testInitialChart: Chart = {
+    const testInitialChart: ChartConfig = {
       type: 'map',
       boundaryLevel: 2,
       map: {
@@ -443,15 +443,48 @@ describe('ChartBuilder', () => {
 
     await user.click(screen.getByRole('tab', { name: 'Boundary levels' }));
 
-    await user.selectOptions(screen.getByLabelText('Boundary level'), ['1']);
+    await user.selectOptions(screen.getByLabelText('Default boundary level'), [
+      '1',
+    ]);
 
     expect(handleUpdate).toHaveBeenCalledWith({ boundaryLevel: 1 });
   });
 
   describe('data groupings tab', () => {
-    const testInitialChart: Chart = {
+    const testInitialChart: ChartConfig = {
       type: 'map',
       boundaryLevel: 2,
+      legend: {
+        items: [
+          {
+            colour: '#12436D',
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2014_AY',
+            },
+            inlinePosition: undefined,
+            label:
+              'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2014/15)',
+            lineStyle: undefined,
+            symbol: undefined,
+          },
+          {
+            colour: '#F46A25',
+            dataSet: {
+              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+              indicator: 'authorised-absence-sessions',
+              timePeriod: '2015_AY',
+            },
+            inlinePosition: undefined,
+            label:
+              'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2015/16)',
+            lineStyle: undefined,
+            symbol: undefined,
+          },
+        ],
+        position: 'bottom',
+      },
       map: {
         dataSetConfigs: [
           {
@@ -496,19 +529,12 @@ describe('ChartBuilder', () => {
           dataSets: [
             {
               order: 0,
-              indicator: 'overall-absence-sessions',
-              filters: ['state-funded-primary'],
-              timePeriod: '2014_AY',
-            },
-
-            {
-              order: 1,
               filters: ['ethnicity-major-chinese', 'state-funded-primary'],
               indicator: 'authorised-absence-sessions',
               timePeriod: '2014_AY',
             },
             {
-              order: 2,
+              order: 1,
               filters: ['ethnicity-major-chinese', 'state-funded-primary'],
               indicator: 'authorised-absence-sessions',
               timePeriod: '2015_AY',
@@ -527,37 +553,6 @@ describe('ChartBuilder', () => {
           tickConfig: 'default',
           tickSpacing: 1,
         },
-      },
-      legend: {
-        items: [
-          {
-            colour: '#12436D',
-            dataSet: {
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-              timePeriod: '2014_AY',
-            },
-            inlinePosition: undefined,
-            label:
-              'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2014/15)',
-            lineStyle: undefined,
-            symbol: undefined,
-          },
-          {
-            colour: '#F46A25',
-            dataSet: {
-              filters: ['ethnicity-major-chinese', 'state-funded-primary'],
-              indicator: 'authorised-absence-sessions',
-              timePeriod: '2015_AY',
-            },
-            inlinePosition: undefined,
-            label:
-              'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, 2015/16)',
-            lineStyle: undefined,
-            symbol: undefined,
-          },
-        ],
-        position: 'bottom',
       },
     };
 

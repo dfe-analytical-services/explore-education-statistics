@@ -40,23 +40,31 @@ describe('ChartRenderer', () => {
   };
   const testFullTableMeta = mapFullTable(testChartTableData);
   const testMapChartRenderer: ChartRendererProps = {
-    type: 'map',
-    meta: testFullTableMeta.subjectMeta,
-    data: testFullTableMeta.results,
-    alt: '',
-    height: 100,
-    axes: {
-      major: testAxisConfiguration,
+    id: 'test-id',
+    fullChart: {
+      type: 'map',
+      meta: testFullTableMeta.subjectMeta,
+      data: testFullTableMeta.results,
+      onBoundaryLevelChange: async () => undefined,
+      chartConfig: {
+        type: 'map',
+        alt: '',
+        includeNonNumericData: false,
+        height: 100,
+        axes: {
+          major: testAxisConfiguration,
+        },
+        legend: {
+          items: [],
+        },
+        boundaryLevel: 1,
+        map: { dataSetConfigs: [] },
+      },
     },
-    legend: {
-      items: [],
-    },
-    boundaryLevel: 1,
-    map: { dataSetConfigs: [] },
   };
 
   test('renders auto-generated boundary level footnote successfully', async () => {
-    render(<ChartRenderer id="test-id" {...testMapChartRenderer} />);
+    render(<ChartRenderer {...testMapChartRenderer} />);
     const footnotes = screen.queryByTestId('footnotes');
     expect(footnotes).toBeInTheDocument();
     expect(footnotes).toHaveTextContent(

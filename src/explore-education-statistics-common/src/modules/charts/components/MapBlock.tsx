@@ -1,4 +1,6 @@
 import { SelectOption } from '@common/components/form/FormSelect';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import useToggle from '@common/hooks/useToggle';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import MapControls from '@common/modules/charts/components/MapControls';
 import MapGeoJSON from '@common/modules/charts/components/MapGeoJSON';
@@ -12,24 +14,23 @@ import { LegendDataGroup } from '@common/modules/charts/components/utils/generat
 import {
   AxisConfiguration,
   ChartDefinition,
-  ChartProps,
-  DataGroupingType,
-  MapConfig,
+  FullChart,
+  MapChartConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import getMapDataSetCategoryConfigs, {
   MapDataSetCategoryConfig,
 } from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import { GeoJsonFeatureProperties } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
-import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
+import generateDataSetKey from '../util/generateDataSetKey';
+import orderMapLegendItems from './utils/orderMapLegendItems';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -45,19 +46,10 @@ export type MapFeatureCollection = FeatureCollection<
   MapFeatureProperties
 >;
 
-export interface MapBlockProps extends ChartProps {
-  axes: {
-    major: AxisConfiguration;
-  };
-  // dataGroups & dataClassification to be removed when
-  // migrate old maps to use the new config
-  // https://dfedigital.atlassian.net/browse/EES-4271
-  dataGroups?: number;
-  dataClassification?: DataGroupingType;
+export interface MapBlockProps extends FullChart {
   id: string;
-  legend: LegendConfiguration;
-  map?: MapConfig;
-  position?: { lat: number; lng: number };
+  chartConfig: MapChartConfig;
+  onBoundaryLevelChange: (boundaryLevel: number) => Promise<void>;
 }
 
 export const mapBlockDefinition: ChartDefinition = {
@@ -110,18 +102,25 @@ export const mapBlockDefinition: ChartDefinition = {
 
 export default function MapBlock({
   id,
-  dataGroups: deprecatedDataGroups,
-  dataClassification: deprecatedDataClassification,
+  chartConfig,
   data,
-  map,
   meta,
-  legend,
-  position = { lat: 53.00986, lng: -3.2524038 },
-  width,
-  height,
-  axes,
-  title,
+  onBoundaryLevelChange,
 }: MapBlockProps) {
+  const {
+    dataGroups: deprecatedDataGroups,
+    dataClassification: deprecatedDataClassification,
+    map,
+    legend,
+    width,
+    height,
+    axes,
+    title,
+    boundaryLevel,
+  } = chartConfig;
+  const [isBoundaryLevelChanging, toggleBoundaryLevelChanging] =
+    useToggle(false);
+
   const axisMajor = useMemo<AxisConfiguration>(
     () => ({
       ...axes.major,
@@ -131,10 +130,9 @@ export default function MapBlock({
     [axes.major],
   );
 
-  const dataSetCategories = useMemo<MapDataSetCategory[]>(
-    () => createMapDataSetCategories(axisMajor, data, meta),
-    [axisMajor, data, meta],
-  );
+  const dataSetCategories = useMemo<MapDataSetCategory[]>(() => {
+    return createMapDataSetCategories(axisMajor, data, meta);
+  }, [axisMajor, data, meta]);
 
   const dataSetCategoryConfigs = useMemo<Dictionary<MapDataSetCategoryConfig>>(
     () =>
@@ -160,14 +158,22 @@ export default function MapBlock({
   );
 
   const dataSetOptions = useMemo<SelectOption[]>(() => {
-    return naturalOrderBy(
-      Object.values(dataSetCategoryConfigs).map(dataSet => ({
-        label: dataSet.config.label,
-        value: dataSet.dataKey,
-      })),
-      ['label'],
+    const dataSetKeys = orderMapLegendItems(legend).map(({ dataSet }) =>
+      generateDataSetKey(dataSet),
     );
-  }, [dataSetCategoryConfigs]);
+    return dataSetKeys
+      .map(key => {
+        const dataSet: MapDataSetCategoryConfig | undefined =
+          dataSetCategoryConfigs[key];
+        return dataSet
+          ? {
+              label: dataSet.config.label,
+              value: dataSet.dataKey,
+            }
+          : undefined;
+      })
+      .filter(item => item !== undefined);
+  }, [dataSetCategoryConfigs, legend]);
 
   const [selectedDataSetKey, setSelectedDataSetKey] = useState<string>(
     (dataSetOptions[0]?.value as string) ?? '',
@@ -197,14 +203,43 @@ export default function MapBlock({
       setFeatures(newFeatures);
       setLegendDataGroups(newDataGroups);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dataSetCategories,
     dataSetCategoryConfigs,
-    meta,
     selectedDataSetConfig,
     selectedDataSetKey,
   ]);
+
+  const handleLocationChange = useCallback(
+    (value: string) => {
+      setSelectedFeature(features?.features.find(feat => feat.id === value));
+    },
+    [features],
+  );
+
+  const handleDataSetChange = useCallback(
+    async (value: string) => {
+      setSelectedDataSetKey(value);
+
+      const prevBoundaryLevel =
+        selectedDataSetConfig?.boundaryLevel ?? boundaryLevel;
+      const nextBoundaryLevel =
+        dataSetCategoryConfigs[value].boundaryLevel ?? boundaryLevel;
+
+      if (nextBoundaryLevel !== prevBoundaryLevel) {
+        toggleBoundaryLevelChanging.on();
+        await onBoundaryLevelChange(nextBoundaryLevel);
+        toggleBoundaryLevelChanging.off();
+      }
+    },
+    [
+      dataSetCategoryConfigs,
+      boundaryLevel,
+      onBoundaryLevelChange,
+      toggleBoundaryLevelChanging,
+      selectedDataSetConfig,
+    ],
+  );
 
   if (
     data === undefined ||
@@ -223,24 +258,27 @@ export default function MapBlock({
         selectedDataSetKey={selectedDataSetKey}
         selectedLocation={selectedFeature?.id?.toString()}
         title={title}
-        onChangeDataSet={setSelectedDataSetKey}
-        onChangeLocation={value => {
-          const feature = features?.features.find(feat => feat.id === value);
-          return feature
-            ? setSelectedFeature(feature)
-            : setSelectedFeature(undefined);
-        }}
+        onChangeDataSet={handleDataSetChange}
+        onChangeLocation={handleLocationChange}
       />
 
       <div className="govuk-grid-row govuk-!-margin-bottom-4">
-        <div className="govuk-grid-column-two-thirds">
+        <div
+          className={classNames(
+            'govuk-grid-column-two-thirds',
+            styles.mapWrapper,
+            {
+              [styles.mapLoading]: isBoundaryLevelChanging,
+            },
+          )}
+        >
           <MapContainer
             style={{
               width: (width && `${width}px`) || '100%',
               height: `${height || 600}px`,
             }}
             className={classNames(styles.map, 'dfe-print-break-avoid')}
-            center={position}
+            center={{ lat: 53.00986, lng: -3.2524038 }}
             minZoom={5}
             zoom={5}
           >
@@ -254,7 +292,16 @@ export default function MapBlock({
               onSelectFeature={setSelectedFeature}
             />
           </MapContainer>
+          <LoadingSpinner
+            className={styles.mapSpinner}
+            loading={isBoundaryLevelChanging}
+            text="Loading map"
+            size="xl"
+            hideText
+            alert
+          />
         </div>
+
         {selectedDataSetConfig && (
           <div className="govuk-grid-column-one-third">
             <MapLegend

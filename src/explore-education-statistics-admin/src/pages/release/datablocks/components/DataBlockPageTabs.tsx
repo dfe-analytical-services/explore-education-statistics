@@ -9,11 +9,13 @@ import dataBlocksService, {
   CreateReleaseDataBlock,
   ReleaseDataBlock,
 } from '@admin/services/dataBlockService';
+import featuredTableService from '@admin/services/featuredTableService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import getMapInitialBoundaryLevel from '@common/modules/charts/components/utils/getMapInitialBoundaryLevel';
 import isOrphanedDataSet from '@common/modules/charts/util/isOrphanedDataSet';
 import { InitialTableToolState } from '@common/modules/table-tool/components/TableToolWizard';
 import getInitialStepSubjectMeta from '@common/modules/table-tool/components/utils/getInitialStepSubjectMeta';
@@ -29,7 +31,6 @@ import minDelay from '@common/utils/minDelay';
 import { produce } from 'immer';
 import omit from 'lodash/omit';
 import React, { useCallback, useState } from 'react';
-import featuredTableService from '@admin/services/featuredTableService';
 
 export type SavedDataBlock = CreateReleaseDataBlock & {
   id?: string;
@@ -78,14 +79,12 @@ const DataBlockPageTabs = ({
       releaseId,
     };
 
-    const boundaryLevel =
-      dataBlock.charts[0]?.type === 'map'
-        ? dataBlock.charts[0].boundaryLevel
-        : undefined;
     const tableData = await tableBuilderService.getTableData(
       query,
       releaseId,
-      boundaryLevel,
+      dataBlock.charts[0]?.type === 'map'
+        ? getMapInitialBoundaryLevel(dataBlock.charts[0])
+        : undefined,
     );
 
     const { initialStep, subjectMeta } = await getInitialStepSubjectMeta(
@@ -250,29 +249,31 @@ const DataBlockPageTabs = ({
   const handleDataBlockSourceSave: DataBlockSourceWizardSaveHandler =
     useCallback(
       async ({ query, table, tableHeaders, details }) => {
-        const charts = produce(dataBlock?.charts ?? [], draft => {
-          const majorAxis = draft[0]?.axes?.major;
-          const legend = draft[0]?.legend;
-
+        const charts = produce(dataBlock?.charts ?? [], ([draft]) => {
           // If old chart title is the same as the old table title, then the chart title is defaulting to
           // the table title, so don't inadvertently set the old chart/table title
           if (
             dataBlock?.charts[0] &&
             dataBlock?.charts[0]?.title === dataBlock?.heading
           ) {
-            draft[0].title = undefined;
+            draft.title = undefined;
           }
 
-          // Remove data sets that are no longer applicable to a given table's subject meta.
-          if (majorAxis?.dataSets) {
-            majorAxis.dataSets = majorAxis.dataSets.filter(
-              dataSet => !isOrphanedDataSet(dataSet, table.subjectMeta),
-            );
-          }
-          if (legend?.items) {
-            legend.items = legend.items.filter(
-              item => !isOrphanedDataSet(item.dataSet, table.subjectMeta),
-            );
+          if (draft && draft.type !== 'infographic') {
+            const majorAxis = draft.axes?.major;
+            const legend = draft?.legend;
+
+            // Remove data sets that are no longer applicable to a given table's subject meta.
+            if (majorAxis.dataSets) {
+              majorAxis.dataSets = majorAxis.dataSets.filter(
+                dataSet => !isOrphanedDataSet(dataSet, table.subjectMeta),
+              );
+            }
+            if (legend.items) {
+              legend.items = legend.items.filter(
+                item => !isOrphanedDataSet(item.dataSet, table.subjectMeta),
+              );
+            }
           }
         });
 

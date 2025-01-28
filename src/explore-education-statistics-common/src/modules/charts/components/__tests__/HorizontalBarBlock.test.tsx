@@ -1,11 +1,11 @@
 import {
-  testChartConfiguration,
   testChartTableData,
+  testHorizontalBarChartConfig,
 } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
-import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
-import { VerticalBarProps } from '@common/modules/charts/components/VerticalBarBlock';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import HorizontalBarBlock, {
+  HorizontalBarProps,
+} from '@common/modules/charts/components/HorizontalBarBlock';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -14,16 +14,13 @@ jest.mock('recharts/lib/util/LogUtils');
 
 describe('HorizontalBarBlock', () => {
   const fullTable = mapFullTable(testChartTableData);
-  const props: VerticalBarProps = {
-    ...testChartConfiguration,
-    legend: testChartConfiguration.legend as LegendConfiguration,
-    axes: testChartConfiguration.axes as VerticalBarProps['axes'],
+  const props: HorizontalBarProps = {
+    chartConfig: testHorizontalBarChartConfig,
     meta: fullTable.subjectMeta,
     data: fullTable.results,
-    dataLabelPosition: 'inside',
   };
 
-  const { axes } = props;
+  const { chartConfig } = props;
 
   test('renders basic chart correctly', async () => {
     const { container } = render(<HorizontalBarBlock {...props} />);
@@ -69,11 +66,14 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          ...axes,
-          major: {
-            ...axes.major,
-            visible: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...chartConfig.axes,
+            major: {
+              ...chartConfig.axes.major,
+              visible: false,
+            },
           },
         }}
       />,
@@ -88,11 +88,14 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          ...axes,
-          minor: {
-            ...axes.minor,
-            visible: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...chartConfig.axes,
+            minor: {
+              ...chartConfig.axes.minor,
+              visible: false,
+            },
           },
         }}
       />,
@@ -107,15 +110,17 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          ...axes,
-          minor: {
-            ...axes.minor,
-            visible: false,
-          },
-          major: {
-            ...axes.major,
-            visible: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: {
+              ...chartConfig.axes.minor,
+              visible: false,
+            },
+            major: {
+              ...chartConfig.axes.major,
+              visible: false,
+            },
           },
         }}
       />,
@@ -134,9 +139,9 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        legend={{
-          ...props.legend,
-          position: 'none',
+        chartConfig={{
+          ...chartConfig,
+          legend: { ...props.chartConfig.legend, position: 'none' },
         }}
       />,
     );
@@ -150,15 +155,18 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          ...props.axes,
-          minor: {
-            ...props.axes.minor,
-            min: -10,
-            max: 20,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...props.chartConfig.axes,
+            minor: {
+              ...props.chartConfig.axes.minor,
+              min: -10,
+              max: 20,
+            },
           },
+          stacked: true,
         }}
-        stacked
       />,
     );
 
@@ -171,16 +179,19 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          ...props.axes,
-          major: {
-            ...props.axes.major,
-            referenceLines: [
-              {
-                label: 'hello',
-                position: '2014_AY',
-              },
-            ],
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...props.chartConfig.axes,
+            major: {
+              ...props.chartConfig.axes.major,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: '2014_AY',
+                },
+              ],
+            },
           },
         }}
       />,
@@ -194,16 +205,19 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          ...props.axes,
-          minor: {
-            ...props.axes.minor,
-            referenceLines: [
-              {
-                label: 'hello',
-                position: 0,
-              },
-            ],
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...props.chartConfig.axes,
+            minor: {
+              ...props.chartConfig.axes.minor,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: 0,
+                },
+              ],
+            },
           },
         }}
       />,
@@ -215,7 +229,12 @@ describe('HorizontalBarBlock', () => {
   });
 
   test('can change width of chart', () => {
-    const { container } = render(<HorizontalBarBlock {...props} width={200} />);
+    const { container } = render(
+      <HorizontalBarBlock
+        {...props}
+        chartConfig={{ ...chartConfig, width: 200 }}
+      />,
+    );
 
     const responsiveContainer = container.querySelector(
       '.recharts-responsive-container',
@@ -231,7 +250,10 @@ describe('HorizontalBarBlock', () => {
 
   test('can change height of chart', () => {
     const { container } = render(
-      <HorizontalBarBlock {...props} height={200} />,
+      <HorizontalBarBlock
+        {...props}
+        chartConfig={{ ...chartConfig, height: 200 }}
+      />,
     );
 
     const responsiveContainer = container.querySelector(
@@ -250,11 +272,14 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          major: props.axes.major,
-          minor: {
-            ...props.axes.minor,
-            tickConfig: 'default',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            major: props.chartConfig.axes.major,
+            minor: {
+              ...props.chartConfig.axes.minor,
+              tickConfig: 'default',
+            },
           },
         }}
       />,
@@ -267,11 +292,14 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          major: props.axes.major,
-          minor: {
-            ...props.axes.minor,
-            tickConfig: 'startEnd',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            major: props.chartConfig.axes.major,
+            minor: {
+              ...props.chartConfig.axes.minor,
+              tickConfig: 'startEnd',
+            },
           },
         }}
       />,
@@ -284,12 +312,15 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          major: props.axes.major,
-          minor: {
-            ...props.axes.minor,
-            tickConfig: 'custom',
-            tickSpacing: 1,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            major: props.chartConfig.axes.major,
+            minor: {
+              ...props.chartConfig.axes.minor,
+              tickConfig: 'custom',
+              tickSpacing: 1,
+            },
           },
         }}
       />,
@@ -302,11 +333,14 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            tickConfig: 'default',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: props.chartConfig.axes.minor,
+            major: {
+              ...props.chartConfig.axes.major,
+              tickConfig: 'default',
+            },
           },
         }}
       />,
@@ -327,11 +361,14 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            tickConfig: 'startEnd',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: props.chartConfig.axes.minor,
+            major: {
+              ...props.chartConfig.axes.major,
+              tickConfig: 'startEnd',
+            },
           },
         }}
       />,
@@ -344,12 +381,15 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            tickConfig: 'custom',
-            tickSpacing: 2,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: props.chartConfig.axes.minor,
+            major: {
+              ...props.chartConfig.axes.major,
+              tickConfig: 'custom',
+              tickSpacing: 2,
+            },
           },
         }}
       />,
@@ -362,12 +402,15 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            sortBy: 'name',
-            sortAsc: true,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: props.chartConfig.axes.minor,
+            major: {
+              ...props.chartConfig.axes.major,
+              sortBy: 'name',
+              sortAsc: true,
+            },
           },
         }}
       />,
@@ -388,12 +431,15 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            sortBy: 'name',
-            sortAsc: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: props.chartConfig.axes.minor,
+            major: {
+              ...props.chartConfig.axes.major,
+              sortBy: 'name',
+              sortAsc: false,
+            },
           },
         }}
       />,
@@ -414,14 +460,17 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            sortBy: 'name',
-            sortAsc: true,
-            min: 0,
-            max: 1,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: props.chartConfig.axes.minor,
+            major: {
+              ...props.chartConfig.axes.major,
+              sortBy: 'name',
+              sortAsc: true,
+              min: 0,
+              max: 1,
+            },
           },
         }}
       />,
@@ -434,18 +483,20 @@ describe('HorizontalBarBlock', () => {
     render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          ...axes,
-          major: {
-            ...axes.major,
-            label: {
-              text: 'Test axis label 1',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            major: {
+              ...chartConfig.axes.major,
+              label: {
+                text: 'Test axis label 1',
+              },
             },
-          },
-          minor: {
-            ...axes.minor,
-            label: {
-              text: 'Test axis label 2',
+            minor: {
+              ...chartConfig.axes.minor,
+              label: {
+                text: 'Test axis label 2',
+              },
             },
           },
         }}
@@ -464,15 +515,17 @@ describe('HorizontalBarBlock', () => {
     const { container } = render(
       <HorizontalBarBlock
         {...props}
-        axes={{
-          ...axes,
-          major: {
-            ...axes.major,
-            referenceLines: [{ label: 'Test label 1', position: '2015_AY' }],
-          },
-          minor: {
-            ...axes.minor,
-            referenceLines: [{ label: 'Test label 2', position: 3.4 }],
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            major: {
+              ...chartConfig.axes.major,
+              referenceLines: [{ label: 'Test label 1', position: '2015_AY' }],
+            },
+            minor: {
+              ...chartConfig.axes.minor,
+              referenceLines: [{ label: 'Test label 2', position: 3.4 }],
+            },
           },
         }}
       />,

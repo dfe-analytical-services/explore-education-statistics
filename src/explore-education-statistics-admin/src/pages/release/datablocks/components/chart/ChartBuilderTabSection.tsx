@@ -4,13 +4,13 @@ import ChartBuilder, {
 import { SavedDataBlock } from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import releaseChartFileService from '@admin/services/releaseChartFileService';
+import { ChartConfig } from '@common/modules/charts/types/chart';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import tableBuilderService, {
   ReleaseTableDataQuery,
   TableDataQuery,
 } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 import isEqual from 'lodash/isEqual';
 import React, { useCallback, useMemo } from 'react';
 
@@ -47,7 +47,7 @@ const ChartBuilderTabSection = ({
   );
 
   const handleChartSave = useCallback(
-    async (chart: Chart, file?: File) => {
+    async (chart: ChartConfig, file?: File) => {
       let chartToSave = chart;
 
       if (chart.type === 'infographic' && file) {
@@ -72,7 +72,7 @@ const ChartBuilderTabSection = ({
   );
 
   const handleChartDelete = useCallback(
-    async (chart: Chart) => {
+    async (chart: ChartConfig) => {
       // Cleanup potential infographic chart file if required
       if (chart.type === 'infographic' && chart.fileId) {
         await releaseChartFileService.deleteChartFile(releaseId, chart.fileId);

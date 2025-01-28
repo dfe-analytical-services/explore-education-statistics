@@ -1,12 +1,11 @@
 import {
-  testChartConfiguration,
   testChartTableData,
+  testLineChartConfig,
 } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import LineChartBlock, {
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -16,15 +15,13 @@ jest.mock('recharts/lib/util/LogUtils');
 describe('LineChartBlock', () => {
   const fullTable = mapFullTable(testChartTableData);
   const props: LineChartProps = {
-    ...testChartConfiguration,
-    axes: testChartConfiguration.axes as LineChartProps['axes'],
-    legend: testChartConfiguration.legend as LegendConfiguration,
+    chartConfig: testLineChartConfig,
     meta: fullTable.subjectMeta,
     data: fullTable.results,
-    dataLabelPosition: 'above',
   };
 
-  const { axes } = props;
+  const { chartConfig } = props;
+  const { axes, legend } = chartConfig;
 
   test('renders basic chart correctly', async () => {
     const { container } = render(<LineChartBlock {...props} />);
@@ -68,11 +65,14 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          ...axes,
-          major: {
-            ...axes.major,
-            visible: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            major: {
+              ...axes.major,
+              visible: false,
+            },
           },
         }}
       />,
@@ -87,11 +87,14 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          ...axes,
-          minor: {
-            ...axes.minor,
-            visible: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            minor: {
+              ...axes.minor,
+              visible: false,
+            },
           },
         }}
       />,
@@ -106,15 +109,18 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          ...axes,
-          minor: {
-            ...axes.minor,
-            visible: false,
-          },
-          major: {
-            ...axes.major,
-            visible: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            minor: {
+              ...axes.minor,
+              visible: false,
+            },
+            major: {
+              ...axes.major,
+              visible: false,
+            },
           },
         }}
       />,
@@ -133,9 +139,12 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        legend={{
-          ...props.legend,
-          position: 'none',
+        chartConfig={{
+          ...chartConfig,
+          legend: {
+            ...chartConfig.legend,
+            position: 'none',
+          },
         }}
       />,
     );
@@ -149,26 +158,29 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        legend={{
-          ...props.legend,
-          items: [
-            {
-              dataSet: {
-                indicator: 'unauthorised-absence-rate',
-                filters: ['characteristic-total', 'school-type-total'],
-                location: {
-                  level: 'country',
-                  value: 'england',
+        chartConfig={{
+          ...chartConfig,
+          legend: {
+            ...legend,
+            items: [
+              {
+                dataSet: {
+                  indicator: 'unauthorised-absence-rate',
+                  filters: ['characteristic-total', 'school-type-total'],
+                  location: {
+                    level: 'country',
+                    value: 'england',
+                  },
                 },
+                label: 'Unauthorised absence rate',
+                colour: '#4763a5',
+                symbol: 'circle',
+                lineStyle: 'dashed',
               },
-              label: 'Unauthorised absence rate',
-              colour: '#4763a5',
-              symbol: 'circle',
-              lineStyle: 'dashed',
-            },
-            props.legend.items[1],
-            props.legend.items[2],
-          ],
+              legend.items[1],
+              legend.items[2],
+            ],
+          },
         }}
       />,
     );
@@ -182,26 +194,29 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        legend={{
-          ...props.legend,
-          items: [
-            {
-              dataSet: {
-                indicator: 'unauthorised-absence-rate',
-                filters: ['characteristic-total', 'school-type-total'],
-                location: {
-                  level: 'country',
-                  value: 'england',
+        chartConfig={{
+          ...chartConfig,
+          legend: {
+            ...legend,
+            items: [
+              {
+                dataSet: {
+                  indicator: 'unauthorised-absence-rate',
+                  filters: ['characteristic-total', 'school-type-total'],
+                  location: {
+                    level: 'country',
+                    value: 'england',
+                  },
                 },
+                label: 'Unauthorised absence rate',
+                colour: '#4763a5',
+                symbol: 'circle',
+                lineStyle: 'dotted',
               },
-              label: 'Unauthorised absence rate',
-              colour: '#4763a5',
-              symbol: 'circle',
-              lineStyle: 'dotted',
-            },
-            props.legend.items[1],
-            props.legend.items[2],
-          ],
+              legend.items[1],
+              legend.items[2],
+            ],
+          },
         }}
       />,
     );
@@ -215,16 +230,19 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          ...props.axes,
-          major: {
-            ...props.axes.major,
-            referenceLines: [
-              {
-                label: 'hello',
-                position: '2014_AY',
-              },
-            ],
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            major: {
+              ...axes.major,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: '2014_AY',
+                },
+              ],
+            },
           },
         }}
       />,
@@ -239,18 +257,21 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          ...props.axes,
-          minor: {
-            ...props.axes.minor,
-            min: -10,
-            max: 10,
-            referenceLines: [
-              {
-                label: 'hello',
-                position: 5,
-              },
-            ],
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            minor: {
+              ...axes.minor,
+              min: -10,
+              max: 10,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: 5,
+                },
+              ],
+            },
           },
         }}
       />,
@@ -264,7 +285,10 @@ describe('LineChartBlock', () => {
   test('can change width of chart', () => {
     const propsWithSize = {
       ...props,
-      width: 200,
+      chartConfig: {
+        ...chartConfig,
+        width: 200,
+      },
     };
 
     const { container } = render(<LineChartBlock {...propsWithSize} />);
@@ -284,7 +308,10 @@ describe('LineChartBlock', () => {
   test('can change height of chart', () => {
     const propsWithSize = {
       ...props,
-      height: 200,
+      chartConfig: {
+        ...chartConfig,
+        height: 200,
+      },
     };
 
     const { container } = render(<LineChartBlock {...propsWithSize} />);
@@ -305,11 +332,14 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          major: props.axes.major,
-          minor: {
-            ...props.axes.minor,
-            tickConfig: 'default',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            major: axes.major,
+            minor: {
+              ...axes.minor,
+              tickConfig: 'default',
+            },
           },
         }}
       />,
@@ -322,11 +352,14 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          major: props.axes.major,
-          minor: {
-            ...props.axes.minor,
-            tickConfig: 'startEnd',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            major: axes.major,
+            minor: {
+              ...axes.minor,
+              tickConfig: 'startEnd',
+            },
           },
         }}
       />,
@@ -339,12 +372,15 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          major: props.axes.major,
-          minor: {
-            ...props.axes.minor,
-            tickConfig: 'custom',
-            tickSpacing: 1,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            major: axes.major,
+            minor: {
+              ...axes.minor,
+              tickConfig: 'custom',
+              tickSpacing: 1,
+            },
           },
         }}
       />,
@@ -356,11 +392,14 @@ describe('LineChartBlock', () => {
   test('can limit range of major ticks to default', () => {
     const propsWithTicks: LineChartProps = {
       ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          tickConfig: 'default',
+      chartConfig: {
+        ...chartConfig,
+        axes: {
+          minor: axes.minor,
+          major: {
+            ...axes.major,
+            tickConfig: 'default',
+          },
         },
       },
     };
@@ -382,11 +421,14 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            tickConfig: 'startEnd',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: axes.minor,
+            major: {
+              ...axes.major,
+              tickConfig: 'startEnd',
+            },
           },
         }}
       />,
@@ -398,12 +440,15 @@ describe('LineChartBlock', () => {
   test('can limit range of major ticks to custom', () => {
     const propsWithTicks: LineChartProps = {
       ...props,
-      axes: {
-        minor: props.axes.minor,
-        major: {
-          ...props.axes.major,
-          tickConfig: 'custom',
-          tickSpacing: 2,
+      chartConfig: {
+        ...chartConfig,
+        axes: {
+          minor: axes.minor,
+          major: {
+            ...axes.major,
+            tickConfig: 'custom',
+            tickSpacing: 2,
+          },
         },
       },
     };
@@ -417,12 +462,15 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            sortBy: 'name',
-            sortAsc: true,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: axes.minor,
+            major: {
+              ...axes.major,
+              sortBy: 'name',
+              sortAsc: true,
+            },
           },
         }}
       />,
@@ -443,12 +491,15 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            sortBy: 'name',
-            sortAsc: false,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: axes.minor,
+            major: {
+              ...axes.major,
+              sortBy: 'name',
+              sortAsc: false,
+            },
           },
         }}
       />,
@@ -469,14 +520,17 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          minor: props.axes.minor,
-          major: {
-            ...props.axes.major,
-            sortBy: 'name',
-            sortAsc: true,
-            min: 0,
-            max: 1,
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            minor: axes.minor,
+            major: {
+              ...axes.major,
+              sortBy: 'name',
+              sortAsc: true,
+              min: 0,
+              max: 1,
+            },
           },
         }}
       />,
@@ -489,18 +543,21 @@ describe('LineChartBlock', () => {
     render(
       <LineChartBlock
         {...props}
-        axes={{
-          ...axes,
-          major: {
-            ...axes.major,
-            label: {
-              text: 'Test axis label 1',
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            major: {
+              ...axes.major,
+              label: {
+                text: 'Test axis label 1',
+              },
             },
-          },
-          minor: {
-            ...axes.minor,
-            label: {
-              text: 'Test axis label 2',
+            minor: {
+              ...axes.minor,
+              label: {
+                text: 'Test axis label 2',
+              },
             },
           },
         }}
@@ -519,15 +576,18 @@ describe('LineChartBlock', () => {
     const { container } = render(
       <LineChartBlock
         {...props}
-        axes={{
-          ...axes,
-          major: {
-            ...axes.major,
-            referenceLines: [{ label: 'Test label 1', position: '2015_AY' }],
-          },
-          minor: {
-            ...axes.minor,
-            referenceLines: [{ label: 'Test label 2', position: 3.4 }],
+        chartConfig={{
+          ...chartConfig,
+          axes: {
+            ...axes,
+            major: {
+              ...axes.major,
+              referenceLines: [{ label: 'Test label 1', position: '2015_AY' }],
+            },
+            minor: {
+              ...axes.minor,
+              referenceLines: [{ label: 'Test label 2', position: 3.4 }],
+            },
           },
         }}
       />,
