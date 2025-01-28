@@ -185,7 +185,7 @@ var resourceNames = {
     acr: 'eesacr'
     acrResourceGroup: acrResourceGroupName
     // The Test Resource Group has broken from the naming convention of other environments for Core Storage
-    coreStorageAccount: subscription == 's101t01'
+    coreStorageAccount: subscription == 's101t01' || subscription == 's101p02'
       ? '${legacyResourcePrefix}storageeescore'
       : '${legacyResourcePrefix}saeescore'
     subnets: {
