@@ -27,11 +27,10 @@ public static class DataSetVersionQueryableExtensions
         string wildcardedVersion,
         CancellationToken cancellationToken = default)
     {
-        var parts = wildcardedVersion.Trim('v').Split('.');
-         
         if (!VersionUtils.TryParseWildcard(wildcardedVersion, out var semVersionRange)) 
             return new NotFoundResult();
-     
+        
+        var parts = wildcardedVersion.Trim('v').Split('.');
         int? major = parts[0] == "*" ? null : int.Parse(parts[0]);
         int? minor = (parts.Length > 1 && parts[1] != "*") ? int.Parse(parts[1]) : null;
         int? patch = (parts.Length > 2 && parts[2] != "*") ? int.Parse(parts[2]) : null;
