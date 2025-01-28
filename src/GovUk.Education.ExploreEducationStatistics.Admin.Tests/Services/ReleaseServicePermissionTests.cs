@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -7,8 +6,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -18,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class ReleaseServicePermissionTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     [Fact]
     public async Task CreateRelease()
     {
@@ -34,7 +37,7 @@ public class ReleaseServicePermissionTests
                     await contextDbContext.SaveChangesAsync();
 
                     var service = BuildService(
-                        contentDbContext: contextDbContext,
+                        context: contextDbContext,
                         userService: userService.Object);
 
                     return await service.CreateRelease(
@@ -47,7 +50,7 @@ public class ReleaseServicePermissionTests
             );
     }
 
-    private ReleaseService BuildReleaseService(
+    private static ReleaseService BuildService(
         IUserService userService,
         ContentDbContext? context = null,
         IReleaseVersionService? releaseVersionService = null)
