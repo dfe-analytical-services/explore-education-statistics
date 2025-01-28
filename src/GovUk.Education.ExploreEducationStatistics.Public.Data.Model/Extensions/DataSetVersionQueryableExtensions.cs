@@ -18,7 +18,7 @@ public static class DataSetVersionQueryableExtensions
     }
     /// <summary>
     /// Finds the latest version of data set based on the position of '*' within the string parameter wildcardedVersion. 
-    /// Checks which portion of the version (major, minor, or patch) is being wildcarded and based on that, it: Substitute 1 from the level above the level that's being wildcarded.
+    /// Checks which portion of the version (major, minor, or patch) is being wildcarded and based on that: it Substitute 1 from the level above the level that's being wildcarded.
     /// This is because the end of the range that Semver (library used within VersionUtils) returns defaults to one level higher above the maximum version specified but with a pre-release flag (i.e., endRange.IsPrerelease is always true)
     /// </summary>
     /// <param name="wildcardedVersion">Must contain * (representing the wildcard)</param>
