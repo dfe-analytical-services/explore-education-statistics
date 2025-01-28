@@ -63,7 +63,7 @@ user opens ie
 user opens chrome headlessly
     [Arguments]    ${alias}=headless_chrome
     ${c_opts}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-    Call Method    ${c_opts}    add_argument    headless\=old
+    Call Method    ${c_opts}    add_argument    headless
     Call Method    ${c_opts}    add_argument    start-maximized
     Call Method    ${c_opts}    add_argument    disable-extensions
     Call Method    ${c_opts}    add_argument    disable-infobars
