@@ -220,7 +220,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                             o => o.Id == filterOptionMetaLink.OptionId);
 
                         Assert.Equal(filterOptionMeta.Label, filterOptionMetaViewModel.Label);
-                        Assert.Equal(filterOptionMeta.IsAggregate, filterOptionMetaViewModel.IsAggregate);
+                        Assert.Equal(filterOptionMeta.Label == filterMeta.AutoSelectLabel, filterOptionMetaViewModel.IsAutoSelect);
                     }
                 }
 

@@ -20,6 +20,8 @@ public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffs
 
     public string Hint { get; set; } = string.Empty;
 
+    public string? AutoSelectLabel { get; set; }
+
     public List<FilterOptionMeta> Options { get; set; } = [];
 
     public List<FilterOptionMetaLink> OptionLinks { get; set; } = [];
@@ -40,6 +42,9 @@ public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffs
 
             builder.Property(m => m.Label)
                 .HasMaxLength(80);
+
+            builder.Property(m => m.AutoSelectLabel)
+                .HasMaxLength(120);
 
             builder.HasIndex(m => new { m.DataSetVersionId, m.PublicId })
                 .IsUnique();

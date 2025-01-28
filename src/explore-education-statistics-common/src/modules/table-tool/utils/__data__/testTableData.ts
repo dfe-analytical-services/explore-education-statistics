@@ -11,7 +11,7 @@ const category1GroupTotalFilter1 = new CategoryFilter({
   value: 'category-1-filter-1',
   label: 'Total',
   group: 'Total',
-  isTotal: true,
+  isAutoSelect: true,
   category: 'Category 1',
 });
 
@@ -19,7 +19,7 @@ const category1Group1Filter2 = new CategoryFilter({
   value: 'category-1-filter-2',
   label: 'Category 1 Filter 2',
   group: 'Group 1',
-  isTotal: false,
+  isAutoSelect: false,
   category: 'Category 1',
 });
 
@@ -39,7 +39,7 @@ const category1Group1Filter3 = new CategoryFilter({
   value: 'category-1-filter-3',
   label: 'Category 1 Filter 3',
   group: 'Group 1',
-  isTotal: false,
+  isAutoSelect: false,
   category: 'Category 1',
 });
 
@@ -47,7 +47,7 @@ const category2GroupDefaultFilter1 = new CategoryFilter({
   value: 'category-2-filter-1',
   label: 'Category 2 Filter 1',
   group: 'Default',
-  isTotal: false,
+  isAutoSelect: false,
   category: 'Category 2',
 });
 
@@ -55,7 +55,7 @@ const category2GroupDefaultFilter2 = new CategoryFilter({
   value: 'category-2-filter-2',
   label: 'Category 2 Filter 2',
   group: 'Default',
-  isTotal: false,
+  isAutoSelect: false,
   category: 'Category 2',
 });
 

@@ -77,7 +77,7 @@ export interface DataSetMeta {
         {
           id: string;
           label: string;
-          isAggregate: boolean;
+          isAutoSelect: boolean;
         },
       ];
       name: string;

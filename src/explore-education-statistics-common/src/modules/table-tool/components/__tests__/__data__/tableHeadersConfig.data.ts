@@ -47,14 +47,14 @@ export const testCategoryFilters: CategoryFilter[] = [
     value: 'category-1-value',
     label: 'Category 1',
     group: 'Default',
-    isTotal: false,
+    isAutoSelect: false,
     category: 'Category group',
   }),
   new CategoryFilter({
     value: 'category-2-value',
     label: 'Category 2',
     group: 'Default',
-    isTotal: false,
+    isAutoSelect: false,
     category: 'Category group',
   }),
 ];

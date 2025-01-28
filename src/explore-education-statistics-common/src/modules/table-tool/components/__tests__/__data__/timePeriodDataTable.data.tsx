@@ -5,7 +5,7 @@ export const testData1Table: TableDataResponse = {
   subjectMeta: {
     filters: {
       Characteristic: {
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         name: 'characteristic',
@@ -29,7 +29,7 @@ export const testData1Table: TableDataResponse = {
         order: 0,
       },
       SchoolType: {
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by school type',
         legend: 'School type',
         name: 'school_type',
@@ -314,7 +314,7 @@ export const testData2Table: TableDataResponse = {
   subjectMeta: {
     filters: {
       Characteristic: {
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         name: 'characteristic',
@@ -338,7 +338,7 @@ export const testData2Table: TableDataResponse = {
         order: 0,
       },
       SchoolType: {
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by school type',
         legend: 'School type',
         name: 'school_type',
@@ -564,7 +564,7 @@ export const testData3Table: TableDataResponse = {
   subjectMeta: {
     filters: {
       Characteristic: {
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         name: 'characteristic',
@@ -588,7 +588,7 @@ export const testData3Table: TableDataResponse = {
         order: 0,
       },
       SchoolType: {
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by school type',
         legend: 'School type',
         name: 'school_type',
@@ -868,7 +868,7 @@ export const testDataFiltersWithNoResults: TableDataResponse = {
     geoJsonAvailable: false,
     filters: {
       Characteristic: {
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         name: 'characteristic',
@@ -893,7 +893,7 @@ export const testDataFiltersWithNoResults: TableDataResponse = {
         order: 0,
       },
       SchoolType: {
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by school type',
         legend: 'School type',
         name: 'school_type',

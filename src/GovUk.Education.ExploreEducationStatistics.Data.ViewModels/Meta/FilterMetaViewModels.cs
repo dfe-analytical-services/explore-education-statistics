@@ -10,19 +10,17 @@ public record FilterMetaViewModel
     public Dictionary<string, FilterGroupMetaViewModel> Options { get; init; } = new();
     public string Name { get; init; } = string.Empty;
     public string? GroupCsvColumn { get; init; }
-    public Guid? TotalValue { get; init; }
+    public Guid? AutoSelectFilterItemId { get; init; }
     public int Order { get; init; }
 
-    public FilterMetaViewModel(Filter filter,
-        Guid? totalFilterItemId,
-        int order)
+    public FilterMetaViewModel(Filter filter, int order)
     {
         Id = filter.Id;
         Hint = filter.Hint;
         Legend = filter.Label;
         Name = filter.Name;
         GroupCsvColumn = filter.GroupCsvColumn;
-        TotalValue = totalFilterItemId;
+        AutoSelectFilterItemId = filter.AutoSelectFilterItemId;
         Order = order;
     }
 

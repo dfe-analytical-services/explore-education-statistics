@@ -13,23 +13,12 @@ public static class FilterOptionMetaGeneratorExtensions
     public static Generator<FilterOptionMeta> WithLabel(this Generator<FilterOptionMeta> generator, string label)
         => generator.ForInstance(s => s.SetLabel(label));
 
-    public static Generator<FilterOptionMeta> WithIsAggregate(
-        this Generator<FilterOptionMeta> generator,
-        bool? isAggregate)
-        => generator.ForInstance(s => s.SetIsAggregate(isAggregate));
-
     public static InstanceSetters<FilterOptionMeta> SetDefaults(this InstanceSetters<FilterOptionMeta> setters)
         => setters
-            .SetDefault(m => m.Label)
-            .Set(m => m.IsAggregate, false);
+            .SetDefault(m => m.Label);
 
     public static InstanceSetters<FilterOptionMeta> SetLabel(
         this InstanceSetters<FilterOptionMeta> setters,
         string label)
         => setters.Set(m => m.Label, label);
-
-    public static InstanceSetters<FilterOptionMeta> SetIsAggregate(
-        this InstanceSetters<FilterOptionMeta> setters,
-        bool? isAggregate)
-        => setters.Set(m => m.IsAggregate, isAggregate);
 }

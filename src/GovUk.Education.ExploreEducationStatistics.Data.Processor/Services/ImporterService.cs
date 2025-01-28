@@ -162,14 +162,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         fg.FilterId.Equals(filterId)
                         && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
 
-                    return new FilterItem(filterItemLabel, filterGroup.Id);
+                    return new FilterItem(filterItemLabel, filterGroup); // includes filterGroups objects in returned filterItems
                 })
                 .ToList();
-                    
+
+            var filterIds = filterGroups
+                .Select(group => group.FilterId)
+                .Distinct()
+                .ToList();
+
+            var filterIdToAutoSelectFilterItem = filterIds
+                .ToDictionary(
+                    filterId => filterId,
+                    filterId =>
+                    {
+                        var autoSelectFilterItemLabel = context.Filter
+                            .Where(f => f.Id == filterId)
+                            .Select(f => f.AutoSelectFilterItemLabel)
+                            .SingleOrDefault() ?? "Total"; // If meta file didn't specify a default, look for "Total"
+
+                        return filterItems
+                            .Where(item =>
+                                item.FilterGroup.FilterId == filterId
+                                && item.Label.Equals(autoSelectFilterItemLabel, OrdinalIgnoreCase))
+                            .Select(item => new { item.Id , item.Label})
+                            // There might be two filter items with the same label under different groups.
+                            // If so, we set no autoSelectFilterItem.
+                            .SingleOrDefault();
+                    }
+                );
+
             await _databaseHelper.DoInTransaction(context, async ctxDelegate =>
             {
-                await ctxDelegate.FilterGroup.AddRangeAsync(filterGroups);
+                // We don't add filter groups explicitly, as they are included in `filterItems`
                 await ctxDelegate.FilterItem.AddRangeAsync(filterItems);
+
+                var filters = ctxDelegate.Filter
+                    .Where(f => filterIds.Contains(f.Id))
+                    .ToList();
+                foreach (var filter in filters)
+                {
+                    var filterItem = filterIdToAutoSelectFilterItem[filter.Id];
+                    filter.AutoSelectFilterItemId = filterItem?.Id;
+                    // If filter item Total is found, AutoSelectFilterItemLabel wouldn't be set, so set it
+                    filter.AutoSelectFilterItemLabel = filterItem?.Label;
+                }
+
                 await ctxDelegate.SaveChangesAsync();
             });
 

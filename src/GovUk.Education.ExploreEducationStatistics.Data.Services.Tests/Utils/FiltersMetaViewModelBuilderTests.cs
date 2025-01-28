@@ -133,7 +133,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Equal(filters[0].Hint, filterA.Hint);
         Assert.Equal(filters[0].Label, filterA.Legend);
         Assert.Equal(filters[0].Name, filterA.Name);
-        Assert.Null(filterA.TotalValue);
+        Assert.Null(filterA.AutoSelectFilterItemId);
 
         // Verify filter A's filter groups
         var filterAGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterA.Options;
@@ -175,7 +175,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Equal(filters[1].Hint, filterB.Hint);
         Assert.Equal(filters[1].Label, filterB.Legend);
         Assert.Equal(filters[1].Name, filterB.Name);
-        Assert.Null(filterB.TotalValue);
+        Assert.Null(filterB.AutoSelectFilterItemId);
 
         // Verify filter B's filter groups
         var filterBGroups = (IDictionary<string, FilterGroupMetaViewModel>) filterB.Options;
@@ -213,12 +213,15 @@ public class FiltersMetaViewModelBuilderTests
     }
 
     [Fact]
-    public void BuildFilters_GetsTotalFilterItemId_TotalItemExistsAndSingleGroup()
+    public void BuildFilters_AutoSelectFilterItem()
     {
+        var autoSelectFilterItemId = Guid.NewGuid();
         var filter = new Filter
         {
             Id = Guid.NewGuid(),
             Label = "Filter a",
+            AutoSelectFilterItemId = autoSelectFilterItemId,
+            AutoSelectFilterItemLabel = "Total",
             FilterGroups = new List<FilterGroup>
             {
                 new()
@@ -234,7 +237,7 @@ public class FiltersMetaViewModelBuilderTests
                         },
                         new()
                         {
-                            Id = Guid.NewGuid(),
+                            Id = autoSelectFilterItemId,
                             Label = "Total"
                         }
                     }
@@ -247,182 +250,7 @@ public class FiltersMetaViewModelBuilderTests
         Assert.Single(result);
         var filterA = Assert.Contains("FilterA", result);
 
-        // Verify the total item id exists because there's only a single group despite it not being labelled "Total"
-        Assert.Equal(filter.FilterGroups[0].FilterItems[1].Id, filterA.TotalValue);
-    }
-
-    [Fact]
-    public void BuildFilters_GetsTotalFilterItemId_TotalItemExistsAndMultipleGroups()
-    {
-        var filter = new Filter
-        {
-            Id = Guid.NewGuid(),
-            Label = "Filter a",
-            FilterGroups = new List<FilterGroup>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    Label = "Group a",
-                    FilterItems = new List<FilterItem>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item a"
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item b"
-                        }
-                    }
-                },
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    Label = "Group b",
-                    FilterItems = new List<FilterItem>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item b"
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Total"
-                        }
-                    }
-                }
-            }
-        };
-
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(ListOf(filter));
-
-        Assert.Single(result);
-        var filterA = Assert.Contains("FilterA", result);
-
-        // Verify the total item id is not present because there's multiple groups none of which are labelled "Total"
-        // despite there being a "Total" filter item
-        Assert.Null(filterA.TotalValue);
-    }
-
-    [Fact]
-    public void BuildFilters_GetsTotalFilterItemId_TotalItemExistsInTotalGroup()
-    {
-        var filter = new Filter
-        {
-            Id = Guid.NewGuid(),
-            Label = "Filter a",
-            FilterGroups = new List<FilterGroup>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    Label = "Group a",
-                    FilterItems = new List<FilterItem>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item a"
-                        },
-                        // Filter item is labelled "Total" but is not in the "Total" group so is ignored
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Total"
-                        }
-                    }
-                },
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    Label = "Total",
-                    FilterItems = new List<FilterItem>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item b"
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Total"
-                        }
-                    }
-                }
-            }
-        };
-
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(ListOf(filter));
-
-        Assert.Single(result);
-        var filterA = Assert.Contains("FilterA", result);
-
-        // Verify the total item id exists because there's a "Total" filter item in a "Total" group
-        Assert.Equal(filter.FilterGroups[1].FilterItems[1].Id, filterA.TotalValue);
-    }
-
-    [Fact]
-    public void BuildFilters_GetsTotalFilterItemId_TotalGroupExistsWithoutTotalItem()
-    {
-        var filter = new Filter
-        {
-            Id = Guid.NewGuid(),
-            Label = "Filter a",
-            FilterGroups = new List<FilterGroup>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    Label = "Group a",
-                    FilterItems = new List<FilterItem>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item a"
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item b"
-                        }
-                    }
-                },
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    Label = "Total",
-                    FilterItems = new List<FilterItem>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item c"
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Label = "Item d"
-                        }
-                    }
-                }
-            }
-        };
-
-        var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(ListOf(filter));
-
-        Assert.Single(result);
-        var filterA = Assert.Contains("FilterA", result);
-
-        // Verify the total item id is not present because there's no "Total" filter item despite there being a
-        // "Total" group
-        Assert.Null(filterA.TotalValue);
+        Assert.Equal(autoSelectFilterItemId, filterA.AutoSelectFilterItemId);
     }
 
     [Fact]

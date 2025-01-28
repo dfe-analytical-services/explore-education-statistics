@@ -7,7 +7,7 @@ describe('getDefaultTableHeadersConfig', () => {
     subjectMeta: {
       filters: {
         Characteristic: {
-          totalValue: '',
+          autoSelectFilterItemId: '',
           hint: '',
           legend: 'Characteristic',
           name: 'characteristic',
@@ -31,7 +31,7 @@ describe('getDefaultTableHeadersConfig', () => {
           order: 0,
         },
         SchoolType: {
-          totalValue: '',
+          autoSelectFilterItemId: '',
           hint: 'Filter by school type',
           legend: 'School type',
           name: 'school_type',

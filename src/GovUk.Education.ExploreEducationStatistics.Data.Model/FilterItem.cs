@@ -23,6 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             FilterGroupId = filterGroupId;
         }
 
+        public FilterItem(string label, FilterGroup filterGroup)
+        {
+            Id = Guid.NewGuid();
+            Label = label;
+            FilterGroup = filterGroup;
+            FilterGroupId = filterGroup.Id;
+        }
+
         public bool Equals(FilterItem? other)
         {
             return other?.Id == Id;

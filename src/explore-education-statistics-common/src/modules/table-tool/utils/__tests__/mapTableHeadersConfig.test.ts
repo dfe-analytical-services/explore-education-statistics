@@ -72,7 +72,7 @@ describe('mapTableHeadersConfig', () => {
     subjectMeta: {
       filters: {
         Characteristic: {
-          totalValue: '',
+          autoSelectFilterItemId: '',
           hint: 'Filter by pupil characteristic',
           legend: 'Characteristic',
           name: 'characteristic',
@@ -96,7 +96,7 @@ describe('mapTableHeadersConfig', () => {
           order: 0,
         },
         SchoolType: {
-          totalValue: '',
+          autoSelectFilterItemId: '',
           hint: 'Filter by school type',
           legend: 'School type',
           name: 'school_type',

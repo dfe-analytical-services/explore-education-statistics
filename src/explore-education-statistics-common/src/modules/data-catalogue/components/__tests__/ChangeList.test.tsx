@@ -89,7 +89,7 @@ describe('ChangeList', () => {
         currentState: {
           id: 'filter-opt-3',
           label: 'Filter option 3 updated',
-          isAggregate: true,
+          isAutoSelect: true,
         },
       },
     ];
@@ -113,7 +113,7 @@ describe('ChangeList', () => {
     expect(updates[1]).toHaveTextContent('id changed to: filter-opt-2-updated');
 
     expect(updates[2]).toHaveTextContent('Filter option 3 (id: filter-opt-3)');
-    expect(updates[2]).toHaveTextContent('changed to an aggregate');
+    expect(updates[2]).toHaveTextContent('changed to be the default option');
 
     expect(
       screen.queryByRole('heading', { name: 'Deleted filter options' }),

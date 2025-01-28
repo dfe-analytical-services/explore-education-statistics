@@ -5,7 +5,7 @@ export const testTableData: TableDataResponse = {
   subjectMeta: {
     filters: {
       Characteristic: {
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         options: {
@@ -29,7 +29,7 @@ export const testTableData: TableDataResponse = {
         name: 'characteristic',
       },
       SchoolType: {
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by school type',
         legend: 'School type',
         options: {

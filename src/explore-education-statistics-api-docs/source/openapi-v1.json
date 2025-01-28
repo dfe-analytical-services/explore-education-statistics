@@ -3061,9 +3061,9 @@
             "description": "The human-readable label describing the filter option.",
             "example": "State-funded primary"
           },
-          "isAggregate": {
+          "isAutoSelect": {
             "type": "boolean",
-            "description": "Whether the filter option is an aggregate (i.e. ‘all’ or a ‘total’) of the other filter options.",
+            "description": "Whether the filter option is auto selected in the table tool if no other options are selected.",
             "nullable": true,
             "example": false
           }

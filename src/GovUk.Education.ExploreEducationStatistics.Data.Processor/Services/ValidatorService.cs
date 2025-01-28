@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var errors = new List<DataImportError>();
             
             // Check for unexpected column names
-            Array.ForEach(Enum.GetNames(typeof(MetaColumns)), col =>
+            Array.ForEach(ImporterMetaService.RequiredMetaColumns, col =>
             {
                 if (!csvHeaders.Contains(col))
                 {

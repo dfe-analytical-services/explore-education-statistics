@@ -21,7 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -54,6 +53,12 @@ public class ProcessorStage2Tests
     public async Task ProcessStage2_SpecialFilterItemValues()
     {
         await AssertStage2ItemsImportedCorrectly(new SpecialFilterItemsScenario());
+    }
+
+    [Fact]
+    public async Task ProcessStage2_AutoSelectFilterItems()
+    {
+        await AssertStage2ItemsImportedCorrectly(new AutoSelectFilterItemCsvStage2Scenario());
     }
 
     [Fact]
@@ -315,6 +320,37 @@ public class ProcessorStage2Tests
             Assert.Equal(expectedFilterGroupCsvColumns, filterGroupCsvColumns);
 
             filters.ForEach(filter => Assert.Equal(subject.Id, filter.SubjectId));
+
+            var autoSelectFilterValues = scenario.GetAutoSelectFilterValues();
+            filters.ForEach(filter =>
+            {
+                var allFilterItems = filter.FilterGroups
+                        .SelectMany(group => group.FilterItems)
+                        .ToList();
+
+                var autoSelectFilterValue = autoSelectFilterValues.SingleOrDefault(autoSelect =>
+                    autoSelect.FilterLabel == filter.Label);
+
+                if (autoSelectFilterValue == null)
+                {
+                    Assert.Null(filter.AutoSelectFilterItemId);
+                    Assert.Null(filter.AutoSelectFilterItemLabel);
+
+                    // There should either be no Total items, or more than one (in different groups).
+                    // If there is more than one, neither is set as the AutoSelectFilterItem
+                    Assert.NotEqual(1, allFilterItems.Count(fi =>
+                        fi.Label.Equals("Total", StringComparison.CurrentCultureIgnoreCase)));
+                }
+                else
+                {
+                    var filterItem = allFilterItems.SingleOrDefault(item =>
+                        item.Label == autoSelectFilterValue.AutoSelectFilterItemLabel);
+                    Assert.NotNull(filterItem);
+
+                    Assert.Equal(filter.AutoSelectFilterItemId, filterItem.Id);
+                    Assert.Equal(filter.AutoSelectFilterItemLabel, filterItem.Label);
+                }
+            });
 
             scenario.GetExpectedFilters().ForEach(expectedFilter =>
             {

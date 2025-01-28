@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models
         public string Label { get; set; } = string.Empty;
         public string? FilterGroupingColumn { get; set; }
         public string? FilterHint { get; set; }
+        public string? AutoSelectFilterItemLabel { get; set; }
         public string? IndicatorGrouping { get; set; }
         public IndicatorUnit IndicatorUnit { get; set; }
         public int? DecimalPlaces { get; set; }

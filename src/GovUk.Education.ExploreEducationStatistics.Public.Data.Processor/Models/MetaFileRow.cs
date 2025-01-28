@@ -24,6 +24,8 @@ public record MetaFileRow
 
     public string? FilterGroupingColumn { get; init; }
 
+    public string? FilterDefault { get; init; }
+
     public string? FilterHint { get; init; }
 
     public enum ColumnType

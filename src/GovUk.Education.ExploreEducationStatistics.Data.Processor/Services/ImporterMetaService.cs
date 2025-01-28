@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -20,15 +21,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         label,
         filter_grouping_column,
         filter_hint,
+        filter_default,
         indicator_grouping,
         indicator_unit,
-        indicator_dp
+        indicator_dp,
     }
 
     public class ImporterMetaService : IImporterMetaService
     {
         private readonly IGuidGenerator _guidGenerator;
         private readonly IDatabaseHelper _databaseHelper;
+
+        public static readonly string[] RequiredMetaColumns = Enum.GetValues<MetaColumns>()
+            .Where(col => col != MetaColumns.filter_default) // if we make other columns optional, screener would also need updating
+            .Select(col => col.ToString())
+            .ToArray();
 
         public ImporterMetaService(
             IGuidGenerator guidGenerator,

@@ -21,10 +21,10 @@ public record FilterOptionViewModel
     public required string Label { get; init; }
 
     /// <summary>
-    /// Whether the filter option is an aggregate (i.e. ‘all’ or a ‘total’) of the other filter options.
+    /// Whether the filter option is auto selected in the table tool if no other options are selected.
     /// </summary>
     /// <example>false</example>
-    public bool? IsAggregate { get; init; }
+    public bool? IsAutoSelect { get; init; }
 
     public static FilterOptionViewModel Create(FilterOptionMetaChange.State changeState)
     {
@@ -32,7 +32,7 @@ public record FilterOptionViewModel
         {
             Id = changeState.PublicId,
             Label = changeState.Option.Label,
-            IsAggregate = changeState.Option.IsAggregate
+            IsAutoSelect = changeState.Meta.AutoSelectLabel == changeState.Option.Label,
         };
     }
 }

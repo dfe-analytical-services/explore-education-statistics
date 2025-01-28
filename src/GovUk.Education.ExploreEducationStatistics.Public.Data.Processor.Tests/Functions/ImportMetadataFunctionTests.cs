@@ -1279,7 +1279,6 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             var expectedOption = expectedFilter.Options[linkIndex];
 
             Assert.Equal(expectedOption.Label, actualOptionLink.Option.Label);
-            Assert.Equal(expectedOption.IsAggregate, actualOptionLink.Option.IsAggregate);
         });
     }
 

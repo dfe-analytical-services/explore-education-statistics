@@ -88,7 +88,7 @@ export const testMapTableData: TableDataResponse & {
   subjectMeta: {
     filters: {
       SchoolType: {
-        totalValue: 'school-type-total',
+        autoSelectFilterItemId: 'school-type-total',
         hint: 'Filter by school type',
         legend: 'School type',
         options: {
@@ -108,7 +108,7 @@ export const testMapTableData: TableDataResponse & {
         name: 'school_type',
       },
       Characteristic: {
-        totalValue: 'characteristic-total',
+        autoSelectFilterItemId: 'characteristic-total',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         options: {

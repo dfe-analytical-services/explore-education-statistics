@@ -44,7 +44,7 @@ describe('PreReleaseTableToolPage', () => {
     filters: {
       SchoolType: {
         id: 'school-type',
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by school type',
         legend: 'School type',
         name: 'school_type',
@@ -103,7 +103,7 @@ describe('PreReleaseTableToolPage', () => {
     subjectMeta: {
       filters: {
         SchoolType: {
-          totalValue: '',
+          autoSelectFilterItemId: '',
           hint: 'Filter by school type',
           legend: 'School type',
           options: {

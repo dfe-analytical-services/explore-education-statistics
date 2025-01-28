@@ -33,7 +33,7 @@ const category1Group1Filter1 = new CategoryFilter({
   value: 'category1_group1_filter1',
   label: 'Category 1 Group 1',
   group: 'Category 1 Group 1',
-  isTotal: false,
+  isAutoSelect: false,
   category: 'Category 1',
 });
 
@@ -41,7 +41,7 @@ const category1Group2Filter1 = new CategoryFilter({
   value: 'category1_group2_filter1',
   label: 'Category 1 Group 2 Filter 1',
   group: 'Category 1 Group 2',
-  isTotal: false,
+  isAutoSelect: false,
   category: 'Category 1',
 });
 
@@ -50,7 +50,7 @@ const category1Group2Filter2 = new CategoryFilter({
   value: 'category1_group2_filter2',
   label: 'Category 1 Group 2',
   group: 'Category 1 Group 2',
-  isTotal: false,
+  isAutoSelect: false,
   category: 'Category 1',
 });
 
@@ -58,7 +58,7 @@ const category2Group1Filter1 = new CategoryFilter({
   value: 'category2_group1_filter1',
   label: 'Category 2 Group 1 Filter 1',
   group: 'Group 1',
-  isTotal: false,
+  isAutoSelect: false,
   category: 'Category 2',
 });
 
@@ -66,7 +66,7 @@ const category2Group1Filter2 = new CategoryFilter({
   value: 'category2_group1_filter2',
   label: 'Category 2 Group 1 Filter 2',
   group: 'Group 1',
-  isTotal: false,
+  isAutoSelect: false,
   category: 'Category 2',
 });
 
@@ -74,7 +74,7 @@ const category3Group1Filter1 = new CategoryFilter({
   value: 'category3_group1_filter1',
   label: 'Category 3 Group 1 Filter 1',
   group: 'Group 1',
-  isTotal: false,
+  isAutoSelect: false,
   category: 'Category 3',
 });
 
@@ -82,7 +82,7 @@ const category3Group1Filter2 = new CategoryFilter({
   value: 'category3_group1_filter2',
   label: 'Category 3 Group 1 Filter 2',
   group: 'Group 1',
-  isTotal: false,
+  isAutoSelect: false,
   category: 'Category 3',
 });
 

@@ -35,6 +35,10 @@ public static class FilterMetaGeneratorExtensions
     public static Generator<FilterMeta> WithHint(this Generator<FilterMeta> generator, string hint)
         => generator.ForInstance(s => s.SetHint(hint));
 
+    public static Generator<FilterMeta> WithAutoSelectLabel(this Generator<FilterMeta> generator,
+        string autoSelectLabel)
+        => generator.ForInstance(s => s.SetAutoSelectLabel(autoSelectLabel));
+
     public static Generator<FilterMeta> WithOptions(
         this Generator<FilterMeta> generator,
         IEnumerable<FilterOptionMeta> options)
@@ -80,6 +84,10 @@ public static class FilterMetaGeneratorExtensions
 
     public static InstanceSetters<FilterMeta> SetHint(this InstanceSetters<FilterMeta> setters, string hint)
         => setters.Set(m => m.Hint, hint);
+
+    public static InstanceSetters<FilterMeta> SetAutoSelectLabel(this InstanceSetters<FilterMeta> setters,
+        string autoSelectLabel)
+        => setters.Set(m => m.AutoSelectLabel, autoSelectLabel);
 
     public static InstanceSetters<FilterMeta> SetOptions(
         this InstanceSetters<FilterMeta> setters,
