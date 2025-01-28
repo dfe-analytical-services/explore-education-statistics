@@ -175,6 +175,9 @@ module databaseAliveAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSQLDatabase
+  ]
 }
 
 module queryTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.queryTime) {
@@ -192,6 +195,9 @@ module queryTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSQLDatabase
+  ]
 }
 
 module transactionTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.transactionTime) {
@@ -209,6 +215,9 @@ module transactionTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nu
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSQLDatabase
+  ]
 }
 
 module clientConnectionsWaitingAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.clientConenctionsWaiting) {
@@ -226,6 +235,9 @@ module clientConnectionsWaitingAlert 'alerts/dynamicMetricAlert.bicep' = if (ale
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSQLDatabase
+  ]
 }
 
 module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
@@ -240,6 +252,9 @@ module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSQLDatabase
+  ]
 }
 
 module diskBandwidthAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.diskBandwidth) {
@@ -257,6 +272,9 @@ module diskBandwidthAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSQLDatabase
+  ]
 }
 
 module diskIopsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.diskIops) {
@@ -274,6 +292,9 @@ module diskIopsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && a
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSQLDatabase
+  ]
 }
 
 module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
@@ -288,6 +309,9 @@ module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != n
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSQLDatabase
+  ]
 }
 
 var capacityAlertThresholds = [{
@@ -323,6 +347,9 @@ module capacityAlerts 'alerts/staticMetricAlert.bicep' = [for capacityThreshold 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSQLDatabase
+  ]
 }]
 
 module failedConnectionsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedConnections) {
@@ -340,6 +367,9 @@ module failedConnectionsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSQLDatabase
+  ]
 }
 
 module deadlocksAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.deadlocks) {
@@ -362,6 +392,9 @@ module deadlocksAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && a
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    postgreSQLDatabase
+  ]
 }
 
 @description('The fully qualified Azure resource ID of the Database Server.')

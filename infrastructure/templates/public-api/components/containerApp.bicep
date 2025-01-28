@@ -234,6 +234,9 @@ module containerAppRestartsAlert 'alerts/staticMetricAlert.bicep' = if (alerts !
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    containerApp
+  ]
 }
 
 module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
@@ -248,6 +251,9 @@ module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    containerApp
+  ]
 }
 
 module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
@@ -262,6 +268,9 @@ module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    containerApp
+  ]
 }
 
 module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
@@ -276,6 +285,9 @@ module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != n
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    containerApp
+  ]
 }
 
 module connectionTimeoutsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.connectionTimeouts) {
@@ -293,6 +305,9 @@ module connectionTimeoutsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    containerApp
+  ]
 }
 
 module requestRetriesAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.requestRetries) {
@@ -310,6 +325,9 @@ module requestRetriesAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    containerApp
+  ]
 }
 
 module requestTimeoutsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.requestTimeouts) {
@@ -327,6 +345,9 @@ module requestTimeoutsAlert 'alerts/staticMetricAlert.bicep' = if (alerts != nul
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    containerApp
+  ]
 }
 
 output containerAppFqdn string = containerAppFqdn
