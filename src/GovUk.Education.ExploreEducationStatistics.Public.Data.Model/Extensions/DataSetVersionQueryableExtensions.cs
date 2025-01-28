@@ -17,9 +17,8 @@ public static class DataSetVersionQueryableExtensions
         return await (version.Contains('*') ? queryable.FindByWildcardVersion(dataSetId, version, cancellationToken) : queryable.FindBySpecificVersion(dataSetId, version, cancellationToken));
     }
     /// <summary>
-    /// Finds the latest version of data set based on the position of '*' within the string parameter wildcardedVersion. 
-    /// Checks which portion of the version (major, minor, or patch) is being wildcarded and based on that: it Substitute 1 from the level above the level that's being wildcarded.
-    /// This is because the end of the range that Semver (library used within VersionUtils) returns defaults to one level higher above the maximum version specified but with a pre-release flag (i.e., endRange.IsPrerelease is always true)
+    /// Returns the latest version of a data set based on a major/minor/patch level that's being wildcarded (i.e., substituted with '*').
+    /// This method retrieves the most recent data set version based on which portion of the version (major, minor, or patch) is being wildcarded (i.e., the position of '*' within the string parameter wildcardedVersion)
     /// </summary>
     /// <param name="wildcardedVersion">Must contain * (representing the wildcard)</param>
     public static async Task<Either<ActionResult, DataSetVersion>> FindByWildcardVersion(
@@ -29,12 +28,11 @@ public static class DataSetVersionQueryableExtensions
         CancellationToken cancellationToken = default)
     {
         SemVersion startRange, endRange;
-        var parts = wildcardedVersion.Trim('v').Split('.');
+        var dataSetVersion = wildcardedVersion.Trim('v');
+        var parts = dataSetVersion.Split('.');
          
-        if (!VersionUtils.TryParseWildcard(wildcardedVersion, out var semVersionRange))
-            return new NotFoundResult();
-        else if (wildcardedVersion.Trim('v') == "*")
-            startRange = endRange = new SemVersion(0);
+        if (!VersionUtils.TryParseWildcard(wildcardedVersion, out var semVersionRange)) return new NotFoundResult();
+        else if (dataSetVersion == "*") startRange = endRange = new SemVersion(0);
         else
         {
             startRange = semVersionRange[0].Start;
@@ -45,11 +43,11 @@ public static class DataSetVersionQueryableExtensions
             .Where(dsv => dsv.DataSetId == dataSetId)
             .Where(v =>
                 (endRange.Major == 0 ? true :
-                    parts.ElementAtOrDefault(1) == "*" ? v.VersionMajor == (endRange.Major - 1) :
+                    parts.ElementAtOrDefault(1) == "*" ? v.VersionMajor < endRange.Major :
                         v.VersionMajor == endRange.Major
                 ) &&
                 (endRange.Minor == 0 ? true :
-                    parts.ElementAtOrDefault(2) == "*" ? v.VersionMinor == (endRange.Minor - 1) :
+                    parts.ElementAtOrDefault(2) == "*" ? v.VersionMinor < endRange.Minor :
                         v.VersionMinor == endRange.Minor
                 ) &&
                 (
