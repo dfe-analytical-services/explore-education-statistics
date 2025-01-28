@@ -28,30 +28,26 @@ Navigate to 'Data and files' page
 
 Upload a ZIP file subject
     [Documentation]    EES-1397
-    user enters text into element    label:Subject title    Absence in PRUs
+    user enters text into element    label:Title    Absence in PRUs
     user clicks radio    ZIP file
     user waits until page contains element    label:Upload ZIP file
     user chooses file    label:Upload ZIP file    ${FILES_DIR}upload-zip-test.zip
     user clicks button    Upload data files
 
     user waits until h2 is visible    Uploaded data files
-    user waits until page contains accordion section    Absence in PRUs
-    user opens accordion section    Absence in PRUs
-
-    ${section}=    user gets accordion section content element    Absence in PRUs
+    user waits until page contains data uploads table
 
     # To ensure "Data file size" and "Number of rows" will be filled
     user waits until page does not contain    Queued    %{WAIT_MEDIUM}
-
-    user checks headed table body row contains    Subject title    Absence in PRUs    ${section}
-    user checks headed table body row contains    Data file    absence_in_prus.csv    ${section}
-    user checks headed table body row contains    Metadata file    absence_in_prus.meta.csv    ${section}
-    user checks headed table body row contains    Data file size    141 Kb    ${section}
-    user checks headed table body row contains    Number of rows    612    ${section}
-    user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
+    user checks table cell contains    1    1    Absence in PRUs    testid:Data files table
+    user checks table cell contains    1    2    141 Kb    testid:Data files table
+    user waits until table cell contains    1    3    Complete    testid:Data files table
+    user checks table cell contains    1    4    View details    testid:Data files table
+    user checks table cell contains    1    4    Edit title    testid:Data files table
+    user checks table cell contains    1    4    Replace data    testid:Data files table
+    user checks table cell contains    1    4    Delete files    testid:Data files table
 
 Change subject title
-    user waits until page contains accordion section    Absence in PRUs
     user clicks link    Edit title
 
     user waits until h2 is visible    Edit data file details
@@ -62,11 +58,7 @@ Change subject title
 
 Validate subject title has been updated
     user waits until h2 is visible    Uploaded data files
-    user waits until page contains accordion section    Updated Absence in PRUs
-    user opens accordion section    Absence in PRUs
-
-    ${section}=    user gets accordion section content element    Absence in PRUs
-    user checks headed table body row contains    Subject title    Updated Absence in PRUs    ${section}
+    user checks table cell contains    1    1    Updated Absence in PRUs    testid:Data files table
 
 Check subject appears in 'Data blocks' page
     user clicks link    Data blocks

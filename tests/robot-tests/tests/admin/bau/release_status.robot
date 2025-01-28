@@ -41,7 +41,7 @@ Validate checklist errors and warnings
     user checks checklist errors contains link
     ...    Release must contain a key statistic or a non-empty headline text block
 
-    user checks page does not contain testid    releaseChecklist-success
+    user waits until page does not contain testid    releaseChecklist-success
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
@@ -58,8 +58,8 @@ Validate checklist errors and warnings after adding headline text block
     user checks checklist warnings contains link    No data files uploaded
     user checks checklist warnings contains link    A public pre-release access list has not been created
 
-    user checks page does not contain testid    releaseChecklist-errors
-    user checks page does not contain testid    releaseChecklist-success
+    user waits until page does not contain testid    releaseChecklist-errors
+    user waits until page does not contain testid    releaseChecklist-success
 
 Add empty Summary section text block to the page
     user navigates to content page    ${PUBLICATION_NAME}
@@ -131,8 +131,8 @@ Validate checklist errors and warnings after adding content to text blocks
     user checks checklist warnings contains link    No data files uploaded
     user checks checklist warnings contains link    A public pre-release access list has not been created
 
-    user checks page does not contain testid    releaseChecklist-errors
-    user checks page does not contain testid    releaseChecklist-success
+    user waits until page does not contain testid    releaseChecklist-errors
+    user waits until page does not contain testid    releaseChecklist-success
 
 Submit release for Higher Review
     user clicks radio    Ready for higher review (this will notify approvers)
@@ -155,8 +155,8 @@ Verify release checklist has not been updated by status
     user checks checklist warnings contains link    No data files uploaded
     user checks checklist warnings contains link    A public pre-release access list has not been created
 
-    user checks page does not contain testid    releaseChecklist-errors
-    user checks page does not contain testid    releaseChecklist-success
+    user waits until page does not contain testid    releaseChecklist-errors
+    user waits until page does not contain testid    releaseChecklist-success
 
 Add public prerelease access list via release checklist
     user clicks link    A public pre-release access list has not been created
@@ -170,8 +170,8 @@ Verify release checklist has been updated
     user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
     user checks checklist warnings contains link    No data files uploaded
 
-    user checks page does not contain testid    releaseChecklist-errors
-    user checks page does not contain testid    releaseChecklist-success
+    user waits until page does not contain testid    releaseChecklist-errors
+    user waits until page does not contain testid    releaseChecklist-success
 
 Approve release
     user clicks radio    Approved for publication
@@ -284,7 +284,7 @@ Verify the checklist errors and warnings for amendment
 
     user checks checklist errors contains link
     ...    A public release note for this amendment is required, add this near the top of the content page
-    user checks page does not contain testid    releaseChecklist-success
+    user waits until page does not contain testid    releaseChecklist-success
 
 Navigate to contents page and add a release note
     user clicks link    Content
@@ -307,12 +307,8 @@ Create third release
 Upload data files
     user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
     user clicks link    Data and files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
-    user waits until page contains accordion section    Dates test subject
-    user opens accordion section    Dates test subject
-
-    ${section}    user gets accordion section content element    Dates test subject
-    user clicks link    Replace data    ${section}
+    user waits until page contains data uploads table
+    user clicks link    Replace data
 
     user waits until h2 is visible    Data file details
     user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
@@ -323,7 +319,7 @@ Navigate to data replacement page
     user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
     user clicks button    Upload data files
 
-    user waits until page contains element    testid:Replacement Subject title
+    user waits until page contains element    testid:Replacement Title
     user reloads page
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
@@ -341,16 +337,13 @@ Validate checklist errors
     user checks checklist errors contains link
     ...    Release must contain a key statistic or a non-empty headline text block
 
-    user checks page does not contain testid    releaseChecklist-success
+    user waits until page does not contain testid    releaseChecklist-success
 
 Navigate to data upload and confirm data replacement
     user clicks link    Data and files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
-    user waits until page contains accordion section    Dates test subject
-    user opens accordion section    Dates test subject
+    user waits until page contains data uploads table
 
-    ${section}    user gets accordion section content element    Dates test subject
-    user clicks link    Replace data    ${section}
+    user clicks link    Replace data
     user waits until page contains    Footnotes: OK
     user waits until page contains    Data blocks: OK
     user waits until button is enabled    Confirm data replacement
@@ -374,7 +367,7 @@ Validate checklist errors (3rd release)
     ...    All summary information must be completed on the data guidance page
     user checks checklist errors contains link
     ...    Release must contain a key statistic or a non-empty headline text block
-    user checks page does not contain testid    releaseChecklist-success
+    user waits until page does not contain testid    releaseChecklist-success
 
 Add data guidance to subject
     user clicks link    Data and files

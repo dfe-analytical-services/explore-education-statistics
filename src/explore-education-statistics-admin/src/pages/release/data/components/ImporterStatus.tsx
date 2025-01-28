@@ -87,11 +87,13 @@ interface ImporterStatusProps {
   releaseId: string;
   dataFile: DataFile;
   onStatusChange?: ImporterStatusChangeHandler;
+  className?: string;
 }
 const ImporterStatus = ({
   releaseId,
   dataFile,
   onStatusChange,
+  className,
 }: ImporterStatusProps) => {
   const [currentStatus, setCurrentStatus] = useState<StatusState>({
     status: dataFile.status,
@@ -130,7 +132,7 @@ const ImporterStatus = ({
   );
 
   return (
-    <div>
+    <div className={className}>
       <div className="dfe-flex dfe-align-items--center">
         <Tag
           colour={
@@ -140,7 +142,7 @@ const ImporterStatus = ({
           }
         >
           {dataFile.replacedBy
-            ? 'Data replacement in progress'
+            ? 'Replacement in progress'
             : getImportStatusLabel(currentStatus.status)}
         </Tag>
 

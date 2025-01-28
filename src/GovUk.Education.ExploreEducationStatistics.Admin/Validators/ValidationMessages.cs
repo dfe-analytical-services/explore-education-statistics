@@ -207,7 +207,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage DataSetTitleTooLong = new(
         Code: nameof(DataSetTitleTooLong),
-        Message: "Subject title '{0}' must be 120 characters or less"
+        Message: "Title '{0}' must be 120 characters or less"
     );
 
     public static ErrorViewModel GenerateErrorDataSetTitleTooLong(string title)
