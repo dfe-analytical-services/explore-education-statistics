@@ -30,11 +30,6 @@ var severityLevel = severityMapping[config.severity]
 
 var resourceIds = [id != null ? id! : resourceId(resourceMetric.resourceType, resourceName)]
 
-var resourceMetricWithDimensions = {
-  dimensions: []
-  ...resourceMetric
-}
-
 resource alertsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
   name: alertsGroupName
 }
@@ -66,7 +61,7 @@ resource metricAlertRule 'Microsoft.Insights/metricAlerts@2018-03-01' = {
         #disable-next-line BCP036
         threshold: config.threshold
 
-        dimensions: length(resourceMetricWithDimensions.dimensions) > 0 ? map(resourceMetric.dimensions, dimension => {
+        dimensions: length(resourceMetric.?dimensions ?? []) > 0 ? map(resourceMetric.dimensions, dimension => {
           operator: 'Include'
             ...dimension
         }) : null
