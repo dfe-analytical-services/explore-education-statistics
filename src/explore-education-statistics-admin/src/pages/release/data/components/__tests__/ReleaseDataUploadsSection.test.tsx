@@ -623,8 +623,8 @@ describe('ReleaseDataUploadsSection', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enter a subject title', {
-            selector: '#dataFileUploadForm-subjectTitle-error',
+          screen.getByText('Enter a title', {
+            selector: '#dataFileUploadForm-title-error',
           }),
         ).toBeInTheDocument();
       });
@@ -653,8 +653,8 @@ describe('ReleaseDataUploadsSection', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enter a unique subject title', {
-            selector: '#dataFileUploadForm-subjectTitle-error',
+          screen.getByText('Enter a unique title', {
+            selector: '#dataFileUploadForm-title-error',
           }),
         ).toBeInTheDocument();
       });
@@ -681,8 +681,8 @@ describe('ReleaseDataUploadsSection', () => {
         expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
 
         expect(
-          screen.getByText('Enter a subject title', {
-            selector: '#dataFileUploadForm-subjectTitle-error',
+          screen.getByText('Enter a title', {
+            selector: '#dataFileUploadForm-title-error',
           }),
         ).toBeInTheDocument();
 
@@ -726,8 +726,8 @@ describe('ReleaseDataUploadsSection', () => {
         expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
 
         expect(
-          screen.getByText('Enter a subject title', {
-            selector: '#dataFileUploadForm-subjectTitle-error',
+          screen.getByText('Enter a title', {
+            selector: '#dataFileUploadForm-title-error',
           }),
         ).toBeInTheDocument();
 

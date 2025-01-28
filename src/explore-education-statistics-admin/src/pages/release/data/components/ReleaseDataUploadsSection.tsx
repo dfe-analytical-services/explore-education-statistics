@@ -132,12 +132,12 @@ const ReleaseDataUploadsSection = ({
 
       switch (values.uploadType) {
         case 'csv': {
-          if (!values.subjectTitle) {
+          if (!values.title) {
             return;
           }
           newFiles.push(
             await releaseDataFileService.uploadDataFiles(releaseId, {
-              title: values.subjectTitle,
+              title: values.title,
               dataFile: values.dataFile as File,
               metadataFile: values.metadataFile as File,
             }),
@@ -146,12 +146,12 @@ const ReleaseDataUploadsSection = ({
           break;
         }
         case 'zip': {
-          if (!values.subjectTitle) {
+          if (!values.title) {
             return;
           }
           newFiles.push(
             await releaseDataFileService.uploadZipDataFile(releaseId, {
-              title: values.subjectTitle,
+              title: values.title,
               zipFile: values.zipFile as File,
             }),
           );
