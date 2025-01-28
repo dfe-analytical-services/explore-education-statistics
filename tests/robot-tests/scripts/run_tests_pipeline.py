@@ -35,6 +35,9 @@ def run_tests_pipeline():
     if args.rerun_attempts:
         run_tests_command += f" --rerun-attempts {str(args.rerun_attempts)}"
 
+    if args.chromedriver_version:
+        run_tests_command += f" --chromedriver {str(args.chromedriver_version)}"
+
     subprocess.check_call(run_tests_command, shell=True)
 
 
@@ -67,5 +70,13 @@ if __name__ == "__main__":
     parser.add_argument("--processes", dest="processes", help="number of processes to run", required=True)
 
     parser.add_argument("--rerun-attempts", dest="rerun_attempts", type=int, help="Number of rerun attempts")
+
+    parser.add_argument(
+        "--chromedriver",
+        dest="chromedriver_version",
+        metavar="{version}",
+        help="specify which version of chromedriver to use",
+    )
+
     args = parser.parse_args()
     run_tests_pipeline()
