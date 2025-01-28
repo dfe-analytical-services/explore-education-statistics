@@ -189,7 +189,7 @@ export default function DataFilesTable({
                           showClose
                           title="Cannot delete files"
                           triggerButton={
-                            <ButtonText className="govuk-!-margin-left-3">
+                            <ButtonText variant="warning">
                               Delete files
                             </ButtonText>
                           }

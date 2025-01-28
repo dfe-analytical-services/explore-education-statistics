@@ -20,17 +20,12 @@
 }
 
 .actions {
+  --verticalSpacing: #{govuk-spacing(1)};
   margin-bottom: 0;
 
   @include govuk-media-query($until: desktop) {
     align-items: start;
     flex-direction: column;
-
-    a,
-    button {
-      margin-bottom: 1rem;
-      margin-left: 0;
-      white-space: nowrap;
-    }
+    white-space: nowrap;
   }
 }
