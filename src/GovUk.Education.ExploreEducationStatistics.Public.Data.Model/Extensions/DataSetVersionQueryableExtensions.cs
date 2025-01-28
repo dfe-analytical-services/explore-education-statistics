@@ -14,10 +14,7 @@ public static class DataSetVersionQueryableExtensions
         string version,
         CancellationToken cancellationToken = default)
     {
-        if (version.Contains("*"))
-            return await queryable.FindByWildcardVersion(dataSetId, version, cancellationToken);
-        else
-            return await queryable.FindBySpecificVersion(dataSetId, version, cancellationToken);
+        return await (version.Contains('*') ? queryable.FindByWildcardVersion(dataSetId, version, cancellationToken) : queryable.FindBySpecificVersion(dataSetId, version, cancellationToken));
     }
     /// <summary>
     /// Finds the latest version of data set based on the position of '*' within the string parameter wildcardedVersion. 
