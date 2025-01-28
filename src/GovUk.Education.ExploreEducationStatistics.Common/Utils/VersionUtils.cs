@@ -1,6 +1,5 @@
 #nullable enable
 using Semver;
-using System.Reflection.Metadata.Ecma335;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
