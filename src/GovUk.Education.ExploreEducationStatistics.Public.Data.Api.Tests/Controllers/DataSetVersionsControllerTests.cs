@@ -1721,7 +1721,6 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             response.AssertOk();
         }
 
-
         private async Task<HttpResponseMessage> GetDataSetVersionChanges(
             Guid dataSetId,
             string dataSetVersion,

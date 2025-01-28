@@ -18,4 +18,16 @@ public static class VersionUtils
 
         return successful;
     }
+    public static bool TryParseWildcard(string versionString, out SemVersionRange version)
+    {
+        var successful = SemVersionRange.TryParse(
+            versionString,
+            SemVersionRangeOptions.OptionalMinorPatch
+            | SemVersionRangeOptions.AllowLowerV,
+            out var sv);
+
+        version = sv;
+
+        return successful;
+    }
 }
