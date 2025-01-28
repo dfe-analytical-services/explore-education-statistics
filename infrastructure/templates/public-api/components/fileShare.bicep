@@ -63,6 +63,9 @@ module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null &
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    fileShare
+  ]
 }
 
 module latencyAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.latency) {
@@ -82,6 +85,9 @@ module latencyAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && ale
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    fileShare
+  ]
 }
 
 var capacityAlertThresholds = [{
@@ -124,6 +130,9 @@ module fileCapacityAlerts 'alerts/staticMetricAlert.bicep' = [for capacityThresh
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    fileShare
+  ]
 }]
 
 output fileShareName string = fileShare.name

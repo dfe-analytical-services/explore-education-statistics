@@ -304,6 +304,9 @@ module backendPoolsHealthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }
 
 module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
@@ -318,6 +321,9 @@ module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }
 
 module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
@@ -340,6 +346,9 @@ module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }
 
 module responseStatusAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
@@ -362,4 +371,7 @@ module responseStatusAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }
