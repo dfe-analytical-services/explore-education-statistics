@@ -1,11 +1,21 @@
 import {
   DraftChartConfig,
   DraftFullChart,
+  MapChartConfig,
   RenderableChart,
 } from '../types/chart';
 
+function isMapRenderable(
+  draftMapChartConfig: DraftChartConfig<MapChartConfig>,
+): boolean {
+  if (Number.isNaN(draftMapChartConfig.boundaryLevel)) {
+    return false;
+  }
+  return true;
+}
+
 export default function isChartRenderable(
-  draftFullChart: DraftFullChart | RenderableChart,
+  draftFullChart: DraftFullChart,
 ): draftFullChart is RenderableChart {
   const { chartConfig, data, meta } = draftFullChart;
 
@@ -13,8 +23,8 @@ export default function isChartRenderable(
     return Boolean(chartConfig.fileId && chartConfig.fileId.length > 0);
   }
 
-  if (chartConfig.type === 'map' && !chartConfig.boundaryLevel) {
-    return false;
+  if (chartConfig.type === 'map') {
+    return isMapRenderable(chartConfig);
   }
 
   return Boolean(

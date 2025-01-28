@@ -210,7 +210,7 @@ interface BaseChartConfig {
   alt: string;
   height: number;
   width?: number;
-  includeNonNumericData: boolean;
+  includeNonNumericData?: boolean;
   titleType?: TitleType;
 }
 
@@ -287,7 +287,14 @@ export type ChartConfig =
   | HorizontalBarChartConfig
   | VerticalBarChartConfig;
 
-export type DraftChartConfig = Partial<ChartConfig>;
+export type DraftChartConfig<T extends ChartConfig = ChartConfig> = Omit<
+  T,
+  'legend' | 'axes' | 'boundaryLevel'
+> & {
+  legend?: T['legend'];
+  boundaryLevel?: number;
+  axes: AxesConfiguration;
+};
 
 /**
  * FullChart, a {@see ChartConfig} alongside related all data and meta.

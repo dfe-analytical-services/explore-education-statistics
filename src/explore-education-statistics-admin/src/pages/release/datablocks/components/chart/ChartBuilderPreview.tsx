@@ -9,11 +9,11 @@ import isChartRenderable, {
 import React, { useRef } from 'react';
 
 interface Props {
-  fullChart?: DraftFullChart;
+  draftFullChart: DraftFullChart;
   loading: boolean;
 }
 
-const ChartBuilderPreview = ({ fullChart, loading }: Props) => {
+const ChartBuilderPreview = ({ draftFullChart, loading }: Props) => {
   const renderCount = useRef(0);
 
   return (
@@ -22,11 +22,11 @@ const ChartBuilderPreview = ({ fullChart, loading }: Props) => {
         className="govuk-width-container govuk-!-margin-bottom-6"
         data-testid="chartBuilderPreviewContainer"
       >
-        {fullChart && isChartRenderable(fullChart) ? (
+        {isChartRenderable(draftFullChart) ? (
           <LoadingSpinner loading={loading} text="Loading chart data">
             <div className="govuk-width-container govuk-!-padding-4 dfe-border">
               <ChartRenderer
-                fullChart={fullChart}
+                fullChart={draftFullChart}
                 key={renderCount.current}
                 id="chartBuilderPreview"
               />
@@ -34,7 +34,7 @@ const ChartBuilderPreview = ({ fullChart, loading }: Props) => {
           </LoadingSpinner>
         ) : (
           <div className={styles.previewPlaceholder}>
-            <p>{getChartPreviewText(fullChart?.chartConfig)}</p>
+            <p>{getChartPreviewText(draftFullChart.chartConfig)}</p>
           </div>
         )}
       </div>

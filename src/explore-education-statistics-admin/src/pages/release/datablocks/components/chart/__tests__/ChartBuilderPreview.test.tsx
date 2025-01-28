@@ -124,7 +124,7 @@ describe('ChartBuilderPreview', () => {
   };
 
   test('renders the loading spinner when the loading flag is indicating that it is loading', () => {
-    render(<ChartBuilderPreview fullChart={testLineChart} loading />);
+    render(<ChartBuilderPreview draftFullChart={testLineChart} loading />);
     const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
     expect(detailsSection).toBeInTheDocument();
     expect(detailsSection).toHaveTextContent('Loading chart data');
@@ -138,7 +138,9 @@ describe('ChartBuilderPreview', () => {
     testMapChart,
   ].forEach(fullChart => {
     test(`renders chart of type '${fullChart.chartConfig.type}' when all mandatory fields are provided`, () => {
-      render(<ChartBuilderPreview fullChart={fullChart} loading={false} />);
+      render(
+        <ChartBuilderPreview draftFullChart={fullChart} loading={false} />,
+      );
       const detailsSection = screen.queryByTestId(
         'chartBuilderPreviewContainer',
       );
@@ -160,7 +162,7 @@ describe('ChartBuilderPreview', () => {
     test(`renders preview help text for chart of type '${fullChart.chartConfig.type}' when no data sets are yet added`, () => {
       render(
         <ChartBuilderPreview
-          fullChart={produce(fullChart, draft => {
+          draftFullChart={produce(fullChart, draft => {
             draft.chartConfig.axes = {
               ...draft.chartConfig.axes,
               major: {
@@ -188,7 +190,7 @@ describe('ChartBuilderPreview', () => {
   test(`renders preview help text for chart of type 'infographic' when no fileId is selected`, () => {
     render(
       <ChartBuilderPreview
-        fullChart={produce(testInfographicChart, draft => {
+        draftFullChart={produce(testInfographicChart, draft => {
           (draft.chartConfig as InfographicConfig).fileId = '';
         })}
         loading={false}
@@ -204,7 +206,7 @@ describe('ChartBuilderPreview', () => {
   test(`renders preview help text for chart of type 'map' when no boundaryLevel is selected`, () => {
     render(
       <ChartBuilderPreview
-        fullChart={produce(testMapChart, draft => {
+        draftFullChart={produce(testMapChart, draft => {
           (draft.chartConfig as MapChartConfig).boundaryLevel = 0;
         })}
         loading={false}

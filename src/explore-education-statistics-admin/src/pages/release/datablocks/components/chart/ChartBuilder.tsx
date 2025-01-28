@@ -40,6 +40,7 @@ import {
   InfographicConfig,
   DraftFullChart,
   DraftChartConfig,
+  RenderableChart,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
@@ -61,16 +62,12 @@ const chartDefinitions: ChartDefinition[] = [
   mapBlockDefinition,
 ];
 
-type ChartBuilderChartProps = DraftFullChart & {
-  file?: File;
-};
-
-const filterChartProps = (props: ChartBuilderChartProps): ChartConfig => {
+const filterChartProps = (props: RenderableChart): ChartConfig => {
   const excludedProps: (
-    | keyof ChartBuilderChartProps
+    | keyof RenderableChart
     | keyof InfographicChartProps
     | keyof MapBlockProps
-  )[] = ['data', 'meta', 'getInfographic', 'file', 'onBoundaryLevelChange'];
+  )[] = ['data', 'meta', 'getInfographic', 'onBoundaryLevelChange'];
 
   const excludedChartConfigProps: (
     | keyof ChartConfig
@@ -164,69 +161,76 @@ export default function ChartBuilder({
     [axes.major?.dataSets, meta.indicators],
   );
 
-  const chart = useMemo<ChartBuilderChartProps | undefined>(() => {
+  const chartProps = useMemo<RenderableChart | undefined>(() => {
     if (!definition || !options) {
       return undefined;
     }
 
-    const baseProps: DraftFullChart = {
-      data,
-      meta,
-      chartConfig: {
-        ...options,
-        legend,
-      },
-    };
-
-    switch (definition.type) {
-      case 'infographic':
-        return {
-          ...baseProps,
+    if (definition.type === 'infographic') {
+      const fullInfographic: InfographicChartProps = {
+        data,
+        meta,
+        chartConfig: {
+          ...options,
           type: 'infographic',
           fileId: options.file ? options.file.name : options.fileId ?? '',
-          getInfographic: options.file
-            ? () => Promise.resolve(options.file as File)
-            : getChartFile,
-        };
-      case 'map':
-        return {
-          data,
-          meta,
-          chartConfig: {
-            ...baseProps,
-            map: map ?? {
-              dataSetConfigs: [],
-            },
-            boundaryLevel: options.boundaryLevel ?? 0,
+        },
+        getInfographic: options.file
+          ? () => Promise.resolve(options.file as File)
+          : getChartFile,
+      };
+      return fullInfographic;
+    }
+    if (definition.type === 'map') {
+      const fullMap: Omit<MapBlockProps, 'id'> = {
+        data,
+        meta,
+        chartConfig: {
+          ...options,
+          type: 'map',
+          map: map ?? {
+            dataSetConfigs: [],
           },
-          onBoundaryLevelChange: (boundaryLevel: number) =>
-            onTableQueryUpdate({ boundaryLevel }),
-        };
+          legend,
+          axes,
+        },
+        onBoundaryLevelChange: (boundaryLevel: number) =>
+          onTableQueryUpdate({ boundaryLevel }),
+      };
+      return fullMap;
+    }
+
+    switch (definition.type) {
       case 'line':
       case 'horizontalbar':
       case 'verticalbar':
         return {
-          ...baseProps,
-          type: definition.type,
+          data,
+          meta,
+          chartCong: {
+            legend,
+            axes,
+            type: definition.type,
+          },
         };
 
       default:
         return undefined;
     }
   }, [
-    axes,
-    data,
     definition,
+    options,
+    data,
+    meta,
     getChartFile,
     legend,
-    meta,
-    options,
+    axes,
     map,
     onTableQueryUpdate,
   ]);
 
   const handleSubmit = useCallback(async () => {
-    if (!chart) {
+    if (!chartProps) {
       return;
     }
 
@@ -240,7 +244,7 @@ export default function ChartBuilder({
     }
 
     try {
-      await onChartSave(filterChartProps(chart), chart.file);
+      await onChartSave(filterChartProps(chartProps), options?.file);
     } catch (error) {
       if (isServerValidationError(error) && error.response?.data) {
         setSubmitError(error.response.data);
@@ -248,25 +252,25 @@ export default function ChartBuilder({
         throw error;
       }
     }
-  }, [chart, onChartSave]);
+  }, [options, chartProps, onChartSave]);
 
   const handleChartDelete = useCallback(async () => {
     toggleDeleteModal.off();
 
-    if (!chart) {
+    if (!chartProps) {
       return;
     }
 
     setDeleting(true);
 
     try {
-      await onChartDelete(filterChartProps(chart));
+      await onChartDelete(filterChartProps(chartProps));
 
       actions.resetState();
     } finally {
       setDeleting(false);
     }
-  }, [actions, chart, onChartDelete, toggleDeleteModal]);
+  }, [actions, chartProps, onChartDelete, toggleDeleteModal]);
 
   const handleChartDefinitionChange = useCallback(
     async (chartDefinition: ChartDefinition) => {
@@ -333,8 +337,11 @@ export default function ChartBuilder({
         onChange={handleChartDefinitionChange}
       />
 
-      {definition && (
-        <ChartBuilderPreview fullChart={chart} loading={isDataLoading} />
+      {definition && chartProps && (
+        <ChartBuilderPreview
+          draftFullChart={chartProps}
+          loading={isDataLoading}
+        />
       )}
 
       {definition && (
