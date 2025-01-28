@@ -302,7 +302,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .Include(m => m.Publications)
                 .ThenInclude(p => p.Publication)
                 .ThenInclude(p => p.Contact)
-
                 .Include(m => m.Publications)
                 .ThenInclude(p => p.Publication)
                 .ThenInclude(p => p.LatestPublishedReleaseVersion)
@@ -688,7 +687,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 Id = publication.Id,
                 Title = publication.Title,
                 Slug = publication.Slug,
-                LatestReleaseSlug = publication.LatestPublishedReleaseVersion!.Release.Slug,
+                LatestReleaseSlug = publication.LatestPublishedReleaseVersion?.Release.Slug,
                 Owner = publicationMethodology.Owner,
                 Contact = new ContactViewModel(publication.Contact)
             };
