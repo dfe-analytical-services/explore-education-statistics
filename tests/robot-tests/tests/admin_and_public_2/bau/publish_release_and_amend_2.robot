@@ -32,7 +32,7 @@ Create new release
     user uploads subject and waits until complete    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Upload another subject (for deletion later)
-    user waits until page contains element    id:dataFileUploadForm-subjectTitle
+    user waits until page contains element    id:dataFileUploadForm-title
     user uploads subject and waits until complete    ${SECOND_SUBJECT}    upload-file-test.csv
     ...    upload-file-test.meta.csv
 
@@ -253,7 +253,7 @@ Create release amendment
 
 Replace subject data
     user clicks link    Data and files
-    user waits until page contains element    id:dataFileUploadForm-subjectTitle
+    user waits until page contains element    id:dataFileUploadForm-title
     user waits until page contains data uploads table
     user clicks link    Replace data
     user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}dates.csv

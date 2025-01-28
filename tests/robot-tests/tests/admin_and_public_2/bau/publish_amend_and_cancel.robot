@@ -47,9 +47,9 @@ Add ancillary file
     user clicks link    Supporting file uploads
     user waits until h2 is visible    Add file to release
 
-    user enters text into element    label:Title    Test ancillary file 1
-    user enters text into element    label:Summary    Test ancillary file 1 summary
-    user chooses file    label:Upload file    ${FILES_DIR}test-file-1.txt
+    user enters text into element    id:ancillaryFileForm-title    Test ancillary file 1
+    user enters text into element    id:ancillaryFileForm-summary    Test ancillary file 1 summary
+    user chooses file    id:ancillaryFileForm-file    ${FILES_DIR}test-file-1.txt
     user clicks button    Add file
 
     user waits until page contains accordion section    Test ancillary file 1
@@ -244,10 +244,9 @@ Edit ancillary file and replace data
     ${section_1}=    user gets accordion section content element    Test ancillary file 1    id:file-uploads
     user clicks link    Edit file    ${section_1}
     user waits until h2 is visible    Edit ancillary file
-    user enters text into element    label:Title    Replacement ancillary file
-    user enters text into element    label:Summary    Replacement ancillary file summary updated
-
-    user chooses file    label:Upload new file    ${FILES_DIR}test-file-2.txt
+    user enters text into element    id:ancillaryFileForm-title    Replacement ancillary file
+    user enters text into element    id:ancillaryFileForm-summary    Replacement ancillary file summary updated
+    user chooses file    id:ancillaryFileForm-file    ${FILES_DIR}test-file-2.txt
     user clicks button    Save file
 
     user waits until page contains accordion section    Replacement ancillary file
