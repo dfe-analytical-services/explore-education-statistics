@@ -160,12 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Release = release,
                         Type = releaseCreate.Type!.Value,
                         ApprovalStatus = ReleaseApprovalStatus.Draft,
-
-                        // TODO Remove the following in EES-5659
                         PublicationId = release.PublicationId,
-                        TimePeriodCoverage = release.TimePeriodCoverage,
-                        ReleaseName = release.Year.ToString(),
-                        Slug = release.Slug
                     };
 
                     if (releaseCreate.TemplateReleaseId.HasValue)
@@ -835,11 +830,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             releaseVersion.Release.TimePeriodCoverage = request.TimePeriodCoverage;
             releaseVersion.Release.Slug = request.Slug;
             releaseVersion.Release.Label = string.IsNullOrWhiteSpace(request.Label) ? null : request.Label.Trim();
-
-            // TODO The following will be removed in EES-5659
-            releaseVersion.ReleaseName = releaseVersion.Release.Year.ToString();
-            releaseVersion.TimePeriodCoverage = releaseVersion.Release.TimePeriodCoverage;
-            releaseVersion.Slug = releaseVersion.Release.Slug;
 
             releaseVersion.Type = request.Type!.Value;
             releaseVersion.PreReleaseAccessList = request.PreReleaseAccessList;

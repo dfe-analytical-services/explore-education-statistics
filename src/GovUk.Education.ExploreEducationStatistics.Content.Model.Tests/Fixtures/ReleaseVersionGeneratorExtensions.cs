@@ -187,16 +187,13 @@ public static class ReleaseVersionGeneratorExtensions
     public static InstanceSetters<ReleaseVersion> SetDefaults(this InstanceSetters<ReleaseVersion> setters)
         => setters
             .SetDefault(p => p.Id)
-            .SetDefault(p => p.Slug)
             .SetDefault(p => p.DataGuidance)
             .Set(p => p.Type,
                 f => f.PickRandom(EnumUtil.GetEnums<ReleaseType>().Except([ReleaseType.ExperimentalStatistics])))
             .SetDefault(p => p.PublicationId)
             .SetDefault(p => p.ReleaseId)
             .SetApprovalStatus(ReleaseApprovalStatus.Draft)
-            .SetTimePeriodCoverage(TimeIdentifier.AcademicYear)
             .SetDefault(p => p.PreReleaseAccessList)
-            .Set(p => p.ReleaseName, (_, _, context) => $"{2000 + context.Index}")
             .Set(p => p.NextReleaseDate, (_, _, context) => new PartialDate
             {
                 Day = "1", Month = "1", Year = $"{2000 + context.Index}"
@@ -237,11 +234,6 @@ public static class ReleaseVersionGeneratorExtensions
 
                     releaseVersion.Publication = release.Publication;
                     releaseVersion.PublicationId = release.PublicationId;
-
-                    // TODO EES-5659 Remove setting ReleaseName, TimePeriodCoverage, Slug
-                    releaseVersion.ReleaseName = release.Year.ToString();
-                    releaseVersion.TimePeriodCoverage = release.TimePeriodCoverage;
-                    releaseVersion.Slug = release.Slug;
 
                     return release;
                 })
@@ -348,11 +340,6 @@ public static class ReleaseVersionGeneratorExtensions
         this InstanceSetters<ReleaseVersion> setters,
         int version)
         => setters.Set(releaseVersion => releaseVersion.Version, version);
-
-    public static InstanceSetters<ReleaseVersion> SetTimePeriodCoverage(
-        this InstanceSetters<ReleaseVersion> setters,
-        TimeIdentifier timePeriodCoverage)
-        => setters.Set(releaseVersion => releaseVersion.TimePeriodCoverage, timePeriodCoverage);
 
     public static InstanceSetters<ReleaseVersion> SetNotifySubscribers(
         this InstanceSetters<ReleaseVersion> setters,
