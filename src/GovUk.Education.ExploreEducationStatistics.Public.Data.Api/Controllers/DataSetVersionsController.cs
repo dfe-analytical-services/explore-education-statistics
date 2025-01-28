@@ -56,7 +56,10 @@ public class DataSetVersionsController(
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionViewModel>> GetDataSetVersion(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc. \n\n This supports wildcard data set versions so that you can retreive the latest minor version automatically. \n\n For example: dataSetVersion=v2.* or dataSetVersion=2.* would return the latest minor version in the v2 series.")] string dataSetVersion,
+        [SwaggerParameter("""
+                          The data set version e.g. 1.0, 1.1, 2.0, etc.
+                          Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
+                          """)] string dataSetVersion,
         CancellationToken cancellationToken)
     {
         return await dataSetService
@@ -80,7 +83,10 @@ public class DataSetVersionsController(
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionChangesViewModel>> GetDataSetVersionChanges(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc. \n\n This supports wildcard data set versions so that you can retreive the latest minor version automatically. \n\n For example: dataSetVersion=v2.* or dataSetVersion=2.* would return the latest minor version in the v2 series.")] string dataSetVersion,
+        [SwaggerParameter("""
+                          The data set version e.g. 1.0, 1.1, 2.0, etc.
+                          Wildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.
+                          """)] string dataSetVersion,
         CancellationToken cancellationToken)
     {
         return await dataSetVersionChangeService

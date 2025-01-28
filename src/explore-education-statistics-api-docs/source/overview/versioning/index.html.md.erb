@@ -1,6 +1,6 @@
 ---
 title: Versioning
-last_reviewed_on: 2024-09-18
+last_reviewed_on: 2025-01-29
 review_in: 6 months
 weight: 4
 ---
@@ -56,3 +56,27 @@ You can find lists of changes via:
 
 - the data set's changelog on its details page on the EES website (see [Data catalogue](https://explore-education-statistics.service.gov.uk/data-catalogue))
 - the [Get a data set version's changes](/reference-v1/endpoints/GetDataSetVersionChanges/index.html) endpoint
+
+### Requesting data set versions
+
+There are several API endpoints that accept a `dataSetVersion` query parameter e.g. the 
+[Get a data set version](/reference-v1/endpoints/GetDataSetVersion/index.html) endpoint.
+The `dataSetVersion` parameter can be supplied with a version number (e.g. 1.0, 1.1, 2.0, 
+etc) that controls the data set version that should be used in the request.
+
+For example:
+
+- `dataSetVersion=1.1` uses version 1.1
+- `dataSetVersion=1.0` uses version 1.0
+- `dataSetVersion=1` uses version 1.0
+
+### Automatically receiving minor version updates
+
+When using the `dataSetVersion` parameter, minor data set version updates can automatically
+be retrieved from the API without having to change the version number explicitly. This can 
+be done by including an asterisk `*` wildcard character in place of a major or minor version.
+
+For example: 
+
+- `dataSetVersion=*` uses the latest major and minor version
+- `dataSetVersion=2.*` uses the latest minor version of the v2 series
