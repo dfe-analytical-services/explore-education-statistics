@@ -13,6 +13,11 @@ public class WildCardDatasetVersionTests
     [Theory]
     [InlineData("v*", 5)]
     [InlineData("*", 5)]
+    [InlineData("0.*", 0, 2, 1)]
+    [InlineData("0.*.*", 0, 2, 1)]
+    [InlineData("0.0.*", 0, 0, 3)]
+    [InlineData("0.2.*", 0, 2, 1)]
+    [InlineData("0.1.*", 0, 1, 3)]
     [InlineData("2.*.*", 2, 1, 4)]
     [InlineData("2.*", 2, 1, 4)]
     [InlineData("2.1.*", 2, 1, 4)]
@@ -20,6 +25,11 @@ public class WildCardDatasetVersionTests
     [InlineData("1.2.*", 1, 2, 0)]
     [InlineData("1.1.*", 1, 1, 1)]
     [InlineData("1.*", 1, 3, 0)]
+    [InlineData("v0.*", 0, 2, 1)]
+    [InlineData("v0.*.*", 0, 2, 1)]
+    [InlineData("v0.0.*", 0, 0, 3)]
+    [InlineData("v0.2.*", 0, 2, 1)]
+    [InlineData("v0.1.*", 0, 1, 3)]
     [InlineData("v2.*.*", 2, 1, 4)]
     [InlineData("v2.*", 2, 1, 4)]
     [InlineData("v2.1.*", 2, 1, 4)]
@@ -80,6 +90,74 @@ public class WildCardDatasetVersionTests
             {
                 new() {
                     DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 0, VersionMinor = 0, VersionPatch = 1
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 0, VersionMinor = 0, VersionPatch = 2
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 0, VersionMinor = 0, VersionPatch = 3
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 0, VersionMinor = 1, VersionPatch = 1
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 0, VersionMinor = 1, VersionPatch = 2
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 0, VersionMinor = 1, VersionPatch = 3
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 0, VersionMinor = 2, VersionPatch = 0
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 0, VersionMinor = 2, VersionPatch = 1
+                },
+                new() {
+                    DataSetId = dataSetId , Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 1, VersionMinor = 0, VersionPatch = 0
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 1, VersionMinor = 0, VersionPatch = 1
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 1, VersionMinor = 0, VersionPatch = 2
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 1, VersionMinor = 0, VersionPatch = 3
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 1, VersionMinor = 2, VersionPatch = 0
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 1, VersionMinor = 1
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 1, VersionMinor = 1, VersionPatch = 1
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 1, VersionMinor = 2
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
+                    VersionMajor = 1, VersionMinor = 3
+                },
+                new() {
+                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
                     VersionMajor = 2, VersionMinor = 0
                 },
                 new() {
@@ -102,36 +180,15 @@ public class WildCardDatasetVersionTests
                     DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
                     VersionMajor = 2, VersionMinor = 1, VersionPatch = 4
                 },
-
                 new() {
-                    DataSetId = dataSetId , Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
-                    VersionMajor = 1, VersionMinor = 0
-                },
-                new() {
-                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
-                    VersionMajor = 1, VersionMinor = 1
-                },
-                new() {
-                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
-                    VersionMajor = 1, VersionMinor = 1, VersionPatch = 1
-                },
-                new() {
-                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
-                    VersionMajor = 1, VersionMinor = 2
-                },
-                new() {
-                    DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
-                    VersionMajor = 1, VersionMinor = 3
-                },
-                 new() {
                     DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
                     VersionMajor = 3, VersionMinor = 0
                 },
-                  new() {
+                new() {
                     DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
                     VersionMajor = 4, VersionMinor = 0
                 },
-                  new() {
+                new() {
                     DataSetId = dataSetId, Notes = release.Slug, Release = release, Status = DataSetVersionStatus.Published,
                     VersionMajor = 5, VersionMinor = 0
                 }

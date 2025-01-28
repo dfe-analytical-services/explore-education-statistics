@@ -27,33 +27,21 @@ public static class DataSetVersionQueryableExtensions
         string wildcardedVersion,
         CancellationToken cancellationToken = default)
     {
-        SemVersion startRange, endRange;
-        var dataSetVersion = wildcardedVersion.Trim('v');
-        var parts = dataSetVersion.Split('.');
+        var parts = wildcardedVersion.Trim('v').Split('.');
          
-        if (!VersionUtils.TryParseWildcard(wildcardedVersion, out var semVersionRange)) return new NotFoundResult();
-        else if (dataSetVersion == "*") startRange = endRange = new SemVersion(0);
-        else
-        {
-            startRange = semVersionRange[0].Start;
-            endRange = semVersionRange[0].End;
-        }
+        if (!VersionUtils.TryParseWildcard(wildcardedVersion, out var semVersionRange)) 
+            return new NotFoundResult();
+     
+        int? major = parts[0] == "*" ? null : int.Parse(parts[0]);
+        int? minor = (parts.Length > 1 && parts[1] != "*") ? int.Parse(parts[1]) : null;
+        int? patch = (parts.Length > 2 && parts[2] != "*") ? int.Parse(parts[2]) : null;
 
         return await queryable
             .Where(dsv => dsv.DataSetId == dataSetId)
             .Where(v =>
-                (endRange.Major == 0 ? true :
-                    parts.ElementAtOrDefault(1) == "*" ? v.VersionMajor < endRange.Major :
-                        v.VersionMajor == endRange.Major
-                ) &&
-                (endRange.Minor == 0 ? true :
-                    parts.ElementAtOrDefault(2) == "*" ? v.VersionMinor < endRange.Minor :
-                        v.VersionMinor == endRange.Minor
-                ) &&
-                (
-                    endRange.Patch == 0 ? true : v.VersionPatch == endRange.Patch
-                )
-               )
+                (!major.HasValue || v.VersionMajor == major) &&
+                (!minor.HasValue || v.VersionMinor == minor) &&
+                (!patch.HasValue || v.VersionPatch == patch))
             .OrderByDescending(v => v.VersionMajor)
             .ThenByDescending(v => v.VersionMinor)
             .ThenByDescending(v => v.VersionPatch)
