@@ -44,7 +44,7 @@ export interface ReleaseSeriesItem {
 export interface PublicationSummary {
   id: string;
   slug: string;
-  latestReleaseSlug: string;
+  latestReleaseSlug?: string;
   title: string;
   owner: boolean;
   contact: Contact;

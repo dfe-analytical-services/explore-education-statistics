@@ -12,7 +12,7 @@ public record PublicationSummaryViewModel
 
     public required string Slug { get; init; }
 
-    public required string LatestReleaseSlug { get; init; }
+    public string? LatestReleaseSlug { get; init; }
 
     public bool? Owner { get; init; }
     
