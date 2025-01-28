@@ -342,7 +342,7 @@ module containerAppEnvironmentModule 'application/shared/containerAppEnvironment
 }
 
 // Deploy main Public API Container App.
-module apiAppIdentityModule 'application/public-api/publicApiAppIdentity.bicep' = if (deployContainerApp) {
+module apiAppIdentityModule 'application/public-api/publicApiAppIdentity.bicep' = {
   name: 'publicApiAppIdentityApplicationModuleDeploy'
   params: {
     location: location

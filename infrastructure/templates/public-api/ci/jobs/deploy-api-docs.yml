@@ -46,7 +46,7 @@ jobs:
               displayName: Build API docs
               env:
                 TECH_DOCS_API_URL: $(apiAppUrl)
-                TECH_DOCS_ALLOW_INDEXING: $(docsPreventIndexing)
+                TECH_DOCS_PREVENT_INDEXING: $(docsPreventIndexing)
               inputs:
                 workingDirectory: $(docsPath)
                 targetType: inline

@@ -109,7 +109,6 @@ stages:
       stageName: DeployDev
       condition: eq(variables.isDev, true)
       environment: Dev
-      approvalRequired: false
       serviceConnection: $(serviceConnectionDev)
       bicepParamFile: dev
 
@@ -117,7 +116,6 @@ stages:
     parameters:
       stageName: DeployTest
       condition: eq(variables.isTest, true)
-      # trigger: manual
       environment: Test
       serviceConnection: $(serviceConnectionTest)
       bicepParamFile: test
@@ -126,7 +124,6 @@ stages:
     parameters:
       stageName: DeployPreProd
       condition: eq(variables.isPreProd, true)
-      # trigger: manual
       environment: Pre-Prod
       serviceConnection: $(serviceConnectionPreProd)
       bicepParamFile: preprod
@@ -135,7 +132,6 @@ stages:
 #    parameters:
 #      stageName: DeployProd
 #      condition:  and(succeeded(), eq(variables.isMaster, true))
-#      trigger: manual
 #      dependsOn: DeployPreProd
 #      environment: Prod
 #      serviceConnection: $(serviceConnectionProd)

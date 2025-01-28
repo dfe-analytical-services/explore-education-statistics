@@ -3,9 +3,6 @@ parameters:
     type: string
   - name: environment
     type: string
-  - name: approvalRequired
-    type: boolean
-    default: true
   - name: serviceConnection
     type: string
   - name: bicepParamFile
@@ -31,7 +28,6 @@ stages:
   - stage: ${{ parameters.stageName }}
     displayName: Deploy ${{ parameters.environment }}
     dependsOn: ${{ parameters.dependsOn }}
-    # environment: ${{ if(eq(parameters.approvalRequired, true), 'ApprovalRequired', 'ApprovalNotRequired') }}
     trigger: ${{ parameters.trigger }}
     # Prevent this stage from running in parallel with the same deploy stage in other
     # ongoing runs of this pipeline. Instead, multiple executions of this stage will
