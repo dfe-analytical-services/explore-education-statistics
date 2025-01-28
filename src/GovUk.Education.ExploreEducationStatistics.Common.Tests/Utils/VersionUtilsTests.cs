@@ -69,6 +69,11 @@ public static class VersionUtilsTests
         {
             Assert.False(VersionUtils.TryParse(versionString, out _));
         }
+
+        /// <summary>
+        /// Only testing validation as the object returned from 'TryParseWildcard' returns a 'SemVersionRange' which doesn't contain a specific version that we can test against `versionString`
+        /// </summary>
+        /// <param name="versionString"></param>
         [Theory]
         [InlineData("*")]
         [InlineData("1.*.*")]
@@ -80,11 +85,12 @@ public static class VersionUtilsTests
         [InlineData("v1.*.*")]
         [InlineData("v1.*")]
         [InlineData("v1.2.*")]
-        public void ValidWildCardVersion_SuccessfullyParsed(
+        public void ValidWildcardVersionString_SuccessfullyValidated(
             string versionString)
         {
-            Assert.True(VersionUtils.TryParseWildcard(versionString, out var version));
+            Assert.True(VersionUtils.TryParseWildcard(versionString, out var versionRange));
         }
+
         [Theory]
         [InlineData("2.1*.0")]
         [InlineData("2.**.*")]
@@ -92,9 +98,9 @@ public static class VersionUtilsTests
         [InlineData("2*.1.0")]
         [InlineData("*.1.0")]
         [InlineData("1.*.4")]
-        public void InValidWildCardVersion_FailsToParse(string versionString)
+        public void InvalidWildcardVersionString_FailsValidation(string versionString)
         {
-            Assert.False(VersionUtils.TryParseWildcard(versionString, out var version));
+            Assert.False(VersionUtils.TryParseWildcard(versionString, out var versionRange));
         }
     }
 }
