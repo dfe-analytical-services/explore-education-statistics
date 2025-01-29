@@ -26,32 +26,28 @@ Navigate to 'Data and files' page
     user clicks link    Data and files
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
-Upload a ZIP file subject
+Upload a ZIP file file
     [Documentation]    EES-1397
-    user enters text into element    label:Subject title    Absence in PRUs
+    user enters text into element    id:dataFileUploadForm-title    Absence in PRUs
     user clicks radio    ZIP file
-    user waits until page contains element    label:Upload ZIP file
-    user chooses file    label:Upload ZIP file    ${FILES_DIR}upload-zip-test.zip
+    user waits until page contains element    id:dataFileUploadForm-zipFile
+    user chooses file    id:dataFileUploadForm-zipFile    ${FILES_DIR}upload-zip-test.zip
     user clicks button    Upload data files
 
     user waits until h2 is visible    Uploaded data files
-    user waits until page contains accordion section    Absence in PRUs
-    user opens accordion section    Absence in PRUs
-
-    ${section}=    user gets accordion section content element    Absence in PRUs
+    user waits until page contains data uploads table
 
     # To ensure "Data file size" and "Number of rows" will be filled
     user waits until page does not contain    Queued    %{WAIT_MEDIUM}
+    user checks table cell contains    1    1    Absence in PRUs    testid:Data files table
+    user checks table cell contains    1    2    141 Kb    testid:Data files table
+    user waits until table cell contains    1    3    Complete    testid:Data files table
+    user checks table cell contains    1    4    View details    testid:Data files table
+    user checks table cell contains    1    4    Edit title    testid:Data files table
+    user checks table cell contains    1    4    Replace data    testid:Data files table
+    user checks table cell contains    1    4    Delete files    testid:Data files table
 
-    user checks headed table body row contains    Subject title    Absence in PRUs    ${section}
-    user checks headed table body row contains    Data file    absence_in_prus.csv    ${section}
-    user checks headed table body row contains    Metadata file    absence_in_prus.meta.csv    ${section}
-    user checks headed table body row contains    Data file size    141 Kb    ${section}
-    user checks headed table body row contains    Number of rows    612    ${section}
-    user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
-
-Change subject title
-    user waits until page contains accordion section    Absence in PRUs
+Change data file title
     user clicks link    Edit title
 
     user waits until h2 is visible    Edit data file details
@@ -60,15 +56,11 @@ Change subject title
 
     user clicks button    Save changes
 
-Validate subject title has been updated
+Validate data file title has been updated
     user waits until h2 is visible    Uploaded data files
-    user waits until page contains accordion section    Updated Absence in PRUs
-    user opens accordion section    Absence in PRUs
+    user checks table cell contains    1    1    Updated Absence in PRUs    testid:Data files table
 
-    ${section}=    user gets accordion section content element    Absence in PRUs
-    user checks headed table body row contains    Subject title    Updated Absence in PRUs    ${section}
-
-Check subject appears in 'Data blocks' page
+Check data file appears in 'Data blocks' page
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
 
@@ -88,15 +80,15 @@ Navigate to 'Data and files' page - 'Supporting file uploads' tab
     user waits until page contains    No files have been uploaded
 
 Validate cannot upload empty ancillary file
-    user enters text into element    label:Title    Empty test
-    user chooses file    label:Upload file    ${FILES_DIR}empty-file.txt
+    user enters text into element    id:ancillaryFileForm-title    Empty test
+    user chooses file    id:ancillaryFileForm-file    ${FILES_DIR}empty-file.txt
     user clicks button    Add file
     user waits until page contains    Choose a file that is not empty
 
 Upload multiple ancillary files
-    user enters text into element    label:Title    Test 1
-    user enters text into element    label:Summary    Test 1 summary
-    user chooses file    label:Upload file    ${FILES_DIR}test-file-1.txt
+    user enters text into element    id:ancillaryFileForm-title    Test 1
+    user enters text into element    id:ancillaryFileForm-summary    Test 1 summary
+    user chooses file    id:ancillaryFileForm-file    ${FILES_DIR}test-file-1.txt
     user clicks button    Add file
 
     user waits until page contains accordion section    Test 1
@@ -108,9 +100,9 @@ Upload multiple ancillary files
     user checks summary list contains    File    test-file-1.txt    ${section_1}
     user checks summary list contains    File size    12 B    ${section_1}
 
-    user enters text into element    label:Title    Test 2
-    user enters text into element    label:Summary    Test 2 summary
-    user chooses file    label:Upload file    ${FILES_DIR}test-file-2.txt
+    user enters text into element    id:ancillaryFileForm-title    Test 2
+    user enters text into element    id:ancillaryFileForm-summary    Test 2 summary
+    user chooses file    id:ancillaryFileForm-file    ${FILES_DIR}test-file-2.txt
     user clicks button    Add file
 
     user waits until page contains accordion section    Test 2

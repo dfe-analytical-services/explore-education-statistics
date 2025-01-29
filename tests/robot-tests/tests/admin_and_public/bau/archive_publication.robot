@@ -203,7 +203,7 @@ Add headline text block to superseding-publication content
 Go to "Sign off" page and approve superseding-publication release
     user clicks link    Sign off
     user approves original release for immediate publication
-    user user waits until page contains element id:release-process-status-Complete %{WAIT_MEDIUM}
+    user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
 Check archive-publication is now archived and superseding-publication now appears on Find stats page
     sleep    1    # Prevent intermittent failure where Find Stats page loads before cache is cleared
@@ -227,8 +227,8 @@ Check public archive-publication release page displays superseded warning
     user checks page contains element    testid:superseded-warning
     user checks page contains element    testid:superseded-by-link
 
-    ${SUPERSDED_BY_LINK_TEXT}=    get text    testid:superseded-by-link
-    should contain    ${SUPERSDED_BY_LINK_TEXT}    ${PUBLICATION_NAME_SUPERSEDE}
+    ${superseded_link_text}=    get text    testid:superseded-by-link
+    should contain    ${superseded_link_text}    ${PUBLICATION_NAME_SUPERSEDE}
 
 Check superseded warning link takes user to superseding-publication release page
     user clicks element    testid:superseded-by-link

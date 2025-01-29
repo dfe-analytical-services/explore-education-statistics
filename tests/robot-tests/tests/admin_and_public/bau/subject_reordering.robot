@@ -48,25 +48,27 @@ Upload subjects to release
     ...    ordering-test-2.meta.csv
 
 Validate order of subjects after upload
-    user checks there are x accordion sections    4    id:uploadedDataFiles
-    user checks accordion is in position    Four    1    id:uploadedDataFiles
-    user checks accordion is in position    Three    2    id:uploadedDataFiles
-    user checks accordion is in position    One    3    id:uploadedDataFiles
-    user checks accordion is in position    Two    4    id:uploadedDataFiles
+    user waits until page contains data uploads table
+    user checks table body has x rows    4    testid:Data files table
+
+    user checks table cell contains    1    1    Four    testid:Data files table
+    user checks table cell contains    2    1    Three    testid:Data files table
+    user checks table cell contains    3    1    One    testid:Data files table
+    user checks table cell contains    4    1    Two    testid:Data files table
 
 Validate order of subjects after refreshing Data and files page
     user reloads page
-    user waits until page contains element    id:uploadedDataFiles
+    user waits until page contains data uploads table
+    user checks table body has x rows    4    testid:Data files table
 
-    user checks there are x accordion sections    4    id:uploadedDataFiles
-    user checks accordion is in position    Four    1    id:uploadedDataFiles
-    user checks accordion is in position    Three    2    id:uploadedDataFiles
-    user checks accordion is in position    One    3    id:uploadedDataFiles
-    user checks accordion is in position    Two    4    id:uploadedDataFiles
+    user checks table cell contains    1    1    Four    testid:Data files table
+    user checks table cell contains    2    1    Three    testid:Data files table
+    user checks table cell contains    3    1    One    testid:Data files table
+    user checks table cell contains    4    1    Two    testid:Data files table
 
 Order subjects
-    user clicks button    Reorder
-    user waits until page contains button    Save order
+    user clicks button    Reorder data files
+    user waits until page contains button    Confirm order
 
     click element    xpath://div[text()="Four"]    CTRL
     user presses keys    ${SPACE}
@@ -82,63 +84,59 @@ Order subjects
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
 
-    user clicks button    Save order
+    user clicks button    Confirm order
     user waits until page contains button    Reorder
 
-    user checks accordion is in position    One    1    id:uploadedDataFiles
-    user checks accordion is in position    Two    2    id:uploadedDataFiles
-    user checks accordion is in position    Four    3    id:uploadedDataFiles
-    user checks accordion is in position    Three    4    id:uploadedDataFiles
+    user checks table cell contains    1    1    One    testid:Data files table
+    user checks table cell contains    2    1    Two    testid:Data files table
+    user checks table cell contains    3    1    Four    testid:Data files table
+    user checks table cell contains    4    1    Three    testid:Data files table
 
 Validate new order is preserved after refresh
     user reloads page
-    user waits until page contains element    id:uploadedDataFiles
+    user waits until page contains data uploads table
 
-    user checks accordion is in position    One    1    id:uploadedDataFiles
-    user checks accordion is in position    Two    2    id:uploadedDataFiles
-    user checks accordion is in position    Four    3    id:uploadedDataFiles
-    user checks accordion is in position    Three    4    id:uploadedDataFiles
+    user checks table cell contains    1    1    One    testid:Data files table
+    user checks table cell contains    2    1    Two    testid:Data files table
+    user checks table cell contains    3    1    Four    testid:Data files table
+    user checks table cell contains    4    1    Three    testid:Data files table
 
 Start replacing last subject in order
-    user opens accordion section    Three
-    ${THREE_CONTENT}    user gets accordion section content element    Three    id:uploadedDataFiles
-    user clicks link    Replace data    ${THREE_CONTENT}
+    user clicks link in table cell    4    4    Replace data    testid:Data files table
     user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}ordering-test-3-replacement.csv
     user chooses file    id:dataFileUploadForm-metadataFile
     ...    ${FILES_DIR}ordering-test-3-replacement.meta.csv
     user clicks button    Upload data files
 
-    user waits until page contains element    testid:Replacement Subject title
-    user checks headed table body row cell contains    Subject title    1    Three
+    user waits until page contains element    testid:Replacement Title
+    user checks headed table body row cell contains    Title    1    Three
     user checks headed table body row cell contains    Data file    1    ordering-test-3.csv
-    user checks headed table body row cell contains    Subject title    2    Three
+    user checks headed table body row cell contains    Title    2    Three
     user checks headed table body row cell contains    Data file    2    ordering-test-3-replacement.csv
     user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Reorder subject that is being replaced
     user clicks link    Data and files
-    user waits until page contains element    id:uploadedDataFiles
+    user waits until page contains data uploads table
 
-    user clicks button    Reorder
-    user waits until page contains button    Save order
+    user clicks button    Reorder data files
+    user waits until page contains button    Confirm order
 
     click element    xpath://div[text()="Three"]    CTRL
     user presses keys    ${SPACE}
     user presses keys    ARROW_UP
     user presses keys    ${SPACE}
 
-    user clicks button    Save order
-    user waits until page contains button    Reorder
+    user clicks button    Confirm order
+    user waits until page contains button    Reorder data files
 
-    user checks accordion is in position    One    1    id:uploadedDataFiles
-    user checks accordion is in position    Two    2    id:uploadedDataFiles
-    user checks accordion is in position    Three    3    id:uploadedDataFiles
-    user checks accordion is in position    Four    4    id:uploadedDataFiles
+    user checks table cell contains    1    1    One    testid:Data files table
+    user checks table cell contains    2    1    Two    testid:Data files table
+    user checks table cell contains    3    1    Three    testid:Data files table
+    user checks table cell contains    4    1    Four    testid:Data files table
 
 Complete data replacement
-    user opens accordion section    Three
-    ${THREE_CONTENT}    user gets accordion section content element    Three    id:uploadedDataFiles
-    user clicks link    Replace data    ${THREE_CONTENT}
+    user clicks link in table cell    3    4    Replace data    testid:Data files table
 
     user waits until page contains    Data blocks: OK
     user waits until page contains    Footnotes: OK
@@ -147,12 +145,12 @@ Complete data replacement
 
 Validate subject order is correct after replacement
     user clicks link    Data and files
-    user waits until page contains element    id:uploadedDataFiles
+    user waits until page contains data uploads table
 
-    user checks accordion is in position    One    1    id:uploadedDataFiles
-    user checks accordion is in position    Two    2    id:uploadedDataFiles
-    user checks accordion is in position    Three    3    id:uploadedDataFiles
-    user checks accordion is in position    Four    4    id:uploadedDataFiles
+    user checks table cell contains    1    1    One    testid:Data files table
+    user checks table cell contains    2    1    Two    testid:Data files table
+    user checks table cell contains    3    1    Three    testid:Data files table
+    user checks table cell contains    4    1    Four    testid:Data files table
 
 Add data guidance for all subjects
     user clicks link    Data guidance
@@ -188,12 +186,12 @@ Publish release
 
 Check subjects can no longer be re-ordered after release has been published
     user clicks link    Data and files
-    user waits until page contains element    id:uploadedDataFiles
+    user waits until page contains data uploads table
 
-    user checks accordion is in position    One    1    id:uploadedDataFiles
-    user checks accordion is in position    Two    2    id:uploadedDataFiles
-    user checks accordion is in position    Three    3    id:uploadedDataFiles
-    user checks accordion is in position    Four    4    id:uploadedDataFiles
+    user checks table cell contains    1    1    One    testid:Data files table
+    user checks table cell contains    2    1    Two    testid:Data files table
+    user checks table cell contains    3    1    Three    testid:Data files table
+    user checks table cell contains    4    1    Four    testid:Data files table
 
     user checks element is not visible    testid:reorder-files    %{WAIT_SMALL}
 

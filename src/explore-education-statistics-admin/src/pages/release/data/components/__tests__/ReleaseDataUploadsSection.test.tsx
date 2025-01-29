@@ -144,56 +144,23 @@ describe('ReleaseDataUploadsSection', () => {
         'release-1',
       );
 
-      expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
+      expect(screen.getAllByRole('row')).toHaveLength(3);
     });
 
-    const sections = screen.getAllByTestId('accordionSection');
-    const section1 = within(sections[0]);
+    const fileTableRows = screen.getAllByRole('row');
+    const fileTableRow1 = within(fileTableRows[1]);
 
-    expect(
-      section1.getByRole('button', { name: /Test data 1/ }),
-    ).toBeInTheDocument();
+    expect(fileTableRow1.getByTestId('Title')).toHaveTextContent('Test data 1');
+    expect(fileTableRow1.getByTestId('Data file size')).toHaveTextContent(
+      '50 Kb',
+    );
+    expect(fileTableRow1.getByTestId('Status')).toHaveTextContent('Complete');
 
-    expect(section1.getByTestId('Subject title')).toHaveTextContent(
-      'Test data 1',
-    );
-    expect(section1.getByTestId('Data file')).toHaveTextContent('data-1.csv');
-    expect(section1.getByTestId('Metadata file')).toHaveTextContent(
-      'data-1.meta.csv',
-    );
-    expect(section1.getByTestId('Data file size')).toHaveTextContent('50 Kb');
-    expect(section1.getByTestId('Number of rows')).toHaveTextContent('100');
-    expect(section1.getByTestId('Status')).toHaveTextContent('Complete');
-    expect(section1.getByTestId('Uploaded by')).toHaveTextContent(
-      'user1@test.com',
-    );
-    expect(section1.getByTestId('Date uploaded')).toHaveTextContent(
-      '12 June 2020 12:00',
-    );
+    const fileTableRow2 = within(fileTableRows[2]);
 
-    const section2 = within(sections[1]);
+    expect(fileTableRow2.getByTestId('Title')).toHaveTextContent('Test data 2');
 
-    expect(
-      section2.getByRole('button', { name: /Test data 2/ }),
-    ).toBeInTheDocument();
-
-    expect(section2.getByTestId('Subject title')).toHaveTextContent(
-      'Test data 2',
-    );
-
-    expect(section2.getByTestId('Data file')).toHaveTextContent('data-2.csv');
-    expect(section2.getByTestId('Metadata file')).toHaveTextContent(
-      'data-2.meta.csv',
-    );
-    expect(section2.getByTestId('Data file size')).toHaveTextContent('100 Kb');
-    expect(section2.getByTestId('Number of rows')).toHaveTextContent('200');
-    expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
-    expect(section2.getByTestId('Uploaded by')).toHaveTextContent(
-      'user2@test.com',
-    );
-    expect(section2.getByTestId('Date uploaded')).toHaveTextContent(
-      '1 July 2020 12:00',
-    );
+    expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
   });
 
   test("renders data file details with status of 'Replacement in progress' if being replaced", async () => {
@@ -222,17 +189,15 @@ describe('ReleaseDataUploadsSection', () => {
         'release-1',
       );
 
-      expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
+      expect(screen.getAllByRole('row')).toHaveLength(2);
     });
 
-    const section1 = getAccordionSection(0);
+    const fileTableRow1 = getTableRow(1);
 
-    expect(
-      section1.getByRole('button', { name: /Test data 1/ }),
-    ).toBeInTheDocument();
+    expect(fileTableRow1.getByTestId('Title')).toHaveTextContent('Test data 1');
 
-    expect(section1.getByTestId('Status')).toHaveTextContent(
-      'Data replacement in progress',
+    expect(fileTableRow1.getByTestId('Status')).toHaveTextContent(
+      'Replacement in progress',
     );
   });
 
@@ -281,21 +246,21 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
+        expect(screen.getAllByRole('row')).toHaveLength(3);
       });
 
-      const sections = screen.getAllByTestId('accordionSection');
+      const fileTableRows = screen.getAllByRole('row');
 
-      const section1 = within(sections[0]);
-      expect(section1.getByTestId('Status')).toHaveTextContent('Queued');
+      const fileTableRow1 = within(fileTableRows[1]);
+      expect(fileTableRow1.getByTestId('Status')).toHaveTextContent('Queued');
       expect(
-        section1.queryByRole('button', { name: 'Delete files' }),
+        fileTableRow1.queryByRole('button', { name: 'Delete files' }),
       ).not.toBeInTheDocument();
 
-      const section2 = within(sections[1]);
-      expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
+      const fileTableRow2 = within(fileTableRows[2]);
+      expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
       expect(
-        section2.getByRole('button', { name: 'Delete files' }),
+        fileTableRow2.getByRole('button', { name: 'Delete files' }),
       ).toBeInTheDocument();
     });
 
@@ -339,19 +304,19 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
+        expect(screen.getAllByRole('row')).toHaveLength(3);
       });
 
-      const sections = screen.getAllByTestId('accordionSection');
+      const fileTableRows = screen.getAllByRole('row');
 
       expect(
-        within(sections[1]).getByRole('button', {
+        within(fileTableRows[2]).getByRole('button', {
           name: 'Delete files',
         }),
       ).toBeInTheDocument();
 
       await user.click(
-        within(sections[1]).getByRole('button', {
+        within(fileTableRows[2]).getByRole('button', {
           name: 'Delete files',
         }),
       );
@@ -423,19 +388,19 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
+        expect(screen.getAllByRole('row')).toHaveLength(3);
       });
 
-      const sections = screen.getAllByTestId('accordionSection');
+      const fileTableRows = screen.getAllByRole('row');
 
       expect(
-        within(sections[1]).getByRole('button', {
+        within(fileTableRows[2]).getByRole('button', {
           name: 'Delete files',
         }),
       ).toBeInTheDocument();
 
       await user.click(
-        within(sections[1]).getByRole('button', {
+        within(fileTableRows[2]).getByRole('button', {
           name: 'Delete files',
         }),
       );
@@ -453,14 +418,12 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
+        expect(screen.getAllByRole('row')).toHaveLength(2);
       });
 
-      expect(
-        within(screen.getByTestId('accordionSection')).getByRole('button', {
-          name: /Test data 1/,
-        }),
-      ).toBeInTheDocument();
+      expect(getTableRow(1).getByTestId('Title')).toHaveTextContent(
+        'Test data 1',
+      );
     });
 
     test('does not allow deleting files when linked to an API data set', async () => {
@@ -482,13 +445,13 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
+        expect(screen.getAllByRole('row')).toHaveLength(2);
       });
 
-      const sections = screen.getAllByTestId('accordionSection');
+      const fileTableRows = screen.getAllByRole('row');
 
       await user.click(
-        within(sections[0]).getByRole('button', {
+        within(fileTableRows[1]).getByRole('button', {
           name: 'Delete files',
         }),
       );
@@ -535,22 +498,21 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
+        expect(screen.getAllByRole('row')).toHaveLength(3);
       });
 
-      const sections = screen.getAllByTestId('accordionSection');
-      expect(sections).toHaveLength(2);
+      const fileTableRows = screen.getAllByRole('row');
 
-      const section1 = within(sections[0]);
-      expect(section1.getByTestId('Status')).toHaveTextContent('Queued');
+      const fileTableRow1 = within(fileTableRows[1]);
+      expect(fileTableRow1.getByTestId('Status')).toHaveTextContent('Queued');
       expect(
-        section1.queryByRole('link', { name: 'Replace data' }),
+        fileTableRow1.queryByRole('link', { name: 'Replace data' }),
       ).not.toBeInTheDocument();
 
-      const section2 = within(sections[1]);
-      expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
+      const fileTableRow2 = within(fileTableRows[2]);
+      expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
       expect(
-        section2.getByRole('link', { name: 'Replace data' }),
+        fileTableRow2.getByRole('link', { name: 'Replace data' }),
       ).toBeInTheDocument();
     });
 
@@ -574,14 +536,14 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
+        expect(screen.getAllByRole('row')).toHaveLength(3);
       });
 
-      const sections = screen.getAllByTestId('accordionSection');
+      const fileTableRows = screen.getAllByRole('row');
 
-      const section2 = within(sections[1]);
+      const fileTableRow2 = within(fileTableRows[2]);
       expect(
-        section2.getByRole('link', { name: 'Replace data' }),
+        fileTableRow2.getByRole('link', { name: 'Replace data' }),
       ).toHaveAttribute(
         'href',
         '/publication/publication-1/release/release-1/data/data-2/replace',
@@ -607,13 +569,13 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
+        expect(screen.getAllByRole('row')).toHaveLength(2);
       });
 
-      const sections = screen.getAllByTestId('accordionSection');
+      const fileTableRows = screen.getAllByRole('row');
 
       await user.click(
-        within(sections[0]).getByRole('button', { name: 'Replace data' }),
+        within(fileTableRows[1]).getByRole('button', { name: 'Replace data' }),
       );
 
       await waitFor(() => {
@@ -661,8 +623,8 @@ describe('ReleaseDataUploadsSection', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enter a subject title', {
-            selector: '#dataFileUploadForm-subjectTitle-error',
+          screen.getByText('Enter a title', {
+            selector: '#dataFileUploadForm-title-error',
           }),
         ).toBeInTheDocument();
       });
@@ -679,7 +641,7 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await user.type(screen.getByLabelText('Subject title'), 'Test data 1');
+      await user.type(screen.getByLabelText('Title'), 'Test data 1');
 
       await user.click(
         screen.getByRole('button', {
@@ -687,12 +649,12 @@ describe('ReleaseDataUploadsSection', () => {
         }),
       );
 
-      await user.click(screen.getByLabelText('Subject title'));
+      await user.click(screen.getByLabelText('Title'));
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enter a unique subject title', {
-            selector: '#dataFileUploadForm-subjectTitle-error',
+          screen.getByText('Enter a unique title', {
+            selector: '#dataFileUploadForm-title-error',
           }),
         ).toBeInTheDocument();
       });
@@ -719,8 +681,8 @@ describe('ReleaseDataUploadsSection', () => {
         expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
 
         expect(
-          screen.getByText('Enter a subject title', {
-            selector: '#dataFileUploadForm-subjectTitle-error',
+          screen.getByText('Enter a title', {
+            selector: '#dataFileUploadForm-title-error',
           }),
         ).toBeInTheDocument();
 
@@ -764,8 +726,8 @@ describe('ReleaseDataUploadsSection', () => {
         expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
 
         expect(
-          screen.getByText('Enter a subject title', {
-            selector: '#dataFileUploadForm-subjectTitle-error',
+          screen.getByText('Enter a title', {
+            selector: '#dataFileUploadForm-title-error',
           }),
         ).toBeInTheDocument();
 
@@ -841,7 +803,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      await user.type(screen.getByLabelText('Subject title'), 'Test title');
+      await user.type(screen.getByLabelText('Title'), 'Test title');
 
       await user.upload(screen.getByLabelText('Upload data file'), dataFile);
       await user.upload(
@@ -892,7 +854,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      await user.type(screen.getByLabelText('Subject title'), 'Test zip title');
+      await user.type(screen.getByLabelText('Title'), 'Test zip title');
 
       await user.click(screen.getByLabelText('ZIP file'));
 
@@ -994,7 +956,8 @@ describe('ReleaseDataUploadsSection', () => {
       });
     });
 
-    test('updates the number of rows after uploading CSV file when status changes', async () => {
+    test('updates the file size after uploading CSV file when status changes', async () => {
+      // we don't display rows :/
       releaseDataFileService.uploadDataFiles.mockResolvedValue(
         testUploadedDataFile,
       );
@@ -1033,7 +996,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      await user.type(screen.getByLabelText('Subject title'), 'Test title');
+      await user.type(screen.getByLabelText('Title'), 'Test title');
 
       await user.upload(screen.getByLabelText('Upload data file'), dataFile);
       await user.upload(
@@ -1061,8 +1024,8 @@ describe('ReleaseDataUploadsSection', () => {
         );
       });
 
-      const sections = screen.getAllByTestId('accordionSection');
-      const section3 = within(sections[2]);
+      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRow3 = within(fileTableRows[3]);
 
       await waitFor(() =>
         expect(
@@ -1070,11 +1033,13 @@ describe('ReleaseDataUploadsSection', () => {
         ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
       );
       await waitFor(() => {
-        expect(section3.getByTestId('Number of rows')).toHaveTextContent('100');
+        expect(fileTableRow3.getByTestId('Data file size')).toHaveTextContent(
+          '150 Kb',
+        );
       });
     });
 
-    test('updates the number of rows after uploading ZIP file when status changes', async () => {
+    test('updates the file size after uploading ZIP file when status changes', async () => {
       releaseDataFileService.uploadZipDataFile.mockResolvedValue({
         ...testUploadedZipFile,
       });
@@ -1111,7 +1076,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      await user.type(screen.getByLabelText('Subject title'), 'Test title');
+      await user.type(screen.getByLabelText('Title'), 'Test title');
 
       await user.click(screen.getByLabelText('ZIP file'));
 
@@ -1132,8 +1097,8 @@ describe('ReleaseDataUploadsSection', () => {
         ),
       );
 
-      const sections = screen.getAllByTestId('accordionSection');
-      const section3 = within(sections[2]);
+      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRow3 = within(fileTableRows[3]);
 
       await waitFor(() =>
         expect(
@@ -1141,7 +1106,9 @@ describe('ReleaseDataUploadsSection', () => {
         ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
       );
       await waitFor(() => {
-        expect(section3.getByTestId('Number of rows')).toHaveTextContent('100');
+        expect(fileTableRow3.getByTestId('Data file size')).toHaveTextContent(
+          '150 Kb',
+        );
       });
     });
 
@@ -1169,14 +1136,12 @@ describe('ReleaseDataUploadsSection', () => {
           </MemoryRouter>,
         );
 
-        await waitFor(() =>
-          expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
-        );
+        await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
 
-        const section = getAccordionSection(0);
+        const fileTableRow = getTableRow(1);
 
         expect(
-          section.getByRole('button', { name: 'Cancel' }),
+          fileTableRow.getByRole('button', { name: 'Cancel' }),
         ).toBeInTheDocument();
       });
 
@@ -1203,14 +1168,12 @@ describe('ReleaseDataUploadsSection', () => {
           </MemoryRouter>,
         );
 
-        await waitFor(() =>
-          expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
-        );
+        await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
 
-        const section = getAccordionSection(0);
+        const fileTableRow = getTableRow(1);
 
         expect(
-          section.queryByRole('button', { name: 'Cancel' }),
+          fileTableRow.queryByRole('button', { name: 'Cancel' }),
         ).not.toBeInTheDocument();
       });
     });
@@ -1238,13 +1201,11 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() =>
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
-      );
+      await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
 
-      const section = getAccordionSection(0);
+      const fileTableRow = getTableRow(1);
 
-      await user.click(section.getByRole('button', { name: 'Cancel' }));
+      await user.click(fileTableRow.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1286,13 +1247,11 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() =>
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
-      );
+      await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
 
-      const section = getAccordionSection(0);
+      const fileTableRow = getTableRow(1);
 
-      await user.click(section.getByRole('button', { name: 'Cancel' }));
+      await user.click(fileTableRow.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1318,7 +1277,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       expect(
-        section.queryByRole('button', { name: 'Cancel' }),
+        fileTableRow.queryByRole('button', { name: 'Cancel' }),
       ).not.toBeInTheDocument();
     });
 
@@ -1337,13 +1296,11 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() =>
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
-      );
+      await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
 
-      const section = getAccordionSection(0);
+      const fileTableRow = getTableRow(1);
 
-      await user.click(section.getByRole('button', { name: 'Cancel' }));
+      await user.click(fileTableRow.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1364,7 +1321,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       expect(
-        section.getByRole('button', { name: 'Cancel' }),
+        fileTableRow.getByRole('button', { name: 'Cancel' }),
       ).toBeInTheDocument();
     });
 
@@ -1385,13 +1342,11 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() =>
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
-      );
+      await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
 
-      const section = getAccordionSection(0);
+      const fileTableRow = getTableRow(1);
 
-      await user.click(section.getByRole('button', { name: 'Cancel' }));
+      await user.click(fileTableRow.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1418,14 +1373,14 @@ describe('ReleaseDataUploadsSection', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
       expect(
-        section.queryByRole('button', { name: 'Cancel' }),
+        fileTableRow.queryByRole('button', { name: 'Cancel' }),
       ).not.toBeInTheDocument();
 
       expect(screen.getByText('Cancellation failed')).toBeInTheDocument();
     });
   });
 
-  function getAccordionSection(index: number) {
-    return within(screen.getAllByTestId('accordionSection')[index]);
+  function getTableRow(index: number) {
+    return within(screen.getAllByRole('row')[index]);
   }
 });

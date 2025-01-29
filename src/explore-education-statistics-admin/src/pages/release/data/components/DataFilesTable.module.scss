@@ -1,0 +1,31 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.table {
+  td {
+    vertical-align: middle;
+  }
+}
+
+.title {
+  max-width: 500px;
+}
+
+.fileSize {
+  width: 5rem;
+  text-align: right;
+}
+
+.fileStatus {
+  max-width: 126px;
+}
+
+.actions {
+  --verticalSpacing: #{govuk-spacing(1)};
+  margin-bottom: 0;
+
+  @include govuk-media-query($until: desktop) {
+    align-items: start;
+    flex-direction: column;
+    white-space: nowrap;
+  }
+}
