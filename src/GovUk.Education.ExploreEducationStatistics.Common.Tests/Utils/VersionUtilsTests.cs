@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Xunit;
 
@@ -75,20 +74,30 @@ public static class VersionUtilsTests
         /// </summary>
         /// <param name="versionString"></param>
         [Theory]
-        [InlineData("*")]
-        [InlineData("1.*.*")]
-        [InlineData("  1.*.*")]
-        [InlineData("  1.*.*  ")]
-        [InlineData("1.*")]
-        [InlineData("1.2.*")]
-        [InlineData("v*")]
-        [InlineData("v1.*.*")]
-        [InlineData("v1.*")]
-        [InlineData("v1.2.*")]
+        [InlineData("*", null, null, null)]
+        [InlineData("1.*.*", 1, null, null)]
+        [InlineData("  1.*.*", 1, null, null)]
+        [InlineData("  1.*.*  ", 1, null, null)]
+        [InlineData("1.*", 1, null, null)]
+        [InlineData("1.2.*", 1, 2, null)]
+        [InlineData("v*", null, null, null)]
+        [InlineData("v1.*.*", 1, null, null)]
+        [InlineData("v1.*", 1, null, null)]
+        [InlineData("v1.2.*", 1, 2, null)]
         public void ValidWildcardVersionString_SuccessfullyValidated(
-            string versionString)
+            string versionString,
+            int? major,
+            int? minor,
+            int? patch
+            )
         {
-            Assert.True(VersionUtils.TryParseWildcard(versionString, out var versionRange));
+            Assert.True(VersionUtils.TryParseWildcard(versionString, out var wildcardVersion));
+            
+            Assert.NotNull(wildcardVersion);
+            Assert.Equal((uint?)major, wildcardVersion.VersionMajor);
+            Assert.Equal((uint?)major, wildcardVersion.VersionMajor);
+            Assert.Equal((uint?)minor, wildcardVersion.VersionMinor);
+            Assert.Equal((uint?)patch, wildcardVersion.VersionPatch);
         }
 
         [Theory]
@@ -100,7 +109,8 @@ public static class VersionUtilsTests
         [InlineData("1.*.4")]
         public void InvalidWildcardVersionString_FailsValidation(string versionString)
         {
-            Assert.False(VersionUtils.TryParseWildcard(versionString, out var versionRange));
+            Assert.False(VersionUtils.TryParseWildcard(versionString, out var wildcardVersion));
+            Assert.Null(wildcardVersion);
         }
     }
 }

@@ -19,7 +19,6 @@ public class DataSetVersionQueryableExtensionsTests
         [InlineData("*", 5)]
         [InlineData("0.*", 0, 2, 1)]
         [InlineData("0.*.*", 0, 2, 1)]
-        [InlineData("0.0.*", 0, 0, 3)]
         [InlineData("0.2.*", 0, 2, 1)]
         [InlineData("0.1.*", 0, 1, 3)]
         [InlineData("2.*.*", 2, 1, 4)]
@@ -31,7 +30,6 @@ public class DataSetVersionQueryableExtensionsTests
         [InlineData("1.*", 1, 3, 0)]
         [InlineData("v0.*", 0, 2, 1)]
         [InlineData("v0.*.*", 0, 2, 1)]
-        [InlineData("v0.0.*", 0, 0, 3)]
         [InlineData("v0.2.*", 0, 2, 1)]
         [InlineData("v0.1.*", 0, 1, 3)]
         [InlineData("v2.*.*", 2, 1, 4)]
@@ -69,6 +67,7 @@ public class DataSetVersionQueryableExtensionsTests
         [InlineData("1.*.4")]
         [InlineData("2.4.*")]
         [InlineData("7.*")]
+        [InlineData("0.0.*")]
         [InlineData("0.3.*")]
         public async Task TestDataSetVersions_ReturnsNotFound(string versionString)
         {
@@ -95,9 +94,6 @@ public class DataSetVersionQueryableExtensionsTests
                 .WithStatusPublished()
                 .WithDataSetId(dataSet.Id)
                 .WithPreviewTokens(() => [_dataFixture.DefaultPreviewToken()])
-                .ForIndex(0, dsv => dsv.SetVersionNumber(0, 0, 1))
-                .ForIndex(1, dsv => dsv.SetVersionNumber(0, 0, 2))
-                .ForIndex(2, dsv => dsv.SetVersionNumber(0, 0, 3))
                 .ForIndex(3, dsv => dsv.SetVersionNumber(0, 1, 1))
                 .ForIndex(4, dsv => dsv.SetVersionNumber(0, 1, 2))
                 .ForIndex(5, dsv => dsv.SetVersionNumber(0, 1, 3))
