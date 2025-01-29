@@ -13,6 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=                    UI tests - publish methodology %{RUN_IDENTIFIER}
+${PUBLICATION_URL}=                     /find-statistics/ui-tests-publish-methodology-%{RUN_IDENTIFIER}/2021-22
 ${PUBLIC_METHODOLOGY_URL_ENDING}=       /methodology/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
 ${RELEASE_NAME}=                        Academic year 2021/22
 
@@ -194,7 +195,7 @@ Verify that the methodology displays a link to the publication
 
     user checks page contains link with text and url
     ...    ${PUBLICATION_NAME}
-    ...    /find-statistics/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
+    ...    ${PUBLICATION_URL}
     ...    css:[aria-labelledby="related-information"]
 
 Verify that the methodology content is correct
@@ -349,7 +350,7 @@ Verify that the amended methodology displays a link to the publication
     ...    xpath://h3[text()="Publications"]
     user checks page contains link with text and url
     ...    ${PUBLICATION_NAME}
-    ...    /find-statistics/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
+    ...    ${PUBLICATION_URL}
     ...    css:[aria-labelledby="related-information"]
 
 Verify that the amended methodology content is correct
