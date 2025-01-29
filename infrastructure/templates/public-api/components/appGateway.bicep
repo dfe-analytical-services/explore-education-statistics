@@ -87,8 +87,6 @@ module keyVaultAccessPolicyModule 'keyVaultAccessPolicy.bicep' = {
   }
 }
 
-var publicIpAddressDomainLabel = replace(replace(site.fqdn, '.', ''), '-', '')
-
 // Create public IP addresses for every site we will expose through this App Gateway.
 resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for site in sites: {
   name: '${site.name}-pip'
@@ -101,8 +99,8 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [f
     publicIPAllocationMethod: 'Static'
     idleTimeoutInMinutes: 4
     dnsSettings: {
-      domainNameLabel: publicIpAddressDomainLabel
-      fqdn: '${publicIpAddressDomainLabel}.${location}.cloudapp.azure.com'
+      domainNameLabel: replace(replace(site.fqdn, '.', ''), '-', '')
+      fqdn: '${replace(replace(site.fqdn, '.', ''), '-', '')}.${location}.cloudapp.azure.com'
     }
   }
   zones: availabilityZones
