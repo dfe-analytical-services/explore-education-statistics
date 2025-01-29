@@ -33,7 +33,7 @@ Validate Related information section and links exist
 
 Validate themes filters exist
     user checks select contains option    id:filters-form-theme    All themes
-    user checks selected option label     id:filters-form-theme    All themes
+    user checks selected option label    id:filters-form-theme    All themes
     user checks select contains option    id:filters-form-theme    Children's social care
     user checks select contains option    id:filters-form-theme    COVID-19
     user checks select contains option    id:filters-form-theme    Destination of pupils and students
@@ -46,11 +46,9 @@ Validate themes filters exist
     user checks select contains option    id:filters-form-theme    Teachers and school workforce
     user checks select contains option    id:filters-form-theme    UK education and training statistics
 
-
-
 Validate release type filters exist
     user checks select contains option    id:filters-form-release-type    All release types
-    user checks selected option label     id:filters-form-release-type    All release types
+    user checks selected option label    id:filters-form-release-type    All release types
     user checks select contains option    id:filters-form-release-type    Accredited official statistics
     user checks select contains option    id:filters-form-release-type    Official statistics
     user checks select contains option    id:filters-form-release-type    Official statistics in development
@@ -73,7 +71,7 @@ Filter by theme
 Remove theme filter
     user clicks button    Pupils and schools
     user checks page does not contain button    Pupils and schools
-    user checks selected option label     id:filters-form-theme    All themes
+    user checks selected option label    id:filters-form-theme    All themes
 
 Filter by release type
     user chooses select option    id:filters-form-release-type    Official statistics
@@ -82,7 +80,7 @@ Filter by release type
 Remove release type filter
     user clicks button    Official statistics
     user checks page does not contain button    Official statistics
-    user checks selected option label     id:filters-form-release-type    All release types
+    user checks selected option label    id:filters-form-release-type    All release types
 
 Searching
     user clicks element    id:searchForm-search
@@ -92,7 +90,7 @@ Searching
     user clicks radio    Relevance
     user waits until page finishes loading
     user checks page contains button    pupil absence
-    user checks list item contains    testid:publicationsList    1   Pupil absence in schools in England
+    user checks list item contains    testid:publicationsList    1    Pupil absence in schools in England
 
 Removing search
     user clicks button    pupil absence
@@ -116,5 +114,5 @@ Reset all filters
     user checks page does not contain button    Official statistics
     user checks page does not contain button    Reset filters
 
-    user checks selected option label     id:filters-form-theme    All themes
-    user checks selected option label     id:filters-form-release-type    All release types
+    user checks selected option label    id:filters-form-theme    All themes
+    user checks selected option label    id:filters-form-release-type    All release types
