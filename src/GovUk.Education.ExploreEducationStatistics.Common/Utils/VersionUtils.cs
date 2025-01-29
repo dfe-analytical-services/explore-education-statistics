@@ -1,5 +1,6 @@
 #nullable enable
 using Semver;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
@@ -18,16 +19,11 @@ public static class VersionUtils
 
         return successful;
     }
-    public static bool TryParseWildcard(string versionString, out SemVersionRange version)
-    {
-        var successful = SemVersionRange.TryParse(
-            versionString,
+
+    public static bool TryParseWildcard(string versionString,
+        [NotNullWhen(true)] out SemVersionRange? versionRange) =>
+        SemVersionRange.TryParse(versionString,
             SemVersionRangeOptions.OptionalMinorPatch
             | SemVersionRangeOptions.AllowLowerV,
-            out var sv);
-
-        version = sv;
-
-        return successful;
-    }
+            out versionRange);
 }

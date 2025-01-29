@@ -56,3 +56,14 @@ You can find lists of changes via:
 
 - the data set's changelog on its details page on the EES website (see [Data catalogue](https://explore-education-statistics.service.gov.uk/data-catalogue))
 - the [Get a data set version's changes](/reference-v1/endpoints/GetDataSetVersionChanges/index.html) endpoint
+
+### Automatically receiving minor updates
+
+New data set versions can automatically be retreived from the API without having to specify the new data set version numbers explicitly. This can be used by
+supplying endpoints with the parameter `dataSetVersion` an astrick `*` wildcard character in the place of the minor or major version. 
+
+For example: 
+
+- `dataSetVersion=*` or `dataSetVersion=v*` will return the latest major and minor version for the given data set.
+- `dataSetVersion=2.*.*`, `dataSetVersion=2.*` or `dataSetVersion=v2.*` will return the latest minor version of the v2 series 
+- `dataSetVersion=2.3.*` or `dataSetVersion=v2.3.*` will return the latest patch version of the v2.3 series.

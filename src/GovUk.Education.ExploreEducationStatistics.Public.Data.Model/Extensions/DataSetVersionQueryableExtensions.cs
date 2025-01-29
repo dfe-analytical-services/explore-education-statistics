@@ -12,13 +12,13 @@ public static class DataSetVersionQueryableExtensions
         this IQueryable<DataSetVersion> queryable,
         Guid dataSetId,
         string version,
-        CancellationToken cancellationToken = default)
-    {
-        return await (version.Contains('*') ? queryable.FindByWildcardVersion(dataSetId, version, cancellationToken) : queryable.FindBySpecificVersion(dataSetId, version, cancellationToken));
-    }
+        CancellationToken cancellationToken = default) => await (version.Contains('*') 
+            ? queryable.FindByWildcardVersion(dataSetId, version, cancellationToken) 
+            : queryable.FindBySpecificVersion(dataSetId, version, cancellationToken));
+
     /// <summary>
     /// Returns the latest version of a data set based on a major/minor/patch level that's being wildcarded (i.e., substituted with '*').
-    /// This method retrieves the most recent data set version based on which portion of the version (major, minor, or patch) is being wildcarded (i.e., the position of '*' within the string parameter wildcardedVersion)
+    /// based on which portion of the version (major, minor, or patch) is being wildcarded (i.e., the position of '*' within the string parameter wildcardedVersion)
     /// </summary>
     /// <param name="wildcardedVersion">Must contain * (representing the wildcard)</param>
     public static async Task<Either<ActionResult, DataSetVersion>> FindByWildcardVersion(
@@ -46,6 +46,7 @@ public static class DataSetVersionQueryableExtensions
             .ThenByDescending(v => v.VersionPatch)
             .FirstOrNotFoundAsync(cancellationToken);
     }
+
     public static async Task<Either<ActionResult, DataSetVersion>> FindBySpecificVersion(
        this IQueryable<DataSetVersion> queryable,
        Guid dataSetId,
