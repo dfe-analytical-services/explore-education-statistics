@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
@@ -24,10 +25,14 @@ public class ReleasesController(IReleaseService releaseService) : ControllerBase
 
     [HttpPatch("releases/{releaseId:guid}")]
     public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(ReleaseUpdateRequest request,
-        Guid releaseId)
+        Guid releaseId,
+        CancellationToken cancellationToken)
     {
         return await releaseService
-            .UpdateRelease(releaseId, request)
+            .UpdateRelease(
+                releaseId: releaseId, 
+                releaseUpdate: request,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 }

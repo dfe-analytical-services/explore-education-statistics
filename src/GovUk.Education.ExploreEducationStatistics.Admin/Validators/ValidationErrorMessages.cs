@@ -4,6 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
     {
         // Slug
         SlugNotUnique,
+        ReleaseSlugUsedByRedirect,
         PublicationSlugNotUnique,
         PublicationSlugUsedByRedirect,
         MethodologySlugNotUnique,
