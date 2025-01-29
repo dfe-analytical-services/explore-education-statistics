@@ -22,4 +22,8 @@ public interface IReleaseCacheService
         DateTime expectedPublishDate,
         string publicationSlug,
         string? releaseSlug = null);
+
+    Task<Either<ActionResult, Unit>> RemoveRelease(
+        string publicationSlug,
+        string releaseSlug);
 }
