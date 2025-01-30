@@ -36,7 +36,7 @@ public record WildcardVersion(uint? Major, uint? Minor, uint? Patch)
         }
 
         version = null;
-        if (parts.Length > 3 || !parts.Contains("*") || !parts.All(part => part.Is("*") || uint.TryParse(part, out _)))
+        if (parts.Length > 3 || !parts.All(part => part.Is("*") || uint.TryParse(part, System.Globalization.NumberStyles.None, null, out _)))
             return false;
 
         var indexOfWildcard = Array.FindIndex(parts, part => part == "*");

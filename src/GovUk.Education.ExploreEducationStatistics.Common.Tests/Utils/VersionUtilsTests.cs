@@ -38,6 +38,8 @@ public static class VersionUtilsTests
         [InlineData("  1  .  *  .  *  ")]
         [InlineData("v1 . 2 . *")]
         [InlineData("v1 . 2 . 1")]
+        [InlineData("  1  . 2  .*")]
+        [InlineData("  1  . 2  .1")]
         [InlineData("    v1 . 2 . 1")]
         [InlineData("2.1*.0")]
         [InlineData("2.**.*")]
