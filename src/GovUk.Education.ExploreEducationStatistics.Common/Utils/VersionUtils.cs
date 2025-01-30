@@ -36,11 +36,11 @@ public record WildcardVersion(uint? Major, uint? Minor, uint? Patch)
         }
 
         version = null;
-        if (parts.Length > 3 || !parts.All(part => part.Is("*") || uint.TryParse(part, System.Globalization.NumberStyles.None, null, out _)))
+        var containsInvalidItems = !parts.All(part => part.Is("*") || uint.TryParse(part, System.Globalization.NumberStyles.None, null, out _));
+        if (parts.Length > 3 || containsInvalidItems)
             return false;
 
         var indexOfWildcard = Array.FindIndex(parts, part => part == "*");
-
         if (indexOfWildcard != -1 && parts.Skip(indexOfWildcard + 1).Any(part => part != "*"))
             return false; // reject version strings like 1.*.1
 
