@@ -245,7 +245,7 @@ describe('ReleaseApiDataSetsSection', () => {
     ).toBeInTheDocument();
   });
 
-  test('submitting the create version form calls the correct service and redirects to next page', async () => {
+  test('submitting the create version form calls the correct service and updates the modal', async () => {
     apiDataSetCandidateService.listCandidates.mockResolvedValue(testCandidates);
     apiDataSetService.listDataSets.mockResolvedValue([]);
     apiDataSetService.createDataSet.mockResolvedValue({
@@ -290,9 +290,9 @@ describe('ReleaseApiDataSetsSection', () => {
       });
     });
 
-    expect(history.location.pathname).toBe(
-      '/publication/publication-1/release/release-1/api-data-sets/data-set-id',
-    );
+    expect(
+      await screen.findByText('Creating API data set'),
+    ).toBeInTheDocument();
   });
 
   function renderPage(options?: {

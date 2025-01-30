@@ -62,6 +62,9 @@ Create API data set
     user chooses select option    name:releaseFileId    ${SUBJECT_NAME_1}
     user clicks button    Confirm new API data set
 
+    user waits until page contains    Creating API data set
+    user clicks link    View API data set details
+
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
