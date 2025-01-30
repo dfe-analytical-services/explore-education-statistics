@@ -6,6 +6,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
 public static class VersionUtilsTests
 {
+    public class TryParseWildcard
+    {
+        /// <summary>
+        /// Only testing validation as the object returned from 'TryParseWildcard' returns a 'SemVersionRange' which doesn't contain a specific version that we can test against `versionString`
+        /// </summary>
+        /// <param name="versionString"></param>
+        [Theory]
+        [InlineData("*", null, null, null)]
+        [InlineData("1.*.*", 1, null, null)]
+        [InlineData("  1.*.*", 1, null, null)]
+        [InlineData("  1.*.*  ", 1, null, null)]
+        [InlineData("1.*", 1, null, null)]
+        [InlineData("1.2.*", 1, 2, null)]
+        [InlineData("v*", null, null, null)]
+        [InlineData("v1.*.*", 1, null, null)]
+        [InlineData("v1.*", 1, null, null)]
+        [InlineData("v1.2.*", 1, 2, null)]
+        public void ValidWildcardVersionString_SuccessfullyValidated(
+            string versionString,
+            int? major,
+            int? minor,
+            int? patch
+            )
+        {
+            Assert.True(WildcardVersion.TryParse(versionString, out var wildcardVersion));
+
+            Assert.NotNull(wildcardVersion);
+            Assert.Equal((uint?)major, wildcardVersion.VersionMajor);
+            Assert.Equal((uint?)major, wildcardVersion.VersionMajor);
+            Assert.Equal((uint?)minor, wildcardVersion.VersionMinor);
+            Assert.Equal((uint?)patch, wildcardVersion.VersionPatch);
+        }
+
+        [Theory]
+        [InlineData("2.1*.0")]
+        [InlineData("2.**.*")]
+        [InlineData("2*.*.0")]
+        [InlineData("2*.1.0")]
+        [InlineData("*.1.0")]
+        [InlineData("1.*.4")]
+        public void InvalidWildcardVersionString_FailsValidation(string versionString)
+        {
+            Assert.False(WildcardVersion.TryParse(versionString, out var wildcardVersion));
+            Assert.Null(wildcardVersion);
+        }
+    }
     public class TryParseTests
     {
         [Theory]
@@ -67,50 +113,6 @@ public static class VersionUtilsTests
         public void InvalidVersion_FailsToParse(string versionString)
         {
             Assert.False(VersionUtils.TryParse(versionString, out _));
-        }
-
-        /// <summary>
-        /// Only testing validation as the object returned from 'TryParseWildcard' returns a 'SemVersionRange' which doesn't contain a specific version that we can test against `versionString`
-        /// </summary>
-        /// <param name="versionString"></param>
-        [Theory]
-        [InlineData("*", null, null, null)]
-        [InlineData("1.*.*", 1, null, null)]
-        [InlineData("  1.*.*", 1, null, null)]
-        [InlineData("  1.*.*  ", 1, null, null)]
-        [InlineData("1.*", 1, null, null)]
-        [InlineData("1.2.*", 1, 2, null)]
-        [InlineData("v*", null, null, null)]
-        [InlineData("v1.*.*", 1, null, null)]
-        [InlineData("v1.*", 1, null, null)]
-        [InlineData("v1.2.*", 1, 2, null)]
-        public void ValidWildcardVersionString_SuccessfullyValidated(
-            string versionString,
-            int? major,
-            int? minor,
-            int? patch
-            )
-        {
-            Assert.True(VersionUtils.TryParseWildcard(versionString, out var wildcardVersion));
-            
-            Assert.NotNull(wildcardVersion);
-            Assert.Equal((uint?)major, wildcardVersion.VersionMajor);
-            Assert.Equal((uint?)major, wildcardVersion.VersionMajor);
-            Assert.Equal((uint?)minor, wildcardVersion.VersionMinor);
-            Assert.Equal((uint?)patch, wildcardVersion.VersionPatch);
-        }
-
-        [Theory]
-        [InlineData("2.1*.0")]
-        [InlineData("2.**.*")]
-        [InlineData("2*.*.0")]
-        [InlineData("2*.1.0")]
-        [InlineData("*.1.0")]
-        [InlineData("1.*.4")]
-        public void InvalidWildcardVersionString_FailsValidation(string versionString)
-        {
-            Assert.False(VersionUtils.TryParseWildcard(versionString, out var wildcardVersion));
-            Assert.Null(wildcardVersion);
         }
     }
 }
