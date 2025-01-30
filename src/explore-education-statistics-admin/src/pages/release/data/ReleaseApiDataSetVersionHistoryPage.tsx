@@ -29,7 +29,7 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
     parseNumber(page) ?? 1,
   );
 
-  const { dataSetId, releaseId, publicationId } =
+  const { dataSetId, releaseVersionId, publicationId } =
     useParams<ReleaseDataSetPreviewTokenRouteParams>();
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
@@ -55,7 +55,7 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
           releaseApiDataSetDetailsRoute.path,
           {
             publicationId,
-            releaseId,
+            releaseVersionId,
             dataSetId,
           },
         )}
@@ -95,7 +95,8 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
                             releaseSummaryRoute.path,
                             {
                               publicationId,
-                              releaseId: dataSetVersion.releaseVersion.id,
+                              releaseVersionId:
+                                dataSetVersion.releaseVersion.id,
                             },
                           )}
                         >
@@ -119,7 +120,8 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
                               releaseApiDataSetChangelogRoute.path,
                               {
                                 publicationId,
-                                releaseId: dataSetVersion.releaseVersion.id,
+                                releaseVersionId:
+                                  dataSetVersion.releaseVersion.id,
                                 dataSetId,
                                 dataSetVersionId: dataSetVersion.id,
                               },

@@ -138,7 +138,7 @@ export interface PublicationListRequest {
   themeId?: string;
 }
 
-export interface Release<
+export interface ReleaseVersion<
   ContentBlockType extends ContentBlock = ContentBlock,
   DataBlockType extends DataBlock = DataBlock,
   EmbedBlockType extends EmbedBlock = EmbedBlock,
@@ -231,7 +231,9 @@ const publicationService = {
   listReleases(publicationSlug: string): Promise<ReleaseSummary[]> {
     return contentApi.get(`/publications/${publicationSlug}/releases`);
   },
-  getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
+  getLatestPublicationRelease(
+    publicationSlug: string,
+  ): Promise<ReleaseVersion> {
     return contentApi.get(`/publications/${publicationSlug}/releases/latest`);
   },
   getLatestPublicationReleaseSummary(
@@ -244,7 +246,7 @@ const publicationService = {
   getPublicationRelease(
     publicationSlug: string,
     releaseSlug: string,
-  ): Promise<Release> {
+  ): Promise<ReleaseVersion> {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}`,
     );

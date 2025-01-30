@@ -12,7 +12,7 @@ import ContentBlockRenderer from '@common/modules/find-statistics/components/Con
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import ReleaseHelpAndSupportSection from '@common/modules/release/components/ReleaseHelpAndSupportSection';
 import publicationService, {
-  Release,
+  ReleaseVersion,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import ButtonLink from '@frontend/components/ButtonLink';
@@ -32,24 +32,24 @@ import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 
 interface Props {
-  release: Release;
+  releaseVersion: ReleaseVersion;
 }
 
-const PublicationReleasePage: NextPage<Props> = ({ release }) => {
-  const releaseSeries = release.publication.releaseSeries.filter(
-    rsi => rsi.isLegacyLink || rsi.description !== release.title,
+const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
+  const releaseSeries = releaseVersion.publication.releaseSeries.filter(
+    rsi => rsi.isLegacyLink || rsi.description !== releaseVersion.title,
   );
 
-  const latestReleaseSeriesItem = release.publication.releaseSeries.find(
+  const latestReleaseSeriesItem = releaseVersion.publication.releaseSeries.find(
     rsi => !rsi.isLegacyLink,
   );
 
   // Re-order updates in descending order in-case the cached
   // release from the content API has not been updated to
   // have the updates in the correct order.
-  const releaseUpdates = orderBy(release.updates, 'on', 'desc');
+  const releaseUpdates = orderBy(releaseVersion.updates, 'on', 'desc');
 
-  const showAllFilesButton = release.downloadFiles.some(
+  const showAllFilesButton = releaseVersion.downloadFiles.some(
     file =>
       file.type === 'Data' ||
       (file.type === 'Ancillary' && file.name !== 'All files'),
@@ -57,12 +57,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
   return (
     <Page
-      title={release.publication.title}
-      caption={release.title}
+      title={releaseVersion.publication.title}
+      caption={releaseVersion.title}
       description={
-        release.summarySection.content &&
-        release.summarySection.content.length > 0
-          ? release.summarySection.content[0].body
+        releaseVersion.summarySection.content &&
+        releaseVersion.summarySection.content.length > 0
+          ? releaseVersion.summarySection.content[0].body
           : ''
       }
       breadcrumbs={[
@@ -70,14 +70,14 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       ]}
     >
       <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
-        {release.publication?.isSuperseded && (
+        {releaseVersion.publication?.isSuperseded && (
           <WarningMessage testId="superseded-warning">
             This publication has been superseded by{' '}
             <Link
               testId="superseded-by-link"
-              to={`/find-statistics/${release.publication.supersededBy?.slug}`}
+              to={`/find-statistics/${releaseVersion.publication.supersededBy?.slug}`}
             >
-              {release.publication.supersededBy?.title}
+              {releaseVersion.publication.supersededBy?.title}
             </Link>
           </WarningMessage>
         )}
@@ -85,17 +85,17 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         <div className="govuk-grid-column-two-thirds">
           <ReleaseSummarySection
             lastUpdated={releaseUpdates[0]?.on}
-            latestRelease={release.latestRelease}
-            nextReleaseDate={release.nextReleaseDate}
-            releaseDate={release.published}
-            releaseType={release.type}
+            latestRelease={releaseVersion.latestRelease}
+            nextReleaseDate={releaseVersion.nextReleaseDate}
+            releaseDate={releaseVersion.published}
+            releaseType={releaseVersion.type}
             renderReleaseNotes={
               <>
                 {releaseUpdates.length > 0 && (
                   <Details
                     id="releaseLastUpdates"
                     summary={`See all updates (${releaseUpdates.length})`}
-                    hiddenText={`for ${release.title}`}
+                    hiddenText={`for ${releaseVersion.title}`}
                     onToggle={open => {
                       if (open) {
                         logEvent({
@@ -125,12 +125,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             }
             renderStatusTags={
               <>
-                {!release.publication.isSuperseded &&
-                  !release.latestRelease && (
+                {!releaseVersion.publication.isSuperseded &&
+                  !releaseVersion.latestRelease && (
                     <Link
                       className="govuk-!-display-none-print govuk-!-display-block govuk-!-margin-bottom-3"
                       unvisited
-                      to={`/find-statistics/${release.publication.slug}/${latestReleaseSeriesItem?.releaseSlug}`}
+                      to={`/find-statistics/${releaseVersion.publication.slug}/${latestReleaseSeriesItem?.releaseSlug}`}
                     >
                       View latest data:{' '}
                       <span className="govuk-!-font-weight-bold">
@@ -138,9 +138,9 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                       </span>
                     </Link>
                   )}
-                {!release.publication.isSuperseded && (
+                {!releaseVersion.publication.isSuperseded && (
                   <>
-                    {release.latestRelease ? (
+                    {releaseVersion.latestRelease ? (
                       <Tag>This is the latest data</Tag>
                     ) : (
                       <Tag colour="orange">This is not the latest data</Tag>
@@ -153,8 +153,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               <Link
                 className="govuk-!-display-none-print govuk-!-font-weight-bold"
                 unvisited
-                to={`/subscriptions/new-subscription/${release.publication.slug}`}
-                data-testid={`subscription-${release.publication.slug}`}
+                to={`/subscriptions/new-subscription/${releaseVersion.publication.slug}`}
+                data-testid={`subscription-${releaseVersion.publication.slug}`}
                 onClick={() => {
                   logEvent({
                     category: 'Subscribe',
@@ -175,7 +175,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             }
             onShowReleaseTypeModal={() =>
               logEvent({
-                category: `${release.publication.title} release page`,
+                category: `${releaseVersion.publication.title} release page`,
                 action: 'Release type clicked',
                 label: window.location.pathname,
               })
@@ -190,7 +190,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               */}
             Introduction
           </VisuallyHidden>
-          {release.summarySection.content.map(block => (
+          {releaseVersion.summarySection.content.map(block => (
             <ContentBlockRenderer
               key={block.id}
               block={block}
@@ -225,12 +225,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <li>
                     <ButtonLink
                       className="govuk-button  govuk-!-margin-bottom-3"
-                      to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
+                      to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersion.id}/files`}
                       onClick={() => {
                         logEvent({
-                          category: `${release.publication.title} release page - Useful information`,
+                          category: `${releaseVersion.publication.title} release page - Useful information`,
                           action: 'Download all data button clicked',
-                          label: `Publication: ${release.publication.title}, Release: ${release.title}, File: All files`,
+                          label: `Publication: ${releaseVersion.publication.title}, Release: ${releaseVersion.title}, File: All files`,
                         });
                       }}
                     >
@@ -238,18 +238,18 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     </ButtonLink>
                   </li>
                 )}
-                {!!release.relatedDashboardsSection?.content.length && (
+                {!!releaseVersion.relatedDashboardsSection?.content.length && (
                   <li>
                     <a href="#related-dashboards">View related dashboard(s)</a>
                   </li>
                 )}
-                {!!release.content.length && (
+                {!!releaseVersion.content.length && (
                   <li>
                     <a
                       href="#content"
                       onClick={() => {
                         logEvent({
-                          category: `${release.publication.title} release page`,
+                          category: `${releaseVersion.publication.title} release page`,
                           action: `Release contents clicked`,
                           label: window.location.pathname,
                         });
@@ -264,7 +264,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     href="#explore-data-and-files"
                     onClick={() => {
                       logEvent({
-                        category: `${release.publication.title} release page`,
+                        category: `${releaseVersion.publication.title} release page`,
                         action: `View data and files clicked`,
                         label: window.location.pathname,
                       });
@@ -279,7 +279,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     href="#help-and-support"
                     onClick={() => {
                       logEvent({
-                        category: `${release.publication.title} release page`,
+                        category: `${releaseVersion.publication.title} release page`,
                         action: `Help and support clicked`,
                         label: window.location.pathname,
                       });
@@ -295,16 +295,16 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             <ul className="govuk-list">
               <li>
                 <Link
-                  to={`/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`}
+                  to={`/find-statistics/${releaseVersion.publication.slug}/${releaseVersion.slug}/data-guidance`}
                 >
                   Data guidance
                 </Link>
               </li>
 
-              {release.hasPreReleaseAccessList && (
+              {releaseVersion.hasPreReleaseAccessList && (
                 <li>
                   <Link
-                    to={`/find-statistics/${release.publication.slug}/${release.slug}/prerelease-access-list`}
+                    to={`/find-statistics/${releaseVersion.publication.slug}/${releaseVersion.slug}/prerelease-access-list`}
                   >
                     Pre-release access list
                   </Link>
@@ -323,7 +323,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 <Details
                   className="govuk-!-margin-bottom-4"
                   summary={`View releases (${releaseSeries.length})`}
-                  hiddenText={`for ${release.publication.title}`}
+                  hiddenText={`for ${releaseVersion.publication.title}`}
                   onToggle={open =>
                     open &&
                     logEvent({
@@ -354,7 +354,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                                 <a href={legacyLinkUrl}>{description}</a>
                               ) : (
                                 <Link
-                                  to={`/find-statistics/${release.publication.slug}/${releaseSlug}`}
+                                  to={`/find-statistics/${releaseVersion.publication.slug}/${releaseSlug}`}
                                 >
                                   {description}
                                 </Link>
@@ -369,8 +369,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               </>
             )}
 
-            {(release.publication.methodologies.length > 0 ||
-              release.publication.externalMethodology) && (
+            {(releaseVersion.publication.methodologies.length > 0 ||
+              releaseVersion.publication.externalMethodology) && (
               <>
                 <h2
                   className="govuk-heading-s govuk-!-padding-top-0"
@@ -379,35 +379,35 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   Methodologies
                 </h2>
                 <ul className="govuk-list">
-                  {release.publication.methodologies.map(methodology => (
+                  {releaseVersion.publication.methodologies.map(methodology => (
                     <li key={methodology.id}>
                       <Link to={`/methodology/${methodology.slug}`}>
                         {methodology.title}
                       </Link>
                     </li>
                   ))}
-                  {release.publication.externalMethodology && (
+                  {releaseVersion.publication.externalMethodology && (
                     <li>
                       <Link
-                        to={release.publication.externalMethodology.url}
+                        to={releaseVersion.publication.externalMethodology.url}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {release.publication.externalMethodology.title}
+                        {releaseVersion.publication.externalMethodology.title}
                       </Link>
                     </li>
                   )}
                 </ul>
               </>
             )}
-            {release.relatedInformation.length > 0 && (
+            {releaseVersion.relatedInformation.length > 0 && (
               <>
                 <h2 className="govuk-heading-s" id="related-pages">
                   Related pages
                 </h2>
                 <ul className="govuk-list">
-                  {release.relatedInformation &&
-                    release.relatedInformation.map(link => (
+                  {releaseVersion.relatedInformation &&
+                    releaseVersion.relatedInformation.map(link => (
                       <li key={link.id}>
                         <a href={link.url}>{link.description}</a>
                       </li>
@@ -421,23 +421,23 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       <hr />
 
       <h2 className="dfe-print-break-before">
-        Headline facts and figures - {release.yearTitle}
+        Headline facts and figures - {releaseVersion.yearTitle}
       </h2>
 
-      <PublicationReleaseHeadlinesSection release={release} />
+      <PublicationReleaseHeadlinesSection releaseVersion={releaseVersion} />
 
-      {(release.downloadFiles ||
-        !!release.relatedDashboardsSection?.content.length) && (
+      {(releaseVersion.downloadFiles ||
+        !!releaseVersion.relatedDashboardsSection?.content.length) && (
         <ReleaseDataAndFiles
-          downloadFiles={release.downloadFiles}
-          hasDataGuidance={release.hasDataGuidance}
+          downloadFiles={releaseVersion.downloadFiles}
+          hasDataGuidance={releaseVersion.hasDataGuidance}
           renderAllFilesLink={
             <Link
-              to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
+              to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersion.id}/files`}
               onClick={() => {
                 logEvent({
                   category: 'Downloads',
-                  action: `Release page all files, Release: ${release.title}, File: All files`,
+                  action: `Release page all files, Release: ${releaseVersion.title}, File: All files`,
                 });
               }}
             >
@@ -447,9 +447,9 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           renderCreateTablesLink={
             <Link
               to={
-                release.latestRelease
-                  ? `/data-tables/${release.publication.slug}`
-                  : `/data-tables/${release.publication.slug}/${release.slug}`
+                releaseVersion.latestRelease
+                  ? `/data-tables/${releaseVersion.publication.slug}`
+                  : `/data-tables/${releaseVersion.publication.slug}/${releaseVersion.slug}`
               }
             >
               View or create your own tables
@@ -457,7 +457,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           }
           renderDataCatalogueLink={
             <Link
-              to={`/data-catalogue?themeId=${release.publication.theme.id}&publicationId=${release.publication.id}&releaseId=${release.id}`}
+              to={`/data-catalogue?themeId=${releaseVersion.publication.theme.id}&publicationId=${releaseVersion.publication.id}&releaseVersionId=${releaseVersion.id}`}
             >
               Data catalogue
             </Link>
@@ -465,12 +465,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           renderDownloadLink={file => {
             return (
               <Link
-                to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files/${file.id}`}
+                to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersion.id}/files/${file.id}`}
                 onClick={() => {
                   logEvent({
                     category: 'Downloads',
                     action: 'Release page file downloaded',
-                    label: `Publication: ${release.publication.title}, Release: ${release.title}, File: ${file.fileName}`,
+                    label: `Publication: ${releaseVersion.publication.title}, Release: ${releaseVersion.title}, File: ${file.fileName}`,
                   });
                 }}
               >
@@ -481,9 +481,9 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           renderDataGuidanceLink={
             <Link
               to={
-                release.latestRelease
-                  ? `/find-statistics/${release.publication.slug}/data-guidance`
-                  : `/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`
+                releaseVersion.latestRelease
+                  ? `/find-statistics/${releaseVersion.publication.slug}/data-guidance`
+                  : `/find-statistics/${releaseVersion.publication.slug}/${releaseVersion.slug}/data-guidance`
               }
             >
               Data guidance
@@ -491,14 +491,14 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           }
           onSectionOpen={accordionSection => {
             logEvent({
-              category: `${release.publication.title} release page`,
+              category: `${releaseVersion.publication.title} release page`,
               action: `Data accordion opened`,
               label: accordionSection.title,
             });
           }}
           renderRelatedDashboards={
-            release.relatedDashboardsSection?.content.length
-              ? release.relatedDashboardsSection.content.map(block => (
+            releaseVersion.relatedDashboardsSection?.content.length
+              ? releaseVersion.relatedDashboardsSection.content.map(block => (
                   <ContentBlockRenderer
                     key={block.id}
                     block={block}
@@ -517,37 +517,43 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         />
       )}
 
-      {release.content.length > 0 && (
+      {releaseVersion.content.length > 0 && (
         <Accordion
           className="govuk-!-margin-top-9"
           id="content"
           onSectionOpen={accordionSection => {
             logEvent({
-              category: `${release.publication.title} release page`,
+              category: `${releaseVersion.publication.title} release page`,
               action: `Content accordion opened`,
               label: `${accordionSection.title}`,
             });
           }}
         >
-          {release.content.map(({ heading, caption, order, content }) => {
-            return (
-              <AccordionSection heading={heading} caption={caption} key={order}>
-                {({ open }) => (
-                  <PublicationSectionBlocks
-                    blocks={content}
-                    release={release}
-                    visible={open}
-                  />
-                )}
-              </AccordionSection>
-            );
-          })}
+          {releaseVersion.content.map(
+            ({ heading, caption, order, content }) => {
+              return (
+                <AccordionSection
+                  heading={heading}
+                  caption={caption}
+                  key={order}
+                >
+                  {({ open }) => (
+                    <PublicationSectionBlocks
+                      blocks={content}
+                      releaseVersion={releaseVersion}
+                      visible={open}
+                    />
+                  )}
+                </AccordionSection>
+              );
+            },
+          )}
         </Accordion>
       )}
 
       <ReleaseHelpAndSupportSection
-        publication={release.publication}
-        releaseType={release.type}
+        publication={releaseVersion.publication}
+        releaseType={releaseVersion.type}
         renderExternalMethodologyLink={externalMethodology => (
           <Link to={externalMethodology.url}>{externalMethodology.title}</Link>
         )}
@@ -576,13 +582,13 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
     const { publication: publicationSlug, release: releaseSlug } =
       query as Dictionary<string>;
 
-    const release = await (releaseSlug
+    const releaseVersion = await (releaseSlug
       ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
       : publicationService.getLatestPublicationRelease(publicationSlug));
 
     return {
       props: {
-        release,
+        releaseVersion,
       },
     };
   },

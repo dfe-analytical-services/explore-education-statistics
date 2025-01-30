@@ -28,7 +28,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 const ReleaseDataBlocksPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseId } = match.params;
+  const { publicationId, releaseVersionId } = match.params;
 
   const [deleteDataBlock, setDeleteDataBlock] =
     useState<ReleaseDataBlockSummary>();
@@ -36,12 +36,12 @@ const ReleaseDataBlocksPage = ({
   const queryClient = useQueryClient();
 
   const listFeaturedTablesQuery = useMemo(
-    () => featuredTableQueries.list(releaseId),
-    [releaseId],
+    () => featuredTableQueries.list(releaseVersionId),
+    [releaseVersionId],
   );
   const listDataBlocksQuery = useMemo(
-    () => dataBlockQueries.list(releaseId),
-    [releaseId],
+    () => dataBlockQueries.list(releaseVersionId),
+    [releaseVersionId],
   );
 
   const { data: dataBlocks = [], isLoading: isLoadingDataBlocks } =
@@ -49,7 +49,7 @@ const ReleaseDataBlocksPage = ({
   const { data: featuredTables = [], isLoading: isLoadingFeaturedTables } =
     useQuery(listFeaturedTablesQuery);
   const { data: canUpdateRelease = true, isLoading: isLoadingPermissions } =
-    useQuery(permissionQueries.canUpdateRelease(releaseId));
+    useQuery(permissionQueries.canUpdateRelease(releaseVersionId));
 
   const handleDelete = useCallback(async () => {
     if (!deleteDataBlock) {
@@ -87,19 +87,19 @@ const ReleaseDataBlocksPage = ({
   const handleSaveOrder = useCallback(
     async (reorderedTables: FeaturedTable[]) => {
       await featuredTableService.reorderFeaturedTables(
-        releaseId,
+        releaseVersionId,
         reorderedTables?.map(table => table.id) ?? [],
       );
       await queryClient.invalidateQueries(listFeaturedTablesQuery.queryKey);
     },
-    [listFeaturedTablesQuery, queryClient, releaseId],
+    [listFeaturedTablesQuery, queryClient, releaseVersionId],
   );
 
   const createPath = generatePath<ReleaseRouteParams>(
     releaseDataBlockCreateRoute.path,
     {
       publicationId,
-      releaseId,
+      releaseVersionId,
     },
   );
 
@@ -141,7 +141,7 @@ const ReleaseDataBlocksPage = ({
           <ButtonLink
             to={generatePath<ReleaseRouteParams>(releaseTableToolRoute.path, {
               publicationId,
-              releaseId,
+              releaseVersionId,
             })}
           >
             Go to table tool
@@ -159,7 +159,7 @@ const ReleaseDataBlocksPage = ({
           dataBlocks={dataBlocks}
           featuredTables={featuredTables}
           publicationId={publicationId}
-          releaseId={releaseId}
+          releaseVersionId={releaseVersionId}
           onDelete={setDeleteDataBlock}
           onSaveOrder={handleSaveOrder}
         />
@@ -207,7 +207,7 @@ const ReleaseDataBlocksPage = ({
                         releaseDataBlockEditRoute.path,
                         {
                           publicationId,
-                          releaseId,
+                          releaseVersionId,
                           dataBlockId: dataBlock.id,
                         },
                       )}
@@ -236,7 +236,7 @@ const ReleaseDataBlocksPage = ({
 
       {deleteDataBlock && (
         <DataBlockDeletePlanModal
-          releaseId={releaseId}
+          releaseVersionId={releaseVersionId}
           dataBlockId={deleteDataBlock.id}
           onConfirm={handleDelete}
           onCancel={handleDeleteCancel}

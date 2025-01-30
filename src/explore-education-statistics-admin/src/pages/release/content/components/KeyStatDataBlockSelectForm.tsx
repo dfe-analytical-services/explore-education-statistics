@@ -8,7 +8,7 @@ import React, { useMemo, useState } from 'react';
 import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
 
 interface Props {
-  releaseId: string;
+  releaseVersionId: string;
   onSelect: (selectedDataBlockId: string) => void;
   onCancel?: () => void;
   hideCancel?: boolean;
@@ -16,7 +16,7 @@ interface Props {
 }
 
 const KeyStatDataBlockSelectForm = ({
-  releaseId,
+  releaseVersionId,
   onSelect,
   onCancel = () => {},
   hideCancel = false,
@@ -51,7 +51,7 @@ const KeyStatDataBlockSelectForm = ({
           open
         >
           <KeyStatDataBlock
-            releaseId={releaseId}
+            releaseVersionId={releaseVersionId}
             dataBlockParentId={selectedDataBlock.dataBlockParentId}
           />
         </Details>

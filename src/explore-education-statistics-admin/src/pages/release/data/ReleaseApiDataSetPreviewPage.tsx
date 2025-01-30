@@ -23,7 +23,7 @@ export default function ReleaseApiDataSetPreviewPage() {
 
   const [modalOpen, toggleModalOpen] = useToggle(false);
 
-  const { dataSetId, releaseId, publicationId } =
+  const { dataSetId, releaseVersionId, publicationId } =
     useParams<ReleaseDataSetPreviewTokenRouteParams>();
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
@@ -44,7 +44,7 @@ export default function ReleaseApiDataSetPreviewPage() {
         releaseApiDataSetPreviewTokenRoute.path,
         {
           publicationId,
-          releaseId,
+          releaseVersionId,
           dataSetId,
           previewTokenId: token.id,
         },
@@ -61,7 +61,7 @@ export default function ReleaseApiDataSetPreviewPage() {
           releaseApiDataSetDetailsRoute.path,
           {
             publicationId,
-            releaseId,
+            releaseVersionId,
             dataSetId,
           },
         )}

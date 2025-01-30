@@ -11,7 +11,7 @@ describe('ApiDataSetFinaliseBanner', () => {
       <ApiDataSetFinaliseBanner
         dataSetId="data-set-id"
         dataSetVersionId="data-set-version-id"
-        releaseId="release-id"
+        releaseVersionId="release-id"
         publicationId="publication-id"
         finalisingStatus="finalising"
         onFinalise={noop}
@@ -31,7 +31,7 @@ describe('ApiDataSetFinaliseBanner', () => {
       <ApiDataSetFinaliseBanner
         dataSetId="data-set-id"
         dataSetVersionId="data-set-version-id"
-        releaseId="release-id"
+        releaseVersionId="release-id"
         publicationId="publication-id"
         draftVersionStatus="Mapping"
         onFinalise={noop}
@@ -55,7 +55,7 @@ describe('ApiDataSetFinaliseBanner', () => {
         <ApiDataSetFinaliseBanner
           dataSetId="data-set-id"
           dataSetVersionId="data-set-version-id"
-          releaseId="release-id"
+          releaseVersionId="release-id"
           publicationId="publication-id"
           draftVersionStatus="Draft"
           onFinalise={noop}
@@ -78,7 +78,7 @@ describe('ApiDataSetFinaliseBanner', () => {
       <ApiDataSetFinaliseBanner
         dataSetId="data-set-id"
         dataSetVersionId="data-set-version-id"
-        releaseId="release-id"
+        releaseVersionId="release-id"
         publicationId="publication-id"
         draftVersionStatus="Failed"
         finalisingStatus="finalised"

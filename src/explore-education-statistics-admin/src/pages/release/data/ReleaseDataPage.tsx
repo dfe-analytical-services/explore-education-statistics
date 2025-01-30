@@ -1,5 +1,5 @@
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import ReleaseApiDataSetsSection from '@admin/pages/release/data/components/ReleaseApiDataSetsSection';
 import ReleaseDataGuidanceSection from '@admin/pages/release/data/components/ReleaseDataGuidanceSection';
 import ReleaseDataReorderSection from '@admin/pages/release/data/components/ReleaseDataReorderSection';
@@ -15,14 +15,14 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useState } from 'react';
 
 const ReleaseDataPage = () => {
-  const { release, releaseId } = useReleaseContext();
+  const { releaseVersion, releaseVersionId } = useReleaseVersionContext();
   const { user } = useAuthContext();
 
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
 
   const { value: canUpdateRelease = false, isLoading } = useAsyncHandledRetry(
-    () => permissionService.canUpdateRelease(releaseId),
-    [releaseId],
+    () => permissionService.canUpdateRelease(releaseVersionId),
+    [releaseVersionId],
   );
 
   return (
@@ -33,8 +33,8 @@ const ReleaseDataPage = () => {
           title="Data uploads"
         >
           <ReleaseDataUploadsSection
-            publicationId={release.publicationId}
-            releaseId={releaseId}
+            publicationId={releaseVersion.publicationId}
+            releaseVersionId={releaseVersionId}
             canUpdateRelease={canUpdateRelease}
             onDataFilesChange={setDataFiles}
           />
@@ -44,8 +44,8 @@ const ReleaseDataPage = () => {
           title="Supporting file uploads"
         >
           <ReleaseFileUploadsSection
-            publicationId={release.publicationId}
-            releaseId={releaseId}
+            publicationId={releaseVersion.publicationId}
+            releaseVersionId={releaseVersionId}
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
@@ -58,7 +58,7 @@ const ReleaseDataPage = () => {
             // Track data files so that we can re-render this
             // section automatically whenever there is a change
             key={dataFiles.filter(file => file.status === 'COMPLETE').length}
-            releaseId={releaseId}
+            releaseVersionId={releaseVersionId}
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
@@ -69,7 +69,7 @@ const ReleaseDataPage = () => {
         >
           <ReleaseDataReorderSection
             key={dataFiles.filter(file => file.status === 'COMPLETE').length}
-            releaseId={releaseId}
+            releaseVersionId={releaseVersionId}
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>

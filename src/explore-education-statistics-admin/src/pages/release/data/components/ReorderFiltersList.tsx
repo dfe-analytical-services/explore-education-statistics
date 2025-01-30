@@ -27,20 +27,20 @@ export type UpdateFiltersRequest = UpdatedFilter[];
 
 interface Props {
   subject: Subject;
-  releaseId: string;
+  releaseVersionId: string;
   onCancel: () => void;
   onSave: (subjectId: string, requestFilters: UpdateFiltersRequest) => void;
 }
 
 export default function ReorderFiltersList({
-  releaseId,
+  releaseVersionId,
   subject,
   onCancel,
   onSave,
 }: Props) {
   const { value: subjectMeta, isLoading } = useAsyncHandledRetry(
-    () => tableBuilderService.getSubjectMeta(subject.id, releaseId),
-    [subject.id, releaseId],
+    () => tableBuilderService.getSubjectMeta(subject.id, releaseVersionId),
+    [subject.id, releaseVersionId],
   );
 
   const [filters, setFilters] = useState<ReorderableListItem[]>([]);

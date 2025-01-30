@@ -3,36 +3,39 @@ import formatPretty from '@common/utils/number/formatPretty';
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 
 const tableBuilderQueries = createQueryKeys('tableBuilder', {
-  getDataBlockTable(releaseId: string, dataBlockParentId: string) {
+  getDataBlockTable(releaseVersionId: string, dataBlockParentId: string) {
     return {
-      queryKey: [releaseId, dataBlockParentId],
+      queryKey: [releaseVersionId, dataBlockParentId],
       queryFn: async () =>
-        tableBuilderService.getDataBlockTableData(releaseId, dataBlockParentId),
+        tableBuilderService.getDataBlockTableData(
+          releaseVersionId,
+          dataBlockParentId,
+        ),
     };
   },
 
   getDataBlockGeoJson(
-    releaseId: string,
+    releaseVersionId: string,
     dataBlockParentId: string,
     boundaryLevelId: number,
   ) {
     return {
-      queryKey: [releaseId, dataBlockParentId, boundaryLevelId],
+      queryKey: [releaseVersionId, dataBlockParentId, boundaryLevelId],
       queryFn: async () =>
         tableBuilderService.getDataBlockGeoJson(
-          releaseId,
+          releaseVersionId,
           dataBlockParentId,
           boundaryLevelId,
         ),
     };
   },
 
-  getKeyStat(releaseId: string, dataBlockParentId: string) {
+  getKeyStat(releaseVersionId: string, dataBlockParentId: string) {
     return {
-      queryKey: [releaseId, dataBlockParentId],
+      queryKey: [releaseVersionId, dataBlockParentId],
       queryFn: async () => {
         const tableData = await tableBuilderService.getDataBlockTableData(
-          releaseId,
+          releaseVersionId,
           dataBlockParentId,
         );
 

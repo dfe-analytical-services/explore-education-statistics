@@ -1,10 +1,12 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import _permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseService, {
+  ReleaseVersion,
+} from '@admin/services/releaseVersionService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -12,12 +14,14 @@ import { MemoryRouter } from 'react-router';
 import ReleaseStatusPage from '../ReleaseStatusPage';
 
 jest.mock('@admin/services/permissionService');
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 
 const permissionService = _permissionService as jest.Mocked<
   typeof _permissionService
 >;
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+const releaseVersionService = _releaseService as jest.Mocked<
+  typeof _releaseService
+>;
 
 describe('ReleaseStatusPage', () => {
   const testStatusPermissions: ReleaseStatusPermissions = {
@@ -60,7 +64,7 @@ describe('ReleaseStatusPage', () => {
   });
 
   test('renders Approved status details correctly', async () => {
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Scheduled',
     });
 
@@ -132,13 +136,13 @@ describe('ReleaseStatusPage', () => {
     expect(screen.queryByText('Edit release status')).not.toBeInTheDocument();
   });
 
-  function renderPage(release: Release = testRelease) {
+  function renderPage(releaseVersion: ReleaseVersion = testRelease) {
     return render(
       <MemoryRouter>
         <TestConfigContextProvider>
-          <ReleaseContextProvider release={release}>
+          <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
             <ReleaseStatusPage />
-          </ReleaseContextProvider>
+          </ReleaseVersionContextProvider>
         </TestConfigContextProvider>
       </MemoryRouter>,
     );

@@ -34,7 +34,7 @@ interface Props {
   block: EditableBlock;
   editable?: boolean;
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   sectionId: string;
   sectionKey: ContentSectionKeys;
   visible?: boolean;
@@ -46,7 +46,7 @@ const ReleaseEditableBlock = ({
   block,
   editable = true,
   publicationId,
-  releaseId,
+  releaseVersionId,
   sectionId,
   sectionKey,
   visible,
@@ -72,13 +72,13 @@ const ReleaseEditableBlock = ({
 
   const { hub } = useReleaseContentHubContext();
 
-  const getChartFile = useGetChartFile(releaseId);
+  const getChartFile = useGetChartFile(releaseVersionId);
 
   const { handleImageUpload, handleImageUploadCancel } =
-    useReleaseImageUpload(releaseId);
+    useReleaseImageUpload(releaseVersionId);
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
-    releaseId,
+    releaseVersionId,
   });
 
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
@@ -166,7 +166,7 @@ const ReleaseEditableBlock = ({
   const handleSave = useCallback(
     async (content: string) => {
       await updateContentSectionBlock({
-        releaseId,
+        releaseVersionId,
         sectionId,
         sectionKey,
         blockId: block.id,
@@ -179,7 +179,7 @@ const ReleaseEditableBlock = ({
       block.id,
       updateContentSectionBlock,
       removeUnsavedBlock,
-      releaseId,
+      releaseVersionId,
       sectionId,
       sectionKey,
     ],
@@ -197,17 +197,23 @@ const ReleaseEditableBlock = ({
 
   const handleDelete = useCallback(async () => {
     await deleteContentSectionBlock({
-      releaseId,
+      releaseVersionId,
       sectionId,
       sectionKey,
       blockId: block.id,
     });
-  }, [block.id, deleteContentSectionBlock, releaseId, sectionId, sectionKey]);
+  }, [
+    block.id,
+    deleteContentSectionBlock,
+    releaseVersionId,
+    sectionId,
+    sectionKey,
+  ]);
 
   const handleSaveEmbedBlock = useCallback(
     async (updatedBlock: EditableEmbedFormValues) => {
       await updateEmbedSectionBlock({
-        releaseId,
+        releaseVersionId,
         sectionId,
         sectionKey,
         blockId: block.id,
@@ -223,7 +229,7 @@ const ReleaseEditableBlock = ({
       block.id,
       updateEmbedSectionBlock,
       removeUnsavedBlock,
-      releaseId,
+      releaseVersionId,
       sectionId,
       sectionKey,
     ],
@@ -231,12 +237,18 @@ const ReleaseEditableBlock = ({
 
   const handleDeleteEmbedBlock = useCallback(async () => {
     await deleteEmbedSectionBlock({
-      releaseId,
+      releaseVersionId,
       sectionId,
       sectionKey,
       blockId: block.id,
     });
-  }, [block.id, deleteEmbedSectionBlock, releaseId, sectionId, sectionKey]);
+  }, [
+    block.id,
+    deleteEmbedSectionBlock,
+    releaseVersionId,
+    sectionId,
+    sectionKey,
+  ]);
 
   const handleBlur = useCallback(
     (isDirty: boolean) => {
@@ -250,7 +262,7 @@ const ReleaseEditableBlock = ({
   const handleSaveComment = useCallback(
     async (comment: CommentCreate) => {
       const newComment = await addBlockComment({
-        releaseId,
+        releaseVersionId,
         sectionId,
         sectionKey,
         blockId: block.id,
@@ -264,7 +276,7 @@ const ReleaseEditableBlock = ({
     [
       addBlockComment,
       block.id,
-      releaseId,
+      releaseVersionId,
       sectionId,
       sectionKey,
       updateUnresolvedComments,
@@ -281,20 +293,20 @@ const ReleaseEditableBlock = ({
   const handleDeleteComment = useCallback(
     async (commentId: string) => {
       await deleteBlockComment({
-        releaseId,
+        releaseVersionId,
         sectionId,
         sectionKey,
         blockId: block.id,
         commentId,
       });
     },
-    [block.id, deleteBlockComment, releaseId, sectionId, sectionKey],
+    [block.id, deleteBlockComment, releaseVersionId, sectionId, sectionKey],
   );
 
   const handleSaveUpdatedComment = useCallback(
     async (comment: Comment) => {
       await updateBlockComment({
-        releaseId,
+        releaseVersionId,
         sectionId,
         sectionKey,
         blockId: block.id,
@@ -305,7 +317,7 @@ const ReleaseEditableBlock = ({
     },
     [
       block.id,
-      releaseId,
+      releaseVersionId,
       sectionId,
       sectionKey,
       updateBlockComment,
@@ -333,7 +345,7 @@ const ReleaseEditableBlock = ({
                 releaseDataBlockEditRoute.path,
                 {
                   publicationId,
-                  releaseId,
+                  releaseVersionId,
                   dataBlockId: block.id,
                 },
               )}
@@ -341,7 +353,7 @@ const ReleaseEditableBlock = ({
             >
               <Gate condition={!!visible}>
                 <DataBlockTabs
-                  releaseId={releaseId}
+                  releaseVersionId={releaseVersionId}
                   id={blockId}
                   dataBlock={block}
                   getInfographic={getChartFile}

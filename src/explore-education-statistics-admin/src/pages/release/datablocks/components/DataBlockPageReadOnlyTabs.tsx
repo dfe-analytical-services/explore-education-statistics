@@ -12,15 +12,15 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import React, { useMemo } from 'react';
 
 interface Props {
-  releaseId: string;
+  releaseVersionId: string;
   dataBlock: ReleaseDataBlock;
 }
 
 const testId = (dataBlock: ReleaseDataBlock) =>
   `Data block - ${dataBlock.name}`;
 
-const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
-  const getChartFile = useGetChartFile(releaseId);
+const DataBlockPageReadOnlyTabs = ({ releaseVersionId, dataBlock }: Props) => {
+  const getChartFile = useGetChartFile(releaseVersionId);
   const {
     chart,
     isTableDataLoading,
@@ -30,7 +30,7 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
     isGeoJsonInitialLoading,
   } = useDataBlock({
     dataBlock,
-    releaseId,
+    releaseVersionId,
     getInfographic: getChartFile,
   });
 

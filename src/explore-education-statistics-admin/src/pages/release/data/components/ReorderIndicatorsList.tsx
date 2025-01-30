@@ -25,7 +25,7 @@ interface UpdatedIndicator {
 export type UpdateIndicatorsRequest = UpdatedIndicator[];
 
 interface Props {
-  releaseId: string;
+  releaseVersionId: string;
   subject: Subject;
   onCancel: () => void;
   onSave: (
@@ -35,14 +35,14 @@ interface Props {
 }
 
 export default function ReorderIndicatorsList({
-  releaseId,
+  releaseVersionId,
   subject,
   onCancel,
   onSave,
 }: Props) {
   const { value: subjectMeta, isLoading } = useAsyncHandledRetry(
-    () => tableBuilderService.getSubjectMeta(subject.id, releaseId),
-    [subject.id, releaseId],
+    () => tableBuilderService.getSubjectMeta(subject.id, releaseVersionId),
+    [subject.id, releaseVersionId],
   );
 
   const [indicators, setIndicators] = useState<ReorderableListItem[]>([]);

@@ -49,7 +49,7 @@ export default function ApiDataSetVersionSummaryList({
       <SummaryListItem term="Release">
         <Link
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-            releaseId: dataSetVersion.releaseVersion.id,
+            releaseVersionId: dataSetVersion.releaseVersion.id,
             publicationId,
           })}
         >

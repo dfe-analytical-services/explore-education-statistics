@@ -5,12 +5,12 @@ import chalk from 'chalk';
 import spinner from '../utils/spinner';
 import { ReleaseProgressResponse } from '../types/ReleaseProgressResponse';
 import sleep from '../utils/sleep';
-import { Release } from '../types/Release';
+import { ReleaseVersion } from '../types/Release';
 import adminApi from '../utils/adminApi';
 import logger from '../utils/logger';
 
 const { ADMIN_URL } = process.env;
-const releaseService = {
+const releaseVersionService = {
   createRelease: async (publicationId: string): Promise<string> => {
     spinner.start();
     console.time('createRelease');
@@ -57,7 +57,7 @@ const releaseService = {
         `Overall stage of publication: ${chalk.blue(res.data.overallStage)}`,
       );
       await sleep(1500);
-      await releaseService.getReleaseProgress(releaseId);
+      await releaseVersionService.getReleaseProgress(releaseId);
     }
     if (url) {
       spinner.succeed(`Published release: ${url}`);
@@ -67,7 +67,7 @@ const releaseService = {
   publishRelease: async (release: Release, releaseId: string) => {
     await adminApi.post(`/api/releases/${releaseId}/status`, release);
   },
-  getRelease: async (releaseId: string) => {
+  getReleaseVersion: async (releaseId: string) => {
     spinner.start();
     const res = await adminApi.get(`/api/releases/${releaseId}`);
     const release: Release = res.data;
@@ -134,4 +134,4 @@ const releaseService = {
     );
   },
 };
-export default releaseService;
+export default releaseVersionService;

@@ -5,7 +5,7 @@ import {
   publicationManageReleaseContributorsPageRoute,
   PublicationTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import releasePermissionService from '@admin/services/releasePermissionService';
 import userService from '@admin/services/userService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -20,7 +20,7 @@ import releasePermissionQueries from '@admin/queries/releasePermissionQueries';
 
 interface Props {
   publicationId: string;
-  release: ReleaseSummary;
+  release: ReleaseVersionSummary;
   hasReleaseTeamManagementPermission: boolean;
 }
 
@@ -118,7 +118,7 @@ const PublicationReleaseAccess = ({
             publicationManageReleaseContributorsPageRoute.path,
             {
               publicationId,
-              releaseId: release.id,
+              releaseVersionId: release.id,
             },
           )}
         >

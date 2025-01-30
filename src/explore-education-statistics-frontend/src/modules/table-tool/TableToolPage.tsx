@@ -90,7 +90,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         featuredTables,
         query: {
           ...fastTrack.query,
-          releaseId: selectedPublication?.selectedRelease.id,
+          releaseVersionId: selectedPublication?.selectedRelease.id,
         },
         selectedPublication,
         subjectMeta,
@@ -108,7 +108,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         featuredTables,
         query: {
           publicationId: selectedPublication?.id,
-          releaseId: selectedPublication?.selectedRelease.id,
+          releaseVersionId: selectedPublication?.selectedRelease.id,
           subjectId: selectedSubjectId,
           indicators: [],
           filters: [],
@@ -125,7 +125,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       featuredTables,
       query: {
         publicationId: selectedPublication?.id,
-        releaseId: selectedPublication?.selectedRelease.id,
+        releaseVersionId: selectedPublication?.selectedRelease.id,
         subjectId: '',
         indicators: [],
         filters: [],

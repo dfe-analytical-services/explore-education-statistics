@@ -70,7 +70,7 @@ describe('createDataSetListRequest', () => {
       latestOnly: 'true',
       page: 4,
       publicationId: 'publication-id',
-      releaseId: 'release-id',
+      releaseVersionId: 'release-id',
       sortBy: 'newest',
       searchTerm: 'find me',
       themeId: 'theme-id',
@@ -98,7 +98,7 @@ describe('createDataSetListRequest', () => {
   test('excludes params that are undefined or empty', () => {
     const result = createDataSetFileListRequest({
       publicationId: undefined,
-      releaseId: '',
+      releaseVersionId: '',
     });
     expect(result).toEqual<DataSetFileListRequest>({
       page: 1,

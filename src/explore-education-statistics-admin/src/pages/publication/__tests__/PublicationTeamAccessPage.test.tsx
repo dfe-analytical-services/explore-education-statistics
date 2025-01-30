@@ -540,7 +540,7 @@ describe('PublicationTeamAccessPage', () => {
     );
 
     await renderPage({
-      releaseId: 'release-3',
+      releaseVersionId: 'release-3',
     });
 
     await waitFor(() => {
@@ -643,17 +643,17 @@ describe('PublicationTeamAccessPage', () => {
 
 async function renderPage({
   history = createMemoryHistory(),
-  releaseId,
+  releaseVersionId,
   publication,
 }: {
   history?: MemoryHistory;
-  releaseId?: string;
+  releaseVersionId?: string;
   publication?: PublicationWithPermissions;
 }) {
   history.push(
     generatePath<PublicationTeamRouteParams>(publicationTeamAccessRoute.path, {
       publicationId: 'publication-1',
-      releaseId,
+      releaseVersionId,
     }),
   );
 
