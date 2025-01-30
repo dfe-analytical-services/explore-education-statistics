@@ -64,7 +64,7 @@ export interface DataCataloguePageQuery {
   latestOnly?: string;
   page?: number;
   publicationId?: string;
-  releaseId?: string;
+  releaseVersionId?: string;
   geographicLevel?: GeographicLevelCode;
   searchTerm?: string;
   sortBy?: DataSetFileSortOption;
@@ -89,7 +89,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
     latestOnly,
     sortBy,
     publicationId,
-    releaseId,
+    releaseId: releaseVersionId,
     geographicLevel,
     searchTerm,
     themeId,
@@ -122,10 +122,12 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
   const { data: releases = [] } = useQuery({
     ...publicationQueries.listReleases(selectedPublication?.slug ?? ''),
     staleTime: Infinity,
-    enabled: !!releaseId && !!publicationId && !!themeId,
+    enabled: !!releaseVersionId && !!publicationId && !!themeId,
   });
 
-  const selectedRelease = releases.find(release => release.id === releaseId);
+  const selectedRelease = releases.find(
+    release => release.id === releaseVersionId,
+  );
 
   const selectedGeographicLevel = geographicLevel
     ? geographicLevelCodesMap[geographicLevel]
@@ -192,7 +194,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
           ...router.query,
           themeId: publicationThemeId,
         },
-        ...(!latestOnly && releaseId && { releaseId }),
+        ...(!latestOnly && releaseVersionId && { releaseVersionId }),
         onFetchReleases: () =>
           queryClient.fetchQuery(
             publicationQueries.listReleases(publicationSlug ?? ''),
@@ -207,8 +209,8 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
     }
     if (publicationId) {
       handleParamsOnLoad();
-    } else if (releaseId) {
-      updateQueryParams({ ...omit(router.query, 'releaseId') });
+    } else if (releaseVersionId) {
+      updateQueryParams({ ...omit(router.query, 'releaseVersionId') });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoadingThemes]);
@@ -255,7 +257,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
         ? omit(router.query, 'page', 'latestOnly', ...dataSetFileFilters)
         : omit(router.query, getFiltersToRemove(filterType), 'page')),
       sortBy: searchTerm && sortBy === 'relevance' ? 'newest' : sortBy,
-      ...(filterType === 'releaseId' && { latestOnly: 'false' }),
+      ...(filterType === 'releaseVersionId' && { latestOnly: 'false' }),
     });
 
     logEvent({
@@ -338,7 +340,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                 latestOnly={latestOnly}
                 publicationId={publicationId}
                 publications={publications}
-                releaseId={releaseId}
+                releaseVersionId={releaseVersionId}
                 geographicLevel={geographicLevel}
                 releases={releases}
                 showResetFiltersButton={!isMobileMedia && isFiltered}
@@ -424,7 +426,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                     filterType="Release"
                     name={selectedRelease.title}
                     onClick={() =>
-                      handleResetFilter({ filterType: 'releaseId' })
+                      handleResetFilter({ filterType: 'releaseVersionId' })
                     }
                   />
                 )}
@@ -452,7 +454,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                   latestOnly={latestOnly}
                   publicationId={publicationId}
                   publications={publications}
-                  releaseId={releaseId}
+                  releaseVersionId={releaseVersionId}
                   geographicLevel={geographicLevel}
                   releases={releases}
                   showTypeFilter={showTypeFilter}
@@ -496,7 +498,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
                 ) : (
                   <>
                     <div className="dfe-border-bottom">
-                      {!releaseId && (
+                      {!releaseVersionId && (
                         <SortControls
                           options={[
                             { label: 'Newest', value: 'newest' },
@@ -663,15 +665,17 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
       .find(option => option.slug === publicationSlug);
 
     if (selectedPublication) {
-      let selectedReleaseId: string | undefined;
+      let selectedReleaseVersionId: string | undefined;
       if (releaseSlug) {
         const releases = await queryClient.fetchQuery(
           publicationQueries.listReleases(selectedPublication.slug),
         );
-        selectedReleaseId = releases.find(rel => rel.slug === releaseSlug)?.id;
+        selectedReleaseVersionId = releases.find(
+          rel => rel.slug === releaseSlug,
+        )?.id;
       }
-      const redirectUrlQuery = selectedReleaseId
-        ? `publicationId=${selectedPublication.id}&releaseId=${selectedReleaseId}`
+      const redirectUrlQuery = selectedReleaseVersionId
+        ? `publicationId=${selectedPublication.id}&releaseVersionId=${selectedReleaseVersionId}`
         : `publicationId=${selectedPublication.id}`;
       return {
         redirect: {
@@ -717,10 +721,10 @@ export default DataCataloguePage;
 
 function getFiltersToRemove(filterType: DataSetFileFilter | 'all') {
   if (filterType === 'themeId') {
-    return ['themeId', 'publicationId', 'releaseId'];
+    return ['themeId', 'publicationId', 'releaseVersionId'];
   }
   if (filterType === 'publicationId') {
-    return ['publicationId', 'releaseId'];
+    return ['publicationId', 'releaseVersionId'];
   }
   return filterType;
 }

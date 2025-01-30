@@ -12,13 +12,13 @@ import React from 'react';
 
 interface Props {
   dataFile: DataFile;
-  releaseId: string;
+  releaseVersionId: string;
   onStatusChange: ImporterStatusChangeHandler;
 }
 
 export default function DataFileSummaryList({
   dataFile,
-  releaseId,
+  releaseVersionId,
   onStatusChange,
 }: Props) {
   return (
@@ -28,7 +28,7 @@ export default function DataFileSummaryList({
         <ButtonText
           onClick={() =>
             releaseDataFileService.downloadFile(
-              releaseId,
+              releaseVersionId,
               dataFile.id,
               dataFile.fileName,
             )
@@ -41,7 +41,7 @@ export default function DataFileSummaryList({
         <ButtonText
           onClick={() =>
             releaseDataFileService.downloadFile(
-              releaseId,
+              releaseVersionId,
               dataFile.metaFileId,
               dataFile.metaFileName,
             )
@@ -58,7 +58,7 @@ export default function DataFileSummaryList({
       </SummaryListItem>
       <SummaryListItem term="Status">
         <ImporterStatus
-          releaseId={releaseId}
+          releaseVersionId={releaseVersionId}
           dataFile={dataFile}
           onStatusChange={onStatusChange}
         />

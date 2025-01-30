@@ -28,7 +28,7 @@ interface Props {
   caption: string;
   dataFiles: DataFile[];
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   testId?: string;
   onDeleteFile: (dataFile: DataFile) => Promise<void>;
   onStatusChange: (
@@ -42,7 +42,7 @@ export default function DataFilesTable({
   caption,
   dataFiles,
   publicationId,
-  releaseId,
+  releaseVersionId,
   testId,
   onDeleteFile,
   onStatusChange,
@@ -72,7 +72,7 @@ export default function DataFilesTable({
             <td data-testid="Status">
               <ImporterStatus
                 className={styles.fileStatus}
-                releaseId={releaseId}
+                releaseVersionId={releaseVersionId}
                 dataFile={dataFile}
                 onStatusChange={onStatusChange}
               />
@@ -86,7 +86,7 @@ export default function DataFilesTable({
                 >
                   <DataFileSummaryList
                     dataFile={dataFile}
-                    releaseId={releaseId}
+                    releaseVersionId={releaseVersionId}
                     onStatusChange={onStatusChange}
                   />
                 </Modal>
@@ -100,7 +100,7 @@ export default function DataFilesTable({
                               releaseDataFileRoute.path,
                               {
                                 publicationId,
-                                releaseId,
+                                releaseVersionId,
                                 fileId: dataFile.id,
                               },
                             )}
@@ -126,7 +126,7 @@ export default function DataFilesTable({
                                     releaseApiDataSetDetailsRoute.path,
                                     {
                                       publicationId,
-                                      releaseId,
+                                      releaseVersionId,
                                       dataSetId: dataFile.publicApiDataSetId,
                                     },
                                   )}
@@ -141,7 +141,7 @@ export default function DataFilesTable({
                                 releaseDataFileReplaceRoute.path,
                                 {
                                   publicationId,
-                                  releaseId,
+                                  releaseVersionId,
                                   fileId: dataFile.id,
                                 },
                               )}
@@ -171,7 +171,7 @@ export default function DataFilesTable({
                                 releaseApiDataSetDetailsRoute.path,
                                 {
                                   publicationId,
-                                  releaseId,
+                                  releaseVersionId,
                                   dataSetId: dataFile.publicApiDataSetId,
                                 },
                               )}
@@ -192,7 +192,7 @@ export default function DataFilesTable({
                   )}
                 {dataFile.permissions.canCancelImport && (
                   <DataUploadCancelButton
-                    releaseId={releaseId}
+                    releaseVersionId={releaseVersionId}
                     fileId={dataFile.id}
                   />
                 )}

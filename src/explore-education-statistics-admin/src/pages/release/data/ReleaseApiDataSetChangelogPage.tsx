@@ -22,7 +22,7 @@ import React, { useEffect } from 'react';
 import WarningMessage from '@common/components/WarningMessage';
 
 export default function ReleaseApiDataSetChangelogPage() {
-  const { dataSetId, dataSetVersionId, releaseId, publicationId } =
+  const { dataSetId, dataSetVersionId, releaseVersionId, publicationId } =
     useParams<ReleaseDataSetChangelogRouteParams>();
 
   const {
@@ -68,7 +68,7 @@ export default function ReleaseApiDataSetChangelogPage() {
           releaseApiDataSetDetailsRoute.path,
           {
             publicationId,
-            releaseId,
+            releaseVersionId,
             dataSetId,
           },
         )}

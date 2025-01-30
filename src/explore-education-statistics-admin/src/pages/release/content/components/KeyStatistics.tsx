@@ -59,7 +59,7 @@ export default function KeyStatistics({
                   isReordering
                   keyStat={keyStat}
                   keyStats={[]}
-                  releaseId={release.id}
+                  releaseVersionId={release.id}
                 />
               ),
             };
@@ -70,7 +70,7 @@ export default function KeyStatistics({
           }}
           onConfirm={async () => {
             await reorderKeyStatistics({
-              releaseId: release.id,
+              releaseVersionId: release.id,
               keyStatistics,
             });
             toggleIsReordering.off();
@@ -99,7 +99,7 @@ export default function KeyStatistics({
                 <EditableKeyStat
                   keyStat={keyStat}
                   keyStats={release.keyStatistics}
-                  releaseId={release.id}
+                  releaseVersionId={release.id}
                   isEditing={isEditing}
                 />
               </div>

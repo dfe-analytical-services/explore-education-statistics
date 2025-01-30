@@ -1,5 +1,5 @@
 import StatusBlock, { StatusBlockColors } from '@admin/components/StatusBlock';
-import { ReleaseStageStatus } from '@admin/services/releaseService';
+import { ReleaseVersionStageStatus } from '@admin/services/releaseVersionService';
 import React from 'react';
 import Tag from '@common/components/Tag';
 
@@ -7,7 +7,7 @@ const approvedStatuses = ['Complete', 'Scheduled'];
 
 interface Props {
   color?: StatusBlockColors;
-  currentStatus?: ReleaseStageStatus;
+  currentStatus?: ReleaseVersionStageStatus;
   isApproved?: boolean;
 }
 

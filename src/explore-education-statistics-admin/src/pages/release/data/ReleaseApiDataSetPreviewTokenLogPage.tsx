@@ -21,7 +21,7 @@ import { generatePath, useParams } from 'react-router-dom';
 import React from 'react';
 
 export default function ReleaseApiDataSetPreviewTokenLogPage() {
-  const { dataSetId, releaseId, publicationId } =
+  const { dataSetId, releaseVersionId, publicationId } =
     useParams<ReleaseDataSetPreviewTokenRouteParams>();
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
@@ -51,7 +51,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
           releaseApiDataSetDetailsRoute.path,
           {
             publicationId,
-            releaseId,
+            releaseVersionId,
             dataSetId,
           },
         )}
@@ -116,7 +116,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                               releaseApiDataSetPreviewTokenRoute.path,
                               {
                                 publicationId,
-                                releaseId,
+                                releaseVersionId,
                                 dataSetId,
                                 previewTokenId: token.id,
                               },
@@ -157,7 +157,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
             releaseApiDataSetPreviewRoute.path,
             {
               publicationId,
-              releaseId,
+              releaseVersionId,
               dataSetId,
             },
           )}

@@ -22,7 +22,7 @@ import ApiDataSetCreateProcessing from './ApiDataSetCreateProcessing';
 interface Props {
   buttonText?: ReactNode | string;
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   submitText?: string;
   title?: string;
   onSubmit: (
@@ -33,7 +33,7 @@ interface Props {
 export default function ApiDataSetCreateModal({
   buttonText = 'Create API data set',
   publicationId,
-  releaseId,
+  releaseVersionId,
   submitText,
   title = 'Create a new API data set',
   onSubmit,
@@ -42,7 +42,7 @@ export default function ApiDataSetCreateModal({
   const [processingDataSetId, setProcessingDataSetId] = useState<string>();
 
   const { data: dataSetCandidates = [], isLoading } = useQuery({
-    ...apiDataSetCandidateQueries.list(releaseId),
+    ...apiDataSetCandidateQueries.list(releaseVersionId),
     enabled: isOpen,
   });
 
@@ -57,7 +57,7 @@ export default function ApiDataSetCreateModal({
         <ApiDataSetCreateProcessing
           dataSetId={processingDataSetId}
           publicationId={publicationId}
-          releaseId={releaseId}
+          releaseVersionId={releaseVersionId}
           onClose={toggleOpen.off}
         />
       ) : (
@@ -90,7 +90,7 @@ export default function ApiDataSetCreateModal({
                     releaseDataRoute.path,
                     {
                       publicationId,
-                      releaseId,
+                      releaseVersionId,
                     },
                   )}#${releaseDataPageTabIds.dataUploads}`}
                   onClick={toggleOpen.off}

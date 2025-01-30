@@ -7,12 +7,12 @@ import {
 import _publicationService, {
   Publication,
 } from '@admin/services/publicationService';
-import { Release } from '@admin/services/releaseService';
+import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 
 jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/permissionService');
@@ -34,7 +34,7 @@ const testPublication: Publication = {
   theme: { id: 'theme-1', title: 'Test theme' },
 };
 
-const testRelease: Release = {
+const testRelease: ReleaseVersion = {
   id: '123',
   releaseId: '456',
   slug: '123',
@@ -132,16 +132,16 @@ describe('ReleaseTableToolPage', () => {
         initialEntries={[
           generatePath<ReleaseRouteParams>(releaseTableToolRoute.path, {
             publicationId: 'publication-1',
-            releaseId: 'release-1',
+            releaseVersionId: 'release-1',
           }),
         ]}
       >
-        <ReleaseContextProvider release={testRelease}>
+        <ReleaseVersionContextProvider releaseVersion={testRelease}>
           <Route
             component={ReleaseTableToolPage}
             path={releaseTableToolRoute.path}
           />
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </MemoryRouter>,
     );
   };

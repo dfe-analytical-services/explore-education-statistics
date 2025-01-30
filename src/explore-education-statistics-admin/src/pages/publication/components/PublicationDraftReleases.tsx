@@ -3,13 +3,13 @@ import {
   DraftStatusGuidanceModal,
   IssuesGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
-import { ReleaseSummaryWithPermissions } from '@admin/services/releaseService';
+import { ReleaseVersionSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import InsetText from '@common/components/InsetText';
 import React from 'react';
 
 interface Props {
   publicationId: string;
-  releases: ReleaseSummaryWithPermissions[];
+  releases: ReleaseVersionSummaryWithPermissions[];
   onAmendmentDelete?: () => void;
 }
 

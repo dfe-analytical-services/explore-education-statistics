@@ -26,16 +26,16 @@ const AdminDashboardPage = () => {
     data: draftReleases = [],
     isLoading: isLoadingDraftReleases,
     refetch: reloadDraftReleases,
-  } = useQuery(releaseQueries.listDraftReleases);
+  } = useQuery(releaseQueries.listDraftReleaseVersions);
 
   const {
     data: scheduledReleases = [],
     isLoading: isLoadingScheduledReleases,
-  } = useQuery(releaseQueries.listScheduledReleases);
+  } = useQuery(releaseQueries.listScheduledReleaseVersions);
 
   const { data: releaseApprovals = [], isLoading: isLoadingReleaseApprovals } =
     useQuery({
-      ...releaseQueries.listReleasesForApproval,
+      ...releaseQueries.listReleaseVersionsForApproval,
       enabled: isApprover,
     });
 

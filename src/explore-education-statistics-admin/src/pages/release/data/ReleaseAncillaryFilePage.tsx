@@ -18,15 +18,15 @@ import { generatePath, RouteComponentProps } from 'react-router';
 export default function ReleaseAncillaryFilePage({
   history,
   match: {
-    params: { publicationId, releaseId, fileId },
+    params: { publicationId, releaseVersionId, fileId },
   },
 }: RouteComponentProps<ReleaseAncillaryFileRouteParams>) {
   const { data: file, isLoading: isLoadingFile } = useQuery(
-    releaseAncillaryFileQueries.get(releaseId, fileId),
+    releaseAncillaryFileQueries.get(releaseVersionId, fileId),
   );
 
   const { data: allFiles = [], isLoading: isLoadingAllFiles } = useQuery(
-    releaseAncillaryFileQueries.list(releaseId),
+    releaseAncillaryFileQueries.list(releaseVersionId),
   );
 
   const navigateBack = useCallback(
@@ -34,15 +34,15 @@ export default function ReleaseAncillaryFilePage({
       history.push(
         generatePath<ReleaseRouteParams>(releaseAncillaryFilesRoute.path, {
           publicationId,
-          releaseId,
+          releaseVersionId,
         }),
       ),
-    [history, publicationId, releaseId],
+    [history, publicationId, releaseVersionId],
   );
 
   const handleSubmit = useCallback(
     async ({ title, summary, file: newFile }: AncillaryFileFormValues) => {
-      await releaseAncillaryFileService.updateFile(releaseId, fileId, {
+      await releaseAncillaryFileService.updateFile(releaseVersionId, fileId, {
         title,
         summary,
         file: newFile,
@@ -50,7 +50,7 @@ export default function ReleaseAncillaryFilePage({
 
       navigateBack();
     },
-    [fileId, navigateBack, releaseId],
+    [fileId, navigateBack, releaseVersionId],
   );
 
   return (
@@ -60,7 +60,7 @@ export default function ReleaseAncillaryFilePage({
         back
         to={generatePath<ReleaseRouteParams>(releaseAncillaryFilesRoute.path, {
           publicationId,
-          releaseId,
+          releaseVersionId,
         })}
       >
         Back

@@ -4,7 +4,7 @@ import ApiDataSetVersionSummaryList from '@admin/pages/release/data/components/A
 import DeleteDraftVersionButton from '@admin/pages/release/data/components/DeleteDraftVersionButton';
 import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataSetCreateModal';
 import ApiDataSetFinaliseBanner from '@admin/pages/release/data/components/ApiDataSetFinaliseBanner';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import {
   releaseApiDataSetChangelogRoute,
@@ -39,7 +39,7 @@ export default function ReleaseApiDataSetDetailsPage() {
   const history = useHistory();
 
   const { publicAppUrl } = useConfig();
-  const { release } = useReleaseContext();
+  const { releaseVersion } = useReleaseVersionContext();
 
   const [finalisingStatus, setFinalisingStatus] =
     useState<DataSetFinalisingStatus>(undefined);
@@ -81,7 +81,7 @@ export default function ReleaseApiDataSetDetailsPage() {
       ? 'govuk-grid-column-one-half-from-desktop'
       : 'govuk-grid-column-two-thirds-from-desktop';
 
-  const canUpdateRelease = release.approvalStatus !== 'Approved';
+  const canUpdateRelease = releaseVersion.approvalStatus !== 'Approved';
 
   const showDraftVersionActions =
     dataSet?.draftVersion?.status !== 'Processing';
@@ -90,7 +90,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     <ApiDataSetVersionSummaryList
       dataSetVersion={dataSet.draftVersion}
       id="draft-version-summary"
-      publicationId={release.publicationId}
+      publicationId={releaseVersion.publicationId}
       collapsibleButtonHiddenText="for draft version"
       actions={
         showDraftVersionActions && (
@@ -103,8 +103,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                       to={generatePath<ReleaseDataSetChangelogRouteParams>(
                         releaseApiDataSetChangelogRoute.path,
                         {
-                          publicationId: release.publicationId,
-                          releaseId: release.id,
+                          publicationId: releaseVersion.publicationId,
+                          releaseVersionId: releaseVersion.id,
                           dataSetId,
                           dataSetVersionId: dataSet.draftVersion.id,
                         },
@@ -119,8 +119,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                     to={generatePath<ReleaseDataSetRouteParams>(
                       releaseApiDataSetPreviewRoute.path,
                       {
-                        publicationId: release.publicationId,
-                        releaseId: release.id,
+                        publicationId: releaseVersion.publicationId,
+                        releaseVersionId: releaseVersion.id,
                         dataSetId,
                       },
                     )}
@@ -133,8 +133,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                     to={generatePath<ReleaseDataSetRouteParams>(
                       releaseApiDataSetPreviewTokenLogRoute.path,
                       {
-                        publicationId: release.publicationId,
-                        releaseId: release.id,
+                        publicationId: releaseVersion.publicationId,
+                        releaseVersionId: releaseVersion.id,
                         dataSetId,
                       },
                     )}
@@ -154,8 +154,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                       generatePath<ReleaseRouteParams>(
                         releaseApiDataSetsRoute.path,
                         {
-                          publicationId: release.publicationId,
-                          releaseId: release.id,
+                          publicationId: releaseVersion.publicationId,
+                          releaseVersionId: releaseVersion.id,
                         },
                       ),
                     )
@@ -175,7 +175,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     <ApiDataSetVersionSummaryList
       dataSetVersion={dataSet.latestLiveVersion}
       id="live-version-summary"
-      publicationId={release.publicationId}
+      publicationId={releaseVersion.publicationId}
       collapsibleButtonHiddenText="for latest live version"
       actions={
         <ul className="govuk-list">
@@ -194,8 +194,9 @@ export default function ReleaseApiDataSetDetailsPage() {
                 to={generatePath<ReleaseDataSetChangelogRouteParams>(
                   releaseApiDataSetChangelogRoute.path,
                   {
-                    publicationId: release.publicationId,
-                    releaseId: dataSet.latestLiveVersion.releaseVersion.id,
+                    publicationId: releaseVersion.publicationId,
+                    releaseVersionId:
+                      dataSet.latestLiveVersion.releaseVersion.id,
                     dataSetId,
                     dataSetVersionId: dataSet.latestLiveVersion.id,
                   },
@@ -211,8 +212,9 @@ export default function ReleaseApiDataSetDetailsPage() {
                 to={generatePath<ReleaseDataSetRouteParams>(
                   releaseApiDataSetVersionHistoryRoute.path,
                   {
-                    publicationId: release.publicationId,
-                    releaseId: dataSet.latestLiveVersion.releaseVersion.id,
+                    publicationId: releaseVersion.publicationId,
+                    releaseVersionId:
+                      dataSet.latestLiveVersion.releaseVersion.id,
                     dataSetId,
                   },
                 )}
@@ -244,8 +246,8 @@ export default function ReleaseApiDataSetDetailsPage() {
         back
         className="govuk-!-margin-bottom-6"
         to={generatePath<ReleaseRouteParams>(releaseApiDataSetsRoute.path, {
-          releaseId: release.id,
-          publicationId: release.publicationId,
+          releaseVersionId: releaseVersion.id,
+          publicationId: releaseVersion.publicationId,
         })}
       >
         Back to API data sets
@@ -263,8 +265,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                 dataSetVersionId={dataSet.draftVersion.id}
                 draftVersionStatus={dataSet.draftVersion.status}
                 finalisingStatus={finalisingStatus}
-                publicationId={release.publicationId}
-                releaseId={release.id}
+                publicationId={releaseVersion.publicationId}
+                releaseVersionId={releaseVersion.id}
                 onFinalise={handleFinalise}
               />
             )}
@@ -318,8 +320,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                           to={generatePath<ReleaseDataSetRouteParams>(
                             releaseApiDataSetLocationsMappingRoute.path,
                             {
-                              publicationId: release.publicationId,
-                              releaseId: release.id,
+                              publicationId: releaseVersion.publicationId,
+                              releaseVersionId: releaseVersion.id,
                               dataSetId,
                             },
                           )}
@@ -351,8 +353,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                           to={generatePath<ReleaseDataSetRouteParams>(
                             releaseApiDataSetFiltersMappingRoute.path,
                             {
-                              publicationId: release.publicationId,
-                              releaseId: release.id,
+                              publicationId: releaseVersion.publicationId,
+                              releaseVersionId: releaseVersion.id,
                               dataSetId,
                             },
                           )}
@@ -404,11 +406,13 @@ export default function ReleaseApiDataSetDetailsPage() {
             </div>
             {canUpdateRelease &&
               !dataSet.draftVersion &&
-              !dataSet.previousReleaseIds.includes(release.releaseId) && (
+              !dataSet.previousReleaseIds.includes(
+                releaseVersion.releaseId,
+              ) && (
                 <ApiDataSetCreateModal
                   buttonText="Create a new version of this data set"
-                  publicationId={release.publicationId}
-                  releaseId={release.id}
+                  publicationId={releaseVersion.publicationId}
+                  releaseVersionId={releaseVersion.id}
                   submitText="Confirm new data set version"
                   title="Create a new API data set version"
                   onSubmit={async ({ releaseFileId }) => {

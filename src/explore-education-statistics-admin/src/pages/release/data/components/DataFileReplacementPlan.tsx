@@ -31,7 +31,7 @@ import sanitizeHtml from '@common/utils/sanitizeHtml';
 interface Props {
   cancelButton: ReactNode;
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   fileId: string;
   replacementFileId: string;
   onReplacement?: () => void;
@@ -40,7 +40,7 @@ interface Props {
 const DataFileReplacementPlan = ({
   cancelButton,
   publicationId,
-  releaseId,
+  releaseVersionId,
   fileId,
   replacementFileId,
   onReplacement,
@@ -57,11 +57,11 @@ const DataFileReplacementPlan = ({
   } = useAsyncRetry(
     () =>
       dataReplacementService.getReplacementPlan(
-        releaseId,
+        releaseVersionId,
         fileId,
         replacementFileId,
       ),
-    [releaseId, fileId, replacementFileId],
+    [releaseVersionId, fileId, replacementFileId],
   );
 
   const hasInvalidDataBlocks = useMemo<boolean>(
@@ -224,7 +224,7 @@ const DataFileReplacementPlan = ({
                           releaseDataBlockEditRoute.path,
                           {
                             publicationId,
-                            releaseId,
+                            releaseVersionId,
                             dataBlockId: dataBlock.id,
                           },
                         )}
@@ -240,7 +240,7 @@ const DataFileReplacementPlan = ({
                       }
                       onConfirm={async () => {
                         await dataBlockService.deleteDataBlock(
-                          releaseId,
+                          releaseVersionId,
                           dataBlock.id,
                         );
                         reloadPlan();
@@ -363,7 +363,7 @@ const DataFileReplacementPlan = ({
                           releaseFootnotesEditRoute.path,
                           {
                             publicationId,
-                            releaseId,
+                            releaseVersionId,
                             footnoteId: footnote.id,
                           },
                         )}
@@ -378,7 +378,7 @@ const DataFileReplacementPlan = ({
                         }
                         onConfirm={async () => {
                           await footnoteService.deleteFootnote(
-                            releaseId,
+                            releaseVersionId,
                             footnote.id,
                           );
                           reloadPlan();
@@ -408,7 +408,7 @@ const DataFileReplacementPlan = ({
                   toggleSubmitting.on();
 
                   await dataReplacementService.replaceData(
-                    releaseId,
+                    releaseVersionId,
                     fileId,
                     replacementFileId,
                   );

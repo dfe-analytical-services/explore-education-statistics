@@ -7,15 +7,15 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router-dom';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import { useQuery } from '@tanstack/react-query';
 import publicationQueries from '@admin/queries/publicationQueries';
 
 const ReleaseTableToolPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
-  const { releaseId, publicationId } = match.params;
-  const { release } = useReleaseContext();
+  const { releaseVersionId, publicationId } = match.params;
+  const { releaseVersion } = useReleaseVersionContext();
 
   const { data: publication, isLoading } = useQuery(
     publicationQueries.get(publicationId),
@@ -28,7 +28,7 @@ const ReleaseTableToolPage = ({
         className="govuk-!-margin-bottom-6"
         to={generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
           publicationId,
-          releaseId,
+          releaseVersionId,
         })}
       >
         Back
@@ -36,9 +36,9 @@ const ReleaseTableToolPage = ({
       <LoadingSpinner loading={isLoading}>
         {publication && (
           <ReleasePreviewTableTool
-            releaseId={releaseId}
+            releaseVersionId={releaseVersionId}
             publication={publication}
-            releaseType={release.type}
+            releaseType={releaseVersion.type}
           />
         )}
       </LoadingSpinner>

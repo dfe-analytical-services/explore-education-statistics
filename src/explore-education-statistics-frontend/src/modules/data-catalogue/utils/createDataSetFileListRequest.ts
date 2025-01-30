@@ -102,7 +102,7 @@ export function getParamsFromQuery(query: DataCataloguePageQuery) {
         ? query.sortBy
         : 'newest',
     publicationId: getFirst(query.publicationId),
-    releaseId: getFirst(query.releaseId),
+    releaseId: getFirst(query.releaseVersionId),
     geographicLevel: getFirst(query.geographicLevel),
     searchTerm: getFirst(query.searchTerm),
     themeId: getFirst(query.themeId),

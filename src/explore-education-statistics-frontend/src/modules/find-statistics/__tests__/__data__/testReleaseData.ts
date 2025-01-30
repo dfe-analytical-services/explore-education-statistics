@@ -1,4 +1,7 @@
-import { Publication, Release } from '@common/services/publicationService';
+import {
+  Publication,
+  ReleaseVersion,
+} from '@common/services/publicationService';
 
 export const testPublication: Publication = {
   id: 'publication-1',
@@ -58,7 +61,7 @@ export const testPublication: Publication = {
   isSuperseded: false,
 };
 
-export const testRelease: Release = {
+export const testRelease: ReleaseVersion = {
   latestRelease: true,
   publication: testPublication,
   id: 'release-1',

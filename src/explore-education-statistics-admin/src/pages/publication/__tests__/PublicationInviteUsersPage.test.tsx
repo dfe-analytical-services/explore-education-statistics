@@ -66,7 +66,7 @@ function renderPage() {
     publicationInviteUsersPageRoute.path,
     {
       publicationId: testPublication.id,
-      releaseId: testPaginatedReleaseSummaries.results[0].id,
+      releaseVersionId: testPaginatedReleaseSummaries.results[0].id,
     },
   );
 

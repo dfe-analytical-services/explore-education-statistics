@@ -33,7 +33,7 @@ const ReleaseDataBlockEditPage = ({
   history,
 }: RouteComponentProps<ReleaseDataBlockRouteParams>) => {
   const {
-    params: { publicationId, releaseId, dataBlockId },
+    params: { publicationId, releaseVersionId, dataBlockId },
   } = match;
 
   const config = useConfig();
@@ -48,14 +48,14 @@ const ReleaseDataBlockEditPage = ({
   } = useAsyncHandledRetry<Model>(async () => {
     const [dataBlock, canUpdateRelease] = await Promise.all([
       dataBlocksService.getDataBlock(dataBlockId),
-      permissionService.canUpdateRelease(releaseId),
+      permissionService.canUpdateRelease(releaseVersionId),
     ]);
 
     return {
       dataBlock,
       canUpdateRelease,
     };
-  }, [releaseId, dataBlockId]);
+  }, [releaseVersionId, dataBlockId]);
 
   const handleDataBlockSave = useCallback(
     async (nextDataBlock: ReleaseDataBlock) => {
@@ -84,10 +84,10 @@ const ReleaseDataBlockEditPage = ({
     history.push(
       generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
         publicationId,
-        releaseId,
+        releaseVersionId,
       }),
     );
-  }, [history, publicationId, releaseId]);
+  }, [history, publicationId, releaseVersionId]);
 
   const { canUpdateRelease, dataBlock } = model ?? {};
 
@@ -98,7 +98,7 @@ const ReleaseDataBlockEditPage = ({
         className="govuk-!-margin-bottom-6"
         to={generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
           publicationId,
-          releaseId,
+          releaseVersionId,
         })}
       >
         Back
@@ -110,7 +110,7 @@ const ReleaseDataBlockEditPage = ({
         <DataBlockSelector
           canUpdate={canUpdateRelease}
           publicationId={publicationId}
-          releaseId={releaseId}
+          releaseVersionId={releaseVersionId}
           dataBlockId={dataBlockId}
         />
 
@@ -160,13 +160,13 @@ const ReleaseDataBlockEditPage = ({
               {canUpdateRelease ? (
                 <DataBlockPageTabs
                   key={dataBlockId}
-                  releaseId={releaseId}
+                  releaseVersionId={releaseVersionId}
                   dataBlock={dataBlock}
                   onDataBlockSave={handleDataBlockSave}
                 />
               ) : (
                 <DataBlockPageReadOnlyTabs
-                  releaseId={releaseId}
+                  releaseVersionId={releaseVersionId}
                   dataBlock={dataBlock}
                 />
               )}
@@ -174,7 +174,7 @@ const ReleaseDataBlockEditPage = ({
 
             {isDeleting && canUpdateRelease && (
               <DataBlockDeletePlanModal
-                releaseId={releaseId}
+                releaseVersionId={releaseVersionId}
                 dataBlockId={dataBlockId}
                 onConfirm={handleDataBlockDelete}
                 onCancel={toggleDeleting.off}

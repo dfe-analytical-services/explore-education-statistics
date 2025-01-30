@@ -1,11 +1,11 @@
 import Link from '@admin/components/Link';
 import DraftReleaseRowIssues from '@admin/pages/admin-dashboard/components/DraftReleaseRowIssues';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import releaseService, {
-  ReleaseSummaryWithPermissions,
-  DashboardReleaseSummary,
+import releaseVersionService, {
+  ReleaseVersionSummaryWithPermissions,
+  DashboardReleaseVersionSummary,
   DeleteReleasePlan,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -19,14 +19,15 @@ import CancelAmendmentModal from './CancelAmendmentModal';
 
 interface Props {
   isBauUser: boolean;
-  release: DashboardReleaseSummary & ReleaseSummaryWithPermissions;
+  release: DashboardReleaseVersionSummary &
+    ReleaseVersionSummaryWithPermissions;
   onChangeRelease: () => void;
 }
 
 const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
   const [deleteReleasePlan, setDeleteReleasePlan] = useState<
     DeleteReleasePlan & {
-      releaseId: string;
+      releaseVersionId: string;
     }
   >();
   return (
@@ -39,13 +40,13 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
           }`}
         </Tag>
       </td>
-      {!isBauUser && <DraftReleaseRowIssues releaseId={release.id} />}
+      {!isBauUser && <DraftReleaseRowIssues releaseVersionId={release.id} />}
       <td>
         <Link
           className="govuk-!-margin-right-4 govuk-!-display-inline-block"
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
             publicationId: release.publication.id,
-            releaseId: release.id,
+            releaseVersionId: release.id,
           })}
         >
           {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
@@ -57,7 +58,7 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
             className="govuk-!-margin-right-4 govuk-!-display-inline-block"
             to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
               publicationId: release.publication.id,
-              releaseId: release.previousVersionId,
+              releaseVersionId: release.previousVersionId,
             })}
           >
             View existing version
@@ -73,8 +74,10 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
                 variant="warning"
                 onClick={async () => {
                   setDeleteReleasePlan({
-                    ...(await releaseService.getDeleteReleasePlan(release.id)),
-                    releaseId: release.id,
+                    ...(await releaseVersionService.getDeleteReleaseVersionPlan(
+                      release.id,
+                    )),
+                    releaseVersionId: release.id,
                   });
                 }}
               >
@@ -84,7 +87,9 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
             }
             onConfirm={async () => {
               if (deleteReleasePlan) {
-                await releaseService.deleteRelease(deleteReleasePlan.releaseId);
+                await releaseVersionService.deleteReleaseVersion(
+                  deleteReleasePlan.releaseVersionId,
+                );
                 setDeleteReleasePlan(undefined);
                 onChangeRelease();
               }

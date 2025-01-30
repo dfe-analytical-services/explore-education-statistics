@@ -15,11 +15,11 @@ import {
 } from '@admin/routes/releaseRoutes';
 import { PublicationRouteParams } from '@admin/routes/routes';
 import {
-  Release,
-  ReleaseChecklist,
-  ReleaseChecklistError,
-  ReleaseChecklistWarning,
-} from '@admin/services/releaseService';
+  ReleaseVersion,
+  ReleaseVersionChecklist,
+  ReleaseVersionChecklistError,
+  ReleaseVersionChecklistWarning,
+} from '@admin/services/releaseVersionService';
 import InsetText from '@common/components/InsetText';
 import React, { useMemo } from 'react';
 import { generatePath } from 'react-router';
@@ -33,19 +33,19 @@ interface ChecklistMessage {
 }
 
 interface Props {
-  checklist: ReleaseChecklist;
-  release: Release;
+  checklist: ReleaseVersionChecklist;
+  releaseVersion: ReleaseVersion;
 }
 
-const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
+const ReleaseStatusChecklist = ({ checklist, releaseVersion }: Props) => {
   const { user } = useAuthContext();
 
   const releaseRouteParams = useMemo<ReleaseRouteParams>(
     () => ({
-      releaseId: release.id,
-      publicationId: release.publicationId,
+      releaseVersionId: releaseVersion.id,
+      publicationId: releaseVersion.publicationId,
     }),
-    [release.id, release.publicationId],
+    [releaseVersion.id, releaseVersion.publicationId],
   );
 
   const errors = useMemo<ChecklistMessage[]>(() => {
@@ -160,7 +160,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           // Show error code, even if there is no mapping,
           // as this is better than having invisible errors.
           return {
-            message: (error as ReleaseChecklistError).code,
+            message: (error as ReleaseVersionChecklistError).code,
           };
       }
     });
@@ -205,7 +205,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               'An in-EES methodology page has not been linked to this publication',
             link: generatePath<PublicationRouteParams>(
               publicationMethodologiesRoute.path,
-              { publicationId: release.publicationId },
+              { publicationId: releaseVersion.publicationId },
             ),
           };
         case 'NoNextReleaseDate':
@@ -233,11 +233,11 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           // Show warning code, even if there is no mapping,
           // as this is better than having invisible warnings.
           return {
-            message: (warning as ReleaseChecklistWarning).code,
+            message: (warning as ReleaseVersionChecklistWarning).code,
           };
       }
     });
-  }, [checklist.warnings, release.publicationId, releaseRouteParams]);
+  }, [checklist.warnings, releaseVersion.publicationId, releaseRouteParams]);
 
   return (
     <div className="govuk-!-width-two-thirds">

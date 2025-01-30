@@ -1,4 +1,4 @@
-import { Release } from '@admin/services/releaseService';
+import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
 
 export const getReleaseApprovalStatusLabel = (
@@ -26,5 +26,8 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   return '(not Live)';
 };
 
-export const getReleaseSummaryLabel = (release: Release) =>
-  `${release.title} ${getLiveLatestLabel(release.live, release.latestRelease)}`;
+export const getReleaseSummaryLabel = (releaseVersion: ReleaseVersion) =>
+  `${releaseVersion.title} ${getLiveLatestLabel(
+    releaseVersion.live,
+    releaseVersion.latestRelease,
+  )}`;

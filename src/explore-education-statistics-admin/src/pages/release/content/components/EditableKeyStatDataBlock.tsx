@@ -20,7 +20,7 @@ export interface EditableKeyStatDataBlockProps {
   isReordering?: boolean;
   keyStat: KeyStatisticDataBlock;
   keyStats: KeyStatistic[];
-  releaseId: string;
+  releaseVersionId: string;
   testId?: string;
   onRemove?: () => void;
   onSubmit?: (values: KeyStatDataBlockFormValues) => void;
@@ -31,7 +31,7 @@ export default function EditableKeyStatDataBlock({
   isReordering = false,
   keyStat,
   keyStats,
-  releaseId,
+  releaseVersionId,
   testId = 'keyStat',
   onRemove,
   onSubmit,
@@ -43,7 +43,7 @@ export default function EditableKeyStatDataBlock({
     isLoading,
     error,
   } = useQuery(
-    tableBuilderQueries.getKeyStat(releaseId, keyStat.dataBlockParentId),
+    tableBuilderQueries.getKeyStat(releaseVersionId, keyStat.dataBlockParentId),
   );
 
   const handleSubmit = useCallback(

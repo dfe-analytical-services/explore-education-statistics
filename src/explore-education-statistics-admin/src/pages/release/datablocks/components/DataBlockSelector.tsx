@@ -20,21 +20,21 @@ const emptyDataBlocks: ReleaseDataBlockSummary[] = [];
 interface Props {
   canUpdate?: boolean;
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   dataBlockId: string;
 }
 
 const DataBlockSelector = ({
   canUpdate = true,
   publicationId,
-  releaseId,
+  releaseVersionId,
   dataBlockId,
 }: Props) => {
   const history = useHistory();
 
   const { value: dataBlocks = emptyDataBlocks, isLoading } = useAsyncRetry(
-    () => dataBlockService.listDataBlocks(releaseId),
-    [releaseId],
+    () => dataBlockService.listDataBlocks(releaseVersionId),
+    [releaseVersionId],
   );
 
   const dataBlockOptions = useMemo<SelectOption[]>(() => {
@@ -52,7 +52,7 @@ const DataBlockSelector = ({
     releaseDataBlockCreateRoute.path,
     {
       publicationId,
-      releaseId,
+      releaseVersionId,
     },
   );
 
@@ -82,7 +82,7 @@ const DataBlockSelector = ({
                 releaseDataBlockEditRoute.path,
                 {
                   publicationId,
-                  releaseId,
+                  releaseVersionId,
                   dataBlockId: e.target.value,
                 },
               ),

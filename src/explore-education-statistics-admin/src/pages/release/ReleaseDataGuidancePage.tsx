@@ -4,7 +4,9 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releaseDataGuidanceService, {
   ReleaseDataGuidance,
 } from '@admin/services/releaseDataGuidanceService';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseVersionService, {
+  ReleaseVersion,
+} from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import ReleaseDataGuidancePageContent from '@common/modules/release/components/ReleaseDataGuidancePageContent';
@@ -19,26 +21,26 @@ interface LocationState {
 
 interface Model {
   dataGuidance: ReleaseDataGuidance;
-  release: Release;
+  releaseVersion: ReleaseVersion;
 }
 
 const ReleaseDataGuidancePage = ({
   match,
   location,
 }: RouteComponentProps<ReleaseRouteParams, StaticContext, LocationState>) => {
-  const { releaseId } = match.params;
+  const { releaseVersionId } = match.params;
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
-    const [dataGuidance, release] = await Promise.all([
-      releaseDataGuidanceService.getDataGuidance(releaseId),
-      releaseService.getRelease(releaseId),
+    const [dataGuidance, releaseVersion] = await Promise.all([
+      releaseDataGuidanceService.getDataGuidance(releaseVersionId),
+      releaseVersionService.getReleaseVersion(releaseVersionId),
     ]);
 
     return {
       dataGuidance,
-      release,
+      releaseVersion,
     };
-  }, [releaseId]);
+  }, [releaseVersionId]);
 
   const { publicAppUrl } = useConfig();
 
@@ -48,19 +50,19 @@ const ReleaseDataGuidancePage = ({
         {model && (
           <>
             <PageTitle
-              title={model.release.publicationTitle}
-              caption={model.release.title}
+              title={model.releaseVersion.publicationTitle}
+              caption={model.releaseVersion.title}
             />
 
             <h2>Data guidance</h2>
 
             <ReleaseDataGuidancePageContent
-              published={model.release.published}
+              published={model.releaseVersion.published}
               dataGuidance={model.dataGuidance.content}
               renderDataCatalogueLink={
-                model.release.published ? (
+                model.releaseVersion.published ? (
                   <Link
-                    to={`${publicAppUrl}/data-catalogue?publicationId=${model.release.publicationId}&releaseId=${model.release.id}`}
+                    to={`${publicAppUrl}/data-catalogue?publicationId=${model.releaseVersion.publicationId}&releaseVersionId=${model.releaseVersion.id}`}
                   >
                     data catalogue
                   </Link>

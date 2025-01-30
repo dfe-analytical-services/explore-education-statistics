@@ -357,7 +357,7 @@ describe('PreReleaseMethodologyPage', () => {
         preReleaseMethodologyRoute.path,
         {
           publicationId: 'publication-1',
-          releaseId: 'release-1',
+          releaseVersionId: 'release-1',
           methodologyId: 'methodology-1',
         },
       ),

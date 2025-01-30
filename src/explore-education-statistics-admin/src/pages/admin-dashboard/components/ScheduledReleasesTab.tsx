@@ -1,11 +1,11 @@
 import ScheduledReleasesTable from '@admin/pages/admin-dashboard/components/ScheduledReleasesTable';
-import { DashboardReleaseSummary } from '@admin/services/releaseService';
+import { DashboardReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
 
 interface Props {
   isLoading: boolean;
-  releases: DashboardReleaseSummary[];
+  releases: DashboardReleaseVersionSummary[];
 }
 
 const ScheduledReleasesTab = ({ isLoading, releases }: Props) => {

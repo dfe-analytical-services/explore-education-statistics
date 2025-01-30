@@ -1,28 +1,31 @@
 import ReleaseStatusChecklist from '@admin/pages/release/components/ReleaseStatusChecklist';
 import ReleaseStatusForm from '@admin/pages/release/components/ReleaseStatusForm';
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseVersionService, {
+  ReleaseVersion,
+} from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import { formatISO } from 'date-fns';
 import React from 'react';
 
 interface Props {
-  release: Release;
+  releaseVersion: ReleaseVersion;
   statusPermissions: ReleaseStatusPermissions;
   onCancel: () => void;
-  onUpdate: (values: Release) => void;
+  onUpdate: (values: ReleaseVersion) => void;
 }
 
 const ReleaseStatusEditPage = ({
-  release,
+  releaseVersion,
   statusPermissions,
   onCancel,
   onUpdate,
 }: Props) => {
   const { value: checklist, isLoading } = useAsyncHandledRetry(
-    async () => releaseService.getReleaseChecklist(release.id),
-    [release.id],
+    async () =>
+      releaseVersionService.getReleaseVersionChecklist(releaseVersion.id),
+    [releaseVersion.id],
   );
 
   return (
@@ -30,25 +33,29 @@ const ReleaseStatusEditPage = ({
       <h2>Edit release status</h2>
 
       {checklist && (
-        <ReleaseStatusChecklist checklist={checklist} release={release} />
+        <ReleaseStatusChecklist
+          checklist={checklist}
+          releaseVersion={releaseVersion}
+        />
       )}
 
       <ReleaseStatusForm
-        release={release}
+        releaseVersion={releaseVersion}
         statusPermissions={statusPermissions}
         onCancel={onCancel}
         onSubmit={async values => {
-          const nextRelease = await releaseService.createReleaseStatus(
-            release.id,
-            {
-              ...values,
-              publishScheduled: values.publishScheduled
-                ? formatISO(values.publishScheduled, {
-                    representation: 'date',
-                  })
-                : undefined,
-            },
-          );
+          const nextRelease =
+            await releaseVersionService.createReleaseVersionStatus(
+              releaseVersion.id,
+              {
+                ...values,
+                publishScheduled: values.publishScheduled
+                  ? formatISO(values.publishScheduled, {
+                      representation: 'date',
+                    })
+                  : undefined,
+              },
+            );
           onUpdate(nextRelease);
         }}
       />
