@@ -33,9 +33,9 @@ public static class DataSetVersionQueryableExtensions
         return await queryable
             .Where(dsv => dsv.DataSetId == dataSetId)
             .Where(v =>
-                (!wildcardVersion.VersionMajor.HasValue || v.VersionMajor == wildcardVersion.VersionMajor) &&
-                (!wildcardVersion.VersionMinor.HasValue || v.VersionMinor == wildcardVersion.VersionMinor) &&
-                (!wildcardVersion.VersionPatch.HasValue || v.VersionPatch == wildcardVersion.VersionPatch))
+                (!wildcardVersion.Major.HasValue || v.VersionMajor == wildcardVersion.Major) &&
+                (!wildcardVersion.Minor.HasValue || v.VersionMinor == wildcardVersion.Minor) &&
+                (!wildcardVersion.Patch.HasValue || v.VersionPatch == wildcardVersion.Patch))
             .OrderByDescending(v => v.VersionMajor)
             .ThenByDescending(v => v.VersionMinor)
             .ThenByDescending(v => v.VersionPatch)

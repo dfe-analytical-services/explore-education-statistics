@@ -23,11 +23,11 @@ public static class VersionUtils
         return successful;
     }
 }
-public record WildcardVersion(uint? VersionMajor, uint? VersionMinor, uint? VersionPatch)
+public record WildcardVersion(uint? Major, uint? Minor, uint? Patch)
 {
     public static bool TryParse(string versionString, out WildcardVersion? version)
     {
-        var parts = versionString.Trim('v').Trim().Split('.');
+        var parts = versionString.Trim(' ', 'v').Split('.');
 
         if (parts.Length == 1 && (parts[0].IsNullOrEmpty() || parts[0] == "*"))
         {
@@ -36,7 +36,7 @@ public record WildcardVersion(uint? VersionMajor, uint? VersionMinor, uint? Vers
         }
 
         version = null;
-        if (parts.Length > 3 || !parts.All(part => part.Is("*") || uint.TryParse(part, out _)))
+        if (parts.Length > 3 || !parts.Contains("*") || !parts.All(part => part.Is("*") || uint.TryParse(part, out _)))
             return false;
 
         var indexOfWildcard = Array.FindIndex(parts, part => part == "*");
