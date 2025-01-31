@@ -4,9 +4,9 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
-public static class VersionUtilsTests
+public static class DataSetVersionRecordTest
 {
-    public class TryParseWildcard
+    public class TryParseWildcardTests
     {
         [Theory]
         [InlineData("*", null, null, null)]
@@ -26,12 +26,12 @@ public static class VersionUtilsTests
             int? patch
             )
         {
-            Assert.True(WildcardVersion.TryParse(versionString, out var wildcardVersion));
+            Assert.True(DataSetVersionRecord.TryParse(versionString, out var wildcardVersion));
 
             Assert.NotNull(wildcardVersion);
-            Assert.Equal((uint?)major, wildcardVersion.Major);
-            Assert.Equal((uint?)minor, wildcardVersion.Minor);
-            Assert.Equal((uint?)patch, wildcardVersion.Patch);
+            Assert.Equal(major, wildcardVersion.Major);
+            Assert.Equal(minor, wildcardVersion.Minor);
+            Assert.Equal(patch, wildcardVersion.Patch);
         }
 
         [Theory]
@@ -49,7 +49,7 @@ public static class VersionUtilsTests
         [InlineData("1.*.4")]
         public void InvalidWildcardVersionString_FailsValidation(string versionString)
         {
-            Assert.False(WildcardVersion.TryParse(versionString, out var wildcardVersion));
+            Assert.False(DataSetVersionRecord.TryParse(versionString, out var wildcardVersion));
             Assert.Null(wildcardVersion);
         }
     }
@@ -74,7 +74,7 @@ public static class VersionUtilsTests
             int expectedMinor = default,
             int expectedPatch = default)
         {
-            Assert.True(VersionUtils.TryParse(versionString, out var version));
+            Assert.True(DataSetVersionRecord.TryParse(versionString, out var version));
 
             Assert.Equal(expectedMajor, version.Major);
             Assert.Equal(expectedMinor, version.Minor);
@@ -91,7 +91,7 @@ public static class VersionUtilsTests
             int expectedMinor = default,
             int expectedPatch = default)
         {
-            Assert.True(VersionUtils.TryParse(versionString, out var version));
+            Assert.True(DataSetVersionRecord.TryParse(versionString, out var version));
 
             Assert.Equal(expectedMajor, version.Major);
             Assert.Equal(expectedMinor, version.Minor);
@@ -113,7 +113,7 @@ public static class VersionUtilsTests
 
         public void InvalidVersion_FailsToParse(string versionString)
         {
-            Assert.False(VersionUtils.TryParse(versionString, out _));
+            Assert.False(DataSetVersionRecord.TryParse(versionString, out _));
         }
     }
 }

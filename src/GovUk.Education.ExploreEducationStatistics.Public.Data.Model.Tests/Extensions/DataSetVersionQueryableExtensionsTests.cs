@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Ext
 
 public class DataSetVersionQueryableExtensionsTests
 {
-    public class FindByWildcardVersionTests
+    public class FindByVersionTests
     {
         private readonly DataFixture _dataFixture = new();
 
@@ -28,6 +28,24 @@ public class DataSetVersionQueryableExtensionsTests
         [InlineData("1.2.*", 1, 2, 0)]
         [InlineData("1.1.*", 1, 1, 1)]
         [InlineData("1.*", 1, 3, 0)]
+        [InlineData("0.2", 0, 2, 0)]
+        [InlineData("0.2.1", 0, 2, 1)]
+        [InlineData("0.1.3", 0, 1, 3)]
+        [InlineData("2.1.4", 2, 1, 4)]
+        [InlineData("2.1", 2, 1, 0)]
+        [InlineData("1.3.0", 1, 3, 0)]
+        [InlineData("1.2.0", 1, 2, 0)]
+        [InlineData("1.1.0", 1, 1, 0)]
+        [InlineData("1.3", 1, 3, 0)]
+        [InlineData("v1.3", 1, 3, 0)]
+        [InlineData("v0.2", 0, 2, 0)]
+        [InlineData("v0.2.1", 0, 2, 1)]
+        [InlineData("v0.1.3", 0, 1, 3)]
+        [InlineData("v2.1.4", 2, 1, 4)]
+        [InlineData("v2.1", 2, 1, 0)]
+        [InlineData("v1.3.0", 1, 3, 0)]
+        [InlineData("v1.2.0", 1, 2, 0)]
+        [InlineData("v1.1.0", 1, 1, 0)]
         [InlineData("v0.*", 0, 2, 1)]
         [InlineData("v0.*.*", 0, 2, 1)]
         [InlineData("v0.2.*", 0, 2, 1)]
@@ -39,7 +57,7 @@ public class DataSetVersionQueryableExtensionsTests
         [InlineData("v1.2.*", 1, 2, 0)]
         [InlineData("v1.1.*", 1, 1, 1)]
         [InlineData("v1.*", 1, 3, 0)]
-        public async Task TestDataSetVersions_ReturnsExpectedVersion(string versionString,
+        public async Task TestValidDataSetVersions_ReturnsExpectedVersion(string versionString,
                 int expectedMajor,
                 int expectedMinor = default,
                 int expectedPatch = default)
@@ -49,7 +67,7 @@ public class DataSetVersionQueryableExtensionsTests
             var queryable = SetupDataSetVersions(out dataSetId);
 
             // Act 
-            var actualResult = await queryable.FindByWildcardVersion(dataSetId, versionString, CancellationToken.None);
+            var actualResult = await queryable.FindByVersion(dataSetId, versionString, CancellationToken.None);
 
             // Assert
             Assert.True(actualResult.IsRight);
@@ -64,19 +82,22 @@ public class DataSetVersionQueryableExtensionsTests
         [InlineData("2*.*.0")]
         [InlineData("2*.1.0")]
         [InlineData("*.1.0")]
+        [InlineData("1.   2  .0")]
+        [InlineData("1.   2  .*")]
+        [InlineData("1.   *  .0")]
         [InlineData("1.*.4")]
         [InlineData("2.4.*")]
         [InlineData("7.*")]
         [InlineData("0.0.*")]
         [InlineData("0.3.*")]
-        public async Task TestDataSetVersions_ReturnsNotFound(string versionString)
+        public async Task TestInvalidDataSetVersions_ReturnsNotFound(string versionString)
         {
             // Arrange
             Guid dataSetId;
             var queryable = SetupDataSetVersions(out dataSetId);
 
             // Act 
-            var actualResult = await queryable.FindByWildcardVersion(dataSetId, versionString, CancellationToken.None);
+            var actualResult = await queryable.FindByVersion(dataSetId, versionString, CancellationToken.None);
 
             // Assert
             Assert.True(actualResult.IsLeft);
