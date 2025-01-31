@@ -8,11 +8,13 @@
 
 .title {
   max-width: 500px;
+  overflow-wrap: break-word;
 }
 
 .fileSize {
-  width: 5rem;
   text-align: right;
+  white-space: nowrap;
+  width: 5rem;
 }
 
 .fileStatus {
