@@ -1,0 +1,16 @@
+time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,admission_numbers
+2018,Calendar year,Regional,E92000001,England,E12000003,Yorkshire and the Humber,71924
+2017,Calendar year,Regional,E92000001,England,E12000003,Yorkshire and the Humber,71758
+2016,Calendar year,Regional,E92000001,England,E12000003,Yorkshire and the Humber,71503
+2015,Calendar year,Regional,E92000001,England,E12000003,Yorkshire and the Humber,63652
+2014,Calendar year,Regional,E92000001,England,E12000003,Yorkshire and the Humber,63205
+2018,Calendar year,Regional,E92000001,England,E12000001,North East,60745.2
+2017,Calendar year,Regional,E92000001,England,E12000001,North East,58190.8
+2016,Calendar year,Regional,E92000001,England,E12000001,North East,55636.4
+2015,Calendar year,Regional,E92000001,England,E12000001,North East,53082
+2014,Calendar year,Regional,E92000001,England,E12000001,North East,50527.6
+2018,Calendar year,Regional,E92000001,England,E12000002,North West,47973.2
+2017,Calendar year,Regional,E92000001,England,E12000002,North West,45418.8
+2016,Calendar year,Regional,E92000001,England,E12000002,North West,42864.4
+2015,Calendar year,Regional,E92000001,England,E12000002,North West,40310
+2014,Calendar year,Regional,E92000001,England,E12000002,North West,37755.6

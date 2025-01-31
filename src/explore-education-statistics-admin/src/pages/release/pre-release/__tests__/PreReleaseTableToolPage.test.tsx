@@ -1,0 +1,430 @@
+import render from '@common-test/render';
+import PreReleaseTableToolPage from '@admin/pages/release/pre-release/PreReleaseTableToolPage';
+import {
+  preReleaseTableToolRoute,
+  PreReleaseTableToolRouteParams,
+} from '@admin/routes/preReleaseRoutes';
+import _dataBlockService, {
+  ReleaseDataBlock,
+} from '@admin/services/dataBlockService';
+import _publicationService, {
+  Publication,
+} from '@admin/services/publicationService';
+import _releaseService, { Release } from '@admin/services/releaseService';
+import _tableBuilderService, {
+  SubjectMeta,
+  TableDataResponse,
+  FeaturedTable,
+  Subject,
+} from '@common/services/tableBuilderService';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { MemoryRouter, Route } from 'react-router';
+import { generatePath } from 'react-router-dom';
+
+jest.mock('@admin/services/dataBlockService');
+jest.mock('@admin/services/publicationService');
+jest.mock('@admin/services/releaseService');
+jest.mock('@common/services/tableBuilderService');
+
+const dataBlockService = _dataBlockService as jest.Mocked<
+  typeof _dataBlockService
+>;
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
+>;
+const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+const tableBuilderService = _tableBuilderService as jest.Mocked<
+  typeof _tableBuilderService
+>;
+
+describe('PreReleaseTableToolPage', () => {
+  const testSubjectMeta: SubjectMeta = {
+    filters: {
+      SchoolType: {
+        id: 'school-type',
+        totalValue: '',
+        hint: 'Filter by school type',
+        legend: 'School type',
+        name: 'school_type',
+        options: {
+          Default: {
+            id: 'default',
+            label: 'Default',
+            options: [
+              {
+                label: 'State-funded primary',
+                value: 'state-funded-primary',
+              },
+              {
+                label: 'State-funded secondary',
+                value: 'state-funded-secondary',
+              },
+            ],
+            order: 0,
+          },
+        },
+        order: 0,
+      },
+    },
+    indicators: {
+      AbsenceFields: {
+        id: 'absence-fields',
+        label: 'Absence fields',
+        options: [
+          {
+            value: 'authorised-absence-sessions',
+            label: 'Number of authorised absence sessions',
+            unit: '',
+            name: 'sess_authorised',
+            decimalPlaces: 2,
+          },
+        ],
+        order: 0,
+      },
+    },
+    locations: {
+      localAuthority: {
+        legend: 'Local authority',
+        options: [
+          { value: 'barnet', label: 'Barnet' },
+          { value: 'barnsley', label: 'Barnsley' },
+        ],
+      },
+    },
+    timePeriod: {
+      legend: 'Time period',
+      options: [{ label: '2014/15', code: 'AY', year: 2014 }],
+    },
+  };
+
+  const testTableData: TableDataResponse = {
+    subjectMeta: {
+      filters: {
+        SchoolType: {
+          totalValue: '',
+          hint: 'Filter by school type',
+          legend: 'School type',
+          options: {
+            Default: {
+              id: 'default',
+              label: 'Default',
+              options: [
+                {
+                  label: 'State-funded primary',
+                  value: 'state-funded-primary',
+                },
+                {
+                  label: 'State-funded secondary',
+                  value: 'state-funded-secondary',
+                },
+              ],
+              order: 0,
+            },
+          },
+          order: 0,
+          name: 'school_type',
+        },
+      },
+      footnotes: [],
+      indicators: [
+        {
+          label: 'Number of authorised absence sessions',
+          unit: '',
+          value: 'authorised-absence-sessions',
+          name: 'sess_authorised',
+        },
+      ],
+      locations: {
+        localAuthority: [
+          { id: 'barnet', label: 'Barnet', value: 'barnet' },
+          { id: 'barnsley', label: 'Barnsley', value: 'barnsley' },
+        ],
+      },
+      boundaryLevels: [],
+      publicationName: 'Pupil absence',
+      subjectName: 'Absence by characteristic',
+      timePeriodRange: [{ code: 'AY', label: '2014/15', year: 2014 }],
+      geoJsonAvailable: false,
+    },
+    results: [
+      {
+        filters: ['state-funded-primary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnet',
+        measures: {
+          'authorised-absence-sessions': '2613',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: ['state-funded-secondary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnsley',
+        measures: {
+          'authorised-absence-sessions': 'x',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: ['state-funded-secondary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnet',
+        measures: {
+          'authorised-absence-sessions': '1939',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: ['state-funded-primary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnsley',
+        measures: {
+          'authorised-absence-sessions': '39',
+        },
+        timePeriod: '2014_AY',
+      },
+    ],
+  };
+
+  const testRelease: Release = {
+    id: '123',
+    releaseId: '456',
+    slug: '123',
+    approvalStatus: 'Draft',
+    updatePublishedDate: false,
+    latestRelease: true,
+    live: true,
+    amendment: false,
+    publicationId: '123',
+    publicationTitle: 'Test Publication Title',
+    publicationSlug: 'test-publication-title-slug',
+    timePeriodCoverage: {
+      value: 'test',
+      label: 'test',
+    },
+    title: 'test title',
+    label: undefined,
+    version: 0,
+    type: 'AccreditedOfficialStatistics',
+    preReleaseAccessList: 'test',
+    year: 2023,
+    yearTitle: '2023',
+  };
+
+  const testPublication: Publication = {
+    id: 'publication-1',
+    title: 'Pupil absence',
+    summary: 'Pupil absence summary',
+    slug: 'pupil-absence',
+    theme: { id: 'theme-1', title: 'Test theme' },
+  };
+
+  const testFeaturedTables: FeaturedTable[] = [
+    {
+      id: 'block-1',
+      dataBlockId: 'block-1',
+      dataBlockParentId: 'block-1-parent',
+      name: 'Test highlight',
+      description: 'Test highlight description',
+      subjectId: 'subject-1',
+      order: 0,
+    },
+  ];
+  const testSubjects: Subject[] = [
+    {
+      id: 'subject-1',
+      name: 'Test subject',
+      content: '<p>Test content</p>',
+      timePeriods: {
+        from: '2018',
+        to: '2020',
+      },
+      geographicLevels: ['National'],
+      file: {
+        id: 'file-1',
+        name: 'Test subject',
+        fileName: 'file-1.csv',
+        extension: 'csv',
+        size: '10 Mb',
+        type: 'Data',
+      },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
+      lastUpdated: '2023-12-01',
+    },
+  ];
+
+  const testDataBlock: ReleaseDataBlock = {
+    id: 'block-1',
+    dataBlockParentId: 'block-1-parent',
+    dataSetId: 'data-set-1',
+    dataSetName: 'Test data set',
+    name: 'Test block',
+    highlightName: 'Test highlight name',
+    source: '',
+    heading: '',
+    table: {
+      tableHeaders: {
+        columnGroups: [
+          [
+            { value: 'barnet', type: 'Location', level: 'localAuthority' },
+            { value: 'barnsley', type: 'Location', level: 'localAuthority' },
+          ],
+        ],
+        rowGroups: [
+          [
+            { value: 'state-funded-primary', type: 'Filter' },
+            { value: 'state-funded-secondary', type: 'Filter' },
+          ],
+        ],
+        columns: [{ value: '2014_AY', type: 'TimePeriod' }],
+        rows: [{ value: 'authorised-absence-sessions', type: 'Indicator' }],
+      },
+      indicators: [],
+    },
+    charts: [],
+    query: {
+      subjectId: 'subject-1',
+      indicators: ['authorised-absence-sessions'],
+      filters: ['state-funded-primary', 'state-funded-secondary'],
+      timePeriod: {
+        startYear: 2014,
+        startCode: 'AY',
+        endYear: 2014,
+        endCode: 'AY',
+      },
+      locationIds: ['barnet', 'barnsley'],
+    },
+  };
+
+  test('renders correctly on step 1 with subjects and featured tables', async () => {
+    publicationService.getPublication.mockResolvedValue(testPublication);
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+    tableBuilderService.listReleaseFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
+    );
+
+    renderPage();
+
+    expect(await screen.findByText('Step 1')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Step 1 Select a data set',
+      }),
+    ).toHaveAttribute('aria-current', 'step');
+
+    const step1 = within(screen.getByTestId('wizardStep-1'));
+
+    expect(step1.getByLabelText('Test subject')).toBeInTheDocument();
+
+    await userEvent.click(step1.getByLabelText('View all featured tables'));
+
+    expect(step1.getByRole('link', { name: 'Test highlight' })).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/prerelease/table-tool/block-1',
+    );
+  });
+
+  test('renders correctly on step 1 without featured tables', async () => {
+    publicationService.getPublication.mockResolvedValue(testPublication);
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+    tableBuilderService.listReleaseFeaturedTables.mockResolvedValue([]);
+
+    renderPage();
+
+    expect(await screen.findByText('Step 1')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Step 1 Select a data set' }),
+    ).toHaveAttribute('aria-current', 'step');
+
+    const step1 = within(screen.getByTestId('wizardStep-1'));
+
+    expect(step1.getByLabelText('Test subject')).toBeInTheDocument();
+    expect(
+      step1.queryByRole('heading', { name: 'Choose a table' }),
+    ).not.toBeInTheDocument();
+
+    expect(screen.queryByTestId('dataTableCaption')).not.toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+  });
+
+  test('renders correctly on step 5 with `dataBlockId` route param', async () => {
+    publicationService.getPublication.mockResolvedValue(testPublication);
+    releaseService.getRelease.mockResolvedValue(testRelease);
+    dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
+
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+    tableBuilderService.listReleaseFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
+    );
+
+    tableBuilderService.getTableData.mockResolvedValue(testTableData);
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+
+    renderPage([
+      generatePath<PreReleaseTableToolRouteParams>(
+        preReleaseTableToolRoute.path,
+        {
+          publicationId: 'publication-1',
+          releaseId: 'release-1',
+          dataBlockId: 'block-1',
+        },
+      ),
+    ]);
+
+    expect(await screen.findByText('Step 5')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Step 5 Explore data' }),
+    ).toHaveAttribute('aria-current', 'step');
+
+    expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
+      /Number of authorised absence sessions for 'Absence by characteristic'/,
+    );
+
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')).toHaveLength(3);
+    expect(screen.getAllByRole('cell')).toHaveLength(5);
+
+    expect(
+      screen.queryByRole('radio', {
+        name: 'Table in ODS format (spreadsheet, with title and footnotes)',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('radio', {
+        name: 'Table in CSV format (flat file, with location codes)',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {
+        name: 'Download table',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  const renderPage = (
+    initialEntries: string[] = [
+      generatePath<PreReleaseTableToolRouteParams>(
+        preReleaseTableToolRoute.path,
+        {
+          publicationId: 'publication-1',
+          releaseId: 'release-1',
+        },
+      ),
+    ],
+  ) => {
+    return render(
+      <MemoryRouter initialEntries={initialEntries}>
+        <Route
+          component={PreReleaseTableToolPage}
+          path={preReleaseTableToolRoute.path}
+        />
+      </MemoryRouter>,
+    );
+  };
+});

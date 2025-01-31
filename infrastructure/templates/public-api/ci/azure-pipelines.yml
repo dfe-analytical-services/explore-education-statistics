@@ -1,0 +1,114 @@
+trigger: none
+
+parameters:
+  - name: deploySharedPrivateDnsZones
+    displayName: Do the shared Private DNS Zones need creating or updating?
+    default: false
+  - name: deployPsqlFlexibleServer
+    displayName: Does the PostgreSQL Flexible Server need creating or updating?
+    default: false
+  - name: deployContainerApp
+    displayName: Does the Public API Container App need creating or updating? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.
+    default: true
+  - name: deployDataProcessor
+    displayName: Does the Data Processor need creating or updating?
+    default: true
+  - name: deployDocsSite
+    displayName: Does the Public API static docs site need creating or updating?
+    default: true
+  - name: deployRecoveryVault
+    displayName: Does the Recovery Services Vault need creating or updating?
+    default: false
+  - name: deployAlerts
+    displayName: Whether to create or update Azure Monitor alerts during this deploy.
+    default: false
+  - name: awaitActiveOrchestrations
+    displayName: Should this deploy wait for active orchestrations in Function Apps to complete prior to deploying?
+    default: true
+  - name: forceDeployToEnvironment
+    displayName: Set to either dev or test to force a deploy to that environment from the chosen branch.
+    type: string
+    values:
+      - none
+      - dev
+      - test
+    default: 'none'
+
+resources:
+  pipelines:
+    - pipeline: MainBuild
+      source: Explore Education Statistics
+      trigger:
+        branches:
+          - dev
+          - test
+          - master
+
+variables:
+  - group: Public API Infrastructure - Common
+  - name: forceDeployToEnvironment
+    value: ${{parameters.forceDeployToEnvironment}}
+  - name: isDev
+    value: $[or(eq(variables['forceDeployToEnvironment'], 'dev'), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))]
+  - name: isTest
+    value: $[or(eq(variables['forceDeployToEnvironment'], 'test'), eq(variables['Build.SourceBranch'], 'refs/heads/test'))]
+  - name: isMaster
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  - name: vmImageName
+    value: ubuntu-latest
+  - name: deploySharedPrivateDnsZones
+    value: ${{ parameters.deploySharedPrivateDnsZones }}
+  - name: deployPsqlFlexibleServer
+    value: ${{ parameters.deployPsqlFlexibleServer }}
+  - name: deployContainerApp
+    value: ${{ parameters.deployContainerApp }}
+  - name: deployDataProcessor
+    value: ${{ parameters.deployDataProcessor }}
+  - name: deployDocsSite
+    value: ${{ parameters.deployDocsSite }}
+  - name: deployRecoveryVault
+    value: ${{ parameters.deployRecoveryVault }}
+  - name: deployAlerts
+    value: ${{ parameters.deployAlerts }}
+  - name: awaitActiveOrchestrations
+    value: ${{ parameters.awaitActiveOrchestrations }}
+
+pool:
+  vmImage: $(vmImageName)
+
+stages:
+  - template: stages/deploy.yml
+    parameters:
+      stageName: DeployDev
+      condition: eq(variables.isDev, true)
+      environment: Dev
+      serviceConnection: $(serviceConnectionDev)
+      bicepParamFile: dev
+
+  - template: stages/deploy.yml
+    parameters:
+      stageName: DeployTest
+      condition: eq(variables.isTest, true)
+      dependsOn: DeployDev
+      environment: Test
+      serviceConnection: $(serviceConnectionTest)
+      bicepParamFile: test
+
+#  - template: stages/deploy.yml
+#    parameters:
+#      stageName: DeployPreProd
+#      condition: eq(variables.isMaster, true)
+#      trigger: manual
+#      environment: Pre-Prod
+#      serviceConnection: $(serviceConnectionPreProd)
+#      bicepParamFile: preprod
+#
+#  - template: stages/deploy.yml
+#    parameters:
+#      stageName: DeployProd
+#      condition:  and(succeeded(), eq(variables.isMaster, true))
+#      trigger: manual
+#      dependsOn: DeployPreProd
+#      environment: Prod
+#      serviceConnection: $(serviceConnectionProd)
+#      bicepParamFile: prod

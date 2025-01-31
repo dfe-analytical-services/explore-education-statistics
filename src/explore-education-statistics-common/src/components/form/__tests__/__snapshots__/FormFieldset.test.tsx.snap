@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormFieldset renders correctly with error 1`] = `
+<div class="govuk-form-group govuk-form-group--error">
+  <fieldset aria-describedby="test-fieldset-error"
+            class="govuk-fieldset"
+            id="test-fieldset"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+      Fill the form
+    </legend>
+    <span class="govuk-error-message"
+          id="test-fieldset-error"
+          data-testid="test-fieldset-error"
+    >
+      <span class="govuk-visually-hidden">
+        Error:
+      </span>
+      There was an error
+    </span>
+    <input type="text"
+           name="test-input-1"
+    >
+    <input type="text"
+           name="test-input-2"
+    >
+  </fieldset>
+</div>
+`;
+
+exports[`FormFieldset renders correctly with hint 1`] = `
+<div class="govuk-form-group">
+  <fieldset aria-describedby="test-fieldset-hint"
+            class="govuk-fieldset"
+            id="test-fieldset"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+      Fill the form
+    </legend>
+    <div class="govuk-hint"
+         id="test-fieldset-hint"
+    >
+      All fields are required
+    </div>
+    <input type="text"
+           name="test-input-1"
+    >
+    <input type="text"
+           name="test-input-2"
+    >
+  </fieldset>
+</div>
+`;
+
+exports[`FormFieldset renders correctly with required props 1`] = `
+<legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+  Fill the form
+</legend>
+<input type="text"
+       name="test-input-1"
+>
+<input type="text"
+       name="test-input-2"
+>
+`;

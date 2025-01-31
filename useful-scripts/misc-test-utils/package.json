@@ -1,0 +1,82 @@
+{
+  "name": "misc-test-utils",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "esr src/index.ts",
+    "tsc": "tsc --noEmit",
+    "clean": "rm -rf *.zip test-files/*.csv zip-files/*.zip node_modules && npm ci && npm run start",
+    "test": "jest",
+    "gen-env": "gen-env-types .env -o src/types/env.d.ts -e ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@swc/core": "^1.2.237",
+    "@swc/jest": "^0.2.22",
+    "@types/archiver": "^5.1.0",
+    "@types/form-data": "^2.5.0",
+    "@types/inquirer": "^7.3.2",
+    "@types/node": "^18.7.6",
+    "@types/rimraf": "^3.0.2",
+    "@types/uuid": "^8.3.4",
+    "chalk": "^4.1.1",
+    "gen-env-types": "^1.3.4",
+    "inquirer": "^8.1.1",
+    "jest": "^28.1.3",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "archiver": "^5.3.1",
+    "axios": "^0.27.2",
+    "cross-env": "^7.0.3",
+    "dotenv-safe": "^8.2.0",
+    "esbuild": "^0.13.12",
+    "esbuild-runner": "^2.2.1",
+    "form-data": "^4.0.0",
+    "formdata-node": "^4.3.3",
+    "globby": "^11.0.4",
+    "node-stream-zip": "^1.15.0",
+    "ora": "5.4.1",
+    "pino": "8.4.1",
+    "pino-pretty": "^9.0.1",
+    "rimraf": "^3.0.2",
+    "uuid": "^8.3.2"
+  },
+  "jest": {
+    "testMatch": [
+      "<rootDir>/src/**/*.test.{ts,tsx,js,jsx}",
+      "<rootDir>/*.test.{ts,tsx,js,jsx}"
+    ],
+    "collectCoverage": true,
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "transform": {
+      "^.+\\.(t|j)sx?$": [
+        "@swc/jest",
+        {
+          "sourceMaps": true,
+          "jsc": {
+            "parser": {
+              "syntax": "typescript",
+              "tsx": true
+            },
+            "transform": {
+              "react": {
+                "runtime": "automatic"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "testEnvironment": "node"
+  }
+}

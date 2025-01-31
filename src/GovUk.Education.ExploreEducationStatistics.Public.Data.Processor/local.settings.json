@@ -1,0 +1,16 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "DurableManagementStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage"
+  },
+  "ConnectionStrings": {
+    "ContentDb": "Server=db;Database=content;User=public_data_processor;Password=Your_Password123;TrustServerCertificate=True;",
+    "PublicDataDb": "Host=db;Username=app_public_data_processor;Password=password;Database=public_data"
+  },
+  "Host": {
+    "LocalHttpPort": 7074,
+    "CORS": "*"
+  }
+}

@@ -1,0 +1,137 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <UserSecretsId>aspnet-GovUk.Education.ExploreEducationStatistics.Admin-27177B65-FE3A-416B-97FE-420DF4EFF8BF</UserSecretsId>
+    <WebProject_DirectoryAccessLevelKey>0</WebProject_DirectoryAccessLevelKey>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="RootNamespace" />
+    <CompilerVisibleProperty Include="ProjectDir" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Migrations\ContentMigrations\*.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Migrations\UsersAndRolesMigrations\*.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
+    <PackageReference Include="GeoJSON.Net" Version="1.4.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7" PrivateAssets="all" />
+    <PackageReference Include="GovukNotify" Version="7.1.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
+    <PackageReference Include="JsonKnownTypes" Version="0.6.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
+    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.26.0" />
+    <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.7" />
+    <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Thinktecture.EntityFrameworkCore.SqlServer" Version="8.1.1" />
+    <PackageReference Include="Cronos" Version="0.8.4" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="2.21.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\css\site.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\LICENSE" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\dist\additional-methods.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\dist\additional-methods.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\dist\jquery.validate.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\LICENSE.md" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\dist\jquery.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\dist\jquery.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\dist\jquery.min.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\LICENSE.txt" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-a2452cb66f-v1.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-f38c792ac2-v1.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-fb2676462a-v1.eot" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-tabular-357fdfbcc3-v1.eot" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-tabular-784c21afb8-v1.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\bold-tabular-b89238d840-v1.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-2c037cf7e1-v1.eot" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-458f8ea81c-v1.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-f38ad40456-v1.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-tabular-498ea8ffe2-v1.eot" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-tabular-62cc6f0a28-v1.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\light-tabular-851b10ccdd-v1.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\favicon.ico" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-apple-touch-icon-152x152.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-apple-touch-icon-167x167.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-apple-touch-icon-180x180.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-apple-touch-icon.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-crest-2x.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-crest.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-logotype-crown.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-mask-icon.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\govuk-opengraph-image.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-arrow-left.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-important.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer-2x.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Services\GovUk.Education.ExploreEducationStatistics.Content.Services.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher.Model\GovUk.Education.ExploreEducationStatistics.Publisher.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.Local.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <NoWarn>NU1605</NoWarn>
+  </PropertyGroup>
+</Project>

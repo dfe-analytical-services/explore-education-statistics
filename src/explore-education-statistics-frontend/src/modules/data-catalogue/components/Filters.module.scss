@@ -1,0 +1,13 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.form {
+  margin-top: govuk-spacing(5);
+
+  :global(.govuk-form-group) {
+    margin-top: govuk-spacing(2);
+  }
+
+  :global(.govuk-select) {
+    min-width: auto;
+  }
+}

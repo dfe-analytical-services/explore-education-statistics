@@ -1,0 +1,24 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.section {
+  @media print {
+    page-break-inside: avoid;
+  }
+}
+
+.hasAnchorLink {
+  position: relative;
+}
+
+.copyLinkButton {
+  position: absolute;
+  right: 0;
+  top: 4px;
+  width: auto;
+  z-index: 1;
+
+  @include govuk-media-query($from: tablet) {
+    margin-left: -50px;
+    right: auto;
+  }
+}

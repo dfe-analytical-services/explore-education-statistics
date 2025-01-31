@@ -1,0 +1,117 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "skuPublic": {
+      "value": "B1 Basic"
+    },
+    "skuData": {
+      "value": "P1V2 PremiumV2"
+    },
+    "skuContent": {
+      "value": "P1V2 PremiumV2"
+    },
+    "skuAdmin": {
+      "value": "P1V2 PremiumV2"
+    },
+    "skuImporter": {
+      "value": "P2V2 PremiumV2"
+    },
+    "skuNotifier": {
+      "value": "B1 Basic"
+    },
+    "skuPublisher": {
+      "value": "B1 Basic"
+    },
+    "slackAlertsChannel": {
+      "value": "C067Z1K68UD"
+    },
+    "publishReleasesCronSchedule": {
+      "value": "0 0 * * * *"
+    },
+    "publishReleaseContentCronSchedule": {
+      "value": "0 30 * * * *"
+    },
+    "preReleaseMinutesBeforeStart": {
+      "value": 1440
+    },
+    "useSubnets": {
+      "value": true
+    },
+    "deploySubnets": {
+      "value": true
+    },
+    "blobDeleteRetentionEnabled": {
+      "value": true
+    },
+    "blobDeleteRetentionDays": {
+      "value": 3
+    },
+    "domain": {
+      "value": "dev.explore-education-statistics.service.gov.uk"
+    },
+    "contentApiUrl": {
+      "value": "content.dev.explore-education-statistics.service.gov.uk"
+    },
+    "dataApiUrl": {
+      "value": "data.dev.explore-education-statistics.service.gov.uk"
+    },
+    "publicApiUrl": {
+      "value": "dev.statistics.api.education.gov.uk"
+    },
+    "publicApiDocsUrl": {
+      "value": "dev.statistics.api.education.gov.uk/docs"
+    },
+    "detailedErrors": {
+      "value": true
+    },
+    "storageAccountPrefix": {
+      "value": "sa"
+    },
+    "publicAppGATrackingId": {
+      "value": "G-GRPHH2FN0L"
+    },
+    "enableSwagger": {
+      "value": true
+    },
+    "enableThemeDeletion": {
+      "value": true
+    },
+    "memoryCacheOverridesDurationInSeconds": {
+      "value": 10
+    },
+    "branch": {
+      "value": "dev"
+    },
+    "skuContentDb": {
+      "value": "Standard"
+    },
+    "tierContentDb": {
+      "value": "Standard"
+    },
+    "capacityContentDb": {
+      "value": 50
+    },
+    "skuStatisticsDb": {
+      "value": "GP_Gen5"
+    },
+    "tierStatisticsDb": {
+      "value": "GeneralPurpose"
+    },
+    "capacityStatisticsDb": {
+      "value": 2
+    },
+    "maxContentDbSizeBytes": {
+      "value": 2147483648
+    },
+    "maxStatsDbSizeBytes": {
+      "value": 644245094400
+    },
+    "dataFactoryConcurrency": {
+      "value": 10
+    },
+    "immediatePublicationOfScheduledReleaseVersionsEnabled": {
+      "value": true
+    }
+  }
+}

@@ -1,0 +1,11 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.stepNav {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding-left: 0;
+  @include govuk-media-query($until: tablet) {
+    margin-left: -0.25rem;
+  }
+}

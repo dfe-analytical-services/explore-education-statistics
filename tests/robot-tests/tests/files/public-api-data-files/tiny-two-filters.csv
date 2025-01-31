@@ -1,0 +1,9 @@
+time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,colour,school_phase,school_type,num_schools,enrolments,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,enrolments_pa_10_exact,enrolments_pa_10_exact_percent
+201718,Academic year,National,E92000001,England,,,Blue,Total,Total,20121,6835059,4.20821,3.01996,1.18824,731047,10.69555
+201718,Academic year,National,E92000001,England,,,Blue,Individual,State-funded primary,16739,3885774,3.68934,2.69421,0.99512,357742,9.20645
+201718,Academic year,National,E92000001,England,,,Blue,Individual,State-funded secondary,3382,2949285,4.89899,3.45364,1.44535,373305,12.65747
+201718,Academic year,Regional,E92000001,England,E12000001,North East,Blue,Combined,State-funded primary and secondary,1033,317616,4.62038,3.12503,1.49536,39300,12.37343
+201718,Academic year,National,E92000001,England,,,Orange,Total,Total,4545,354354,464,6,565,665,234
+201718,Academic year,National,E92000001,England,,,Orange,Individual,State-funded primary,534,5435,654,4,56,666,2222
+201718,Academic year,National,E92000001,England,,,Orange,Individual,State-funded secondary,23452,543,64563,33,444,566,25665
+201718,Academic year,Regional,E92000001,England,E12000001,North East,Orange,Combined,State-funded primary and secondary,45,345,356,3564,455,335,2225

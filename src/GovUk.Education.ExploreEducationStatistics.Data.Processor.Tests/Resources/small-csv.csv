@@ -1,0 +1,17 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,filter_one,filter_two,ind_one,ind_two
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Choice 1,1,2
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Total,Choice 2,2,4
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Total,Choice 3,3,6
+2019,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Total,Choice 4,4,8
+2020,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Choice 5,5,10
+2020,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Total,Choice 6,6,12
+2021,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Total,Choice 7,7,14
+2021,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Total,Choice 8,8,16
+2022,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Choice 9,9,18
+2022,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Total,Choice 10,10,20
+2023,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Total,Choice 11,11,22
+2023,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Total,Choice 12,12,24
+2024,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,Choice 13,13,26
+2024,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Total,Choice 14,14,28
+2025,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Total,Choice 15,15,30
+2025,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,Total,Choice 16,16,32

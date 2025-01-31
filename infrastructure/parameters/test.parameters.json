@@ -1,0 +1,102 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "skuPublic": {
+      "value": "B1 Basic"
+    },
+    "skuData": {
+      "value": "S1 Standard"
+    },
+    "skuContent": {
+      "value": "S1 Standard"
+    },
+    "skuAdmin": {
+      "value": "S1 Standard"
+    },
+    "skuImporter": {
+      "value": "P1V2 PremiumV2"
+    },
+    "skuNotifier": {
+      "value": "B1 Basic"
+    },
+    "skuPublisher": {
+      "value": "B1 Basic"
+    },
+    "slackAlertsChannel": {
+      "value": "C0681S23291"
+    },
+    "publishReleasesCronSchedule": {
+      "value": "0 0 * * * *"
+    },
+    "publishReleaseContentCronSchedule": {
+      "value": "0 30 * * * *"
+    },
+    "useSubnets": {
+      "value": true
+    },
+    "deploySubnets": {
+      "value": true
+    },
+    "domain": {
+      "value": "test.explore-education-statistics.service.gov.uk"
+    },
+    "contentApiUrl": {
+      "value": "content.test.explore-education-statistics.service.gov.uk"
+    },
+    "dataApiUrl": {
+      "value": "data.test.explore-education-statistics.service.gov.uk"
+    },
+    "publicApiUrl": {
+      "value": "test.statistics.api.education.gov.uk"
+    },
+    "publicApiDocsUrl": {
+      "value": "test.statistics.api.education.gov.uk/docs"
+    },
+    "detailedErrors": {
+      "value": true
+    },
+    "publicAppGATrackingId": {
+      "value": "G-ZQ5V7CBWMJ"
+    },
+    "branch": {
+      "value": "test"
+    },
+    "enableThemeDeletion": {
+      "value": true
+    },
+    "tableBuilderMaxTableCellsAllowed": {
+      "value": 1000000
+    },
+    "skuContentDb": {
+      "value": "Standard"
+    },
+    "tierContentDb": {
+      "value": "Standard"
+    },
+    "capacityContentDb": {
+      "value": 10
+    },
+    "skuStatisticsDb": {
+      "value": "GP_Gen5"
+    },
+    "tierStatisticsDb": {
+      "value": "GeneralPurpose"
+    },
+    "capacityStatisticsDb": {
+      "value": 2
+    },
+    "maxContentDbSizeBytes": {
+      "value": 1073741824
+    },
+    "maxStatsDbSizeBytes": {
+      "value": 268435456000
+    },
+    "immediatePublicationOfScheduledReleaseVersionsEnabled": {
+      "value": true
+    },
+    "publicDataDbExists": {
+      "value": true
+    }
+  }
+}

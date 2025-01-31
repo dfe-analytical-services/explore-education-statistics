@@ -1,0 +1,11 @@
+.label {
+  position: relative;
+}
+
+.labelRotated {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transform: rotate(-90deg);
+}

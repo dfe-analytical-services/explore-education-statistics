@@ -1,0 +1,22 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.panel {
+  background: #fff;
+  page-break-inside: avoid;
+
+  &:focus {
+    outline: none;
+  }
+
+  @media print {
+    display: contents !important;
+    position: relative !important;
+    width: 100% !important;
+  }
+}
+
+.panelHidden {
+  display: none;
+  position: relative !important;
+  width: 100% !important;
+}

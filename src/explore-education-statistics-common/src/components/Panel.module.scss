@@ -1,0 +1,18 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.panelContainer {
+  p,
+  h1,
+  h2,
+  :global(.govuk-link) {
+    color: inherit;
+  }
+
+  p {
+    font-size: inherit;
+  }
+
+  :global(.govuk-link:focus) {
+    color: govuk-colour('black');
+  }
+}

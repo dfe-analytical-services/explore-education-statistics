@@ -1,0 +1,15 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.table {
+  td {
+    padding-bottom: govuk-spacing(4);
+    padding-top: govuk-spacing(4);
+    vertical-align: middle;
+  }
+}
+
+.table tbody {
+  tr {
+    border-left: 5px solid transparent;
+  }
+}

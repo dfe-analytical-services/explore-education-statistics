@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Link renders correctly with \`unvisited\` state 1`] = `
+<a
+  class="govuk-link govuk-link--no-visited-state"
+  href="/the-link"
+>
+  Test Link
+</a>
+`;
+
+exports[`Link renders correctly without \`unvisited\` state 1`] = `
+<a
+  class="govuk-link"
+  href="/the-link"
+>
+  Test Link
+</a>
+`;

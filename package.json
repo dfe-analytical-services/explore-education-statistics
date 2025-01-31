@@ -1,0 +1,92 @@
+{
+  "name": "explore-education-statistics",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@8.8.0",
+  "engines": {
+    "node": "20.16.0",
+    "pnpm": ">=8.8.0"
+  },
+  "devDependencies": {
+    "@commander-js/extra-typings": "^11.0.0",
+    "@next/eslint-plugin-next": "^12.3.4",
+    "@types/jest": "^29.5.3",
+    "@types/lodash": "^4.14.195",
+    "@types/node": "^18.17.5",
+    "@types/signal-exit": "^3.0.1",
+    "@types/split2": "^4.2.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "caniuse-lite": "^1.0.30001610",
+    "chalk": "^5.3.0",
+    "check-node-version": "^4.2.1",
+    "commander": "^11.0.0",
+    "cross-process-lock": "^2.1.1",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-next": "^12.3.4",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "execa": "^8.0.1",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "lodash": "^4.17.21",
+    "prettier": "^3.0.1",
+    "signal-exit": "^4.1.0",
+    "split2": "^4.2.0",
+    "stylelint": "^15.10.2",
+    "stylelint-config-sass-guidelines": "^10.0.0",
+    "stylelint-prettier": "^4.0.2",
+    "tree-kill": "^1.2.2",
+    "tsx": "^4.12.0",
+    "typescript": "^5.5.4"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "preinstall": "pnpm check:node",
+    "clean": "pnpm -r --parallel exec rm -rf node_modules && rm -rf node_modules && rm -rf src/explore-education-statistics-frontend/.next",
+    "check:node": "check-node-version --package",
+    "fix": "pnpm fix:js && pnpm fix:style",
+    "fix:js": "eslint --fix --ext .ts,.tsx,.js,.jsx .",
+    "fix:style": "stylelint --fix src/**/*.{scss,css}",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,css,scss,html}\"",
+    "format:check": "prettier --list-different \"**/*.{js,jsx,ts,tsx,css,scss,html}\"",
+    "format:robot": "python3 -m pipenv run robotidy --config tests/robot-tests/robotidy.toml tests/robot-tests",
+    "format:robot:check": "pnpm format:robot -- --check --diff",
+    "format:python": "python3 -m pipenv run black tests && python3 -m pipenv run isort tests",
+    "format:python:check": "python3 -m pipenv run black tests --diff && python3 -m pipenv run isort tests --diff",
+    "lint": "pnpm lint:js && pnpm lint:style",
+    "lint:js": "eslint --ext .ts,.tsx,.js,.jsx .",
+    "lint:python": "python3 -m pipenv run flake8 tests",
+    "lint:style": "stylelint src/**/*.{scss,css}",
+    "start": "tsx useful-scripts/start.ts",
+    "test": "pnpm -r --no-bail test",
+    "test:snapshot": "pnpm -r --no-bail test:snapshot",
+    "test:ci": "pnpm -r --no-bail --aggregate-output --reporter=append-only test:ci",
+    "test:coverage": "pnpm -r --no-bail test:coverage",
+    "tsc": "pnpm -r --aggregate-output --reporter=append-only --no-bail tsc"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint"
+    ],
+    "*.{scss,css}": [
+      "stylelint"
+    ],
+    "*.{js,jsx,ts,tsx,css,scss,html}": [
+      "prettier --write"
+    ],
+    "*.robot": [
+      "pipenv run robotidy --config tests/robot-tests/robotidy.toml"
+    ],
+    "*.py": [
+      "pipenv run flake8",
+      "pipenv run black",
+      "pipenv run isort"
+    ]
+  }
+}

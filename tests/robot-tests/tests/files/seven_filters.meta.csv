@@ -1,0 +1,12 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+Gender,Filter,Gender,,,,,
+Ethnicity,Filter,Ethnicity group,,,,,
+Provision,Filter,Provision,,,,,
+LevelOfLearning_Display,Filter,Level of learning,,,,,
+YearsAfterLearning_Display,Filter,Number of years after achievement of learning aim,,,,,
+favouriteColour,Filter,Colour,,,,,
+favouriteCheese,Filter,Cheese,,,,,
+NumLearners,Indicator,Number of learners with earnings,Earnings outcome,,0,,
+25thPercentile,Indicator,Lower quartile annualised earnings,Earning outcomes,,0,,
+Median,Indicator,Median annualised earnings,Earning outcomes,,0,,
+75thPercentile,Indicator,Upper quartile annualised earnings,Earning outcomes,,0,,

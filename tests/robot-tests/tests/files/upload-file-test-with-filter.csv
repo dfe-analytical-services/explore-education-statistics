@@ -1,0 +1,289 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,region_code,region_name,lad_code,lad_name,local_enterprise_partnership_code,local_enterprise_partnership_name,rsc_region_lead_name,opportunity_area_code,opportunity_area_name,pcon_code,pcon_name,ward_code,ward_name,some_filter,admission_numbers
+2005,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000987,Bolton 004,,,,,Orange,8557
+2005,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000895,Richmond (Yorks),,,Orange,2179
+2005,Calendar year,Regional,E92000001,England,,,,E12000001,North East,,,,,,,,,,,,Orange,7988
+2005,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010291,Nailsea Youngwood,Orange,3612
+2006,Calendar year,Local authority district,E92000001,England,,,,,,E06000004,Stockton-on-Tees,,,,,,,,,,Orange,8052
+2006,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,Orange,9341
+2006,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001061,York Central,,,Orange,1605
+2006,Calendar year,Regional,E92000001,England,,,,E12000002,North West,,,,,,,,,,,,Orange,7066
+2006,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,Orange,3338
+2007,Calendar year,Local authority district,E92000001,England,,,,,,E06000002,Middlesbrough,,,,,,,,,,Orange,7769
+2007,Calendar year,Regional,E92000001,England,,,,E12000005,West Midlands,,,,,,,,,,,,Orange,7004
+2007,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,Orange,9023
+2007,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,Orange,6637
+2007,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05000364,Syon,Orange,9914
+2007,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05006937,Yoxall,Orange,7499
+2007,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010450,Rural West York,Orange,9884
+2008,Calendar year,Local authority district,E92000001,England,,,,,,E06000001,Hartlepool,,,,,,,,,,Orange,6765
+2008,Calendar year,Local authority district,E92000001,England,,,,,,E06000002,Middlesbrough,,,,,,,,,,Orange,8024
+2008,Calendar year,Local authority district,E92000001,England,,,,,,E06000003,Redcar and Cleveland,,,,,,,,,,Orange,8730
+2008,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,Orange,4587
+2008,Calendar year,Regional,E92000001,England,,,,E12000005,West Midlands,,,,,,,,,,,,Orange,5901
+2008,Calendar year,RSC region,E92000001,England,,,,,,,,,,East of England and North-East London,,,,,,,Orange,4890
+2008,Calendar year,RSC region,E92000001,England,,,,,,,,,,North of England,,,,,,,Orange,1010
+2008,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05000364,Syon,Orange,5505
+2009,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000984,Bolton 001,,,,,Orange,5815
+2009,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001061,York Central,,,Orange,2409
+2009,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001062,York Outer,,,Orange,3004
+2009,Calendar year,Regional,E92000001,England,,,,E12000003,Yorkshire and The Humber,,,,,,,,,,,,Orange,4157
+2009,Calendar year,Regional,E92000001,England,,,,E12000002,North West,,,,,,,,,,,,Orange,2848
+2009,Calendar year,Regional,E92000001,England,,,,E12000005,West Midlands,,,,,,,,,,,,Orange,2192
+2009,Calendar year,RSC region,E92000001,England,,,,,,,,,,East of England and North-East London,,,,,,,Orange,4900
+2010,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,Orange,1816
+2010,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000986,Bolton 003,,,,,Orange,4621
+2010,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000984,Bolton 001,,,,,Orange,5595
+2010,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001062,York Outer,,,Orange,2321
+2010,Calendar year,Regional,E92000001,England,,,,E12000001,North East,,,,,,,,,,,,Orange,2266
+2010,Calendar year,RSC region,E92000001,England,,,,,,,,,,East of England and North-East London,,,,,,,Orange,6781
+2010,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05000364,Syon,Orange,6060
+2010,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010291,Nailsea Youngwood,Orange,9304
+2011,Calendar year,Local authority district,E92000001,England,,,,,,E06000001,Hartlepool,,,,,,,,,,Orange,9043
+2011,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,Orange,5876
+2011,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,Orange,1574
+2011,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000683,East Yorkshire,,,Orange,5099
+2011,Calendar year,Regional,E92000001,England,,,,E12000005,West Midlands,,,,,,,,,,,,Orange,7904
+2011,Calendar year,RSC region,E92000001,England,,,,,,,,,,East of England and North-East London,,,,,,,Orange,8639
+2011,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,Orange,6888
+2011,Calendar year,RSC region,E92000001,England,,,,,,,,,,North of England,,,,,,,Orange,6526
+2011,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010450,Rural West York,Orange,4415
+2011,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010291,Nailsea Youngwood,Orange,9603
+2012,Calendar year,Local authority district,E92000001,England,,,,,,E06000001,Hartlepool,,,,,,,,,,Orange,6480
+2012,Calendar year,Local authority district,E92000001,England,,,,,,E06000004,Stockton-on-Tees,,,,,,,,,,Orange,6005
+2012,Calendar year,Local authority district,E92000001,England,,,,,,E06000002,Middlesbrough,,,,,,,,,,Orange,1090
+2012,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,Orange,9216
+2012,Calendar year,Regional,E92000001,England,,,,E12000002,North West,,,,,,,,,,,,Orange,6383
+2012,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05000364,Syon,Orange,1109
+2012,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010291,Nailsea Youngwood,Orange,8150
+2013,Calendar year,Local authority district,E92000001,England,,,,,,E06000004,Stockton-on-Tees,,,,,,,,,,Orange,5456
+2013,Calendar year,Local authority district,E92000001,England,,,,,,E06000003,Redcar and Cleveland,,,,,,,,,,Orange,3758
+2013,Calendar year,RSC region,E92000001,England,,,,,,,,,,East of England and North-East London,,,,,,,Orange,3908
+2013,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,Orange,9961
+2014,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Orange,3708
+2014,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,Orange,9854
+2014,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Orange,8247
+2014,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Orange,1054
+2014,Calendar year,Local authority district,E92000001,England,,,,,,E06000002,Middlesbrough,,,,,,,,,,Orange,2284
+2014,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,Orange,3085
+2014,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,Orange,5018
+2014,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000986,Bolton 003,,,,,Orange,8084
+2014,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001061,York Central,,,Orange,4066
+2014,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001062,York Outer,,,Orange,2003
+2014,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000895,Richmond (Yorks),,,Orange,9208
+2014,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05006937,Yoxall,Orange,3646
+2015,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Orange,9303
+2015,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,Orange,1134
+2015,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Orange,6114
+2015,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Orange,9790
+2015,Calendar year,Local authority district,E92000001,England,,,,,,E06000004,Stockton-on-Tees,,,,,,,,,,Orange,2787
+2015,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,Orange,6882
+2015,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000683,East Yorkshire,,,Orange,5653
+2015,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001061,York Central,,,Orange,8650
+2015,Calendar year,Regional,E92000001,England,,,,E12000003,Yorkshire and The Humber,,,,,,,,,,,,Orange,6850
+2015,Calendar year,Regional,E92000001,England,,,,E12000005,West Midlands,,,,,,,,,,,,Orange,5872
+2015,Calendar year,Regional,E92000001,England,,,,E12000001,North East,,,,,,,,,,,,Orange,7731
+2015,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,Orange,2748
+2015,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010450,Rural West York,Orange,4613
+2016,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Orange,8856
+2016,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,Orange,7419
+2016,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Orange,8427
+2016,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Orange,3548
+2016,Calendar year,Local authority district,E92000001,England,,,,,,E06000001,Hartlepool,,,,,,,,,,Orange,2014
+2016,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,Orange,3221
+2016,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,Orange,6493
+2016,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,Orange,5831
+2016,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000895,Richmond (Yorks),,,Orange,1433
+2016,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000683,East Yorkshire,,,Orange,1617
+2016,Calendar year,Regional,E92000001,England,,,,E12000001,North East,,,,,,,,,,,,Orange,7357
+2016,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,Orange,5346
+2016,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05006937,Yoxall,Orange,6772
+2016,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010291,Nailsea Youngwood,Orange,4198
+2016,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010450,Rural West York,Orange,4035
+2017,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Orange,8530
+2017,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,Orange,5032
+2017,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Orange,6981
+2017,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Orange,4180
+2017,Calendar year,Local authority district,E92000001,England,,,,,,E06000002,Middlesbrough,,,,,,,,,,Orange,3001
+2017,Calendar year,Local authority district,E92000001,England,,,,,,E06000003,Redcar and Cleveland,,,,,,,,,,Orange,9123
+2017,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,Orange,6385
+2017,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000987,Bolton 004,,,,,Orange,3481
+2017,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000984,Bolton 001,,,,,Orange,6373
+2017,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000986,Bolton 003,,,,,Orange,1869
+2017,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000683,East Yorkshire,,,Orange,4465
+2017,Calendar year,Regional,E92000001,England,,,,E12000003,Yorkshire and The Humber,,,,,,,,,,,,Orange,1615
+2017,Calendar year,RSC region,E92000001,England,,,,,,,,,,North of England,,,,,,,Orange,4896
+2017,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,Orange,7242
+2017,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05000364,Syon,Orange,1959
+2017,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05006937,Yoxall,Orange,9857
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Orange,3962
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,Orange,8123
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Orange,5669
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Orange,2399
+2018,Calendar year,Local authority district,E92000001,England,,,,,,E06000004,Stockton-on-Tees,,,,,,,,,,Orange,7423
+2018,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,Orange,6170
+2018,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000987,Bolton 004,,,,,Orange,8630
+2018,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000683,East Yorkshire,,,Orange,5549
+2018,Calendar year,Regional,E92000001,England,,,,E12000003,Yorkshire and The Humber,,,,,,,,,,,,Orange,4496
+2018,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,Orange,7612
+2018,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05006937,Yoxall,Orange,1926
+2019,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,Orange,8179
+2019,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,Orange,2701
+2019,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000984,Bolton 001,,,,,Orange,8533
+2019,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,Orange,6945
+2019,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000895,Richmond (Yorks),,,Orange,9468
+2019,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001062,York Outer,,,Orange,3927
+2019,Calendar year,Regional,E92000001,England,,,,E12000002,North West,,,,,,,,,,,,Orange,6296
+2019,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,Orange,1258
+2019,Calendar year,RSC region,E92000001,England,,,,,,,,,,North of England,,,,,,,Orange,1023
+2020,Calendar year,Local authority district,E92000001,England,,,,,,E06000003,Redcar and Cleveland,,,,,,,,,,Orange,4195
+2020,Calendar year,Local authority district,E92000001,England,,,,,,E06000001,Hartlepool,,,,,,,,,,Orange,1506
+2020,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000987,Bolton 004,,,,,Orange,6031
+2020,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000986,Bolton 003,,,,,Orange,6641
+2020,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,Orange,5680
+2020,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000895,Richmond (Yorks),,,Orange,6676
+2020,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001062,York Outer,,,Orange,7569
+2020,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010450,Rural West York,Orange,6650
+2005,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000987,Bolton 004,,,,,Blue,9657
+2005,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000895,Richmond (Yorks),,,Blue,2279
+2005,Calendar year,Regional,E92000001,England,,,,E12000001,North East,,,,,,,,,,,,Blue,8088
+2005,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010291,Nailsea Youngwood,Blue,3712
+2006,Calendar year,Local authority district,E92000001,England,,,,,,E06000004,Stockton-on-Tees,,,,,,,,,,Blue,8152
+2006,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,Blue,9441
+2006,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001061,York Central,,,Blue,1705
+2006,Calendar year,Regional,E92000001,England,,,,E12000002,North West,,,,,,,,,,,,Blue,7166
+2006,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,Blue,3438
+2007,Calendar year,Local authority district,E92000001,England,,,,,,E06000002,Middlesbrough,,,,,,,,,,Blue,7869
+2007,Calendar year,Regional,E92000001,England,,,,E12000005,West Midlands,,,,,,,,,,,,Blue,7104
+2007,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,Blue,9123
+2007,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,Blue,6737
+2007,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05000364,Syon,Blue,10014
+2007,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05006937,Yoxall,Blue,7599
+2007,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010450,Rural West York,Blue,9984
+2008,Calendar year,Local authority district,E92000001,England,,,,,,E06000001,Hartlepool,,,,,,,,,,Blue,6865
+2008,Calendar year,Local authority district,E92000001,England,,,,,,E06000002,Middlesbrough,,,,,,,,,,Blue,8124
+2008,Calendar year,Local authority district,E92000001,England,,,,,,E06000003,Redcar and Cleveland,,,,,,,,,,Blue,8830
+2008,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,Blue,4687
+2008,Calendar year,Regional,E92000001,England,,,,E12000005,West Midlands,,,,,,,,,,,,Blue,6001
+2008,Calendar year,RSC region,E92000001,England,,,,,,,,,,East of England and North-East London,,,,,,,Blue,4990
+2008,Calendar year,RSC region,E92000001,England,,,,,,,,,,North of England,,,,,,,Blue,1110
+2008,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05000364,Syon,Blue,5605
+2009,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000984,Bolton 001,,,,,Blue,5915
+2009,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001061,York Central,,,Blue,2509
+2009,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001062,York Outer,,,Blue,3104
+2009,Calendar year,Regional,E92000001,England,,,,E12000003,Yorkshire and The Humber,,,,,,,,,,,,Blue,4257
+2009,Calendar year,Regional,E92000001,England,,,,E12000002,North West,,,,,,,,,,,,Blue,2948
+2009,Calendar year,Regional,E92000001,England,,,,E12000005,West Midlands,,,,,,,,,,,,Blue,2292
+2009,Calendar year,RSC region,E92000001,England,,,,,,,,,,East of England and North-East London,,,,,,,Blue,5000
+2010,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,Blue,1916
+2010,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000986,Bolton 003,,,,,Blue,4721
+2010,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000984,Bolton 001,,,,,Blue,5695
+2010,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001062,York Outer,,,Blue,2421
+2010,Calendar year,Regional,E92000001,England,,,,E12000001,North East,,,,,,,,,,,,Blue,2366
+2010,Calendar year,RSC region,E92000001,England,,,,,,,,,,East of England and North-East London,,,,,,,Blue,6881
+2010,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05000364,Syon,Blue,6160
+2010,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010291,Nailsea Youngwood,Blue,9404
+2011,Calendar year,Local authority district,E92000001,England,,,,,,E06000001,Hartlepool,,,,,,,,,,Blue,9143
+2011,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,Blue,5976
+2011,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,Blue,1674
+2011,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000683,East Yorkshire,,,Blue,5199
+2011,Calendar year,Regional,E92000001,England,,,,E12000005,West Midlands,,,,,,,,,,,,Blue,8004
+2011,Calendar year,RSC region,E92000001,England,,,,,,,,,,East of England and North-East London,,,,,,,Blue,8739
+2011,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,Blue,6988
+2011,Calendar year,RSC region,E92000001,England,,,,,,,,,,North of England,,,,,,,Blue,6626
+2011,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010450,Rural West York,Blue,4515
+2011,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010291,Nailsea Youngwood,Blue,9703
+2012,Calendar year,Local authority district,E92000001,England,,,,,,E06000001,Hartlepool,,,,,,,,,,Blue,6580
+2012,Calendar year,Local authority district,E92000001,England,,,,,,E06000004,Stockton-on-Tees,,,,,,,,,,Blue,6105
+2012,Calendar year,Local authority district,E92000001,England,,,,,,E06000002,Middlesbrough,,,,,,,,,,Blue,1190
+2012,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,Blue,9316
+2012,Calendar year,Regional,E92000001,England,,,,E12000002,North West,,,,,,,,,,,,Blue,6483
+2012,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05000364,Syon,Blue,1209
+2012,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010291,Nailsea Youngwood,Blue,8250
+2013,Calendar year,Local authority district,E92000001,England,,,,,,E06000004,Stockton-on-Tees,,,,,,,,,,Blue,5556
+2013,Calendar year,Local authority district,E92000001,England,,,,,,E06000003,Redcar and Cleveland,,,,,,,,,,Blue,3858
+2013,Calendar year,RSC region,E92000001,England,,,,,,,,,,East of England and North-East London,,,,,,,Blue,4008
+2013,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,Blue,10061
+2014,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Blue,3808
+2014,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,Blue,9954
+2014,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Blue,8347
+2014,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Blue,1154
+2014,Calendar year,Local authority district,E92000001,England,,,,,,E06000002,Middlesbrough,,,,,,,,,,Blue,2384
+2014,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,Blue,3185
+2014,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,Blue,5118
+2014,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000986,Bolton 003,,,,,Blue,8184
+2014,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001061,York Central,,,Blue,4166
+2014,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001062,York Outer,,,Blue,2103
+2014,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000895,Richmond (Yorks),,,Blue,9308
+2014,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05006937,Yoxall,Blue,3746
+2015,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Blue,9403
+2015,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,Blue,1234
+2015,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Blue,6214
+2015,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Blue,9890
+2015,Calendar year,Local authority district,E92000001,England,,,,,,E06000004,Stockton-on-Tees,,,,,,,,,,Blue,2887
+2015,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,Blue,6982
+2015,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000683,East Yorkshire,,,Blue,5753
+2015,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001061,York Central,,,Blue,8750
+2015,Calendar year,Regional,E92000001,England,,,,E12000003,Yorkshire and The Humber,,,,,,,,,,,,Blue,6950
+2015,Calendar year,Regional,E92000001,England,,,,E12000005,West Midlands,,,,,,,,,,,,Blue,5972
+2015,Calendar year,Regional,E92000001,England,,,,E12000001,North East,,,,,,,,,,,,Blue,7831
+2015,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,Blue,2848
+2015,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010450,Rural West York,Blue,4713
+2016,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Blue,8956
+2016,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,Blue,7519
+2016,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Blue,8527
+2016,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Blue,3648
+2016,Calendar year,Local authority district,E92000001,England,,,,,,E06000001,Hartlepool,,,,,,,,,,Blue,2114
+2016,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,Blue,3321
+2016,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,Blue,6593
+2016,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,Blue,5931
+2016,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000895,Richmond (Yorks),,,Blue,1533
+2016,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000683,East Yorkshire,,,Blue,1717
+2016,Calendar year,Regional,E92000001,England,,,,E12000001,North East,,,,,,,,,,,,Blue,7457
+2016,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,Blue,5446
+2016,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05006937,Yoxall,Blue,6872
+2016,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010291,Nailsea Youngwood,Blue,4298
+2016,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010450,Rural West York,Blue,4135
+2017,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Blue,8630
+2017,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,Blue,5132
+2017,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Blue,7081
+2017,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Blue,4280
+2017,Calendar year,Local authority district,E92000001,England,,,,,,E06000002,Middlesbrough,,,,,,,,,,Blue,3101
+2017,Calendar year,Local authority district,E92000001,England,,,,,,E06000003,Redcar and Cleveland,,,,,,,,,,Blue,9223
+2017,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,Blue,6485
+2017,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000987,Bolton 004,,,,,Blue,3581
+2017,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000984,Bolton 001,,,,,Blue,6473
+2017,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000986,Bolton 003,,,,,Blue,1969
+2017,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000683,East Yorkshire,,,Blue,4565
+2017,Calendar year,Regional,E92000001,England,,,,E12000003,Yorkshire and The Humber,,,,,,,,,,,,Blue,1715
+2017,Calendar year,RSC region,E92000001,England,,,,,,,,,,North of England,,,,,,,Blue,4996
+2017,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,Blue,7342
+2017,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05000364,Syon,Blue,2059
+2017,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05006937,Yoxall,Blue,9957
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,,,,,,,,,,,,,,Blue,4062
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,,,,,,,,,,,,,,Blue,8223
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,,,,,,,,,,,,,Blue,5769
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,,,,,,,,,,,,,,Blue,2499
+2018,Calendar year,Local authority district,E92000001,England,,,,,,E06000004,Stockton-on-Tees,,,,,,,,,,Blue,7523
+2018,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,Blue,6270
+2018,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000987,Bolton 004,,,,,Blue,8730
+2018,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000683,East Yorkshire,,,Blue,5649
+2018,Calendar year,Regional,E92000001,England,,,,E12000003,Yorkshire and The Humber,,,,,,,,,,,,Blue,4596
+2018,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,Blue,7712
+2018,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05006937,Yoxall,Blue,2026
+2019,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,Blue,8279
+2019,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,Blue,2801
+2019,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000984,Bolton 001,,,,,Blue,8633
+2019,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,Blue,7045
+2019,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000895,Richmond (Yorks),,,Blue,9568
+2019,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001062,York Outer,,,Blue,4027
+2019,Calendar year,Regional,E92000001,England,,,,E12000002,North West,,,,,,,,,,,,Blue,6396
+2019,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,Blue,1358
+2019,Calendar year,RSC region,E92000001,England,,,,,,,,,,North of England,,,,,,,Blue,1123
+2020,Calendar year,Local authority district,E92000001,England,,,,,,E06000003,Redcar and Cleveland,,,,,,,,,,Blue,4295
+2020,Calendar year,Local authority district,E92000001,England,,,,,,E06000001,Hartlepool,,,,,,,,,,Blue,1606
+2020,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000987,Bolton 004,,,,,Blue,6131
+2020,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000986,Bolton 003,,,,,Blue,6741
+2020,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,Blue,5780
+2020,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000895,Richmond (Yorks),,,Blue,6776
+2020,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001062,York Outer,,,Blue,7669
+2020,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E05010450,Rural West York,Blue,6750

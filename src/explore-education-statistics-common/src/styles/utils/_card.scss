@@ -1,0 +1,30 @@
+.dfe-card__container {
+  display: flex;
+  @include govuk-media-query($until: tablet) {
+    display: block;
+  }
+}
+
+.dfe-card__item {
+  display: flex;
+}
+
+.dfe-card {
+  background: govuk-colour('light-grey');
+  border-bottom: 4px solid $govuk-brand-colour;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: govuk-spacing(4);
+  min-width: 100%;
+  padding: govuk-spacing(4);
+  width: 1px; //Fix for IE 11 issue with flex items ignoring parent width
+
+  .govuk-button {
+    margin-bottom: 0;
+    width: fit-content;
+    @include govuk-media-query($until: tablet) {
+      width: auto;
+    }
+  }
+}

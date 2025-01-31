@@ -1,0 +1,97 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormRadio does not render conditional content when not checked 1`] = `
+<div class="govuk-radios__item"
+     data-testid="Radio item for Test radio"
+>
+  <input class="govuk-radios__input"
+         id="test-radio"
+         name="test"
+         type="radio"
+         value="true"
+         aria-controls="test-radio-conditional"
+  >
+  <label class="govuk-label govuk-radios__label"
+         for="test-radio"
+  >
+    Test radio
+  </label>
+</div>
+<div class="govuk-radios__conditional govuk-radios__conditional--hidden"
+     id="test-radio-conditional"
+>
+  <p>
+    The conditional content
+  </p>
+</div>
+`;
+
+exports[`FormRadio renders conditional content when checked 1`] = `
+<div class="govuk-radios__item"
+     data-testid="Radio item for Test radio"
+>
+  <input class="govuk-radios__input"
+         id="test-radio"
+         name="test"
+         type="radio"
+         value="true"
+         checked
+         aria-controls="test-radio-conditional"
+         aria-expanded="true"
+  >
+  <label class="govuk-label govuk-radios__label"
+         for="test-radio"
+  >
+    Test radio
+  </label>
+</div>
+<div class="govuk-radios__conditional"
+     id="test-radio-conditional"
+>
+  <p>
+    The conditional content
+  </p>
+</div>
+`;
+
+exports[`FormRadio renders correctly when \`hint\` is provided 1`] = `
+<div class="govuk-radios__item"
+     data-testid="Radio item for Test radio"
+>
+  <input aria-describedby="test-radio-item-hint"
+         class="govuk-radios__input"
+         id="test-radio"
+         name="test"
+         type="radio"
+         value="true"
+  >
+  <label class="govuk-label govuk-radios__label"
+         for="test-radio"
+  >
+    Test radio
+  </label>
+  <div id="test-radio-item-hint"
+       class="govuk-hint govuk-radios__hint"
+  >
+    Click me to proceed
+  </div>
+</div>
+`;
+
+exports[`FormRadio renders correctly with required props 1`] = `
+<div class="govuk-radios__item"
+     data-testid="Radio item for Test radio"
+>
+  <input class="govuk-radios__input"
+         id="test-radio"
+         name="test"
+         type="radio"
+         value="true"
+  >
+  <label class="govuk-label govuk-radios__label"
+         for="test-radio"
+  >
+    Test radio
+  </label>
+</div>
+`;

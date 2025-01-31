@@ -1,0 +1,101 @@
+time_period,time_identifier,geographic_level,country_code,country_name,provider_ukprn,provider_name,filter_1_group,filter_1,filter_2_group,filter_2,indicator_1,indicator_2,indicator_3,indicator_4
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-1,Filter 2 group 1,F2G1-1,519987,851738,508866,721563
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-2,Filter 2 group 1,F2G1-1,890260,684500,730929,900942
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-1,Filter 2 group 1,F2G1-1,898281,194658,626890,179607
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-2,Filter 2 group 1,F2G1-1,442204,520880,752327,357358
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-1,Filter 2 group 1,F2G1-2,845035,980359,396950,787580
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-2,Filter 2 group 1,F2G1-2,21092,24298,965843,657526
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-1,Filter 2 group 1,F2G1-2,268499,34940,827630,73584
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-2,Filter 2 group 1,F2G1-2,498805,484674,210648,958899
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-1,Filter 2 group 2,F2G2-1,116897,301509,988763,562842
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-2,Filter 2 group 2,F2G2-1,583667,901339,853121,826380
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-1,Filter 2 group 2,F2G2-1,207260,423338,682544,360786
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-2,Filter 2 group 2,F2G2-1,640172,911376,148064,234958
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-1,Filter 2 group 2,F2G2-2,501494,747088,979616,135628
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-2,Filter 2 group 2,F2G2-2,363825,32131,260954,603809
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-1,Filter 2 group 2,F2G2-2,967308,110093,788718,162605
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-2,Filter 2 group 2,F2G2-2,974348,546568,267548,382114
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Total,Total,Filter 2 group 1,F2G1-1,1982083,2207028,3618158,3826163
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Total,Total,Filter 2 group 1,F2G1-2,3240042,8827119,1644168,3189486
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Total,Total,Filter 2 group 2,F2G2-1,5469024,7980560,3848042,2378061
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Total,Total,Filter 2 group 2,F2G2-2,3932207,4963282,8725026,1680956
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-1,Total,Total,5545322,8638316,2318343,4750265
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-2,Total,Total,4754866,6148310,3105203,5826699
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-1,Total,Total,9723794,9280871,2144881,9817514
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-2,Total,Total,2941718,8547200,1541122,8742396
+2022,Calendar year,Provider,E92000001,England,1,Provider 1,Total,Total,Total,Total,19264353,79307567,43651917,93261352
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-1,Filter 2 group 1,F2G1-1,83794,966035,682390,863661
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-2,Filter 2 group 1,F2G1-1,938914,146961,46666,280967
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-1,Filter 2 group 1,F2G1-1,866122,37150,56798,96061
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-2,Filter 2 group 1,F2G1-1,793284,549160,633867,264223
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-1,Filter 2 group 1,F2G1-2,139909,306329,425033,900882
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-2,Filter 2 group 1,F2G1-2,679377,985554,594334,849442
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-1,Filter 2 group 1,F2G1-2,995781,785727,451027,656006
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-2,Filter 2 group 1,F2G1-2,266941,212332,967279,637448
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-1,Filter 2 group 2,F2G2-1,498220,427783,602431,250688
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-2,Filter 2 group 2,F2G2-1,265187,215196,183561,439819
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-1,Filter 2 group 2,F2G2-1,829030,4198,112319,855808
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-2,Filter 2 group 2,F2G2-1,927889,982443,924178,401248
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-1,Filter 2 group 2,F2G2-2,338532,607964,578208,272318
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-2,Filter 2 group 2,F2G2-2,502979,427059,777613,323772
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-1,Filter 2 group 2,F2G2-2,195032,520449,570641,75940
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-2,Filter 2 group 2,F2G2-2,731269,792087,138370,891238
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Total,Total,Filter 2 group 1,F2G1-1,6896452,8060420,5135948,7794604
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Total,Total,Filter 2 group 1,F2G1-2,7760898,8671334,5200061,5662784
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Total,Total,Filter 2 group 2,F2G2-1,5544223,5056471,2649363,8489236
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Total,Total,Filter 2 group 2,F2G2-2,2129360,8087774,4547218,8905245
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-1,Total,Total,2239729,3691997,1467644,1696872
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-2,Total,Total,4213007,3876222,7044831,9069167
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-1,Total,Total,6612665,1394364,2810933,1830711
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-2,Total,Total,9611462,7699216,4677741,6485417
+2022,Calendar year,Provider,E92000001,England,2,Provider 2,Total,Total,Total,Total,20006389,96030253,25187338,52603644
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-1,Filter 2 group 1,F2G1-1,424456,523756,532778,784121
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-2,Filter 2 group 1,F2G1-1,731288,321298,504769,74678
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-1,Filter 2 group 1,F2G1-1,691613,488448,700915,548068
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-2,Filter 2 group 1,F2G1-1,47473,767840,871517,974949
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-1,Filter 2 group 1,F2G1-2,65866,805593,98663,505646
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-2,Filter 2 group 1,F2G1-2,661656,451353,586477,825657
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-1,Filter 2 group 1,F2G1-2,117853,454350,585981,147043
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-2,Filter 2 group 1,F2G1-2,692128,332137,545458,368991
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-1,Filter 2 group 2,F2G2-1,409108,210780,644056,648560
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-2,Filter 2 group 2,F2G2-1,73227,534108,126294,752982
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-1,Filter 2 group 2,F2G2-1,886706,549623,980458,311184
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-2,Filter 2 group 2,F2G2-1,757235,360995,589706,120728
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-1,Filter 2 group 2,F2G2-2,750413,946653,227681,59962
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-2,Filter 2 group 2,F2G2-2,633998,595601,617520,786904
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-1,Filter 2 group 2,F2G2-2,900284,705619,903759,883138
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-2,Filter 2 group 2,F2G2-2,873285,123902,368887,854288
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Total,Total,Filter 2 group 1,F2G1-1,3800361,5926696,1129011,3012649
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Total,Total,Filter 2 group 1,F2G1-2,3848960,6244513,2869219,4722341
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Total,Total,Filter 2 group 2,F2G2-1,5394621,8106152,4792742,7240877
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Total,Total,Filter 2 group 2,F2G2-2,1837813,9873198,8641270,7726271
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-1,Total,Total,2553275,9669468,2561438,5861471
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 1,F1G1-2,Total,Total,7552538,9721299,1890102,2670993
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-1,Total,Total,8683582,8783737,7873126,7292120
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Filter 1 group 2,F1G2-2,Total,Total,7392787,1615391,8184700,3587650
+2021,Calendar year,Provider,E92000001,England,1,Provider 1,Total,Total,Total,Total,13203655,18384170,52220504,51794885
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-1,Filter 2 group 1,F2G1-1,507350,229265,628790,252563
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-2,Filter 2 group 1,F2G1-1,506521,502138,363244,955008
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-1,Filter 2 group 1,F2G1-1,651914,850564,209111,407476
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-2,Filter 2 group 1,F2G1-1,83425,181396,660786,785317
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-1,Filter 2 group 1,F2G1-2,444556,650615,592598,388728
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-2,Filter 2 group 1,F2G1-2,430134,957886,432065,213302
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-1,Filter 2 group 1,F2G1-2,479509,853964,334090,133803
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-2,Filter 2 group 1,F2G1-2,525528,766621,115447,722768
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-1,Filter 2 group 2,F2G2-1,266667,44970,204982,298586
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-2,Filter 2 group 2,F2G2-1,212195,192795,692080,788605
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-1,Filter 2 group 2,F2G2-1,649235,767364,378570,152624
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-2,Filter 2 group 2,F2G2-1,60089,413454,455145,744538
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-1,Filter 2 group 2,F2G2-2,44178,607208,147312,856832
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-2,Filter 2 group 2,F2G2-2,785203,473856,562676,599506
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-1,Filter 2 group 2,F2G2-2,548157,924384,16384,40223
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-2,Filter 2 group 2,F2G2-2,164898,929131,183449,390387
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Total,Total,Filter 2 group 1,F2G1-1,7050152,8169706,5494845,3858265
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Total,Total,Filter 2 group 1,F2G1-2,6552976,2443206,8667092,7802975
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Total,Total,Filter 2 group 2,F2G2-1,2668348,7113547,2009895,4985845
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Total,Total,Filter 2 group 2,F2G2-2,2303707,1941501,8969219,2991816
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-1,Total,Total,1411290,9026393,4632174,7903124
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 1,F1G1-2,Total,Total,4462203,3335909,2858860,7178183
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-1,Total,Total,5637258,7413917,1214481,9280212
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Filter 1 group 2,F1G2-2,Total,Total,8815716,5825935,5124154,6824399
+2021,Calendar year,Provider,E92000001,England,2,Provider 2,Total,Total,Total,Total,79115205,40336058,40244077,54043187

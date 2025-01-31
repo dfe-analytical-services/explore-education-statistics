@@ -1,0 +1,106 @@
+{
+  "publicationTitle": "Fixed Data Set Queries",
+  "dataSetName": "Performance tests - API test attendance",
+  "dataSetId": "88419401-29ac-5e75-94a6-66515ad97d45",
+  "query": {
+    "criteria": {
+      "filters": {
+        "in": [
+          "0UtcT",
+          "9WOr4",
+          "42CMU",
+          "mLgx9",
+          "EBkSq",
+          "WMzt2",
+          "Qg9vw",
+          "9WOt4"
+        ]
+      },
+      "locations": {
+        "in": [
+          {
+            "level": "LA",
+            "id": "axqLP"
+          },
+          {
+            "level": "LA",
+            "id": "YdkHK"
+          },
+          {
+            "level": "LA",
+            "id": "hZYyW"
+          },
+          {
+            "level": "LA",
+            "id": "qf0jG"
+          },
+          {
+            "level": "LA",
+            "id": "Ip0Bz"
+          },
+          {
+            "level": "LA",
+            "id": "crH31"
+          },
+          {
+            "level": "LA",
+            "id": "f5ZYF"
+          },
+          {
+            "level": "LA",
+            "id": "92k4v"
+          },
+          {
+            "level": "LA",
+            "id": "NOADC"
+          },
+          {
+            "level": "LA",
+            "id": "uLQo4"
+          },
+          {
+            "level": "LA",
+            "id": "wBCbx"
+          },
+          {
+            "level": "LA",
+            "id": "tXUEm"
+          },
+          {
+            "level": "LA",
+            "id": "PyBeb"
+          },
+          {
+            "level": "LA",
+            "id": "4lmUZ"
+          },
+          {
+            "level": "LA",
+            "id": "1qRi3"
+          },
+          {
+            "level": "LA",
+            "id": "uaYo4"
+          },
+          {
+            "level": "LA",
+            "id": "hsHyW"
+          },
+          {
+            "level": "LA",
+            "id": "mc49K"
+          }
+        ]
+      },
+      "timePeriods": {
+        "notEq": {
+          "code": "W10",
+          "period": "2024"
+        }
+      }
+    },
+    "indicators": [
+      "y2Dha"
+    ]
+  }
+}

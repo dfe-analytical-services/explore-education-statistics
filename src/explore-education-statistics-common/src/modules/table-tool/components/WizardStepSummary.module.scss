@@ -1,0 +1,60 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+// Match the key width with the data set step column width.
+$summary-list-width: 80;
+$key-width-tablet: 33.3 / $summary-list-width * 100;
+$key-width-desktop: 25 / $summary-list-width * 100;
+
+.container {
+  @include govuk-media-query($from: tablet) {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0 -#{govuk-spacing(3)};
+  }
+}
+
+.content {
+  @include govuk-media-query($from: tablet) {
+    width: #{$summary-list-width + '%'};
+
+    :global(.govuk-summary-list__key) {
+      padding-left: 95px;
+      padding-right: govuk-spacing(3);
+      width: #{$key-width-tablet + '%'};
+    }
+
+    :global(.govuk-summary-list__value) {
+      padding-left: govuk-spacing(3);
+      padding-right: govuk-spacing(3);
+      width: #{100 - $key-width-tablet + '%'};
+    }
+  }
+
+  @include govuk-media-query($from: desktop) {
+    :global(.govuk-summary-list__key) {
+      width: #{$key-width-desktop + '%'};
+    }
+
+    :global(.govuk-summary-list__value) {
+      width: #{100 - $key-width-desktop + '%'};
+    }
+  }
+}
+
+.goToContainer {
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: govuk-spacing(3);
+
+  @include govuk-media-query($from: desktop) {
+    width: 20%;
+  }
+}
+
+.goToButton {
+  margin: govuk-spacing(2) 0;
+  text-align: right;
+}

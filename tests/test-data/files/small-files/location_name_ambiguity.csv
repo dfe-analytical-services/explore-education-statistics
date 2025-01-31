@@ -1,0 +1,18 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,region_code,region_name,lad_code,lad_name,local_enterprise_partnership_code,local_enterprise_partnership_name,rsc_region_lead_name,output_area_code,output_area_name,pcon_code,pcon_name,ward_code,ward_name,admission_numbers
+2018,Calendar year,Local authority,E92000001,England,330,E99000025,Birmingham,,,,,,,,,,,,,,3962
+2018,Calendar year,Local authority,E92000001,England,330,E99000026,Birmingham,,,,,,,,,,,,,,8530
+2018,Calendar year,Local authority,E92000001,England,330,E99000027,Birmingham,,,,,,,,,,,,,,8856
+2018,Calendar year,Local authority district,E92000001,England,,,,,,E99000025,Birmingham,,,,,,,,,,6765
+2018,Calendar year,Local authority district,E92000001,England,,,,,,E99000025,Bradford,,,,,,,,,,8024
+2018,Calendar year,Local authority district,E92000001,England,,,,,,E99000025,Nottingham,,,,,,,,,,2911
+2018,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E99000025,Birmingham,,,,,,,,5876
+2018,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E99000026,Birmingham,,,,,,,,5124
+2018,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E99000027,Birmingham,,,,,,,,2076
+2018,Calendar year,RSC region,E92000001,England,,,,,,,,,,Birmingham,,,,,,,7612
+2018,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E99000026,Birmingham,,,,,8533
+2018,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E99000025,Birmingham,,,5549
+2018,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E99000026,Birmingham,,,6676
+2018,Calendar year,Regional,E92000001,England,,,,E99000025,Birmingham,,,,,,,,,,,,2287
+2018,Calendar year,Regional,E92000001,England,,,,E99000026,Birmingham,,,,,,,,,,,,7357
+2018,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E99000025,Birmingham,1959
+2018,Calendar year,Ward,E92000001,England,,,,,,,,,,,,,,,E99000026,Birmingham,9857

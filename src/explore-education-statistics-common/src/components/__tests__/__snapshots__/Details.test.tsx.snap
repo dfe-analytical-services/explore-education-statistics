@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Details renders correctly 1`] = `
+<details id="details-tag-test-details"
+         class="govuk-details"
+>
+  <summary class="govuk-details__summary"
+           aria-controls="test-details"
+           aria-expanded="false"
+           role="button"
+           tabindex="0"
+  >
+    <span id="details-heading-test-details"
+          class="summaryText govuk-details__summary-text"
+          data-testid="Expand Details Section Test summary"
+    >
+      Test summary
+    </span>
+  </summary>
+  <div class="govuk-details__text"
+       id="test-details"
+  >
+    Test content
+  </div>
+</details>
+`;
+
+exports[`Details renders correctly with \`open\` prop set to true 1`] = `
+<details id="details-tag-test-details"
+         class="govuk-details"
+         open
+>
+  <summary class="govuk-details__summary"
+           aria-controls="test-details"
+           aria-expanded="true"
+           role="button"
+           tabindex="0"
+  >
+    <span id="details-heading-test-details"
+          class="summaryText govuk-details__summary-text"
+          data-testid="Expand Details Section Test summary"
+    >
+      Test summary
+    </span>
+  </summary>
+  <div class="govuk-details__text"
+       id="test-details"
+  >
+    Test content
+  </div>
+</details>
+`;

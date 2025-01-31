@@ -1,0 +1,9 @@
+@import './variables';
+
+.dfe-width-container--wide {
+  max-width: $dfe-page-width-wide;
+
+  @media print {
+    max-width: none;
+  }
+}

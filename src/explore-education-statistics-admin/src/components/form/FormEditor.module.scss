@@ -1,0 +1,79 @@
+@import '~govuk-frontend/dist/govuk/base';
+@import '~explore-education-statistics-common/src/styles/mixins';
+
+$active-colour: lighten(govuk-colour('orange'), 10);
+
+.editor {
+  background: govuk-colour('light-grey');
+  border: $govuk-border-width-form-element solid $govuk-input-border-colour;
+  margin-bottom: govuk-spacing(2);
+
+  :global(.ck-focused) {
+    border-color: $govuk-input-border-colour !important;
+  }
+
+  // Make sure svgs are visible (they use the image tag)
+  :global(.ck-content img) {
+    width: 100%;
+  }
+
+  :global(.ck-content blockquote) {
+    font-style: normal;
+  }
+
+  // show grouped toolbar options in a vertical list
+  :global(.ck-dropdown__panel .ck.ck-toolbar > .ck-toolbar__items) {
+    flex-direction: column;
+  }
+
+  :global(.ck-dropdown__panel .ck-toolbar__items .ck-button) {
+    text-align: left;
+    width: 100%;
+  }
+
+  // Adjust the sticky toolbar so it isn't obscured by the page mode bar.
+  // stylelint-disable-next-line selector-class-pattern
+  :global(.ck-sticky-panel .ck-sticky-panel__content_sticky) {
+    padding-top: 48px;
+    @include govuk-media-query($from: tablet) {
+      padding-top: 54px;
+    }
+  }
+}
+
+.focused {
+  @include focused-input;
+}
+
+.readOnlyEditor {
+  background: govuk-colour('light-grey');
+  border: $govuk-border-width-form-element solid $govuk-input-border-colour;
+  cursor: not-allowed;
+  padding: govuk-spacing(2);
+
+  &:focus {
+    @include focused-input;
+  }
+}
+
+// Comments in the editor
+:global(.commentStyle) {
+  background: govuk-colour('yellow');
+
+  :global(.commentStyle) {
+    background: lighten(govuk-colour('yellow'), 20);
+  }
+
+  :global(.commentStyle--active) {
+    background: $active-colour;
+  }
+}
+
+:global(.commentStyle--active) {
+  background: $active-colour;
+}
+
+:global(.commentPlaceholderStyle) {
+  background: govuk-colour('blue');
+  color: govuk-colour('white');
+}

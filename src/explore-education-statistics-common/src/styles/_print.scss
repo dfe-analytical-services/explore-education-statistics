@@ -1,0 +1,47 @@
+@mixin print-hide() {
+  @media print {
+    display: none !important;
+  }
+}
+
+@mixin print-break-avoid() {
+  page-break-inside: avoid;
+}
+
+.dfe-print-break-avoid {
+  @include print-break-avoid();
+}
+
+@mixin dfe-print-break-before() {
+  page-break-before: always;
+}
+
+.dfe-print-break-before {
+  @include dfe-print-break-before();
+}
+
+@media print {
+  *[href]::after {
+    content: none !important;
+  }
+
+  .govuk-accordion__section {
+    @include print-break-avoid();
+  }
+
+  .govuk-details {
+    @include print-hide();
+  }
+
+  figure {
+    @include print-break-avoid();
+    width: calc(100%) !important;
+  }
+}
+
+.recharts-wrapper,
+.recharts-surface {
+  @media print {
+    width: calc(100%) !important;
+  }
+}

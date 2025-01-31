@@ -1,0 +1,228 @@
+time_period,time_identifier,geographic_level,country_code,country_name,pupil_sen_status,primary_need,number_of_pupils,pupil_gender_boys,pupil_gender_girls
+201920,Academic year,National,E92000001,England,No SEN,Missing,7037528,3392763,3644764
+201920,Academic year,National,E92000001,England,No SEN,Total,7037528,3392763,3644764
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,Autistic Spectrum Disorder,67867,51442,16425
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,Hearing Impairment,17173,8605,8568
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,Moderate Learning Difficulty,211563,125442,86121
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,Multi- Sensory Impairment,2647,1783,864
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,Other Difficulty/Disability,45932,28290,17642
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,Physical Disability,23417,13463,9954
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,Profound & Multiple Learning Difficulty,916,566,350
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,SEN support but no specialist assessment of type of need,40333,24879,15454
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,Severe Learning Difficulty,3001,1859,1142
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,"Social, Emotional and Mental Health",194111,135307,58804
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,Specific Learning Difficulty,145878,84324,61554
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,"Speech, Language and Communications needs",236960,163885,73075
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,Total,999420,645159,354261
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,Visual Impairment,9622,5314,4308
+201920,Academic year,National,E92000001,England,Statement or EHC,Autistic Spectrum Disorder,82847,68002,14845
+201920,Academic year,National,E92000001,England,Statement or EHC,Hearing Impairment,6027,3337,2690
+201920,Academic year,National,E92000001,England,Statement or EHC,Missing,1,1,0
+201920,Academic year,National,E92000001,England,Statement or EHC,Moderate Learning Difficulty,29592,18922,10670
+201920,Academic year,National,E92000001,England,Statement or EHC,Multi- Sensory Impairment,965,578,387
+201920,Academic year,National,E92000001,England,Statement or EHC,Other Difficulty/Disability,7069,4572,2497
+201920,Academic year,National,E92000001,England,Statement or EHC,Physical Disability,13371,7748,5623
+201920,Academic year,National,E92000001,England,Statement or EHC,Profound & Multiple Learning Difficulty,10003,5759,4244
+201920,Academic year,National,E92000001,England,Statement or EHC,Severe Learning Difficulty,30593,20029,10564
+201920,Academic year,National,E92000001,England,Statement or EHC,"Social, Emotional and Mental Health",39189,32498,6691
+201920,Academic year,National,E92000001,England,Statement or EHC,Specific Learning Difficulty,9947,6826,3121
+201920,Academic year,National,E92000001,England,Statement or EHC,"Speech, Language and Communications needs",42589,31359,11230
+201920,Academic year,National,E92000001,England,Statement or EHC,Total,275604,201544,74060
+201920,Academic year,National,E92000001,England,Statement or EHC,Visual Impairment,3411,1913,1498
+201920,Academic year,National,E92000001,England,Total,Autistic Spectrum Disorder,150714,119444,31270
+201920,Academic year,National,E92000001,England,Total,Hearing Impairment,23200,11942,11258
+201920,Academic year,National,E92000001,England,Total,Missing,7037529,3392764,3644764
+201920,Academic year,National,E92000001,England,Total,Moderate Learning Difficulty,241155,144364,96791
+201920,Academic year,National,E92000001,England,Total,Multi- Sensory Impairment,3612,2361,1251
+201920,Academic year,National,E92000001,England,Total,Other Difficulty/Disability,53001,32862,20139
+201920,Academic year,National,E92000001,England,Total,Physical Disability,36788,21211,15577
+201920,Academic year,National,E92000001,England,Total,Profound & Multiple Learning Difficulty,10919,6325,4594
+201920,Academic year,National,E92000001,England,Total,SEN support but no specialist assessment of type of need,40333,24879,15454
+201920,Academic year,National,E92000001,England,Total,Severe Learning Difficulty,33594,21888,11706
+201920,Academic year,National,E92000001,England,Total,"Social, Emotional and Mental Health",233300,167805,65495
+201920,Academic year,National,E92000001,England,Total,Specific Learning Difficulty,155825,91150,64675
+201920,Academic year,National,E92000001,England,Total,"Speech, Language and Communications needs",279549,195244,84305
+201920,Academic year,National,E92000001,England,Total,Total,8312552,4239466,4073085
+201920,Academic year,National,E92000001,England,Total,Visual Impairment,13033,7227,5806
+201819,Academic year,National,E92000001,England,No SEN,Missing,7010535,3384780,3625754
+201819,Academic year,National,E92000001,England,No SEN,Severe Learning Difficulty,1,1,0
+201819,Academic year,National,E92000001,England,No SEN,Total,7010536,3384781,3625754
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Autistic Spectrum Disorder,60048,46445,13603
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Hearing Impairment,16591,8327,8264
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Missing,1,1,0
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Moderate Learning Difficulty,218501,130552,87949
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Multi- Sensory Impairment,2473,1698,775
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Other Difficulty/Disability,46393,28601,17792
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Physical Disability,22852,13210,9642
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Profound & Multiple Learning Difficulty,975,607,368
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,SEN support but no specialist assessment of type of need,40246,24920,15326
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Severe Learning Difficulty,3118,1968,1150
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,"Social, Emotional and Mental Health",181944,128411,53533
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Specific Learning Difficulty,142559,83749,58810
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,"Speech, Language and Communications needs",227756,158204,69552
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Total,972841,631854,340987
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,Visual Impairment,9384,5161,4223
+201819,Academic year,National,E92000001,England,Statement or EHC,Autistic Spectrum Disorder,73450,60821,12629
+201819,Academic year,National,E92000001,England,Statement or EHC,Hearing Impairment,5873,3242,2631
+201819,Academic year,National,E92000001,England,Statement or EHC,Missing,1,1,0
+201819,Academic year,National,E92000001,England,Statement or EHC,Moderate Learning Difficulty,29100,18611,10489
+201819,Academic year,National,E92000001,England,Statement or EHC,Multi- Sensory Impairment,915,534,381
+201819,Academic year,National,E92000001,England,Statement or EHC,Other Difficulty/Disability,6766,4337,2429
+201819,Academic year,National,E92000001,England,Statement or EHC,Physical Disability,13094,7609,5485
+201819,Academic year,National,E92000001,England,Statement or EHC,Profound & Multiple Learning Difficulty,9878,5658,4220
+201819,Academic year,National,E92000001,England,Statement or EHC,Severe Learning Difficulty,29921,19507,10414
+201819,Academic year,National,E92000001,England,Statement or EHC,"Social, Emotional and Mental Health",34922,29301,5621
+201819,Academic year,National,E92000001,England,Statement or EHC,Specific Learning Difficulty,9080,6275,2805
+201819,Academic year,National,E92000001,England,Statement or EHC,"Speech, Language and Communications needs",38070,27928,10142
+201819,Academic year,National,E92000001,England,Statement or EHC,Total,254455,185724,68731
+201819,Academic year,National,E92000001,England,Statement or EHC,Visual Impairment,3385,1900,1485
+201819,Academic year,National,E92000001,England,Total,Autistic Spectrum Disorder,133498,107266,26232
+201819,Academic year,National,E92000001,England,Total,Hearing Impairment,22464,11569,10895
+201819,Academic year,National,E92000001,England,Total,Missing,7010537,3384782,3625754
+201819,Academic year,National,E92000001,England,Total,Moderate Learning Difficulty,247601,149163,98438
+201819,Academic year,National,E92000001,England,Total,Multi- Sensory Impairment,3388,2232,1156
+201819,Academic year,National,E92000001,England,Total,Other Difficulty/Disability,53159,32938,20221
+201819,Academic year,National,E92000001,England,Total,Physical Disability,35946,20819,15127
+201819,Academic year,National,E92000001,England,Total,Profound & Multiple Learning Difficulty,10853,6265,4588
+201819,Academic year,National,E92000001,England,Total,SEN support but no specialist assessment of type of need,40246,24920,15326
+201819,Academic year,National,E92000001,England,Total,Severe Learning Difficulty,33040,21476,11564
+201819,Academic year,National,E92000001,England,Total,"Social, Emotional and Mental Health",216866,157712,59154
+201819,Academic year,National,E92000001,England,Total,Specific Learning Difficulty,151639,90024,61615
+201819,Academic year,National,E92000001,England,Total,"Speech, Language and Communications needs",265826,186132,79694
+201819,Academic year,National,E92000001,England,Total,Total,8237832,4202359,4035472
+201819,Academic year,National,E92000001,England,Total,Visual Impairment,12769,7061,5708
+201718,Academic year,National,E92000001,England,No SEN,Missing,6964972,3366770,3598202
+201718,Academic year,National,E92000001,England,No SEN,Total,6964972,3366770,3598202
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,Autistic Spectrum Disorder,54269,42651,11618
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,Hearing Impairment,15985,8057,7928
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,Moderate Learning Difficulty,224910,135020,89890
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,Multi- Sensory Impairment,2286,1556,730
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,Other Difficulty/Disability,47695,29315,18380
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,Physical Disability,22256,12936,9320
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,Profound & Multiple Learning Difficulty,1001,632,369
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,SEN support but no specialist assessment of type of need,39272,24225,15047
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,Severe Learning Difficulty,3297,2098,1199
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,"Social, Emotional and Mental Health",173115,123496,49619
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,Specific Learning Difficulty,139907,83599,56308
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,"Speech, Language and Communications needs",216679,150519,66160
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,Total,949750,619105,330645
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,Visual Impairment,9078,5001,4077
+201718,Academic year,National,E92000001,England,Statement or EHC,Autistic Spectrum Disorder,66723,55678,11045
+201718,Academic year,National,E92000001,England,Statement or EHC,Hearing Impairment,5886,3240,2646
+201718,Academic year,National,E92000001,England,Statement or EHC,Missing,1,1,0
+201718,Academic year,National,E92000001,England,Statement or EHC,Moderate Learning Difficulty,28341,18188,10153
+201718,Academic year,National,E92000001,England,Statement or EHC,Multi- Sensory Impairment,753,442,311
+201718,Academic year,National,E92000001,England,Statement or EHC,Other Difficulty/Disability,6163,3962,2201
+201718,Academic year,National,E92000001,England,Statement or EHC,Physical Disability,12827,7433,5394
+201718,Academic year,National,E92000001,England,Statement or EHC,Profound & Multiple Learning Difficulty,10072,5687,4385
+201718,Academic year,National,E92000001,England,Statement or EHC,Severe Learning Difficulty,29532,19257,10275
+201718,Academic year,National,E92000001,England,Statement or EHC,"Social, Emotional and Mental Health",31308,26598,4710
+201718,Academic year,National,E92000001,England,Statement or EHC,Specific Learning Difficulty,8290,5834,2456
+201718,Academic year,National,E92000001,England,Statement or EHC,"Speech, Language and Communications needs",34415,25156,9259
+201718,Academic year,National,E92000001,England,Statement or EHC,Total,237601,173304,64297
+201718,Academic year,National,E92000001,England,Statement or EHC,Visual Impairment,3290,1828,1462
+201718,Academic year,National,E92000001,England,Total,Autistic Spectrum Disorder,120992,98329,22663
+201718,Academic year,National,E92000001,England,Total,Hearing Impairment,21871,11297,10574
+201718,Academic year,National,E92000001,England,Total,Missing,6964973,3366771,3598202
+201718,Academic year,National,E92000001,England,Total,Moderate Learning Difficulty,253251,153208,100043
+201718,Academic year,National,E92000001,England,Total,Multi- Sensory Impairment,3039,1998,1041
+201718,Academic year,National,E92000001,England,Total,Other Difficulty/Disability,53858,33277,20581
+201718,Academic year,National,E92000001,England,Total,Physical Disability,35083,20369,14714
+201718,Academic year,National,E92000001,England,Total,Profound & Multiple Learning Difficulty,11073,6319,4754
+201718,Academic year,National,E92000001,England,Total,SEN support but no specialist assessment of type of need,39272,24225,15047
+201718,Academic year,National,E92000001,England,Total,Severe Learning Difficulty,32829,21355,11474
+201718,Academic year,National,E92000001,England,Total,"Social, Emotional and Mental Health",204423,150094,54329
+201718,Academic year,National,E92000001,England,Total,Specific Learning Difficulty,148197,89433,58764
+201718,Academic year,National,E92000001,England,Total,"Speech, Language and Communications needs",251094,175675,75419
+201718,Academic year,National,E92000001,England,Total,Total,8152323,4159179,3993144
+201718,Academic year,National,E92000001,England,Total,Visual Impairment,12368,6829,5539
+201617,Academic year,National,E92000001,England,No SEN,Missing,6922226,3348290,3573936
+201617,Academic year,National,E92000001,England,No SEN,Total,6922226,3348290,3573936
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,Autistic Spectrum Disorder,48200,38426,9774
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,Hearing Impairment,15302,7705,7597
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,Moderate Learning Difficulty,231796,139893,91903
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,Multi- Sensory Impairment,2053,1387,666
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,Other Difficulty/Disability,49080,30127,18953
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,Physical Disability,21211,12406,8805
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,Profound & Multiple Learning Difficulty,1039,637,402
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,SEN support but no specialist assessment of type of need,41437,25504,15933
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,Severe Learning Difficulty,3322,2144,1178
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,"Social, Emotional and Mental Health",167670,120043,47627
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,Specific Learning Difficulty,138876,84090,54786
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,"Speech, Language and Communications needs",205643,142900,62743
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,Total,934348,610144,324204
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,Visual Impairment,8719,4882,3837
+201617,Academic year,National,E92000001,England,Statement or EHC,Autistic Spectrum Disorder,61137,51434,9703
+201617,Academic year,National,E92000001,England,Statement or EHC,Hearing Impairment,5997,3343,2654
+201617,Academic year,National,E92000001,England,Statement or EHC,Moderate Learning Difficulty,28663,18467,10196
+201617,Academic year,National,E92000001,England,Statement or EHC,Multi- Sensory Impairment,688,402,286
+201617,Academic year,National,E92000001,England,Statement or EHC,Other Difficulty/Disability,5801,3723,2078
+201617,Academic year,National,E92000001,England,Statement or EHC,Physical Disability,12782,7389,5393
+201617,Academic year,National,E92000001,England,Statement or EHC,Profound & Multiple Learning Difficulty,10045,5662,4383
+201617,Academic year,National,E92000001,England,Statement or EHC,SEN support but no specialist assessment of type of need,370,287,83
+201617,Academic year,National,E92000001,England,Statement or EHC,Severe Learning Difficulty,29158,18924,10234
+201617,Academic year,National,E92000001,England,Statement or EHC,"Social, Emotional and Mental Health",29139,25010,4129
+201617,Academic year,National,E92000001,England,Statement or EHC,Specific Learning Difficulty,8480,6081,2399
+201617,Academic year,National,E92000001,England,Statement or EHC,"Speech, Language and Communications needs",32439,23768,8671
+201617,Academic year,National,E92000001,England,Statement or EHC,Total,227954,166290,61664
+201617,Academic year,National,E92000001,England,Statement or EHC,Visual Impairment,3255,1800,1455
+201617,Academic year,National,E92000001,England,Total,Autistic Spectrum Disorder,109337,89860,19477
+201617,Academic year,National,E92000001,England,Total,Hearing Impairment,21299,11048,10251
+201617,Academic year,National,E92000001,England,Total,Missing,6922226,3348290,3573936
+201617,Academic year,National,E92000001,England,Total,Moderate Learning Difficulty,260459,158360,102099
+201617,Academic year,National,E92000001,England,Total,Multi- Sensory Impairment,2741,1789,952
+201617,Academic year,National,E92000001,England,Total,Other Difficulty/Disability,54881,33850,21031
+201617,Academic year,National,E92000001,England,Total,Physical Disability,33993,19795,14198
+201617,Academic year,National,E92000001,England,Total,Profound & Multiple Learning Difficulty,11084,6299,4785
+201617,Academic year,National,E92000001,England,Total,SEN support but no specialist assessment of type of need,41807,25791,16016
+201617,Academic year,National,E92000001,England,Total,Severe Learning Difficulty,32480,21068,11412
+201617,Academic year,National,E92000001,England,Total,"Social, Emotional and Mental Health",196809,145053,51756
+201617,Academic year,National,E92000001,England,Total,Specific Learning Difficulty,147356,90171,57185
+201617,Academic year,National,E92000001,England,Total,"Speech, Language and Communications needs",238082,166668,71414
+201617,Academic year,National,E92000001,England,Total,Total,8084528,4124724,3959804
+201617,Academic year,National,E92000001,England,Total,Visual Impairment,11974,6682,5292
+201516,Academic year,National,E92000001,England,No SEN,Missing,6824895,3301069,3523826
+201516,Academic year,National,E92000001,England,No SEN,Total,6824895,3301069,3523826
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,Autistic Spectrum Disorder,43327,35097,8230
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,Hearing Impairment,14654,7345,7309
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,Moderate Learning Difficulty,244539,147582,96957
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,Multi- Sensory Impairment,1692,1146,546
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,Other Difficulty/Disability,50413,30599,19814
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,Physical Disability,20212,11875,8337
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,Profound & Multiple Learning Difficulty,1012,618,394
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,SEN support but no specialist assessment of type of need,36385,22181,14204
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,Severe Learning Difficulty,3381,2187,1194
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,"Social, Emotional and Mental Health",166347,118818,47529
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,Specific Learning Difficulty,142550,87283,55267
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,"Speech, Language and Communications needs",194200,134749,59451
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,Total,927037,604110,322927
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,Visual Impairment,8325,4630,3695
+201516,Academic year,National,E92000001,England,Statement or EHC,Autistic Spectrum Disorder,57474,48527,8947
+201516,Academic year,National,E92000001,England,Statement or EHC,Hearing Impairment,5956,3304,2652
+201516,Academic year,National,E92000001,England,Statement or EHC,Moderate Learning Difficulty,29741,19295,10446
+201516,Academic year,National,E92000001,England,Statement or EHC,Multi- Sensory Impairment,634,359,275
+201516,Academic year,National,E92000001,England,Statement or EHC,Other Difficulty/Disability,5277,3376,1901
+201516,Academic year,National,E92000001,England,Statement or EHC,Physical Disability,12914,7424,5490
+201516,Academic year,National,E92000001,England,Statement or EHC,Profound & Multiple Learning Difficulty,9984,5637,4347
+201516,Academic year,National,E92000001,England,Statement or EHC,SEN support but no specialist assessment of type of need,282,235,47
+201516,Academic year,National,E92000001,England,Statement or EHC,Severe Learning Difficulty,29036,18853,10183
+201516,Academic year,National,E92000001,England,Statement or EHC,"Social, Emotional and Mental Health",28344,24509,3835
+201516,Academic year,National,E92000001,England,Statement or EHC,Specific Learning Difficulty,9009,6512,2497
+201516,Academic year,National,E92000001,England,Statement or EHC,"Speech, Language and Communications needs",31045,22711,8334
+201516,Academic year,National,E92000001,England,Statement or EHC,Total,223039,162594,60445
+201516,Academic year,National,E92000001,England,Statement or EHC,Visual Impairment,3343,1852,1491
+201516,Academic year,National,E92000001,England,Total,Autistic Spectrum Disorder,100801,83624,17177
+201516,Academic year,National,E92000001,England,Total,Hearing Impairment,20610,10649,9961
+201516,Academic year,National,E92000001,England,Total,Missing,6824895,3301069,3523826
+201516,Academic year,National,E92000001,England,Total,Moderate Learning Difficulty,274280,166877,107403
+201516,Academic year,National,E92000001,England,Total,Multi- Sensory Impairment,2326,1505,821
+201516,Academic year,National,E92000001,England,Total,Other Difficulty/Disability,55690,33975,21715
+201516,Academic year,National,E92000001,England,Total,Physical Disability,33126,19299,13827
+201516,Academic year,National,E92000001,England,Total,Profound & Multiple Learning Difficulty,10996,6255,4741
+201516,Academic year,National,E92000001,England,Total,SEN support but no specialist assessment of type of need,36667,22416,14251
+201516,Academic year,National,E92000001,England,Total,Severe Learning Difficulty,32417,21040,11377
+201516,Academic year,National,E92000001,England,Total,"Social, Emotional and Mental Health",194691,143327,51364
+201516,Academic year,National,E92000001,England,Total,Specific Learning Difficulty,151559,93795,57764
+201516,Academic year,National,E92000001,England,Total,"Speech, Language and Communications needs",225245,157460,67785
+201516,Academic year,National,E92000001,England,Total,Total,7974971,4067773,3907198
+201516,Academic year,National,E92000001,England,Total,Visual Impairment,11668,6482,5186

@@ -1,0 +1,6 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.text {
+  fill: $govuk-text-colour;
+  @include govuk-font($size: 16);
+}

@@ -1,0 +1,10 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.stepEnabled {
+  @include govuk-media-query($from: tablet) {
+    line-height: 1;
+    margin: -2px govuk-spacing(2) 0 govuk-spacing(3);
+    position: absolute;
+    width: 75px;
+  }
+}

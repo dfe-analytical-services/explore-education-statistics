@@ -1,0 +1,28 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.container {
+  margin-bottom: govuk-spacing(4);
+
+  @include govuk-media-query($until: tablet) {
+    display: block;
+  }
+}
+
+.urlContainer {
+  @include govuk-media-query($until: tablet) {
+    margin-bottom: govuk-spacing(2);
+  }
+}
+
+.button {
+  display: block;
+
+  @include govuk-media-query($from: tablet) {
+    box-shadow: 0 0;
+    display: inline-block;
+    flex-shrink: 1;
+    margin-bottom: 0;
+    white-space: nowrap;
+    width: auto;
+  }
+}

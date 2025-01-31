@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormGroup renders correctly when there is an error 1`] = `
+<div class="govuk-form-group govuk-form-group--error">
+  <p>
+    Some content
+  </p>
+</div>
+`;
+
+exports[`FormGroup renders correctly with required props 1`] = `
+<div class="govuk-form-group">
+  <p>
+    Some content
+  </p>
+</div>
+`;

@@ -1,0 +1,9 @@
+.nextPrevious {
+  text-decoration: none;
+}
+
+.nextPreviousSmall {
+  &:hover {
+    text-decoration: underline;
+  }
+}

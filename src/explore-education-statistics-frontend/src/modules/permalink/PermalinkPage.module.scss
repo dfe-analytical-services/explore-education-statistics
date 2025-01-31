@@ -1,0 +1,11 @@
+.permalinkPage {
+  @media print {
+    :global(.govuk-breadcrumbs) {
+      display: none;
+    }
+
+    :global(.govuk-footer__inline-list) {
+      display: none;
+    }
+  }
+}

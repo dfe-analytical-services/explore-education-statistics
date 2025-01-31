@@ -1,0 +1,74 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
+<figure class="figure">
+  <figcaption>
+    Test table
+  </figcaption>
+  <div tabindex="0"
+       class="container"
+       role="region"
+  >
+    <table data-testid="test-caption-id-table"
+           aria-labelledby="test-caption-id"
+           class="govuk-table table"
+    >
+      <thead class="tableHead">
+        <tr>
+          <td colspan="1"
+              rowspan="1"
+          >
+          </td>
+          <th colspan="1"
+              rowspan="1"
+              scope="col"
+          >
+            Column heading
+          </th>
+          <th colspan="1"
+              rowspan="1"
+              scope="col"
+          >
+            Column heading 2
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th colspan="1"
+              rowspan="1"
+              scope="row"
+              class
+          >
+            Row header
+          </th>
+          <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
+            425,590
+          </td>
+          <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
+            425,591
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    <button aria-disabled="false"
+            type="button"
+            class="button"
+    >
+      Data symbols
+      <span class="infoIcon"
+            aria-hidden="true"
+      >
+        ?
+      </span>
+      <span class="govuk-visually-hidden">
+        Data symbols guide
+      </span>
+    </button>
+  </p>
+  <div>
+  </div>
+</figure>
+`;

@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormCheckboxSearchGroup without searchOnly renders list of checkboxes in correct order 1`] = `
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset"
+            id="test-checkboxes"
+  >
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+      Choose options
+    </legend>
+    <label class="govuk-label"
+           for="test-checkboxes-search"
+    >
+      Search options
+    </label>
+    <input name="testCheckboxes-search"
+           class="govuk-input searchInput govuk-input--width-20"
+           id="test-checkboxes-search"
+           type="text"
+           value
+    >
+    <div class="optionsContainer">
+      <span aria-live="polite"
+            aria-atomic="true"
+            class="govuk-visually-hidden"
+      >
+        3 options found
+      </span>
+      <div class="govuk-checkboxes govuk-checkboxes--small">
+        <div class="govuk-checkboxes__item"
+             data-testid="Checkbox item for Test checkbox 1"
+        >
+          <input class="govuk-checkboxes__input"
+                 id="test-checkboxes-options-1"
+                 name="testCheckboxes"
+                 type="checkbox"
+                 value="1"
+          >
+          <label class="govuk-label govuk-checkboxes__label"
+                 for="test-checkboxes-options-1"
+          >
+            Test checkbox 1
+          </label>
+        </div>
+        <div class="govuk-checkboxes__item"
+             data-testid="Checkbox item for Test checkbox 2"
+        >
+          <input class="govuk-checkboxes__input"
+                 id="test-checkboxes-options-2"
+                 name="testCheckboxes"
+                 type="checkbox"
+                 value="2"
+          >
+          <label class="govuk-label govuk-checkboxes__label"
+                 for="test-checkboxes-options-2"
+          >
+            Test checkbox 2
+          </label>
+        </div>
+        <div class="govuk-checkboxes__item"
+             data-testid="Checkbox item for Test checkbox 3"
+        >
+          <input class="govuk-checkboxes__input"
+                 id="test-checkboxes-options-3"
+                 name="testCheckboxes"
+                 type="checkbox"
+                 value="3"
+          >
+          <label class="govuk-label govuk-checkboxes__label"
+                 for="test-checkboxes-options-3"
+          >
+            Test checkbox 3
+          </label>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</div>
+`;

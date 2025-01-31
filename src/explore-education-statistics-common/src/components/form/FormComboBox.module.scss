@@ -1,0 +1,66 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.container {
+  margin-bottom: govuk-spacing(0);
+  position: relative;
+}
+
+.optionsContainer {
+  background-color: govuk-colour('white');
+  border: 2px solid govuk-colour('light-grey');
+  width: 100%;
+  z-index: 2000;
+
+  &.overflowContainer {
+    position: absolute;
+  }
+}
+
+.optionsLabel {
+  background-color: govuk-colour('light-grey');
+  font-size: 1rem;
+  padding: govuk-spacing(2) govuk-spacing(1);
+}
+
+.options {
+  height: 100%;
+  list-style: none;
+  margin: 0;
+  max-height: 50vh;
+  overflow: auto;
+  padding-left: 0;
+  padding-top: 0;
+
+  &:focus {
+    border: $govuk-focus-width solid #000;
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+  }
+}
+
+.optionsNoFocus {
+  &:focus {
+    outline: 0;
+    outline-offset: 0;
+  }
+}
+
+.options li {
+  margin: 0;
+  padding: govuk-spacing(1);
+
+  &:focus,
+  &:hover {
+    background-color: $govuk-brand-colour;
+    color: govuk-colour('white');
+    cursor: pointer;
+  }
+
+  &:not(:first-child) {
+    border-top: 1px solid $govuk-border-colour;
+  }
+}
+
+.selected {
+  background-color: $govuk-brand-colour;
+  color: govuk-colour('white');
+}

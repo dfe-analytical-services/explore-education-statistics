@@ -1,0 +1,83 @@
+version: '3.9'
+services:
+  influxdb:
+    image: influxdb:1.8
+    networks:
+      - k6_performance_test_network
+    environment:
+      - INFLUXDB_DB=k6
+    ports:
+      - "8086:8086"
+
+  grafana:
+    image: grafana/grafana:9.3.2
+    depends_on:
+      - influxdb
+      - renderer
+    networks:
+      - k6_performance_test_network
+    links:
+      - influxdb
+    ports:
+      - "3005:3005"
+    environment:
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_RENDERING_SERVER_URL=http://renderer:8081/render
+      - GF_RENDERING_CALLBACK_URL=http://grafana:3005/
+      - GF_LOG_FILTERS=rendering:debug
+    volumes:
+      - ./dashboards:/var/lib/grafana/dashboards
+      - ./grafana-dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - "./grafana.ini:/etc/grafana/grafana.ini"
+
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    networks:
+      - k6_performance_test_network
+    ports:
+      - 8081
+
+  k6:
+    image: loadimpact/k6:latest
+    depends_on:
+      - influxdb
+    # Add the host IP address to the k6 container to allow it to connect to the host 
+    # when running and developing performance tests locally.
+    extra_hosts:
+      - ees.local:host-gateway
+    networks: 
+      - k6_performance_test_network
+    environment:
+      - K6_OUT=influxdb=http://influxdb:8086/k6
+      - TEST_ENVIRONMENT
+    volumes:
+      - ./:/home/k6/app
+    working_dir: /home/k6/app
+
+  node:
+    build:
+      dockerfile: Dockerfile-node-chromium
+      context: .
+    # Add the host IP address to the Node container to allow it to connect to the host 
+    # when running scripts that access the local environment.
+    extra_hosts:
+      - ees.local:host-gateway
+    networks:
+      - k6_performance_test_network
+    volumes:
+      - ./:/home/node/app
+    working_dir:
+      /home/node/app
+  
+networks:
+  k6_performance_test_network:
+    ipam:
+      config:
+        # Restrict containers to this subnet to allow predictable setting of firewall 
+        # rules to this IP range. This is to allow the k6 container to connect to the 
+        # host machine on specific ports after port access has been allowed for this 
+        # IP range.
+        - subnet: 172.30.0.0/16

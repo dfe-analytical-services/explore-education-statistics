@@ -1,0 +1,138 @@
+import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
+import {
+  KeyStatistic,
+  KeyStatisticText,
+} from '@common/services/publicationService';
+import React from 'react';
+import Yup from '@common/validation/yup';
+
+export interface KeyStatTextFormValues {
+  title: string;
+  statistic: string;
+  trend: string;
+  guidanceTitle?: string;
+  guidanceText?: string;
+}
+
+interface EditableKeyStatTextFormProps {
+  keyStat?: KeyStatisticText;
+  keyStats: KeyStatistic[];
+  onSubmit: (values: KeyStatTextFormValues) => void;
+  onCancel: () => void;
+  testId: string;
+}
+
+export default function EditableKeyStatTextForm({
+  keyStat,
+  keyStats,
+  onSubmit,
+  onCancel,
+  testId,
+}: EditableKeyStatTextFormProps) {
+  const guidanceTitles = keyStats
+    .filter(stat => stat.id !== keyStat?.id && !!stat.guidanceTitle)
+    .map(stat => stat.guidanceTitle) as string[];
+
+  const handleSubmit = async (values: KeyStatTextFormValues) => {
+    await onSubmit({
+      ...values,
+      guidanceTitle: values.guidanceTitle,
+      guidanceText: values.guidanceText,
+    });
+  };
+
+  return (
+    <div data-testid={testId}>
+      <FormProvider
+        initialValues={{
+          title: keyStat?.title,
+          statistic: keyStat?.statistic,
+          trend: keyStat?.trend,
+          guidanceTitle: keyStat?.guidanceTitle,
+          guidanceText: keyStat?.guidanceText,
+        }}
+        validationSchema={Yup.object<KeyStatTextFormValues>({
+          title: Yup.string().required('Enter a title').max(60),
+          statistic: Yup.string().required('Enter a statistic').max(12),
+          trend: Yup.string().max(230),
+          guidanceTitle: Yup.string()
+            .max(65)
+            .when('guidanceText', {
+              is: (val: string) => val !== '',
+              then: s => s.required('Enter a guidance title'),
+            })
+            .test({
+              name: 'duplicateGuidanceTitle',
+              message: 'Guidance title must be unique',
+              test: (value?: string) => {
+                if (!value) {
+                  return true;
+                }
+
+                return !guidanceTitles?.some(
+                  guidanceTitle =>
+                    guidanceTitle.toLowerCase() === value.toLowerCase(),
+                );
+              },
+            }),
+          guidanceText: Yup.string(),
+        })}
+      >
+        {({ formState }) => {
+          return (
+            <Form
+              id={
+                keyStat
+                  ? `editableKeyStatTextForm-${keyStat.id}`
+                  : 'editableKeyStatTextForm-create'
+              }
+              onSubmit={handleSubmit}
+            >
+              <div className={styles.textTile}>
+                <FormFieldTextInput<KeyStatTextFormValues>
+                  name="title"
+                  label={<span>Title</span>}
+                />
+                <FormFieldTextInput<KeyStatTextFormValues>
+                  name="statistic"
+                  label={<span>Statistic</span>}
+                />
+                <FormFieldTextInput<KeyStatTextFormValues>
+                  name="trend"
+                  label={<span>Trend</span>}
+                />
+              </div>
+
+              <FormFieldTextInput<KeyStatTextFormValues>
+                formGroupClass="govuk-!-margin-top-2"
+                name="guidanceTitle"
+                label="Guidance title"
+              />
+
+              <FormFieldTextArea<KeyStatTextFormValues>
+                label="Guidance text"
+                name="guidanceText"
+                rows={3}
+              />
+
+              <ButtonGroup>
+                <Button disabled={formState.isSubmitting} type="submit">
+                  Save
+                </Button>
+                <Button variant="secondary" onClick={onCancel}>
+                  Cancel
+                </Button>
+              </ButtonGroup>
+            </Form>
+          );
+        }}
+      </FormProvider>
+    </div>
+  );
+}

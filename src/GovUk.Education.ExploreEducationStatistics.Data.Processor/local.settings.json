@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+  },
+  "ConnectionStrings": {
+    "StatisticsDb": "Server=db;Database=statistics;User=importer;Password=Your_Password123;TrustServerCertificate=True;",
+    "ContentDb": "Server=db;Database=content;User=importer;Password=Your_Password123;TrustServerCertificate=True;"
+  },
+  "Host": {
+    "LocalHttpPort": 7071,
+    "CORS": "*"
+  }
+}

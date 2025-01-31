@@ -1,0 +1,105 @@
+@import '~govuk-frontend/dist/govuk/base';
+@import '~govuk-frontend/dist/govuk/core/lists';
+@import '~govuk-frontend/dist/govuk/core/section-break';
+@import '~govuk-frontend/dist/govuk/core/typography';
+@import '~govuk-frontend/dist/govuk/core/links';
+@import '~govuk-frontend/dist/govuk/helpers/typography';
+
+body {
+  @extend %govuk-body-m;
+}
+
+p {
+  @extend %govuk-body-m;
+}
+
+a {
+  @extend %govuk-link;
+  word-break: break-word;
+}
+
+strong {
+  @include govuk-typography-weight-bold;
+}
+
+small {
+  @extend %govuk-body-s;
+}
+
+ul {
+  @extend %govuk-list--bullet;
+  @include govuk-responsive-margin(4, 'bottom');
+}
+
+ol {
+  @extend %govuk-list--number;
+  @include govuk-responsive-margin(4, 'bottom');
+}
+
+ol,
+ul {
+  ul,
+  ol {
+    margin-top: govuk-spacing(2);
+  }
+}
+
+dt {
+  @include govuk-typography-weight-bold;
+}
+
+h1 {
+  @extend %govuk-heading-xl;
+}
+
+h2 {
+  @extend %govuk-heading-l;
+}
+
+h3 {
+  @extend %govuk-heading-m;
+}
+
+h4 {
+  @extend %govuk-heading-s;
+}
+
+h5 {
+  @include govuk-text-colour;
+  @include govuk-font($size: 16, $weight: bold);
+  margin-top: 0;
+  @include govuk-responsive-margin(4, 'bottom');
+}
+
+hr {
+  @extend %govuk-section-break,
+    %govuk-section-break--m,
+    %govuk-section-break--visible;
+}
+
+address {
+  @extend %govuk-body-m;
+  font-style: normal;
+}
+
+/* stylelint-disable scss/at-extend-no-missing-placeholder */
+
+blockquote {
+  @extend .govuk-inset-text;
+  margin-left: 0;
+}
+
+p pre,
+.govuk-body pre {
+  white-space: normal;
+}
+
+code {
+  background: govuk-colour('light-grey');
+  // Slightly darker than govuk red for
+  // AAA contrast with background.
+  color: #d13118;
+  font-size: 1rem;
+  line-height: 1.25;
+  padding: 1px 3px;
+}

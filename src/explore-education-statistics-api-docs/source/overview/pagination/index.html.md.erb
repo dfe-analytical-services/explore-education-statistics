@@ -1,0 +1,66 @@
+---
+title: Pagination
+last_reviewed_on: 2024-09-18
+review_in: 12 months
+weight: 2
+---
+
+# Pagination
+
+Endpoints that return a list of results may return a paginated response. This is done for
+performance reasons to avoid excessively large responses that would result from returning all results
+in a single request.
+
+When responses are paginated, the list of results is split into multiple pages (or 'batches') that
+must be requested separately.
+
+A typical paginated response looks like the following:
+
+```json
+{
+  "paging" : {
+    "page" : 1,
+    "pageSize" : 3,
+    "totalPages" : 2,
+    "totalResults" : 5
+  },
+  "results" : [
+    { "id": 1 },
+    { "id": 2 },
+    { "id": 3 }
+  ]
+}
+```
+
+In the above example, the `paging` property contains paging metadata. This metadata tells you that
+there are 5 results (denoted by `totalResults`) split over 2 pages (denoted by `totalPages`).
+The `pageSize` property indicates the maximum number of results that can be shown in a single page.
+
+Typically, you need to provide a `page` query parameter in the URL to specify the page of results
+you want. In the above example, you'd use a URL like `/the-endpoint?page=2` to get the second
+page of results.
+
+Some endpoints may allow you to control the page size, meaning that you can adjust the number of
+results each page contains. In these cases, a `pageSize` query parameter can be used e.g.
+`/the-endpoint?pageSize=5` requests that each page contains 5 results.
+
+The `pageSize` parameter is not always available and may be validated to prevent excessively large
+pages being used.
+
+## Paging metadata in response headers
+
+Sometimes the paging metadata cannot be embedded in response body itself, for example, if the
+response format is specified to be CSV.
+
+In these cases, the paging metadata will be contained in the response headers instead. This will
+look like the following:
+
+```
+Page: 2
+Page-Size: 3
+Total-Results: 5
+Total-Pages: 5
+```
+
+These headers map directly to the metadata found under the typical `paging` property seen in
+paginated JSON responses.

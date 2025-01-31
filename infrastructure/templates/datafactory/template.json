@@ -1,0 +1,148 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters":{
+    "subscription": {
+      "type": "string",
+      "metadata": {
+        "description": "Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources"
+      }
+    },
+    "environment": {
+      "type": "string",
+      "defaultValue": "ees",
+      "metadata": {
+        "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
+      }
+    },
+    "publisherAppName": {
+      "type": "string"
+    },
+    "dataFactoryName": {
+      "type": "string",
+      "metadata": {
+        "description": "The data factory name"
+      }
+    },
+    "dataFactoryConcurrency": {
+      "type": "int",
+      "metadata": {
+        "description": "Maximum number of times a DF pipeline will run in parallel"
+      }
+    },
+    "keyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the key vault"
+      }
+    },
+    "branch": {
+      "type": "string",
+      "defaultValue": "master",
+      "allowedValues": [
+        "master",
+        "dev",
+        "test"
+      ]
+    },
+    "actionGroupAlerts": {
+      "type": "string"
+    },
+    "slackAlertsChannel": {
+      "type": "string",
+      "metadata": {
+        "description": "Slack channel to post Azure alerts to"
+      }
+    }
+  },
+  "variables":{
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]"
+  },
+  "resources":[
+    {
+      "name":"[parameters('dataFactoryName')]",
+      "apiVersion":"2018-06-01",
+      "type":"Microsoft.DataFactory/factories",
+      "location":"[resourceGroup().location]",
+      "identity":{
+        "type":"SystemAssigned"
+      },
+      "properties": {},
+      "dependsOn": []
+    },
+    {
+      "name": "datafactory-housekeeping",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateBaseUrl'), 'datafactory/components/db-maintenance-template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "factoryName": {
+            "value": "[parameters('dataFactoryName')]"
+          },
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
+          },
+          "slackAlertsChannel": {
+            "value": "[parameters('slackAlertsChannel')]"
+          },
+          "slackAppToken": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+              },
+              "secretName": "ees-alerts-slackapptoken"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "name": "[concat(parameters('subscription'),'DataFactoryActivityFailures')]",
+      "location": "global",
+      "dependsOn": [
+        "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+      ],
+      "properties": {
+        "description": "Data Factory - Activity Failures",
+        "enabled": "true",
+        "severity": 3,
+        "scopes": [
+          "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+        ],
+        "evaluationFrequency": "PT1M",
+        "windowSize": "PT5M",
+        "criteria": {
+          "allOf": [
+            {
+              "threshold": 0,
+              "name": "Metric1",
+              "metricNamespace": "Microsoft.DataFactory/factories",
+              "metricName": "ActivityFailedRuns",
+              "operator": "GreaterThan",
+              "timeAggregation": "Total",
+              "criterionType": "StaticThresholdCriterion"
+            }
+          ],
+          "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+        },
+        "autoMitigate": true,
+        "targetResourceType": "Microsoft.DataFactory/factories",
+        "actions": [
+          {
+            "actionGroupId": "[resourceId(resourceGroup().name, 'microsoft.insights/actionGroups', parameters('actionGroupAlerts'))]"
+          }
+        ]
+      }
+    }
+  ]
+}

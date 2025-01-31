@@ -1,0 +1,15 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.buttons {
+  @include govuk-media-query($from: tablet) {
+    justify-content: space-between;
+  }
+}
+
+.dataBlockFormContainer {
+  width: 100%;
+}
+
+.textFormContainer {
+  width: 33%;
+}

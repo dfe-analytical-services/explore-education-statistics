@@ -1,0 +1,105 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TableToolPage renders the page correctly with pre-built table when a fast track is provided 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="2"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2018-19
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        PGCE
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Gender gap
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        20.00%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Graduates included in earnings figures
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        MBA
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Gender gap
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        60.00%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Graduates included in earnings figures
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;

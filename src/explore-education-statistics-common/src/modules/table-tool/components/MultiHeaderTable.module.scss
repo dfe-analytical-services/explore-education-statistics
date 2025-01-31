@@ -1,0 +1,85 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+$border-width: 1px;
+
+.table {
+  border-collapse: separate;
+
+  th:last-child,
+  td:last-child {
+    padding-right: govuk-spacing(2);
+  }
+
+  tbody th {
+    background: #fff;
+    position: relative;
+    text-align: left !important;
+    z-index: 1;
+  }
+
+  @media print {
+    font-size: 0.8rem;
+    max-height: none;
+    overflow: visible !important;
+    padding-right: 0;
+    width: auto;
+
+    thead {
+      display: table-row-group;
+    }
+
+    table {
+      break-inside: auto;
+    }
+
+    tr,
+    td {
+      break-after: auto;
+      break-inside: avoid;
+    }
+
+    thead th,
+    thead td {
+      transform: none !important;
+    }
+  }
+}
+
+.tableHead {
+  td {
+    background: govuk-colour('white');
+    position: relative;
+    z-index: 3;
+  }
+
+  // Uses the spacer cell to cover the left border
+  // of header cells. We can't just remove the
+  // left border on the first cell in header rows
+  // because this causes inconsistent styling when there
+  // are merged cells which span down through rows.
+  td::after {
+    background: govuk-colour('white');
+    bottom: 0;
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 0;
+    width: 1px;
+  }
+
+  th {
+    background: govuk-colour('light-grey');
+    border-bottom: 1px solid $govuk-border-colour;
+    border-left: 1px solid $govuk-border-colour;
+    padding: govuk-spacing(2);
+    position: relative;
+    text-align: center;
+    z-index: 2;
+  }
+
+  tr:only-child th {
+    background: govuk-colour('white');
+    border-left: 0;
+    text-align: right;
+  }
+}

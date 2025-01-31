@@ -1,0 +1,102 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "skuPublic": {
+      "value": "P1V2 PremiumV2"
+    },
+    "skuData": {
+      "value": "P1V2 PremiumV2"
+    },
+    "skuContent": {
+      "value": "P1V2 PremiumV2"
+    },
+    "skuAdmin": {
+      "value": "P1V2 PremiumV2"
+    },
+    "skuAdminSignalR": {
+      "value": "Standard_S1"
+    },
+    "skuImporter": {
+      "value": "P2V2 PremiumV2"
+    },
+    "skuNotifier": {
+      "value": "S1 Standard"
+    },
+    "skuPublisher": {
+      "value": "S1 Standard"
+    },
+    "slackAlertsChannel": {
+      "value": "C01MCTX47E3"
+    },
+    "publicAppBasicAuth": {
+      "value": "false"
+    },
+    "useSubnets": {
+      "value": true
+    },
+    "deploySubnets": {
+      "value": true
+    },
+    "autoscalePublicApplication": {
+      "value": true
+    },
+    "domain": {
+      "value": "explore-education-statistics.service.gov.uk"
+    },
+    "contentApiUrl": {
+      "value": "content.explore-education-statistics.service.gov.uk"
+    },
+    "dataApiUrl": {
+      "value": "data.explore-education-statistics.service.gov.uk"
+    },
+    "publicApiUrl": {
+      "value": "statistics.api.education.gov.uk"
+    },
+    "publicApiDocsUrl": {
+      "value": "statistics.api.education.gov.uk/docs"
+    },
+    "publicAppGATrackingId": {
+      "value": "G-9YG8ESXR5Y"
+    },
+    "storageAccountPrefix": {
+      "value": "sa"
+    },
+    "skuContentDb": {
+      "value": "GP_S_Gen5"
+    },
+    "tierContentDb": {
+      "value": "GeneralPurpose"
+    },
+    "capacityContentDb": {
+      "value": 4
+    },
+    "minCapacityContentDb": {
+      "value": "0.5"
+    },
+    "licenseTypeStatisticsDb": {
+      "value": "BasePrice"
+    },
+    "skuStatisticsDb": {
+      "value": "GP_Gen5"
+    },
+    "tierStatisticsDb": {
+      "value": "GeneralPurpose"
+    },
+    "capacityStatisticsDb": {
+      "value": 10
+    },
+    "tableBuilderMaxTableCellsAllowed": {
+      "value": 1000000
+    },
+    "maxContentDbSizeBytes": {
+      "value": 4294967296
+    },
+    "maxStatsDbSizeBytes": {
+      "value": 1610612736000
+    },
+    "publicDataDbExists": {
+      "value": false
+    }
+  }
+}

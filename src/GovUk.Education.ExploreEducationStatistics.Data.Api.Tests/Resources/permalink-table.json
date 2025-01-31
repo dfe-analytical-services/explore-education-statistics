@@ -1,0 +1,44 @@
+﻿{
+  "thead": [
+    [
+      {
+        "colSpan": 1,
+        "rowSpan": 1,
+        "tag": "td"
+      },
+      {
+        "colSpan": 1,
+        "rowSpan": 1,
+        "scope": "col",
+        "text": "2022",
+        "tag": "th"
+      },
+      {
+        "colSpan": 1,
+        "rowSpan": 1,
+        "scope": "col",
+        "text": "2023",
+        "tag": "th"
+      }
+    ]
+  ],
+  "tbody": [
+    [
+      {
+        "rowSpan": 1,
+        "colSpan": 1,
+        "scope": "row",
+        "text": "Admission Numbers",
+        "tag": "th"
+      },
+      {
+        "tag": "td",
+        "text": "7,731"
+      },
+      {
+        "tag": "td",
+        "text": "7,357"
+      }
+    ]
+  ]
+}

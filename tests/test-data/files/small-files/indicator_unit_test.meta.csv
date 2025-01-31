@@ -1,0 +1,7 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+number,Indicator,All the numbers,Number,,,,
+percent,Indicator,All the percents,Percents,%,,,
+pound,Indicator,All the pounds,Pounds,£,,,
+pp,Indicator,All the pps,PP,pp,,,
+million_pound,Indicator,All the MILLIONS OF POUND,Millions,£m,,,
+numberstring,Indicator,All the NUMBERSTRINGS!!!!,NumberStrings,numberstring,,,

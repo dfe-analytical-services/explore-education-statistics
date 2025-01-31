@@ -1,0 +1,12 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+one_dp,Indicator,One DP,One DP,,1,,
+one_dp_percent,Indicator,One DP Percent,One DP,%,1,,
+one_dp_pound,Indicator,One DP Pound,One DP,£,1,,
+one_dp_negative,Indicator,One DP Negative,One DP,,1,,
+two_dp,Indicator,Two DP,Two DP,,2,,
+three_dp,Indicator,Three DP,Three DP,,3,,
+four_dp,Indicator,Four DP,Four DP,,4,,
+five_dp,Indicator,Five DP,Five DP,,5,,
+five_dp_percent,Indicator,Five DP Percent,Five DP,%,5,,
+five_dp_pound,Indicator,Five DP Pound,Five DP,£,5,,
+five_dp_negative,Indicator,Five DP Negative,Five DP,,5,,

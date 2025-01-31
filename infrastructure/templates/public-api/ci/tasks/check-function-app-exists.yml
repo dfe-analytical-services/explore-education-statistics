@@ -1,0 +1,26 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: resourceGroupName
+    type: string    
+  - name: functionAppName
+    type: string
+  - name: variableName
+    type: string
+
+steps:
+  - task: AzureCLI@2
+    displayName: Check if ${{ parameters.functionAppName }} exists
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+        functionAppExists=`az functionapp list --resource-group ${{ parameters.resourceGroupName }} --query "[?name=='${{ parameters.functionAppName }}']" | jq '. != []'`
+
+        if [[ "$functionAppExists" == "true" ]]; then
+          echo "${{ parameters.functionAppName }} exists"
+        fi
+
+        echo "##vso[task.setvariable variable=${{ parameters.variableName }};]$functionAppExists"

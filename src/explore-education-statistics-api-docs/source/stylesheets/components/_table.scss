@@ -1,0 +1,12 @@
+.app-table-container {
+  &:focus {
+    box-shadow: 0 0 0 2px;
+    outline: $govuk-focus-width solid $govuk-focus-colour;
+    outline-offset: 4px;
+  }
+
+  @include govuk-media-query($until: desktop) {
+    display: block;
+    overflow-x: auto;
+  }
+}

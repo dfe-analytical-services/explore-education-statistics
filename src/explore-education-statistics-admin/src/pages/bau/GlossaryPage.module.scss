@@ -1,0 +1,9 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.clearCacheButton {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: $govuk-success-colour;
+  font-weight: bold;
+}

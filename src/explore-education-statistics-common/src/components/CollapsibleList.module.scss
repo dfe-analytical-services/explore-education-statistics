@@ -1,0 +1,7 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.focusableItem {
+  &:focus-visible {
+    @include govuk-focused-text;
+  }
+}

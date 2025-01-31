@@ -1,0 +1,11 @@
+@import '~govuk-frontend/dist/govuk/base';
+@import '@admin/styles/variables';
+
+.form {
+  // stylelint-disable-next-line selector-no-qualifying-type
+  img:not([alt]),
+  img[alt=''] {
+    border: 4px solid $govuk-error-colour;
+    padding: 4px;
+  }
+}

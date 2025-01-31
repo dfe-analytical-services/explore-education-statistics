@@ -1,0 +1,17 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.focusContainer {
+  outline: 0;
+}
+
+.list {
+  margin-top: govuk-spacing(2);
+  max-height: 40vh;
+  outline: $govuk-focus-width solid $govuk-focus-colour;
+  outline-offset: 0;
+  overflow: auto;
+
+  &.isDraggingOver {
+    background: govuk-colour('yellow');
+  }
+}

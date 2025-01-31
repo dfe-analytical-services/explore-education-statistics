@@ -1,0 +1,11 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: govuk-spacing(2);
+
+  button {
+    margin-bottom: 0;
+  }
+}

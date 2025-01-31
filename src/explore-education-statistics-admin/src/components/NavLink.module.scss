@@ -1,0 +1,9 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.currentPage {
+  border-bottom: 0.3rem solid $govuk-link-colour;
+}
+
+.currentPage:global(.govuk-link):focus {
+  border-bottom: 0;
+}

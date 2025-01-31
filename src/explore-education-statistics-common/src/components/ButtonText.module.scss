@@ -1,0 +1,45 @@
+@import '~govuk-frontend/dist/govuk/base';
+@import '~govuk-frontend/dist/govuk/core/links';
+
+.button {
+  @include govuk-link-common;
+  @include govuk-link-style-default;
+  @include govuk-link-print-friendly;
+
+  background: none;
+  border-width: 0;
+  color: govuk-colour('blue');
+  cursor: pointer;
+  display: inline-block;
+  padding: 0;
+  text-align: left;
+  text-decoration-thickness: $govuk-link-underline-thickness;
+  text-underline-offset: $govuk-link-underline-offset;
+
+  &:focus {
+    @include govuk-focused-text;
+  }
+
+  &:hover {
+    text-decoration-thickness: $govuk-link-hover-underline-thickness;
+    text-decoration-skip-ink: none;
+    text-decoration-skip: none;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    text-decoration: none;
+  }
+
+  &[disabled] {
+    color: govuk-colour('light-blue');
+  }
+}
+
+.noUnderline {
+  text-decoration: none;
+}
+
+.warning {
+  color: govuk-colour('red');
+}

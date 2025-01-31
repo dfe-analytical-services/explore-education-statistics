@@ -1,0 +1,29 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+robotframework = "~=6.1.1"
+robotframework-seleniumlibrary = "~=6.1.0"
+requests = "~=2.31.0"
+python-dotenv = "~=1.0.0"
+robotframework-pabot = "~=2.17.0"
+pytz = "~=2023.3"
+beautifulsoup4 = "~=4.12.2"
+robotframework-tidy = "~=4.4.0"
+slack-sdk = "~=3.21.3"
+lxml = "~=4.9.3"
+azure-storage-blob = "~=12.17.0"
+scikit-image = "~=0.21.0"
+imutils = "~=0.5.4"
+opencv-python = "~=4.8.0.74"
+numpy = "~=1.25.2"
+flake8 = "~=6.1.0"
+isort = "~=5.12.0"
+black = "~=23.7.0"
+cffi = "~=1.15.1"
+webdriver-manager = "~=4.0.0"
+
+[requires]
+python_version = "3.10"

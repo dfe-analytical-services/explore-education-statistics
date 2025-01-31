@@ -1,0 +1,10 @@
+.mobileHidden {
+  @media (pointer: coarse) {
+    // Hide if touch device
+    display: none;
+  }
+  @media (max-width: 40.0625em) {
+    // Hide if mobile viewport width
+    display: none;
+  }
+}

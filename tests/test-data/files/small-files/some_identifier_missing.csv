@@ -1,0 +1,9 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,admission_numbers
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,16659
+2018,,Local authority,E92000001,England,370,E08000016,Barnsley,3017
+2018,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,14020
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,2590
+2017,,Local authority,E92000001,England,330,E08000025,Birmingham,16688
+2017,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,3053
+2017,,Local authority,E92000001,England,203,E09000011,Greenwich,14120
+2017,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,2555

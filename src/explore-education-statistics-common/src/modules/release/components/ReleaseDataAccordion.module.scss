@@ -1,0 +1,29 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.container {
+  margin-bottom: govuk-spacing(9);
+  margin-top: -(govuk-spacing(6));
+
+  @include govuk-media-query($until: tablet) {
+    margin-top: 0;
+  }
+
+  /* stylelint-disable max-nesting-depth */
+  :global(.govuk-accordion__section:is(:first-child)) {
+    :global(.govuk-accordion__section-header) {
+      border-top: 0;
+    }
+  }
+  /* stylelint-enable */
+}
+
+.section {
+  p:last-of-type {
+    margin-bottom: 0;
+  }
+
+  :global(.govuk-button) {
+    margin-bottom: 0;
+    width: 100%;
+  }
+}

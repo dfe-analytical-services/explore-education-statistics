@@ -1,0 +1,13 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.content {
+  > :first-child {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+}

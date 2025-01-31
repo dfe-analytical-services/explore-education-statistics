@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "stylelint-config-sass-guidelines",
+    "stylelint-prettier/recommended"
+  ],
+  "rules": {
+    "property-no-unknown": [
+      true,
+      {
+        "ignoreProperties": ["composes"]
+      }
+    ],
+    "selector-class-pattern": "^(?:(?:o|c|u|t|s|is|has|_|js|qa)-)?[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*(?:__[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)?(?:--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)?(?:\\\\[.+\\\\])?$",
+    "scss/no-global-function-names": null
+  }
+}

@@ -1,0 +1,32 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.navContainer {
+  @include govuk-media-query($from: tablet) {
+    border-bottom: 0;
+    max-height: 100vh;
+    position: sticky;
+    top: govuk-spacing(4);
+  }
+}
+
+.navItem {
+  margin-bottom: govuk-spacing(2) !important;
+}
+
+.subNav {
+  margin-bottom: govuk-spacing(2);
+  margin-top: govuk-spacing(2) !important;
+  padding-left: govuk-spacing(4);
+}
+
+.subNavItem {
+  &::before {
+    content: '—';
+    margin-left: -#{govuk-spacing(4)};
+    color: govuk-colour('dark-grey');
+  }
+}
+
+.subNavLink {
+  padding-left: 2px;
+}

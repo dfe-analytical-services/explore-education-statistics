@@ -1,0 +1,23 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.optionsContainer {
+  margin: govuk-spacing(4) 0 govuk-spacing(1);
+  overflow-y: auto;
+  padding: govuk-spacing(2);
+  // Need this to prevent child elements with absolute positioning
+  // (e.g. visually hidden text) from causing the entire browser
+  // window to overflow and have more height than is necessary.
+  position: relative;
+
+  @media (max-height: 720px) {
+    max-height: 70vh;
+  }
+
+  @media (min-height: 720px) and (max-height: 1080px) {
+    max-height: 50vh;
+  }
+
+  @media (min-height: 1080px) {
+    max-height: 30vh;
+  }
+}

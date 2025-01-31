@@ -1,0 +1,4140 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "domain": {
+      "type": "string"
+    },
+    "contentApiUrl": {
+      "type": "string"
+    },
+    "dataApiUrl": {
+      "type": "string"
+    },
+    "publicApiUrl": {
+      "type": "string"
+    },
+    "publicApiDocsUrl": {
+      "type": "string"
+    },
+    "subscription": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources"
+      }
+    },
+    "environment": {
+      "type": "string",
+      "defaultValue": "ees",
+      "metadata": {
+        "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
+      }
+    },
+    "skuPublic": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
+      ]
+    },
+    "skuData": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
+      ]
+    },
+    "skuContent": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
+      ]
+    },
+    "skuAdmin": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
+      ]
+    },
+    "skuImporter": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
+      ]
+    },
+    "skuNotifier": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
+      ]
+    },
+    "skuPublisher": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
+      ]
+    },
+    "skuAdminSignalR": {
+      "type": "string",
+      "defaultValue": "Free_F1",
+      "allowedValues": [
+        "Free_F1",
+        "Standard_S1"
+      ]
+    },
+    "adminSignalRCapacity": {
+      "type": "int",
+      "metadata": {
+        "description": "The number of SignalR units."
+      },
+      "defaultValue": 1,
+      "allowedValues": [
+        1,
+        2,
+        5,
+        10,
+        20,
+        50,
+        100
+      ]
+    },
+    "adminFirewallRules": {
+      "type": "array",
+      "metadata": {
+        "description": "Firewall restrictions for the admin application"
+      }
+    },
+    "storageFirewallRules": {
+      "type": "array",
+      "metadata": {
+        "description": "Firewall restrictions for storage accounts, string array"
+      }
+    },
+    "sqlPublicContentApiUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the content api for the public SQL Server"
+      }
+    },
+    "sqlPublicContentApiPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the content api user of the public SQL Server"
+      }
+    },
+    "sqlPublicDataApiUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the data api for the public SQL Server"
+      }
+    },
+    "sqlPublicDataApiPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the data api user of the public SQL Server"
+      }
+    },
+    "sqlContentApiUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the content api for the private SQL Server"
+      }
+    },
+    "sqlContentApiPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the content api user for the private SQL Server"
+      }
+    },
+    "sqlDataApiUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the data api for the private SQL Server"
+      }
+    },
+    "sqlDataApiPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the data api user for the private SQL Server"
+      }
+    },
+    "sqlPublisherUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the publisher for the private SQL Server"
+      }
+    },
+    "sqlPublisherUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the publisher user for the private SQL Server"
+      }
+    },
+    "sqlImporterUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the importer for the private SQL Server"
+      }
+    },
+    "sqlImporterUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the importer user for the private SQL Server"
+      }
+    },
+    "sqlNotifierUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the notifier for the private SQL Server"
+      }
+    },
+    "sqlNotifierUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the notifier user for the private SQL Server"
+      }
+    },
+    "sqlAdminUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username of the admin app for the private SQL Server"
+      }
+    },
+    "sqlAdminUserPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the admin app for the private SQL Server"
+      }
+    },
+    "sqlFirewallRules": {
+      "type": "array",
+      "metadata": {
+        "description": "Firewall restrictions for sql databases"
+      }
+    },
+    "sqlAdministratorLogin": {
+      "type": "string",
+      "metadata": {
+        "description": "The admin user of the SQL Server"
+      }
+    },
+    "sqlAdministratorLoginPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the admin user of the SQL Server"
+      }
+    },
+    "sqlAzureAdministratorLogin": {
+      "type": "string"
+    },
+    "sqlAzureAdministratorSid": {
+      "type": "string"
+    },
+    "secAlertRetentionDays": {
+      "defaultValue": "14",
+      "type": "string",
+      "metadata": {
+        "description": "Number of days to retain the security alerts for"
+      }
+    },
+    "sqlAuditing": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "sqlVulnerabilityAssessments": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "publicAppBasicAuth": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "metadata": {
+        "description": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
+    },
+    "publicAppBasicAuthUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
+    },
+    "publicAppBasicAuthPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
+    },
+    "publicAppGATrackingId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Google Analytics tracking ID for the public app. Leave as empty string to disable Google Analytics"
+      }
+    },
+    "notifyInviteWithRolesTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for new user invites"
+      }
+    },
+    "notifyPublicationRoleTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me"
+    },
+    "notifyReleaseRoleTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me"
+    },
+    "notifyPreReleaseTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me"
+    },
+    "notifyContributorTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me"
+    },
+    "notifyReleaseHigherReviewersTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me",
+      "metadata": {
+        "description": "Gov UK Notify service template ID for release higher review approver notifications"
+      }
+    },
+    "notifyMethodologyHigherReviewersTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me",
+      "metadata": {
+        "description": "Gov UK Notify service template ID for methodology higher review approver notifications"
+      }
+    },
+    "immediatePublicationOfScheduledReleaseVersionsEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enables the Functions in the Publisher App which allow scheduled release versions to be published immediately"
+      }
+    },
+    "teamEmailAddresses": {
+      "type": "array",
+      "defaultValue": [
+        "dfeteam@hiveit.co.uk",
+        "explore.statistics@education.gov.uk"
+      ],
+      "metadata": {
+        "description": "Email addresses for receiving alerts"
+      }
+    },
+    "departmentName": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the Department name tag value e.g. Data Directorate"
+      }
+    },
+    "environmentName": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - The name of the phase of the development lifecycle environment that the component will be used in e.g. Development / Test / Integration / Production"
+      }
+    },
+    "subscriptionName": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the full name of the Azure subscription where this resource is located e.g. s101-datahub-development / s101-datahub-test / s101-datahub-production"
+      }
+    },
+    "solutionName": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the solution name that the component is a part of e.g. EDAP, LDS, EES"
+      }
+    },
+    "costCentre": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the cost centre identifying value provided by the Service Owner. Otherwise populate with Unknown."
+      }
+    },
+    "serviceOwnerName": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the name of the Service or Application Owner in the SURNAME, Firstname format e.g. SINCLAIR, Paul / SHELBY, Laura"
+      }
+    },
+    "dateProvisioned": {
+      "type": "string",
+      "defaultValue": "[utcNow('u')]",
+      "metadata": {
+        "description": "Tag Value - Enter the date that the component was created using the YYYYMMDD format e.g. 20190417. Use of the utcNow function will automatically populate this entry at creation time. Note: This only works when forced as a default value."
+      }
+    },
+    "createdBy": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the name of the user who created these resources in the SURNAME, Firstname format e.g. RULER, Paul"
+      }
+    },
+    "deploymentRepo": {
+      "type": "string",
+      "defaultValue": "N/A",
+      "metadata": {
+        "description": "Tag Value - Enter the name of the repo that the deployment script for the component name be found. If the component is deployed manually, the value should be N/A"
+      }
+    },
+    "deploymentScript": {
+      "type": "string",
+      "defaultValue": "N/A",
+      "metadata": {
+        "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
+      }
+    },
+    "adminUri": {
+      "type": "string"
+    },
+    "minTlsVersion": {
+      "type": "string",
+      "defaultValue": "1.2",
+      "allowedValues": [
+        "-1.0",
+        "1.1",
+        "1.2"
+      ]
+    },
+    "useSubnets": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "deploySubnets": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "publishReleasesCronSchedule": {
+      "type": "string",
+      "defaultValue": "0 0 0 * * *",
+      "metadata": {
+        "description": "Cron string that is used to control the schedule of the Publish Releases Function in the Publisher App"
+      }
+    },
+    "publishReleaseContentCronSchedule": {
+      "type": "string",
+      "defaultValue": "0 30 9 * * *",
+      "metadata": {
+        "description": "Cron string that is used to control the schedule of the Publish Release Content Function in the Publisher App"
+      }
+    },
+    "preReleaseMinutesBeforeStart": {
+      "type": "int",
+      "defaultValue": 870,
+      "metadata": {
+        "description": "Prerelease start time as number of minutes before a release is scheduled to be published"
+      }
+    },
+    "blobDeleteRetentionEnabled": {
+      "defaultValue": true,
+      "type": "bool",
+      "metadata": {
+        "description": "Retain blobs after delete"
+      }
+    },
+    "blobDeleteRetentionDays": {
+      "defaultValue": 90,
+      "type": "int",
+      "metadata": {
+        "description": "Number of days to retain blobs after delete"
+      }
+    },
+    "autoscalePublicApplication": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "storageAccountPrefix": {
+      "type": "string",
+      "defaultValue": "storage"
+    },
+    "detailedErrors": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "enableSwagger": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "enableThemeDeletion": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "memoryCacheEnabled": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether or not short-lived in-memory caching of specific responses is enabled"
+      }
+    },
+    "memoryCacheMaxCacheSizeMb": {
+      "type": "int",
+      "defaultValue": 50,
+      "metadata": {
+        "description": "Max size of in-memory cache in MBs.  This is an approximation based on the size of the cached objects in JSON notation."
+      }
+    },
+    "memoryCacheExpirationScanFrequencySeconds": {
+      "type": "int",
+      "defaultValue": 50,
+      "metadata": {
+        "description": "The frequency of scans to evict expired entries from the in-memory cache."
+      }
+    },
+    "memoryCacheOverridesDurationInSeconds": {
+      "type": "int",
+      "defaultValue": -1,
+      "metadata": {
+        "description": "Override duration in seconds for all entities cached in memory"
+      }
+    },
+    "memoryCacheOverridesExpirySchedule": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Override cron expression for all entities cached in memory"
+      }
+    },
+    "requestTimeoutsTableBuilderQuery": {
+      "type": "int",
+      "defaultValue": 210000,
+      "metadata": {
+        "description": "Timeout in milliseconds for a table builder query to return results before cancelling the request in the API"
+      }
+    },
+    "tableBuilderMaxTableCellsAllowed": {
+      "type": "int",
+      "defaultValue": 25000,
+      "metadata": {
+        "description": "Maximum number of table cells that a table builder query could potentially render for a request to be valid"
+      }
+    },
+    "timeZone": {
+      "type": "string",
+      "defaultValue": "GMT Standard Time"
+    },
+    "branch": {
+      "type": "string",
+      "defaultValue": "master",
+      "allowedValues": [
+        "master",
+        "dev",
+        "test"
+      ]
+    },
+    "licenseTypeContentDb": {
+      "type": "string",
+      "defaultValue": "LicenseIncluded",
+      "allowedValues": [
+        "BasePrice",
+        "LicenseIncluded"
+      ]
+    },
+    "licenseTypeStatisticsDb": {
+      "type": "string",
+      "defaultValue": "LicenseIncluded",
+      "allowedValues": [
+        "BasePrice",
+        "LicenseIncluded"
+      ]
+    },
+    "skuContentDb": {
+      "type": "string",
+      "allowedValues": [
+        "Free",
+        "Basic",
+        "Standard",
+        "Premium",
+        "GP_S_Gen5"
+      ]
+    },
+    "skuStatisticsDb": {
+      "type": "string",
+      "allowedValues": [
+        "Free",
+        "Basic",
+        "Standard",
+        "Premium",
+        "GP_Gen5",
+        "GP_S_Gen5"
+      ]
+    },
+    "tierContentDb": {
+      "type": "string",
+      "allowedValues": [
+        "Free",
+        "Basic",
+        "Standard",
+        "Premium",
+        "GeneralPurpose"
+      ]
+    },
+    "tierStatisticsDb": {
+      "type": "string",
+      "allowedValues": [
+        "Free",
+        "Basic",
+        "Standard",
+        "Premium",
+        "GeneralPurpose"
+      ]
+    },
+    "minCapacityContentDb": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "capacityContentDb": {
+      "type": "int"
+    },
+    "minCapacityStatisticsDb": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "capacityStatisticsDb": {
+      "type": "int"
+    },
+    "deploySlotName": {
+      "type": "string",
+      "defaultValue": "deploy"
+    },
+    "maxContentDbSizeBytes": {
+      "type": "int",
+      "defaultValue": 1073741824
+    },
+    "maxStatsDbSizeBytes": {
+      "type": "int",
+      "defaultValue": 268435456000
+    },
+    "slackAlertsChannel": {
+      "type": "string",
+      "metadata": {
+        "description": "Slack channel to post Azure alerts to"
+      }
+    },
+    "dataFactoryConcurrency": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "containerRegistryName": {
+      "type": "string",
+      "defaultValue": "eesacr",
+      "metadata": {
+        "description": "The name of the Container registry"
+      }
+    },
+    "dockerRegistryServerUrl": {
+      "type": "string",
+      "defaultValue": "https://[parameters('containerRegistryName')].azurecr.io",
+      "metadata": {
+        "description": "The URL of the Container registry"
+      }
+    },
+    "dockerRegistryServerUsername": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The username to log in to the Container registry"
+      }
+    },
+    "dockerRegistryServerPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The password to log in to the Container registry"
+      }
+    },
+    "publicDataDbExists": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Flag to determine if the public data database exists. TODO EES-5073 remove this when the public data database is available in every environment"
+      }
+    },
+    "publicDataProcessorAppRegistrationClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Client ID of a manually-created App Registration that represents the Public API Data Processor Function App in Entra ID"
+      }
+    },
+    "apiAppRegistrationClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Client ID of a manually-created App Registration that represents the Public API Container App in Entra ID"
+      }
+    }
+  },
+  "variables": {
+    "contentDbName": "content",
+    "statisticsDbName": "statistics",
+    "statisticsReplicaDbName": "statistics",
+    "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
+    "dataPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-data')]",
+    "dataAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-data')]",
+    "contentAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-content')]",
+    "contentPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-content')]",
+    "contentAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-content')]",
+    "adminAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-admin')]",
+    "adminPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-admin')]",
+    "adminSignalRName": "[concat(parameters('subscription'), '-sr-', parameters('environment'), '-admin')]",
+    "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-admin')]",
+    "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public-site')]",
+    "publicAppUrl": "[concat('https://', parameters('domain'))]",
+    "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public-site')]",
+    "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public-site')]",
+    "coreStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eescore')]",
+    "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
+    "coreSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
+    "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
+    "importerAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-importer')]",
+    "importerPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-importer')]",
+    "importerAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-importer')]",
+    "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-notify')]",
+    "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
+    "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
+    "notificationsStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eesnotify')]",
+    "notificationsStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsStorageAccountName'))]",
+    "publicStorageAccountName": "[concat(parameters('subscription'), 'saeespublic')]",
+    "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
+    "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
+    "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
+    "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
+    "publisherStorageAccountName": "[concat(parameters('subscription'), 'saeespublisher')]",
+    "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
+    "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
+    "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
+    "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
+    "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
+    "metricAlerts": [
+      {
+        "name": "[concat(parameters('subscription'),'ImporterAppServiceHttpServiceErrors')]",
+        "description": "Importer App Service - Http Service Errors",
+        "resourceId": "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
+        "resourceType": "Microsoft.Web/sites",
+        "metricName": "Http5xx",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'NotificationsAppServiceHttpServiceErrors')]",
+        "description": "Notifications App Service - Http Service Errors",
+        "resourceId": "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
+        "resourceType": "Microsoft.Web/sites",
+        "metricName": "Http5xx",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'PublisherAppServiceHttpServiceErrors')]",
+        "description": "Publisher App Service - Http Service Errors",
+        "resourceId": "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
+        "resourceType": "Microsoft.Web/sites",
+        "metricName": "Http5xx",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'ImporterAppInsightsExceptions')]",
+        "description": "Importer AppInsights - Exceptions",
+        "resourceId": "[resourceId('Microsoft.Insights/components', variables('importerAppInsights'))]",
+        "resourceType": "Microsoft.Insights/components",
+        "metricName": "exceptions/count",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Count",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'NotificationsAppInsightsExceptions')]",
+        "description": "Notifications AppInsights - Exceptions",
+        "resourceId": "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]",
+        "resourceType": "Microsoft.Insights/components",
+        "metricName": "exceptions/count",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Count",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'PublisherAppInsightsExceptions')]",
+        "description": "Publisher AppInsights - Exceptions",
+        "resourceId": "[resourceId('Microsoft.Insights/components', variables('publisherAppInsights'))]",
+        "resourceType": "Microsoft.Insights/components",
+        "metricName": "exceptions/count",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Count",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'PublicAppServiceResponseTime')]",
+        "description": "Public App Service - Response Time",
+        "resourceId": "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]",
+        "resourceType": "Microsoft.Web/sites",
+        "metricName": "HttpResponseTime",
+        "threshold": 10,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBCpuPercent')]",
+        "description": "Statistics Replica DB CPU percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "cpu_percent",
+        "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDataIOPercent')]",
+        "description": "Statistics Replica DB Data IO Percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "physical_data_read_percent",
+        "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBFailedConnections')]",
+        "description": "Statistics Replica DB Failed Connections",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "connection_failed",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDeadlock')]",
+        "description": "Statistics Replica DB Deadlock",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "deadlock",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDataSpaceUsedPercent')]",
+        "description": "Statistics Replica DB Data Space Used Percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "storage_percent",
+        "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Maximum",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDataSpaceUsedPercentUrgent')]",
+        "description": "Statistics Replica DB Data Space Used Percentage - URGENT",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "storage_percent",
+        "threshold": 95,
+        "operator": "GreaterThan",
+        "timeAggregation": "Maximum",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBBlockedByFirewall')]",
+        "description": "Statistics Replica DB Blocked By Firewall",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "blocked_by_firewall",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatsDBCpuPercent')]",
+        "description": "Statistics DB CPU percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "cpu_percent",
+        "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatsDBDataIOPercent')]",
+        "description": "Statistics DB Data IO Percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "physical_data_read_percent",
+        "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatsDBFailedConnections')]",
+        "description": "Statistics DB Failed Connections",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "connection_failed",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatsDBDeadlock')]",
+        "description": "Statistics DB Deadlock",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "deadlock",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatsDBDataSpaceUsedPercent')]",
+        "description": "Statistics DB Data Space Used Percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "storage_percent",
+        "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Maximum",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatsDBDataSpaceUsedPercentUrgent')]",
+        "description": "Statistics DB Data Space Used Percentage - URGENT",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "storage_percent",
+        "threshold": 95,
+        "operator": "GreaterThan",
+        "timeAggregation": "Maximum",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatsDBBlockedByFirewall')]",
+        "description": "Statistics DB Blocked By Firewall",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "blocked_by_firewall",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'ContentDBCpuPercent')]",
+        "description": "Content DB CPU percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "cpu_percent",
+        "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'ContentDBDataIOPercent')]",
+        "description": "Content DB Data IO Percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "physical_data_read_percent",
+        "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'ContentDBFailedConnections')]",
+        "description": "Content DB Failed Connections",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "connection_failed",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'ContentDBDeadlock')]",
+        "description": "Content DB Deadlock",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "deadlock",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'ContentDBDataSpaceUsedPercent')]",
+        "description": "Content DB Data Space Used Percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "storage_percent",
+        "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Maximum",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'ContentDBDataSpaceUsedPercentUrgent')]",
+        "description": "Content DB Data Space Used Percentage - URGENT",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "storage_percent",
+        "threshold": 95,
+        "operator": "GreaterThan",
+        "timeAggregation": "Maximum",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'ContentDBBlockedByFirewall')]",
+        "description": "Content DB Blocked By Firewall",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "blocked_by_firewall",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      }
+    ],
+    "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
+    "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
+    "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
+    "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
+    "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-importer')]",
+    "importerSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('importerSubnetName'))]",
+    "publisherSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-publisher')]",
+    "publisherSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publisherSubnetName'))]",
+    "notifySubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-notify')]",
+    "notifySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('notifySubnetName'))]",
+    "contentSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-content')]",
+    "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
+    "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
+    "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
+    "publicApiDataProcessorSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor')]",
+    "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
+    "publicApiDataProcessorPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor-pep')]",
+    "publicApiStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-sa-pep')]",
+    "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
+    "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
+    "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
+    "sqlAllowedSubnets": [
+      {
+        "name": "admin",
+        "id": "[variables('adminSubnetRef')]"
+      },
+      {
+        "name": "importer",
+        "id": "[variables('importerSubnetRef')]"
+      },
+      {
+        "name": "publisher",
+        "id": "[variables('publisherSubnetRef')]"
+      },
+      {
+        "name": "content",
+        "id": "[variables('contentSubnetRef')]"
+      },
+      {
+        "name": "data",
+        "id": "[variables('dataSubnetRef')]"
+      },
+      {
+        "name": "notifier",
+        "id": "[variables('notifySubnetRef')]"
+      },
+      {
+        "name": "publicApiDataProcessor",
+        "id": "[variables('publicApiDataProcessorSubnetRef')]"
+      }
+    ],
+    "publicSqlAllowedSubnets": [
+      {
+        "name": "content",
+        "id": "[variables('contentSubnetRef')]"
+      },
+      {
+        "name": "data",
+        "id": "[variables('dataSubnetRef')]"
+      },
+      {
+        "name": "publisher",
+        "id": "[variables('publisherSubnetRef')]"
+      }
+    ],
+    "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
+    "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
+    "ees-admin-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-admin-govuknotify-api-key')]",
+    "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
+    "ees-notifier-token-secret-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-token-secret-key')]",
+    "ees-notifier-templateid-release-amendment-published": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-amendment-published')]",
+    "ees-notifier-templateid-release-amendment-published-superseded-subscribers": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-amendment-published-superseded-subscribers')]",
+    "ees-notifier-templateid-release-published": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-published')]",
+    "ees-notifier-templateid-release-published-superseded-subscribers": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-published-superseded-subscribers')]",
+    "ees-notifier-templateid-subscription-confirmation": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-subscription-confirmation')]",
+    "ees-notifier-templateid-subscription-verification": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-subscription-verification')]",
+    "ees-notifier-templateid-api-subscription-confirmation": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-confirmation')]",
+    "ees-notifier-templateid-api-subscription-notification": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-notification')]",
+    "ees-notifier-templateid-api-subscription-verification": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-api-subscription-verification')]",
+    "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
+    "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",
+    "ees-openidconnect-authority": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-authority')]",
+    "ees-openidconnect-valid-audience": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-valid-audience')]",
+    "ees-openidconnect-fully-qualified-scope-name": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-fully-qualified-scope-name')]",
+    "ees-openidconnect-valid-issuers": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-valid-issuers')]",
+    "ees-publisher-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientid')]",
+    "ees-publisher-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientsecret')]",
+    "ees-signalr-admin-connectionstring": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-signalr-admin-connectionstring')]",
+    "ees-sql-admin-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-admin-password')]",
+    "ees-sql-public-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-public-password')]",
+    "ees-sql-password-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-admin')]",
+    "ees-sql-password-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-data')]",
+    "ees-sql-password-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-importer')]",
+    "ees-sql-password-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-publisher')]",
+    "ees-sql-password-notifier": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-notifier')]",
+    "ees-sql-user-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-admin')]",
+    "ees-sql-user-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-data')]",
+    "ees-sql-user-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-importer')]",
+    "ees-sql-user-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-publisher')]",
+    "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-core')]",
+    "ees-storage-notifications": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]",
+    "ees-storage-public": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
+    "ees-storage-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-publisher')]",
+    "ipWhiteList": {
+      "copy": [
+        {
+          "name": "addresses",
+          "count": "[length(parameters('adminFirewallRules'))]",
+          "input": {
+            "ipAddress": "[parameters('adminFirewallRules')[copyIndex('addresses')].Address]",
+            "name": "[parameters('adminFirewallRules')[copyIndex('addresses')].Name]",
+            "action": "Allow"
+          }
+        }
+      ]
+    },
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
+    "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
+    "keyVaultSecretsUserPrincipalRefs": [
+      "[concat('Microsoft.Web/sites/', variables('adminAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('publisherAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('importerAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('contentAppName'))]",
+      "[concat('Microsoft.Web/sites/', variables('dataAppName'))]"
+    ],
+    "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
+    "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
+    "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('dataAppName')]",
+      "apiVersion": "2019-08-01",
+      "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('dataSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
+      "properties": {
+        "name": "[variables('dataAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
+        "hostingEnvironment": "",
+        "httpsOnly": true,
+        "clientAffinityEnabled": false,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v8.0",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          },
+          "connectionStrings": [
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('statisticsReplicaDbName'), ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
+            },
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlDataApiPassword'), ';')]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('dataPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('dataAppInsights'))]"
+      ]
+    },
+    {
+      "name": "[concat(variables('dataAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[variables('ees-storage-public')]"
+      ],
+      "properties": {
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2020-02-02').InstrumentationKey]",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
+        "WEBSITE_RUN_FROM_PACKAGE": "1",
+        "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
+        "enableSwagger": "[parameters('enableSwagger')]",
+        "PublicApp:Url": "[variables('publicAppUrl')]",
+        "PublicApp:BasicAuth": "[parameters('publicAppBasicAuth')]",
+        "PublicApp:BasicAuthUsername": "[parameters('publicAppBasicAuthUsername')]",
+        "PublicApp:BasicAuthPassword": "[parameters('publicAppBasicAuthPassword')]",
+        "RequestTimeouts:TableBuilderQuery": "[parameters('requestTimeoutsTableBuilderQuery')]",
+        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
+      }
+    },
+    {
+      "apiVersion": "2018-11-01",
+      "type": "Microsoft.Web/sites/slots",
+      "name": "[concat(variables('dataAppName'), '/', parameters('deploySlotName'))]",
+      "kind": "app",
+      "location": "[resourceGroup().location]",
+      "comments": "This specifies the web app slots.",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Web App",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          }
+        }
+      },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('dataSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites/slots', variables('dataAppName'), parameters('deploySlotName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuData'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuData'), ' '))]"
+      },
+      "name": "[variables('dataPlanName')]",
+      "apiVersion": "2022-03-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('dataPlanName')]",
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('dataAppInsights')]",
+      "apiVersion": "2020-02-02",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "applicationId": "[variables('dataAppName')]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('contentAppName')]",
+      "apiVersion": "2019-08-01",
+      "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('contentSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
+      "properties": {
+        "name": "[variables('contentAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
+        "hostingEnvironment": "",
+        "httpsOnly": true,
+        "clientAffinityEnabled": false,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v8.0",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          },
+          "connectionStrings": [
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('statisticsReplicaDbName'), ';User Id=', parameters('sqlPublicContentApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicContentApiPassword'), ';')]"
+            },
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlContentApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlContentApiPassword'), ';')]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('contentPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('contentAppInsights'))]"
+      ]
+    },
+    {
+      "name": "[concat(variables('contentAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[variables('ees-storage-public')]"
+      ],
+      "properties": {
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2020-02-02').InstrumentationKey]",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
+        "WEBSITE_RUN_FROM_PACKAGE": "1",
+        "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
+        "enableSwagger": "[parameters('enableSwagger')]"
+      }
+    },
+    {
+      "apiVersion": "2018-11-01",
+      "type": "Microsoft.Web/sites/slots",
+      "name": "[concat(variables('contentAppName'), '/', parameters('deploySlotName'))]",
+      "kind": "app",
+      "location": "[resourceGroup().location]",
+      "comments": "This specifies the web app slots.",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Web App",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('contentPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', parameters('domain'))]",
+              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
+              "https://localhost:3000",
+              "http://localhost:3000",
+              "http://127.0.0.1"
+            ]
+          }
+        }
+      },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('contentSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites/slots', variables('contentAppName'), parameters('deploySlotName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuContent'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuContent'), ' '))]"
+      },
+      "name": "[variables('contentPlanName')]",
+      "apiVersion": "2022-03-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('contentPlanName')]",
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('contentAppInsights')]",
+      "apiVersion": "2020-02-02",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "applicationId": "[variables('contentAppName')]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('adminAppName')]",
+      "apiVersion": "2019-08-01",
+      "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('adminSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
+      "properties": {
+        "name": "[variables('adminAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
+        "hostingEnvironment": "",
+        "httpsOnly": true,
+        "WEBSITE_SWAP_WARMUP_PING_STATUSES": "200, 202, 204",
+        "WEBSITE_ADD_SITENAME_BINDINGS_IN_APPHOST_CONFIG": 1,
+        "clientAffinityEnabled": true,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v8.0",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
+          "cors": {
+            "allowedOrigins": [
+              "https://localhost:3000",
+              "http://localhost:3000"
+            ]
+          },
+          "connectionStrings": [
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('statisticsDbName'), ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
+            },
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
+            },
+            {
+              "name": "PublicDataDb",
+              "type": "Custom",
+              "connectionString": "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName'), ';SecretName=ees-admin-connectionstring-publicdatadb)')]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('adminAppInsights'))]"
+      ]
+    },
+    {
+      "name": "[concat(variables('adminAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[variables('ees-storage-core')]",
+        "[variables('ees-storage-public')]",
+        "[variables('ees-storage-publisher')]"
+      ],
+      "properties": {
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
+        "AppInsights:InstrumentationKey": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
+        "WEBSITE_RUN_FROM_PACKAGE": "1",
+        "WEBSITE_LOAD_CERTIFICATES": "*",
+        "ASPNETCORE_DETAILEDERRORS": "[parameters('detailedErrors')]",
+        "App:Url": "[concat('https://', parameters('adminUri'))]",
+        "App:EnableSwagger": "[parameters('enableSwagger')]",
+        "App:EnableThemeDeletion": "[parameters('enableThemeDeletion')]",
+        "Azure:SignalR:ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-signalr-admin-connectionstring'), '2018-02-14').secretUriWithVersion, ')')]",
+        "IdentityServer:IssuerUri": "[concat('urn=', parameters('adminUri'))]",
+        "IdentityServer:Key:Name": "[concat('CN=', parameters('adminUri'))]",
+        "Notify:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-admin-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
+        "Notify:InviteWithRolesTemplateId": "[parameters('notifyInviteWithRolesTemplateId')]",
+        "Notify:PublicationRoleTemplateId": "[parameters('notifyPublicationRoleTemplateId')]",
+        "Notify:ReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
+        "Notify:PreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
+        "Notify:ContributorTemplateId": "[parameters('notifyContributorTemplateId')]",
+        "Notify:ReleaseHigherReviewersTemplateId": "[parameters('notifyReleaseHigherReviewersTemplateId')]",
+        "Notify:MethodologyHigherReviewersTemplateId": "[parameters('notifyMethodologyHigherReviewersTemplateId')]",
+        "OpenIdConnectIdentityFramework:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectIdentityFramework:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectIdentityFramework:TokenValidationParameters:ValidAudience": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-valid-audience'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectIdentityFramework:TokenValidationParameters:ValidIssuers": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-valid-issuers'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient:KnownAuthorities:0": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient:AdminApiScope": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-fully-qualified-scope-name'), '2018-02-14').secretUriWithVersion, ')')]",
+        "MemoryCache:Enabled": "[parameters('memoryCacheEnabled')]",
+        "MemoryCache:MaxCacheSizeMb": "[parameters('memoryCacheMaxCacheSizeMb')]",
+        "MemoryCache:ExpirationScanFrequencySeconds": "[parameters('memoryCacheExpirationScanFrequencySeconds')]",
+        "MemoryCache:Overrides:DurationInSeconds": "[parameters('memoryCacheOverridesDurationInSeconds')]",
+        "MemoryCache:Overrides:ExpirySchedule": "[parameters('memoryCacheOverridesExpirySchedule')]",
+        "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core'), '2018-02-14').secretUriWithVersion, ')')]",
+        "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
+        "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
+        "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeStart": "[parameters('preReleaseMinutesBeforeStart')]",
+        "ReleaseApproval:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
+        "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
+        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
+        "PublicApp:Url": "[variables('publicAppUrl')]",
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]",
+        "PublicDataApi:Url": "[concat('https://', parameters('publicApiUrl'))]",
+        "PublicDataApi:DocsUrl": "[concat('https://', parameters('publicApiDocsUrl'))]",
+        "PublicDataApi:AppRegistrationClientId": "[parameters('apiAppRegistrationClientId')]",
+        "PublicDataProcessor:Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
+        "PublicDataProcessor:AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]"
+      }
+    },
+    {
+      "apiVersion": "2018-11-01",
+      "type": "Microsoft.Web/sites/slots",
+      "name": "[concat(variables('adminAppName'), '/', parameters('deploySlotName'))]",
+      "kind": "app",
+      "location": "[resourceGroup().location]",
+      "comments": "This specifies the web app slots.",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Web App",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
+          "phpVersion": "off",
+          "AlwaysOn": false,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          "use32BitWorkerProcess": false,
+          "cors": {
+            "allowedOrigins": [
+              "https://localhost:3000",
+              "http://localhost:3000"
+            ]
+          }
+        }
+      },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('adminSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites/slots', variables('adminAppName'), parameters('deploySlotName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuAdmin'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuAdmin'), ' '))]"
+      },
+      "name": "[variables('adminPlanName')]",
+      "apiVersion": "2022-03-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('adminPlanName')]",
+        "workerSizeId": "0",
+        "reserved": false,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "type": "Microsoft.SignalRService/signalR",
+      "apiVersion": "2021-10-01",
+      "name": "[variables('adminSignalRName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "capacity": "[parameters('adminSignalRCapacity')]",
+        "name": "[parameters('skuAdminSignalR')]"
+      },
+      "kind": "SignalR",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "tls": {
+          "clientCertEnabled": false
+        },
+        "features": [
+          {
+            "flag": "ServiceMode",
+            "value": "Default"
+          },
+          {
+            "flag": "EnableConnectivityLogs",
+            "value": "true"
+          },
+          {
+            "flag": "EnableMessagingLogs",
+            "value": "true"
+          },
+          {
+            "flag": "EnableLiveTrace",
+            "value": "true"
+          }
+        ],
+        "cors": {
+          "allowedOrigins": [
+            "[concat('https://', parameters('adminUri'))]",
+            "https://localhost:5021",
+            "http://localhost:5021"
+          ]
+        },
+        "networkACLs": {
+          "defaultAction": "deny",
+          "publicNetwork": {
+            "allow": [
+              "ClientConnection",
+              "ServerConnection",
+              "RESTAPI",
+              "Trace"
+            ]
+          }
+        },
+        "upstream": {
+          "templates": [
+            {
+              "categoryPattern": "*",
+              "eventPattern": "*",
+              "hubPattern": "*",
+              "urlTemplate": "[concat('https://', parameters('adminUri'), '/hubs/{hub}/{event}')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('adminAppInsights')]",
+      "apiVersion": "2020-02-02",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "applicationId": "[variables('adminAppName')]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+      }
+    },
+    {
+      "condition": "[equals(parameters('environmentName'), 'Development')]",
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2022-02-01-preview",
+      "name": "[parameters('containerRegistryName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard"
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Container Registry",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "adminUserEnabled": false,
+        "policies": {
+          "quarantinePolicy": {
+            "status": "disabled"
+          },
+          "trustPolicy": {
+            "type": "Notary",
+            "status": "disabled"
+          },
+          "retentionPolicy": {
+            "days": 7,
+            "status": "disabled"
+          },
+          "exportPolicy": {
+            "status": "enabled"
+          },
+          "azureADAuthenticationAsArmPolicy": {
+            "status": "enabled"
+          },
+          "softDeletePolicy": {
+            "retentionDays": 7,
+            "status": "enabled"
+          }
+        },
+        "encryption": {
+          "status": "disabled"
+        },
+        "dataEndpointEnabled": false,
+        "publicNetworkAccess": "Enabled",
+        "networkRuleBypassOptions": "AzureServices",
+        "zoneRedundancy": "Disabled",
+        "anonymousPullEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('publicAppName')]",
+      "kind": "app,linux,container",
+      "apiVersion": "2021-02-01",
+      "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('publicAppName')]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
+        "hostingEnvironment": "",
+        "httpsOnly": true,
+        "clientAffinityEnabled": false,
+        "reserved": true,
+        "siteConfig": {
+          "acrUseManagedIdentityCreds": false,
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
+          "preWarmedInstanceCount": 1,
+          "framework": "node",
+          "nodeVersion": "16-lts",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
+        "[resourceId('microsoft.insights/components/', variables('publicAppInsights'))]"
+      ]
+    },
+    {
+      "name": "[concat(variables('publicAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2021-02-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]"
+      ],
+      "properties": {
+        "APP_ENV": "[parameters('environmentName')]",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
+        "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
+        "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
+        "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
+        "CONTENT_API_BASE_URL": "[concat('https://', parameters('contentApiUrl'),'/api')]",
+        "DATA_API_BASE_URL": "[concat('https://', parameters('dataApiUrl'),'/api')]",
+        "DOCKER_REGISTRY_SERVER_URL": "[parameters('dockerRegistryServerUrl')]",
+        "DOCKER_REGISTRY_SERVER_USERNAME": "[parameters('dockerRegistryServerUsername')]",
+        "DOCKER_REGISTRY_SERVER_PASSWORD": "[parameters('dockerRegistryServerPassword')]",
+        "NOTIFICATION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
+        "GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",
+        "NEXT_CONFIG_MODE": "server",
+        "NODE_ENV": "production",
+        "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
+        "PUBLIC_API_BASE_URL": "[concat('https://', parameters('publicApiUrl'), '/v1')]",
+        "PUBLIC_API_DOCS_URL": "[concat('https://', parameters('publicApiDocsUrl'))]",
+        "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
+        "WEBSITES_PORT": 3000
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuPublic'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuPublic'), ' '))]"
+      },
+      "name": "[variables('publicPlanName')]",
+      "kind": "app,linux,container",
+      "apiVersion": "2022-03-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('publicPlanName')]",
+        "workerSizeId": "0",
+        "numberOfWorkers": "1",
+        "hostingEnvironment": "",
+        "reserved": true
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('publicAppInsights')]",
+      "apiVersion": "2020-02-02",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "applicationId": "[variables('publicAppName')]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+      }
+    },
+    {
+      "name": "[variables('coreStorageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2019-04-01",
+      "location": "westeurope",
+      "kind": "StorageV2",
+      "properties": {
+        "accessTier": "Hot",
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('adminSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('importerSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('publicApiDataProcessorSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
+      },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('coreStorageAccountName')]"
+          ]
+        }
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Storage account",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "dependsOn": [
+        "[variables('vNetRef')]"
+      ],
+      "sku": {
+        "name": "Standard_RAGRS"
+      }
+    },
+    {
+      "name": "[variables('coreSqlServerName')]",
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2022-05-01-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "type": "databases",
+          "apiVersion": "2022-05-01-preview",
+          "name": "[variables('statisticsDbName')]",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "Department": "[parameters('departmentName')]",
+            "Solution": "[parameters('solutionName')]",
+            "ServiceType": "SQL Database",
+            "Environment": "[parameters('environmentName')]",
+            "Subscription": "[parameters('subscriptionName')]",
+            "CostCentre": "[parameters('costCentre')]",
+            "ServiceOwner": "[parameters('serviceOwnerName')]",
+            "DateProvisioned": "[parameters('dateProvisioned')]",
+            "CreatedBy": "[parameters('createdBy')]",
+            "DeploymentRepo": "[parameters('deploymentRepo')]",
+            "DeploymentScript": "[parameters('deploymentScript')]"
+          },
+          "dependsOn": [
+            "[variables('coreSqlServerName')]"
+          ],
+          "sku": {
+            "name": "[parameters('skuStatisticsDb')]",
+            "tier": "[parameters('tierStatisticsDb')]",
+            "capacity": "[parameters('capacityStatisticsDb')]"
+          },
+          "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "licenseType": "[parameters('licenseTypeStatisticsDb')]",
+            "maxSizeBytes": "[parameters('maxStatsDbSizeBytes')]",
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "autoPauseDelay": -1,
+            "storageAccountType": "GRS",
+            "minCapacity": "[if(not(empty(parameters('minCapacityStatisticsDb'))), parameters('minCapacityStatisticsDb'), json('null'))]"
+          }
+        },
+        {
+          "type": "databases",
+          "apiVersion": "2022-05-01-preview",
+          "name": "[variables('contentDbName')]",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "Department": "[parameters('departmentName')]",
+            "Solution": "[parameters('solutionName')]",
+            "ServiceType": "SQL Database",
+            "Environment": "[parameters('environmentName')]",
+            "Subscription": "[parameters('subscriptionName')]",
+            "CostCentre": "[parameters('costCentre')]",
+            "ServiceOwner": "[parameters('serviceOwnerName')]",
+            "DateProvisioned": "[parameters('dateProvisioned')]",
+            "CreatedBy": "[parameters('createdBy')]",
+            "DeploymentRepo": "[parameters('deploymentRepo')]",
+            "DeploymentScript": "[parameters('deploymentScript')]"
+          },
+          "dependsOn": [
+            "[variables('coreSqlServerName')]"
+          ],
+          "sku": {
+            "name": "[parameters('skuContentDb')]",
+            "tier": "[parameters('tierContentDb')]",
+            "capacity": "[parameters('capacityContentDb')]"
+          },
+          "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "licenseType": "[parameters('licenseTypeContentDb')]",
+            "maxSizeBytes": "[parameters('maxContentDbSizeBytes')]",
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "autoPauseDelay": -1,
+            "storageAccountType": "GRS",
+            "minCapacity": "[if(not(empty(parameters('minCapacityContentDb'))), parameters('minCapacityContentDb'), json('null'))]"
+          }
+        },
+        {
+          "name": "[concat(variables('coreSqlServerName'),'/activeDirectory')]",
+          "type": "Microsoft.Sql/servers/administrators",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
+          ],
+          "properties": {
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAzureAdministratorLogin')]",
+            "sid": "[parameters('sqlAzureAdministratorSid')]",
+            "tenantId": "[subscription().tenantId]"
+          }
+        },
+        {
+          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('statisticsDbName'), '/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')), '/databases/', variables('statisticsDbName'))]"
+          ]
+        },
+        {
+          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('contentDbName'), '/current')]",
+          "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "Enabled"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')), '/databases/', variables('contentDbName'))]"
+          ]
+        },
+        {
+          "type": "securityAlertPolicies",
+          "name": "Default",
+          "apiVersion": "2017-03-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
+          ],
+          "properties": {
+            "state": "Enabled",
+            "disabledAlerts": "",
+            "emailAddresses": "[parameters('teamEmailAddresses')]",
+            "emailAccountAdmins": true
+          }
+        },
+        {
+          "condition": "[parameters('sqlVulnerabilityAssessments')]",
+          "type": "vulnerabilityAssessments",
+          "name": "Default",
+          "apiVersion": "2018-06-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('coreSqlServerName'), 'Default')]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName'))]"
+          ],
+          "properties": {
+            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
+            "recurringScans": {
+              "isEnabled": true,
+              "emailSubscriptionAdmins": true,
+              "emails": "[parameters('teamEmailAddresses')]"
+            }
+          }
+        },
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "auditingSettings",
+          "name": "DefaultAuditingSettings2",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
+          ]
+        },
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "extendedAuditingSettings",
+          "name": "Default2",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
+          ]
+        }
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "SQL Server",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "name": "[concat(variables('coreSqlServerName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "apiVersion": "2015-05-01-preview",
+      "scale": null,
+      "properties": {
+        "startIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeStart]",
+        "endIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeEnd]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
+      ],
+      "copy": {
+        "name": "firewallloop",
+        "count": "[length(parameters('sqlFirewallRules'))]"
+      }
+    },
+    {
+      "condition": "[parameters('useSubnets')]",
+      "name": "[concat(variables('coreSqlServerName'), '/', variables('sqlAllowedSubnets')[copyIndex()].name)]",
+      "type": "Microsoft.Sql/servers/virtualNetworkRules",
+      "apiVersion": "2015-05-01-preview",
+      "properties": {
+        "virtualNetworkSubnetId": "[variables('sqlAllowedSubnets')[copyIndex()].id]",
+        "ignoreMissingVnetServiceEndpoint": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+        "[variables('vNetRef')]"
+      ],
+      "copy": {
+        "name": "networkRuleLoop",
+        "count": "[length(variables('sqlAllowedSubnets'))]"
+      }
+    },
+    {
+      "name": "[variables('publicSqlServerName')]",
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2022-05-01-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "type": "databases",
+          "apiVersion": "2022-05-01-preview",
+          "name": "[variables('statisticsReplicaDbName')]",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "Department": "[parameters('departmentName')]",
+            "Solution": "[parameters('solutionName')]",
+            "ServiceType": "SQL Database",
+            "Environment": "[parameters('environmentName')]",
+            "Subscription": "[parameters('subscriptionName')]",
+            "CostCentre": "[parameters('costCentre')]",
+            "ServiceOwner": "[parameters('serviceOwnerName')]",
+            "DateProvisioned": "[parameters('dateProvisioned')]",
+            "CreatedBy": "[parameters('createdBy')]",
+            "DeploymentRepo": "[parameters('deploymentRepo')]",
+            "DeploymentScript": "[parameters('deploymentScript')]"
+          },
+          "dependsOn": [
+            "[variables('publicSqlServerName')]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]"
+          ],
+          "sku": {
+            "name": "[parameters('skuStatisticsDb')]",
+            "tier": "[parameters('tierStatisticsDb')]",
+            "capacity": "[parameters('capacityStatisticsDb')]"
+          },
+          "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "licenseType": "[parameters('licenseTypeStatisticsDb')]",
+            "maxSizeBytes": "[parameters('maxStatsDbSizeBytes')]",
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "autoPauseDelay": -1,
+            "storageAccountType": "GRS",
+            "minCapacity": "[if(not(empty(parameters('minCapacityStatisticsDb'))), parameters('minCapacityStatisticsDb'), json('null'))]",
+            "createMode": "OnlineSecondary",
+            "sourceDatabaseId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
+            "secondaryType": "Geo"
+          }
+        },
+        {
+          "name": "[concat(variables('publicSqlServerName'),'/activeDirectory')]",
+          "type": "Microsoft.Sql/servers/administrators",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+          ],
+          "properties": {
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAzureAdministratorLogin')]",
+            "sid": "[parameters('sqlAzureAdministratorSid')]",
+            "tenantId": "[subscription().tenantId]"
+          }
+        },
+        {
+          "type": "securityAlertPolicies",
+          "name": "Default",
+          "apiVersion": "2017-03-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+          ],
+          "properties": {
+            "state": "Enabled",
+            "disabledAlerts": "",
+            "emailAddresses": "[parameters('teamEmailAddresses')]",
+            "emailAccountAdmins": true
+          }
+        },
+        {
+          "type": "vulnerabilityAssessments",
+          "name": "Default",
+          "apiVersion": "2018-06-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('publicSqlServerName'), 'Default')]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName'))]"
+          ],
+          "properties": {
+            "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
+            "recurringScans": {
+              "isEnabled": true,
+              "emailSubscriptionAdmins": true,
+              "emails": "[parameters('teamEmailAddresses')]"
+            }
+          }
+        },
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "auditingSettings",
+          "name": "DefaultAuditingSettings",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+          ]
+        },
+        {
+          "condition": "[parameters('sqlAuditing')]",
+          "type": "extendedAuditingSettings",
+          "name": "Default",
+          "apiVersion": "2017-03-01-preview",
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'auditing-settings')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-02-01').keys[0].value]",
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "eventTypesToAudit": "All",
+            "retentionDays": "[parameters('secAlertRetentionDays')]",
+            "isAzureMonitorTargetEnabled": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+          ]
+        }
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "SQL Server",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "name": "[concat(variables('publicSqlServerName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "apiVersion": "2015-05-01-preview",
+      "scale": null,
+      "properties": {
+        "startIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeStart]",
+        "endIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeEnd]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
+      ],
+      "copy": {
+        "name": "firewallloop",
+        "count": "[length(parameters('sqlFirewallRules'))]"
+      }
+    },
+    {
+      "condition": "[parameters('useSubnets')]",
+      "name": "[concat(variables('publicSqlserverName'), '/', variables('publicSqlAllowedSubnets')[copyIndex()].name)]",
+      "type": "Microsoft.Sql/servers/virtualNetworkRules",
+      "apiVersion": "2015-05-01-preview",
+      "properties": {
+        "virtualNetworkSubnetId": "[variables('publicSqlAllowedSubnets')[copyIndex()].id]",
+        "ignoreMissingVnetServiceEndpoint": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+        "[variables('vNetRef')]"
+      ],
+      "copy": {
+        "name": "networkRuleLoop",
+        "count": "[length(variables('publicSqlAllowedSubnets'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('notificationsstorageAccountName')]",
+      "apiVersion": "2019-04-01",
+      "location": "[resourceGroup().location]",
+      "kind": "Storage",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "properties": {
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('notifySubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
+      },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('notificationsstorageAccountName')]"
+          ]
+        }
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Storage account",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "name": "[variables('publicStorageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2018-07-01",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "condition": "[parameters('useSubnets')]",
+              "id": "[variables('adminSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('contentSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('dataSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
+      },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('publicStorageAccountName')]"
+          ]
+        }
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Storage account",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "apiVersion": "2020-02-02",
+      "name": "[variables('notificationsAppInsights')]",
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "Application_Type": "web",
+        "ApplicationId": "[variables('notificationsAppName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('notificationsPlanName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuNotifier'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuNotifier'), ' '))]"
+      },
+      "properties": {
+        "name": "[variables('notificationsPlanName')]",
+        "workerSize": "0",
+        "workerSizeId": "0",
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "apiVersion": "2019-08-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('notificationsAppName')]",
+      "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "kind": "functionapp",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]"
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('notifySubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
+          "netFrameworkVersion": "v8.0",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "requestTracingEnabled": true,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', parameters('domain'))]"
+            ]
+          },
+          "connectionStrings": [
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlNotifierUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlNotifierUserPassword'), ';')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[concat(variables('notificationsAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[variables('ees-storage-notifications')]"
+      ],
+      "properties": {
+        "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        "WEBSITE_RUN_FROM_PACKAGE": "1",
+        "FUNCTIONS_EXTENSION_VERSION": "~4",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('notificationsAppInsights')), '2020-02-02').InstrumentationKey]",
+        "App:Url": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api')]",
+        "App:PublicAppUrl": "[variables('publicAppUrl')]",
+        "App:NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        "App:TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-token-secret-key'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify:EmailTemplates:ReleaseAmendmentPublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-amendment-published'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify:EmailTemplates:ReleaseAmendmentPublishedSupersededSubscribersId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-amendment-published-superseded-subscribers'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify:EmailTemplates:ReleasePublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-published'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify:EmailTemplates:ReleasePublishedSupersededSubscribersId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-published-superseded-subscribers'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify:EmailTemplates:SubscriptionConfirmationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-subscription-confirmation'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify:EmailTemplates:SubscriptionVerificationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-subscription-verification'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify:EmailTemplates:ApiSubscriptionConfirmationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-confirmation'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify:EmailTemplates:ApiSubscriptionNotificationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-notification'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify:EmailTemplates:ApiSubscriptionVerificationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-api-subscription-verification'), '2018-02-14').secretUriWithVersion, ')')]"
+      }
+    },
+    {
+      "apiVersion": "2020-02-02",
+      "name": "[variables('importerAppInsights')]",
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "Application_Type": "web",
+        "ApplicationId": "[variables('importerAppName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuImporter'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuImporter'), ' '))]"
+      },
+      "name": "[variables('importerPlanName')]",
+      "apiVersion": "2022-03-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "name": "[variables('importerPlanName')]",
+        "workerSize": "0",
+        "workerSizeId": "0",
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "apiVersion": "2019-08-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('importerAppName')]",
+      "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "kind": "functionapp",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('importerAppInsights'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('importerSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v8.0",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          "cors": {
+            "allowedOrigins": []
+          },
+          "connectionStrings": [
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('statisticsDbName'), ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
+            },
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
+            }
+          ],
+          "use32BitWorkerProcess": false
+        }
+      }
+    },
+    {
+      "name": "[concat(variables('importerAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[variables('ees-storage-core')]"
+      ],
+      "properties": {
+        "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
+        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
+        "WEBSITE_RUN_FROM_PACKAGE": "1",
+        "FUNCTIONS_EXTENSION_VERSION": "~4",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2020-02-02').InstrumentationKey]",
+        "App:RowsPerBatch": "3000",
+        "App:PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]"
+      }
+    },
+    {
+      "apiVersion": "2020-02-02",
+      "name": "[variables('publisherAppInsights')]",
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Application Insights",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "Application_Type": "web",
+        "ApplicationId": "[variables('publisherAppName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('publisherPlanName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service plan",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "sku": {
+        "Tier": "[first(skip(split(parameters('skuPublisher'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuPublisher'), ' '))]"
+      },
+      "properties": {
+        "name": "[variables('publisherPlanName')]",
+        "workerSize": "0",
+        "workerSizeId": "0",
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      }
+    },
+    {
+      "apiVersion": "2019-08-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('publisherAppName')]",
+      "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "kind": "functionapp",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('publisherAppInsights'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "App Service",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "resources": [
+        {
+          "condition": "[parameters('useSubnets')]",
+          "name": "virtualNetwork",
+          "type": "config",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "subnetResourceId": "[variables('publisherSubnetRef')]",
+            "swiftSupported": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
+            "[variables('vNetRef')]"
+          ]
+        }
+      ],
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
+          "phpVersion": "off",
+          "netFrameworkVersion": "v8.0",
+          "AlwaysOn": true,
+          "webSocketsEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
+          "cors": {
+            "allowedOrigins": []
+          },
+          "connectionStrings": [
+            {
+              "name": "ContentDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+            },
+            {
+              "name": "StatisticsDb",
+              "type": "SQLAzure",
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('statisticsDbName'), ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+            },
+            {
+              "name": "PublicDataDb",
+              "type": "PostgreSQL",
+              "connectionString": "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName'), ';SecretName=ees-publisher-connectionstring-publicdatadb)')]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[concat(variables('publisherAppName'), '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[variables('ees-storage-core')]",
+        "[variables('ees-storage-public')]",
+        "[variables('ees-storage-notifications')]",
+        "[variables('ees-storage-publisher')]"
+      ],
+      "properties": {
+        "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "AzureWebJobs.StageScheduledReleaseVersionsImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
+        "AzureWebJobs.PublishStagedReleaseVersionContentImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleaseVersionsEnabled'))]",
+        "WEBSITE_CONTENTOVERVNET": "1",
+        "WEBSITE_TIME_ZONE": "[parameters('timeZone')]",
+        "WEBSITE_RUN_FROM_PACKAGE": "1",
+        "FUNCTIONS_EXTENSION_VERSION": "~4",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publisherAppInsights')), '2020-02-02').InstrumentationKey]",
+        "App:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
+        "App:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
+        "App:PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
+        "App:NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
+        "App:PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
+        "App:PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "DataFiles:BasePath": "[variables('publicDataFileShareMountPathWindows')]",
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
+      }
+    },
+    {
+      "condition": "[parameters('publicDataDbExists')]",
+      "name": "[concat(variables('publisherAppName'), '/azurestorageaccounts')]",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
+      ],
+      "properties": {
+        "[variables('publicDataFileShareName')]": {
+          "type": "AzureFiles",
+          "accountName": "[variables('publicDataStorageAccountName')]",
+          "accessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicDataStorageAccountName')), '2018-02-01').keys[0].value]",
+          "shareName": "[variables('publicDataFileShareName')]",
+          "mountPath": "[variables('publicDataFileShareMountPathWindows')]",
+          "protocol": "Smb"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('publisherStorageAccountName')]",
+      "apiVersion": "2019-04-01",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_GZRS"
+      },
+      "properties": {
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "condition": "[parameters('useSubnets')]",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+            {
+              "id": "[variables('adminSubnetRef')]",
+              "action": "Allow"
+            },
+            {
+              "id": "[variables('publisherSubnetRef')]",
+              "action": "Allow"
+            }
+          ],
+          "ipRules": "[parameters('storageFirewallRules')]",
+          "defaultAction": "Deny"
+        }
+      },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('publisherStorageAccountName')]"
+          ]
+        }
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Storage account V2",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('loggingStorageAccountName')]",
+      "apiVersion": "2019-04-01",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_GZRS"
+      },
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      },
+      "resources": [
+        {
+          "name": "default",
+          "type": "blobServices",
+          "apiVersion": "2019-04-01",
+          "properties": {
+            "deleteRetentionPolicy": {
+              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
+              "days": "[parameters('blobDeleteRetentionDays')]"
+            }
+          },
+          "dependsOn": [
+            "[variables('loggingStorageAccountName')]"
+          ]
+        }
+      ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Storage account V2",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      }
+    },
+    {
+      "condition": "[parameters('deploySubnets')]",
+      "apiVersion": "2020-05-01",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('vNetName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Virtual network",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('adminSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('importerSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.1.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('publisherSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.2.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('notifySubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.3.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('contentSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.4.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('dataSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.5.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('publicApiDataProcessorSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.6.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('publicApiDataProcessorPrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.7.0/24"
+            }
+          },
+          {
+            "name": "[variables('containerAppEnvironmentSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.8.0/23",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "environment",
+                  "properties": {
+                    "serviceName": "Microsoft.App/environments"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('applicationGatewaySubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.10.0/24"
+            }
+          },
+          {
+            "name": "[variables('publicApiStoragePrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.11.0/24"
+            }
+          },
+          {
+            "name": "[variables('psqlFlexibleServerSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.12.0/24"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "datafactory",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateBaseUrl'), 'datafactory/template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "subscription": {
+            "value": "[parameters('subscription')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "publisherAppName": {
+            "value": "[variables('publisherAppName')]"
+          },
+          "dataFactoryName": {
+            "value": "[variables('dataFactoryName')]"
+          },
+          "dataFactoryConcurrency": {
+            "value": "[parameters('dataFactoryConcurrency')]"
+          },
+          "keyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          },
+          "branch": {
+            "value": "[parameters('branch')]"
+          },
+          "actionGroupAlerts": {
+            "value": "[variables('actionGroupAlerts')]"
+          },
+          "slackAlertsChannel": {
+            "value": "[parameters('slackAlertsChannel')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
+      ]
+    },
+    {
+      "name": "[variables('keyVaultName')]",
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2016-10-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Key Vault",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "family": "A",
+          "name": "Standard"
+        },
+        "enabledForDeployment": true,
+        "enabledForDiskEncryption": true,
+        "enabledForTemplateDeployment": true,
+        "enableSoftDelete": true,
+        "accessPolicies": [],
+        "enableRbacAuthorization": true
+      },
+      "resources": [
+        {
+          "type": "secrets",
+          "name": "ees-storage-core",
+          "apiVersion": "2016-10-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+          ],
+          "properties": {
+            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
+          }
+        },
+        {
+          "type": "secrets",
+          "name": "ees-storage-notifications",
+          "apiVersion": "2016-10-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsStorageAccountName'))]"
+          ],
+          "properties": {
+            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsStorageAccountName'), ';AccountKey=', listKeys(variables('notificationsStorageAccountId'),'2015-05-01-preview').key1)]"
+          }
+        },
+        {
+          "type": "secrets",
+          "name": "ees-storage-public",
+          "apiVersion": "2016-10-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
+          ],
+          "properties": {
+            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
+          }
+        },
+        {
+          "type": "secrets",
+          "name": "ees-storage-publisher",
+          "apiVersion": "2016-10-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
+          ],
+          "properties": {
+            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
+          }
+        }
+      ]
+    },
+    {
+      "copy": {
+        "name": "keyVaultSecretUsersCopy",
+        "count": "[length(variables('keyVaultSecretsUserPrincipalRefs'))]"
+      },
+      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()]))]",
+      "properties": {
+        "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
+        "principalId": "[reference(variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "principalType": "ServicePrincipal"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), variables('dataFactoryName')))]",
+      "properties": {
+        "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
+        "principalId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "principalType": "ServicePrincipal"
+      }
+    },
+    {
+      "name": "[concat(variables('dataAppName'), '-autoscale')]",
+      "apiVersion": "2014-04-01",
+      "type": "Microsoft.Insights/autoscaleSettings",
+      "location": "[resourceGroup().location]",
+      "tags": {},
+      "properties": {
+        "name": "[concat(variables('dataAppName'), '-autoscale')]",
+        "enabled": "[parameters('autoscalePublicApplication')]",
+        "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+        "profiles": [
+          {
+            "name": "Auto created scale condition",
+            "capacity": {
+              "minimum": 2,
+              "maximum": 10,
+              "default": 2
+            },
+            "rules": [
+              {
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+                  "operator": "GreaterThan",
+                  "statistic": "Average",
+                  "threshold": 70,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [],
+                  "dividePerInstance": false
+                }
+              },
+              {
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+                  "operator": "LessThan",
+                  "statistic": "Average",
+                  "threshold": 30,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [],
+                  "dividePerInstance": false
+                }
+              }
+            ]
+          }
+        ],
+        "notifications": [],
+        "targetResourceLocation": ""
+      }
+    },
+    {
+      "name": "[concat(variables('contentAppName'), '-autoscale')]",
+      "apiVersion": "2014-04-01",
+      "type": "Microsoft.Insights/autoscaleSettings",
+      "location": "[resourceGroup().location]",
+      "tags": {},
+      "properties": {
+        "name": "[concat(variables('contentAppName'), '-autoscale')]",
+        "enabled": "[parameters('autoscalePublicApplication')]",
+        "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('contentPlanName'))]",
+        "profiles": [
+          {
+            "name": "Auto created scale condition",
+            "capacity": {
+              "minimum": 2,
+              "maximum": 10,
+              "default": 2
+            },
+            "rules": [
+              {
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('contentPlanName'))]",
+                  "operator": "GreaterThan",
+                  "statistic": "Average",
+                  "threshold": 70,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [],
+                  "dividePerInstance": false
+                }
+              },
+              {
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('contentPlanName'))]",
+                  "operator": "LessThan",
+                  "statistic": "Average",
+                  "threshold": 30,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [],
+                  "dividePerInstance": false
+                }
+              }
+            ]
+          }
+        ],
+        "notifications": [],
+        "targetResourceLocation": ""
+      }
+    },
+    {
+      "name": "[concat(variables('publicAppName'), '-autoscale')]",
+      "apiVersion": "2014-04-01",
+      "type": "Microsoft.Insights/autoscaleSettings",
+      "location": "[resourceGroup().location]",
+      "tags": {},
+      "properties": {
+        "name": "[concat(variables('publicAppName'), '-autoscale')]",
+        "enabled": "[parameters('autoscalePublicApplication')]",
+        "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('publicPlanName'))]",
+        "profiles": [
+          {
+            "name": "Auto created scale condition",
+            "capacity": {
+              "minimum": 2,
+              "maximum": 10,
+              "default": 2
+            },
+            "rules": [
+              {
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('publicPlanName'))]",
+                  "operator": "GreaterThan",
+                  "statistic": "Average",
+                  "threshold": 70,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [],
+                  "dividePerInstance": false
+                }
+              },
+              {
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                },
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "microsoft.web/serverfarms",
+                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('publicPlanName'))]",
+                  "operator": "LessThan",
+                  "statistic": "Average",
+                  "threshold": 30,
+                  "timeAggregation": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT10M",
+                  "Dimensions": [],
+                  "dividePerInstance": false
+                }
+              }
+            ]
+          }
+        ],
+        "notifications": [],
+        "targetResourceLocation": ""
+      }
+    },
+    {
+      "name": "logicAppTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateBaseUrl'), 'logic-app-template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "logicAppName": {
+            "value": "[variables('logicAppSlackAlerts')]"
+          },
+          "slackAlertsChannel": {
+            "value": "[parameters('slackAlertsChannel')]"
+          },
+          "slackAppToken": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+              },
+              "secretName": "ees-alerts-slackapptoken"
+            }
+          },
+          "subscription": {
+            "value": "[parameters('subscription')]"
+          },
+          "resourceGroup": {
+            "value": "[resourceGroup().name]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "microsoft.insights/actionGroups",
+      "apiVersion": "2019-06-01",
+      "name": "[variables('actionGroupAlerts')]",
+      "location": "global",
+      "properties": {
+        "groupShortName": "alertAG",
+        "enabled": "true",
+        "logicAppReceivers": [
+          {
+            "name": "[variables('logicAppSlackAlerts')]",
+            "resourceId": "[resourceId('Microsoft.Logic/workflows', variables('logicAppSlackAlerts'))]",
+            "callbackUrl": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows', variables('logicAppSlackAlerts')), '/triggers/manual'), '2017-07-01').value]",
+            "useCommonAlertSchema": true
+          }
+        ]
+      }
+    },
+    {
+      "type": "microsoft.insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "name": "[variables('metricAlerts')[copyIndex()].name]",
+      "location": "global",
+      "dependsOn": [
+        "[variables('metricAlerts')[copyIndex()].resourceId]",
+        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
+      ],
+      "copy": {
+        "name": "metricAlertsCopy",
+        "count": "[length(variables('metricAlerts'))]"
+      },
+      "properties": {
+        "description": "[variables('metricAlerts')[copyIndex()].description]",
+        "enabled": "true",
+        "severity": 3,
+        "scopes": [
+          "[variables('metricAlerts')[copyIndex()].resourceId]"
+        ],
+        "evaluationFrequency": "PT1M",
+        "windowSize": "PT5M",
+        "criteria": {
+          "allOf": [
+            {
+              "threshold": "[variables('metricAlerts')[copyIndex()].threshold]",
+              "name": "Metric1",
+              "metricNamespace": "[variables('metricAlerts')[copyIndex()].resourceType]",
+              "metricName": "[variables('metricAlerts')[copyIndex()].metricName]",
+              "operator": "[variables('metricAlerts')[copyIndex()].operator]",
+              "timeAggregation": "[variables('metricAlerts')[copyIndex()].timeAggregation]",
+              "criterionType": "[variables('metricAlerts')[copyIndex()].criterionType]"
+            }
+          ],
+          "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+        },
+        "autoMitigate": true,
+        "targetResourceType": "[variables('metricAlerts')[copyIndex()].resourceType]",
+        "actions": [
+          {
+            "actionGroupId": "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
+          }
+        ]
+      }
+    }
+  ]
+}

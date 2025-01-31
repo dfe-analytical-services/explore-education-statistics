@@ -1,0 +1,26 @@
+#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using System;
+using static System.String;
+
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
+{
+    public class PublicationCreateViewModel
+    {
+        public Guid Id { get; set; }
+
+        public string Title { get; set; } = Empty;
+
+        public string Summary { get; set; } = Empty;
+
+        public string Slug { get; set; } = Empty;
+
+        public ContactViewModel Contact { get; set; } = null!;
+
+        public IdTitleViewModel Theme { get; set; } = null!;
+
+        public Guid? SupersededById { get; set; }
+
+        public bool IsSuperseded { get; set; }
+    }
+}

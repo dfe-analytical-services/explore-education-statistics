@@ -1,0 +1,130 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+
+jobs:
+  - deployment: DeployPublicDataProcessor
+    displayName: Deploy Public Data Processor
+    condition: and(succeeded(), eq(variables.deployDataProcessor, true))
+    dependsOn: ${{ parameters.dependsOn }}
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: MainBuild
+              displayName: Download Public API Data Processor artifact
+              artifact: public-api-data-processor
+
+            - template: ../tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                
+            # We do config updates out of Bicep template so we can implement slot swapping.
+            # Changes are first deployed to the staging slot and combined with a fresh
+            # code deploy prior to being swapped with the production slot.
+            - task: AzureCLI@2
+              displayName: Update staging slot app settings
+              retryCountOnTaskFailure: 1
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+                  
+                  az functionapp config appsettings set \
+                    --name $(dataProcessorFunctionAppName) \
+                    --resource-group $(resourceGroupName) \
+                    --slot staging \
+                    --settings \
+                      "App__MetaInsertBatchSize=1000" \
+                      "App__EnableThemeDeletion=$(enableThemeDeletion)" \
+                      "App__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
+                      "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
+                      "AzureWebJobs.TriggerLongRunningOrchestration.Disabled=true" \
+                      "DataFiles__BasePath=$(dataProcessorPublicApiDataFileShareMountPath)"
+                  
+                  az webapp config connection-string set \
+                    --name $(dataProcessorFunctionAppName) \
+                    --resource-group $(resourceGroupName) \
+                    --connection-string-type SQLAzure \
+                    --slot staging \
+                    --settings \
+                      "ContentDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorContentDbConnectionStringSecretKey))"
+                  
+                  az webapp config connection-string set \
+                    --name $(dataProcessorFunctionAppName) \
+                    --resource-group $(resourceGroupName) \
+                    --connection-string-type PostgreSQL \
+                    --slot staging \
+                    --settings \
+                      "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
+
+            - template: ../tasks/wait-for-endpoint-success.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Checking that staging slot is healthy after updating appsettings
+                maxAttempts: 20
+                accessTokenScope: $(dataProcessorAppRegistrationClientId)
+                endpoint: $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck
+                # We allow 404s because if this is the first time the Function App is being deployed, there won't be any
+                # deployed code yet in the staging slot.
+                allow404s: true
+
+            - task: AzureCLI@2
+              displayName: Deploy to staging slot
+              retryCountOnTaskFailure: 10
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+                  az functionapp deployment source config-zip \
+                    --src '$(Pipeline.Workspace)/MainBuild/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
+                    --name $(dataProcessorFunctionAppName) \
+                    --resource-group $(resourceGroupName) \
+                    --slot staging
+
+            - template: ../tasks/wait-for-endpoint-success.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Waiting for staging slot to start successfully
+                accessTokenScope: $(dataProcessorAppRegistrationClientId)
+                endpoint: $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck
+
+            - template: ../tasks/wait-for-orchestrations-to-complete.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Waiting for active orchestrations in the production slot to complete
+                accessTokenScope: $(dataProcessorAppRegistrationClientId)
+                endpoint: $(dataProcessorFunctionAppUrl)/api/StatusCheck
+                condition: eq(variables.awaitActiveOrchestrations, true)
+              
+            - task: AzureCLI@2
+              displayName: Swap slots
+              retryCountOnTaskFailure: 1
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+                  az functionapp deployment slot swap \
+                    --name $(dataProcessorFunctionAppName) \
+                    --resource-group $(resourceGroupName) \
+                    --slot staging \
+                    --target-slot production
+
+            - template: ../tasks/wait-for-endpoint-success.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Checking that production slot is healthy after slot swap
+                accessTokenScope: $(dataProcessorAppRegistrationClientId)
+                endpoint: $(dataProcessorFunctionAppUrl)/api/HealthCheck

@@ -1,0 +1,15 @@
+node_modules
+dist
+build
+.env
+.env.*
+!.env.example
+.DS_Store
+*.zip
+/*.zip
+clean-test-*.zip
+test-files
+test-results
+zip-files
+coverage 
+.swc

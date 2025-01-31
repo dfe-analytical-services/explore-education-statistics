@@ -1,0 +1,23 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.tabs {
+  @media print {
+    :global(.govuk-tabs__list) {
+      list-style: none;
+    }
+
+    :global(.govuk-tabs__list-item) {
+      display: none;
+    }
+
+    :global(.govuk-tabs__tab) {
+      display: none;
+    }
+  }
+}
+
+.singleTab {
+  @include govuk-media-query($from: tablet) {
+    border-top: 1px solid govuk-colour('mid-grey');
+  }
+}

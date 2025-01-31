@@ -1,0 +1,21 @@
+time_period,time_identifier,geographic_level,country_code,country_name,ward_code,ward_name,admission_numbers
+2018,Calendar year,Ward,E92000001,England,E05000364,Syon,16659
+2018,Calendar year,Ward,E92000001,England,E05006937,Yoxall,3017
+2018,Calendar year,Ward,E92000001,England,E05010291,Nailsea Youngwood,14020
+2018,Calendar year,Ward,E92000001,England,E05010450,Rural West York,2590
+2017,Calendar year,Ward,E92000001,England,E05000364,Syon,16688
+2017,Calendar year,Ward,E92000001,England,E05006937,Yoxall,3053
+2017,Calendar year,Ward,E92000001,England,E05010291,Nailsea Youngwood,14120
+2017,Calendar year,Ward,E92000001,England,E05010450,Rural West York,2555
+2016,Calendar year,Ward,E92000001,England,E05000364,Syon,16457
+2016,Calendar year,Ward,E92000001,England,E05006937,Yoxall,3089
+2016,Calendar year,Ward,E92000001,England,E05010291,Nailsea Youngwood,13944
+2016,Calendar year,Ward,E92000001,England,E05010450,Rural West York,2520
+2015,Calendar year,Ward,E92000001,England,E05000364,Syon,13860
+2015,Calendar year,Ward,E92000001,England,E05006937,Yoxall,2490
+2015,Calendar year,Ward,E92000001,England,E05010291,Nailsea Youngwood,16268
+2015,Calendar year,Ward,E92000001,England,E05010450,Rural West York,3029
+2014,Calendar year,Ward,E92000001,England,E05000364,Syon,2490
+2014,Calendar year,Ward,E92000001,England,E05006937,Yoxall,13321
+2014,Calendar year,Ward,E92000001,England,E05010291,Nailsea Youngwood,2955
+2014,Calendar year,Ward,E92000001,England,E05010450,Rural West York,16054

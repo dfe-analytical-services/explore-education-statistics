@@ -1,0 +1,15 @@
+// box-sizing: inherit (set in _reset.scss) conflicts with
+// the GDS radio styles.
+.radio {
+  :global(.govuk-radios__label) {
+    box-sizing: initial;
+  }
+}
+
+// Overriding the GDS max-width to workaround a bug when using
+// small inline radios - https://github.com/alphagov/govuk-frontend/issues/4873
+.small {
+  :global(.govuk-radios__label) {
+    max-width: calc(100% - 50px);
+  }
+}

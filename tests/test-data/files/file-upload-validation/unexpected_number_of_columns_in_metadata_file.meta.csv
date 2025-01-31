@@ -1,0 +1,4 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+admission_numbers,Indicator,Admission Numbers,,,,,,whats_this_doing_here
+admission_numbers2,Indicator,Admission Numbers2,,,,,
+admission_numbers3,Indicator,Admission Numbers3,

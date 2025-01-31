@@ -1,0 +1,35 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.figure {
+  margin: 0;
+
+  figcaption {
+    padding-bottom: govuk-spacing(4);
+  }
+}
+
+:global(.dfe-width-container--wide) .figure {
+  @include govuk-media-query($from: desktop) {
+    figcaption {
+      max-width: 66.6%;
+
+      @media print {
+        max-width: 100%;
+      }
+    }
+  }
+}
+
+.container {
+  display: inline-block;
+  max-height: 80vh;
+  overflow: auto;
+  padding-right: govuk-spacing(4);
+  width: 100%;
+
+  &:focus {
+    box-shadow: 0 0 0 4px;
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline-offset: 4px;
+  }
+}

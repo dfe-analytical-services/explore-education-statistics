@@ -1,0 +1,4 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+unexpected_column1,Indicator,Unexpected Column 1,,,,,
+admission_numbers,Indicator,Admission Numbers,,,,,
+unexpected_column2,Indicator,Unexpected Column 2,,,,,

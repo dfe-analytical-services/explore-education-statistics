@@ -1,0 +1,1845 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TimePeriodDataTable renders table correctly when region group is missing in column headers 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="1"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        England
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        Barnsley
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        Barnet
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Authorised absence rate
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        18.3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        21.5%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        20.2%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table correctly when region group is missing in column headers and other locations have hierarchy 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="1"
+        rowspan="2"
+      />
+      <th
+        colspan="1"
+        rowspan="2"
+        scope="col"
+      >
+        England
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="colgroup"
+      >
+        Yorkshire and the Humber
+      </th>
+      <th
+        colspan="1"
+        rowspan="2"
+        scope="col"
+      >
+        Barnet
+      </th>
+    </tr>
+    <tr>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        Barnsley
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Authorised absence rate
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        18.3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        21.5%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        20.2%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table correctly when region group is missing in row headers 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="1"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        England
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        18.3%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnsley
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        21.5%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnet
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        20.2%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table correctly when region group is missing in row headers and other locations have hierarchy 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="2"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="2"
+        rowspan="1"
+        scope="row"
+      >
+        England
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        18.3%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="rowgroup"
+      >
+        Yorkshire and the Humber
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnsley
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        21.5%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="2"
+        rowspan="1"
+        scope="row"
+      >
+        Barnet
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        20.2%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table with completely empty columns removed 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="3"
+        rowspan="3"
+      />
+      <th
+        colspan="4"
+        rowspan="1"
+        scope="colgroup"
+      >
+        First language
+      </th>
+    </tr>
+    <tr>
+      <th
+        colspan="3"
+        rowspan="1"
+        scope="colgroup"
+      >
+        First language Known or believed to be other than English
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="colgroup"
+      >
+        First language Unclassified
+      </th>
+    </tr>
+    <tr>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2013/14
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2015/16
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2013/14
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        Coventry
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        Special
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of authorised absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        6,492
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        5,542
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        4,185
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        no data
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of overall absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        7,280
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        6,493
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        5,142
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        no data
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        Croydon
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        Special
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of authorised absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        4,179
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        4,809
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        5,322
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        x
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of overall absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        4,390
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        5,076
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        5,483
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        x
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table with completely empty rows removed 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="4"
+        rowspan="2"
+      />
+      <th
+        colspan="3"
+        rowspan="1"
+        scope="colgroup"
+      >
+        Special
+      </th>
+    </tr>
+    <tr>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2013/14
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2015/16
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        Coventry
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        First language
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        First language Known or believed to be other than English
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of authorised absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        6,492
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        5,542
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        4,185
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of overall absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        7,280
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        6,493
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        5,142
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="4"
+        scope="rowgroup"
+      >
+        Croydon
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="4"
+        scope="rowgroup"
+      >
+        First language
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        First language Known or believed to be other than English
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of authorised absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        4,179
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        4,809
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        5,322
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of overall absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        4,390
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        5,076
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        5,483
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        First language Unclassified
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of authorised absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        x
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        no data
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        no data
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of overall absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        x
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        no data
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        no data
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table with location hierarchies 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="2"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="2"
+        rowspan="1"
+        scope="row"
+      >
+        England
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        18.3%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="rowgroup"
+      >
+        Yorkshire and the Humber
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnsley
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        21.5%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="rowgroup"
+      >
+        Outer London
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnet
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        20.2%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table with no filters 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="2"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2015/16
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2016/17
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="3"
+        scope="rowgroup"
+      >
+        England
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Authorised absence rate
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        18.3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        18.6%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        19.2%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of authorised absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        1,280,964
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        1,397,521
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        1,488,865
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of overall absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2,212,399
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2,453,340
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2,637,752
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table with only one of each option 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="1"
+        rowspan="2"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="colgroup"
+      >
+        Ethnic group major
+      </th>
+    </tr>
+    <tr>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        Ethnicity Major Asian Total
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        England
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        18.3%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table with only one of each option and no filters 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="1"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        England
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        18.3%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table with only one of each option and no filters or locations 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="1"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        England
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        18.3%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table with two of every option 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="3"
+        rowspan="3"
+      />
+      <th
+        colspan="4"
+        rowspan="1"
+        scope="colgroup"
+      >
+        Ethnic group major
+      </th>
+    </tr>
+    <tr>
+      <th
+        colspan="2"
+        rowspan="1"
+        scope="colgroup"
+      >
+        Ethnicity Major Asian Total
+      </th>
+      <th
+        colspan="2"
+        rowspan="1"
+        scope="colgroup"
+      >
+        Ethnicity Major Black Total
+      </th>
+    </tr>
+    <tr>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2013/14
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2013/14
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="4"
+        scope="rowgroup"
+      >
+        State-funded primary
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        Barnet
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of authorised absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        32,125
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        33,725
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        31,241
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        31,322
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of overall absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        39,697
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        41,239
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        41,945
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        41,228
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        Barnsley
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of authorised absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        1,135
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        1,582
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        904
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        939
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of overall absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        1,512
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2,122
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        1,215
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        1,268
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="4"
+        scope="rowgroup"
+      >
+        State-funded secondary
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        Barnet
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of authorised absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        30,389
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        31,244
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        25,741
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        26,594
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of overall absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        34,689
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        36,083
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        33,422
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        37,084
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        Barnsley
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of authorised absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        481
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        274
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        442
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        745
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Number of overall absence sessions
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        752
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        571
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        788
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        1,105
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table without indicators when there is only one 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="2"
+        rowspan="3"
+      />
+      <th
+        colspan="4"
+        rowspan="1"
+        scope="colgroup"
+      >
+        Ethnic group major
+      </th>
+    </tr>
+    <tr>
+      <th
+        colspan="2"
+        rowspan="1"
+        scope="colgroup"
+      >
+        Ethnicity Major Asian Total
+      </th>
+      <th
+        colspan="2"
+        rowspan="1"
+        scope="colgroup"
+      >
+        Ethnicity Major Black Total
+      </th>
+    </tr>
+    <tr>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2013/14
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2013/14
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        State-funded primary
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnet
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        3.4%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        3.4%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2.9%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2.8%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnsley
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        3.7%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        4.3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2.5%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2.4%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        State-funded secondary
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnet
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        3.3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        3.3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2.9%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        3.0%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnsley
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        3.3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2.1%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        1.8%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2.6%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table without time period when there is only one 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="2"
+        rowspan="2"
+      />
+      <th
+        colspan="2"
+        rowspan="1"
+        scope="colgroup"
+      >
+        Ethnic group major
+      </th>
+    </tr>
+    <tr>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        Ethnicity Major Asian Total
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        Ethnicity Major Black Total
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        State-funded primary
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnet
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        3.4%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2.8%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnsley
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        4.3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2.4%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="2"
+        scope="rowgroup"
+      >
+        State-funded secondary
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnet
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        3.3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        3.0%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnsley
+      </th>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2.1%
+      </td>
+      <td
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
+      >
+        2.6%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;

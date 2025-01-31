@@ -1,0 +1,16 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+@include govuk-media-query($from: tablet) {
+  .inlineHint {
+    :global(.govuk-radios__hint) {
+      align-items: center;
+      display: flex;
+      padding: 0;
+      width: auto;
+    }
+  }
+}
+
+.divider {
+  margin: govuk-spacing(4) 0;
+}

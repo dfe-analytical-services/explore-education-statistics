@@ -1,0 +1,10 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.publication {
+  align-items: flex-start;
+  border-bottom: 1px solid $govuk-border-colour;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: govuk-spacing(3) 0;
+}

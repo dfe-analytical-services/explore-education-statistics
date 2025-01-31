@@ -1,0 +1,11 @@
+time_period,time_identifier,geographic_level,country_code,country_name,provider_ukprn,provider_name,school_urn,school_name,admission_numbers
+2011,Calendar year,Provider,E92000001,England,1,One,,,712196
+2011,Calendar year,Provider,E92000001,England,2,Two,,,709548
+2011,Calendar year,Provider,E92000001,England,3,Three,,,709143
+2011,Calendar year,Provider,E92000001,England,4,Four,,,607928
+2222,Calendar year,Provider,E92000001,England,5,Five,,,600903
+2011,Calendar year,School,E92000001,England,,,6,Six,712196
+2011,Calendar year,School,E92000001,England,,,7,Seven,709548
+2011,Calendar year,School,E92000001,England,,,8,Eight,709143
+2011,Calendar year,School,E92000001,England,,,9,Nine,607928
+2222,Calendar year,School,E92000001,England,,,10,Ten,600903

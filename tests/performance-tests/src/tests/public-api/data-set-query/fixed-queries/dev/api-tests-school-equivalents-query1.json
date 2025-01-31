@@ -1,0 +1,77 @@
+{
+  "publicationTitle": "Fixed Data Set Queries",
+  "dataSetName": "Performance tests - API test school A level equivalents",
+  "dataSetId": "8b419401-0062-7675-bfad-7f5ad21315a6",
+  "query": {
+    "criteria": {
+      "filters": {
+        "in": [
+          "TREYP",
+          "civ93",
+          "k37ph",
+          "uyAHo",
+          "XpZwf",
+          "jXyNA",
+          "tIRKE"
+        ]
+      },
+      "locations": {
+        "in": [
+          {
+            "level": "SCH",
+            "id": "7JiKX"
+          },
+          {
+            "level": "PCON",
+            "id": "PkVXe"
+          },
+          {
+            "level": "SCH",
+            "id": "5oHmd"
+          },
+          {
+            "level": "SCH",
+            "id": "WZvg2"
+          },
+          {
+            "level": "SCH",
+            "id": "OFfOC"
+          },
+          {
+            "level": "SCH",
+            "id": "NqpfD"
+          },
+          {
+            "level": "PCON",
+            "id": "l1aCc"
+          },
+          {
+            "level": "SCH",
+            "id": "R2Gck"
+          },
+          {
+            "level": "SCH",
+            "id": "gYzaO"
+          },
+          {
+            "level": "SCH",
+            "id": "z0TUF"
+          }
+        ]
+      },
+      "timePeriods": {
+        "gt": {
+          "code": "AY",
+          "period": "2022/2023"
+        }
+      }
+    },
+    "indicators": [
+      "0u34T",
+      "QEFCw",
+      "e9s9u",
+      "EGp7q",
+      "4hiaU"
+    ]
+  }
+}

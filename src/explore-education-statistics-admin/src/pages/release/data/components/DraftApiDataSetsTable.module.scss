@@ -1,0 +1,20 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.table {
+  thead th {
+    vertical-align: bottom;
+  }
+
+  td {
+    padding-bottom: govuk-spacing(4);
+    padding-top: govuk-spacing(4);
+    vertical-align: middle;
+  }
+
+  @include govuk-media-query($from: tablet) {
+    td {
+      padding-bottom: govuk-spacing(5);
+      padding-top: govuk-spacing(5);
+    }
+  }
+}

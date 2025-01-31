@@ -1,0 +1,101 @@
+## IDEs
+.idea
+.vs
+.vscode
+
+*.code-workspace
+*.iml
+*.ipr
+*.iws
+
+## Application
+bin
+obj
+/data/ees-mssql
+/data/public-api-db/*
+!/data/public-api-db/00-init.sh
+/data/public-api-data
+dfe-meta.db
+
+## CSharp
+
+*.sln.DotSettings.user
+dotnet-format-report.json
+
+## Javascript
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+tsconfig.tsbuildinfo
+
+## Tests
+
+junit.xml
+src/explore-education-statistics-admin/*.xml
+src/explore-education-statistics-common/*.xml
+src/explore-education-statistics-frontend/*.xml
+**/test-results/
+.pabotsuitenames
+/tests/robot-tests/backup-data
+/tests/robot-tests/.env.*
+/tests/robot-tests/UI-test-report.zip
+!/tests/robot-tests/.env.example
+/tests/robot-tests/IDENTITY_*
+/tests/robot-tests/.pabotsuitenames
+/tests/robot-tests/.failing_suites
+/tests/robot-tests/geckodriver.log
+/tests/robot-tests/debug.log
+**/*/jwt
+**/coverage
+/tests/robot-tests/scripts/permalink_snapshots/invalid-permalinks.csv
+/tests/robot-tests/scripts/permalink_snapshots/prod-permalinks.csv
+/tests/robot-tests/scripts/permalink_snapshots/checked-permalinks.csv
+/tests/robot-tests/tests/visual_testing/visually_check_tables_and_charts.dev.robot
+/tests/robot-tests/tests/visual_testing/visually_check_tables_and_charts.dev.robot.csv
+/tests/robot-tests/tests/files/.unzipped-seed-data-files
+seed-data-files.zip
+
+/tests/performance-tests/.env.*
+!/tests/performance-tests/.env.example.json
+/tests/performance-tests/dist
+/tests/performance-tests/big-files
+/tests/performance-tests/*.html
+
+## Scripts
+
+useful-scripts/*.lock
+useful-scripts/get_data_block_responses/*.csv
+useful-scripts/get_data_block_responses/results*
+
+## Data API Seed CSV data
+
+src/GovUk.Education.ExploreEducationStatistics.Data.Seed/Files/
+
+## Infrastructure build artifacts
+
+infrastructure/templates/public-api/main.json
+
+## Misc
+
+*.~lock*
+tags
+*.pyc
+*.tmp
+lerna-debug.log
+
+admin-start.sh
+remote-profile
+
+.DS_Store
+
+src/GovUk.Education.ExploreEducationStatistics.*/appsettings.Local.json
+src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Idp.json
+src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.IdpBootstrapUsers.json
+
+## IdentityServer Developer Signing key
+**/*/tempkey.rsa
+
+## IDE Files (e.g. local Visual Studio configuration)
+*.csproj.user

@@ -1,0 +1,97 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormCheckbox does not render conditional content when not checked 1`] = `
+<div class="govuk-checkboxes__item"
+     data-testid="Checkbox item for Test checkbox"
+>
+  <input class="govuk-checkboxes__input"
+         id="test-checkbox"
+         name="test"
+         type="checkbox"
+         value="true"
+         aria-controls="test-checkbox-conditional"
+  >
+  <label class="govuk-label govuk-checkboxes__label"
+         for="test-checkbox"
+  >
+    Test checkbox
+  </label>
+</div>
+<div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden"
+     id="test-checkbox-conditional"
+>
+  <p>
+    The conditional content
+  </p>
+</div>
+`;
+
+exports[`FormCheckbox renders conditional content when checked 1`] = `
+<div class="govuk-checkboxes__item"
+     data-testid="Checkbox item for Test checkbox"
+>
+  <input class="govuk-checkboxes__input"
+         id="test-checkbox"
+         name="test"
+         type="checkbox"
+         value="true"
+         checked
+         aria-controls="test-checkbox-conditional"
+         aria-expanded="true"
+  >
+  <label class="govuk-label govuk-checkboxes__label"
+         for="test-checkbox"
+  >
+    Test checkbox
+  </label>
+</div>
+<div class="govuk-checkboxes__conditional"
+     id="test-checkbox-conditional"
+>
+  <p>
+    The conditional content
+  </p>
+</div>
+`;
+
+exports[`FormCheckbox renders correctly when \`hint\` is provided 1`] = `
+<div class="govuk-checkboxes__item"
+     data-testid="Checkbox item for Test checkbox"
+>
+  <input aria-describedby="test-checkbox-item-hint"
+         class="govuk-checkboxes__input"
+         id="test-checkbox"
+         name="test"
+         type="checkbox"
+         value="true"
+  >
+  <label class="govuk-label govuk-checkboxes__label"
+         for="test-checkbox"
+  >
+    Test checkbox
+  </label>
+  <div id="test-checkbox-item-hint"
+       class="govuk-hint govuk-checkboxes__hint"
+  >
+    Click me to proceed
+  </div>
+</div>
+`;
+
+exports[`FormCheckbox renders correctly with required props 1`] = `
+<div class="govuk-checkboxes__item"
+     data-testid="Checkbox item for Test checkbox"
+>
+  <input class="govuk-checkboxes__input"
+         id="test-checkbox"
+         name="test"
+         type="checkbox"
+         value="true"
+  >
+  <label class="govuk-label govuk-checkboxes__label"
+         for="test-checkbox"
+  >
+    Test checkbox
+  </label>
+</div>
+`;
