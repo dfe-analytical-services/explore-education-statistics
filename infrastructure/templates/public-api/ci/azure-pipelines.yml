@@ -3,52 +3,60 @@ trigger: none
 parameters:
   - name: deploySharedPrivateDnsZones
     displayName: Do the shared Private DNS Zones need creating or updating?
+    type: string
     values:
-      - true
-      - false
-    default: false
+      - Yes
+      - No
+    default: No
   - name: deployPsqlFlexibleServer
     displayName: Does the PostgreSQL Flexible Server need creating or updating?
+    type: string
     values:
-      - true
-      - false
-    default: false
+      - Yes
+      - No
+    default: No
   - name: deployContainerApp
     displayName: Does the Public API Container App need creating or updating? This is dependent on the PostgreSQL Flexible Server being set up and having users manually added.
+    type: string
     values:
-      - true
-      - false
-    default: true
+      - Yes
+      - No
+    default: Yes
   - name: deployDataProcessor
     displayName: Does the Data Processor need creating or updating?
+    type: string
     values:
-      - true
-      - false
-    default: true
+      - Yes
+      - No
+    default: Yes
   - name: deployDocsSite
     displayName: Does the Public API static docs site need creating or updating?
+    type: string
     values:
-      - true
-      - false
-    default: true
+      - Yes
+      - No
+    default: Yes
   - name: deployRecoveryVault
     displayName: Does the Recovery Services Vault need creating or updating?
+    type: string
     values:
-      - true
-      - false
-    default: false
+      - Yes
+      - No
+    default: No
   - name: deployAlerts
     displayName: Do the Azure Monitor alerts need creating or updating?
+    type: string
     values:
-      - true
-      - false
-    default: false
+      - Yes
+      - No
+    default: No
   - name: awaitActiveOrchestrations
     displayName: Should this deploy wait for active orchestrations in Function Apps to complete prior to deploying?
+    type: string
     values:
-      - true
-      - false
-    default: true
+      - Yes
+      - No
+    default: Yes
   - name: forceDeployToEnvironment
     displayName: Set to either dev or test to force a deploy to that environment from the chosen branch.
     type: string
@@ -57,7 +65,7 @@ parameters:
       - dev
       - test
       - preprod
-    default: 'none'
+    default: none
 
 resources:
   pipelines:
@@ -84,21 +92,21 @@ variables:
   - name: vmImageName
     value: ubuntu-latest
   - name: deploySharedPrivateDnsZones
-    value: ${{ parameters.deploySharedPrivateDnsZones }}
+    value: ${{ iif(eq(parameters.deploySharedPrivateDnsZones, 'Yes'), true, false) }}
   - name: deployPsqlFlexibleServer
-    value: ${{ parameters.deployPsqlFlexibleServer }}
+    value: ${{ iif(eq(parameters.deployPsqlFlexibleServer, 'Yes'), true, false) }}
   - name: deployContainerApp
-    value: ${{ parameters.deployContainerApp }}
+    value: ${{ iif(eq(parameters.deployContainerApp, 'Yes'), true, false) }}
   - name: deployDataProcessor
-    value: ${{ parameters.deployDataProcessor }}
+    value: ${{ iif(eq(parameters.deployDataProcessor, 'Yes'), true, false) }}
   - name: deployDocsSite
-    value: ${{ parameters.deployDocsSite }}
+    value: ${{ iif(eq(parameters.deployDocsSite, 'Yes'), true, false) }}
   - name: deployRecoveryVault
-    value: ${{ parameters.deployRecoveryVault }}
+    value: ${{ iif(eq(parameters.deployRecoveryVault, 'Yes'), true, false) }}
   - name: deployAlerts
-    value: ${{ parameters.deployAlerts }}
+    value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
   - name: awaitActiveOrchestrations
-    value: ${{ parameters.awaitActiveOrchestrations }}
+    value: ${{ iif(eq(parameters.awaitActiveOrchestrations, 'Yes'), true, false) }}
 
 pool:
   vmImage: $(vmImageName)

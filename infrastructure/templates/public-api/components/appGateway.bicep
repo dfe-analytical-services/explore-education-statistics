@@ -1,5 +1,6 @@
 import { responseTimeConfig, dynamicTotalGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
 import { staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
+import { removeMultiple } from '../functions.bicep'
 
 import {
   AppGatewayBackend
@@ -87,6 +88,8 @@ module keyVaultAccessPolicyModule 'keyVaultAccessPolicy.bicep' = {
   }
 }
 
+var invalidDomainLabelCharacters = ['.', '-']
+
 // Create public IP addresses for every site we will expose through this App Gateway.
 resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for site in sites: {
   name: '${site.name}-pip'
@@ -99,8 +102,8 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [f
     publicIPAllocationMethod: 'Static'
     idleTimeoutInMinutes: 4
     dnsSettings: {
-      domainNameLabel: replace(replace(site.fqdn, '.', ''), '-', '')
-      fqdn: '${replace(replace(site.fqdn, '.', ''), '-', '')}.${location}.cloudapp.azure.com'
+      domainNameLabel: removeMultiple(site.fqdn, invalidDomainLabelCharacters)
+      fqdn: '${removeMultiple(site.fqdn, invalidDomainLabelCharacters)}.${location}.cloudapp.azure.com'
     }
   }
   zones: availabilityZones
