@@ -2,7 +2,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
-using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 
@@ -27,7 +26,7 @@ public static class DataSetVersionQueryableExtensions
             .Where(v =>
                 (!versionRecord.Major.HasValue || v.VersionMajor == versionRecord.Major) &&
                 (!versionRecord.Minor.HasValue || v.VersionMinor == versionRecord.Minor) &&
-                (!versionRecord.Patch.HasValue || v.VersionPatch == versionRecord.Patch))//Is this gonna break any existing functionality, especially since it's being sorted?
+                (!versionRecord.Patch.HasValue || v.VersionPatch == versionRecord.Patch))
             .OrderByDescending(v => v.VersionMajor)
             .ThenByDescending(v => v.VersionMinor)
             .ThenByDescending(v => v.VersionPatch)
