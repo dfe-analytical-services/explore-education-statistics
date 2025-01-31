@@ -249,7 +249,7 @@ const ReleaseDataUploadsSection = ({
               releaseId={releaseId}
             />
 
-            {isReordering ? undefined : (
+            {dataFiles.length < 2 || isReordering ? null : (
               <Button onClick={toggleReordering.on} variant="secondary">
                 Reorder data files
               </Button>
