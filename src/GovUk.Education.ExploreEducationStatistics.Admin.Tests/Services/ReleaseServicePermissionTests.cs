@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -53,12 +54,14 @@ public class ReleaseServicePermissionTests
     private static ReleaseService BuildService(
         IUserService userService,
         ContentDbContext? context = null,
-        IReleaseVersionService? releaseVersionService = null)
+        IReleaseVersionService? releaseVersionService = null,
+        IReleaseCacheService? releaseCacheService = null)
     {
         return new ReleaseService(
             context: context ?? Mock.Of<ContentDbContext>(),
             userService: userService,
             releaseVersionService: releaseVersionService ?? Mock.Of<IReleaseVersionService>(),
+            releaseCacheService: releaseCacheService ?? Mock.Of<IReleaseCacheService>(),
             guidGenerator: new SequentialGuidGenerator()
         );
     }

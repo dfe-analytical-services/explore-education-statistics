@@ -1,4 +1,5 @@
 #nullable enable
+using Google.Protobuf.WellKnownTypes;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -7,12 +8,17 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
 using System.Linq;
@@ -23,6 +29,7 @@ using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
 
@@ -65,7 +72,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         [InlineData(2020, TimeIdentifier.AcademicYear, " initial", "initial", "2020-21-initial")]
         [InlineData(2020, TimeIdentifier.AcademicYear, "initial ", "initial", "2020-21-initial")]
         [InlineData(2020, TimeIdentifier.AcademicYear, "initial 2", "initial 2", "2020-21-initial-2")]
-        [InlineData(2020, TimeIdentifier.AcademicYear, "initial  2", "initial  2", "2020-21-initial-2")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "initial  2", "initial 2", "2020-21-initial-2")]
         [InlineData(2020, TimeIdentifier.AcademicYear, "", null, "2020-21")]
         [InlineData(2020, TimeIdentifier.AcademicYear, " ", null, "2020-21")]
         [InlineData(2020, TimeIdentifier.AcademicYear, "  ", null, "2020-21")]
@@ -256,7 +263,420 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
                 Label = label,
             };
 
-            return await client.PostAsJsonAsync($"api/releases", request);
+            return await client.PostAsJsonAsync("api/releases", request);
+        }
+    }
+
+    public class UpdateReleaseTests(TestApplicationFactory testApp) : ReleasesControllerIntegrationTests(testApp)
+    {
+        public override async Task InitializeAsync() => await InitializeWithAzurite();
+
+        [Theory]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "initial", "initial", "2020-21-initial", "Academic year 2020/21 initial")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "Initial", "Initial", "2020-21-initial", "Academic year 2020/21 Initial")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, " initial", "initial", "2020-21-initial", "Academic year 2020/21 initial")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "initial ", "initial", "2020-21-initial", "Academic year 2020/21 initial")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "initial 2", "initial 2", "2020-21-initial-2", "Academic year 2020/21 initial 2")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "initial  2", "initial 2", "2020-21-initial-2", "Academic year 2020/21 initial 2")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "", null, "2020-21", "Academic year 2020/21")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, " ", null, "2020-21", "Academic year 2020/21")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "  ", null, "2020-21", "Academic year 2020/21")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, null, null, "2020-21", "Academic year 2020/21")]
+        [InlineData(2020, TimeIdentifier.AcademicYearQ1, "initial", "initial", "2020-21-q1-initial", "Academic year Q1 2020/21 initial")]
+        public async Task Success(
+            int year,
+            TimeIdentifier timePeriodCoverage,
+            string? label,
+            string? expectedLabel,
+            string expectedSlug,
+            string expectedTitle)
+        {
+            Release release = DataFixture.DefaultRelease(publishedVersions: 1)
+                .WithYear(year)
+                .WithTimePeriodCoverage(timePeriodCoverage)
+                .WithPublication(DataFixture.DefaultPublication());
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Releases.Add(release));
+
+            var response = await UpdateRelease(
+                releaseId: release.Id,
+                label: label);
+
+            var viewModel = response.AssertOk<ReleaseViewModel>();
+
+            Assert.Equal(release.PublicationId, viewModel.PublicationId);
+            Assert.Equal(expectedSlug, viewModel.Slug);
+            Assert.Equal(timePeriodCoverage, viewModel.TimePeriodCoverage);
+            Assert.Equal(year, viewModel.Year);
+            Assert.Equal(expectedLabel, viewModel.Label);
+            Assert.Equal(expectedTitle, viewModel.Title);
+
+            var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
+
+            var updatedRelease = await contentDbContext.Releases
+                .Include(r => r.Publication)
+                .SingleAsync(r => r.Id == release.Id);
+
+            Assert.Equal(expectedLabel, updatedRelease.Label);
+            Assert.Equal(expectedSlug, updatedRelease.Slug);
+        }
+
+        // cache is updated for live release (old cache is DELETED, new cache with new cache key formed)
+
+        [Fact]
+        public async Task CacheIsUpdatedForLiveRelease()
+        {
+            var oldSlug = "2020-21-initial";
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            Release oldRelease = DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)
+                .WithYear(2020)
+                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                .WithLabel("initial")
+                .WithSlug(oldSlug)
+                .WithPublication(publication);
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Releases.Add(oldRelease));
+
+            var app = BuildApp();
+            var client = app.CreateClient();
+
+            var blobCacheService = app.Services.GetRequiredService<IBlobCacheService>();
+
+            var oldReleaseCachedViewModel = new ReleaseCacheViewModel(id: oldRelease.Versions[0].Id);
+            var oldReleaseCacheKey = new ReleaseCacheKey(
+                publicationSlug: publication.Slug,
+                releaseSlug: oldRelease.Slug);
+
+            var oldLatestReleaseCachedViewModel = new ReleaseCacheViewModel(id: oldRelease.Versions[0].Id);
+            var oldLatestReleaseCacheKey = new ReleaseCacheKey(
+                publicationSlug: publication.Slug);
+
+            // This represents the cache stored in the release-specific directory
+            await blobCacheService.SetItemAsync(oldReleaseCacheKey, oldReleaseCachedViewModel);
+            // This represents the cache stored in the 'latest-release.json' path
+            await blobCacheService.SetItemAsync(oldLatestReleaseCacheKey, oldLatestReleaseCachedViewModel);
+
+            // Testing that these two pieces of cache have actually been stored
+            Assert.NotNull(await blobCacheService.GetItemAsync(oldReleaseCacheKey, typeof(ReleaseCacheViewModel)));
+            Assert.NotNull(await blobCacheService.GetItemAsync(oldLatestReleaseCacheKey, typeof(ReleaseCacheViewModel)));
+
+            var response = await UpdateRelease(
+                releaseId: oldRelease.Id,
+                label: "final",
+                client: client);
+
+            response.AssertOk<ReleaseViewModel>();
+
+            var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
+
+            var updatedRelease = await contentDbContext.Releases
+                .Include(r => r.Publication)
+                .SingleAsync(r => r.Id == oldRelease.Id);
+
+            var oldSlugReleaseCacheKey = new ReleaseCacheKey(
+                publicationSlug: publication.Slug,
+                releaseSlug: oldRelease.Slug);
+            var oldSlugCachedValue = await blobCacheService.GetItemAsync(oldSlugReleaseCacheKey, typeof(ReleaseCacheViewModel));
+
+            var newSlugReleaseCacheKey = new ReleaseCacheKey(
+                publicationSlug: publication.Slug,
+                releaseSlug: updatedRelease.Slug);
+            var newSlugCachedValue = await blobCacheService.GetItemAsync(newSlugReleaseCacheKey, typeof(ReleaseCacheViewModel))
+                as ReleaseCacheViewModel;
+
+            var latestReleaseCacheKey = new ReleaseCacheKey(
+                publicationSlug: publication.Slug);
+            var latestReleaseCachedValue = await blobCacheService.GetItemAsync(latestReleaseCacheKey, typeof(ReleaseCacheViewModel))
+                as ReleaseCacheViewModel;
+
+            // Checking that the cache for the old release slug has been deleted
+            Assert.Null(oldSlugCachedValue);
+
+            // Checking that the release-specific cache for the new release slug has been created, and is not the same as the old cache
+            Assert.NotNull(newSlugCachedValue);
+            Assert.NotEqual(oldReleaseCachedViewModel, newSlugCachedValue);
+            Assert.Equal(updatedRelease.Slug, newSlugCachedValue.Slug);
+
+            // Checking that the latest release cache has been updated, and is not the same as the old cache
+            Assert.NotNull(latestReleaseCachedValue);
+            Assert.NotEqual(oldLatestReleaseCachedViewModel, latestReleaseCachedValue);
+            Assert.NotEqual(updatedRelease.Slug, latestReleaseCachedValue.Slug);
+        }
+
+        [Fact]
+        public async Task CacheIsUntouchedForUnpublishedRelease()
+        {
+            var oldSlug = "2020-21-initial";
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            Release oldRelease = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+                .WithYear(2020)
+                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                .WithLabel("initial")
+                .WithSlug(oldSlug)
+                .WithPublication(publication);
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Releases.Add(oldRelease));
+
+            var app = BuildApp();
+            var client = app.CreateClient();
+
+            var response = await UpdateRelease(
+                releaseId: oldRelease.Id,
+                label: "final",
+                client: client);
+
+            response.AssertOk<ReleaseViewModel>();
+
+            var blobCacheService = app.Services.GetRequiredService<IBlobCacheService>();
+
+            var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
+
+            var updatedRelease = await contentDbContext.Releases
+                .Include(r => r.Publication)
+                .SingleAsync(r => r.Id == oldRelease.Id);
+
+            var oldSlugCacheKey = new ReleaseCacheKey(
+                publicationSlug: publication.Slug,
+                releaseSlug: oldRelease.Slug);
+            var oldSlugCachedValue = await blobCacheService.GetItemAsync(oldSlugCacheKey, typeof(ReleaseCacheViewModel));
+
+            var newSlugCacheKey = new ReleaseCacheKey(
+                publicationSlug: publication.Slug,
+                releaseSlug: updatedRelease.Slug);
+            var newSlugCachedValue = await blobCacheService.GetItemAsync(newSlugCacheKey, typeof(ReleaseCacheViewModel));
+
+            // Checking that there isn't any cache for the old release view-model
+            Assert.Null(oldSlugCachedValue);
+
+            // Checking that there isn't any cache for the new release view-model
+            Assert.Null(newSlugCachedValue);
+        }
+
+        [Fact]
+        public async Task ReleaseRedirectNotCreatedForUnpublishedRelease()
+        {
+            var oldSlug = "2020-21-initial";
+
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+                .WithYear(2020)
+                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                .WithLabel("initial")
+                .WithSlug(oldSlug)
+                .WithPublication(DataFixture.DefaultPublication());
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Releases.Add(release));
+
+            var response = await UpdateRelease(
+                releaseId: release.Id,
+                label: "final");
+
+            response.AssertOk<ReleaseViewModel>();
+
+            var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
+
+            var releaseRedirects = await contentDbContext.ReleaseRedirects
+                .ToListAsync();
+
+            Assert.Empty(releaseRedirects);
+        }
+
+        [Fact]
+        public async Task ReleaseRedirectCreatedForLiveRelease()
+        {
+            var oldSlug = "2020-21-initial";
+
+            Release release = DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)
+                .WithYear(2020)
+                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                .WithLabel("initial")
+                .WithSlug(oldSlug)
+                .WithPublication(DataFixture.DefaultPublication());
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Releases.Add(release));
+
+            var response = await UpdateRelease(
+                releaseId: release.Id,
+                label: "final");
+
+            response.AssertOk<ReleaseViewModel>();
+
+            var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
+
+            var releaseRedirect = await contentDbContext.ReleaseRedirects
+                .SingleAsync(r => r.ReleaseId == release.Id);
+
+            Assert.Equal(oldSlug, releaseRedirect.Slug);
+        }
+
+        [Fact]
+        public async Task ReleaseNotFound()
+        {
+            var response = await UpdateRelease(
+                releaseId: Guid.NewGuid(),
+                label: null);
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task UserDoesNotHavePermission()
+        {
+            Release release = DataFixture.DefaultRelease(publishedVersions: 1)
+                .WithPublication(DataFixture.DefaultPublication());
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Releases.Add(release));
+
+            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
+
+            var response = await UpdateRelease(
+                releaseId: release.Id,
+                label: null,
+                client: client);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "initial", "2020-21-initial")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "Initial", "2020-21-initial")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, " initial ", "2020-21-initial")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, null, "2020-21")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "", "2020-21")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, " ", "2020-21")]
+        [InlineData(2020, TimeIdentifier.AcademicYear, "  ", "2020-21")]
+        [InlineData(2020, TimeIdentifier.AcademicYearQ1, "initial", "2020-21-q1-initial")]
+        public async Task SlugNotUniqueToPublication(
+            int year,
+            TimeIdentifier timePeriodCoverage,
+            string? label,
+            string existingReleaseSlug)
+        { 
+            Publication publication = DataFixture.DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1)
+                    .WithYear(year)
+                    .WithTimePeriodCoverage(timePeriodCoverage)
+                    .ForIndex(0, s => s.SetSlug(existingReleaseSlug))
+                    .GenerateList(2));
+
+            var releaseBeingUpdated = publication.Releases[1];
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Publications.Add(publication));
+
+            var response = await UpdateRelease(
+                releaseId: releaseBeingUpdated.Id,
+                label: label);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            var error = Assert.Single(validationProblem.Errors);
+
+            Assert.Equal(SlugNotUnique.ToString(), error.Code);
+        }
+
+        [Fact]
+        public async Task ReleaseIsUndergoingPublishing()
+        {
+            Release release = DataFixture.DefaultRelease()
+                .WithVersions(DataFixture.DefaultReleaseVersion()
+                    .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                    .ForIndex(0, s => s.SetPublished(DateTime.UtcNow))
+                    .ForIndex(1, s => s.SetPublished(DateTime.UtcNow))
+                    .GenerateList(3))
+                .WithPublication(DataFixture.DefaultPublication());
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Releases.Add(release));
+
+            var response = await UpdateRelease(
+                releaseId: release.Id,
+                label: "new label");
+
+            var validationProblem = response.AssertValidationProblem();
+
+            var error = Assert.Single(validationProblem.Errors);
+
+            Assert.Equal(ReleaseUndergoingPublishing.ToString(), error.Code);
+        }
+
+        [Fact]
+        public async Task ReleaseRedirectExistsForNewSlug()
+        {
+            Release release = DataFixture.DefaultRelease(publishedVersions: 1)
+                .WithYear(2020)
+                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                .WithLabel("initial")
+                .WithSlug("2020-21-initial")
+                .WithRedirects([DataFixture.DefaultReleaseRedirect()
+                    .WithSlug("2020-21-final")])
+                .WithPublication(DataFixture.DefaultPublication());
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Releases.Add(release));
+
+            var response = await UpdateRelease(
+                releaseId: release.Id,
+                label: "final");
+
+            var validationProblem = response.AssertValidationProblem();
+
+            var error = Assert.Single(validationProblem.Errors);
+
+            Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
+        }
+
+        [Fact]
+        public async Task LabelOver50Characters()
+        {
+            Release release = DataFixture.DefaultRelease(publishedVersions: 1)
+                .WithPublication(DataFixture.DefaultPublication());
+
+            await TestApp.AddTestData<ContentDbContext>(
+                context => context.Releases.Add(release));
+
+            var response = await UpdateRelease(
+                releaseId: release.Id,
+                label: new string('a', 51));
+
+            var validationProblem = response.AssertValidationProblem();
+
+            var error = Assert.Single(validationProblem.Errors);
+
+            Assert.Equal($"The field {nameof(ReleaseUpdateRequest.Label)} must be a string or array type with a maximum length of '50'.", error.Message);
+            Assert.Equal(nameof(ReleaseUpdateRequest.Label), error.Path);
+        }
+
+        private WebApplicationFactory<TestStartup> BuildApp(
+            ClaimsPrincipal? user = null)
+        {
+            return WithAzurite(
+                testApp: TestApp.SetUser(user ?? DataFixture.BauUser()), 
+                enabled: true);
+        }
+
+        private async Task<HttpResponseMessage> UpdateRelease(
+            Guid releaseId,
+            string? label = null,
+            HttpClient? client = null)
+        {
+            client ??= BuildApp().CreateClient();
+
+            var request = new ReleaseUpdateRequest
+            {
+                Label = label,
+            };
+
+            return await client.PatchAsJsonAsync($"api/releases/{releaseId}", request);
         }
     }
 }

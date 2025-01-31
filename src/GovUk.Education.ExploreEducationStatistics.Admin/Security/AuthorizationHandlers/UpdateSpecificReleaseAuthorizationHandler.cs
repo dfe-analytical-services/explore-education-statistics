@@ -9,17 +9,10 @@ public class UpdateSpecificReleaseRequirement : IAuthorizationRequirement
 {
 }
 
-public class UpdateSpecificReleaseAuthorizationHandler
-    : AuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
+public class UpdateSpecificReleaseAuthorizationHandler(
+    AuthorizationHandlerService authorizationHandlerService)
+        : AuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
 {
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public UpdateSpecificReleaseAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
-    {
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         UpdateSpecificReleaseRequirement requirement,
@@ -33,7 +26,7 @@ public class UpdateSpecificReleaseAuthorizationHandler
 
         var allowedPublicationRole = PublicationRole.Owner;
 
-        if (await _authorizationHandlerService
+        if (await authorizationHandlerService
                 .HasRolesOnPublication(
                     userId: context.User.GetUserId(),
                     publicationId: release.PublicationId,
