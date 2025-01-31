@@ -93,6 +93,20 @@ public class FilterMetaRepository(
                 meta,
                 cancellationToken);
 
+            var hasTotal = options.Any(option => option.Label == "Total");
+            if (meta.AutoSelectLabel == null && hasTotal)
+            {
+                // If filter_default in the CSV meta file row is null, FilterMeta.AutoSelectLabel will initially be set
+                // to null even if a "Total" option exists. If there is a "Total", we set FilterMeta.AutoSelectLabel
+                // here.
+                await publicDataDbContext.FilterMetas
+                    .AsNoTracking() // to avoid IUpdatedTimestamp - we don't want to set FilterMeta.Updated as part of this UPDATE
+                    .Where(fm => fm.Id == meta.Id)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(fm => fm.AutoSelectLabel, "Total"),
+                        cancellationToken: cancellationToken);
+            }
+
             var optionTable = publicDataDbContext.GetTable<FilterOptionMeta>();
 
             // Merge to only inserting new filter options
@@ -101,8 +115,8 @@ public class FilterMetaRepository(
                 .Merge()
                 .Using(options)
                 .On(
-                    o => new { o.Label, o.IsAggregate },
-                    o => new { o.Label, o.IsAggregate }
+                    o => o.Label,
+                    o => o.Label
                 )
                 .InsertWhenNotMatched()
                 .MergeAsync(cancellationToken);
@@ -124,12 +138,12 @@ public class FilterMetaRepository(
                 // technique that was used for the location meta. This is more for
                 // future-proofing if we ever add more columns to the filter options table.
                 var batchRowKeys = batch
-                    .Select(o => o.Label + ',' + (o.IsAggregate == true ? "True" : ""))
+                    .Select(o => o.Label)
                     .ToHashSet();
 
                 var filterOptionMeta = await optionTable
                     .Where(o =>
-                        batchRowKeys.Contains(o.Label + ',' + (o.IsAggregate == true ? "True" : "")))
+                        batchRowKeys.Contains(o.Label))
                     .OrderBy(o => o.Label)
                     .ToListAsync(token: cancellationToken);
 
@@ -200,7 +214,8 @@ public class FilterMetaRepository(
                 Column = row.ColName,
                 DataSetVersionId = dataSetVersion.Id,
                 Label = row.Label,
-                Hint = row.FilterHint ?? string.Empty
+                Hint = row.FilterHint ?? string.Empty,
+                AutoSelectLabel = row.FilterDefault,
             })
             .ToList();
     }
@@ -223,9 +238,7 @@ public class FilterMetaRepository(
                 label => new FilterOptionMeta
                 {
                     Label = label,
-                    IsAggregate = label == "Total" ? true : null
-                }
-            )
+                })
             .ToList();
     }
 

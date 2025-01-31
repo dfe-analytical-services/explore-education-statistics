@@ -7,7 +7,7 @@ export const testSubjectMeta: SubjectMeta = {
   filters: {
     Characteristic: {
       id: 'characteristic',
-      totalValue: '',
+      autoSelectFilterItemId: '',
       hint: 'Filter by pupil characteristic',
       legend: 'Characteristic',
       name: 'characteristic',
@@ -87,7 +87,7 @@ export const testTableData: TableDataResponse = {
     ],
     filters: {
       Characteristic: {
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         name: 'characteristic',

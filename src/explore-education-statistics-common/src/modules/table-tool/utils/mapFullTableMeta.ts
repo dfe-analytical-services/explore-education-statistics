@@ -22,7 +22,7 @@ export default function mapFullTableMeta(
               ...option,
               group: filterGroup.label,
               category: category.legend,
-              isTotal: category.totalValue === option.value,
+              isAutoSelect: category.autoSelectFilterItemId === option.value,
             }),
         ),
       ),

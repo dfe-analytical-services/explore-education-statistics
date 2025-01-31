@@ -111,7 +111,7 @@ export interface SubjectMeta {
     id: string;
     options: GroupedFilterOptions;
     order: number;
-    totalValue?: string;
+    autoSelectFilterItemId?: string;
     name: string;
   }>;
   indicators: Dictionary<{
@@ -173,7 +173,7 @@ export interface TableDataSubjectMeta {
     hint?: string;
     options: GroupedFilterOptions;
     order: number;
-    totalValue?: string;
+    autoSelectFilterItemId?: string;
   }>;
   geoJsonAvailable: boolean;
   indicators: IndicatorOption[];
