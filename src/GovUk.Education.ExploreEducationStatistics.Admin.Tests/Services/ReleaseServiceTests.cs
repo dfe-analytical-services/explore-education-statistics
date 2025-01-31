@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -259,7 +260,8 @@ public abstract class ReleaseServiceTests
 
     private static ReleaseService BuildReleaseService(
         ContentDbContext contentDbContext,
-        IReleaseVersionService? releaseVersionService = null)
+        IReleaseVersionService? releaseVersionService = null,
+        IReleaseCacheService? releaseCacheService = null)
     {
         var userService = AlwaysTrueUserService();
 
@@ -271,6 +273,7 @@ public abstract class ReleaseServiceTests
             context: contentDbContext,
             userService: userService.Object,
             releaseVersionService: releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
+            releaseCacheService: releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
             guidGenerator: new SequentialGuidGenerator()
         );
     }

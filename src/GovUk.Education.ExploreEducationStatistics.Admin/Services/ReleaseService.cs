@@ -14,9 +14,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Profiling.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -24,7 +26,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class ReleaseService(
+public partial class ReleaseService(
     ContentDbContext context,
     IUserService userService,
     IReleaseVersionService releaseVersionService,
@@ -47,7 +49,7 @@ public class ReleaseService(
                     Year = releaseCreate.Year,
                     TimePeriodCoverage = releaseCreate.TimePeriodCoverage,
                     Slug = releaseCreate.Slug,
-                    Label = string.IsNullOrWhiteSpace(releaseCreate.Label) ? null : releaseCreate.Label.Trim(),
+                    Label = FormatReleaseLabel(releaseCreate.Label),
                 };
 
                 var newReleaseVersion = new ReleaseVersion
@@ -121,9 +123,13 @@ public class ReleaseService(
             .OnSuccess(async releaseAndSlugs =>
             {
                 var latestPublishedReleaseVersion = await GetLatestPublishedReleaseVersion(
-                    publicationId: releaseId,
+                    publicationId: releaseAndSlugs.release.PublicationId,
                     releaseSlug: releaseAndSlugs.newReleaseSlug,
                     cancellationToken: cancellationToken);
+
+                // NEED TO ASK BEN IF WE ONLY EVER CACHE FOR THE LATEST RELEASE VERSION?
+                // OR, DO WE NEED TO UPDATE THE CACHE FOR ALL RELEASE PATHS, AS WELL AS THE
+                // LATEST RELEASE PATH?
 
                 var releaseIsLive = latestPublishedReleaseVersion is not null;
 
@@ -133,7 +139,8 @@ public class ReleaseService(
                         oldReleaseSlug: releaseAndSlugs.oldReleaseSlug,
                         newReleaseSlug: releaseAndSlugs.newReleaseSlug,
                         publicationSlug: releaseAndSlugs.release.Publication.Slug,
-                        releaseVersionId: latestPublishedReleaseVersion!.Id);
+                        releaseVersionId: latestPublishedReleaseVersion!.Id,
+                        latestReleaseVersionId: latestPublishedReleaseVersion.Id);
                 }
 
                 return (releaseAndSlugs.oldReleaseSlug, releaseIsLive);
@@ -268,12 +275,25 @@ public class ReleaseService(
         ReleaseUpdateRequest releaseUpdate,
         CancellationToken cancellationToken)
     {
-        release.Label = releaseUpdate.Label;
+        var newLabel = FormatReleaseLabel(releaseUpdate.Label);
+
+        release.Label = newLabel;
         release.Slug = newReleaseSlug;
 
         await context.SaveChangesAsync(cancellationToken: cancellationToken);
 
         return Unit.Instance;
+    }
+
+    private static string? FormatReleaseLabel(string? releaseLabel)
+    {
+        var trimmedNewLabel = string.IsNullOrWhiteSpace(releaseLabel) 
+            ? null 
+            : releaseLabel.Trim();
+
+        return trimmedNewLabel.HasValue()
+            ? MatchWhitespaceRegex().Replace(trimmedNewLabel, " ")
+            : null;
     }
 
     private async Task<ReleaseVersion?> GetLatestPublishedReleaseVersion(
@@ -282,7 +302,10 @@ public class ReleaseService(
         CancellationToken cancellationToken = default)
     {
         return await context.ReleaseVersions
-            .LatestReleaseVersions(publicationId, releaseSlug, publishedOnly: true)
+            .LatestReleaseVersions(
+                publicationId: publicationId,
+                releaseSlug: releaseSlug, 
+                publishedOnly: true)
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
@@ -290,21 +313,30 @@ public class ReleaseService(
         string oldReleaseSlug,
         string newReleaseSlug,
         string publicationSlug,
-        Guid releaseVersionId)
+        Guid releaseVersionId,
+        Guid latestReleaseVersionId)
     {
         var slugHasChanged = oldReleaseSlug != newReleaseSlug;
 
         if (slugHasChanged)
         {
+            // Remove release-specific path cache as the release slug has changed - hence,
+            // the path should also change
             await releaseCacheService.RemoveRelease(
                 publicationSlug: publicationSlug,
                 releaseSlug: oldReleaseSlug);
         }
 
+        // Update release-specific path cache
         await releaseCacheService.UpdateRelease(
             releaseVersionId: releaseVersionId,
             publicationSlug: publicationSlug,
             releaseSlug: newReleaseSlug);
+
+        // Update latest release path cache
+        await releaseCacheService.UpdateRelease(
+            releaseVersionId: latestReleaseVersionId,
+            publicationSlug: publicationSlug);
 
         return Unit.Instance;
     }
@@ -346,4 +378,7 @@ public class ReleaseService(
             Title = release.Title,
         };
     }
+
+    [GeneratedRegex(@"\s+", RegexOptions.Compiled, matchTimeoutMilliseconds: 200)]
+    private static partial Regex MatchWhitespaceRegex();
 }
