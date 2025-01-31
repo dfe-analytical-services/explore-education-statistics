@@ -19,6 +19,14 @@ jobs:
       runOnce:
         deploy:
           steps:
+
+            - template: ../tasks/assign-app-role-to-service-principal.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                appRoleName: Admin.Access
+                protectedResourceAppRegName: $(subscription)-ees-papi-ca-api-appreg
+                servicePrincipalName: $(subscription)-as-ees-admin
+
             - checkout: self
 
             - task: AzureCLI@2
@@ -65,10 +73,3 @@ jobs:
                 deployRecoveryVault: $(deployRecoveryVault)
                 deployAlerts: $(deployAlerts)
                 dataProcessorExists: $(dataProcessorExists)
-
-           # - template: ../tasks/assign-app-role-to-service-principal.yml
-           #   parameters:
-           #     serviceConnection: ${ {parameters.serviceConnection }}
-           #     appRoleName: Admin.Access
-           #     protectedResourceAppRegName: $(subscription)-ees-papi-ca-api-appreg
-           #     servicePrincipalName: $(subscription)-as-ees-admin
