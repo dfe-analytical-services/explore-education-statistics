@@ -110,6 +110,9 @@ public static class DataSetVersionRecordTest
         [InlineData("V1.1.1")]
         [InlineData("V1.1")]
         [InlineData("V1")]
+        [InlineData("v")]
+        [InlineData(".")]
+        [InlineData("..")]
 
         public void InvalidVersion_FailsToParse(string versionString)
         {

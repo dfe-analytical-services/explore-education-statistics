@@ -15,48 +15,7 @@ public class DataSetVersionQueryableExtensionsTests
         private readonly DataFixture _dataFixture = new();
 
         [Theory]
-        [InlineData("v*", 5)]
-        [InlineData("*", 5)]
-        [InlineData("0.*", 0, 2, 1)]
-        [InlineData("0.*.*", 0, 2, 1)]
-        [InlineData("0.2.*", 0, 2, 1)]
-        [InlineData("0.1.*", 0, 1, 3)]
-        [InlineData("2.*.*", 2, 1, 4)]
-        [InlineData("2.*", 2, 1, 4)]
-        [InlineData("2.1.*", 2, 1, 4)]
-        [InlineData("1.*.*", 1, 3, 0)]
-        [InlineData("1.2.*", 1, 2, 0)]
-        [InlineData("1.1.*", 1, 1, 1)]
-        [InlineData("1.*", 1, 3, 0)]
-        [InlineData("0.2", 0, 2, 0)]
-        [InlineData("0.2.1", 0, 2, 1)]
-        [InlineData("0.1.3", 0, 1, 3)]
-        [InlineData("2.1.4", 2, 1, 4)]
-        [InlineData("2.1", 2, 1, 0)]
-        [InlineData("1.3.0", 1, 3, 0)]
-        [InlineData("1.2.0", 1, 2, 0)]
-        [InlineData("1.1.0", 1, 1, 0)]
-        [InlineData("1.3", 1, 3, 0)]
-        [InlineData("v1.3", 1, 3, 0)]
-        [InlineData("v0.2", 0, 2, 0)]
-        [InlineData("v0.2.1", 0, 2, 1)]
-        [InlineData("v0.1.3", 0, 1, 3)]
-        [InlineData("v2.1.4", 2, 1, 4)]
-        [InlineData("v2.1", 2, 1, 0)]
-        [InlineData("v1.3.0", 1, 3, 0)]
-        [InlineData("v1.2.0", 1, 2, 0)]
-        [InlineData("v1.1.0", 1, 1, 0)]
-        [InlineData("v0.*", 0, 2, 1)]
-        [InlineData("v0.*.*", 0, 2, 1)]
-        [InlineData("v0.2.*", 0, 2, 1)]
-        [InlineData("v0.1.*", 0, 1, 3)]
-        [InlineData("v2.*.*", 2, 1, 4)]
-        [InlineData("v2.*", 2, 1, 4)]
-        [InlineData("v2.1.*", 2, 1, 4)]
-        [InlineData("v1.*.*", 1, 3, 0)]
-        [InlineData("v1.2.*", 1, 2, 0)]
-        [InlineData("v1.1.*", 1, 1, 1)]
-        [InlineData("v1.*", 1, 3, 0)]
+        [MemberData(nameof(ValidVersions))]
         public async Task TestValidDataSetVersions_ReturnsExpectedVersion(string versionString,
                 int expectedMajor,
                 int expectedMinor = default,
@@ -90,6 +49,11 @@ public class DataSetVersionQueryableExtensionsTests
         [InlineData("7.*")]
         [InlineData("0.0.*")]
         [InlineData("0.3.*")]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData("v")]
+        [InlineData(".")]
+        [InlineData("..")]
         public async Task TestInvalidDataSetVersions_ReturnsNotFound(string versionString)
         {
             // Arrange
@@ -144,5 +108,50 @@ public class DataSetVersionQueryableExtensionsTests
 
             return publicDataDbContextMock.Object.DataSetVersions.AsNoTracking();
         }
+        public static TheoryData<string, int, int, int> ValidVersions => new()
+        {
+            {"0.1.*", 0, 1, 3},
+            {"0.1.3", 0, 1, 3},
+            {"0.2", 0, 2, 0},
+            {"0.2.*", 0, 2, 1},
+            {"0.2.1", 0, 2, 1},
+            {"0.*", 0, 2, 1},
+            {"0.*.*", 0, 2, 1},
+            {"1.1.*", 1, 1, 1},
+            {"1.1.0", 1, 1, 0},
+            {"1.2.*", 1, 2, 0},
+            {"1.2.0", 1, 2, 0},
+            {"1.3", 1, 3, 0},
+            {"1.3.0", 1, 3, 0},
+            {"1.*", 1, 3, 0},
+            {"1.*.*", 1, 3, 0},
+            {"2.1", 2, 1, 0},
+            {"2.1.*", 2, 1, 4},
+            {"2.1.4", 2, 1, 4},
+            {"2.*", 2, 1, 4},
+            {"2.*.*", 2, 1, 4},
+            {"*", 5, 0, 0},
+            {"v0.1.*", 0, 1, 3},
+            {"v0.1.3", 0, 1, 3},
+            {"v0.2", 0, 2, 0},
+            {"v0.2.*", 0, 2, 1},
+            {"v0.2.1", 0, 2, 1},
+            {"v0.*", 0, 2, 1},
+            {"v0.*.*", 0, 2, 1},
+            {"v1.1.*", 1, 1, 1},
+            {"v1.1.0", 1, 1, 0},
+            {"v1.2.*", 1, 2, 0},
+            {"v1.2.0", 1, 2, 0},
+            {"v1.3", 1, 3, 0},
+            {"v1.3.0", 1, 3, 0},
+            {"v1.*", 1, 3, 0},
+            {"v1.*.*", 1, 3, 0},
+            {"v2.1", 2, 1, 0},
+            {"v2.1.*", 2, 1, 4},
+            {"v2.1.4", 2, 1, 4},
+            {"v2.*", 2, 1, 4},
+            {"v2.*.*", 2, 1, 4},
+            {"v*", 5, 0, 0}
+        };
     }
 }
