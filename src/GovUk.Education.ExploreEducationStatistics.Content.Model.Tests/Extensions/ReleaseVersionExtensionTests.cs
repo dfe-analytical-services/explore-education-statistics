@@ -1,28 +1,23 @@
-using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensions;
+
+public class ReleaseVersionExtensionTests
 {
-    public class ReleaseVersionExtensionTests
+    private readonly DataFixture _dataFixture = new();
+
+    [Fact]
+    public void AllFilesZipPath()
     {
-        [Fact]
-        public void AllFilesZipPath()
-        {
-            const string releaseSlug = "release-slug";
-            const string publicationSlug = "publication-slug";
+        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication()));
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Slug = releaseSlug,
-                Publication = new Publication
-                {
-                    Slug = publicationSlug
-                }
-            };
-
-            Assert.Equal($"{releaseVersion.Id}/zip/{publicationSlug}_{releaseSlug}.zip", releaseVersion.AllFilesZipPath());
-        }
+        Assert.Equal(
+            $"{releaseVersion.Id}/zip/{releaseVersion.Release.Publication.Slug}_{releaseVersion.Release.Slug}.zip",
+            releaseVersion.AllFilesZipPath());
     }
 }

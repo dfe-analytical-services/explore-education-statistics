@@ -7,14 +7,15 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev    Test    Preprod
 
+
 *** Variables ***
-${PUBLIC_URL}=    %{PUBLIC_URL}
-${PUBLIC_URL_WITHOUT_AUTH}           ${EMPTY}
+${PUBLIC_URL}=                  %{PUBLIC_URL}
+${PUBLIC_URL_WITHOUT_AUTH}      ${EMPTY}
 
 #In local, public url contains authentication details. In order to make it work while running against dev- we need to get rid of it to compare public url against expected value.
 
-*** Test Cases ***
 
+*** Test Cases ***
 Parse and Store public url without auth details
     ${PUBLIC_URL_WITHOUT_AUTH}=    remove auth from url    %{PUBLIC_URL}
     set suite variable    ${PUBLIC_URL_WITHOUT_AUTH}
@@ -22,7 +23,7 @@ Parse and Store public url without auth details
 Verify that absolute paths with trailing slashes are redirected without them
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/
     user waits until page contains    Data catalogue
-    user checks url without auth equals   ${PUBLIC_URL_WITHOUT_AUTH}/data-catalogue
+    user checks url without auth equals    ${PUBLIC_URL_WITHOUT_AUTH}/data-catalogue
 
     user navigates to public frontend    %{PUBLIC_URL}/glossary/?someRandomUrlParameter=123
     user waits until page contains    Glossary
@@ -35,7 +36,7 @@ Verify that redirects do not affect browser history
 
     user navigates to public frontend    %{PUBLIC_URL}/data-catalogue/
     user waits until page contains    Data catalogue
-    user checks url without auth equals   ${PUBLIC_URL_WITHOUT_AUTH}/data-catalogue
+    user checks url without auth equals    ${PUBLIC_URL_WITHOUT_AUTH}/data-catalogue
 
     user goes back
     user checks url equals    about:blank

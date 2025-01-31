@@ -1,4 +1,11 @@
-import { FirewallRule, IpRange, AzureFileShareMount, EntraIdAuthentication } from '../types.bicep'
+import {
+  FirewallRule
+  IpRange
+  AzureFileShareMount
+  EntraIdAuthentication
+  StorageAccountPrivateEndpoints
+} from '../types.bicep'
+
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
 import { abbreviations } from '../abbreviations.bicep'
@@ -31,7 +38,10 @@ param applicationInsightsKey string
 param subnetId string
 
 @description('Specifies the optional subnet id for function app inbound traffic from the VNet')
-param privateEndpointSubnetId string?
+param privateEndpoints {
+  functionApp: string?
+  storageAccounts: string
+}
 
 @description('Specifies whether this Function App is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
@@ -120,10 +130,10 @@ module appServicePlanModule 'appServicePlan.bicep' = {
   }
 }
 
-// Configure a single shared storage account for access key storage, and 2 individual storage accounts to be split
+// Configure a single management storage account for access key storage, and 2 individual storage accounts to be split
 // between the production slot and staging slot for reliable execution. See
 // https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-zero-downtime-deployment#status-check-with-slot
-var sharedStorageAccountName = '${storageAccountsNamePrefix}mg'
+var managementStorageAccountName = '${storageAccountsNamePrefix}mg'
 var slot1StorageAccountName = '${storageAccountsNamePrefix}s1'
 var slot2StorageAccountName = '${storageAccountsNamePrefix}s2'
 var functionAppCodeFileShareName = '${functionAppName}-${abbreviations.fileShare}'
@@ -147,22 +157,21 @@ var fileServiceAlerts = alerts != null
   : null
 
 // This is the shared Storage Account for this Durable Function App that is used for key management, timer trigger
-// management etc.
-//
-// The Durable Function App is granted access by whitelisting its subnet for inbound traffic.
-//
-// For performance, it is considered good practice for each Function App to have its own dedicated Storage Account. See
-// https://learn.microsoft.com/en-us/azure/azure-functions/storage-considerations?tabs=azure-cli#optimize-storage-performance.
-
-// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
-module sharedStorageAccountModule 'storageAccount.bicep' = {
-  name: '${sharedStorageAccountName}StorageAccountDeploy'
+// management etc.  For performance, it is considered good practice for each Function App to have its own dedicated 
+// Storage Account. See https://learn.microsoft.com/en-us/azure/azure-functions/storage-considerations?tabs=azure-cli#optimize-storage-performance.
+module manamementStorageAccountModule 'storageAccount.bicep' = {
+  name: '${managementStorageAccountName}StorageAccountDeploy'
   params: {
     location: location
-    storageAccountName: sharedStorageAccountName
+    storageAccountName: managementStorageAccountName
     allowedSubnetIds: [subnetId]
-    skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
+    publicNetworkAccessEnabled: false
+    privateEndpointSubnetIds: {
+      blob: privateEndpoints.storageAccounts
+      queue: privateEndpoints.storageAccounts
+      table: privateEndpoints.storageAccounts
+    }
     firewallRules: storageFirewallRules
     alerts: storageAlerts
     tagValues: tagValues
@@ -171,15 +180,20 @@ module sharedStorageAccountModule 'storageAccount.bicep' = {
 
 // This is a storage account dedicated to slot 1. It uses this for its own reliable execution.
 // It also contains a file share where its slot-specific version of the code lives.
-// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
 module slot1StorageAccountModule 'storageAccount.bicep' = {
   name: '${slot1StorageAccountName}StorageAccountDeploy'
   params: {
     location: location
     storageAccountName: slot1StorageAccountName
     allowedSubnetIds: [subnetId]
-    skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
+    publicNetworkAccessEnabled: false
+    privateEndpointSubnetIds: {
+      file: privateEndpoints.storageAccounts
+      blob: privateEndpoints.storageAccounts
+      queue: privateEndpoints.storageAccounts
+      table: privateEndpoints.storageAccounts
+    }
     firewallRules: storageFirewallRules
     alerts: storageAlerts
     tagValues: tagValues
@@ -202,15 +216,20 @@ module slot1FileShareModule 'fileShare.bicep' = {
 
 // This is a storage account dedicated to slot 2. It uses this for its own reliable execution.
 // It also contains a file share where its slot-specific version of the code lives.
-// TODO EES-5128 - add private endpoints to allow VNet traffic to go directly to Storage Account over the VNet.
 module slot2StorageAccountModule 'storageAccount.bicep' = {
   name: '${slot2StorageAccountName}StorageAccountDeploy'
   params: {
     location: location
     storageAccountName: slot2StorageAccountName
     allowedSubnetIds: [subnetId]
-    skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
+    publicNetworkAccessEnabled: false
+    privateEndpointSubnetIds: {
+      file: privateEndpoints.storageAccounts
+      blob: privateEndpoints.storageAccounts
+      queue: privateEndpoints.storageAccounts
+      table: privateEndpoints.storageAccounts
+    }
     firewallRules: storageFirewallRules
     alerts: storageAlerts
     tagValues: tagValues
@@ -258,6 +277,7 @@ var commonSiteProperties = {
     netFrameworkVersion: '8.0'
     linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     keyVaultReferenceIdentity: keyVaultReferenceIdentity
+    minTlsVersion: '1.3'
     publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
     ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
     ipSecurityRestrictionsDefaultAction: 'Deny'
@@ -382,7 +402,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     ]
     commonSettings: union(appSettings, {
       // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
-      AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${sharedStorageAccountModule.outputs.connectionStringSecretName})'
+      AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${manamementStorageAccountModule.outputs.connectionStringSecretName})'
 
       // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
       // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
@@ -441,13 +461,13 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   ]
 }
 
-module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetId != null) {
+module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.functionApp != null) {
   name: '${functionAppName}PrivateEndpointDeploy'
   params: {
     serviceId: functionApp.id
     serviceName: functionApp.name
     serviceType: 'sites'
-    subnetId: privateEndpointSubnetId!
+    subnetId: privateEndpoints.functionApp!
     location: location
     tagValues: tagValues
   }
@@ -516,6 +536,6 @@ module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
 output functionAppName string = functionApp.name
 output url string = 'https://${functionApp.name}.azurewebsites.net'
 output stagingUrl string = 'https://${functionApp.name}-staging.azurewebsites.net'
-output managementStorageAccountName string = sharedStorageAccountName
+output managementStorageAccountName string = managementStorageAccountName
 output slot1StorageAccountName string = slot1StorageAccountName
 output slot2StorageAccountName string = slot2StorageAccountName

@@ -489,9 +489,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("DataSetFileMeta")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("DataSetFileMetaGeogLvlMigrated")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("DataSetFileVersion")
                         .HasColumnType("int");
 

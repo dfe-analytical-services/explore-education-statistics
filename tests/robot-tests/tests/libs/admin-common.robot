@@ -487,11 +487,10 @@ user creates amendment for release
 
 user deletes subject file
     [Arguments]    ${SUBJECT_NAME}
-    user waits until page contains accordion section    ${SUBJECT_NAME}
-    user opens accordion section    ${SUBJECT_NAME}
-    user scrolls to accordion section    ${SUBJECT_NAME}
-    ${accordion}=    user gets accordion section content element    ${SUBJECT_NAME}
-    ${button}=    user gets button element    Delete files    ${accordion}
+    user waits until page contains data uploads table
+    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
+    user scrolls to element    ${row}
+    ${button}=    user gets button element    Delete files    ${row}
     user clicks element    ${button}
     user clicks button    Confirm
 
@@ -570,31 +569,51 @@ user uploads subject
     ...    ${IMPORT_STATUS}
     ...    ${FOLDER}=${FILES_DIR}
     user clicks link    Data and files
-    user waits until page contains element    id:dataFileUploadForm-subjectTitle    %{WAIT_SMALL}
-    user enters text into element    id:dataFileUploadForm-subjectTitle    ${SUBJECT_NAME}
+    user waits until page contains element    id:dataFileUploadForm-title    %{WAIT_SMALL}
+    user enters text into element    id:dataFileUploadForm-title    ${SUBJECT_NAME}
     user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
     user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
     user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
-    user waits until page contains accordion section    ${SUBJECT_NAME}    %{WAIT_SMALL}
-    user scrolls to accordion section    ${SUBJECT_NAME}
-    user opens accordion section    ${SUBJECT_NAME}
-    ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
+    user waits until page contains element    testid:Data files table
 
     IF    "${IMPORT_STATUS}" != "Importing"
         user waits until page finishes loading
     END
 
-    user checks headed table body row contains    Status    ${IMPORT_STATUS}    ${section}    %{WAIT_DATA_FILE_IMPORT}
+    user waits until page contains data uploads table
+    user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_SMALL}
+    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
+    ${status_cell}=    user gets testid element    Status    %{WAIT_SMALL}    ${row}
+    user scrolls to element    ${status_cell}
+    user waits until element contains    ${status_cell}    ${IMPORT_STATUS}    %{WAIT_DATA_FILE_IMPORT}
 
 user waits until data upload is completed
     [Arguments]
     ...    ${SUBJECT_NAME}
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
-    user opens accordion section    ${SUBJECT_NAME}
-    ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
-    user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
+    user waits until data file import is complete    ${SUBJECT_NAME}
+
+user waits until data files table contains subject
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_DATA_FILE_IMPORT}
+    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
+
+user waits until data file import is complete
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    user waits until page contains data uploads table
+    user waits until table contains row with    ${SUBJECT_NAME}    testid:Data files table    %{WAIT_DATA_FILE_IMPORT}
+    ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
+    user waits until element contains    ${row}    Complete
+
+user waits until page contains data uploads table
+    user waits until page contains testid    Data files table    %{WAIT_DATA_FILE_IMPORT}
+
+user waits until page does not contain data uploads table
+    user waits until page does not contain testid    Data files table
 
 user puts release into draft
     [Arguments]

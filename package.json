@@ -81,12 +81,12 @@
       "prettier --write"
     ],
     "*.robot": [
-      "pipenv run robotidy --config tests/robot-tests/robotidy.toml"
+      "python3 -m pipenv run robotidy --config tests/robot-tests/robotidy.toml"
     ],
     "*.py": [
-      "pipenv run flake8",
-      "pipenv run black",
-      "pipenv run isort"
+      "python3 -m pipenv run flake8",
+      "python3 -m pipenv run black",
+      "python3 -m pipenv run isort"
     ]
   }
 }

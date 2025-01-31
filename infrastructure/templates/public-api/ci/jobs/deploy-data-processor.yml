@@ -24,7 +24,7 @@ jobs:
             - template: ../tasks/bicep-output-variables.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
-
+                
             # We do config updates out of Bicep template so we can implement slot swapping.
             # Changes are first deployed to the staging slot and combined with a fresh
             # code deploy prior to being swapped with the production slot.
@@ -66,18 +66,17 @@ jobs:
                     --settings \
                       "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
 
-            # TODO EES-5128
-            # Retry deploying the Function App in order to allow the staging slot the time to
-            # fully restart after config and network settings have been updated prior to deploy.
-            #
-            # Deploying prematurely results in a 500 from the deployment endpoint until the
-            # endpoint is ready to accept the deployment request.
-            #
-            # In the future it would be preferable to have a health check Function that can
-            # check the site is ready, but we need to add the Service Principal to allowed
-            # Client IDs / Identities that can access the Function App. The Service Principal
-            # that is performing the deploy can be accessed by using the `addSpnToEnvironment`
-            # config option in the task definition and using the $(servicePrincipalId) variable.
+            - template: ../tasks/wait-for-endpoint-success.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Checking that staging slot is healthy after updating appsettings
+                maxAttempts: 20
+                accessTokenScope: $(dataProcessorAppRegistrationClientId)
+                endpoint: $(dataProcessorFunctionAppStagingUrl)/api/HealthCheck
+                # We allow 404s because if this is the first time the Function App is being deployed, there won't be any
+                # deployed code yet in the staging slot.
+                allow404s: true
+
             - task: AzureCLI@2
               displayName: Deploy to staging slot
               retryCountOnTaskFailure: 10

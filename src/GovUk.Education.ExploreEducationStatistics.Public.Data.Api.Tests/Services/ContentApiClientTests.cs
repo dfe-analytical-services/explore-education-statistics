@@ -91,6 +91,7 @@ public abstract class ContentApiClientTests
                 new()
                 {
                     Id = Guid.NewGuid(),
+                    LatestReleaseSlug = "latest-release-slug"
                 }
             };
             var responseBody =

@@ -58,9 +58,9 @@ Add ancillary file
     user clicks link    Supporting file uploads
     user waits until h2 is visible    Add file to release
 
-    user enters text into element    label:Title    Test ancillary file 1
-    user enters text into element    label:Summary    Test ancillary file 1 summary
-    user chooses file    label:Upload file    ${FILES_DIR}test-file-1.txt
+    user enters text into element    id:ancillaryFileForm-title    Test ancillary file 1
+    user enters text into element    id:ancillaryFileForm-summary    Test ancillary file 1 summary
+    user chooses file    id:ancillaryFileForm-file    ${FILES_DIR}test-file-1.txt
     user clicks button    Add file
 
     user waits until page contains accordion section    Test ancillary file 1
@@ -493,15 +493,11 @@ Change the Release type
 
 Navigate to data replacement page
     user clicks link    Data and files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
-    user waits until page contains accordion section    Dates test subject
-    user opens accordion section    Dates test subject
-
-    ${section}=    user gets accordion section content element    Dates test subject
-    user clicks link    Replace data    ${section}
+    user waits until page contains data uploads table
+    user clicks link    Replace data
 
     user waits until h2 is visible    Data file details
-    user checks headed table body row contains    Subject title    Dates test subject
+    user checks headed table body row contains    Title    Dates test subject
     user checks headed table body row contains    Data file    dates.csv
     user checks headed table body row contains    Metadata file    dates.meta.csv
     user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
@@ -514,18 +510,18 @@ Upload replacement data
     user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
     user clicks button    Upload data files
 
-    user waits until page contains element    testid:Replacement Subject title
+    user waits until page contains element    testid:Replacement Title
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
 
-    user checks headed table body row cell contains    Subject title    1    Dates test subject
+    user checks headed table body row cell contains    Title    1    Dates test subject
     user checks headed table body row cell contains    Data file    1    dates.csv
     user checks headed table body row cell contains    Metadata file    1    dates.meta.csv
     user checks headed table body row cell contains    Number of rows    1    118    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    1    Data replacement in progress    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Status    1    Replacement in progress    wait=%{WAIT_LONG}
 
-    user checks headed table body row cell contains    Subject title    2    Dates test subject
+    user checks headed table body row cell contains    Title    2    Dates test subject
     user checks headed table body row cell contains    Data file    2    dates-replacement.csv
     user checks headed table body row cell contains    Metadata file    2    dates-replacement.meta.csv
     user checks headed table body row cell contains    Number of rows    2    118    wait=%{WAIT_SMALL}
@@ -587,9 +583,9 @@ Add ancillary file to amendment
     user clicks link    Supporting file uploads
     user waits until h2 is visible    Add file to release
 
-    user enters text into element    label:Title    Test ancillary file 2
-    user enters text into element    label:Summary    Test ancillary file 2 summary
-    user chooses file    label:Upload file    ${FILES_DIR}test-file-2.txt
+    user enters text into element    id:ancillaryFileForm-title    Test ancillary file 2
+    user enters text into element    id:ancillaryFileForm-summary    Test ancillary file 2 summary
+    user chooses file    id:ancillaryFileForm-file    ${FILES_DIR}test-file-2.txt
     user clicks button    Add file
 
     user waits until page contains accordion section    Test ancillary file 2

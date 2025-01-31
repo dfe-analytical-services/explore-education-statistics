@@ -1,7 +1,6 @@
 import { responseTimeConfig } from 'alerts/dynamicAlertConfig.bicep'
 import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
-
-import { IpRange } from '../types.bicep'
+import { IpRange, StorageAccountPrivateEndpoints } from '../types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -16,10 +15,19 @@ param allowedSubnetIds string[] = []
 param firewallRules IpRange[] = []
 
 @description('Storage Account SKU')
-param skuStorageResource 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 'Premium_LRS' | 'Premium_ZRS' | 'Standard_GZRS' | 'Standard_RAGZRS' = 'Standard_LRS'
+param sku 'Standard_LRS' | 'Standard_GRS' | 'Standard_RAGRS' | 'Standard_ZRS' | 'Premium_LRS' | 'Premium_ZRS' | 'Standard_GZRS' | 'Standard_RAGZRS' = 'Standard_LRS'
+
+@description('Storage Account kind')
+param kind 'StorageV2' | 'FileStorage' = 'StorageV2'
 
 @description('Storage Account Name')
 param keyVaultName string
+
+@description('Whether the storage account is accessible from the public internet')
+param publicNetworkAccessEnabled bool = false
+
+@description('Private endpoint subnets')
+param privateEndpointSubnetIds StorageAccountPrivateEndpoints?
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
@@ -36,13 +44,14 @@ var endpointSuffix = environment().suffixes.storage
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: storageAccountName
   location: location
-  kind: 'StorageV2'
+  kind: kind
   sku: {
-    name: skuStorageResource
+    name: sku
   }
   properties: {
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
+    publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
@@ -58,6 +67,66 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     }
   }
   tags: tagValues
+}
+
+var servicePrivateSubnetIds = {
+  file: ''
+  blob: ''
+  queue: ''
+  table: ''
+  ...(privateEndpointSubnetIds ?? {})
+}
+
+module fileServicePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.file != '') {
+  name: '${storageAccountName}FileServicePrivateEndpointDeploy'
+  params: {
+    serviceId: storageAccount.id
+    serviceName: storageAccount.name
+    privateEndpointNameOverride: '${storageAccount.name}-file'
+    serviceType: 'fileService'
+    subnetId: servicePrivateSubnetIds.file
+    location: location
+    tagValues: tagValues
+  }
+}
+
+module blobStoragePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.blob != '') {
+  name: '${storageAccountName}BlobStoragePrivateEndpointDeploy'
+  params: {
+    serviceId: storageAccount.id
+    serviceName: storageAccount.name
+    privateEndpointNameOverride: '${storageAccount.name}-blob'
+    serviceType: 'blobStorage'
+    subnetId: servicePrivateSubnetIds.blob
+    location: location
+    tagValues: tagValues
+  }
+}
+
+module queuePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.queue != '') {
+  name: '${storageAccountName}QueuePrivateEndpointDeploy'
+  params: {
+    serviceId: storageAccount.id
+    serviceName: storageAccount.name
+    privateEndpointNameOverride: '${storageAccount.name}-queue'
+    serviceType: 'queue'
+    subnetId: servicePrivateSubnetIds.queue
+    location: location
+    tagValues: tagValues
+  }
+}
+
+module tableStoragePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.table != '') {
+  name: '${storageAccountName}TableStoragePrivateEndpointDeploy'
+  params: {
+    serviceId: storageAccount.id
+    serviceName: storageAccount.name
+    privateEndpointNameOverride: '${storageAccount.name}-table'
+    serviceType: 'tableStorage'
+    subnetId: servicePrivateSubnetIds.table
+    location: location
+    tagValues: tagValues
+  }
 }
 
 module availabilityAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.availability) {

@@ -237,6 +237,15 @@ for a given duration.
 * MAIN_TEST_STAGE_DURATION_MINS - the duration of the main stage of the test. Also the duration of a
   subsequent cooldown period which allows in-flight requests and responses to finish.
 
+Example for running at a steady 15 RPS for 20 minutes, followed by a 20 minute cooldown period:
+
+```
+pnpm --environment=dev perftest dist/publicApiDataSetQuery.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=15
+```
+
 #### Ramping request rates
 
 See [rampingRequestRateProfile.ts](src/configuration/rampingRequestRateProfile.ts).
@@ -246,8 +255,23 @@ slowly increases over time, to find the point at which the system under test bec
 
 * RPS - the rate of requests generated per second at the point of maximum stress (the end of the main
   test stage).
-* MAIN_TEST_STAGE_DURATION_MINS - the duration of the main stage of the test. Also the duration of a
+* RAMPING_TEST_STAGE_DURATION_MINS - the duration of the period during which the test ramps up from 
+  zero RPS to the maximum RPS.
   subsequent cooldown period which allows in-flight requests and responses to finish.
+* MAIN_TEST_STAGE_DURATION_MINS - a duration after the ramping up period to maintain the maximum RPS.
+  Also the duration of a subsequent cooldown period which allows in-flight requests and responses to
+  finish.
+
+Example for ramping up from zero to 30 RPS maximum over 10 minutes, with a further 15 minutes maintaining
+the maximum RPS and then a final 15 minute cooldown period:
+
+```
+pnpm --environment=dev perftest dist/publicApiDataSetQuery.test.js \
+  -e PROFILE=stress \
+  -e RAMPING_TEST_STAGE_DURATION_MINS=10 \
+  -e MAIN_TEST_STAGE_DURATION_MINS=15 \
+  -e RPS=30
+```
 
 #### Spike
 
@@ -262,6 +286,19 @@ and the recovery time post-spike.
 * RPS_NORMAL - the rate of requests generated per second under normal traffic conditions.
 * RPS_SPIKE - the rate of requests generated per second during the traffic spike period.
 
+Example of testing normal traffic at 10 RPS for 5 minutes, a 1 minute spike at 50 RPS, and then
+a 10 minute period of normal traffic following the spike:
+
+```
+pnpm --environment=dev perftest dist/publicApiDataSetQuery.test.js \
+  -e PROFILE=spike \
+  -e PRE_SPIKE_DURATION_MINS=5 \
+  -e RPS_NORMAL=10 \
+  -e SPIKE_DURATION_MINS=1
+  -e RPS_SPIKE=50
+  -e POST_SPIKE_DURATION_MINS=10
+```
+
 #### Sequential executions
 
 See [sequentialRequestsProfile.ts](src/configuration/sequentialRequestsProfile.ts).
@@ -271,6 +308,16 @@ typically used to be able to measure performance on an individual request basis.
 
 * MAIN_TEST_STAGE_DURATION_MINS - the duration of the main stage of the test. There is no
   cooldown period with this profile.
+
+Example of running a test over a 15 minute duration, executing the tests one after another
+with no parallelisation.  Each test execution begins immediately after the previous one 
+completes. 
+
+```
+pnpm --environment=dev perftest dist/publicApiDataSetQuery.test.js \
+  -e PROFILE=sequential \
+  -e MAIN_TEST_STAGE_DURATION_MINS=15
+```
 
 ### Individual test options
 

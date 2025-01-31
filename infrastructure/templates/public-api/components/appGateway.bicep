@@ -107,7 +107,7 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [f
 }]
 
 // Add a Firewall Policy with OWASP and Bot rulesets, running in Prevention mode.
-module wafPolicyModule 'wafPolicy.bicep' = {
+module wafPolicyModule 'appGatewayWafPolicy.bicep' = {
   name: 'wafPolicy'
   params: {
     name: '${appGatewayName}-afwp'

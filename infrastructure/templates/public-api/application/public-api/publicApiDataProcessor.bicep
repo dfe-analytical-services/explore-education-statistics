@@ -62,13 +62,13 @@ resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-0
   parent: vNet
 }
 
-resource inboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
   name: resourceNames.existingResources.subnets.dataProcessorPrivateEndpoints
   parent: vNet
 }
 
 // Deploy Data Processor Function.
-module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
+module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
     functionAppName: resourceNames.publicApi.dataProcessor
@@ -77,7 +77,10 @@ module dataProcessorFunctionAppModule '../../components/functionApp.bicep' = {
     location: location
     applicationInsightsKey: applicationInsightsKey
     subnetId: outboundVnetSubnet.id
-    privateEndpointSubnetId: inboundVnetSubnet.id
+    privateEndpoints: {
+      functionApp: privateEndpointsSubnet.id
+      storageAccounts: privateEndpointsSubnet.id
+    }
     publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules
     entraIdAuthentication: {

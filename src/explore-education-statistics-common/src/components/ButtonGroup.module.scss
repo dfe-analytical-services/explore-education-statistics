@@ -8,24 +8,22 @@
   display: flex;
   flex-direction: column;
   margin-bottom: govuk-spacing(6);
+  column-gap: var(--horizontalSpacing);
+  row-gap: var(--verticalSpacing);
 
   > * {
     margin-bottom: 0;
   }
 
-  > * + * {
-    margin-left: 0;
-    margin-top: var(--verticalSpacing);
-  }
-
   @include govuk-media-query($from: tablet) {
     flex-direction: row;
-
-    > * + * {
-      margin-left: var(--horizontalSpacing);
-      margin-top: 0;
-    }
   }
+}
+
+td > .group {
+  // Avoid centering within a table cell as this
+  // is likely to be an 'Actions' column.
+  align-items: start;
 }
 
 .horizontalSpacing--m {

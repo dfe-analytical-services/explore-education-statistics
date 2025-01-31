@@ -28,7 +28,7 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
       id: 'release-series-item-1',
       isLegacyLink: true,
       description: 'Legacy link 1',
-
+      releaseSlug: '2000-01',
       legacyLinkUrl: 'https://gov.uk/1',
     },
     {
@@ -45,7 +45,7 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
       id: 'release-series-item-3',
       isLegacyLink: true,
       description: 'Legacy link 2',
-
+      releaseSlug: '2000-01',
       legacyLinkUrl: 'https://gov.uk/2',
     },
   ];

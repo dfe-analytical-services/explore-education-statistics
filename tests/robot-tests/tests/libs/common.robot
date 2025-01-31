@@ -63,7 +63,7 @@ user opens ie
 user opens chrome headlessly
     [Arguments]    ${alias}=headless_chrome
     ${c_opts}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-    Call Method    ${c_opts}    add_argument    headless\=old
+    Call Method    ${c_opts}    add_argument    headless
     Call Method    ${c_opts}    add_argument    start-maximized
     Call Method    ${c_opts}    add_argument    disable-extensions
     Call Method    ${c_opts}    add_argument    disable-infobars
@@ -353,9 +353,9 @@ user waits until page contains testid
     [Arguments]    ${id}    ${wait}=${timeout}
     user waits until page contains element    css:[data-testid="${id}"]    ${wait}
 
-user checks page does not contain testid
-    [Arguments]    ${id}
-    user checks page does not contain element    css:[data-testid="${id}"]
+user waits until page does not contain testid
+    [Arguments]    ${id}    ${wait}=${timeout}
+    user waits until page does not contain element    css:[data-testid="${id}"]    ${wait}
 
 user checks testid element contains
     [Arguments]    ${id}    ${text}

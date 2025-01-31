@@ -47,9 +47,9 @@ Add ancillary file
     user clicks link    Supporting file uploads
     user waits until h2 is visible    Add file to release
 
-    user enters text into element    label:Title    Test ancillary file 1
-    user enters text into element    label:Summary    Test ancillary file 1 summary
-    user chooses file    label:Upload file    ${FILES_DIR}test-file-1.txt
+    user enters text into element    id:ancillaryFileForm-title    Test ancillary file 1
+    user enters text into element    id:ancillaryFileForm-summary    Test ancillary file 1 summary
+    user chooses file    id:ancillaryFileForm-file    ${FILES_DIR}test-file-1.txt
     user clicks button    Add file
 
     user waits until page contains accordion section    Test ancillary file 1
@@ -212,15 +212,8 @@ Change the Release type
 
 Navigate to data replacement page
     user clicks link    Data and files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
-    user waits until page contains accordion section    Dates test subject
-    user opens accordion section    Dates test subject
-
-    ${section}=    user gets accordion section content element    Dates test subject
-    user clicks link    Replace data    ${section}
-
-    user waits until h2 is visible    Data file details
-    user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
+    user waits until page contains data uploads table
+    user clicks link    Replace data
 
 Upload replacement data
     user waits until h2 is visible    Upload replacement data    %{WAIT_MEDIUM}
@@ -228,7 +221,7 @@ Upload replacement data
     user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
     user clicks button    Upload data files
 
-    user waits until page contains element    testid:Replacement Subject title
+    user waits until page contains element    testid:Replacement Title
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
     user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
@@ -251,10 +244,9 @@ Edit ancillary file and replace data
     ${section_1}=    user gets accordion section content element    Test ancillary file 1    id:file-uploads
     user clicks link    Edit file    ${section_1}
     user waits until h2 is visible    Edit ancillary file
-    user enters text into element    label:Title    Replacement ancillary file
-    user enters text into element    label:Summary    Replacement ancillary file summary updated
-
-    user chooses file    label:Upload new file    ${FILES_DIR}test-file-2.txt
+    user enters text into element    id:ancillaryFileForm-title    Replacement ancillary file
+    user enters text into element    id:ancillaryFileForm-summary    Replacement ancillary file summary updated
+    user chooses file    id:ancillaryFileForm-file    ${FILES_DIR}test-file-2.txt
     user clicks button    Save file
 
     user waits until page contains accordion section    Replacement ancillary file
@@ -400,16 +392,10 @@ Revisit the Release after the cancellation to double check it remains unaffected
 
 Verify that the Data and Files are unchanged
     user clicks link    Data and files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
-    user waits until page contains accordion section    Dates test subject
-    user opens accordion section    Dates test subject
-    ${section}=    user gets accordion section content element    Dates test subject
-    user checks headed table body row contains    Subject title    Dates test subject
-    user checks headed table body row contains    Data file    dates.csv
-    user checks headed table body row contains    Metadata file    dates.meta.csv
-    user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
-    user checks headed table body row contains    Data file size    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
+    user waits until page contains data uploads table
+    user checks table cell contains    1    1    Dates test subject    testid:Data files table
+    user checks table cell contains    1    2    17 Kb    testid:Data files table
+    user checks table cell contains    1    3    Complete    testid:Data files table
 
 Verify that the ancillary file is unchanged
     user clicks link    Data and files

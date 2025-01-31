@@ -25,6 +25,7 @@ describe('DraftReleasesTable', () => {
         id: 'publication-1',
         title: 'Publication 1',
         slug: 'publication-1-slug',
+        latestReleaseSlug: 'latest-release-slug-1',
         owner: true,
         contact: {
           teamName: 'Mock Contact Team Name',
@@ -64,6 +65,7 @@ describe('DraftReleasesTable', () => {
         id: 'publication-2',
         title: 'Publication 2',
         slug: 'publication-2-slug',
+        latestReleaseSlug: 'latest-release-slug-2',
         owner: true,
         contact: {
           teamName: 'Mock Contact Team Name',
@@ -104,6 +106,7 @@ describe('DraftReleasesTable', () => {
         id: 'publication-1',
         title: 'Publication 1',
         slug: 'publication-1-slug',
+        latestReleaseSlug: 'latest-release-slug-1',
         owner: true,
         contact: {
           teamName: 'Mock Contact Team Name',
@@ -143,6 +146,7 @@ describe('DraftReleasesTable', () => {
         id: 'publication-3',
         title: 'Publication 3',
         slug: 'publication-3-slug',
+        latestReleaseSlug: 'latest-release-slug-3',
         owner: true,
         contact: {
           teamName: 'Mock Contact Team Name',

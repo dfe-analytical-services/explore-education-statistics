@@ -35,13 +35,13 @@ Validate Related information section and links exist
 
 Validate themes filters exist
     user checks select contains option    id:filters-form-theme    All themes
-    user checks selected option label     id:filters-form-theme    All themes
+    user checks selected option label    id:filters-form-theme    All themes
     user checks select contains option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks select contains option    id:filters-form-theme    ${ROLE_PERMISSIONS_THEME_TITLE}
 
 Validate release type filters exist
     user checks select contains option    id:filters-form-release-type    All release types
-    user checks selected option label     id:filters-form-release-type    All release types   
+    user checks selected option label    id:filters-form-release-type    All release types
     user checks select contains option    id:filters-form-release-type    Accredited official statistics
     user checks select contains option    id:filters-form-release-type    Official statistics
     user checks select contains option    id:filters-form-release-type    Official statistics in development
@@ -64,7 +64,7 @@ Filter by theme
 Remove theme filter
     user clicks button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks selected option label     id:filters-form-theme    All themes
+    user checks selected option label    id:filters-form-theme    All themes
 
 Filter by release type
     user chooses select option    id:filters-form-release-type    Official statistics
@@ -73,13 +73,13 @@ Filter by release type
 Remove release type filter
     user clicks button    Official statistics
     user checks page does not contain button    Official statistics
-    user checks selected option label     id:filters-form-release-type    All release types
+    user checks selected option label    id:filters-form-release-type    All release types
 
 Searching
     # filter by theme first to make sure we get the seed publication on dev.
     user chooses select option    id:filters-form-theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    
+
     user clicks element    id:searchForm-search
     user presses keys    pupil absence
     user clicks button    Search
@@ -108,5 +108,5 @@ Reset all filters
     user checks page does not contain button    Official statistics
     user checks page does not contain button    Reset filters
 
-    user checks selected option label     id:filters-form-theme    All themes
-    user checks selected option label     id:filters-form-release-type    All release types
+    user checks selected option label    id:filters-form-theme    All themes
+    user checks selected option label    id:filters-form-release-type    All release types

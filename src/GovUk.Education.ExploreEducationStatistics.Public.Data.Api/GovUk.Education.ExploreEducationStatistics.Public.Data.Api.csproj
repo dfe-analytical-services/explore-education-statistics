@@ -63,7 +63,7 @@
     <Exec Command="dotnet tool restore"/>
     <Exec
       Command="dotnet tool run swagger tofile --output $(OutputPath)wwwroot/openapi-v%(Version.Identity).json $(OutputPath)$(AssemblyName).dll %(Version.Identity)"
-      EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
+      EnvironmentVariables="DOTNET_ROLL_FORWARD=LatestMajor;ASPNETCORE_ENVIRONMENT=Development"
     />
   </Target>
 

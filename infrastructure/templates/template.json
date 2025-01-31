@@ -1107,6 +1107,7 @@
     "publicApiDataProcessorSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor')]",
     "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
     "publicApiDataProcessorPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor-pep')]",
+    "publicApiStoragePrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-sa-pep')]",
     "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
     "applicationGatewaySubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-agw-01')]",
     "psqlFlexibleServerSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-psql-flexibleserver')]",
@@ -1216,7 +1217,7 @@
       "[concat('Microsoft.Web/sites/', variables('dataAppName'))]"
     ],
     "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
-    "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-fs-data')]",
+    "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
     "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]"
   },
   "resources": [
@@ -3658,6 +3659,12 @@
             "name": "[variables('applicationGatewaySubnetName')]",
             "properties": {
               "addressPrefix": "10.0.10.0/24"
+            }
+          },
+          {
+            "name": "[variables('publicApiStoragePrivateEndpointsSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.11.0/24"
             }
           },
           {

@@ -44,7 +44,7 @@ const PrototypeMetaPreview = () => {
         <FormTextInput
           id="subjectTitle"
           name="subjectTitle"
-          label="Subject title"
+          label="Title"
           width={20}
         />
       </FormGroup>
@@ -67,9 +67,7 @@ const PrototypeMetaPreview = () => {
       <Accordion id="dataFiles">
         <AccordionSection heading="Data example 1" goToTop={false}>
           <SummaryList className="govuk-!-margin-bottom-9">
-            <SummaryListItem term="Subject title">
-              Data example 1
-            </SummaryListItem>
+            <SummaryListItem term="Title">Data example 1</SummaryListItem>
             <SummaryListItem term="Data title">
               example-data-{updatedData ? '2' : '1'}.csv{' '}
               {replaceInProgress && (
@@ -116,9 +114,7 @@ const PrototypeMetaPreview = () => {
                 (updatedData && <span className="govuk-tag">Complete</span>)}
               {replaceInProgress && (
                 <>
-                  <span className="govuk-tag">
-                    Data replacement in progress
-                  </span>
+                  <span className="govuk-tag">Replacement in progress</span>
                   <WarningMessage>
                     Before confirming the data replacement please check the
                     information below. Making this change could affect existing

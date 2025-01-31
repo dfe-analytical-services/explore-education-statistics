@@ -1,4 +1,4 @@
-import { PrivateDnsZone } from '../types.bicep'
+import { PrivateDnsZone, dnsZones } from '../types.bicep'
 
 @description('Specifies the name of the service being connected via private endpoint')
 @minLength(0)
@@ -7,6 +7,10 @@ param serviceName string
 @description('Specifies the resource id of the service being connected via private endpoint')
 @minLength(0)
 param serviceId string
+
+@description('Specifies an optional name prefix for the private endpoint prior to appending "-pep" to the end')
+@minLength(0)
+param privateEndpointNameOverride string?
 
 @description('Specifies the resource id of the subnet with which the service will be attached to the VNet')
 @minLength(0)
@@ -21,18 +25,8 @@ param serviceType PrivateDnsZone
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-var serviceTypeToDnsZoneNames = {
-  sites: 'privatelink.azurewebsites.net'
-  postgres: 'privatelink.postgres.database.azure.com'
-}
-
-var serviceTypeToGroupIds = {
-  sites: 'sites'
-  postgres: 'postgresqlServer'
-}
-
-var privateEndpointName = '${serviceName}-pep'
-var privateDnsZoneName = serviceTypeToDnsZoneNames[serviceType]
+var privateEndpointName = '${privateEndpointNameOverride ?? serviceName}-pep'
+var privateDnsZoneName = dnsZones[serviceType].zoneName
 
 // A private endpoint that establishes a link between a VNet and an Azure service
 // that supports Private Link. This takes the form of an IP address that is
@@ -48,7 +42,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-01-01' = {
         properties: {
           privateLinkServiceId: serviceId
           groupIds: [
-            serviceTypeToGroupIds[serviceType]
+            dnsZones[serviceType].dnsGroup
           ]
           privateLinkServiceConnectionState: {
             status: 'Approved'

@@ -7,3 +7,13 @@ html {
 * {
   box-sizing: inherit;
 }
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  // Unset line heights as normalize.css sets these
+  // to 1.15 for some arbitrary reason!
+  line-height: unset;
+}

@@ -226,6 +226,8 @@ public static class ReleaseGeneratorExtensions
 
                     releaseVersion.Publication = release.Publication;
                     releaseVersion.PublicationId = release.PublicationId;
+
+                    // TODO EES-5659 Remove setting ReleaseName, TimePeriodCoverage, Slug
                     releaseVersion.ReleaseName = release.Year.ToString();
                     releaseVersion.TimePeriodCoverage = release.TimePeriodCoverage;
                     releaseVersion.Slug = release.Slug;

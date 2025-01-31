@@ -8,7 +8,7 @@ $bar-height: 10px;
   border-radius: $bar-border-radius;
   display: block;
   height: $bar-height;
-  width: 100%;
+  max-width: 100%;
 }
 
 .bar {

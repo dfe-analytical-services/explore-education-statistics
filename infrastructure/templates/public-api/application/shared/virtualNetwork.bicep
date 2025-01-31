@@ -44,6 +44,11 @@ resource appGatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01'
   parent: vNet
 }
 
+resource storageAccountPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: subnets.storagePrivateEndpoints
+  parent: vNet
+}
+
 @description('The fully qualified Azure resource ID of the virtual network')
 output vnetId string = resourceId('Microsoft.Network/VirtualNetworks', resourceNames.existingResources.vNet)
 
@@ -103,3 +108,6 @@ output psqlFlexibleServerSubnetEndIpAddress string = parseCidr(psqlFlexibleServe
 
 @description('The fully qualified Azure resource ID of the App Gateway Subnet.')
 output appGatewaySubnetRef string = appGatewaySubnet.id
+
+@description('The fully qualified Azure resource ID of the Public API Storage Account Private Endpoint Subnet.')
+output storageAccountPrivateEndpointSubnetRef string = storageAccountPrivateEndpointSubnet.id

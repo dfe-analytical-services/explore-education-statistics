@@ -1,13 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 
 public interface IContentService
 {
-    Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseVersionIds);
+    Task DeletePreviousVersionsDownloadFiles(IReadOnlyList<Guid> releaseVersionIds);
 
-    Task DeletePreviousVersionsContent(params Guid[] releaseVersionIds);
+    Task DeletePreviousVersionsContent(IReadOnlyList<Guid> releaseVersionIds);
 
     Task UpdateContent(Guid releaseVersionId);
 
