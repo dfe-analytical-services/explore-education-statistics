@@ -40,6 +40,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
     rsi => rsi.isLegacyLink || rsi.description !== release.title,
   );
 
+  const releaseSeriesNonLegacy = release.publication.releaseSeries.find(
+    rsi => !rsi.isLegacyLink,
+  );
+
+  console.log(releaseSeriesNonLegacy);
+
   // Re-order updates in descending order in-case the cached
   // release from the content API has not been updated to
   // have the updates in the correct order.
@@ -126,15 +132,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     <Link
                       className="govuk-!-display-none-print govuk-!-display-block govuk-!-margin-bottom-3"
                       unvisited
-                      to={`/find-statistics/${release.publication.slug}/${release.slug}`}
+                      to={`/find-statistics/${release.publication.slug}/${releaseSeriesNonLegacy?.releaseSlug}`}
                     >
                       View latest data:{' '}
                       <span className="govuk-!-font-weight-bold">
-                        {
-                          release.publication.releaseSeries.find(
-                            rsi => !rsi.isLegacyLink,
-                          )?.description
-                        }
+                        {releaseSeriesNonLegacy?.description}
                       </span>
                     </Link>
                   )}
