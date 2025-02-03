@@ -4,7 +4,7 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
-public static class DataSetVersionRecordTest
+public static class DataSetVersionNumberTest
 {
     public class TryParseWildcardTests
     {
@@ -26,7 +26,7 @@ public static class DataSetVersionRecordTest
             int? patch
             )
         {
-            Assert.True(DataSetVersionRecord.TryParse(versionString, out var wildcardVersion));
+            Assert.True(DataSetVersionNumber.TryParse(versionString, out var wildcardVersion));
 
             Assert.NotNull(wildcardVersion);
             Assert.Equal(major, wildcardVersion.Major);
@@ -49,7 +49,7 @@ public static class DataSetVersionRecordTest
         [InlineData("1.*.4")]
         public void InvalidWildcardVersionString_FailsValidation(string versionString)
         {
-            Assert.False(DataSetVersionRecord.TryParse(versionString, out var wildcardVersion));
+            Assert.False(DataSetVersionNumber.TryParse(versionString, out var wildcardVersion));
             Assert.Null(wildcardVersion);
         }
     }
@@ -74,7 +74,7 @@ public static class DataSetVersionRecordTest
             int expectedMinor = default,
             int expectedPatch = default)
         {
-            Assert.True(DataSetVersionRecord.TryParse(versionString, out var version));
+            Assert.True(DataSetVersionNumber.TryParse(versionString, out var version));
 
             Assert.Equal(expectedMajor, version.Major);
             Assert.Equal(expectedMinor, version.Minor);
@@ -91,7 +91,7 @@ public static class DataSetVersionRecordTest
             int expectedMinor = default,
             int expectedPatch = default)
         {
-            Assert.True(DataSetVersionRecord.TryParse(versionString, out var version));
+            Assert.True(DataSetVersionNumber.TryParse(versionString, out var version));
 
             Assert.Equal(expectedMajor, version.Major);
             Assert.Equal(expectedMinor, version.Minor);
@@ -116,7 +116,7 @@ public static class DataSetVersionRecordTest
 
         public void InvalidVersion_FailsToParse(string versionString)
         {
-            Assert.False(DataSetVersionRecord.TryParse(versionString, out _));
+            Assert.False(DataSetVersionNumber.TryParse(versionString, out _));
         }
     }
 }

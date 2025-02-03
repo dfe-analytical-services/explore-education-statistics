@@ -17,7 +17,7 @@ public static class DataSetVersionQueryableExtensions
         string version,
         CancellationToken cancellationToken = default)
     {
-        if (!DataSetVersionRecord.TryParse(version, out var parsedVersion)) 
+        if (!DataSetVersionNumber.TryParse(version, out var parsedVersion)) 
             return new NotFoundResult();
 
         return await queryable
