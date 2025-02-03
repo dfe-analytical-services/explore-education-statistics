@@ -44,8 +44,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
     rsi => !rsi.isLegacyLink,
   );
 
-  console.log(releaseSeriesNonLegacy);
-
   // Re-order updates in descending order in-case the cached
   // release from the content API has not been updated to
   // have the updates in the correct order.
