@@ -104,20 +104,13 @@ Corepack is a tool installed as part of your Node.js installation that allows yo
 manage multiple package manager versions in your environment based on per-project configuration 
 (via the `packageManager` field in `package.json`). 
 
-We use corepack to ensure that everyone is using the same version of PNPM to avoid any issues when 
+We use Corepack to ensure that everyone is using the same version of PNPM to avoid any issues when 
 people are using different versions of PNPM. 
 
 In order to install Corepack and the right version of PNPM, run the following command:
 
 ```bash
-corepack enable
-```
-
-If for some reason the above corepack command doesn't work, you can install PNPM manually by running:
-
-```bash
-PNPM_VERSION=$(node -e "console.log(require('./package.json').engines.pnpm)")
-curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=$PNPM_VERSION sh -
+corepack install
 ```
 
 This will install the package manager version specified in the `package.json` file. You can check
