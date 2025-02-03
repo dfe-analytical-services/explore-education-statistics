@@ -262,6 +262,13 @@ jobs:
           version: $(NodeVersion)
 
       - task: Bash@3
+        displayName: Install Corepack
+        inputs:
+          workingDir: .
+          targetType: inline
+          script: npm i -g corepack@latest
+
+      - task: Bash@3
         displayName: corepack enable
         inputs:
           workingDir: .
@@ -330,6 +337,13 @@ jobs:
         displayName: Install Node.js $(NodeVersion)
         inputs:
           version: $(NodeVersion)
+
+      - task: Bash@3
+        displayName: Install Corepack
+        inputs:
+          workingDir: .
+          targetType: inline
+          script: npm i -g corepack@latest
 
       - task: Bash@3
         displayName: corepack enable
