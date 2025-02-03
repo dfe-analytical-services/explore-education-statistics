@@ -4,13 +4,13 @@ import ChartBuilder, {
 import { SavedDataBlock } from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import releaseChartFileService from '@admin/services/releaseChartFileService';
+import { Chart } from '@common/modules/charts/types/chart';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import tableBuilderService, {
   ReleaseTableDataQuery,
   TableDataQuery,
 } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 import isEqual from 'lodash/isEqual';
 import React, { useCallback, useMemo } from 'react';
 

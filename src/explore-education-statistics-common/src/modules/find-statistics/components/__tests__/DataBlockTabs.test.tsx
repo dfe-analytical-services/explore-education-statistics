@@ -6,17 +6,20 @@ import {
 import {
   testMapConfiguration,
   testMapTableData,
+  testMapTableDataLocationsLowRes,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
+import { Chart } from '@common/modules/charts/types/chart';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import _tableBuilderService from '@common/services/tableBuilderService';
-import { Chart, DataBlock } from '@common/services/types/blocks';
-import { screen, waitFor } from '@testing-library/dom';
+import { DataBlock } from '@common/services/types/blocks';
+import { screen, waitFor, within } from '@testing-library/dom';
+import userEvent from '@testing-library/user-event';
 import { AxiosError } from 'axios';
-import React from 'react';
 import { forceVisible } from 'react-lazyload';
+import React from 'react';
 
 jest.mock('@common/services/tableBuilderService');
 
@@ -163,7 +166,7 @@ describe('DataBlockTabs', () => {
         'block-1-parent',
       );
 
-      expect(screen.getAllByText('Could not load content')).toHaveLength(2);
+      expect(screen.getByText('Could not load content')).toBeInTheDocument();
     });
   });
 
@@ -346,7 +349,7 @@ describe('DataBlockTabs', () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testMapTableData,
     );
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
+    tableBuilderService.getDataBlockGeoJson.mockResolvedValue(
       testMapTableData.subjectMeta.locations,
     );
 
@@ -366,7 +369,7 @@ describe('DataBlockTabs', () => {
         'block-1-parent',
       );
 
-      expect(tableBuilderService.getLocationGeoJson).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledWith(
         'release-1',
         'block-1-parent',
         1,
@@ -375,9 +378,72 @@ describe('DataBlockTabs', () => {
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
     });
     await waitFor(() => {
-      expect(tableBuilderService.getLocationGeoJson).toBeCalled();
-      expect(tableBuilderService.getLocationGeoJson).toBeCalledTimes(1);
+      expect(tableBuilderService.getDataBlockGeoJson).toBeCalled();
+      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledTimes(1);
     });
+  });
+
+  test('selecting data set with boundaryLevel retrieves and renders new map polygons', async () => {
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testMapTableData,
+    );
+    tableBuilderService.getDataBlockGeoJson
+      .mockResolvedValueOnce(testMapTableData.subjectMeta.locations)
+      .mockResolvedValue(testMapTableDataLocationsLowRes);
+
+    const { container } = render(
+      <DataBlockTabs
+        releaseId="release-1"
+        id="test-block"
+        dataBlock={testDataBlockMap}
+      />,
+    );
+
+    forceVisible();
+
+    await waitFor(() => {
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1-parent',
+      );
+
+      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledWith(
+        'release-1',
+        'block-1-parent',
+        1,
+      );
+
+      expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
+    });
+
+    expect(tableBuilderService.getDataBlockTableData).toBeCalledTimes(1);
+
+    await waitFor(() => {
+      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledTimes(1);
+    });
+
+    const mapPathSelector =
+      '.leaflet-container svg:not(.leaflet-attribution-flag) path';
+
+    const initialPaths =
+      container.querySelectorAll<HTMLElement>(mapPathSelector);
+    expect(initialPaths.length).toEqual(4);
+
+    const select = screen.getByLabelText('1. Select data to view');
+    const options = within(select).getAllByRole('option');
+    expect(options).toHaveLength(2);
+    await userEvent.selectOptions(select, options[1]);
+
+    expect(tableBuilderService.getDataBlockGeoJson).toBeCalledWith(
+      'release-1',
+      'block-1-parent',
+      2,
+    );
+    expect(tableBuilderService.getDataBlockGeoJson).toBeCalledTimes(2);
+
+    const updatedPaths =
+      container.querySelectorAll<HTMLElement>(mapPathSelector);
+    expect(updatedPaths.length).toEqual(4);
   });
 
   test('re-rendering with new data block does not throw error', async () => {

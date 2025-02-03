@@ -289,7 +289,7 @@ const tableBuilderService = {
   ): Promise<FastTrackTableAndReleaseMeta> {
     return dataApi.get(`/tablebuilder/fast-track/${dataBlockParentId}`);
   },
-  getLocationGeoJson(
+  getDataBlockGeoJson(
     releaseId: string,
     dataBlockParentId: string,
     boundaryLevelId: number,
