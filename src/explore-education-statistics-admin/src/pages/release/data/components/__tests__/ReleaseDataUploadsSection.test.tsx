@@ -17,12 +17,8 @@ import render from '@common-test/render';
 jest.mock('@admin/services/releaseDataFileService');
 jest.mock('@admin/services/permissionService');
 
-const releaseDataFileService = _releaseDataFileService as jest.Mocked<
-  typeof _releaseDataFileService
->;
-const permissionService = _permissionService as jest.Mocked<
-  typeof _permissionService
->;
+const releaseDataFileService = jest.mocked(_releaseDataFileService);
+const permissionService = jest.mocked(_permissionService);
 
 describe('ReleaseDataUploadsSection', () => {
   const testDataFiles: DataFile[] = [
@@ -139,15 +135,16 @@ describe('ReleaseDataUploadsSection', () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => {
-      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
-        'release-1',
-      );
+    expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+      'release-1',
+    );
 
-      expect(screen.getAllByRole('row')).toHaveLength(3);
-    });
+    expect(await screen.findByText('Uploaded data files')).toBeInTheDocument();
 
     const fileTableRows = screen.getAllByRole('row');
+
+    expect(fileTableRows).toHaveLength(3);
+
     const fileTableRow1 = within(fileTableRows[1]);
 
     expect(fileTableRow1.getByTestId('Title')).toHaveTextContent('Test data 1');
@@ -159,7 +156,6 @@ describe('ReleaseDataUploadsSection', () => {
     const fileTableRow2 = within(fileTableRows[2]);
 
     expect(fileTableRow2.getByTestId('Title')).toHaveTextContent('Test data 2');
-
     expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
   });
 
@@ -184,18 +180,19 @@ describe('ReleaseDataUploadsSection', () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => {
-      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
-        'release-1',
-      );
+    expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+      'release-1',
+    );
 
-      expect(screen.getAllByRole('row')).toHaveLength(2);
-    });
+    expect(await screen.findByText('Uploaded data files')).toBeInTheDocument();
 
-    const fileTableRow1 = getTableRow(1);
+    const fileTableRows = screen.getAllByRole('row');
+
+    expect(fileTableRows).toHaveLength(2);
+
+    const fileTableRow1 = within(fileTableRows[1]);
 
     expect(fileTableRow1.getByTestId('Title')).toHaveTextContent('Test data 1');
-
     expect(fileTableRow1.getByTestId('Status')).toHaveTextContent(
       'Replacement in progress',
     );
@@ -214,15 +211,11 @@ describe('ReleaseDataUploadsSection', () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => {
-      expect(screen.queryAllByTestId('accordionSection')).toHaveLength(0);
-    });
+    expect(
+      await screen.findByText('No data files have been uploaded.'),
+    ).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('No data files have been uploaded.'),
-      ).toBeInTheDocument();
-    });
+    expect(screen.queryByText('Uploaded data files')).not.toBeInTheDocument();
   });
 
   describe('deleting data file', () => {
@@ -245,19 +238,23 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() => {
-        expect(screen.getAllByRole('row')).toHaveLength(3);
-      });
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
       const fileTableRows = screen.getAllByRole('row');
 
+      expect(fileTableRows).toHaveLength(3);
+
       const fileTableRow1 = within(fileTableRows[1]);
+
       expect(fileTableRow1.getByTestId('Status')).toHaveTextContent('Queued');
       expect(
         fileTableRow1.queryByRole('button', { name: 'Delete files' }),
       ).not.toBeInTheDocument();
 
       const fileTableRow2 = within(fileTableRows[2]);
+
       expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
       expect(
         fileTableRow2.getByRole('button', { name: 'Delete files' }),
@@ -303,29 +300,25 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() => {
-        expect(screen.getAllByRole('row')).toHaveLength(3);
-      });
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
       const fileTableRows = screen.getAllByRole('row');
 
+      expect(fileTableRows).toHaveLength(3);
+
       expect(
-        within(fileTableRows[2]).getByRole('button', {
-          name: 'Delete files',
-        }),
+        within(fileTableRows[2]).getByRole('button', { name: 'Delete files' }),
       ).toBeInTheDocument();
 
       await user.click(
-        within(fileTableRows[2]).getByRole('button', {
-          name: 'Delete files',
-        }),
+        within(fileTableRows[2]).getByRole('button', { name: 'Delete files' }),
       );
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Confirm deletion of selected data files'),
-        ).toBeInTheDocument();
-      });
+      expect(
+        await screen.findByText('Confirm deletion of selected data files'),
+      ).toBeInTheDocument();
 
       const modal = within(screen.getByRole('dialog'));
 
@@ -387,29 +380,25 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() => {
-        expect(screen.getAllByRole('row')).toHaveLength(3);
-      });
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
-      const fileTableRows = screen.getAllByRole('row');
+      let fileTableRows = screen.getAllByRole('row');
+
+      expect(fileTableRows).toHaveLength(3);
 
       expect(
-        within(fileTableRows[2]).getByRole('button', {
-          name: 'Delete files',
-        }),
+        within(fileTableRows[2]).getByRole('button', { name: 'Delete files' }),
       ).toBeInTheDocument();
 
       await user.click(
-        within(fileTableRows[2]).getByRole('button', {
-          name: 'Delete files',
-        }),
+        within(fileTableRows[2]).getByRole('button', { name: 'Delete files' }),
       );
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Confirm deletion of selected data files'),
-        ).toBeInTheDocument();
-      });
+      expect(
+        await screen.findByText('Confirm deletion of selected data files'),
+      ).toBeInTheDocument();
 
       await user.click(
         within(screen.getByRole('dialog')).getByRole('button', {
@@ -417,11 +406,15 @@ describe('ReleaseDataUploadsSection', () => {
         }),
       );
 
-      await waitFor(() => {
-        expect(screen.getAllByRole('row')).toHaveLength(2);
-      });
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
-      expect(getTableRow(1).getByTestId('Title')).toHaveTextContent(
+      fileTableRows = screen.getAllByRole('row');
+
+      expect(fileTableRows).toHaveLength(2);
+
+      expect(within(fileTableRows[1]).getByTestId('Title')).toHaveTextContent(
         'Test data 1',
       );
     });
@@ -444,21 +437,21 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() => {
-        expect(screen.getAllByRole('row')).toHaveLength(2);
-      });
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
       const fileTableRows = screen.getAllByRole('row');
 
+      expect(fileTableRows).toHaveLength(2);
+
       await user.click(
-        within(fileTableRows[1]).getByRole('button', {
-          name: 'Delete files',
-        }),
+        within(fileTableRows[1]).getByRole('button', { name: 'Delete files' }),
       );
 
-      await waitFor(() => {
-        expect(screen.getByText('Cannot delete files')).toBeInTheDocument();
-      });
+      expect(
+        await screen.findByText('Cannot delete files'),
+      ).toBeInTheDocument();
 
       const modal = within(screen.getByRole('dialog'));
 
@@ -497,19 +490,23 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() => {
-        expect(screen.getAllByRole('row')).toHaveLength(3);
-      });
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
       const fileTableRows = screen.getAllByRole('row');
 
+      expect(fileTableRows).toHaveLength(3);
+
       const fileTableRow1 = within(fileTableRows[1]);
+
       expect(fileTableRow1.getByTestId('Status')).toHaveTextContent('Queued');
       expect(
         fileTableRow1.queryByRole('link', { name: 'Replace data' }),
       ).not.toBeInTheDocument();
 
       const fileTableRow2 = within(fileTableRows[2]);
+
       expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
       expect(
         fileTableRow2.getByRole('link', { name: 'Replace data' }),
@@ -535,11 +532,13 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() => {
-        expect(screen.getAllByRole('row')).toHaveLength(3);
-      });
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
       const fileTableRows = screen.getAllByRole('row');
+
+      expect(fileTableRows).toHaveLength(3);
 
       const fileTableRow2 = within(fileTableRows[2]);
       expect(
@@ -568,19 +567,21 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() => {
-        expect(screen.getAllByRole('row')).toHaveLength(2);
-      });
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
       const fileTableRows = screen.getAllByRole('row');
+
+      expect(fileTableRows).toHaveLength(2);
 
       await user.click(
         within(fileTableRows[1]).getByRole('button', { name: 'Replace data' }),
       );
 
-      await waitFor(() => {
-        expect(screen.getByText('Cannot replace data')).toBeInTheDocument();
-      });
+      expect(
+        await screen.findByText('Cannot replace data'),
+      ).toBeInTheDocument();
 
       const modal = within(screen.getByRole('dialog'));
 
@@ -616,18 +617,14 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await user.click(
-        screen.getByRole('button', {
-          name: 'Upload data files',
-        }),
+        screen.getByRole('button', { name: 'Upload data files' }),
       );
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Enter a title', {
-            selector: '#dataFileUploadForm-title-error',
-          }),
-        ).toBeInTheDocument();
-      });
+      expect(
+        await screen.findByText('Enter a title', {
+          selector: '#dataFileUploadForm-title-error',
+        }),
+      ).toBeInTheDocument();
     });
 
     test('shows validation message when non-unique subject title', async () => {
@@ -644,20 +641,16 @@ describe('ReleaseDataUploadsSection', () => {
       await user.type(screen.getByLabelText('Title'), 'Test data 1');
 
       await user.click(
-        screen.getByRole('button', {
-          name: 'Upload data files',
-        }),
+        screen.getByRole('button', { name: 'Upload data files' }),
       );
 
       await user.click(screen.getByLabelText('Title'));
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Enter a unique title', {
-            selector: '#dataFileUploadForm-title-error',
-          }),
-        ).toBeInTheDocument();
-      });
+      expect(
+        await screen.findByText('Enter a unique title', {
+          selector: '#dataFileUploadForm-title-error',
+        }),
+      ).toBeInTheDocument();
     });
 
     test('cannot submit with invalid values when trying to upload CSV files', async () => {
@@ -672,36 +665,34 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await user.click(
-        screen.getByRole('button', {
-          name: 'Upload data files',
-        }),
+        screen.getByRole('button', { name: 'Upload data files' }),
       );
 
-      await waitFor(() => {
-        expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
+      expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 
-        expect(
-          screen.getByText('Enter a title', {
-            selector: '#dataFileUploadForm-title-error',
-          }),
-        ).toBeInTheDocument();
+      expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
 
-        expect(
-          screen.getByText('Choose a data file', {
-            selector: '#dataFileUploadForm-dataFile-error',
-          }),
-        ).toBeInTheDocument();
-        expect(
-          screen.getByText('Choose a metadata file', {
-            selector: '#dataFileUploadForm-metadataFile-error',
-          }),
-        ).toBeInTheDocument();
-        expect(
-          screen.queryByText('Choose a ZIP file that is not empty', {
-            selector: '#dataFileUploadForm-metadataFile-error',
-          }),
-        ).not.toBeInTheDocument();
-      });
+      expect(
+        screen.getByText('Enter a title', {
+          selector: '#dataFileUploadForm-title-error',
+        }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByText('Choose a data file', {
+          selector: '#dataFileUploadForm-dataFile-error',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Choose a metadata file', {
+          selector: '#dataFileUploadForm-metadataFile-error',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText('Choose a ZIP file that is not empty', {
+          selector: '#dataFileUploadForm-metadataFile-error',
+        }),
+      ).not.toBeInTheDocument();
     });
 
     test('cannot submit with invalid values when trying to upload ZIP file', async () => {
@@ -717,37 +708,35 @@ describe('ReleaseDataUploadsSection', () => {
 
       await user.click(screen.getByLabelText('ZIP file'));
       await user.click(
-        screen.getByRole('button', {
-          name: 'Upload data files',
-        }),
+        screen.getByRole('button', { name: 'Upload data files' }),
       );
 
-      await waitFor(() => {
-        expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
+      expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 
-        expect(
-          screen.getByText('Enter a title', {
-            selector: '#dataFileUploadForm-title-error',
-          }),
-        ).toBeInTheDocument();
+      expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
 
-        expect(
-          screen.queryByText('Choose a data file that is not empty', {
-            selector: '#dataFileUploadForm-dataFile-error',
-          }),
-        ).not.toBeInTheDocument();
-        expect(
-          screen.queryByText('Choose a metadata file that is not empty', {
-            selector: '#dataFileUploadForm-metadataFile-error',
-          }),
-        ).not.toBeInTheDocument();
+      expect(
+        screen.getByText('Enter a title', {
+          selector: '#dataFileUploadForm-title-error',
+        }),
+      ).toBeInTheDocument();
 
-        expect(
-          screen.getByText('Choose a zip file', {
-            selector: '#dataFileUploadForm-zipFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
+      expect(
+        screen.queryByText('Choose a data file that is not empty', {
+          selector: '#dataFileUploadForm-dataFile-error',
+        }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Choose a metadata file that is not empty', {
+          selector: '#dataFileUploadForm-metadataFile-error',
+        }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.getByText('Choose a zip file', {
+          selector: '#dataFileUploadForm-zipFile-error',
+        }),
+      ).toBeInTheDocument();
     });
 
     test('cannot submit with invalid values when trying to upload bulk ZIP file', async () => {
@@ -763,20 +752,18 @@ describe('ReleaseDataUploadsSection', () => {
 
       await user.click(screen.getByLabelText('Bulk ZIP upload'));
       await user.click(
-        screen.getByRole('button', {
-          name: 'Upload data files',
-        }),
+        screen.getByRole('button', { name: 'Upload data files' }),
       );
 
-      await waitFor(() => {
-        expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
+      expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 
-        expect(
-          screen.getByText('Choose a zip file', {
-            selector: '#dataFileUploadForm-bulkZipFile-error',
-          }),
-        ).toBeInTheDocument();
-      });
+      expect(releaseDataFileService.uploadDataFiles).not.toHaveBeenCalled();
+
+      expect(
+        screen.getByText('Choose a zip file', {
+          selector: '#dataFileUploadForm-bulkZipFile-error',
+        }),
+      ).toBeInTheDocument();
     });
 
     test('successful submit with CSV files refetches data files', async () => {
@@ -811,9 +798,7 @@ describe('ReleaseDataUploadsSection', () => {
         metadataFile,
       );
       await user.click(
-        screen.getByRole('button', {
-          name: 'Upload data files',
-        }),
+        screen.getByRole('button', { name: 'Upload data files' }),
       );
 
       await waitFor(() => {
@@ -860,9 +845,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       await user.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
       await user.click(
-        screen.getByRole('button', {
-          name: 'Upload data files',
-        }),
+        screen.getByRole('button', { name: 'Upload data files' }),
       );
 
       await waitFor(() => {
@@ -939,15 +922,9 @@ describe('ReleaseDataUploadsSection', () => {
 
       await user.upload(screen.getByLabelText('Upload bulk ZIP file'), zipFile);
       await user.click(
-        screen.getByRole('button', {
-          name: 'Upload data files',
-        }),
+        screen.getByRole('button', { name: 'Upload data files' }),
       );
-      await user.click(
-        screen.getByRole('button', {
-          name: 'Confirm',
-        }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
@@ -1004,9 +981,7 @@ describe('ReleaseDataUploadsSection', () => {
         metadataFile,
       );
       await user.click(
-        screen.getByRole('button', {
-          name: 'Upload data files',
-        }),
+        screen.getByRole('button', { name: 'Upload data files' }),
       );
 
       await waitFor(() => {
@@ -1025,6 +1000,9 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       const fileTableRows = screen.getAllByRole('row');
+
+      expect(fileTableRows).toHaveLength(4);
+
       const fileTableRow3 = within(fileTableRows[3]);
 
       await waitFor(() =>
@@ -1032,11 +1010,10 @@ describe('ReleaseDataUploadsSection', () => {
           releaseDataFileService.getDataFileImportStatus,
         ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
       );
-      await waitFor(() => {
-        expect(fileTableRow3.getByTestId('Data file size')).toHaveTextContent(
-          '150 Kb',
-        );
-      });
+
+      expect(fileTableRow3.getByTestId('Data file size')).toHaveTextContent(
+        '150 Kb',
+      );
     });
 
     test('updates the file size after uploading ZIP file when status changes', async () => {
@@ -1082,9 +1059,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       await user.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
       await user.click(
-        screen.getByRole('button', {
-          name: 'Upload data files',
-        }),
+        screen.getByRole('button', { name: 'Upload data files' }),
       );
 
       await waitFor(() =>
@@ -1105,11 +1080,10 @@ describe('ReleaseDataUploadsSection', () => {
           releaseDataFileService.getDataFileImportStatus,
         ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
       );
-      await waitFor(() => {
-        expect(fileTableRow3.getByTestId('Data file size')).toHaveTextContent(
-          '150 Kb',
-        );
-      });
+
+      expect(fileTableRow3.getByTestId('Data file size')).toHaveTextContent(
+        '150 Kb',
+      );
     });
 
     describe('permissions during upload', () => {
@@ -1136,9 +1110,15 @@ describe('ReleaseDataUploadsSection', () => {
           </MemoryRouter>,
         );
 
-        await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
+        expect(
+          await screen.findByText('Uploaded data files'),
+        ).toBeInTheDocument();
 
-        const fileTableRow = getTableRow(1);
+        const fileTableRows = screen.getAllByRole('row');
+
+        expect(fileTableRows).toHaveLength(2);
+
+        const fileTableRow = within(fileTableRows[1]);
 
         expect(
           fileTableRow.getByRole('button', { name: 'Cancel' }),
@@ -1168,12 +1148,16 @@ describe('ReleaseDataUploadsSection', () => {
           </MemoryRouter>,
         );
 
-        await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
+        expect(
+          await screen.findByText('Uploaded data files'),
+        ).toBeInTheDocument();
 
-        const fileTableRow = getTableRow(1);
+        const fileTableRows = screen.getAllByRole('row');
+
+        expect(fileTableRows).toHaveLength(2);
 
         expect(
-          fileTableRow.queryByRole('button', { name: 'Cancel' }),
+          within(fileTableRows[1]).queryByRole('button', { name: 'Cancel' }),
         ).not.toBeInTheDocument();
       });
     });
@@ -1201,17 +1185,23 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
-      const fileTableRow = getTableRow(1);
+      expect(screen.getAllByRole('row')).toHaveLength(2);
+
+      const fileTableRows = screen.getAllByRole('row');
+
+      expect(fileTableRows).toHaveLength(2);
+
+      const fileTableRow = within(fileTableRows[1]);
 
       await user.click(fileTableRow.getByRole('button', { name: 'Cancel' }));
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Confirm cancellation of selected data file'),
-        ).toBeInTheDocument();
-      });
+      expect(
+        await screen.findByText('Confirm cancellation of selected data file'),
+      ).toBeInTheDocument();
 
       const modal = within(screen.getByRole('dialog'));
 
@@ -1247,17 +1237,21 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
-      const fileTableRow = getTableRow(1);
+      const fileTableRows = screen.getAllByRole('row');
+
+      expect(fileTableRows).toHaveLength(2);
+
+      const fileTableRow = within(fileTableRows[1]);
 
       await user.click(fileTableRow.getByRole('button', { name: 'Cancel' }));
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Confirm cancellation of selected data file'),
-        ).toBeInTheDocument();
-      });
+      expect(
+        await screen.findByText('Confirm cancellation of selected data file'),
+      ).toBeInTheDocument();
 
       const modal = within(screen.getByRole('dialog'));
       await user.click(modal.getByRole('button', { name: 'Confirm' }));
@@ -1269,11 +1263,9 @@ describe('ReleaseDataUploadsSection', () => {
         );
       });
 
-      await waitFor(() => {
-        expect(
-          screen.queryByText('Confirm cancellation of selected data file'),
-        ).not.toBeInTheDocument();
-      });
+      expect(
+        screen.queryByText('Confirm cancellation of selected data file'),
+      ).not.toBeInTheDocument();
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       expect(
@@ -1296,28 +1288,32 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
-      const fileTableRow = getTableRow(1);
+      const fileTableRows = screen.getAllByRole('row');
+
+      expect(fileTableRows).toHaveLength(2);
+
+      const fileTableRow = within(fileTableRows[1]);
 
       await user.click(fileTableRow.getByRole('button', { name: 'Cancel' }));
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Confirm cancellation of selected data file'),
-        ).toBeInTheDocument();
-      });
+      expect(
+        await screen.findByText('Confirm cancellation of selected data file'),
+      ).toBeInTheDocument();
 
       const modal = within(screen.getByRole('dialog'));
       await user.click(modal.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.cancelImport).not.toHaveBeenCalled();
-
-        expect(
-          screen.queryByText('Confirm cancellation of selected data file'),
-        ).not.toBeInTheDocument();
       });
+
+      expect(
+        screen.queryByText('Confirm cancellation of selected data file'),
+      ).not.toBeInTheDocument();
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       expect(
@@ -1342,19 +1338,24 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
 
-      const fileTableRow = getTableRow(1);
+      const fileTableRows = screen.getAllByRole('row');
+
+      expect(fileTableRows).toHaveLength(2);
+
+      const fileTableRow = within(fileTableRows[1]);
 
       await user.click(fileTableRow.getByRole('button', { name: 'Cancel' }));
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Confirm cancellation of selected data file'),
-        ).toBeInTheDocument();
-      });
+      expect(
+        await screen.findByText('Confirm cancellation of selected data file'),
+      ).toBeInTheDocument();
 
       const modal = within(screen.getByRole('dialog'));
+
       await user.click(modal.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
@@ -1364,11 +1365,9 @@ describe('ReleaseDataUploadsSection', () => {
         );
       });
 
-      await waitFor(() => {
-        expect(
-          screen.queryByText('Confirm cancellation of selected data file'),
-        ).not.toBeInTheDocument();
-      });
+      expect(
+        screen.queryByText('Confirm cancellation of selected data file'),
+      ).not.toBeInTheDocument();
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
@@ -1379,8 +1378,4 @@ describe('ReleaseDataUploadsSection', () => {
       expect(screen.getByText('Cancellation failed')).toBeInTheDocument();
     });
   });
-
-  function getTableRow(index: number) {
-    return within(screen.getAllByRole('row')[index]);
-  }
 });
