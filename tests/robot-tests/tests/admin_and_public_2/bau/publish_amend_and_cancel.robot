@@ -397,6 +397,18 @@ Verify that the Data and Files are unchanged
     user checks table cell contains    1    2    17 Kb    testid:Data files table
     user checks table cell contains    1    3    Complete    testid:Data files table
 
+    user clicks button in table cell    1    4    View details    testid:Data files table
+    user waits until h2 is visible    Data file details
+
+    user checks summary list contains    Title    Dates test subject    testid:Data file details
+    user checks summary list contains    Data file    dates.csv    testid:Data file details
+    user checks summary list contains    Meta file    dates.meta.csv    testid:Data file details
+    user checks summary list contains    Size    17 Kb    testid:Data file details
+    user checks summary list contains    Number of rows    118    testid:Data file details
+    user checks summary list contains    Status    Complete    testid:Data file details
+
+    user clicks button    Close
+
 Verify that the ancillary file is unchanged
     user clicks link    Data and files
     user clicks link    Supporting file uploads

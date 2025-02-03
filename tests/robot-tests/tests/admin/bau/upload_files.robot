@@ -47,6 +47,17 @@ Upload a ZIP file file
     user checks table cell contains    1    4    Replace data    testid:Data files table
     user checks table cell contains    1    4    Delete files    testid:Data files table
 
+    user clicks button in table cell    1    4    View details    testid:Data files table
+    user waits until h2 is visible    Data file details
+
+    user checks summary list contains    Title    Absence in PRUs    testid:Data file details
+    user checks summary list contains    Data file    absence_in_prus.csv    testid:Data file details
+    user checks summary list contains    Meta file    absence_in_prus.meta.csv    testid:Data file details
+    user checks summary list contains    Size    141 Kb    testid:Data file details
+    user checks summary list contains    Number of rows    612    testid:Data file details
+    user checks summary list contains    Status    Complete    testid:Data file details
+    user clicks button    Close
+
 Change data file title
     user clicks link    Edit title
 

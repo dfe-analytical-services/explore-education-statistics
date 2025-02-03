@@ -1,3 +1,4 @@
+import DataFilesReorderableList from '@admin/pages/release/data/components/DataFilesReorderableList';
 import DataFileUploadForm, {
   DataFileUploadFormValues,
 } from '@admin/pages/release/data/components/DataFileUploadForm';
@@ -17,7 +18,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
 import { useQuery } from '@tanstack/react-query';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import BulkZipUploadModalConfirm from './BulkZipUploadModalConfirm';
 import DataFilesTable from './DataFilesTable';
 
@@ -40,7 +41,7 @@ export default function ReleaseDataUploadsSection({
   onDataFilesChange,
 }: Props) {
   const [deleteDataFile, setDeleteDataFile] = useState<DeleteDataFile>();
-  const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
+  const [allDataFiles, setAllDataFiles] = useState<DataFile[]>([]);
   const [bulkUploadPlan, setBulkUploadPlan] = useState<ArchiveDataSetFile[]>();
   const [isReordering, toggleReordering] = useToggle(false);
 
@@ -53,17 +54,27 @@ export default function ReleaseDataUploadsSection({
   // Store the data files on state so we can reliably update them
   // when the permissions/status change.
   useEffect(() => {
-    setDataFiles(initialDataFiles ?? []);
+    setAllDataFiles(initialDataFiles ?? []);
   }, [initialDataFiles]);
 
   useEffect(() => {
-    onDataFilesChange?.(dataFiles);
-  }, [dataFiles, onDataFilesChange]);
+    onDataFilesChange?.(allDataFiles);
+  }, [allDataFiles, onDataFilesChange]);
+
+  const replacedDataFiles = useMemo(
+    () => allDataFiles.filter(dataFile => dataFile.replacedBy),
+    [allDataFiles],
+  );
+
+  const dataFiles = useMemo(
+    () => allDataFiles.filter(dataFile => !dataFile.replacedBy),
+    [allDataFiles],
+  );
 
   const setFileDeleting = useCallback(
     (dataFile: DeleteDataFile, deleting: boolean) => {
-      setDataFiles(currentDataFiles =>
-        currentDataFiles.map(file =>
+      setAllDataFiles(files =>
+        files.map(file =>
           file.fileName !== dataFile.file.fileName
             ? file
             : { ...file, isDeleting: deleting },
@@ -101,7 +112,7 @@ export default function ReleaseDataUploadsSection({
         dataFile.id,
       );
 
-      setDataFiles(currentDataFiles =>
+      setAllDataFiles(currentDataFiles =>
         currentDataFiles.map(file =>
           file.fileName !== dataFile.fileName
             ? file
@@ -143,8 +154,8 @@ export default function ReleaseDataUploadsSection({
     try {
       await releaseDataFileService.deleteDataFiles(releaseId, file.id);
 
-      setDataFiles(currentDataFiles =>
-        currentDataFiles.filter(dataFile => dataFile.id !== file.id),
+      setAllDataFiles(files =>
+        files.filter(dataFile => dataFile.id !== file.id),
       );
     } catch (err) {
       logger.error(err);
@@ -202,6 +213,19 @@ export default function ReleaseDataUploadsSection({
     [releaseId, refetchDataFiles],
   );
 
+  const handleConfirmReordering = useCallback(
+    async (nextDataFiles: DataFile[]) => {
+      setAllDataFiles(
+        await releaseDataFileService.updateDataFilesOrder(
+          releaseId,
+          nextDataFiles.map(file => file.id),
+        ),
+      );
+      toggleReordering.off();
+    },
+    [releaseId, toggleReordering],
+  );
+
   return (
     <>
       <h2>Add data file to release</h2>
@@ -235,7 +259,10 @@ export default function ReleaseDataUploadsSection({
       </InsetText>
       {canUpdateRelease ? (
         <>
-          <DataFileUploadForm dataFiles={dataFiles} onSubmit={handleSubmit} />
+          <DataFileUploadForm
+            dataFiles={allDataFiles}
+            onSubmit={handleSubmit}
+          />
           {bulkUploadPlan === undefined ||
           bulkUploadPlan.length === 0 ? null : (
             <BulkZipUploadModalConfirm
@@ -254,34 +281,50 @@ export default function ReleaseDataUploadsSection({
       <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
 
       <LoadingSpinner loading={isLoading}>
-        {dataFiles.length > 0 ? (
+        {allDataFiles.length > 0 ? (
           <>
             <h2>Uploaded data files</h2>
 
-            <DataFilesTable
-              canUpdateRelease={canUpdateRelease}
-              dataFiles={dataFiles}
-              isReordering={isReordering}
-              onCancelReordering={toggleReordering.off}
-              onConfirmReordering={async nextDataFiles => {
-                setDataFiles(
-                  await releaseDataFileService.updateDataFilesOrder(
-                    releaseId,
-                    nextDataFiles.map(file => file.id),
-                  ),
-                );
-                toggleReordering.off();
-              }}
-              onStatusChange={handleStatusChange}
-              onDeleteFile={handleDeleteFile}
-              publicationId={publicationId}
-              releaseId={releaseId}
-            />
-
-            {dataFiles.length < 2 || isReordering ? null : (
+            {!isReordering && allDataFiles.length > 1 && (
               <Button onClick={toggleReordering.on} variant="secondary">
                 Reorder data files
               </Button>
+            )}
+
+            {isReordering ? (
+              <DataFilesReorderableList
+                dataFiles={allDataFiles}
+                onCancelReordering={toggleReordering.off}
+                onConfirmReordering={handleConfirmReordering}
+              />
+            ) : (
+              <>
+                {replacedDataFiles.length > 0 && (
+                  <DataFilesTable
+                    canUpdateRelease={canUpdateRelease}
+                    caption="Data file replacements"
+                    dataFiles={replacedDataFiles}
+                    publicationId={publicationId}
+                    releaseId={releaseId}
+                    testId="Data file replacements table"
+                    onDeleteFile={handleDeleteFile}
+                    onStatusChange={handleStatusChange}
+                  />
+                )}
+
+                {dataFiles.length > 0 && (
+                  <DataFilesTable
+                    canUpdateRelease={canUpdateRelease}
+                    caption="Data files"
+                    dataFiles={dataFiles}
+                    publicationId={publicationId}
+                    releaseId={releaseId}
+                    testId="Data files table"
+                    onDeleteFile={handleDeleteFile}
+                    onStatusChange={handleStatusChange}
+                  />
+                )}
+              </>
             )}
           </>
         ) : (

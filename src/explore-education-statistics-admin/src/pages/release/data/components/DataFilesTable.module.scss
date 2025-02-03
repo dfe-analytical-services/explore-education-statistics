@@ -7,7 +7,7 @@
 }
 
 .title {
-  max-width: 500px;
+  width: 500px;
   overflow-wrap: break-word;
 }
 
@@ -23,11 +23,8 @@
 
 .actions {
   --verticalSpacing: #{govuk-spacing(1)};
+  flex-direction: row;
+  flex-wrap: wrap;
   margin-bottom: 0;
-
-  @include govuk-media-query($until: desktop) {
-    align-items: start;
-    flex-direction: column;
-    white-space: nowrap;
-  }
+  white-space: nowrap;
 }

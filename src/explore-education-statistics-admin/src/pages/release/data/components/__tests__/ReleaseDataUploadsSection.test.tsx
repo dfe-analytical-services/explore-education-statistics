@@ -119,7 +119,7 @@ describe('ReleaseDataUploadsSection', () => {
     totalRows: 100,
   };
 
-  test('renders list of uploaded data files', async () => {
+  test('renders uploaded data files table', async () => {
     releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
       testCompleteImportStatus,
@@ -141,31 +141,29 @@ describe('ReleaseDataUploadsSection', () => {
 
     expect(await screen.findByText('Uploaded data files')).toBeInTheDocument();
 
-    const fileTableRows = screen.getAllByRole('row');
+    const fileTableRows = getAllFileTableRows('Data files');
 
     expect(fileTableRows).toHaveLength(3);
 
     const fileTableRow1 = within(fileTableRows[1]);
 
     expect(fileTableRow1.getByTestId('Title')).toHaveTextContent('Test data 1');
-    expect(fileTableRow1.getByTestId('Data file size')).toHaveTextContent(
-      '50 Kb',
-    );
+    expect(fileTableRow1.getByTestId('Size')).toHaveTextContent('50 Kb');
     expect(fileTableRow1.getByTestId('Status')).toHaveTextContent('Complete');
 
     const fileTableRow2 = within(fileTableRows[2]);
 
     expect(fileTableRow2.getByTestId('Title')).toHaveTextContent('Test data 2');
+    expect(fileTableRow2.getByTestId('Size')).toHaveTextContent('100 Kb');
     expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
   });
 
-  test("renders data file details with status of 'Replacement in progress' if being replaced", async () => {
+  test('renders data files replacements table', async () => {
     releaseDataFileService.getDataFiles.mockResolvedValue([
-      {
-        ...testDataFiles[0],
-        replacedBy: 'data-replacement-1',
-      },
+      { ...testDataFiles[0], replacedBy: 'data-replacement-1' },
+      { ...testDataFiles[1], replacedBy: 'data-replacement-1' },
     ]);
+
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
       testCompleteImportStatus,
     );
@@ -180,22 +178,78 @@ describe('ReleaseDataUploadsSection', () => {
       </MemoryRouter>,
     );
 
-    expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
-      'release-1',
+    expect(await screen.findByText('Uploaded data files')).toBeInTheDocument();
+
+    const replacementRows = getAllFileTableRows('Data file replacements');
+
+    expect(replacementRows).toHaveLength(3);
+
+    const replacementRow1 = within(replacementRows[1]);
+
+    expect(replacementRow1.getByTestId('Title')).toHaveTextContent(
+      'Test data 1',
+    );
+    expect(replacementRow1.getByTestId('Size')).toHaveTextContent('50 Kb');
+    expect(replacementRow1.getByTestId('Status')).toHaveTextContent(
+      'Replacement in progress',
+    );
+
+    const replacementRow2 = within(replacementRows[2]);
+
+    expect(replacementRow2.getByTestId('Title')).toHaveTextContent(
+      'Test data 2',
+    );
+    expect(replacementRow2.getByTestId('Size')).toHaveTextContent('100 Kb');
+    expect(replacementRow2.getByTestId('Status')).toHaveTextContent(
+      'Replacement in progress',
+    );
+  });
+
+  test('renders data files and data file replacements tables', async () => {
+    releaseDataFileService.getDataFiles.mockResolvedValue([
+      { ...testDataFiles[0], replacedBy: 'data-replacement-1' },
+      testDataFiles[1],
+    ]);
+
+    releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+      testCompleteImportStatus,
+    );
+
+    render(
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
     );
 
     expect(await screen.findByText('Uploaded data files')).toBeInTheDocument();
 
-    const fileTableRows = screen.getAllByRole('row');
+    const replacementRows = getAllFileTableRows('Data file replacements');
+
+    expect(replacementRows).toHaveLength(2);
+
+    const replacementRow1 = within(replacementRows[1]);
+
+    expect(replacementRow1.getByTestId('Title')).toHaveTextContent(
+      'Test data 1',
+    );
+    expect(replacementRow1.getByTestId('Size')).toHaveTextContent('50 Kb');
+    expect(replacementRow1.getByTestId('Status')).toHaveTextContent(
+      'Replacement in progress',
+    );
+
+    const fileTableRows = getAllFileTableRows('Data files');
 
     expect(fileTableRows).toHaveLength(2);
 
-    const fileTableRow1 = within(fileTableRows[1]);
+    const fileTableRow2 = within(fileTableRows[1]);
 
-    expect(fileTableRow1.getByTestId('Title')).toHaveTextContent('Test data 1');
-    expect(fileTableRow1.getByTestId('Status')).toHaveTextContent(
-      'Replacement in progress',
-    );
+    expect(fileTableRow2.getByTestId('Title')).toHaveTextContent('Test data 2');
+    expect(fileTableRow2.getByTestId('Size')).toHaveTextContent('100 Kb');
+    expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
   });
 
   test('renders empty message when there are no data files', async () => {
@@ -216,6 +270,139 @@ describe('ReleaseDataUploadsSection', () => {
     ).toBeInTheDocument();
 
     expect(screen.queryByText('Uploaded data files')).not.toBeInTheDocument();
+  });
+
+  describe('view details modal', () => {
+    test('renders details of data file when opened', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([testDataFiles[1]]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testCompleteImportStatus,
+      );
+
+      const { user } = render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+        'release-1',
+      );
+
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
+
+      const dataFileRows = getAllFileTableRows('Data files');
+
+      expect(dataFileRows).toHaveLength(2);
+
+      const dataFileRow = within(dataFileRows[1]);
+
+      await user.click(
+        dataFileRow.getByRole('button', { name: 'View details' }),
+      );
+
+      expect(await screen.findByText('Data file details')).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(modal.getByTestId('Title')).toHaveTextContent('Test data 2');
+
+      expect(
+        within(modal.getByTestId('Data file')).getByRole('button'),
+      ).toHaveTextContent('data-2.csv');
+      expect(
+        within(modal.getByTestId('Meta file')).getByRole('button'),
+      ).toHaveTextContent('data-2.meta.csv');
+
+      expect(modal.getByTestId('Size')).toHaveTextContent('100 Kb');
+      expect(modal.getByTestId('Number of rows')).toHaveTextContent('200');
+      expect(modal.getByTestId('Status')).toHaveTextContent('Complete');
+
+      expect(
+        within(modal.getByTestId('Uploaded by')).getByRole('link', {
+          name: 'user2@test.com',
+        }),
+      ).toHaveAttribute('href', 'mailto:user2@test.com');
+
+      expect(modal.getByTestId('Date uploaded')).toHaveTextContent(
+        '1 July 2020, 12:00',
+      );
+    });
+
+    test('renders details of data file replacement when opened', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        {
+          ...testDataFiles[0],
+          replacedBy: 'data-replacement-1',
+        },
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testCompleteImportStatus,
+      );
+
+      const { user } = render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
+        'release-1',
+      );
+
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
+
+      const replacementRows = getAllFileTableRows('Data file replacements');
+
+      expect(replacementRows).toHaveLength(2);
+
+      const replacementRow = within(replacementRows[1]);
+
+      await user.click(
+        replacementRow.getByRole('button', { name: 'View details' }),
+      );
+
+      expect(await screen.findByText('Data file details')).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(modal.getByTestId('Title')).toHaveTextContent('Test data 1');
+
+      expect(
+        within(modal.getByTestId('Data file')).getByRole('button'),
+      ).toHaveTextContent('data-1.csv');
+      expect(
+        within(modal.getByTestId('Meta file')).getByRole('button'),
+      ).toHaveTextContent('data-1.meta.csv');
+
+      expect(modal.getByTestId('Size')).toHaveTextContent('50 Kb');
+      expect(modal.getByTestId('Number of rows')).toHaveTextContent('100');
+      expect(modal.getByTestId('Status')).toHaveTextContent(
+        'Replacement in progress',
+      );
+
+      expect(
+        within(modal.getByTestId('Uploaded by')).getByRole('link', {
+          name: 'user1@test.com',
+        }),
+      ).toHaveAttribute('href', 'mailto:user1@test.com');
+
+      expect(modal.getByTestId('Date uploaded')).toHaveTextContent(
+        '12 June 2020, 12:00',
+      );
+    });
   });
 
   describe('deleting data file', () => {
@@ -242,7 +429,7 @@ describe('ReleaseDataUploadsSection', () => {
         await screen.findByText('Uploaded data files'),
       ).toBeInTheDocument();
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(3);
 
@@ -304,7 +491,7 @@ describe('ReleaseDataUploadsSection', () => {
         await screen.findByText('Uploaded data files'),
       ).toBeInTheDocument();
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(3);
 
@@ -384,7 +571,7 @@ describe('ReleaseDataUploadsSection', () => {
         await screen.findByText('Uploaded data files'),
       ).toBeInTheDocument();
 
-      let fileTableRows = screen.getAllByRole('row');
+      let fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(3);
 
@@ -410,7 +597,7 @@ describe('ReleaseDataUploadsSection', () => {
         await screen.findByText('Uploaded data files'),
       ).toBeInTheDocument();
 
-      fileTableRows = screen.getAllByRole('row');
+      fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(2);
 
@@ -441,7 +628,7 @@ describe('ReleaseDataUploadsSection', () => {
         await screen.findByText('Uploaded data files'),
       ).toBeInTheDocument();
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(2);
 
@@ -494,7 +681,7 @@ describe('ReleaseDataUploadsSection', () => {
         await screen.findByText('Uploaded data files'),
       ).toBeInTheDocument();
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(3);
 
@@ -536,7 +723,7 @@ describe('ReleaseDataUploadsSection', () => {
         await screen.findByText('Uploaded data files'),
       ).toBeInTheDocument();
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(3);
 
@@ -571,7 +758,7 @@ describe('ReleaseDataUploadsSection', () => {
         await screen.findByText('Uploaded data files'),
       ).toBeInTheDocument();
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(2);
 
@@ -999,7 +1186,7 @@ describe('ReleaseDataUploadsSection', () => {
         );
       });
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(4);
 
@@ -1011,9 +1198,7 @@ describe('ReleaseDataUploadsSection', () => {
         ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
       );
 
-      expect(fileTableRow3.getByTestId('Data file size')).toHaveTextContent(
-        '150 Kb',
-      );
+      expect(fileTableRow3.getByTestId('Size')).toHaveTextContent('150 Kb');
     });
 
     test('updates the file size after uploading ZIP file when status changes', async () => {
@@ -1072,7 +1257,10 @@ describe('ReleaseDataUploadsSection', () => {
         ),
       );
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
+
+      expect(fileTableRows).toHaveLength(4);
+
       const fileTableRow3 = within(fileTableRows[3]);
 
       await waitFor(() =>
@@ -1081,9 +1269,7 @@ describe('ReleaseDataUploadsSection', () => {
         ).toHaveBeenCalledWith('release-1', testUploadedDataFile2),
       );
 
-      expect(fileTableRow3.getByTestId('Data file size')).toHaveTextContent(
-        '150 Kb',
-      );
+      expect(fileTableRow3.getByTestId('Size')).toHaveTextContent('150 Kb');
     });
 
     describe('permissions during upload', () => {
@@ -1114,7 +1300,7 @@ describe('ReleaseDataUploadsSection', () => {
           await screen.findByText('Uploaded data files'),
         ).toBeInTheDocument();
 
-        const fileTableRows = screen.getAllByRole('row');
+        const fileTableRows = getAllFileTableRows('Data files');
 
         expect(fileTableRows).toHaveLength(2);
 
@@ -1152,7 +1338,7 @@ describe('ReleaseDataUploadsSection', () => {
           await screen.findByText('Uploaded data files'),
         ).toBeInTheDocument();
 
-        const fileTableRows = screen.getAllByRole('row');
+        const fileTableRows = getAllFileTableRows('Data files');
 
         expect(fileTableRows).toHaveLength(2);
 
@@ -1191,7 +1377,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       expect(screen.getAllByRole('row')).toHaveLength(2);
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(2);
 
@@ -1241,7 +1427,7 @@ describe('ReleaseDataUploadsSection', () => {
         await screen.findByText('Uploaded data files'),
       ).toBeInTheDocument();
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(2);
 
@@ -1292,7 +1478,7 @@ describe('ReleaseDataUploadsSection', () => {
         await screen.findByText('Uploaded data files'),
       ).toBeInTheDocument();
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(2);
 
@@ -1342,7 +1528,7 @@ describe('ReleaseDataUploadsSection', () => {
         await screen.findByText('Uploaded data files'),
       ).toBeInTheDocument();
 
-      const fileTableRows = screen.getAllByRole('row');
+      const fileTableRows = getAllFileTableRows('Data files');
 
       expect(fileTableRows).toHaveLength(2);
 
@@ -1378,4 +1564,10 @@ describe('ReleaseDataUploadsSection', () => {
       expect(screen.getByText('Cancellation failed')).toBeInTheDocument();
     });
   });
+
+  function getAllFileTableRows(caption: string) {
+    const table = screen.getByRole('table', { name: caption });
+
+    return within(table).getAllByRole('row');
+  }
 });

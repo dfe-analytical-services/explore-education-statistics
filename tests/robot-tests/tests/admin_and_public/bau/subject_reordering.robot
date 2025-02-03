@@ -130,13 +130,14 @@ Reorder subject that is being replaced
     user clicks button    Confirm order
     user waits until page contains button    Reorder data files
 
+    user checks table cell contains    1    1    Three    testid:Data file replacements table
+
     user checks table cell contains    1    1    One    testid:Data files table
     user checks table cell contains    2    1    Two    testid:Data files table
-    user checks table cell contains    3    1    Three    testid:Data files table
-    user checks table cell contains    4    1    Four    testid:Data files table
+    user checks table cell contains    3    1    Four    testid:Data files table
 
 Complete data replacement
-    user clicks link in table cell    3    4    Replace data    testid:Data files table
+    user clicks link in table cell    1    4    Replace data    testid:Data file replacements table
 
     user waits until page contains    Data blocks: OK
     user waits until page contains    Footnotes: OK
