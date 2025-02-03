@@ -20,9 +20,7 @@ const ReleaseDataGuidancePage = ({ release }: Props) => {
         { name: 'Find statistics and data', link: '/find-statistics' },
         {
           name: release.publication.title,
-          link: release.latestRelease
-            ? `/find-statistics/${release.publication.slug}`
-            : `/find-statistics/${release.publication.slug}/${release.slug}`,
+          link: `/find-statistics/${release.publication.slug}/${release.slug}`,
         },
       ]}
       breadcrumbLabel="Data guidance"
