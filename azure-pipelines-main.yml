@@ -262,11 +262,18 @@ jobs:
           version: $(NodeVersion)
 
       - task: Bash@3
-        displayName: corepack enable
+        displayName: Install Corepack
         inputs:
           workingDir: .
           targetType: inline
-          script: corepack enable
+          script: npm -g corepack@latest
+
+      - task: Bash@3
+        displayName: corepack install
+        inputs:
+          workingDir: .
+          targetType: inline
+          script: corepack install
 
       - task: UseDotNet@2
         displayName: Install .NET $(DotNetVersion)
