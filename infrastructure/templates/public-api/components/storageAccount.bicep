@@ -69,61 +69,53 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   tags: tagValues
 }
 
-var servicePrivateSubnetIds = {
-  file: ''
-  blob: ''
-  queue: ''
-  table: ''
-  ...(privateEndpointSubnetIds ?? {})
-}
-
-module fileServicePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.file != '') {
+module fileServicePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetIds.?file != null) {
   name: '${storageAccountName}FileServicePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
     serviceName: storageAccount.name
     privateEndpointNameOverride: '${storageAccount.name}-file'
     serviceType: 'fileService'
-    subnetId: servicePrivateSubnetIds.file
+    subnetId: privateEndpointSubnetIds.?file ?? ''
     location: location
     tagValues: tagValues
   }
 }
 
-module blobStoragePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.blob != '') {
+module blobStoragePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetIds.?blob != null) {
   name: '${storageAccountName}BlobStoragePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
     serviceName: storageAccount.name
     privateEndpointNameOverride: '${storageAccount.name}-blob'
     serviceType: 'blobStorage'
-    subnetId: servicePrivateSubnetIds.blob
+    subnetId: privateEndpointSubnetIds.?blob ?? ''
     location: location
     tagValues: tagValues
   }
 }
 
-module queuePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.queue != '') {
+module queuePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetIds.?queue != null) {
   name: '${storageAccountName}QueuePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
     serviceName: storageAccount.name
     privateEndpointNameOverride: '${storageAccount.name}-queue'
     serviceType: 'queue'
-    subnetId: servicePrivateSubnetIds.queue
+    subnetId: privateEndpointSubnetIds.?queue ?? ''
     location: location
     tagValues: tagValues
   }
 }
 
-module tableStoragePrivateEndpointModule 'privateEndpoint.bicep' = if (servicePrivateSubnetIds.table != '') {
+module tableStoragePrivateEndpointModule 'privateEndpoint.bicep' = if (privateEndpointSubnetIds.?table != null) {
   name: '${storageAccountName}TableStoragePrivateEndpointDeploy'
   params: {
     serviceId: storageAccount.id
     serviceName: storageAccount.name
     privateEndpointNameOverride: '${storageAccount.name}-table'
     serviceType: 'tableStorage'
-    subnetId: servicePrivateSubnetIds.table
+    subnetId: privateEndpointSubnetIds.?table ?? ''
     location: location
     tagValues: tagValues
   }

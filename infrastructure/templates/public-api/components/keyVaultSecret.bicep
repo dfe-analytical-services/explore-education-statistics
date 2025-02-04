@@ -1,3 +1,5 @@
+import { replaceMultiple } from '../functions.bicep'
+
 @description('The name of the Key Vault to store the secret within')
 param keyVaultName string
 
@@ -20,7 +22,10 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 }
 
 resource keyVaultSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  name: replace(replace(secretName, '.', '-'), ' ', '-')
+  name: replaceMultiple(secretName, {
+    '.': '-'
+    ' ': '-'
+  })
   parent: keyVault
   properties: {
     contentType: contentType

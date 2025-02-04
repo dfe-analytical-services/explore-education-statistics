@@ -91,9 +91,6 @@
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
-    },
-    "publicDataDbExists": {
-      "value": false
     }
   }
 }

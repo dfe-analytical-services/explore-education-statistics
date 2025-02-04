@@ -159,7 +159,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     memoryGis: resourceAndScalingConfig.memoryGis
     minReplicas: resourceAndScalingConfig.minReplicas
     maxReplicas: resourceAndScalingConfig.maxReplicas
-    scaleAtConcurrentHttpRequests: resourceAndScalingConfig.scaleAtConcurrentHttpRequests
+    scaleAtConcurrentHttpRequests: resourceAndScalingConfig.?scaleAtConcurrentHttpRequests
     workloadProfileName: resourceAndScalingConfig.workloadProfileName
     alerts: deployAlerts ? {
       restarts: true
