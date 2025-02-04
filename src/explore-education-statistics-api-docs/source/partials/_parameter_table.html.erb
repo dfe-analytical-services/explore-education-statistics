@@ -3,7 +3,7 @@
   role="region"
   tabindex="0"
 >
-  <table>
+  <table class="app-parameter-table">
     <thead>
     <tr>
       <th scope="col">Parameter</th>
@@ -18,7 +18,7 @@
         <td><code class="app-word-break--normal"><%= parameter.name %></code></td>
         <td><%= render_schema_type(parameter.schema) %></td>
         <td><%= parameter.required? %></td>
-        <td>
+        <td class="app-parameter-table__description">
           <%= partial("partials/schema_description", :locals => {
             description: parameter.description,
             schema: parameter.schema

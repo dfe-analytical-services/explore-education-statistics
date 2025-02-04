@@ -63,31 +63,33 @@ body_schema = schema.type.nil? && schema.all_of&.count == 1 ? schema.all_of[0] :
 body_parameters = get_schema_properties(schema)
 %>
 
-<table>
-  <thead>
-  <tr>
-    <th scope="col">Name</th>
-    <th scope="col">Type</th>
-    <th scope="col">Required</th>
-    <th scope="col">Description</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% body_parameters.each do |name, parameter| %>
+<div aria-label="Request body properties" class="app-table-container" role="region" tabindex="0">
+  <table class="app-parameter-table">
+    <thead>
     <tr>
-      <td><code class="app-word-break--normal"><%= name %></code></td>
-      <td><%= render_schema_type(parameter) %></td>
-      <td><%= body_schema.requires?(parameter) %></td>
-      <td>
-        <%= partial("partials/schema_description", :locals => {
-          description: parameter.description,
-          schema: parameter
-        }) %>
-      </td>
+      <th scope="col">Name</th>
+      <th scope="col">Type</th>
+      <th scope="col">Required</th>
+      <th scope="col">Description</th>
     </tr>
-  <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+    <% body_parameters.each do |name, parameter| %>
+      <tr>
+        <td><code class="app-word-break--normal"><%= name %></code></td>
+        <td><%= render_schema_type(parameter) %></td>
+        <td><%= body_schema.requires?(parameter) %></td>
+        <td>
+          <%= partial("partials/schema_description", :locals => {
+            description: parameter.description,
+            schema: parameter
+          }) %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
 
 ### Example request body
 
@@ -150,32 +152,34 @@ languages.
 <% if responses.any? %>
 ## Responses
 
-<table>
-  <thead>
-  <tr>
-    <th scope="col">Status</th>
-    <th scope="col">Description</th>
-    <th scope="col">Media Type</th>
-    <th scope="col">Schema</th>
-  </tr>
-  </thead>
-  <tbody>
-<% responses.each do |status, response| %>
-<% response.content.each do |media_type, content| %>
+<div aria-labelledby="responses" class="app-table-container" role="region" tabindex="0">
+  <table class="app-parameter-table">
+    <thead>
     <tr>
-      <td><%= status %></td>
-      <td><%= render_markdown(response.description) %></td>
-      <td>
-        <%= media_type %>
-      </td>
-      <td>
-        <%= render_schema_type(content.schema) %>
-      </td>
+      <th scope="col">Status</th>
+      <th scope="col">Description</th>
+      <th scope="col">Media Type</th>
+      <th scope="col">Schema</th>
     </tr>
-<% end %>
-<% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+  <% responses.each do |status, response| %>
+  <% response.content.each do |media_type, content| %>
+      <tr>
+        <td><%= status %></td>
+        <td><%= render_markdown(response.description) %></td>
+        <td>
+          <%= media_type %>
+        </td>
+        <td>
+          <%= render_schema_type(content.schema) %>
+        </td>
+      </tr>
+  <% end %>
+  <% end %>
+    </tbody>
+  </table>
+</div>
 
 <% if responses[200] %>
 ### Example successful response
