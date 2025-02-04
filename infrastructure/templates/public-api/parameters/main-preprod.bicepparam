@@ -6,7 +6,7 @@ param environmentName = 'Pre-Production'
 param publicUrls = {
   contentApi: 'https://content.pre-production.explore-education-statistics.service.gov.uk'
   publicSite: 'https://pre-production.explore-education-statistics.service.gov.uk'
-  publicApi: 'https://pre-production.statistics.api.education.gov.uk'
+  publicApi: 'https://pp-api.education.gov.uk/statistics-preprod'
 }
 
 // PostgreSQL Database Params
