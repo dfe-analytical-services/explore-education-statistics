@@ -39,6 +39,15 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing 
   parent: vNet
 }
 
+module globalWafPolicyModule '../../components/appGatewayWafPolicy.bicep' = {
+  name: 'wafPolicy'
+  params: {
+    name: '${resourceNames.sharedResources.appGateway}-afwp'
+    location: location
+    tagValues: tagValues
+  }
+}
+
 module appGatewayModule '../../components/appGateway.bicep' = {
   name: 'appGatewayDeploy'
   params: {
@@ -51,6 +60,7 @@ module appGatewayModule '../../components/appGateway.bicep' = {
     backends: backends
     routes: routes
     rewrites: rewrites
+    globalWafPolicyId: globalWafPolicyModule.outputs.id
     alerts: deployAlerts ? {
       health: true
       responseTime: true

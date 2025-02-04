@@ -1,8 +1,27 @@
+import { AppGatewayFirewallPolicyCustomRule } from '../types.bicep'
+
 @description('Specifies the location for all resources')
 param location string
 
 @description('Specifies the name of the policy')
 param name string
+
+@description('A set of custom rules to include alongside the default rulesets')
+param customRules AppGatewayFirewallPolicyCustomRule[] = []
+
+param managedRuleSets {
+  ruleSetType: string
+  ruleSetVersion: string
+}[] = [
+  {
+    ruleSetType: 'Microsoft_DefaultRuleSet'
+    ruleSetVersion: '2.1'
+  }
+  {
+    ruleSetType: 'Microsoft_BotManagerRuleSet'
+    ruleSetVersion: '1.1'
+  }
+]
 
 @description('Specifies a set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -22,17 +41,23 @@ resource policy 'Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolic
       requestBodyEnforcement: true
     }
     managedRules: {
-      managedRuleSets: [
-        {
-          ruleSetType: 'Microsoft_DefaultRuleSet'
-          ruleSetVersion: '2.1'
-        }
-        {
-          ruleSetType: 'Microsoft_BotManagerRuleSet'
-          ruleSetVersion: '1.1'
-        }
-      ]
+      managedRuleSets: managedRuleSets
     }
+    customRules: map(customRules, (rule, index) => {
+      name: rule.name
+      action: rule.action
+      ruleType: 'Match'
+      priority: 1 + (index * 5)
+      matchConditions: map(rule.matchConditions, condition => {
+        matchVariables: [{
+          variableName: condition.type
+          selector: condition.?selector
+        }]
+        operator: condition.operator
+        matchValues: condition.matchValues
+      })
+
+    })
   }
   tags: tagValues
 }

@@ -36,6 +36,9 @@ param routes AppGatewayRoute[]
 @description('Rules for how the App Gateway should rewrite URLs')
 param rewrites AppGatewayRewriteSet[]
 
+@description('Optional id of a WAF policy to use globally across all listeners in this APp Gateway')
+param globalWafPolicyId string?
+
 @description('Availability zones in the region that the resource should be accessible from. Defaults to all zones')
 param availabilityZones ('1' | '2' | '3') [] = [
   '1'
@@ -108,16 +111,6 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [f
   }
   zones: availabilityZones
 }]
-
-// Add a Firewall Policy with OWASP and Bot rulesets, running in Prevention mode.
-module wafPolicyModule 'appGatewayWafPolicy.bicep' = {
-  name: 'wafPolicy'
-  params: {
-    name: '${appGatewayName}-afwp'
-    location: location
-    tagValues: tagValues
-  }
-}
 
 module pathRulesModule './appGatewayPathRules.bicep' = [for route in routes: {
   name: '${route.name}-route-paths'
@@ -220,6 +213,9 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
         }
         hostName: site.fqdn
         requireServerNameIndication: true
+        firewallPolicy: site.?wafPolicyName != null ? {
+          id: resourceId('Microsoft.Network/webApplicationFirewallPolicies', site.?wafPolicyName ?? '')
+        } : null
       }
     }]
     requestRoutingRules: [for (route, index) in routes: {
@@ -279,9 +275,9 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
       minCapacity: 0
       maxCapacity: 10
     }
-    firewallPolicy: {
-      id: wafPolicyModule.outputs.id
-    }
+    firewallPolicy: globalWafPolicyId != null ? {
+      id: globalWafPolicyId!
+    } : null
   }
   dependsOn: [
     publicIPAddresses
