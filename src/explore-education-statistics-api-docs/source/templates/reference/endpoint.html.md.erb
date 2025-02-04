@@ -23,7 +23,10 @@ The URL for this endpoint is:
 
 The following parameters will need to be substituted into the URL path.
 
-<%= partial("partials/parameter_table", :locals => { parameters: path_parameters }) %>
+<%= partial("partials/parameter_table", :locals => {
+  labelled_by: "path-parameters",
+  parameters: path_parameters })
+%>
 <% end %>
 
 <% query_parameters = parameters.select { |parameter| parameter.in == "query" } %>
@@ -31,14 +34,20 @@ The following parameters will need to be substituted into the URL path.
 <% if query_parameters.any? %>
 ### Query parameters
 
-<%= partial("partials/parameter_table", :locals => { parameters: query_parameters }) %>
+<%= partial("partials/parameter_table", :locals => {
+  labelled_by: "query-parameters",
+  parameters: query_parameters }) %>
 <% end %>
 
 <% headers = parameters.select { |parameter| parameter.in == "header" } %>
 
 <% if headers.any? %>
 ### Headers
-<%= partial("partials/parameter_table", :locals => { parameters: headers }) %>
+
+<%= partial("partials/parameter_table", :locals => {
+  labelled_by: "headers",
+  parameters: headers
+}) %>
 <% end %>
 <% end %>
 

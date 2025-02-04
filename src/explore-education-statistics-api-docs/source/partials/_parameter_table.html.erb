@@ -1,4 +1,8 @@
-<div aria-label="Parameters" class="app-table-container" role="region" tabindex="0">
+<div <% if defined? labelled_by %>aria-labelledby="<%= labelled_by %>"<% end %>
+  class="app-table-container"
+  role="region"
+  tabindex="0"
+>
   <table>
     <thead>
     <tr>
