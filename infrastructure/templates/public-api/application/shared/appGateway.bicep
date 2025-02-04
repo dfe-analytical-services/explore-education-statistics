@@ -42,7 +42,7 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing 
 module globalWafPolicyModule '../../components/appGatewayWafPolicy.bicep' = {
   name: 'wafPolicy'
   params: {
-    name: '${resourceNames.sharedResources.appGateway}-afwp'
+    name: '${resourceNames.sharedResources.appGateway}-global-afwp'
     location: location
     tagValues: tagValues
   }

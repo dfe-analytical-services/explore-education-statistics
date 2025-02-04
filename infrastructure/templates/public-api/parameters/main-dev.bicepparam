@@ -6,7 +6,7 @@ param environmentName = 'Development'
 param publicUrls = {
   contentApi: 'https://content.dev.explore-education-statistics.service.gov.uk'
   publicSite: 'https://dev.explore-education-statistics.service.gov.uk'
-  publicApi: 'https://pp-api.education.gov.uk/statistics-dev'
+  publicApiAppGateway: 'https://dev.statistics.api.education.gov.uk'
 }
 
 param publicApiContainerAppConfig = {

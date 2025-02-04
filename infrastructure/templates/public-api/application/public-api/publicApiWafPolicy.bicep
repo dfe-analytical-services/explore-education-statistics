@@ -8,7 +8,7 @@ param location string
 
 @description('Secret header value from FUAPI.')
 @secure()
-param fuapiHeaderValue string
+param fuapiSecretValue string
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -27,16 +27,28 @@ module wafPolicyModule '../../components/appGatewayWafPolicy.bicep' = {
     // header value that is included from FUAPI.
     customRules: [
       {
-        name: 'fuapisecretheader'
+        name: 'fuapisecretnotpresent'
+        action: 'Block'
+        matchConditions: [
+          {
+            type: 'RequestHeaders'
+            selector: 'X-FUAPI-Secret'
+            operator: 'Any'
+            negateOperator: true
+          }
+        ]
+      }
+      {
+        name: 'fuapisecretincorrect'
         action: 'Block'
         matchConditions: [
           {
             type: 'RequestHeaders'
             selector: 'X-FUAPI-Secret'
             operator: 'Equal'
-            operatorNegation: true
+            negateOperator: true
             matchValues: [
-              fuapiHeaderValue
+              fuapiSecretValue
             ]
           }
         ]

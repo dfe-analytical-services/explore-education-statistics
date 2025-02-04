@@ -214,7 +214,7 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
         hostName: site.fqdn
         requireServerNameIndication: true
         firewallPolicy: site.?wafPolicyName != null ? {
-          id: resourceId('Microsoft.Network/webApplicationFirewallPolicies', site.?wafPolicyName ?? '')
+          id: resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', site.?wafPolicyName ?? '')
         } : null
       }
     }]

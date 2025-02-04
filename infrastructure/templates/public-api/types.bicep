@@ -237,7 +237,10 @@ type AppGatewayRewriteUrlConfig = {
 
 // This is not an exhaustive list. For a list of available operators, see:
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.network/applicationgatewaywebapplicationfirewallpolicies?pivots=deployment-language-bicep#matchcondition
-type AppGatewayFirewallPolicyCustomRuleOperator = 'Equal' | 'BeginsWith'
+type AppGatewayFirewallPolicyCustomRuleOperator = 
+  | 'Equal'
+  | 'BeginsWith'
+  | 'Any'
 
 @export()
 type AppGatewayFirewallPolicyCustomRuleMatchCondition = {
@@ -254,10 +257,10 @@ type AppGatewayFirewallPolicyCustomRuleMatchCondition = {
   operator: AppGatewayFirewallPolicyCustomRuleOperator
 
   @description('Whether or not to negate the operator')
-  operatorNegation: bool
+  negateOperator: bool
 
   @description('Array of possible values to match')
-  matchValues: string[]
+  matchValues: string[]?
 }
 
 @export()

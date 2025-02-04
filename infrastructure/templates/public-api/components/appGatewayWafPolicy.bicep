@@ -6,22 +6,28 @@ param location string
 @description('Specifies the name of the policy')
 param name string
 
-@description('A set of custom rules to include alongside the default rulesets')
-param customRules AppGatewayFirewallPolicyCustomRule[] = []
+@description('A set of managed rulesets to include alongside the default ruleset')
+param defaultRuleSet {
+  ruleSetType: string
+  ruleSetVersion: string
+} = {
+  ruleSetType: 'Microsoft_DefaultRuleSet'
+  ruleSetVersion: '2.1'
+}
 
+@description('A set of managed rulesets to include alongside the default ruleset')
 param managedRuleSets {
   ruleSetType: string
   ruleSetVersion: string
 }[] = [
   {
-    ruleSetType: 'Microsoft_DefaultRuleSet'
-    ruleSetVersion: '2.1'
-  }
-  {
     ruleSetType: 'Microsoft_BotManagerRuleSet'
     ruleSetVersion: '1.1'
   }
 ]
+
+@description('A set of custom rules to include alongside the managed rulesets')
+param customRules AppGatewayFirewallPolicyCustomRule[] = []
 
 @description('Specifies a set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -41,20 +47,24 @@ resource policy 'Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolic
       requestBodyEnforcement: true
     }
     managedRules: {
-      managedRuleSets: managedRuleSets
+      managedRuleSets: [
+        defaultRuleSet
+        ...managedRuleSets
+      ]
     }
     customRules: map(customRules, (rule, index) => {
       name: rule.name
       action: rule.action
-      ruleType: 'Match'
-      priority: 1 + (index * 5)
+      ruleType: 'MatchRule'
+      priority: rule.?priority ?? 1 + (index * 5)
       matchConditions: map(rule.matchConditions, condition => {
         matchVariables: [{
           variableName: condition.type
           selector: condition.?selector
         }]
         operator: condition.operator
-        matchValues: condition.matchValues
+        negationConditon: condition.negateOperator
+        matchValues: condition.?matchValues ?? []
       })
 
     })

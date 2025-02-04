@@ -51,10 +51,10 @@
       "value": "data.explore-education-statistics.service.gov.uk"
     },
     "publicApiUrl": {
-      "value": "statistics.api.education.gov.uk"
+      "value": "api.education.gov.uk/statistics"
     },
     "publicApiDocsUrl": {
-      "value": "statistics.api.education.gov.uk/docs"
+      "value": "api.education.gov.uk/statistics/docs"
     },
     "publicAppGATrackingId": {
       "value": "G-9YG8ESXR5Y"
