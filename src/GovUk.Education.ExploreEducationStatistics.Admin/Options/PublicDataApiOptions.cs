@@ -7,7 +7,9 @@ public class PublicDataApiOptions
 {
     public const string Section = "PublicDataApi";
 
-    public string Url { get; init; } = string.Empty;
+    public string PublicUrl { get; init; } = string.Empty;
+
+    public string PrivateUrl { get; init; } = string.Empty;
 
     public string DocsUrl { get; init; } = string.Empty;
 
