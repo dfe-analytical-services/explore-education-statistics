@@ -8,7 +8,7 @@ weight: 4
 # Versioning
 
 The Explore Education Statistics (EES) API uses URL-based versioning. Each endpoint encodes its current
-version within its URL e.g. `/api/v1/the-endpoint`, `/api/v2/the-endpoint`, etc.
+version within its URL e.g. `/v1/the-endpoint`, `/v2/the-endpoint`, etc.
 
 When backwards-incompatible changes to an endpoint are unavoidable, a new version of the endpoint
 will be published. Backwards-incompatible changes may include things like:
@@ -59,9 +59,9 @@ You can find lists of changes via:
 
 ### Requesting data set versions
 
-There are several API endpoints that accept a `dataSetVersion` query parameter e.g. the 
+There are several API endpoints that accept a `dataSetVersion` query parameter e.g. the
 [Get a data set version](/reference-v1/endpoints/GetDataSetVersion/index.html) endpoint.
-The `dataSetVersion` parameter can be supplied with a version number (e.g. 1.0, 1.1, 2.0, 
+The `dataSetVersion` parameter can be supplied with a version number (e.g. 1.0, 1.1, 2.0,
 etc) that controls the data set version that should be used in the request.
 
 For example:
@@ -73,10 +73,10 @@ For example:
 ### Automatically receiving minor version updates
 
 When using the `dataSetVersion` parameter, minor data set version updates can automatically
-be retrieved from the API without having to change the version number explicitly. This can 
+be retrieved from the API without having to change the version number explicitly. This can
 be done by including an asterisk `*` wildcard character in place of a major or minor version.
 
-For example: 
+For example:
 
 - `dataSetVersion=*` uses the latest major and minor version
 - `dataSetVersion=2.*` uses the latest minor version of the v2 series
