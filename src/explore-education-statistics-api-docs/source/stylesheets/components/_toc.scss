@@ -9,10 +9,20 @@
   word-break: break-word;
 }
 
-@include govuk-media-query($until: desktop) {
+@include govuk-media-query($until: tablet) {
   .js .toc__list {
     margin-right: 0;
   }
+
+  /* stylelint-disable selector-max-compound-selectors */
+  .js .toc li li li {
+    display: initial;
+
+    a {
+      padding-left: govuk-spacing(3);
+    }
+  }
+  /* stylelint-enable selector-max-compound-selectors */
 
   .collapsible {
     align-items: center;
@@ -42,6 +52,7 @@
   }
 
   .collapsible__body {
+    word-break: break-all;
     width: 100%;
 
     a {
