@@ -1,0 +1,51 @@
+.toc__list li {
+  a:link,
+  a:visited {
+    padding: 8px 10px;
+  }
+}
+
+.collapsible {
+  word-break: break-word;
+}
+
+@include govuk-media-query($until: desktop) {
+  .js .toc__list {
+    margin-right: 0;
+  }
+
+  .collapsible {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .collapsible__toggle {
+    align-items: center;
+    display: flex;
+    height: 30px;
+    justify-content: center;
+    right: 0;
+    top: 5px;
+    width: 20px;
+  }
+
+  .collapsible__toggle-icon {
+    position: relative;
+    top: -5px;
+    right: unset;
+  }
+
+  .collapsible__toggle-label {
+    position: absolute;
+  }
+
+  .collapsible__body {
+    width: 100%;
+
+    a {
+      width: fit-content;
+    }
+  }
+}
