@@ -40,7 +40,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
     rsi => rsi.isLegacyLink || rsi.description !== release.title,
   );
 
-  const releaseSeriesNonLegacy = release.publication.releaseSeries.find(
+  const latestReleaseSeriesItem = release.publication.releaseSeries.find(
     rsi => !rsi.isLegacyLink,
   );
 
@@ -130,11 +130,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     <Link
                       className="govuk-!-display-none-print govuk-!-display-block govuk-!-margin-bottom-3"
                       unvisited
-                      to={`/find-statistics/${release.publication.slug}/${releaseSeriesNonLegacy?.releaseSlug}`}
+                      to={`/find-statistics/${release.publication.slug}/${latestReleaseSeriesItem?.releaseSlug}`}
                     >
                       View latest data:{' '}
                       <span className="govuk-!-font-weight-bold">
-                        {releaseSeriesNonLegacy?.description}
+                        {latestReleaseSeriesItem?.description}
                       </span>
                     </Link>
                   )}
