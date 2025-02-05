@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IDataSetVersionService _dataSetVersionService;
         private readonly IProcessorClient _processorClient;
-        private readonly IBlobCacheService _cacheService;
+        private readonly IPrivateBlobCacheService _privateCacheService;
 
         // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseSubjectRepository releaseSubjectRepository,
             IDataSetVersionService dataSetVersionService,
             IProcessorClient processorClient,
-            IBlobCacheService cacheService)
+            IPrivateBlobCacheService privateCacheService)
         {
             _context = context;
             _statisticsDbContext = statisticsDbContext;
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseSubjectRepository = releaseSubjectRepository;
             _dataSetVersionService = dataSetVersionService;
             _processorClient = processorClient;
-            _cacheService = cacheService;
+            _privateCacheService = privateCacheService;
         }
 
         public async Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId)
@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     forceDeleteAll: forceDeleteRelatedData,
                     cancellationToken: cancellationToken)
                 .OnSuccessDo(async _ =>
-                    await _cacheService.DeleteCacheFolderAsync(
+                    await _privateCacheService.DeleteCacheFolderAsync(
                         new PrivateReleaseContentFolderCacheKey(releaseVersion.Id)))
                 .OnSuccessDo(() => _releaseDataFileService.DeleteAll(
                     releaseVersionId: releaseVersion.Id,
@@ -677,7 +677,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     await _releaseSubjectRepository.DeleteReleaseSubject(releaseVersionId: releaseVersionId,
                         subjectId: deletePlan.SubjectId);
-                    await _cacheService.DeleteItemAsync(new PrivateSubjectMetaCacheKey(
+                    await _privateCacheService.DeleteItemAsync(new PrivateSubjectMetaCacheKey(
                         releaseVersionId: releaseVersionId,
                         subjectId: deletePlan.SubjectId));
                 })

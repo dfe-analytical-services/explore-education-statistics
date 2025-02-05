@@ -261,14 +261,14 @@ public abstract class ReleaseVersionServiceTests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<IBlobCacheService>(Strict);
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var dataBlockService = new Mock<IDataBlockService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
 
-            cacheService
+            privateCacheService
                 .Setup(service =>
                     service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersion.Id, subject.Id)))
                 .Returns(Task.CompletedTask);
@@ -298,7 +298,7 @@ public abstract class ReleaseVersionServiceTests
             {
                 var releaseVersionService = BuildReleaseVersionService(context,
                     statisticsDbContext,
-                    cacheService: cacheService.Object,
+                    privateCacheService: privateCacheService.Object,
                     dataBlockService: dataBlockService.Object,
                     dataImportService: dataImportService.Object,
                     footnoteRepository: footnoteRepository.Object,
@@ -308,7 +308,7 @@ public abstract class ReleaseVersionServiceTests
                 var result = await releaseVersionService.RemoveDataFiles(releaseVersionId: releaseVersion.Id,
                     fileId: file.Id);
 
-                VerifyAllMocks(cacheService,
+                VerifyAllMocks(privateCacheService,
                     dataBlockService,
                     dataImportService,
                     footnoteRepository,
@@ -414,17 +414,17 @@ public abstract class ReleaseVersionServiceTests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var cacheService = new Mock<IBlobCacheService>(Strict);
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var dataBlockService = new Mock<IDataBlockService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
 
-            cacheService.Setup(service =>
+            privateCacheService.Setup(service =>
                     service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersion.Id, subject.Id)))
                 .Returns(Task.CompletedTask);
-            cacheService.Setup(service =>
+            privateCacheService.Setup(service =>
                     service.DeleteItemAsync(
                         new PrivateSubjectMetaCacheKey(releaseVersion.Id, replacementSubject.Id)))
                 .Returns(Task.CompletedTask);
@@ -461,7 +461,7 @@ public abstract class ReleaseVersionServiceTests
                 var releaseVersionService = BuildReleaseVersionService(
                     context,
                     statisticsDbContext,
-                    cacheService: cacheService.Object,
+                    privateCacheService: privateCacheService.Object,
                     dataBlockService: dataBlockService.Object,
                     dataImportService: dataImportService.Object,
                     footnoteRepository: footnoteRepository.Object,
@@ -473,7 +473,7 @@ public abstract class ReleaseVersionServiceTests
                     fileId: file.Id);
 
                 VerifyAllMocks(
-                    cacheService,
+                    privateCacheService,
                     dataBlockService,
                     dataImportService,
                     footnoteRepository,
@@ -1188,7 +1188,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
-            var cacheService = new Mock<IBlobCacheService>(Strict);
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
 
             var forceDeleteRelatedData = false;
@@ -1203,7 +1203,7 @@ public abstract class ReleaseVersionServiceTests
                     mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
                 .Returns(Task.CompletedTask);
 
-            cacheService
+            privateCacheService
                 .Setup(mock => mock.DeleteCacheFolderAsync(
                     ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
                 .Returns(Task.CompletedTask);
@@ -1223,7 +1223,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
-                    cacheService: cacheService.Object,
+                    privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object);
 
                 // Act
@@ -1242,7 +1242,7 @@ public abstract class ReleaseVersionServiceTests
                         mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData),
                     Times.Once);
 
-                VerifyAllMocks(cacheService,
+                VerifyAllMocks(privateCacheService,
                     releaseDataFilesService,
                     releaseFileService,
                     processorClient
@@ -1607,7 +1607,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
-            var cacheService = new Mock<IBlobCacheService>(Strict);
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
 
             var forceDeleteRelatedData = true;
@@ -1626,7 +1626,7 @@ public abstract class ReleaseVersionServiceTests
                     mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
                 .Returns(Task.CompletedTask);
 
-            cacheService
+            privateCacheService
                 .Setup(mock => mock.DeleteCacheFolderAsync(
                     ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
                 .Returns(Task.CompletedTask);
@@ -1647,7 +1647,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService: releaseFileService.Object,
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
-                    cacheService: cacheService.Object,
+                    privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object);
 
                 // Act
@@ -1667,7 +1667,7 @@ public abstract class ReleaseVersionServiceTests
                     Times.Once);
 
                 VerifyAllMocks(
-                    cacheService,
+                    privateCacheService,
                     releaseDataFilesService,
                     releaseFileService,
                     processorClient,
@@ -2335,7 +2335,7 @@ public abstract class ReleaseVersionServiceTests
         IReleaseSubjectRepository? releaseSubjectRepository = null,
         IDataSetVersionService? dataSetVersionService = null,
         IProcessorClient? processorClient = null,
-        IBlobCacheService? cacheService = null)
+        IPrivateBlobCacheService? privateCacheService = null)
     {
         var userService = AlwaysTrueUserService();
 
@@ -2361,7 +2361,7 @@ public abstract class ReleaseVersionServiceTests
             releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
-            cacheService ?? Mock.Of<IBlobCacheService>(Strict)
+            privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict)
         );
     }
 }

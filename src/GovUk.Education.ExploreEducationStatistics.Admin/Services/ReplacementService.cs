@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
         private readonly ICacheKeyService _cacheKeyService;
-        private readonly IBlobCacheService _cacheService;
+        private readonly IPrivateBlobCacheService _privateCacheService;
 
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ITimePeriodService timePeriodService,
             IUserService userService,
             ICacheKeyService cacheKeyService,
-            IBlobCacheService cacheService)
+            IPrivateBlobCacheService privateCacheService)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _timePeriodService = timePeriodService;
             _userService = userService;
             _cacheKeyService = cacheKeyService;
-            _cacheService = cacheService;
+            _privateCacheService = privateCacheService;
         }
 
         public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
@@ -1225,7 +1225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _cacheKeyService
                 .CreateCacheKeyForDataBlock(releaseVersionId: releaseVersionId,
                     dataBlockId: plan.Id)
-                .OnSuccessVoid(_cacheService.DeleteItemAsync);
+                .OnSuccessVoid(_privateCacheService.DeleteItemAsync);
         }
 
         private static Guid ReplacementPlanOriginalId(TargetableReplacementViewModel plan)
