@@ -3180,8 +3180,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     service.CreateCacheKeyForDataBlock(dataBlock.ReleaseVersionId, dataBlock.Id))
                 .ReturnsAsync(cacheKey);
 
-            var blobCacheService = new Mock<IBlobCacheService>(Strict);
-            blobCacheService.Setup(service => service.DeleteItemAsync(cacheKey))
+            var privateBlobCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            privateBlobCacheService.Setup(service => service.DeleteItemAsync(cacheKey))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3189,7 +3189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext,
                     statisticsDbContext,
-                    blobCacheService: blobCacheService.Object,
+                    privateBlobCacheService: privateBlobCacheService.Object,
                     cacheKeyService: cacheKeyService.Object,
                     locationRepository: locationRepository.Object,
                     releaseVersionService: releaseVersionService.Object,
@@ -3200,7 +3200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                VerifyAllMocks(blobCacheService,
+                VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
                     locationRepository,
                     releaseVersionService,
@@ -3668,8 +3668,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     service.CreateCacheKeyForDataBlock(dataBlock.ReleaseVersionId, dataBlock.Id))
                 .ReturnsAsync(cacheKey);
 
-            var blobCacheService = new Mock<IBlobCacheService>(Strict);
-            blobCacheService.Setup(service => service.DeleteItemAsync(cacheKey))
+            var privateBlobCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            privateBlobCacheService.Setup(service => service.DeleteItemAsync(cacheKey))
                 .Returns(Task.CompletedTask);
 
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
@@ -3681,7 +3681,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext,
                     statisticsDbContext,
-                    blobCacheService: blobCacheService.Object,
+                    privateBlobCacheService: privateBlobCacheService.Object,
                     cacheKeyService: cacheKeyService.Object,
                     locationRepository: locationRepository.Object,
                     releaseVersionService: releaseVersionService.Object,
@@ -3692,7 +3692,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                VerifyAllMocks(blobCacheService,
+                VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
                     locationRepository,
                     releaseVersionService,
@@ -3959,8 +3959,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     service.CreateCacheKeyForDataBlock(dataBlock.ReleaseVersionId, dataBlock.Id))
                 .ReturnsAsync(cacheKey);
 
-            var blobCacheService = new Mock<IBlobCacheService>(Strict);
-            blobCacheService.Setup(service => service.DeleteItemAsync(cacheKey))
+            var privateBlobCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            privateBlobCacheService.Setup(service => service.DeleteItemAsync(cacheKey))
                 .Returns(Task.CompletedTask);
 
             var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
@@ -3972,7 +3972,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var replacementService = BuildReplacementService(contentDbContext,
                     statisticsDbContext,
-                    blobCacheService: blobCacheService.Object,
+                    privateBlobCacheService: privateBlobCacheService.Object,
                     cacheKeyService: cacheKeyService.Object,
                     locationRepository: locationRepository.Object,
                     releaseVersionService: releaseVersionService.Object,
@@ -3983,7 +3983,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                VerifyAllMocks(blobCacheService,
+                VerifyAllMocks(privateBlobCacheService,
                     cacheKeyService,
                     locationRepository,
                     releaseVersionService,
@@ -4471,7 +4471,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataSetVersionService dataSetVersionService = null,
             ITimePeriodService? timePeriodService = null,
             ICacheKeyService? cacheKeyService = null,
-            IBlobCacheService? blobCacheService = null)
+            IPrivateBlobCacheService? privateBlobCacheService = null)
         {
             return new ReplacementService(
                 contentDbContext,
@@ -4486,7 +4486,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
                 AlwaysTrueUserService().Object,
                 cacheKeyService ?? Mock.Of<ICacheKeyService>(Strict),
-                blobCacheService ?? Mock.Of<IBlobCacheService>(Strict)
+                privateBlobCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict)
             );
         }
     }

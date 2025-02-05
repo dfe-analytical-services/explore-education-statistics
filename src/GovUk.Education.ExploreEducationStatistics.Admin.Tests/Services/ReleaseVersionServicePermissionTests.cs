@@ -372,7 +372,7 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IReleaseSubjectRepository>(),
             Mock.Of<IDataSetVersionService>(),
             Mock.Of<IProcessorClient>(),
-            Mock.Of<IBlobCacheService>()
+            Mock.Of<IPrivateBlobCacheService>()
         );
     }
 }

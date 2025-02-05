@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseFileService _releaseFileService;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
-        private readonly IBlobCacheService _cacheService;
+        private readonly IPrivateBlobCacheService _privateCacheService;
         private readonly ICacheKeyService _cacheKeyService;
 
         public DataBlockService(ContentDbContext context,
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseFileService releaseFileService,
             IUserService userService,
             IMapper mapper,
-            IBlobCacheService cacheService,
+            IPrivateBlobCacheService privateCacheService,
             ICacheKeyService cacheKeyService)
         {
             _context = context;
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseFileService = releaseFileService;
             _userService = userService;
             _mapper = mapper;
-            _cacheService = cacheService;
+            _privateCacheService = privateCacheService;
             _cacheKeyService = cacheKeyService;
         }
 
@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var mapChart = dataBlockVersion.Charts.OfType<MapChart>().FirstOrDefault();
                     if (mapChart != null)
                     {
-                        await _cacheService.DeleteItemAsync(
+                        await _privateCacheService.DeleteItemAsync(
                             new LocationsForDataBlockCacheKey(dataBlockVersion, mapChart.BoundaryLevel));
                     }
 
@@ -473,7 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _cacheKeyService
                 .CreateCacheKeyForDataBlock(releaseVersionId: releaseVersionId,
                     dataBlockId: dataBlockId)
-                .OnSuccessVoid(_cacheService.DeleteItemAsync);
+                .OnSuccessVoid(_privateCacheService.DeleteItemAsync);
         }
 
         public async Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseVersionId)

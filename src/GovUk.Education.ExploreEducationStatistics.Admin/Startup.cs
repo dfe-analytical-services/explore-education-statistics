@@ -600,11 +600,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddSingleton<IFileTypeService, FileTypeService>();
             services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
-            services.AddTransient<IBlobCacheService, BlobCacheService>(provider =>
-                new BlobCacheService(
-                    provider.GetRequiredService<IPrivateBlobStorageService>(),
-                    provider.GetRequiredService<ILogger<BlobCacheService>>()
-                ));
+            services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
             services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ =>
                 new DataProcessorClient(coreStorageConnectionString));
