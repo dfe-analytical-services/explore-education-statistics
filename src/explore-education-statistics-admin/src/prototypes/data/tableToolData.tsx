@@ -691,6 +691,7 @@ export const summary: PublicationReleaseSummary = {
     id: '89869bba-0c00-40f7-b7d6-e28cb904ad37',
     title: 'Characteristics of children in need',
     slug: 'characteristics-of-children-in-need',
+    latestReleaseSlug: 'latest-release-slug',
     owner: true,
     contact: {
       teamName: 'Contact Team Name',

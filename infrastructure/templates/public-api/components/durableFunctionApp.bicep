@@ -165,7 +165,6 @@ module manamementStorageAccountModule 'storageAccount.bicep' = {
     location: location
     storageAccountName: managementStorageAccountName
     allowedSubnetIds: [subnetId]
-    skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
@@ -187,7 +186,6 @@ module slot1StorageAccountModule 'storageAccount.bicep' = {
     location: location
     storageAccountName: slot1StorageAccountName
     allowedSubnetIds: [subnetId]
-    skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
@@ -224,7 +222,6 @@ module slot2StorageAccountModule 'storageAccount.bicep' = {
     location: location
     storageAccountName: slot2StorageAccountName
     allowedSubnetIds: [subnetId]
-    skuStorageResource: 'Standard_LRS'
     keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
@@ -464,13 +461,13 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   ]
 }
 
-module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.functionApp != null) {
+module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
   name: '${functionAppName}PrivateEndpointDeploy'
   params: {
     serviceId: functionApp.id
     serviceName: functionApp.name
     serviceType: 'sites'
-    subnetId: privateEndpoints.functionApp!
+    subnetId: privateEndpoints.?functionApp ?? ''
     location: location
     tagValues: tagValues
   }
@@ -491,6 +488,9 @@ module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && aler
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    functionApp
+  ]
 }
 
 var unexpectedHttpStatusCodeMetrics = ['Http401', 'Http5xx']
@@ -511,6 +511,9 @@ module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
       alertsGroupName: alerts!.alertsGroupName
       tagValues: tagValues
     }
+    dependsOn: [
+      functionApp
+    ]
   }
 ]
 
@@ -533,6 +536,9 @@ module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
       alertsGroupName: alerts!.alertsGroupName
       tagValues: tagValues
     }
+    dependsOn: [
+      functionApp
+    ]
   }
 ]
 

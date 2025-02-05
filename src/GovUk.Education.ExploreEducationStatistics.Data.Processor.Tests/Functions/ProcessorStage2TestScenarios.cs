@@ -171,6 +171,12 @@ public class OrderingCsvStage2Scenario : IProcessorStage2TestScenario
                 LocalAuthority = new LocalAuthority("E09000007", "202", "Camden")
             });
     }
+
+    public List<AutoSelectFilterValue> GetAutoSelectFilterValues() =>
+    [
+        new AutoSelectFilterValue("Filter one", "Total"),
+        new AutoSelectFilterValue("Filter three", "Total"),
+    ];
 }
 
 public class AdditionalFiltersAndIndicatorsScenario : IProcessorStage2TestScenario
@@ -278,6 +284,9 @@ public class AdditionalFiltersAndIndicatorsScenario : IProcessorStage2TestScenar
                 LocalAuthority = new LocalAuthority("E09000007", "202", "Camden")
             });
     }
+
+    public List<AutoSelectFilterValue> GetAutoSelectFilterValues() =>
+        [new AutoSelectFilterValue("Filter one", "Total")];
 }
 
 public class SpecialFilterItemsScenario : IProcessorStage2TestScenario
@@ -366,7 +375,155 @@ public class SpecialFilterItemsScenario : IProcessorStage2TestScenario
                 LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich")
             });
     }
+
+    public List<AutoSelectFilterValue> GetAutoSelectFilterValues() => [];
 }
+
+public class AutoSelectFilterItemCsvStage2Scenario : IProcessorStage2TestScenario
+{
+    private readonly Guid _subjectId;
+
+    public AutoSelectFilterItemCsvStage2Scenario(Guid? subjectId = null)
+    {
+        _subjectId = subjectId ?? Guid.NewGuid();
+    }
+
+    public string GetFilenameUnderTest()
+    {
+        return "auto-select-filter-items.csv";
+    }
+
+    public Guid GetSubjectId()
+    {
+        return _subjectId;
+    }
+
+    public List<Filter> GetExpectedFilters()
+    {
+        return ListOf(
+            new Filter
+            {
+                Label = "Filter with Total",
+                Name = "filter_with_total",
+                GroupCsvColumn = null,
+                AutoSelectFilterItemLabel = "Total",
+                // AutoSelectFilterItemId should also be set, but we cannot know what it is here
+                FilterGroups = ListOf(
+                    new FilterGroup
+                    {
+                        Label = "Default",
+                        FilterItems = ListOf(
+                            new FilterItem
+                            {
+                                Label = "OneOne"
+                            },
+                            new FilterItem
+                            {
+                                Label = "Total"
+                            },
+                            new FilterItem
+                            {
+                                Label = "OneThree"
+                            })
+                    }),
+                SubjectId = _subjectId
+            },
+            new Filter
+            {
+                Label = "Filter with default TwoTwo",
+                Name = "filter_with_default",
+                GroupCsvColumn = null,
+                AutoSelectFilterItemLabel = "TwoTwo",
+                // AutoSelectFilterItemId should also be set, but we cannot know what it is here
+                FilterGroups = ListOf(
+                    new FilterGroup
+                    {
+                        Label = "Default",
+                        FilterItems = ListOf(
+                            new FilterItem
+                            {
+                                Label = "TwoOne"
+                            },
+                            new FilterItem
+                            {
+                                Label = "TwoTwo"
+                            },
+                            new FilterItem
+                            {
+                                Label = "TwoThree"
+                            })
+                    }
+                ),
+                SubjectId = _subjectId
+            },
+            new Filter
+            {
+                Label = "Filter with no default",
+                Name = "filter_no_default",
+                GroupCsvColumn = null,
+                FilterGroups = ListOf(
+                    new FilterGroup
+                    {
+                        Label = "Default",
+                        FilterItems = ListOf(
+                            new FilterItem
+                            {
+                                Label = "ThreeOne"
+                            },
+                            new FilterItem
+                            {
+                                Label = "ThreeTwo"
+                            },
+                            new FilterItem
+                            {
+                                Label = "ThreeThree"
+                            })
+                    }
+                ),
+                SubjectId = _subjectId
+            });
+    }
+
+    public List<IndicatorGroup> GetExpectedIndicatorGroups()
+    {
+        return ListOf(
+            new IndicatorGroup
+            {
+                Label = "Default",
+                Indicators = ListOf(
+                    new Indicator
+                    {
+                        Label = "Indicator one"
+                    }),
+                SubjectId = _subjectId
+            });
+    }
+
+    public List<Location> GetExpectedLocations()
+    {
+        return ListOf(
+            new Location
+            {
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = new Country("E92000001", "England"),
+                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham")
+            },
+            new Location
+            {
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = new Country("E92000001", "England"),
+                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley")
+            });
+    }
+
+    public List<AutoSelectFilterValue> GetAutoSelectFilterValues() =>
+    [
+        new AutoSelectFilterValue("Filter with Total", "Total"),
+        new AutoSelectFilterValue("Filter with default TwoTwo", "TwoTwo"),
+    ];
+}
+
+public record AutoSelectFilterValue(string FilterLabel, string AutoSelectFilterItemLabel);
 
 public interface IProcessorStage2TestScenario
 {
@@ -379,4 +536,6 @@ public interface IProcessorStage2TestScenario
     List<IndicatorGroup> GetExpectedIndicatorGroups();
 
     List<Location> GetExpectedLocations();
+
+    List<AutoSelectFilterValue> GetAutoSelectFilterValues();
 }

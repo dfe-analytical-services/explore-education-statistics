@@ -22,7 +22,7 @@ Validate title
 Validate data set info
     user checks page contains    Latest data
     user checks page contains    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user checks page contains    ${PUPIL_ABSENCE_RELEASE_NAME}   
+    user checks page contains    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Validate zip contains correct files
     [Documentation]    EES-4147
@@ -30,19 +30,20 @@ Validate zip contains correct files
 
     sleep    8    # wait for file to download
     ${list}=    create list    data/absence_in_prus.csv    data-guidance/data-guidance.txt
-    zip should contain directories and files    seed-publication-pupil-absence-in-schools-in-england_2016-17.zip    ${list}
+    zip should contain directories and files    seed-publication-pupil-absence-in-schools-in-england_2016-17.zip
+    ...    ${list}
 
 Validate data set details
     user checks summary list contains    Theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks summary list contains    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks summary list contains    Release    ${PUPIL_ABSENCE_RELEASE_NAME}
-    user checks summary list contains    Release type    	Official statistics
+    user checks summary list contains    Release type    Official statistics
     user checks summary list contains    Geographic levels    Local authority, National, Regional
     user checks summary list contains    Indicators    Authorised absence rate
     user checks summary list contains    Indicators    Number of authorised absence sessions
     user checks summary list contains    Indicators    Number of authorised holiday sessions
     user checks summary list contains    Indicators    Show 24 more indicators
-    user checks summary list contains    Time period    	2013/14 to 2016/17
+    user checks summary list contains    Time period    2013/14 to 2016/17
 
 Validate data set preview
     user checks table column heading contains    1    1    time_identifier    testid:preview-table
@@ -81,11 +82,11 @@ Validate data set variables
 Validate using this data
     user checks page contains button    Download this data set (ZIP)
     user checks page contains link    View or create your own tables
-  
+
 Validate table tool link
     user clicks link    View or create your own tables
     user waits until h1 is visible    Create your own tables
 
-    user checks page contains   Choose locations
+    user checks page contains    Choose locations
     user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks previous table tool step contains    2    Data set    Absence in PRUs

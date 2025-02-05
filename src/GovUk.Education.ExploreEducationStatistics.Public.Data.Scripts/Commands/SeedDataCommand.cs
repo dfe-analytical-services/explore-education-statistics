@@ -476,7 +476,6 @@ public class SeedDataCommand : ICommand
                         label => new FilterOptionMeta
                         {
                             Label = label,
-                            IsAggregate = label == "Total" ? true : null
                         }
                     )
                     .ToList();
@@ -489,8 +488,8 @@ public class SeedDataCommand : ICommand
                     .Merge()
                     .Using(options)
                     .On(
-                        o => new { o.Label, o.IsAggregate },
-                        o => new { o.Label, o.IsAggregate }
+                        o =>  o.Label,
+                        o =>  o.Label
                     )
                     .InsertWhenNotMatched()
                     .MergeAsync(_cancellationToken);
@@ -515,12 +514,12 @@ public class SeedDataCommand : ICommand
                     // technique that was used for the location meta. This is more for
                     // future-proofing if we ever add more columns to the filter options table.
                     var batchRowKeys = batch
-                        .Select(o => o.Label + ',' + (o.IsAggregate == true ? "True" : ""))
+                        .Select(o => o.Label)
                         .ToHashSet();
 
                     var links = await optionTable
                         .Where(o =>
-                            batchRowKeys.Contains(o.Label + ',' + (o.IsAggregate == true ? "True" : "")))
+                            batchRowKeys.Contains(o.Label))
                         .OrderBy(o => o.Label)
                         .Select((option, index) => new FilterOptionMetaLink
                         {

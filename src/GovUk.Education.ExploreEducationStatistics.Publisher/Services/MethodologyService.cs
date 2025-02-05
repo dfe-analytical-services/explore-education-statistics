@@ -34,7 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task<List<MethodologyVersion>> GetLatestVersionByRelease(ReleaseVersion releaseVersion)
         {
-            return await _methodologyVersionRepository.GetLatestVersionByPublication(releaseVersion.PublicationId);
+            return await _methodologyVersionRepository.GetLatestVersionByPublication(
+                releaseVersion.Release.PublicationId);
         }
 
         public async Task<List<File>> GetFiles(Guid methodologyVersionId, params FileType[] types)
@@ -81,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 return false;
             }
 
-            var firstRelease = !await _publicationRepository.IsPublished(releaseVersion.PublicationId);
+            var firstRelease = !await _publicationRepository.IsPublished(releaseVersion.Release.PublicationId);
 
             var firstReleaseAndMethodologyScheduledImmediately =
                 firstRelease &&

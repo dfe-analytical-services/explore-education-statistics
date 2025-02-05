@@ -26,7 +26,7 @@ Validate Published date
     user checks summary list contains    Published    22 March 2018
 
 Validate Last updated is not visible
-    user checks page does not contain testid    Last updated
+    user waits until page does not contain testid    Last updated
 
 Validate accordion sections order
     user checks accordion is in position    1. Overview of absence statistics    1    id:content

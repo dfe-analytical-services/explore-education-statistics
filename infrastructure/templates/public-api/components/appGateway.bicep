@@ -1,5 +1,6 @@
 import { responseTimeConfig, dynamicTotalGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
 import { staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
+import { removeMultiple } from '../functions.bicep'
 
 import {
   AppGatewayBackend
@@ -87,6 +88,8 @@ module keyVaultAccessPolicyModule 'keyVaultAccessPolicy.bicep' = {
   }
 }
 
+var invalidDomainLabelCharacters = ['.', '-']
+
 // Create public IP addresses for every site we will expose through this App Gateway.
 resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for site in sites: {
   name: '${site.name}-pip'
@@ -99,8 +102,8 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [f
     publicIPAllocationMethod: 'Static'
     idleTimeoutInMinutes: 4
     dnsSettings: {
-      domainNameLabel: replace(site.fqdn, '.', '')
-      fqdn: '${replace(site.fqdn, '.', '')}.${location}.cloudapp.azure.com'
+      domainNameLabel: removeMultiple(site.fqdn, invalidDomainLabelCharacters)
+      fqdn: '${removeMultiple(site.fqdn, invalidDomainLabelCharacters)}.${location}.cloudapp.azure.com'
     }
   }
   zones: availabilityZones
@@ -304,6 +307,9 @@ module backendPoolsHealthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }
 
 module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
@@ -318,6 +324,9 @@ module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }
 
 module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
@@ -340,6 +349,9 @@ module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }
 
 module responseStatusAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
@@ -362,4 +374,7 @@ module responseStatusAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }

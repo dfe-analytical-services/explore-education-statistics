@@ -1217,7 +1217,7 @@
       "[concat('Microsoft.Web/sites/', variables('dataAppName'))]"
     ],
     "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
-    "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-fs-data')]",
+    "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
     "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]"
   },
   "resources": [

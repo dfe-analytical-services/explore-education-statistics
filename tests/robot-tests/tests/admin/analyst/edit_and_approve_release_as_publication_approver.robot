@@ -73,9 +73,9 @@ Add data guidance
 Add ancillary file
     user clicks link    Supporting file uploads
     user waits until h2 is visible    Add file to release
-    user enters text into element    label:Title    Test ancillary file 1
-    user enters text into element    label:Summary    Test ancillary file 1 summary
-    user chooses file    label:Upload file    ${FILES_DIR}test-file-1.txt
+    user enters text into element    id:ancillaryFileForm-title    Test ancillary file 1
+    user enters text into element    id:ancillaryFileForm-summary    Test ancillary file 1 summary
+    user chooses file    id:ancillaryFileForm-file    ${FILES_DIR}test-file-1.txt
     user clicks button    Add file
     user waits until page contains accordion section    Test ancillary file 1
 

@@ -9,10 +9,4 @@ param publicUrls = {
   publicApi: 'https://test.statistics.api.education.gov.uk'
 }
 
-// PostgreSQL Database Params
-param postgreSqlSkuName = 'Standard_B1ms'
-param postgreSqlStorageSizeGB = 32
-param postgreSqlAutoGrowStatus = 'Disabled'
-param postgreSqlGeoRedundantBackupEnabled = false
-
 param enableThemeDeletion = false

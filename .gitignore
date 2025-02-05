@@ -73,6 +73,10 @@ useful-scripts/get_data_block_responses/results*
 
 src/GovUk.Education.ExploreEducationStatistics.Data.Seed/Files/
 
+## Infrastructure build artifacts
+
+infrastructure/templates/public-api/main.json
+
 ## Misc
 
 *.~lock*

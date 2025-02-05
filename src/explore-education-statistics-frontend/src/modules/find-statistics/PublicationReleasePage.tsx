@@ -40,6 +40,10 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
     rsi => rsi.isLegacyLink || rsi.description !== release.title,
   );
 
+  const latestReleaseSeriesItem = release.publication.releaseSeries.find(
+    rsi => !rsi.isLegacyLink,
+  );
+
   // Re-order updates in descending order in-case the cached
   // release from the content API has not been updated to
   // have the updates in the correct order.
@@ -126,15 +130,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     <Link
                       className="govuk-!-display-none-print govuk-!-display-block govuk-!-margin-bottom-3"
                       unvisited
-                      to={`/find-statistics/${release.publication.slug}`}
+                      to={`/find-statistics/${release.publication.slug}/${latestReleaseSeriesItem?.releaseSlug}`}
                     >
                       View latest data:{' '}
                       <span className="govuk-!-font-weight-bold">
-                        {
-                          release.publication.releaseSeries.find(
-                            rsi => !rsi.isLegacyLink,
-                          )?.description
-                        }
+                        {latestReleaseSeriesItem?.description}
                       </span>
                     </Link>
                   )}
@@ -295,11 +295,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             <ul className="govuk-list">
               <li>
                 <Link
-                  to={
-                    release.latestRelease
-                      ? `/find-statistics/${release.publication.slug}/data-guidance`
-                      : `/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`
-                  }
+                  to={`/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`}
                 >
                   Data guidance
                 </Link>
@@ -308,11 +304,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               {release.hasPreReleaseAccessList && (
                 <li>
                   <Link
-                    to={
-                      release.latestRelease
-                        ? `/find-statistics/${release.publication.slug}/prerelease-access-list`
-                        : `/find-statistics/${release.publication.slug}/${release.slug}/prerelease-access-list`
-                    }
+                    to={`/find-statistics/${release.publication.slug}/${release.slug}/prerelease-access-list`}
                   >
                     Pre-release access list
                   </Link>

@@ -227,6 +227,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AutoSelectLabel")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
                     b.Property<string>("Column")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -301,9 +305,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool?>("IsAggregate")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Label")
                         .IsRequired()

@@ -1,5 +1,13 @@
 import { abbreviations } from 'abbreviations.bicep'
-import { ContainerAppResourceConfig, IpRange, PrincipalNameAndId, StaticWebAppSku, ContainerAppWorkloadProfile } from 'types.bicep'
+import {
+  ContainerAppResourceConfig
+  IpRange
+  PrincipalNameAndId
+  StaticWebAppSku
+  ContainerAppWorkloadProfile
+  PostgreSqlFlexibleServerConfig
+  PublicApiStorageAccountConfig
+} from 'types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -7,11 +15,46 @@ param subscription string = ''
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
 
-@description('Public API Storage : Size of the file share in GB.')
-param publicApiDataFileShareQuotaGbs int = 1
+@description('Public API Storage configuration.')
+param publicApiStorageConfig PublicApiStorageAccountConfig = {
+  kind: 'FileStorage'
+  sku: 'Premium_ZRS'
+  fileShare: {
+    quotaGbs: 100
+    accessTier: 'Premium'
+  }
+}
 
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
+
+@description('PostgreSQL Database : Server configuration.')
+param postgreSqlServerConfig PostgreSqlFlexibleServerConfig = {
+  sku: {
+    pricingTier: 'Burstable'
+    compute: 'Standard_B1ms'
+  }
+  settings: [
+    {
+      name: 'max_prepared_transactions'
+      value: '100'
+    }
+  ]
+  backups: {
+    retentionDays: 7
+    geoRedundantBackup: false
+  }
+  server: {
+    postgreSqlVersion: '16'
+  }
+  storage: {
+    storageSizeGB: 32
+    autoGrow: true
+  }
+}
+
+@description('Database : Entra ID admin  principal names for this resource')
+param postgreSqlEntraIdAdminPrincipals PrincipalNameAndId[] = []
 
 @description('Database : administrator login name.')
 @minLength(0)
@@ -21,26 +64,6 @@ param postgreSqlAdminName string = ''
 @minLength(8)
 @secure()
 param postgreSqlAdminPassword string?
-
-@description('Database : Azure Database for PostgreSQL sku name.')
-@allowed([
-  'Standard_B1ms'
-  'Standard_D4ads_v5'
-  'Standard_E4ads_v5'
-])
-param postgreSqlSkuName string = 'Standard_B1ms'
-
-@description('Database : Azure Database for PostgreSQL Storage Size in GB.')
-param postgreSqlStorageSizeGB int = 32
-
-@description('Database : Azure Database for PostgreSQL Autogrow setting.')
-param postgreSqlAutoGrowStatus string = 'Disabled'
-
-@description('Database : Entra ID admin  principal names for this resource')
-param postgreSqlEntraIdAdminPrincipals PrincipalNameAndId[] = []
-
-@description('Database : Is geo-redundant backup enabled?')
-param postgreSqlGeoRedundantBackupEnabled bool
 
 @description('ACR : Specifies the resource group in which the shared Container Registry lives.')
 param acrResourceGroupName string = ''
@@ -162,7 +185,9 @@ var resourceNames = {
     acr: 'eesacr'
     acrResourceGroup: acrResourceGroupName
     // The Test Resource Group has broken from the naming convention of other environments for Core Storage
-    coreStorageAccount: subscription == 's101t01' ? '${legacyResourcePrefix}storageeescore' : '${legacyResourcePrefix}saeescore'
+    coreStorageAccount: subscription == 's101t01' || subscription == 's101p02'
+      ? '${legacyResourcePrefix}storageeescore'
+      : '${legacyResourcePrefix}saeescore'
     subnets: {
       adminApp: '${legacyResourcePrefix}-snet-ees-admin'
       publisherFunction: '${legacyResourcePrefix}-snet-ees-publisher'
@@ -197,12 +222,14 @@ var resourceNames = {
   }
 }
 
-var maintenanceFirewallRules = [for maintenanceIpRange in maintenanceIpRanges: {
-  name: maintenanceIpRange.name
-  cidr: maintenanceIpRange.cidr
-  tag: 'Default'
-  priority: 100
-}]
+var maintenanceFirewallRules = [
+  for maintenanceIpRange in maintenanceIpRanges: {
+    name: maintenanceIpRange.name
+    cidr: maintenanceIpRange.cidr
+    tag: 'Default'
+    priority: 100
+  }
+]
 
 module vNetModule 'application/shared/virtualNetwork.bicep' = {
   name: 'virtualNetworkApplicationModuleDeploy'
@@ -218,8 +245,7 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
-module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' =
-  if (deploySharedPrivateDnsZones) {
+module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = if (deploySharedPrivateDnsZones) {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
@@ -232,7 +258,7 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
   params: {
     location: location
     resourceNames: resourceNames
-    publicApiDataFileShareQuotaGbs: publicApiDataFileShareQuotaGbs
+    config: publicApiStorageConfig
     storageFirewallRules: maintenanceIpRanges
     deployAlerts: deployAlerts
     tagValues: tagValues
@@ -267,12 +293,9 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     adminPassword: postgreSqlAdminPassword!
     entraIdAdminPrincipals: postgreSqlEntraIdAdminPrincipals
     privateEndpointSubnetId: vNetModule.outputs.psqlFlexibleServerSubnetRef
-    autoGrowStatus: postgreSqlAutoGrowStatus
+    serverConfig: postgreSqlServerConfig
     firewallRules: maintenanceIpRanges
-    sku: postgreSqlSkuName
-    storageSizeGB: postgreSqlStorageSizeGB
     deployAlerts: deployAlerts
-    geoRedundantBackupEnabled: postgreSqlGeoRedundantBackupEnabled
     tagValues: tagValues
   }
   dependsOn: [
@@ -319,7 +342,7 @@ module containerAppEnvironmentModule 'application/shared/containerAppEnvironment
 }
 
 // Deploy main Public API Container App.
-module apiAppIdentityModule 'application/public-api/publicApiAppIdentity.bicep' = if (deployContainerApp) {
+module apiAppIdentityModule 'application/public-api/publicApiAppIdentity.bicep' = {
   name: 'publicApiAppIdentityApplicationModuleDeploy'
   params: {
     location: location
@@ -442,26 +465,29 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
     dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
     devopsServicePrincipalId: devopsServicePrincipalId
     storageFirewallRules: maintenanceIpRanges
-    functionAppFirewallRules: union([
-      {
-        name: 'Admin App Service subnet range'
-        cidr: vNetModule.outputs.adminAppServiceSubnetCidr
-        tag: 'Default'
-        priority: 100
-      }
-      // TODO EES-5446 - remove service tag whitelisting when runner scale set IP range reinstated
-      {
-        cidr: 'AzureCloud'
-        tag: 'ServiceTag'
-        priority: 101
-        name: 'AzureCloud'
-      }
-      // TODO EES-5446 - reinstate when static IP range available for runner scale sets
-      // {
-      //   name: 'Pipeline runner IP address range'
-      //   cidr: pipelineRunnerCidr
-      // }
-    ], maintenanceFirewallRules)
+    functionAppFirewallRules: union(
+      [
+        {
+          name: 'Admin App Service subnet range'
+          cidr: vNetModule.outputs.adminAppServiceSubnetCidr
+          tag: 'Default'
+          priority: 100
+        }
+        // TODO EES-5446 - remove service tag whitelisting when runner scale set IP range reinstated
+        {
+          cidr: 'AzureCloud'
+          tag: 'ServiceTag'
+          priority: 101
+          name: 'AzureCloud'
+        }
+        // TODO EES-5446 - reinstate when static IP range available for runner scale sets
+        // {
+        //   name: 'Pipeline runner IP address range'
+        //   cidr: pipelineRunnerCidr
+        // }
+      ],
+      maintenanceFirewallRules
+    )
     dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
     deployAlerts: deployAlerts
     tagValues: tagValues
@@ -479,12 +505,8 @@ output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProces
   ? dataProcessorModule.outputs.managedIdentityClientId
   : ''
 
-output dataProcessorFunctionAppUrl string = deployDataProcessor
-  ? dataProcessorModule.outputs.url
-  : ''
-output dataProcessorFunctionAppStagingUrl string = deployDataProcessor
-  ? dataProcessorModule.outputs.stagingUrl
-  : ''
+output dataProcessorFunctionAppUrl string = deployDataProcessor ? dataProcessorModule.outputs.url : ''
+output dataProcessorFunctionAppStagingUrl string = deployDataProcessor ? dataProcessorModule.outputs.stagingUrl : ''
 
 output dataProcessorPublicApiDataFileShareMountPath string = deployDataProcessor
   ? dataProcessorModule.outputs.publicApiDataFileShareMountPath

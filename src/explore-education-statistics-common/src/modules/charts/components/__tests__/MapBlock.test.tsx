@@ -12,19 +12,14 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import _tableBuilderService from '@common/services/tableBuilderService';
 import { produce } from 'immer';
-
-jest.mock('@common/services/tableBuilderService');
-
-const tableBuilderService = _tableBuilderService as jest.Mocked<
-  typeof _tableBuilderService
->;
 
 describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
+  const onBoundaryLevelChange = jest.fn();
   const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
+    boundaryLevel: 1,
     id: 'testMap',
     axes: testMapConfiguration.axes as MapBlockProps['axes'],
     legend: testMapConfiguration.legend as LegendConfiguration,
@@ -32,14 +27,10 @@ describe('MapBlock', () => {
     data: testFullTable.results,
     height: 600,
     width: 900,
-    map: { dataSetConfigs: [] },
+    onBoundaryLevelChange,
   };
 
   test('renders legends and polygons correctly', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
@@ -81,10 +72,6 @@ describe('MapBlock', () => {
   });
 
   test('renders legend groups correctly with custom 1 d.p decimal places', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const fullTable = mapFullTable(
       produce(testMapTableData, draft => {
         draft.results[0].measures['authorised-absence-rate'] = '3.5123';
@@ -115,10 +102,6 @@ describe('MapBlock', () => {
   });
 
   test('renders legend groups correctly with custom 3 d.p decimal places', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const fullTable = mapFullTable(
       produce(testMapTableData, draft => {
         draft.results[0].measures['authorised-absence-rate'] = '3.5123';
@@ -148,34 +131,14 @@ describe('MapBlock', () => {
     });
   });
 
-  test('changing selected data set changes legends and polygons', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
+  test('changing selected data set changes legends', async () => {
     render(<MapBlock {...testBlockProps} />);
 
-    await waitFor(async () => {
-      const select = screen.getByLabelText('1. Select data to view');
-
-      expect(select.children[1]).toHaveTextContent(
-        'Overall absence rate (2016/17)',
-      );
-
-      await userEvent.selectOptions(select, select.children[1] as HTMLElement);
-      // const paths = container.querySelectorAll<HTMLElement>(
-      //   '.leaflet-container svg:not(.leaflet-attribution-flag) path',
-      // );
-
-      // expect(paths).toHaveLength(4);
-
-      // // Location polygon
-      // expect(paths[0]).toHaveAttribute('fill', 'rgba(251, 219, 185, 1)');
-      // expect(paths[1]).toHaveAttribute('fill', 'rgba(253, 237, 220, 1)');
-      // expect(paths[2]).toHaveAttribute('fill', 'rgba(245, 164, 80, 1)');
-      // // UK polygon
-      // expect(paths[3]).toHaveAttribute('fill', '#003078');
-    });
+    const select = screen.getByLabelText('1. Select data to view');
+    expect(select.children[1]).toHaveTextContent(
+      'Overall absence rate (2016/17)',
+    );
+    await userEvent.selectOptions(select, select.children[1] as HTMLElement);
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
@@ -194,11 +157,21 @@ describe('MapBlock', () => {
     expect(legendColours[4].style.backgroundColor).toBe('rgb(245, 164, 80)');
   });
 
-  test('changing selected location focuses the correct polygon', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
+  test('selecting data set with different boundary level calls onBoundaryLevelChange', async () => {
+    render(<MapBlock {...testBlockProps} />);
 
+    expect(onBoundaryLevelChange).not.toHaveBeenCalled();
+
+    const select = screen.getByLabelText('1. Select data to view');
+    const options = within(select).getAllByRole('option');
+    expect(options).toHaveLength(2);
+
+    // Selecting another data set with different boundary level
+    await userEvent.selectOptions(select, options[1]);
+    expect(onBoundaryLevelChange).toHaveBeenCalledWith(2);
+  });
+
+  test('changing selected location focuses the correct polygon', async () => {
     const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
@@ -231,10 +204,6 @@ describe('MapBlock', () => {
   });
 
   test('changing selected location renders its indicator tile', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
@@ -263,10 +232,6 @@ describe('MapBlock', () => {
   });
 
   test('renders location indicator tiles correctly with custom decimal places', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const fullTable = mapFullTable(
       produce(testMapTableData, draft => {
         draft.results[0].measures['authorised-absence-rate'] = '3.5123';
@@ -328,10 +293,6 @@ describe('MapBlock', () => {
   });
 
   test('resetting the map when no location selected', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
@@ -369,10 +330,6 @@ describe('MapBlock', () => {
   });
 
   test('ensure values with decimal places go are assigned the correct colour when the legend values are set to 0 decimal places', async () => {
-    tableBuilderService.getLocationGeoJson.mockResolvedValue(
-      testMapTableData.subjectMeta.locations,
-    );
-
     const fullTable = mapFullTable(
       produce(testMapTableData, draft => {
         draft.results[0].measures['authorised-absence-rate'] =
@@ -386,7 +343,7 @@ describe('MapBlock', () => {
       }),
     );
 
-    render(
+    const { container } = render(
       <MapBlock
         {...testBlockProps}
         meta={fullTable.subjectMeta}
@@ -400,17 +357,15 @@ describe('MapBlock', () => {
       ).toBeInTheDocument();
     });
 
-    // const paths = container.querySelectorAll<HTMLElement>(
-    //   '.leaflet-container svg:not(.leaflet-attribution-flag) path',
-    // );
+    const paths = container.querySelectorAll<HTMLElement>(
+      '.leaflet-container svg:not(.leaflet-attribution-flag) path',
+    );
 
-    // expect(paths).toHaveLength(4);
-    // // Location polygon
-    // expect(paths[0]).toHaveAttribute('fill', 'rgba(71, 99, 165, 1)');
-    // expect(paths[1]).toHaveAttribute('fill', 'rgba(218, 224, 237, 1)');
-    // expect(paths[2]).toHaveAttribute('fill', 'rgba(145, 161, 201, 1)');
-    // // UK polygon
-    // expect(paths[3]).toHaveAttribute('fill', '#003078');
+    expect(paths).toHaveLength(3);
+    // Location polygon
+    expect(paths[0]).toHaveAttribute('fill', 'rgba(71, 99, 165, 1)');
+    expect(paths[1]).toHaveAttribute('fill', 'rgba(218, 224, 237, 1)');
+    expect(paths[2]).toHaveAttribute('fill', 'rgba(145, 161, 201, 1)');
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 

@@ -154,8 +154,7 @@ Navigate back to 'Data and files' page
 Delete UI test subject
     user clicks link    Data uploads
     user waits until h2 is visible    Add data file to release    %{WAIT_SMALL}
-    user waits until page contains accordion section    UI test subject    %{WAIT_SMALL}
-    user opens accordion section    UI test subject
+    user waits until data upload is completed    UI test subject
     user clicks button    Delete files
 
     user waits until h2 is visible    Confirm deletion of selected data files    %{WAIT_SMALL}
@@ -166,5 +165,5 @@ Delete UI test subject
     user checks page contains    dfe-logo.jpg
     user clicks button    Confirm
 
-    user waits until page does not contain accordion section    UI test subject
+    user waits until page does not contain data uploads table
     user waits until h2 is visible    Add data file to release    %{WAIT_SMALL}

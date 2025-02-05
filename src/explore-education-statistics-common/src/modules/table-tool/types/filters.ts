@@ -38,7 +38,7 @@ export abstract class Filter {
 }
 
 export class CategoryFilter extends Filter {
-  public readonly isTotal: boolean;
+  public readonly isAutoSelect: boolean;
 
   public readonly category: string;
 
@@ -46,11 +46,11 @@ export class CategoryFilter extends Filter {
     value,
     label,
     group,
-    isTotal = false,
+    isAutoSelect = false,
     category,
-  }: GroupedFilterOption & { isTotal?: boolean; category: string }) {
+  }: GroupedFilterOption & { isAutoSelect?: boolean; category: string }) {
     super({ value, label, group });
-    this.isTotal = isTotal;
+    this.isAutoSelect = isAutoSelect;
     this.category = category;
   }
 }

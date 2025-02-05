@@ -23,11 +23,11 @@ export default function FilterOptionChangeLabel({
               id changed to: <code>{currentState.id}</code>
             </li>
           )}
-          {previousState.isAggregate !== currentState.isAggregate && (
+          {previousState.isAutoSelect !== currentState.isAutoSelect && (
             <li>
-              {currentState.isAggregate
-                ? 'changed to an aggregate'
-                : 'no longer an aggregate'}
+              {currentState.isAutoSelect
+                ? 'changed to be the default option'
+                : 'no longer the default option'}
             </li>
           )}
         </ul>

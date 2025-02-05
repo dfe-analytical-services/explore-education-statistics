@@ -2,6 +2,8 @@
 
 .map {
   background-color: govuk-colour('light-grey');
+  transition: opacity 200ms;
+  opacity: 1;
 
   path:focus {
     outline: none;
@@ -12,6 +14,21 @@
     box-shadow: none;
     color: govuk-colour('black');
     outline: govuk-colour('black') solid $govuk-focus-width;
+  }
+}
+
+.mapSpinner {
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.mapLoading {
+  position: relative;
+
+  .map {
+    opacity: 0.5;
   }
 }
 

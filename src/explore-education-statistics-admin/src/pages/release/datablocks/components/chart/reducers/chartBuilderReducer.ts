@@ -7,6 +7,7 @@ import {
   AxesConfiguration,
   AxisConfiguration,
   AxisType,
+  Chart,
   ChartDefinition,
   ChartDefinitionAxis,
   ChartDefinitionOptions,
@@ -20,7 +21,6 @@ import createDataSetCategories from '@common/modules/charts/util/createDataSetCa
 import getMapDataSetCategoryConfigs from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 import deepMerge from 'deepmerge';
 import mapValues from 'lodash/mapValues';
 import { Reducer, useCallback, useMemo } from 'react';
@@ -170,7 +170,7 @@ const getInitialState = ({
     (axisDefinition: ChartDefinitionAxis, axisType: AxisType) =>
       updateAxis(
         axisDefinition,
-        (initialAxes?.[axisType] ?? {}) as AxisConfiguration,
+        (initialAxes as AxesConfiguration)?.[axisType] ?? {},
       ),
   );
 

@@ -13,14 +13,15 @@ import _dataBlockService, {
   ReleaseDataBlockSummary,
 } from '@admin/services/dataBlockService';
 import _permissionService from '@admin/services/permissionService';
+import render from '@common-test/render';
+import { Chart } from '@common/modules/charts/types/chart';
 import _tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { produce } from 'immer';
-import React from 'react';
 import { MemoryRouter } from 'react-router';
 import { generatePath, Route } from 'react-router-dom';
 
@@ -49,6 +50,48 @@ jest.mock('@common/hooks/useMedia', () => ({
 }));
 
 describe('ReleaseDataBlockEditPage', () => {
+  const chart: Chart = {
+    title: 'Test chart title',
+    alt: 'Test chart alt',
+    type: 'verticalbar',
+    height: 300,
+    width: 600,
+    axes: {
+      major: {
+        type: 'major',
+        visible: true,
+        groupBy: 'timePeriod',
+        min: 0,
+        sortAsc: true,
+        size: 50,
+        showGrid: true,
+        tickConfig: 'default',
+        referenceLines: [],
+        dataSets: [
+          {
+            filters: ['gender-female'],
+            indicator: 'authorised-absence-sessions',
+          },
+        ],
+      },
+      minor: {
+        type: 'minor',
+        visible: true,
+        min: 0,
+        sortAsc: true,
+        size: 50,
+        showGrid: true,
+        tickConfig: 'default',
+        referenceLines: [],
+        dataSets: [],
+      },
+    },
+    legend: {
+      position: 'top',
+      items: [],
+    },
+  };
+
   const testDataBlock: ReleaseDataBlock = {
     id: 'block-1',
     dataBlockParentId: 'block-1-parent',
@@ -82,49 +125,7 @@ describe('ReleaseDataBlockEditPage', () => {
         rows: [{ type: 'Indicator', value: 'authorised-absence-sessions' }],
       },
     },
-    charts: [
-      {
-        title: 'Test chart title',
-        alt: 'Test chart alt',
-        type: 'verticalbar',
-        height: 300,
-        width: 600,
-        axes: {
-          major: {
-            type: 'major',
-            visible: true,
-            groupBy: 'timePeriod',
-            min: 0,
-            sortAsc: true,
-            size: 50,
-            showGrid: true,
-            tickConfig: 'default',
-            referenceLines: [],
-            dataSets: [
-              {
-                filters: ['gender-female'],
-                indicator: 'authorised-absence-sessions',
-              },
-            ],
-          },
-          minor: {
-            type: 'minor',
-            visible: true,
-            min: 0,
-            sortAsc: true,
-            size: 50,
-            showGrid: true,
-            tickConfig: 'default',
-            referenceLines: [],
-            dataSets: [],
-          },
-        },
-        legend: {
-          position: 'top',
-          items: [],
-        },
-      },
-    ],
+    charts: [chart],
   };
 
   const testDataBlockSummaries: ReleaseDataBlockSummary[] = [
@@ -179,6 +180,7 @@ describe('ReleaseDataBlockEditPage', () => {
 
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(testTableData);
 
     dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
     dataBlockService.listDataBlocks.mockResolvedValue(testDataBlockSummaries);

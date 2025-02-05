@@ -105,7 +105,7 @@ describe('TableToolWizard', () => {
     filters: {
       Characteristic: {
         id: 'characteristic',
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         name: 'characteristic',
@@ -130,7 +130,7 @@ describe('TableToolWizard', () => {
       },
       SchoolType: {
         id: 'school-type',
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by school type',
         legend: 'School type',
         name: 'school_type',

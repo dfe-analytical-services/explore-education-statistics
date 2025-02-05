@@ -226,9 +226,6 @@ public static class ReleaseGeneratorExtensions
 
                     releaseVersion.Publication = release.Publication;
                     releaseVersion.PublicationId = release.PublicationId;
-                    releaseVersion.ReleaseName = release.Year.ToString();
-                    releaseVersion.TimePeriodCoverage = release.TimePeriodCoverage;
-                    releaseVersion.Slug = release.Slug;
                 });
 
                 return list;

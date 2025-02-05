@@ -27,6 +27,12 @@ user checks table cell contains
     user waits until parent contains element    ${parent}
     ...    xpath:.//tbody/tr[${row}]/td[${column}][contains(., "${expected}")]
 
+user waits until table cell contains
+    [Arguments]    ${row}    ${column}    ${expected}    ${parent}=css:table    ${wait}=%{WAIT_SMALL}
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//tbody/tr[${row}]/td[${column}][contains(., "${expected}")]
+    ...    timeout=${wait}
+
 user checks table cell does not contain
     [Arguments]    ${row}    ${column}    ${expected}    ${parent}=css:table
     user waits until parent does not contain element    ${parent}
@@ -61,6 +67,11 @@ user gets table row
     [Arguments]    ${row_cell_text}    ${parent}=css:table
     ${elem}=    get child element    ${parent}    xpath:.//tbody/tr/td[text()="${row_cell_text}"]/..
     [Return]    ${elem}
+
+user waits until table contains row with
+    [Arguments]    ${row_cell_text}    ${parent}=css:table    ${wait}=%{WAIT_SMALL}
+    wait until page contains element    ${parent}    timeout=${wait}
+    get child element    ${parent}    xpath:.//tbody/tr/td[text()="${row_cell_text}"]/..
 
 user checks table body has x rows
     [Arguments]    ${count}    ${parent}=css:table    ${wait}=${timeout}

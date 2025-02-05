@@ -3,41 +3,15 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Newtonsoft.Json;
 using static System.DateTime;
-using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.PartialDate;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
     public class ReleaseVersion : ICreatedTimestamp<DateTime>
     {
         public Guid Id { get; set; }
-
-        public int Year => int.Parse(_releaseName);
-
-        public string YearTitle => TimePeriodLabelFormatter.FormatYear(Year, TimePeriodCoverage);
-
-        private string _releaseName;
-
-        public string ReleaseName
-        {
-            get => _releaseName;
-            set
-            {
-                if (value == null || YearRegex.Match(value).Success)
-                {
-                    _releaseName = value;
-                }
-                else
-                {
-                    throw new FormatException("The release name is invalid");
-                }
-            }
-        }
 
         /**
          * The last date the release was published - this should be set when the PublishScheduled date is reached and
@@ -53,10 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [NotMapped] public bool Amendment => Version > 0 && !Live;
 
-        public string Slug { get; set; }
-
+        [Obsolete("Use ReleaseVersion.Release.PublicationId. This will be removed in EES-5818")]
         public Guid PublicationId { get; set; }
 
+        [Obsolete("Use ReleaseVersion.Release.Publication. This will be removed in EES-5818")]
         public Publication Publication { get; set; }
 
         public List<Update> Updates { get; set; } = new();
@@ -179,9 +153,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
 
         public ReleaseType Type { get; set; }
-
-        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-        public TimeIdentifier TimePeriodCoverage { get; set; }
 
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 

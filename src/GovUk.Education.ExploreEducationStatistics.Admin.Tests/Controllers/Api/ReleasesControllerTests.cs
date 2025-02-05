@@ -612,10 +612,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 var releaseVersion = Assert.Single(release.Versions);
                 Assert.Equal(publication.Id, releaseVersion.PublicationId);
                 Assert.Equal(release.Id, releaseVersion.ReleaseId);
-                Assert.Equal(year.ToString(), releaseVersion.ReleaseName);
-                Assert.Equal(year, releaseVersion.Year);
-                Assert.Equal(timePeriodCoverage, releaseVersion.TimePeriodCoverage);
-                Assert.Equal(expectedSlug, releaseVersion.Slug);
 
                 var releaseSeriesItem = Assert.Single(updatedPublication.ReleaseSeries);
                 Assert.Equal(release.Id, releaseSeriesItem.ReleaseId);
@@ -817,10 +813,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 var releaseVersion = Assert.Single(release.Versions);
                 Assert.Equal(publication.Id, releaseVersion.PublicationId);
                 Assert.Equal(release.Id, releaseVersion.ReleaseId);
-                Assert.Equal(newYear.ToString(), releaseVersion.ReleaseName);
-                Assert.Equal(newYear, releaseVersion.Year);
-                Assert.Equal(newTimePeriodCoverage, releaseVersion.TimePeriodCoverage);
-                Assert.Equal(expectedNewSlug, releaseVersion.Slug);
 
                 var releaseSeriesItem = Assert.Single(updatedPublication.ReleaseSeries);
                 Assert.Equal(release.Id, releaseSeriesItem.ReleaseId);
@@ -874,9 +866,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 var release = Assert.Single(updatedPublication.Releases);
                 Assert.Equal(expectedNewLabel, release.Label);
                 Assert.Equal(expectedNewSlug, release.Slug);
-
-                var releaseVersion = Assert.Single(release.Versions);
-                Assert.Equal(expectedNewSlug, releaseVersion.Slug);
             }
 
             [Fact]

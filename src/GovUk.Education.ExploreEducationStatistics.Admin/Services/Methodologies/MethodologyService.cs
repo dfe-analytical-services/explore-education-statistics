@@ -298,10 +298,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             var loadedMethodologyVersion = _context.AssertEntityLoaded(methodologyVersion);
             await _context.Entry(loadedMethodologyVersion)
                 .Reference(m => m.Methodology)
-                .Query()
+                .Query()               
                 .Include(m => m.Publications)
                 .ThenInclude(p => p.Publication)
                 .ThenInclude(p => p.Contact)
+                .Include(m => m.Publications)
+                .ThenInclude(p => p.Publication)
+                .ThenInclude(p => p.LatestPublishedReleaseVersion)
+                .ThenInclude(p => p!.Release)
                 .LoadAsync();
 
             var publicationLinks = loadedMethodologyVersion.Methodology.Publications;
@@ -683,6 +687,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 Id = publication.Id,
                 Title = publication.Title,
                 Slug = publication.Slug,
+                LatestReleaseSlug = publication.LatestPublishedReleaseVersion?.Release.Slug,
                 Owner = publicationMethodology.Owner,
                 Contact = new ContactViewModel(publication.Contact)
             };

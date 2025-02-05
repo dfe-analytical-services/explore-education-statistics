@@ -22,7 +22,7 @@ type FileType = 'csv' | 'zip' | 'bulkZip';
 export interface DataFileUploadFormValues {
   dataFile?: File | null;
   metadataFile?: File | null;
-  subjectTitle?: string;
+  title?: string;
   uploadType: FileType;
   zipFile?: File | null;
   bulkZipFile?: File | null;
@@ -33,11 +33,11 @@ const titleMaxLength = 120;
 
 const subjectErrorMappings = [
   mapFieldErrors<DataFileUploadFormValues>({
-    target: 'subjectTitle',
+    target: 'title',
     messages: {
-      SubjectTitleMustBeUnique: 'Subject title must be unique',
+      SubjectTitleMustBeUnique: 'Title must be unique',
       SubjectTitleCannotContainSpecialCharacters:
-        'Subject title cannot contain special characters',
+        'Title cannot contain special characters',
     },
   }),
 ];
@@ -155,7 +155,7 @@ export default function DataFileUploadForm({
             .minSize(0, 'Choose a metadata file that is not empty'),
         otherwise: s => s.nullable(),
       }),
-      subjectTitle: Yup.string(),
+      title: Yup.string(),
       uploadType: Yup.string().oneOf(['csv', 'zip', 'bulkZip']).defined(),
       zipFile: Yup.file().when('uploadType', {
         is: 'zip',
@@ -177,15 +177,15 @@ export default function DataFileUploadForm({
 
     if (!isDataReplacement) {
       return schema.shape({
-        subjectTitle: Yup.string().when('uploadType', {
+        title: Yup.string().when('uploadType', {
           is: (uploadType: FileType) =>
             uploadType === 'csv' || uploadType === 'zip',
           then: s =>
             s
-              .required('Enter a subject title')
+              .required('Enter a title')
               .test({
                 name: 'unique',
-                message: 'Enter a unique subject title',
+                message: 'Enter a unique title',
                 test(value: string) {
                   if (!value) {
                     return true;
@@ -200,7 +200,7 @@ export default function DataFileUploadForm({
               })
               .max(
                 titleMaxLength,
-                `Subject title must be ${titleMaxLength} characters or less`,
+                `Title must be ${titleMaxLength} characters or less`,
               ),
         }),
       });
@@ -222,7 +222,7 @@ export default function DataFileUploadForm({
       initialValues={
         isDataReplacement
           ? defaultInitialValues
-          : { ...defaultInitialValues, subjectTitle: '' }
+          : { ...defaultInitialValues, title: '' }
       }
       resetAfterSubmit
       validationSchema={validationSchema}
@@ -238,8 +238,8 @@ export default function DataFileUploadForm({
               )}
               {!isDataReplacement && uploadType !== 'bulkZip' && (
                 <FormFieldTextInput<DataFileUploadFormValues>
-                  name="subjectTitle"
-                  label="Subject title"
+                  name="title"
+                  label="Title"
                   className="govuk-!-width-two-thirds"
                   maxLength={titleMaxLength}
                 />

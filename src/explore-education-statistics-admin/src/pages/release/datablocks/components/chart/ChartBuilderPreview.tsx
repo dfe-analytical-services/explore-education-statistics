@@ -2,7 +2,7 @@ import styles from '@admin/pages/release/datablocks/components/chart/ChartBuilde
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ChartRenderer, {
-  ChartRendererProps,
+  RenderableChart,
 } from '@common/modules/charts/components/ChartRenderer';
 import isChartRenderable, {
   getChartPreviewText,
@@ -10,7 +10,7 @@ import isChartRenderable, {
 import React, { useRef } from 'react';
 
 interface Props {
-  chart?: ChartRendererProps;
+  chart?: RenderableChart;
   loading: boolean;
 }
 
@@ -27,7 +27,7 @@ const ChartBuilderPreview = ({ chart, loading }: Props) => {
           <LoadingSpinner loading={loading} text="Loading chart data">
             <div className="govuk-width-container govuk-!-padding-4 dfe-border">
               <ChartRenderer
-                {...chart}
+                chart={chart}
                 key={renderCount.current}
                 id="chartBuilderPreview"
               />

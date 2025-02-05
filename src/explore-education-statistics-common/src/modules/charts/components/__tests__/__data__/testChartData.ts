@@ -1,5 +1,5 @@
+import { Chart } from '@common/modules/charts/types/chart';
 import { TableDataResponse } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 
 export const testChartConfiguration: Chart = {
   legend: {
@@ -98,7 +98,7 @@ export const testChartTableData: TableDataResponse = {
   subjectMeta: {
     filters: {
       SchoolType: {
-        totalValue: 'school-type-total',
+        autoSelectFilterItemId: 'school-type-total',
         hint: 'Filter by school type',
         legend: 'School type',
         options: {
@@ -118,7 +118,7 @@ export const testChartTableData: TableDataResponse = {
         name: 'school_type',
       },
       Characteristic: {
-        totalValue: 'characteristic-total',
+        autoSelectFilterItemId: 'characteristic-total',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         options: {

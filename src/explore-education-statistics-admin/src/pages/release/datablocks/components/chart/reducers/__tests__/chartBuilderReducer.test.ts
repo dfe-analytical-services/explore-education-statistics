@@ -10,12 +10,13 @@ import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
 import {
   AxisConfiguration,
   AxisType,
+  Chart,
   ChartDefinition,
   DataGroupingConfig,
+  LineChart,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
-import { Chart } from '@common/services/types/blocks';
 import { renderHook } from '@testing-library/react';
 import { produce } from 'immer';
 import { testFullTable } from '../../__tests__/__data__/testTableData';
@@ -959,6 +960,7 @@ describe('chartBuilderReducer', () => {
 
     test('has default `axes.minor` state if initial configuration is missing it', () => {
       const initialConfiguration: Chart = {
+        type: 'line',
         legend: {
           position: 'top',
           items: [],
@@ -976,8 +978,7 @@ describe('chartBuilderReducer', () => {
             referenceLines: [],
             visible: true,
           },
-        },
-        type: 'line',
+        } as never as LineChart['axes'],
         height: 300,
         title: '',
         alt: '',
@@ -1140,6 +1141,7 @@ describe('chartBuilderReducer', () => {
 
     test('has correct state with initial configuration for a map', () => {
       const initialConfiguration: Chart = {
+        type: 'map',
         legend: {
           position: 'top',
           items: [],
@@ -1162,7 +1164,6 @@ describe('chartBuilderReducer', () => {
             referenceLines: [],
           },
         },
-        type: 'map',
         height: 300,
         title: 'Chart title',
         alt: '',
@@ -1248,6 +1249,7 @@ describe('chartBuilderReducer', () => {
 
     test('setting boundary levels does not change data groupings', () => {
       const initialConfiguration: Chart = {
+        type: 'map',
         legend: {
           position: 'top',
           items: [],
@@ -1270,7 +1272,6 @@ describe('chartBuilderReducer', () => {
             referenceLines: [],
           },
         },
-        type: 'map',
         height: 300,
         title: 'Chart title',
         alt: '',
@@ -1357,6 +1358,7 @@ describe('chartBuilderReducer', () => {
 
     test('setting data groupings does not change boundary levels', () => {
       const initialConfiguration: Chart = {
+        type: 'map',
         legend: {
           position: 'top',
           items: [],
@@ -1379,7 +1381,6 @@ describe('chartBuilderReducer', () => {
             referenceLines: [],
           },
         },
-        type: 'map',
         height: 300,
         title: 'Chart title',
         alt: '',

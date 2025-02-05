@@ -1,23 +1,15 @@
+import useGetChartFile from '@admin/hooks/useGetChartFile';
 import TableTabSection from '@admin/pages/release/datablocks/components/TableTabSection';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
+import ErrorBoundary from '@common/components/ErrorBoundary';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
-import { AxesConfiguration } from '@common/modules/charts/types/chart';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import useDataBlock from '@common/modules/find-statistics/hooks/useDataBlock';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import tableBuilderService from '@common/services/tableBuilderService';
-import React from 'react';
-
-interface Model {
-  table: FullTable;
-  tableHeaders: TableHeadersConfig;
-}
+import React, { useMemo } from 'react';
 
 interface Props {
   releaseId: string;
@@ -28,72 +20,78 @@ const testId = (dataBlock: ReleaseDataBlock) =>
   `Data block - ${dataBlock.name}`;
 
 const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
-  const { value: model, isLoading } = useAsyncRetry<Model>(async () => {
-    const tableData = await tableBuilderService.getTableData(
-      dataBlock.query,
-      releaseId,
-      dataBlock.charts[0]?.type === 'map'
-        ? dataBlock.charts[0].boundaryLevel
-        : undefined,
-    );
-    const table = mapFullTable(tableData);
+  const getChartFile = useGetChartFile(releaseId);
+  const {
+    chart,
+    isTableDataLoading,
+    isTableDataError,
+    fullTable,
+    isGeoJsonError,
+    isGeoJsonInitialLoading,
+  } = useDataBlock({
+    dataBlock,
+    releaseId,
+    getInfographic: getChartFile,
+  });
 
-    const tableHeaders = mapTableHeadersConfig(
-      dataBlock.table.tableHeaders,
-      table,
-    );
+  const tableHeaders = useMemo(() => {
+    if (!fullTable) return undefined;
+    return mapTableHeadersConfig(dataBlock.table.tableHeaders, fullTable);
+  }, [dataBlock, fullTable]);
 
-    return {
-      table,
-      tableHeaders,
-    };
-  }, [releaseId, dataBlock]);
+  if (isTableDataError)
+    return (
+      <WarningMessage>
+        There was a problem loading the data block
+      </WarningMessage>
+    );
 
   return (
-    <LoadingSpinner text="Loading data block" loading={isLoading}>
-      {model ? (
-        <Tabs id="dataBlockTabs">
-          <TabsSection title="Table" key="table" id="dataBlockTabs-table">
-            <TableTabSection
-              dataBlock={dataBlock}
-              table={model.table}
-              tableHeaders={model.tableHeaders}
-            />
-          </TabsSection>
-          {dataBlock.charts.length > 0 && [
-            <TabsSection
-              title="Chart"
-              key="chart"
-              id="dataBlockTabs-chart"
-              testId={`${testId(dataBlock)}-chart-tab`}
-            >
-              <div className="govuk-width-container">
-                {dataBlock.charts.map((chart, index) => {
-                  const key = index;
-
-                  const axes = { ...chart.axes } as Required<AxesConfiguration>;
-
-                  return (
-                    <ChartRenderer
-                      {...chart}
-                      key={key}
-                      id={`dataBlockTabs-chart-${index}`}
-                      axes={axes}
-                      data={model.table.results}
-                      meta={model.table.subjectMeta}
-                      source={dataBlock.source}
-                    />
-                  );
-                })}
-              </div>
+    <LoadingSpinner
+      text="Loading data block"
+      loading={isTableDataLoading || isGeoJsonInitialLoading}
+    >
+      <Tabs id="dataBlockTabs">
+        {fullTable &&
+          tableHeaders && [
+            <TabsSection title="Table" key="table" id="dataBlockTabs-table">
+              <TableTabSection
+                dataBlock={dataBlock}
+                table={fullTable}
+                tableHeaders={tableHeaders}
+              />
             </TabsSection>,
           ]}
-        </Tabs>
-      ) : (
-        <WarningMessage>
-          There was a problem loading the data block
-        </WarningMessage>
-      )}
+        {!!dataBlock.charts.length && [
+          <TabsSection
+            title="Chart"
+            key="chart"
+            id="dataBlockTabs-chart"
+            testId={`${testId(dataBlock)}-chart-tab`}
+          >
+            {fullTable && (
+              <div className="govuk-width-container">
+                {!!isGeoJsonError && (
+                  <WarningMessage>Could not load chart</WarningMessage>
+                )}
+                <ErrorBoundary
+                  fallback={
+                    <WarningMessage>Could not load chart</WarningMessage>
+                  }
+                >
+                  {chart && (
+                    <ChartRenderer
+                      id="dataBlockTabs-chart"
+                      source={dataBlock.source}
+                      chart={chart}
+                    />
+                  )}
+                </ErrorBoundary>
+              </div>
+            )}
+          </TabsSection>,
+        ]}
+      </Tabs>
     </LoadingSpinner>
   );
 };

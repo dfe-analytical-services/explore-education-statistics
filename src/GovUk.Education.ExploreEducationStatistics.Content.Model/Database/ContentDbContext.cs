@@ -524,11 +524,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<ReleaseVersion>()
-                .Property(rv => rv.TimePeriodCoverage)
-                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
-                .HasMaxLength(6);
-
-            modelBuilder.Entity<ReleaseVersion>()
                 .Property<List<Link>>("RelatedInformation")
                 .IsRequired()
                 .HasConversion(
