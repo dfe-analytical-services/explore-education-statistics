@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
@@ -50,12 +51,11 @@ public class ReleaseCacheService(
         string publicationSlug,
         string releaseSlug)
     {
-        await publicBlobStorageService.DeleteBlobs(
+        await publicBlobStorageService.DeleteBlob(
             containerName: BlobContainers.PublicContent,
-            options: new IBlobStorageService.DeleteBlobsOptions
-            {
-                IncludeRegex = new Regex($"^publications/{publicationSlug.TrimToLower()}/releases/{releaseSlug.TrimToLower()}.json")
-            }
+            path: FileStoragePathUtils.PublicContentReleasePath(
+                publicationSlug: publicationSlug,
+                releaseSlug: releaseSlug)
         );
 
         return Unit.Instance;
