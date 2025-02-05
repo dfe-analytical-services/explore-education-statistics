@@ -102,6 +102,7 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                             sp.GetRequiredService<ILogger<IBlobStorageService>>()
                         )
                     );
+                    services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
                 });
         });
     }

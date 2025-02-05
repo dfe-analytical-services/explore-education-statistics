@@ -139,7 +139,6 @@ public partial class ReleaseService(
                         oldReleaseSlug: releaseAndSlugs.oldReleaseSlug,
                         newReleaseSlug: releaseAndSlugs.newReleaseSlug,
                         publicationSlug: releaseAndSlugs.release.Publication.Slug,
-                        releaseVersionId: latestPublishedReleaseVersion!.Id,
                         latestReleaseVersionId: latestPublishedReleaseVersion.Id);
                 }
 
@@ -313,7 +312,6 @@ public partial class ReleaseService(
         string oldReleaseSlug,
         string newReleaseSlug,
         string publicationSlug,
-        Guid releaseVersionId,
         Guid latestReleaseVersionId)
     {
         var slugHasChanged = oldReleaseSlug != newReleaseSlug;
@@ -329,7 +327,7 @@ public partial class ReleaseService(
 
         // Update release-specific path cache
         await releaseCacheService.UpdateRelease(
-            releaseVersionId: releaseVersionId,
+            releaseVersionId: latestReleaseVersionId,
             publicationSlug: publicationSlug,
             releaseSlug: newReleaseSlug);
 
