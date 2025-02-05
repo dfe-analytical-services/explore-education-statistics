@@ -31,6 +31,7 @@ public partial class ReleaseService(
     IUserService userService,
     IReleaseVersionService releaseVersionService,
     IReleaseCacheService releaseCacheService,
+    IPublicationCacheService publicationCacheService,
     IGuidGenerator guidGenerator) : IReleaseService
 {
     public async Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
@@ -127,10 +128,6 @@ public partial class ReleaseService(
                     releaseSlug: releaseAndSlugs.newReleaseSlug,
                     cancellationToken: cancellationToken);
 
-                // NEED TO ASK BEN IF WE ONLY EVER CACHE FOR THE LATEST RELEASE VERSION?
-                // OR, DO WE NEED TO UPDATE THE CACHE FOR ALL RELEASE PATHS, AS WELL AS THE
-                // LATEST RELEASE PATH?
-
                 var releaseIsLive = latestPublishedReleaseVersion is not null;
 
                 if (releaseIsLive)
@@ -139,7 +136,7 @@ public partial class ReleaseService(
                         oldReleaseSlug: releaseAndSlugs.oldReleaseSlug,
                         newReleaseSlug: releaseAndSlugs.newReleaseSlug,
                         publicationSlug: releaseAndSlugs.release.Publication.Slug,
-                        latestReleaseVersionId: latestPublishedReleaseVersion.Id);
+                        latestReleaseVersionId: latestPublishedReleaseVersion!.Id);
                 }
 
                 return (releaseAndSlugs.oldReleaseSlug, releaseIsLive);
@@ -335,6 +332,9 @@ public partial class ReleaseService(
         await releaseCacheService.UpdateRelease(
             releaseVersionId: latestReleaseVersionId,
             publicationSlug: publicationSlug);
+
+        // Update publication cache (view-model contains release related data that has now been updated)
+        await publicationCacheService.UpdatePublication(publicationSlug);
 
         return Unit.Instance;
     }

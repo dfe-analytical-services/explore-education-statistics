@@ -326,7 +326,8 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         {
             var oldSlug = "2020-21-initial";
 
-            Publication publication = DataFixture.DefaultPublication();
+            Publication publication = DataFixture.DefaultPublication()
+                .WithTheme(DataFixture.DefaultTheme());
 
             Release oldRelease = DataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true)
                 .WithYear(2020)
@@ -354,14 +355,20 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var oldLatestReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug);
 
+            var oldPublicationCachedViewModel = new PublicationCacheViewModel();
+            var oldPublicationCacheKey = new PublicationCacheKey(publication.Slug);
+
             // This represents the cache stored in the release-specific directory
             await publicBlobCacheService.SetItemAsync(oldReleaseCacheKey, oldReleaseCachedViewModel);
             // This represents the cache stored in the 'latest-release.json' path
             await publicBlobCacheService.SetItemAsync(oldLatestReleaseCacheKey, oldLatestReleaseCachedViewModel);
+            // This represents the publication cache
+            await publicBlobCacheService.SetItemAsync(oldPublicationCacheKey, oldPublicationCachedViewModel);
 
-            // Testing that these two pieces of cache have actually been stored
+            // Testing that these pieces of cache have actually been stored
             Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldReleaseCacheKey, typeof(ReleaseCacheViewModel)));
             Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldLatestReleaseCacheKey, typeof(ReleaseCacheViewModel)));
+            Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldPublicationCacheKey, typeof(PublicationCacheViewModel)));
 
             var response = await UpdateRelease(
                 releaseId: oldRelease.Id,
@@ -387,10 +394,13 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var newSlugCachedValue = await publicBlobCacheService.GetItemAsync(newSlugReleaseCacheKey, typeof(ReleaseCacheViewModel))
                 as ReleaseCacheViewModel;
 
-            var latestReleaseCacheKey = new ReleaseCacheKey(
+            var newLatestReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug);
-            var latestReleaseCachedValue = await publicBlobCacheService.GetItemAsync(latestReleaseCacheKey, typeof(ReleaseCacheViewModel))
+            var newLatestReleaseCachedValue = await publicBlobCacheService.GetItemAsync(newLatestReleaseCacheKey, typeof(ReleaseCacheViewModel))
                 as ReleaseCacheViewModel;
+
+            var newPublicationCachedValue = await publicBlobCacheService.GetItemAsync(oldPublicationCacheKey, typeof(PublicationCacheViewModel))
+                as PublicationCacheViewModel;
 
             // Checking that the cache for the old release slug has been deleted
             Assert.Null(oldSlugCachedValue);
@@ -404,10 +414,16 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
 
             // Checking that the latest release cache has been updated, and is not the same as the old cache.
             // Also checking that the cache is for the LATEST release version via it's ID.
-            Assert.NotNull(latestReleaseCachedValue);
-            Assert.NotEqual(oldLatestReleaseCachedViewModel, latestReleaseCachedValue);
-            Assert.Equal(latestPublishedReleaseVersion.Id, latestReleaseCachedValue.Id);
-            Assert.Equal(updatedRelease.Slug, latestReleaseCachedValue.Slug);
+            Assert.NotNull(newLatestReleaseCachedValue);
+            Assert.NotEqual(oldLatestReleaseCachedViewModel, newLatestReleaseCachedValue);
+            Assert.Equal(latestPublishedReleaseVersion.Id, newLatestReleaseCachedValue.Id);
+            Assert.Equal(updatedRelease.Slug, newLatestReleaseCachedValue.Slug);
+
+            // Checking that the publication cache has been updated, and is not the same as the old cache.
+            Assert.NotNull(newPublicationCachedValue);
+            Assert.NotEqual(oldPublicationCachedViewModel, newPublicationCachedValue);
+            Assert.All(newPublicationCachedValue.Releases, r => Assert.Equal(updatedRelease.Slug, r.Slug));
+            Assert.All(newPublicationCachedValue.ReleaseSeries, rs => Assert.Equal(updatedRelease.Slug, rs.ReleaseSlug));
         }
 
         [Fact]
@@ -445,21 +461,27 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
                 .Include(r => r.Publication)
                 .SingleAsync(r => r.Id == oldRelease.Id);
 
-            var oldSlugCacheKey = new ReleaseCacheKey(
+            var oldSlugReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug,
                 releaseSlug: oldRelease.Slug);
-            var oldSlugCachedValue = await publicBlobCacheService.GetItemAsync(oldSlugCacheKey, typeof(ReleaseCacheViewModel));
+            var oldSlugReleaseCachedValue = await publicBlobCacheService.GetItemAsync(oldSlugReleaseCacheKey, typeof(ReleaseCacheViewModel));
 
-            var newSlugCacheKey = new ReleaseCacheKey(
+            var newSlugReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug,
                 releaseSlug: updatedRelease.Slug);
-            var newSlugCachedValue = await publicBlobCacheService.GetItemAsync(newSlugCacheKey, typeof(ReleaseCacheViewModel));
+            var newSlugReleaseCachedValue = await publicBlobCacheService.GetItemAsync(newSlugReleaseCacheKey, typeof(ReleaseCacheViewModel));
+
+            var publicationCacheKey = new PublicationCacheKey(publication.Slug);
+            var publicationCacheValue = await publicBlobCacheService.GetItemAsync(newSlugReleaseCacheKey, typeof(ReleaseCacheViewModel));
 
             // Checking that there isn't any cache for the old release view-model
-            Assert.Null(oldSlugCachedValue);
+            Assert.Null(oldSlugReleaseCachedValue);
 
             // Checking that there isn't any cache for the new release view-model
-            Assert.Null(newSlugCachedValue);
+            Assert.Null(newSlugReleaseCachedValue);
+
+            // Checking that there isn't any cache for the publication view-model
+            Assert.Null(publicationCacheValue);
         }
 
         [Fact]
