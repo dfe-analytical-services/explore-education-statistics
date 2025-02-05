@@ -64,7 +64,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     history.push(tokenLogPagePath);
   };
 
-  const tokenExampleUrl = `${publicApiUrl}/api/v1.0/data-sets/${dataSet?.draftVersion?.id}`;
+  const tokenExampleUrl = `${publicApiUrl}/v1/data-sets/${dataSet?.draftVersion?.id}`;
 
   return (
     <>
@@ -177,7 +177,7 @@ response <- GET(url, add_headers("Preview-Token" = "${previewToken.id}"))
 
                 {dataSet?.draftVersion && (
                   <ApiDataSetQuickStart
-                    publicApiBaseUrl={`${publicApiUrl}/api/v1.0`}
+                    publicApiBaseUrl={publicApiUrl}
                     publicApiDocsUrl={publicApiDocsUrl}
                     dataSetId={dataSet.id}
                     dataSetName={dataSet.title}

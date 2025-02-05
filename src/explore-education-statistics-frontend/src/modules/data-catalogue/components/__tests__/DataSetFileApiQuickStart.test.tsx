@@ -43,20 +43,20 @@ describe('DataSetFileApiQuickStart', () => {
 
     expect(
       screen.getByLabelText('GET data set summary URL'),
-    ).toHaveDisplayValue(/data-sets\/api-data-set-id/);
+    ).toHaveDisplayValue('http://localhost:5050/v1/data-sets/api-data-set-id');
     expect(
       screen.getByLabelText('GET data set metadata URL'),
     ).toHaveDisplayValue(
-      /data-sets\/api-data-set-id\/meta\?dataSetVersion=1.0/,
+      'http://localhost:5050/v1/data-sets/api-data-set-id/meta?dataSetVersion=1.0',
     );
     expect(screen.getByLabelText('GET data set query URL')).toHaveDisplayValue(
-      /data-sets\/api-data-set-id\/query\?dataSetVersion=1.0/,
+      'http://localhost:5050/v1/data-sets/api-data-set-id/query?dataSetVersion=1.0',
     );
     expect(screen.getByLabelText('POST data set query URL')).toHaveDisplayValue(
-      /data-sets\/api-data-set-id\/query\?dataSetVersion=1.0/,
+      'http://localhost:5050/v1/data-sets/api-data-set-id/query?dataSetVersion=1.0',
     );
     expect(screen.getByLabelText('GET data set CSV URL')).toHaveDisplayValue(
-      /data-sets\/api-data-set-id\/csv\?dataSetVersion=1.0/,
+      'http://localhost:5050/v1/data-sets/api-data-set-id/csv?dataSetVersion=1.0',
     );
   });
 });
