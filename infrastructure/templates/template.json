@@ -2135,7 +2135,7 @@
         "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
-        "PUBLIC_API_BASE_URL": "[concat('https://', parameters('publicApiUrl'), '/v1')]",
+        "PUBLIC_API_BASE_URL": "[concat('https://', parameters('publicApiUrl'))]",
         "PUBLIC_API_DOCS_URL": "[concat('https://', parameters('publicApiDocsUrl'))]",
         "WEBSITE_NODE_DEFAULT_VERSION": "20.16.0",
         "WEBSITES_PORT": 3000

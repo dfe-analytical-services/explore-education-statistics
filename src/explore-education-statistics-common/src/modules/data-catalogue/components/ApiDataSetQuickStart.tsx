@@ -12,6 +12,7 @@ interface Props {
   headingsTag?: 'h3' | 'h4';
   publicApiBaseUrl: string;
   publicApiDocsUrl: string;
+  publicApiVersion?: 'v1';
   renderLink: ({
     children,
     toString,
@@ -28,8 +29,12 @@ export default function ApiDataSetQuickStart({
   headingsTag: Heading = 'h3',
   publicApiBaseUrl,
   publicApiDocsUrl,
+  publicApiVersion = 'v1',
   renderLink,
 }: Props) {
+  const publicApiVersionUrl = `${publicApiBaseUrl}/${publicApiVersion}`;
+  const publicApiDocsVersionUrl = `${publicApiDocsUrl}/reference-${publicApiVersion}`;
+
   return (
     <>
       <InsetText>
@@ -69,11 +74,11 @@ export default function ApiDataSetQuickStart({
           </>
         }
         labelHidden={false}
-        url={`${publicApiBaseUrl}/data-sets/${dataSetId}`}
+        url={`${publicApiVersionUrl}/data-sets/${dataSetId}`}
       />
       <p>
         {renderLink({
-          to: `${publicApiDocsUrl}/reference-v1/endpoints/GetDataSet/`,
+          to: `${publicApiDocsVersionUrl}/endpoints/GetDataSet/`,
           children: 'Guidance: Get data set summary',
         })}
       </p>
@@ -89,11 +94,11 @@ export default function ApiDataSetQuickStart({
           </>
         }
         labelHidden={false}
-        url={`${publicApiBaseUrl}/data-sets/${dataSetId}/meta?dataSetVersion=${dataSetVersion}`}
+        url={`${publicApiVersionUrl}/data-sets/${dataSetId}/meta?dataSetVersion=${dataSetVersion}`}
       />
       <p>
         {renderLink({
-          to: `${publicApiDocsUrl}/reference-v1/endpoints/GetDataSetMeta/`,
+          to: `${publicApiDocsVersionUrl}/endpoints/GetDataSetMeta/`,
           children: 'Guidance: Get data set metadata',
         })}
       </p>
@@ -109,11 +114,11 @@ export default function ApiDataSetQuickStart({
           </>
         }
         labelHidden={false}
-        url={`${publicApiBaseUrl}/data-sets/${dataSetId}/query?dataSetVersion=${dataSetVersion}`}
+        url={`${publicApiVersionUrl}/data-sets/${dataSetId}/query?dataSetVersion=${dataSetVersion}`}
       />
       <p>
         {renderLink({
-          to: `${publicApiDocsUrl}/reference-v1/endpoints/QueryDataSetGet/`,
+          to: `${publicApiDocsVersionUrl}/endpoints/QueryDataSetGet/`,
           children: 'Guidance: Query data set (GET)',
         })}
       </p>
@@ -129,11 +134,11 @@ export default function ApiDataSetQuickStart({
           </>
         }
         labelHidden={false}
-        url={`${publicApiBaseUrl}/data-sets/${dataSetId}/query?dataSetVersion=${dataSetVersion}`}
+        url={`${publicApiVersionUrl}/data-sets/${dataSetId}/query?dataSetVersion=${dataSetVersion}`}
       />
       <p>
         {renderLink({
-          to: `${publicApiDocsUrl}/reference-v1/endpoints/QueryDataSetPost/`,
+          to: `${publicApiDocsVersionUrl}/endpoints/QueryDataSetPost/`,
           children: 'Guidance: Query data set (POST)',
         })}
       </p>
@@ -149,11 +154,11 @@ export default function ApiDataSetQuickStart({
           </>
         }
         labelHidden={false}
-        url={`${publicApiBaseUrl}/data-sets/${dataSetId}/csv?dataSetVersion=${dataSetVersion}`}
+        url={`${publicApiVersionUrl}/data-sets/${dataSetId}/csv?dataSetVersion=${dataSetVersion}`}
       />
       <p>
         {renderLink({
-          to: `${publicApiDocsUrl}/reference-v1/endpoints/DownloadDataSetCsv/`,
+          to: `${publicApiDocsVersionUrl}/endpoints/DownloadDataSetCsv/`,
           children: 'Guidance: Download data set as CSV',
         })}
       </p>
