@@ -322,7 +322,7 @@ public record ProcessorTestData
                 Column = "school_type",
                 Label = "School type",
                 Hint = "",
-                AutoSelectLabel = "Total",
+                DefaultOptionId = 10,
                 DataSetVersionId = Guid.Empty,
                 Options =
                 [

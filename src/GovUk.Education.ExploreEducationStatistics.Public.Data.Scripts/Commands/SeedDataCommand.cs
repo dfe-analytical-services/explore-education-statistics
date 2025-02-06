@@ -431,38 +431,29 @@ public class SeedDataCommand : ICommand
                 PublicDataDbContext.FilterMetasIdSequence,
                 _cancellationToken);
 
-            var metas = metaFileRows
+            var filterMetaRows = metaFileRows
                 .Where(
                     row => row.ColType == MetaFileRow.ColumnType.Filter
                            && allowedColumns.Contains(row.ColName)
                 )
-                .OrderBy(row => row.Label)
-                .Select(row =>
-                {
-                    var id = currentId++;
+                .OrderBy(row => row.Label);
 
-                    return new FilterMeta
-                    {
-                        Id = id,
-                        PublicId = SqidEncoder.Encode(id),
-                        Column = row.ColName,
-                        DataSetVersionId = _seed.DataSetVersionId,
-                        Label = row.Label,
-                        Hint = row.FilterHint ?? string.Empty,
-                    };
-                })
-                .ToList();
-
-            _dbContext.FilterMetas.AddRange(metas);
-            await _dbContext.SaveChangesAsync(_cancellationToken);
-
-            await _dbContext.SetSequenceValue(
-                PublicDataDbContext.FilterMetasIdSequence,
-                currentId - 1,
-                _cancellationToken);
-
-            foreach (var meta in metas)
+            foreach (var metaRow in filterMetaRows)
             {
+                var id = currentId++;
+                var meta = new FilterMeta
+                {
+                    Id = id,
+                    PublicId = SqidEncoder.Encode(id),
+                    Column = metaRow.ColName,
+                    DataSetVersionId = _seed.DataSetVersionId,
+                    Label = metaRow.Label,
+                    Hint = metaRow.FilterHint ?? string.Empty,
+                };
+
+                _dbContext.FilterMetas.Add(meta);
+                await _dbContext.SaveChangesAsync(_cancellationToken);
+
                 var options = (await _duckDbConnection.SqlBuilder(
                             $"""
                              SELECT DISTINCT "{meta.Column:raw}"
@@ -551,7 +542,26 @@ public class SeedDataCommand : ICommand
                     startIndex + insertedLinks - 1,
                     _cancellationToken
                 );
+
+                var defaultOption = options.FirstOrDefault(option => metaRow.FilterDefault != null
+                    ? option.Label == metaRow.FilterDefault
+                    : option.Label == "Total");
+
+                if (defaultOption is not null)
+                {
+                    await _dbContext.FilterMetas
+                        .AsNoTracking()
+                        .Where(fm => fm.Id == meta.Id)
+                        .ExecuteUpdateAsync(setters => setters
+                                .SetProperty(fm => fm.DefaultOptionId, defaultOption.Id),
+                            cancellationToken: _cancellationToken);
+                }
             }
+
+            await _dbContext.SetSequenceValue(
+                PublicDataDbContext.FilterMetasIdSequence,
+                currentId - 1,
+                _cancellationToken);
         }
 
         private async Task CreateLocationMetas(IReadOnlySet<string> allowedColumns)
