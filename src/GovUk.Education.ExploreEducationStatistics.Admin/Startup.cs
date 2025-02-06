@@ -563,7 +563,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
-            services.AddTransient<ISubjectMetaService, SubjectMetaService>();
+            services.AddTransient<ISubjectMetaService, SubjectMetaService>(provider => 
+                new SubjectMetaService(
+                    statisticsDbContext: provider.GetRequiredService<StatisticsDbContext>(),
+                    contentDbContext: provider.GetRequiredService<ContentDbContext>(),
+                    cacheService: provider.GetRequiredService<IPrivateBlobCacheService>(),
+                    releaseSubjectService: provider.GetRequiredService<IReleaseSubjectService>(),
+                    filterRepository: provider.GetRequiredService<IFilterRepository>(),
+                    filterItemRepository: provider.GetRequiredService<IFilterItemRepository>(),
+                    indicatorGroupRepository: provider.GetRequiredService<IIndicatorGroupRepository>(),
+                    locationRepository: provider.GetRequiredService<ILocationRepository>(),
+                    logger: provider.GetRequiredService<ILogger<SubjectMetaService>>(),
+                    observationService: provider.GetRequiredService<IObservationService>(),
+                    timePeriodService: provider.GetRequiredService<ITimePeriodService>(),
+                    userService: provider.GetRequiredService<IUserService>(),
+                    locationOptions: provider.GetRequiredService<IOptions<LocationsOptions>>()
+                    ));
             services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
             services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
