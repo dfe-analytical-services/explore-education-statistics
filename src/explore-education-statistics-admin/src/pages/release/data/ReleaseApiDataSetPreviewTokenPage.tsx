@@ -41,15 +41,6 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     ...previewTokenQueries.get(previewTokenId),
   });
 
-  const previewPagePath = generatePath<ReleaseDataSetRouteParams>(
-    releaseApiDataSetPreviewRoute.path,
-    {
-      publicationId,
-      releaseId,
-      dataSetId,
-    },
-  );
-
   const detailsPagePath = generatePath<ReleaseDataSetRouteParams>(
     releaseApiDataSetDetailsRoute.path,
     {
@@ -70,12 +61,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
 
   const handleRevoke = async (id: string) => {
     await previewTokenService.revokePreviewToken(id);
-
-    history.push(
-      lastLocation?.pathname === tokenLogPagePath
-        ? tokenLogPagePath
-        : previewPagePath,
-    );
+    history.push(tokenLogPagePath);
   };
 
   const tokenExampleUrl = `${publicApiUrl}/api/v1.0/data-sets/${dataSet?.draftVersion?.id}`;
