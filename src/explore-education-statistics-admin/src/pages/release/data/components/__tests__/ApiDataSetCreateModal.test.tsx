@@ -35,7 +35,7 @@ describe('ApiDataSetCreateModal', () => {
       <ApiDataSetCreateModal
         publicationId="publication-id"
         releaseId="release-id"
-        onSubmit={noop}
+        onSubmit={Promise.resolve}
       />,
     );
 
@@ -72,7 +72,7 @@ describe('ApiDataSetCreateModal', () => {
       <ApiDataSetCreateModal
         publicationId="publication-id"
         releaseId="release-id"
-        onSubmit={noop}
+        onSubmit={Promise.resolve}
       />,
     );
 
