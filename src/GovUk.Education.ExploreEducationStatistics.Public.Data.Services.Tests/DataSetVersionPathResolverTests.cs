@@ -179,32 +179,6 @@ public abstract class DataSetVersionPathResolverTests
                 resolver.DirectoryPath(version));
         }
 
-        // TODO EES-5660 - remove once draft DataSetVersions have had their folders migrated
-        // on each Public API-enabled environment.
-        [Theory]
-        [MemberData(nameof(GetEnvironmentNames))]
-        public void ValidDirectoryPath_VersionArgument(string environmentName)
-        {
-            DataSetVersion version = _dataFixture.DefaultDataSetVersion();
-
-            _webHostEnvironmentMock
-                .SetupGet(s => s.EnvironmentName)
-                .Returns(environmentName);
-
-            var resolver = BuildService(options: new DataFilesOptions
-            {
-                BasePath = Path.Combine("data", "data-files")
-            });
-
-            Assert.Equal(
-                Path.Combine(
-                    resolver.DataSetsPath(),
-                    version.DataSetId.ToString(),
-                    "v1.2.3"
-                ),
-                resolver.DirectoryPath(version, new SemVersion(major: 1, minor: 2, patch: 3)));
-        }
-
         [Theory]
         [MemberData(nameof(GetEnvironmentNames))]
         public void ValidFilePaths(string environmentName)
