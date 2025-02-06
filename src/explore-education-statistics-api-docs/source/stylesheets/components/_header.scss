@@ -1,0 +1,34 @@
+.app-header {
+  @include govuk-media-query($until: tablet) {
+    .govuk-header__container {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: govuk-spacing(2) !important;
+    }
+
+    .govuk-header__logo {
+      padding-right: 0;
+      margin-bottom: govuk-spacing(1);
+    }
+
+    .govuk-header__content {
+      flex-grow: 1;
+    }
+
+    .govuk-header__navigation--end {
+      text-align: right;
+    }
+
+    .govuk-header__menu-button {
+      display: inline-block;
+      position: unset;
+    }
+
+    .govuk-header__navigation-list {
+      text-align: left;
+      width: 100%;
+    }
+  }
+}
