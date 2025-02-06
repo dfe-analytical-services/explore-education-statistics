@@ -250,8 +250,7 @@ The endpoint will return something like the following:
       "options": [
         {
           "id": "1oX7c",
-          "label": "Total",
-          "isAggregate": true
+          "label": "Total"
         },
         {
           "id": "uKR2K",
@@ -357,10 +356,6 @@ Each filter is identified by an `id`. The example above has a 'School type' filt
 Each filter will have a set of filter options. The example above has 'State-funded primary' and
 'Total' options for 'School type'. Filter options also have their own `id` properties that can be used
 to identify them.
-
-Some filter options are aggregates of the entire filter and are marked by an `isAggregate` property
-set to true. In the above example, the 'Total' school type is an aggregate of all school types
-(e.g. primary, secondary, special schools, etc).
 
 Finally, the `indicators` property contains the data set's indicators. Each indicator contains an
 `id` to identify it and may also contain:
