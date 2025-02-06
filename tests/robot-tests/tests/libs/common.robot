@@ -35,7 +35,26 @@ user opens the browser
     IF    "${browser}" == "ie"
         user opens ie    ${alias}
     END
-    go to    about:blank
+
+    # Visiting a page with basic auth credentials in the URL fails affects
+    # the browser Back button behaviour, causing various tests to fail
+    # when asserting the back button behaviour of certain URLs.
+    #
+    # The cause for this is that visiting a page with auth credentials causes a
+    # page reload with the auth credentials stripped off.    What remains in the
+    # browser's history however is the URL with the auth credentials still included,
+    # thus any forms filled in on the page will not then be filled in when pressing
+    # the back button from the form submission page, as the browser firstly revisits
+    # the URL with the auth credentials in place, then reloads the page again with
+    # the auth details removed.    By this point, the previously filled-in form details
+    # have been lost.
+    #
+    # Therefore, all browsers used in our tests firstly obtain basic auth access, and
+    # then can continue using the site as per usual without any more need to interact
+    # with authentication.
+    ${authenticated_url}=    get url with basic auth    %{PUBLIC_URL}
+    go to    ${authenticated_url}
+    user waits until page finishes loading
 
 user opens chrome
     [Arguments]    ${alias}=chrome
@@ -758,13 +777,6 @@ user checks url equals
     ${current_url}=    get location
     should be equal    ${current_url}    ${expected}
 
-user checks url without auth equals
-    [Arguments]    ${expected}
-    ${current_url}=    get location
-    ${remove_auth_current_url}=    remove auth from url    ${current_url}
-    set variable    ${remove_auth_current_url}
-    should contain    ${remove_auth_current_url}    ${expected}
-
 user checks page contains link
     [Arguments]
     ...    ${text}
@@ -993,23 +1005,19 @@ user checks page does not contain other release
 
 user navigates to admin frontend
     [Arguments]    ${URL}=%{ADMIN_URL}
-    disable basic auth headers
     go to    ${URL}
 
 user navigates to public frontend
     [Arguments]    ${URL}=%{PUBLIC_URL}
-    enable basic auth headers
-    go to    ${URL}
+    user navigates to    ${URL}
 
 user navigates to public frontend with www
     [Arguments]    ${URL}=%{PUBLIC_URL}
-    enable basic auth headers
     ${www_url}=    get www url    ${URL}
-    go to    ${www_url}
+    user navigates to    ${www_url}
 
 user navigates to
     [Arguments]    ${URL}
-    enable basic auth headers
     go to    ${URL}
 
 check that variable is not empty
@@ -1103,15 +1111,11 @@ check option exist in dropdown
         ${text}=    get text    ${option}
         Append To List    ${all_texts}    ${text}
     END
-    # Adding logging to help catch intermittent test failures
-    Log to console    \n\tAll Texts: ${all_texts}
-    ${matched}=    Run Keyword And Return Status    Should Contain    ${all_texts}    ${option_text}
 
-    IF    ${matched}
+    ${matched}=    Run Keyword And Return Status    Should Contain    ${all_texts}    ${option_text}
+    IF    "${matched}" == "${False}"
         # Adding logging to help catch intermittent test failures
-        Log to console    \n\tOption '${option_text}' found in the dropdown.
-    ELSE
-        # Adding logging to help catch intermittent test failures
-        Log to console    \n\tOption '${option_text}' not found in the dropdown.
+        Log to console    \n\tOption '${option_text}' not found in the ${dropdown_locator} dropdown.
+        Log to console    \n\tAvailable options were: ${all_texts}
     END
-    Return From Keyword    ${matched}
+    [Return]    ${matched}

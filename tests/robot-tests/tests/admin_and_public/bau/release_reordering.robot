@@ -59,10 +59,8 @@ Validate first legacy release exists in the publication release order
 Create first release via api
     user creates test release via api    ${PUBLICATION_ID}    AY    2020
 
-    ${PUBLIC_URL_WITHOUT_AUTH}=    remove auth from url    %{PUBLIC_URL}
-    set suite variable    ${PUBLIC_URL_WITHOUT_AUTH}
     set suite variable    ${PUBLIC_RELEASE_1_URL}
-    ...    ${PUBLIC_URL_WITHOUT_AUTH}/find-statistics/${PUBLICATION_SLUG}/2020-21
+    ...    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2020-21
 
 Validate first release exists in the publication release order with status unpublished
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
@@ -261,7 +259,7 @@ Validate other releases section of first published release contains updated lega
 Create second release via api
     user creates test release via api    ${PUBLICATION_ID}    AYQ1    2022
     set suite variable    ${PUBLIC_RELEASE_2_URL}
-    ...    ${PUBLIC_URL_WITHOUT_AUTH}/find-statistics/${PUBLICATION_SLUG}/2022-23-q1
+    ...    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2022-23-q1
 
 Validate second release exists in the publication release order with status unpublished
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}

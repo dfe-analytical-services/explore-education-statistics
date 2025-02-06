@@ -1,4 +1,3 @@
-import base64
 import json
 import os
 import re
@@ -57,23 +56,21 @@ if not utilities_init.initialised:
     utilities_init.initialised = True
 
 
-def enable_basic_auth_headers():
-    # Setup basic auth headers for public frontend
+def get_url_with_basic_auth(url: str):
     public_auth_user = os.getenv("PUBLIC_AUTH_USER")
     public_auth_password = os.getenv("PUBLIC_AUTH_PASSWORD")
 
     if public_auth_user and public_auth_password:
-        token = base64.b64encode(f"{public_auth_user}:{public_auth_password}".encode())
-
-        try:
-            assert sl().driver is not None, "sl().driver is None"
-            sl().driver.execute_cdp_cmd("Network.enable", {})
-
-            sl().driver.execute_cdp_cmd(
-                "Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}}
-            )
-        except Exception as e:
-            BuiltIn().log_to_console("Exception: ", e)
+        basic_auth_credentials = f"{public_auth_user}:{public_auth_password}"
+        if basic_auth_credentials in url:
+            return url
+        url_parts = url.split("://")
+        if len(url_parts) == 2:
+            return f"{url_parts[0]}://{basic_auth_credentials}@{url_parts[1]}"
+        else:
+            return f"{basic_auth_credentials}@{url_parts[0]}"
+    else:
+        return url
 
 
 def disable_basic_auth_headers():
