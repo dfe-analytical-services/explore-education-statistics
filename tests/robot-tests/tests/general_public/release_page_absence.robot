@@ -12,7 +12,7 @@ Force Tags          GeneralPublic    Local    Dev    Preprod
 
 *** Test Cases ***
 Navigate to Absence publication
-    user navigates to public frontend
+    user navigates to public site homepage
     user waits until page contains    Explore our statistics and data
 
     user clicks link    Explore

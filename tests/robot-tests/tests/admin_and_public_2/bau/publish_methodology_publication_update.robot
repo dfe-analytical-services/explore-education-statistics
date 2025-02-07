@@ -102,7 +102,7 @@ Check publication is updated on dashboard
     user waits until page contains link    ${PUBLICATION_NAME_UPDATED}
 
 Validate publication redirect works
-    user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}${ACADEMIC_YEAR}
+    user navigates to    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}${ACADEMIC_YEAR}
     user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}
     user checks url contains    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated${ACADEMIC_YEAR}
 
@@ -147,7 +147,7 @@ Navigate to sign-off page and approve the methodology immediately
     user waits for caches to expire
 
 Validate methodology re-directs works for the updated publication methodology
-    user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}
+    user navigates to    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}
     user waits until h1 is visible    ${PUBLICATION_NAME}-methodology update
     user checks url contains    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}-methodology-update
 
@@ -178,11 +178,11 @@ Approve second release
     user approves release for immediate publication
 
 Check that first release does not contains the latest data
-    user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated/2050-51-q1
+    user navigates to    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated/2050-51-q1
     user checks page does not contain    This is the latest data
     user checks page contains    This is not the latest data
 
 Check that second release contains the latest data
-    user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated/2051-52-q1
+    user navigates to    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated/2051-52-q1
     user checks page does not contain    This is not the latest data
     user checks page contains    This is the latest data

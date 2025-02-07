@@ -264,7 +264,7 @@ Removing search
 
 Validate data catalogue page redirect from slug based urls
     environment variable should be set    PUBLIC_URL
-    user navigates to public frontend
+    user navigates to
     ...    %{PUBLIC_URL}/data-catalogue/${PUPIL_ABSENCE_PUBLICATION_SLUG}/2016-17
     user waits until h1 is visible    Data catalogue
 

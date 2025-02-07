@@ -81,7 +81,7 @@ Check publication is updated on dashboard
     user waits until page contains link    ${PUBLICATION_NAME_UPDATED}
 
 Validate publication redirect works
-    user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}${ACADEMIC_YEAR}
+    user navigates to    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}${ACADEMIC_YEAR}
     user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}
     user checks url contains    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated${ACADEMIC_YEAR}
 

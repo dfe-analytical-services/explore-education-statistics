@@ -219,7 +219,7 @@ Check public superseding-publication release page displays correctly
 Check public archive-publication release page displays correctly
     user waits for caches to expire
 
-    user navigates to public frontend    ${PUBLICATION_ARCHIVE_URL}
+    user navigates to    ${PUBLICATION_ARCHIVE_URL}
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user checks page does not contain    This is the latest data
 
@@ -295,7 +295,7 @@ Check archive-publication permalink has out-of-date warning
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
 
-    user navigates to public frontend    ${PERMALINK_URL}
+    user navigates to    ${PERMALINK_URL}
 
     user waits until h1 is visible
     ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
@@ -405,7 +405,7 @@ Check archive-publication permalink no longer has out-of-date warning after arch
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
 
-    user navigates to public frontend    ${PERMALINK_URL}
+    user navigates to    ${PERMALINK_URL}
 
     user waits until h1 is visible
     ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'

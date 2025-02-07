@@ -11,7 +11,7 @@ Test Setup          fail test fast if required
 
 *** Test Cases ***
 Navigate to Absence publication
-    user navigates to public frontend    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
+    user navigates to    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
 
 Go to Notify me page for Absence publication

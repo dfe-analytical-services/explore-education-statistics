@@ -1011,15 +1011,11 @@ user navigates to admin frontend
     [Arguments]    ${URL}=%{ADMIN_URL}
     go to    ${URL}
 
-# EES-5802 - remove in favour of just using "user navigates to".
-
-user navigates to public frontend
+user navigates to public site homepage
     [Arguments]    ${URL}=%{PUBLIC_URL}
     user navigates to    ${URL}
 
-# EES-5802 - rename to "user navigates to www".
-
-user navigates to public frontend with www
+user navigates to www
     [Arguments]    ${URL}=%{PUBLIC_URL}
     ${www_url}=    get www url    ${URL}
     user navigates to    ${www_url}

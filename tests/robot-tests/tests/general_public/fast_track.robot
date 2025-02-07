@@ -12,7 +12,7 @@ Test Setup          fail test fast if required
 *** Test Cases ***
 Navigate to publication release page
     environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
+    user navigates to    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
 
 Click fast track link for 'Pupil absence rates' data block
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
