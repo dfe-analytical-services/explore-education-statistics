@@ -9,7 +9,8 @@
       "SubscriptionConfirmationId": "change-me",
       "SubscriptionVerificationId": "change-me",
       "ApiSubscriptionConfirmationId": "change-me",
-      "ApiSubscriptionNotificationId": "change-me",
+      "ApiSubscriptionMinorDataSetVersionId": "change-me",
+      "ApiSubscriptionMajorDataSetVersionId": "change-me",
       "ApiSubscriptionVerificationId": "change-me"
     }
   }
