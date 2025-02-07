@@ -104,16 +104,26 @@ export interface FeaturedTable {
   order: number;
 }
 
+export interface SubjectMetaFilterHierarchy {
+  rootFilterId: string;
+  childFilterIds: string[];
+  rootOptionIds: string[];
+  tiers: { level: number; hierarchy: { [key: string]: string[] } }[];
+}
+
+export interface SubjectMetaFilter {
+  legend: string;
+  hint?: string;
+  id: string;
+  options: GroupedFilterOptions;
+  order: number;
+  autoSelectFilterItemId?: string;
+  name: string;
+}
+
 export interface SubjectMeta {
-  filters: Dictionary<{
-    legend: string;
-    hint?: string;
-    id: string;
-    options: GroupedFilterOptions;
-    order: number;
-    autoSelectFilterItemId?: string;
-    name: string;
-  }>;
+  filterHierarchies: SubjectMetaFilterHierarchy[];
+  filters: Dictionary<SubjectMetaFilter>;
   indicators: Dictionary<{
     id: string;
     label: string;
