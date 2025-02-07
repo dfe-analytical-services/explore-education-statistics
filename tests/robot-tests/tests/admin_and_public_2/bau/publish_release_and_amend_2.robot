@@ -239,7 +239,7 @@ Generate the permalink
     Set Suite Variable    ${PERMA_LOCATION_URL}
 
 Go to permalink
-    user navigates to public frontend    ${PERMA_LOCATION_URL}
+    user navigates to    ${PERMA_LOCATION_URL}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain    WARNING
     user checks page contains    Footnote 1 ${SUBJECT_NAME}
@@ -315,7 +315,7 @@ Check new release status history entry is present
     table cell should contain    testid:release-status-history    2    4    2    # Release version 2
 
 Go to permalink page & check for error element to be present
-    user navigates to public frontend    ${PERMA_LOCATION_URL}
+    user navigates to    ${PERMA_LOCATION_URL}
     user waits until page contains
     ...    WARNING - The data used in this table may be invalid as the subject file has been amended or removed since its creation.
 
@@ -375,7 +375,7 @@ Check the table has the same results as original table
     user checks table cell contains    7    5    1
 
 Check amended release doesn't contain deleted subject
-    user navigates to public frontend    %{PUBLIC_URL}/data-tables
+    user navigates to    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
     user clicks radio    %{TEST_THEME_NAME}
     user clicks radio    ${PUBLICATION_NAME}
@@ -431,7 +431,7 @@ Go to "Sign off" to approve amended release for immediate publication
     user approves amended release for immediate publication
 
 Go to public Table Tool page for amendment
-    user navigates to public frontend    %{PUBLIC_URL}/data-tables
+    user navigates to    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
 
 Select publication
@@ -502,7 +502,7 @@ Generate the new permalink
     Set Suite Variable    ${PERMA_LOCATION_URL_TWO}
 
 Go to new permalink
-    user navigates to public frontend    ${PERMA_LOCATION_URL_TWO}
+    user navigates to    ${PERMA_LOCATION_URL_TWO}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain    WARNING
     user checks page contains    Updating ${SUBJECT_NAME} footnote
