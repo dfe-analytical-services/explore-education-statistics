@@ -246,6 +246,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
 
+        services.AddScoped<IAnalyticsService, AnalyticsService>();
+
         // TODO EES-5660 - remove this migration after it has been run against each Public API-enabled environment.
         services.AddScoped<ICustomMigration, EES5660_MigrateDraftDataSetVersionFolderNames>();
     }

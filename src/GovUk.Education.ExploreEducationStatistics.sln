@@ -128,6 +128,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ContentServices", "ContentS
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PublicDataProcessor", "PublicDataProcessor", "{82AD39EC-E1A5-44A0-9280-EB6F7ABB0112}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analytics", "Analytics", "{EF72BBCA-9F6E-483F-92AE-A00533AAE3BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Analytics.Requests", "GovUk.Education.ExploreEducationStatistics.Analytics.Requests\GovUk.Education.ExploreEducationStatistics.Analytics.Requests.csproj", "{ABB651FE-3655-4F73-80C0-F53E5BA11E62}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -654,6 +658,18 @@ Global
 		{A29A7A00-47E8-4D58-B461-505B88AE66BC}.Release|x64.Build.0 = Release|Any CPU
 		{A29A7A00-47E8-4D58-B461-505B88AE66BC}.Release|x86.ActiveCfg = Release|Any CPU
 		{A29A7A00-47E8-4D58-B461-505B88AE66BC}.Release|x86.Build.0 = Release|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Debug|x64.Build.0 = Debug|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Debug|x86.Build.0 = Debug|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Release|x64.ActiveCfg = Release|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Release|x64.Build.0 = Release|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Release|x86.ActiveCfg = Release|Any CPU
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -718,5 +734,6 @@ Global
 		{82AD39EC-E1A5-44A0-9280-EB6F7ABB0112} = {A58A13A6-EA97-4CE1-A134-83045CC08C85}
 		{2D73B7E2-A961-4AF6-90E6-4199EBA0E6CC} = {82AD39EC-E1A5-44A0-9280-EB6F7ABB0112}
 		{A29A7A00-47E8-4D58-B461-505B88AE66BC} = {82AD39EC-E1A5-44A0-9280-EB6F7ABB0112}
+		{ABB651FE-3655-4F73-80C0-F53E5BA11E62} = {EF72BBCA-9F6E-483F-92AE-A00533AAE3BE}
 	EndGlobalSection
 EndGlobal

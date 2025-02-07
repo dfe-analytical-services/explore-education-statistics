@@ -38,7 +38,8 @@ internal class DataSetQueryService(
     IParquetFilterRepository filterRepository,
     IParquetIndicatorRepository indicatorRepository,
     IParquetLocationRepository locationRepository,
-    IParquetTimePeriodRepository timePeriodRepository)
+    IParquetTimePeriodRepository timePeriodRepository,
+    IAnalyticsService analyticsService)
     : IDataSetQueryService
 {
     private static readonly Dictionary<string, string> ReservedSorts = new()
@@ -78,19 +79,16 @@ internal class DataSetQueryService(
 
         return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
-            .OnSuccess(dsv => RunQuery(
+            .OnSuccess(dsv => RunQueryWithAnalytics(
                 dataSetVersion: dsv,
                 query: query,
                 cancellationToken: cancellationToken
             ))
-            .OnSuccess(results => results with
-            {
-                Warnings = results.Warnings.Select(MapGetQueryWarning).ToList()
-            })
+            .OnSuccess(results => results with { Warnings = results.Warnings.Select(MapGetQueryWarning).ToList() })
             .OnFailureFailWith(result =>
                 result is not BadRequestObjectResult { Value: ValidationProblemViewModel validationProblem }
-                ? result
-                : ValidationUtils.ValidationResult(validationProblem.Errors.Select(MapGetQueryError))
+                    ? result
+                    : ValidationUtils.ValidationResult(validationProblem.Errors.Select(MapGetQueryError))
             );
     }
 
@@ -102,7 +100,7 @@ internal class DataSetQueryService(
     {
         return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
-            .OnSuccess(dsv => RunQuery(
+            .OnSuccess(dsv => RunQueryWithAnalytics(
                 dataSetVersion: dsv,
                 query: request,
                 cancellationToken: cancellationToken,
@@ -130,6 +128,29 @@ internal class DataSetQueryService(
 
         return await publicDataDbContext.DataSetVersions.AsNoTracking()
             .FindByVersion(dataSetId, dataSetVersion, cancellationToken);
+    }
+    
+    private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQueryWithAnalytics(
+        DataSetVersion dataSetVersion,
+        DataSetQueryRequest query,
+        CancellationToken cancellationToken,
+        string baseCriteriaPath = "")
+    {
+        var startTime = DateTime.UtcNow;
+
+        return await 
+            RunQuery(
+                dataSetVersion: dataSetVersion,
+                query: query,
+                cancellationToken: cancellationToken,
+                baseCriteriaPath: baseCriteriaPath)
+            .OnSuccessDo(results => analyticsService.ReportDataSetVersionQuery(
+                dataSetVersion: dataSetVersion,
+                query: query,
+                resultsCount: results.Results.Count,
+                totalRowsCount: results.Paging.TotalResults,
+                startTime: startTime,
+                endTime: DateTime.UtcNow));
     }
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(
@@ -191,7 +212,8 @@ internal class DataSetQueryService(
 
         var rowsTask = dataRepository.ListRows(
             dataSetVersion: dataSetVersion,
-            columns: [
+            columns:
+            [
                 DataTable.Cols.TimePeriodId,
                 DataTable.Cols.GeographicLevel,
                 ..columnMappings.Columns
@@ -326,8 +348,7 @@ internal class DataSetQueryService(
     private static bool TryGetSortColumn(
         DataSetQuerySort sort,
         ColumnMappings columnMappings,
-        [NotNullWhen(true)]
-        out string? column)
+        [NotNullWhen(true)] out string? column)
     {
         column = null;
 
@@ -423,34 +444,35 @@ internal class DataSetQueryService(
             GetFilterOptionsById(dataSetVersion, filterOptionIds, debug, cancellationToken);
         var locationOptionsById =
             GetLocationOptionsById(dataSetVersion, locationOptionIds, debug, cancellationToken);
-        var timePeriodsById = 
+        var timePeriodsById =
             GetTimePeriodsById(dataSetVersion, timePeriodIds, cancellationToken);
 
         await Task.WhenAll(filterOptionsById, locationOptionsById, timePeriodsById);
 
         return rows.Select(row => new DataSetQueryResultViewModel
-        {
-            GeographicLevel = EnumUtil.GetFromEnumLabel<GeographicLevel>((string)row[DataTable.Cols.GeographicLevel]!),
-            TimePeriod = timePeriodsById.Result[(int)row[DataTable.Cols.TimePeriodId]!],
-            Filters = columnMappings.Filters
-                .Where(kv => row[kv.Value] is int and not 0)
-                .ToDictionary(
-                    kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
-                    kv => filterOptionsById.Result[(int)row[kv.Value]!]
-                ),
-            Locations = columnMappings.LocationLevels
-                .Where(kv => row[kv.Value] is int and not 0)
-                .ToDictionary(
-                    kv => kv.Key,
-                    kv => locationOptionsById.Result[(int)row[kv.Value]!]
-                ),
-            Values = columnMappings.Indicators
-                .ToDictionary(
-                    kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
-                    kv => row[kv.Value] as string ?? string.Empty
-                )
-        })
-        .ToList();
+            {
+                GeographicLevel =
+                    EnumUtil.GetFromEnumLabel<GeographicLevel>((string)row[DataTable.Cols.GeographicLevel]!),
+                TimePeriod = timePeriodsById.Result[(int)row[DataTable.Cols.TimePeriodId]!],
+                Filters = columnMappings.Filters
+                    .Where(kv => row[kv.Value] is int and not 0)
+                    .ToDictionary(
+                        kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
+                        kv => filterOptionsById.Result[(int)row[kv.Value]!]
+                    ),
+                Locations = columnMappings.LocationLevels
+                    .Where(kv => row[kv.Value] is int and not 0)
+                    .ToDictionary(
+                        kv => kv.Key,
+                        kv => locationOptionsById.Result[(int)row[kv.Value]!]
+                    ),
+                Values = columnMappings.Indicators
+                    .ToDictionary(
+                        kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
+                        kv => row[kv.Value] as string ?? string.Empty
+                    )
+            })
+            .ToList();
     }
 
     private static WarningViewModel MapGetQueryWarning(WarningViewModel warning)
