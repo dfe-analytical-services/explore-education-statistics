@@ -68,9 +68,11 @@ Add release note to release
 
 Add Useful information related page link to release
     user clicks button    Add related page
+    user waits until modal is visible    Add related page link
     user enters text into element    id:relatedPageForm-description    Test link one
     user enters text into element    id:relatedPageForm-url    http://test1.example.com/test1
     user clicks button    Save    id:relatedPageForm
+    user waits until modal is not visible    Add related page link
 
 Edit related page link
     user clicks button    Edit pages
@@ -82,9 +84,11 @@ Edit related page link
 
 Reorder related pages
     user clicks button    Add related page
+    user waits until modal is visible    Add related page link
     user enters text into element    id:relatedPageForm-description    Test link two
     user enters text into element    id:relatedPageForm-url    http://test2.example.com/test2
     user clicks button    Save    id:relatedPageForm
+    user waits until modal is not visible    Add related page link
     user clicks button    Edit pages
     user clicks button    Reorder pages
     user moves item of draggable list down    testid:reorder-related-pages    1
@@ -103,7 +107,6 @@ Add secondary statistics
 
 Check secondary statistics are included correctly
     user waits until element is visible    id:${SECONDARY_STATS_TABLE_TAB_ID}    %{WAIT_MEDIUM}
-    user scrolls to element    id:${SECONDARY_STATS_TABLE_TAB_ID}
     user clicks element    id:${SECONDARY_STATS_TABLE_TAB_ID}
     user checks page contains    Data Block 1 title
     user checks page contains element    css:table
@@ -119,8 +122,10 @@ Change secondary statistics
     user checks select contains option    name:selectedDataBlock    Key Stats Data Block 1
     user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 2
-    user waits until page finishes loading
-    user waits until secondary stats table tab is visible    ${SECONDARY_STATS_TABLE_TAB_ID}
+    # Fix for bug whereby occasionally the secondary stats block fails to lazy-load until
+    # scrolling is performed.    EES-5856 is raised to try and address this.
+    user scrolls down    20
+    user waits until element is visible    id:${SECONDARY_STATS_TABLE_TAB_ID}    %{WAIT_MEDIUM}
     user checks page contains    Data Block 2 title
     user checks page contains button    Change secondary stats
     user checks page contains button    Remove secondary stats
@@ -269,10 +274,3 @@ Verify that validation prevents adding an invalid link
     user clicks button    Save & close
 
     user checks page does not contain    1 link has an invalid URL.
-
-
-*** Keywords ***
-User waits until secondary stats table tab is visible
-    [Arguments]    ${SECONDARY_STATS_TABLE_TAB_ID}    ${timeout}= %{TIMEOUT}
-    wait until keyword succeeds    ${timeout}    5 sec    Element Should Be Visible
-    ...    id=${SECONDARY_STATS_TABLE_TAB_ID}

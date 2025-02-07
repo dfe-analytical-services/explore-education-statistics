@@ -118,7 +118,7 @@ param deployRecoveryVault bool = false
 param publicUrls {
   contentApi: string
   publicSite: string
-  publicApi: string
+  publicApiAppGateway: string
 }
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
@@ -361,7 +361,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     containerAppEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     containerAppEnvironmentIpAddress: containerAppEnvironmentModule.outputs.containerAppEnvironmentIpAddress
     contentApiUrl: publicUrls.contentApi
-    publicApiUrl: publicUrls.publicApi
+    publicApiUrl: publicUrls.publicApiAppGateway
     publicSiteUrl: publicUrls.publicSite
     dockerImagesTag: dockerImagesTag
     appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
@@ -388,6 +388,20 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsS
 
 var docsRewriteSetName = '${publicApiResourcePrefix}-docs-rewrites'
 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: resourceNames.existingResources.keyVault
+}
+
+module publicApiWafPolicyModule 'application/public-api/publicApiWafPolicy.bicep' = {
+  name: 'publicApiWafPolicyModuleDeploy'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    fuapiSecretValue: keyVault.getSecret('ees-publicapi-app-gateway-fuapi-header')
+    tagValues: tagValues
+  }
+}
+
 // Create an Application Gateway to serve public traffic for the Public API Container App.
 module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp && deployDocsSite) {
   name: 'appGatewayModuleDeploy'
@@ -398,7 +412,8 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
       {
         name: publicApiResourcePrefix
         certificateName: '${publicApiResourcePrefix}-certificate'
-        fqdn: replace(publicUrls.publicApi, 'https://', '')
+        fqdn: replace(publicUrls.publicApiAppGateway, 'https://', '')
+        wafPolicyName: publicApiWafPolicyModule.outputs.name
       }
     ]
     backends: [

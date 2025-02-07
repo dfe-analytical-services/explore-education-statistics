@@ -57,10 +57,10 @@
       "value": "data.dev.explore-education-statistics.service.gov.uk"
     },
     "publicApiUrl": {
-      "value": "dev.statistics.api.education.gov.uk"
+      "value": "pp-api.education.gov.uk/statistics-dev"
     },
     "publicApiDocsUrl": {
-      "value": "dev.statistics.api.education.gov.uk/docs"
+      "value": "pp-api.education.gov.uk/statistics-dev/docs"
     },
     "detailedErrors": {
       "value": true
