@@ -164,7 +164,7 @@ user scrolls up
 user scrolls to element
     [Arguments]    ${element}
     user waits until page contains element    ${element}
-    scroll element into view    ${element}
+    user scrolls element to center of view    ${element}
 
 user mouses over element
     [Arguments]    ${element}
@@ -435,10 +435,12 @@ user checks element does not contain link
 
 user waits until element is visible
     [Arguments]    ${selector}    ${wait}=${timeout}
+    user scrolls to element    ${selector}
     wait until element is visible    ${selector}    timeout=${wait}
 
 user checks element is visible
     [Arguments]    ${element}
+    user scrolls to element    ${element}
     element should be visible    ${element}
 
 user waits until element is not visible
@@ -1003,13 +1005,19 @@ user checks page does not contain other release
     user checks page does not contain element
     ...    xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
 
+# EES-5802 - remove in favour of just using "user navigates to".
+
 user navigates to admin frontend
     [Arguments]    ${URL}=%{ADMIN_URL}
     go to    ${URL}
 
+# EES-5802 - remove in favour of just using "user navigates to".
+
 user navigates to public frontend
     [Arguments]    ${URL}=%{PUBLIC_URL}
     user navigates to    ${URL}
+
+# EES-5802 - rename to "user navigates to www".
 
 user navigates to public frontend with www
     [Arguments]    ${URL}=%{PUBLIC_URL}
