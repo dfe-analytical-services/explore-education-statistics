@@ -1,9 +1,9 @@
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
 import PublicPreReleaseAccessForm from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm';
 import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import releaseService from '@admin/services/releaseService';
+import releaseVersionService from '@admin/services/releaseVersionService';
 import permissionService from '@admin/services/permissionService';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -20,20 +20,20 @@ export const releasePreReleaseAccessPageTabs = {
 };
 
 const ReleasePreReleaseAccessPage = () => {
-  const { releaseId } = useReleaseContext();
+  const { releaseVersionId } = useReleaseVersionContext();
 
   const {
     value: release,
     isLoading,
     setState: setRelease,
   } = useAsyncHandledRetry(
-    () => releaseService.getRelease(releaseId),
-    [releaseId],
+    () => releaseVersionService.getReleaseVersion(releaseVersionId),
+    [releaseVersionId],
   );
 
   const { value: canUpdateRelease = false } = useAsyncHandledRetry(
-    () => permissionService.canUpdateRelease(releaseId),
-    [releaseId],
+    () => permissionService.canUpdateRelease(releaseVersionId),
+    [releaseVersionId],
   );
 
   return (
@@ -82,7 +82,7 @@ const ReleasePreReleaseAccessPage = () => {
                     preReleaseContentRoute.path,
                     {
                       publicationId: release.publicationId,
-                      releaseId: release.id,
+                      releaseVersionId: release.id,
                     },
                   )}`}
                 />
@@ -90,7 +90,7 @@ const ReleasePreReleaseAccessPage = () => {
             )}
 
             <PreReleaseUserAccessForm
-              releaseId={release.id}
+              releaseVersionId={release.id}
               isReleaseApproved={release.approvalStatus === 'Approved'}
               isReleaseLive={release.live}
             />
@@ -106,16 +106,14 @@ const ReleasePreReleaseAccessPage = () => {
               isReleaseLive={release.live}
               preReleaseAccessList={release.preReleaseAccessList}
               onSubmit={async ({ preReleaseAccessList }) => {
-                const updatedRelease = await releaseService.updateRelease(
-                  release.id,
-                  {
+                const updatedRelease =
+                  await releaseVersionService.updateReleaseVersion(release.id, {
                     year: release.year,
                     timePeriodCoverage: release.timePeriodCoverage,
                     type: release.type,
                     preReleaseAccessList,
                     label: release.label,
-                  },
-                );
+                  });
 
                 setRelease({
                   value: updatedRelease,

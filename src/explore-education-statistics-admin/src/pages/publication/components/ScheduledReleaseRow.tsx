@@ -6,7 +6,7 @@ import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import FormattedDate from '@common/components/FormattedDate';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React from 'react';
@@ -14,12 +14,12 @@ import { generatePath } from 'react-router';
 
 interface Props {
   publicationId: string;
-  release: ReleaseSummary;
+  release: ReleaseVersionSummary;
 }
 
 const ScheduledReleaseRow = ({ publicationId, release }: Props) => {
   const { currentStatus, currentStatusDetail } = useReleasePublishingStatus({
-    releaseId: release.id,
+    releaseVersionId: release.id,
   });
 
   return (
@@ -47,7 +47,7 @@ const ScheduledReleaseRow = ({ publicationId, release }: Props) => {
         <Link
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
             publicationId,
-            releaseId: release.id,
+            releaseVersionId: release.id,
           })}
         >
           {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}

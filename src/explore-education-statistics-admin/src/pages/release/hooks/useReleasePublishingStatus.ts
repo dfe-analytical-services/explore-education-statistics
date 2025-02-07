@@ -1,8 +1,8 @@
 import { StatusBlockProps } from '@admin/components/StatusBlock';
 import getStatusDetail from '@admin/pages/release/utils/getStatusDetail';
-import releaseService, {
-  ReleaseStageStatus,
-} from '@admin/services/releaseService';
+import releaseVersionService, {
+  ReleaseVersionStageStatus,
+} from '@admin/services/releaseVersionService';
 import isEqual from 'lodash/isEqual';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { forceCheck } from 'react-lazyload';
@@ -14,8 +14,8 @@ export interface StatusDetail {
 
 interface Options {
   refreshPeriod?: number;
-  releaseId: string;
-  onChange?: (status: ReleaseStageStatus) => void;
+  releaseVersionId: string;
+  onChange?: (status: ReleaseVersionStageStatus) => void;
 }
 
 /**
@@ -23,13 +23,14 @@ interface Options {
  */
 export default function useReleasePublishingStatus({
   refreshPeriod = 10000,
-  releaseId,
+  releaseVersionId,
   onChange,
 }: Options): {
-  currentStatus?: ReleaseStageStatus;
+  currentStatus?: ReleaseVersionStageStatus;
   currentStatusDetail: StatusDetail;
 } {
-  const [currentStatus, setCurrentStatus] = useState<ReleaseStageStatus>();
+  const [currentStatus, setCurrentStatus] =
+    useState<ReleaseVersionStageStatus>();
   const [currentStatusDetail, setStatusDetail] = useState<StatusDetail>({
     color: 'blue',
     text: '',
@@ -38,9 +39,11 @@ export default function useReleasePublishingStatus({
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const fetchNextStatus = useCallback(async () => {
-    const status = await releaseService.getReleaseStatus(releaseId);
+    const status = await releaseVersionService.getReleaseVersionStatus(
+      releaseVersionId,
+    );
 
-    const setNextStatus = (nextStatus: ReleaseStageStatus) => {
+    const setNextStatus = (nextStatus: ReleaseVersionStageStatus) => {
       setCurrentStatus(prevStatus => {
         if (onChange && !isEqual(prevStatus, nextStatus)) {
           onChange(nextStatus);
@@ -63,7 +66,7 @@ export default function useReleasePublishingStatus({
       }
     }
     forceCheck();
-  }, [releaseId, onChange, refreshPeriod]);
+  }, [releaseVersionId, onChange, refreshPeriod]);
 
   function cancelTimer() {
     if (timeoutRef.current) {

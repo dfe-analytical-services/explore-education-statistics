@@ -7,25 +7,25 @@ import KeyStat, {
 } from '@common/modules/find-statistics/components/KeyStat';
 import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
-import { Release } from '@common/services/publicationService';
+import { ReleaseVersion } from '@common/services/publicationService';
 import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
 
 interface Props {
-  release: Release;
+  releaseVersion: ReleaseVersion;
 }
 
 const PublicationReleaseHeadlinesSection = ({
-  release: {
-    id: releaseId,
+  releaseVersion: {
+    id: releaseVersionId,
     keyStatisticsSecondarySection,
     keyStatistics,
     headlinesSection,
   },
 }: Props) => {
-  const getReleaseFile = useGetReleaseFile(releaseId);
+  const getReleaseFile = useGetReleaseFile(releaseVersionId);
 
   const summaryTab = (
     <TabsSection title="Summary" id="releaseHeadlines-summary">
@@ -35,7 +35,7 @@ const PublicationReleaseHeadlinesSection = ({
             return (
               <KeyStatDataBlock
                 key={keyStat.id}
-                releaseId={releaseId}
+                releaseVersionId={releaseVersionId}
                 dataBlockParentId={keyStat.dataBlockParentId}
                 trend={keyStat.trend}
                 guidanceTitle={keyStat.guidanceTitle}
@@ -81,7 +81,7 @@ const PublicationReleaseHeadlinesSection = ({
   return (
     <DataBlockTabs
       id="releaseHeadlines"
-      releaseId={releaseId}
+      releaseVersionId={releaseVersionId}
       getInfographic={getReleaseFile}
       dataBlock={keyStatisticsSecondarySection.content[0]}
       firstTabs={summaryTab}

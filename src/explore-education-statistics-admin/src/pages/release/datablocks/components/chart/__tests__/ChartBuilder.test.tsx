@@ -30,7 +30,7 @@ describe('ChartBuilder', () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilder
-          releaseId="release-1"
+          releaseVersionId="release-1"
           data={testFullTable.results}
           meta={testFullTable.subjectMeta}
           tableTitle="Table title"
@@ -68,7 +68,7 @@ describe('ChartBuilder', () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilder
-          releaseId="release-1"
+          releaseVersionId="release-1"
           data={testFullTable.results}
           meta={testFullTable.subjectMeta}
           tableTitle="Table title"
@@ -114,7 +114,7 @@ describe('ChartBuilder', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
-            releaseId="release-1"
+            releaseVersionId="release-1"
             data={testFullTable.results}
             meta={testFullTable.subjectMeta}
             tableTitle="Table title"
@@ -192,7 +192,7 @@ describe('ChartBuilder', () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
-            releaseId="release-1"
+            releaseVersionId="release-1"
             data={testFullTable.results}
             meta={testFullTable.subjectMeta}
             tableTitle="Table title"
@@ -269,7 +269,7 @@ describe('ChartBuilder', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
-            releaseId="release-1"
+            releaseVersionId="release-1"
             data={testFullTable.results}
             meta={testFullTable.subjectMeta}
             tableTitle="Table title"
@@ -408,7 +408,7 @@ describe('ChartBuilder', () => {
     const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilder
-          releaseId="release-1"
+          releaseVersionId="release-1"
           data={testFullTable.results}
           initialChart={testInitialChart}
           meta={{
@@ -561,7 +561,7 @@ describe('ChartBuilder', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
-            releaseId="release-1"
+            releaseVersionId="release-1"
             data={testFullTable.results}
             initialChart={testInitialChart}
             meta={{

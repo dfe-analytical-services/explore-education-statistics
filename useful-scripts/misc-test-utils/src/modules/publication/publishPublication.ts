@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import spinner from '../../utils/spinner';
 import publicationService from '../../services/publicationService';
 import { projectRoot } from '../../config';
-import releaseService from '../../services/releaseService';
+import releaseVersionService from '../../services/releaseVersionService';
 import commonService from '../../services/commonService';
 import ZipDirectory from '../../utils/zipDirectory';
 import sleep from '../../utils/sleep';
@@ -23,7 +23,7 @@ const createReleaseAndPublish = async () => {
   let importStatus: importStages = '';
 
   const publicationId = await publicationService.createPublication();
-  const releaseId = await releaseService.createRelease(publicationId);
+  const releaseId = await releaseVersionService.createRelease(publicationId);
 
   await commonService.extractZip();
   await commonService.renameFiles();
@@ -62,17 +62,22 @@ const createReleaseAndPublish = async () => {
 
   const subjectArray = await subjectService.getSubjectIdArr(releaseId);
 
-  await releaseService.addDataGuidance(
+  await releaseVersionService.addDataGuidance(
     subjectArray as { id: string; content: string }[],
     releaseId,
   );
 
-  const finalReleaseObject = await releaseService.getRelease(releaseId);
+  const finalReleaseObject = await releaseVersionService.getReleaseVersion(
+    releaseId,
+  );
 
-  await releaseService.publishRelease(finalReleaseObject as never, releaseId);
+  await releaseVersionService.publishRelease(
+    finalReleaseObject as never,
+    releaseId,
+  );
   console.time('publication elapsed time');
   const url = `${ADMIN_URL}/publication/${publicationId}/release/${releaseId}/status`;
 
-  await releaseService.getReleaseProgress(releaseId, url);
+  await releaseVersionService.getReleaseProgress(releaseId, url);
 };
 export default createReleaseAndPublish;

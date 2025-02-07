@@ -1,7 +1,7 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetPreviewPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewPage';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import {
   releaseApiDataSetPreviewRoute,
   ReleaseDataSetRouteParams,
@@ -9,7 +9,7 @@ import {
 import _apiDataSetService, {
   ApiDataSet,
 } from '@admin/services/apiDataSetService';
-import { Release } from '@admin/services/releaseService';
+import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import _previewTokenService, {
   PreviewToken,
 } from '@admin/services/previewTokenService';
@@ -119,13 +119,13 @@ describe('ReleaseApiDataSetPreviewPage', () => {
   });
 
   function renderPage(options?: {
-    release?: Release;
+    releaseVersion?: ReleaseVersion;
     dataSetId?: string;
     previewTokenId?: string;
     history?: MemoryHistory;
   }) {
     const {
-      release = testRelease,
+      releaseVersion = testRelease,
       dataSetId = 'data-set-id',
       history = createMemoryHistory(),
     } = options ?? {};
@@ -134,8 +134,8 @@ describe('ReleaseApiDataSetPreviewPage', () => {
       generatePath<ReleaseDataSetRouteParams>(
         releaseApiDataSetPreviewRoute.path,
         {
-          publicationId: release.publicationId,
-          releaseId: release.id,
+          publicationId: releaseVersion.publicationId,
+          releaseVersionId: releaseVersion.id,
           dataSetId,
         },
       ),
@@ -143,14 +143,14 @@ describe('ReleaseApiDataSetPreviewPage', () => {
 
     return render(
       <TestConfigContextProvider>
-        <ReleaseContextProvider release={release}>
+        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
           <Router history={history}>
             <Route
               component={ReleaseApiDataSetPreviewPage}
               path={releaseApiDataSetPreviewRoute.path}
             />
           </Router>
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>,
     );
   }

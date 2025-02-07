@@ -2,12 +2,12 @@ import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/components/ReleaseSummaryForm';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import releaseService from '@admin/services/releaseService';
+import releaseVersionService from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
@@ -20,31 +20,31 @@ export default function ReleaseSummaryEditPage({
   const lastLocation = useLastLocation();
 
   const {
-    releaseId,
-    release: contextRelease,
+    releaseVersionId,
+    releaseVersion: contextRelease,
     onReleaseChange,
-  } = useReleaseContext();
+  } = useReleaseVersionContext();
 
-  const { value: release, isLoading } = useAsyncRetry(
+  const { value: releaseVersion, isLoading } = useAsyncRetry(
     async () =>
       lastLocation && lastLocation !== location
-        ? releaseService.getRelease(releaseId)
+        ? releaseVersionService.getReleaseVersion(releaseVersionId)
         : contextRelease,
-    [releaseId],
+    [releaseVersionId],
   );
 
   const handleSubmit = async (values: ReleaseSummaryFormValues) => {
-    if (!release) {
+    if (!releaseVersion) {
       throw new Error('Could not update missing release');
     }
 
-    await releaseService.updateRelease(releaseId, {
+    await releaseVersionService.updateReleaseVersion(releaseVersionId, {
       year: Number(values.timePeriodCoverageStartYear),
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
       },
       type: values.releaseType ?? 'AdHocStatistics',
-      preReleaseAccessList: release.preReleaseAccessList,
+      preReleaseAccessList: releaseVersion.preReleaseAccessList,
       label: values.releaseLabel,
     });
 
@@ -52,40 +52,40 @@ export default function ReleaseSummaryEditPage({
 
     history.push(
       generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-        publicationId: release.publicationId,
-        releaseId,
+        publicationId: releaseVersion.publicationId,
+        releaseVersionId,
       }),
     );
   };
 
   const handleCancel = () => {
-    if (!release) {
+    if (!releaseVersion) {
       return;
     }
 
     history.push(
       generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-        publicationId: release.publicationId,
-        releaseId,
+        publicationId: releaseVersion.publicationId,
+        releaseVersionId,
       }),
     );
   };
 
   return (
     <LoadingSpinner loading={isLoading}>
-      {release && (
+      {releaseVersion && (
         <>
           <h2>Edit release summary</h2>
 
           <ReleaseSummaryForm
             submitText="Update release summary"
             initialValues={{
-              timePeriodCoverageCode: release.timePeriodCoverage.value,
-              timePeriodCoverageStartYear: release.year.toString(),
-              releaseType: release.type,
-              releaseLabel: release.label,
+              timePeriodCoverageCode: releaseVersion.timePeriodCoverage.value,
+              timePeriodCoverageStartYear: releaseVersion.year.toString(),
+              releaseType: releaseVersion.type,
+              releaseLabel: releaseVersion.label,
             }}
-            releaseVersion={release.version}
+            releaseVersion={releaseVersion.version}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
           />

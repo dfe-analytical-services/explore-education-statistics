@@ -3,14 +3,14 @@ import {
   ScheduledStagesGuidanceModal,
   ScheduledStatusGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
-import { DashboardReleaseSummary } from '@admin/services/releaseService';
+import { DashboardReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo } from 'react';
 
 interface PublicationRowProps {
   publication: string;
-  releases: DashboardReleaseSummary[];
+  releases: DashboardReleaseVersionSummary[];
 }
 
 const PublicationRow = ({ publication, releases }: PublicationRowProps) => {
@@ -33,13 +33,13 @@ const PublicationRow = ({ publication, releases }: PublicationRowProps) => {
 };
 
 interface ScheduledReleasesTableProps {
-  releases: DashboardReleaseSummary[];
+  releases: DashboardReleaseVersionSummary[];
 }
 
 const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
-  const releasesByPublication: Dictionary<DashboardReleaseSummary[]> =
+  const releasesByPublication: Dictionary<DashboardReleaseVersionSummary[]> =
     useMemo(() => {
-      return releases.reduce<Dictionary<DashboardReleaseSummary[]>>(
+      return releases.reduce<Dictionary<DashboardReleaseVersionSummary[]>>(
         (acc, release) => {
           if (acc[release.publication.title]) {
             acc[release.publication.title].push(release);

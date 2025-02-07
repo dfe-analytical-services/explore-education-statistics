@@ -12,7 +12,7 @@ interface Props {
   children?: ReactNode;
   dataFile: DataFile;
   replacementDataFile?: DataFile;
-  releaseId: string;
+  releaseVersionId: string;
   onStatusChange?: ImporterStatusChangeHandler;
   onReplacementStatusChange?: ImporterStatusChangeHandler;
 }
@@ -21,7 +21,7 @@ const DataFileDetailsTable = ({
   children,
   dataFile,
   replacementDataFile,
-  releaseId,
+  releaseVersionId,
   onStatusChange,
   onReplacementStatusChange,
 }: Props) => {
@@ -52,7 +52,7 @@ const DataFileDetailsTable = ({
             <ButtonText
               onClick={() =>
                 releaseDataFileService.downloadFile(
-                  releaseId,
+                  releaseVersionId,
                   dataFile.id,
                   dataFile.fileName,
                 )
@@ -66,7 +66,7 @@ const DataFileDetailsTable = ({
               <ButtonText
                 onClick={() =>
                   releaseDataFileService.downloadFile(
-                    releaseId,
+                    releaseVersionId,
                     replacementDataFile.id,
                     replacementDataFile.fileName,
                   )
@@ -83,7 +83,7 @@ const DataFileDetailsTable = ({
             <ButtonText
               onClick={() =>
                 releaseDataFileService.downloadFile(
-                  releaseId,
+                  releaseVersionId,
                   dataFile.metaFileId,
                   dataFile.metaFileName,
                 )
@@ -97,7 +97,7 @@ const DataFileDetailsTable = ({
               <ButtonText
                 onClick={() =>
                   releaseDataFileService.downloadFile(
-                    releaseId,
+                    releaseVersionId,
                     replacementDataFile.metaFileId,
                     replacementDataFile.metaFileName,
                   )
@@ -138,7 +138,7 @@ const DataFileDetailsTable = ({
           <th scope="row">Status</th>
           <td data-testid="Status">
             <ImporterStatus
-              releaseId={releaseId}
+              releaseVersionId={releaseVersionId}
               dataFile={dataFile}
               onStatusChange={onStatusChange}
             />
@@ -146,7 +146,7 @@ const DataFileDetailsTable = ({
           {replacementDataFile && (
             <td data-testid="Replacement Status">
               <ImporterStatus
-                releaseId={releaseId}
+                releaseVersionId={releaseVersionId}
                 dataFile={replacementDataFile}
                 onStatusChange={onReplacementStatusChange}
               />

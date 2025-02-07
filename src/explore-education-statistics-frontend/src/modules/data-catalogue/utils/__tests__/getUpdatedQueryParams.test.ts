@@ -73,7 +73,7 @@ describe('getUpdatedQueryParams', () => {
         query: {
           page: '4',
           publicationId: 'publication-id',
-          releaseId: 'release-id',
+          releaseVersionId: 'release-id',
           themeId: 'previous-theme-id',
         },
         onFetchReleases: () => Promise.resolve([]),
@@ -92,7 +92,7 @@ describe('getUpdatedQueryParams', () => {
         query: {
           page: '4',
           publicationId: 'publication-id',
-          releaseId: 'release-id',
+          releaseVersionId: 'release-id',
           themeId: 'previous-theme-id',
         },
         onFetchReleases: () => Promise.resolve([]),
@@ -111,7 +111,7 @@ describe('getUpdatedQueryParams', () => {
           latestOnly: 'false',
           page: '4',
           publicationId: 'publication-id',
-          releaseId: 'release-id',
+          releaseVersionId: 'release-id',
           themeId: 'previous-theme-id',
         },
         onFetchReleases: () => Promise.resolve([]),
@@ -142,7 +142,7 @@ describe('getUpdatedQueryParams', () => {
 
       expect(result).toEqual({
         publicationId: 'selected-publication-id',
-        releaseId: 'release-id-3',
+        releaseVersionId: 'release-id-3',
         themeId: 'theme-id',
       });
     });
@@ -167,7 +167,7 @@ describe('getUpdatedQueryParams', () => {
 
       expect(result).toEqual({
         publicationId: 'selected-publication-id',
-        releaseId: 'release-id-4',
+        releaseVersionId: 'release-id-4',
         themeId: 'theme-id',
       });
     });
@@ -181,7 +181,7 @@ describe('getUpdatedQueryParams', () => {
         sortBy: 'newest',
         query: {
           page: '4',
-          releaseId: 'release-id',
+          releaseVersionId: 'release-id',
           themeId: 'theme-id',
         },
         onFetchReleases: handleFetchReleases,
@@ -211,7 +211,7 @@ describe('getUpdatedQueryParams', () => {
 
       expect(result).toEqual({
         publicationId: 'selected-publication-id',
-        releaseId: 'release-id-3',
+        releaseVersionId: 'release-id-3',
         themeId: 'theme-id',
       });
     });
@@ -220,13 +220,13 @@ describe('getUpdatedQueryParams', () => {
   describe('filter by release', () => {
     test('removes the page and sortBy params and updates the release id when changing release', async () => {
       const result = await getUpdatedQueryParams({
-        filterType: 'releaseId',
+        filterType: 'releaseVersionId',
         nextValue: 'selected-release-id',
         sortBy: 'newest',
         query: {
           page: '4',
           publicationId: 'publication-id',
-          releaseId: 'release-id',
+          releaseVersionId: 'release-id',
           sortBy: 'newest',
           themeId: 'theme-id',
         },
@@ -234,20 +234,20 @@ describe('getUpdatedQueryParams', () => {
       });
       expect(result).toEqual({
         publicationId: 'publication-id',
-        releaseId: 'selected-release-id',
+        releaseVersionId: 'selected-release-id',
         themeId: 'theme-id',
       });
     });
 
     test('removes the release param and sets latestOnly to false when changing to all releases from a specific release', async () => {
       const result = await getUpdatedQueryParams({
-        filterType: 'releaseId',
+        filterType: 'releaseVersionId',
         nextValue: 'all',
         sortBy: 'newest',
         query: {
           page: '4',
           publicationId: 'publication-id',
-          releaseId: 'release-id',
+          releaseVersionId: 'release-id',
           sortBy: 'newest',
           themeId: 'theme-id',
         },
@@ -263,7 +263,7 @@ describe('getUpdatedQueryParams', () => {
 
     test('sets latestOnly to false when changing to all releases', async () => {
       const result = await getUpdatedQueryParams({
-        filterType: 'releaseId',
+        filterType: 'releaseVersionId',
         nextValue: 'all',
         sortBy: 'newest',
         query: {},
@@ -276,7 +276,7 @@ describe('getUpdatedQueryParams', () => {
 
     test('sets latestOnly to true when changing from all to latest releases', async () => {
       const result = await getUpdatedQueryParams({
-        filterType: 'releaseId',
+        filterType: 'releaseVersionId',
         nextValue: 'latest',
         sortBy: 'newest',
         query: {},
@@ -312,7 +312,7 @@ describe('getUpdatedQueryParams', () => {
           latestOnly: 'false',
           sortBy: 'newest',
           publicationId: 'publication-id',
-          releaseId: 'release-id',
+          releaseVersionId: 'release-id',
           themeId: 'theme-id',
         },
         onFetchReleases: () => Promise.resolve([]),
@@ -321,7 +321,7 @@ describe('getUpdatedQueryParams', () => {
         latestOnly: 'false',
         sortBy: 'relevance',
         publicationId: 'publication-id',
-        releaseId: 'release-id',
+        releaseVersionId: 'release-id',
         searchTerm: 'find me',
         themeId: 'theme-id',
       });

@@ -1,12 +1,12 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import { useLastLocation } from '@admin/contexts/LastLocationContext';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import {
   ReleaseRouteParams,
   releaseSummaryEditRoute,
 } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
-import releaseService from '@admin/services/releaseService';
+import releaseVersionService from '@admin/services/releaseVersionService';
 import Gate from '@common/components/Gate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
@@ -21,48 +21,54 @@ const ReleaseSummaryPage = () => {
   const location = useLocation();
   const lastLocation = useLastLocation();
 
-  const { release: contextRelease, releaseId } = useReleaseContext();
+  const { releaseVersion: contextRelease, releaseVersionId } =
+    useReleaseVersionContext();
 
-  const { value: release, isLoading } = useAsyncRetry(
+  const { value: releaseVersion, isLoading } = useAsyncRetry(
     async () =>
       lastLocation && lastLocation !== location
-        ? releaseService.getRelease(releaseId)
+        ? releaseVersionService.getReleaseVersion(releaseVersionId)
         : contextRelease,
-    [releaseId],
+    [releaseVersionId],
   );
 
   return (
     <LoadingSpinner loading={isLoading}>
       <h2>Release summary</h2>
 
-      {release ? (
+      {releaseVersion ? (
         <>
           <p>
-            These details will be shown to users to help identify this release.
+            These details will be shown to users to help identify this
+            releaseVersion.
           </p>
 
           <SummaryList>
             <SummaryListItem term="Time period">
-              {release.timePeriodCoverage.label}
+              {releaseVersion.timePeriodCoverage.label}
             </SummaryListItem>
             <SummaryListItem term="Release period">
-              <time>{release.yearTitle}</time>
+              <time>{releaseVersion.yearTitle}</time>
             </SummaryListItem>
             <SummaryListItem term="Release type">
-              {releaseTypes[release.type]}
+              {releaseTypes[releaseVersion.type]}
             </SummaryListItem>
             <SummaryListItem term="Release label">
-              {release.label ?? ''}
+              {releaseVersion.label ?? ''}
             </SummaryListItem>
           </SummaryList>
 
-          <Gate condition={() => permissionService.canUpdateRelease(releaseId)}>
+          <Gate
+            condition={() =>
+              permissionService.canUpdateRelease(releaseVersionId)
+            }
+          >
             <ButtonLink
               to={generatePath<ReleaseRouteParams>(
                 releaseSummaryEditRoute.path,
                 {
-                  publicationId: release.publicationId,
-                  releaseId,
+                  publicationId: releaseVersion.publicationId,
+                  releaseVersionId,
                 },
               )}
             >

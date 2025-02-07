@@ -518,7 +518,7 @@ describe('ReleaseDataBlocksPage', () => {
       <MemoryRouter
         initialEntries={[
           generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
-            releaseId: 'release-1',
+            releaseVersionId: 'release-1',
             publicationId: 'publication-1',
           }),
         ]}

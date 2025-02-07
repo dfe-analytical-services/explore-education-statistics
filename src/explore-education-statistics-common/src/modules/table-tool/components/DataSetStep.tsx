@@ -26,7 +26,7 @@ export interface DataSetFormValues {
 interface Props extends InjectedWizardProps {
   featuredTables?: FeaturedTable[];
   loadingFastTrack?: boolean;
-  release?: SelectedRelease;
+  releaseVersion?: SelectedRelease;
   stepTitle: string;
   subjects: Subject[];
   subjectId?: string;
@@ -37,7 +37,7 @@ interface Props extends InjectedWizardProps {
 export default function DataSetStep({
   featuredTables = [],
   loadingFastTrack = false,
-  release,
+  releaseVersion,
   stepTitle,
   subjects,
   subjectId = '',
@@ -161,7 +161,7 @@ export default function DataSetStep({
                         {...stepProps}
                         featuredTables={orderBy(featuredTables, 'order')}
                         isSubmitting={formState.isSubmitting}
-                        release={release}
+                        releaseVersion={releaseVersion}
                         renderFeaturedTableLink={renderFeaturedTableLink}
                         subjects={subjects}
                       />

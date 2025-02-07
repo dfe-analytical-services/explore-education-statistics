@@ -1,22 +1,22 @@
 import ReleasePublishingStatus from '@admin/pages/release/components/ReleasePublishingStatus';
-import _releaseService from '@admin/services/releaseService';
+import _releaseService from '@admin/services/releaseVersionService';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 
-const releaseService = jest.mocked(_releaseService);
+const releaseVersionService = jest.mocked(_releaseService);
 
 describe('ReleasePublishingStatus', () => {
   test('renders correctly with initial status', async () => {
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Started',
       filesStage: 'Queued',
       contentStage: 'Complete',
       publishingStage: 'NotStarted',
     });
 
-    render(<ReleasePublishingStatus releaseId="release-1" />);
+    render(<ReleasePublishingStatus releaseVersionId="release-1" />);
 
     expect(await screen.findByText('Started')).toBeInTheDocument();
 
@@ -28,15 +28,15 @@ describe('ReleasePublishingStatus', () => {
   test('re-renders correctly when status changes to complete', async () => {
     jest.useFakeTimers();
 
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Started',
     });
 
-    render(<ReleasePublishingStatus releaseId="release-1" />);
+    render(<ReleasePublishingStatus releaseVersionId="release-1" />);
 
     expect(await screen.findByText('Started')).toBeInTheDocument();
 
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Complete',
       contentStage: 'Complete',
       publishingStage: 'Complete',
@@ -57,14 +57,17 @@ describe('ReleasePublishingStatus', () => {
   test('calls `onChange` only when status changes', async () => {
     jest.useFakeTimers();
 
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Started',
     });
 
     const handleChange = jest.fn();
 
     render(
-      <ReleasePublishingStatus releaseId="release-1" onChange={handleChange} />,
+      <ReleasePublishingStatus
+        releaseVersionId="release-1"
+        onChange={handleChange}
+      />,
     );
 
     expect(await screen.findByText('Started')).toBeInTheDocument();
@@ -78,7 +81,7 @@ describe('ReleasePublishingStatus', () => {
     // Not called again because the status hasn't changed
     expect(handleChange).toHaveBeenCalledTimes(1);
 
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Complete',
       contentStage: 'Complete',
       publishingStage: 'Complete',
@@ -97,21 +100,26 @@ describe('ReleasePublishingStatus', () => {
   test('does not re-render or call service after overall status is no longer `Started`', async () => {
     jest.useFakeTimers();
 
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Started',
     });
 
     const handleChange = jest.fn();
 
     render(
-      <ReleasePublishingStatus releaseId="release-1" onChange={handleChange} />,
+      <ReleasePublishingStatus
+        releaseVersionId="release-1"
+        onChange={handleChange}
+      />,
     );
 
     expect(await screen.findByText('Started')).toBeInTheDocument();
 
-    expect(releaseService.getReleaseStatus).toHaveBeenCalledTimes(1);
+    expect(releaseVersionService.getReleaseVersionStatus).toHaveBeenCalledTimes(
+      1,
+    );
 
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Complete',
     });
 
@@ -119,11 +127,13 @@ describe('ReleasePublishingStatus', () => {
 
     expect(await screen.findByText('Complete')).toBeInTheDocument();
 
-    expect(releaseService.getReleaseStatus).toHaveBeenCalledTimes(2);
+    expect(releaseVersionService.getReleaseVersionStatus).toHaveBeenCalledTimes(
+      2,
+    );
 
     // Can't really transition from Complete to Failed, but
     // just simulating a change for the test.
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Failed',
     });
 
@@ -131,7 +141,9 @@ describe('ReleasePublishingStatus', () => {
 
     expect(await screen.findByText('Complete')).toBeInTheDocument();
 
-    expect(releaseService.getReleaseStatus).toHaveBeenCalledTimes(2);
+    expect(releaseVersionService.getReleaseVersionStatus).toHaveBeenCalledTimes(
+      2,
+    );
 
     jest.useRealTimers();
   });

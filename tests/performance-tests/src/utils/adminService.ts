@@ -146,7 +146,7 @@ export class AdminService {
     };
   }
 
-  getRelease({
+  getReleaseVersion({
     themeId,
     publicationTitle,
     year,
@@ -225,7 +225,7 @@ export class AdminService {
     year: number;
     timePeriodCoverage: 'AY' | 'FY';
   }) {
-    const existingRelease = this.getRelease({
+    const existingRelease = this.getReleaseVersion({
       themeId,
       publicationTitle,
       year,

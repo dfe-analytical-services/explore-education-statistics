@@ -1,7 +1,7 @@
 import PublicationPublishedReleases from '@admin/pages/publication/components/PublicationPublishedReleases';
 import _releaseService, {
-  ReleaseSummaryWithPermissions,
-} from '@admin/services/releaseService';
+  ReleaseVersionSummaryWithPermissions,
+} from '@admin/services/releaseVersionService';
 import _publicationService from '@admin/services/publicationService';
 import baseRender from '@common-test/render';
 import { PaginatedList } from '@common/services/types/pagination';
@@ -12,8 +12,10 @@ import { produce } from 'immer';
 import React, { ReactElement } from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 
-jest.mock('@admin/services/releaseService');
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+jest.mock('@admin/services/releaseVersionService');
+const releaseVersionService = _releaseService as jest.Mocked<
+  typeof _releaseService
+>;
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -23,7 +25,7 @@ const publicationService = _publicationService as jest.Mocked<
 describe('PublicationPublishedReleases', () => {
   const testPublicationId = 'publication-1';
 
-  const testRelease1: ReleaseSummaryWithPermissions = {
+  const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
     id: 'release-1',
@@ -48,7 +50,7 @@ describe('PublicationPublishedReleases', () => {
     latestRelease: false,
   };
 
-  const testRelease2: ReleaseSummaryWithPermissions = {
+  const testRelease2: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
     id: 'release-2',
     published: '2022-01-02T00:00:00',
@@ -58,7 +60,7 @@ describe('PublicationPublishedReleases', () => {
     yearTitle: '2020/21',
   };
 
-  const testRelease3: ReleaseSummaryWithPermissions = {
+  const testRelease3: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
     id: 'release-3',
     published: '2022-01-03T00:00:00',
@@ -68,7 +70,7 @@ describe('PublicationPublishedReleases', () => {
     yearTitle: '2019/20',
   };
 
-  const testRelease4: ReleaseSummaryWithPermissions = {
+  const testRelease4: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
     id: 'release-4',
     published: '2022-01-04T00:00:00',
@@ -78,7 +80,7 @@ describe('PublicationPublishedReleases', () => {
     yearTitle: '2018/19',
   };
 
-  const testRelease5: ReleaseSummaryWithPermissions = {
+  const testRelease5: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
     id: 'release-5',
     published: '2022-01-05T00:00:00',
@@ -88,7 +90,7 @@ describe('PublicationPublishedReleases', () => {
     yearTitle: '2017/18',
   };
 
-  const testRelease6: ReleaseSummaryWithPermissions = {
+  const testRelease6: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
     id: 'release-6',
     published: '2022-01-06T00:00:00',
@@ -98,7 +100,7 @@ describe('PublicationPublishedReleases', () => {
     yearTitle: '2016/17',
   };
 
-  const testRelease7: ReleaseSummaryWithPermissions = {
+  const testRelease7: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
     id: 'release-7',
     published: '2022-01-07T00:00:00',
@@ -108,7 +110,7 @@ describe('PublicationPublishedReleases', () => {
     yearTitle: '2015/16',
   };
 
-  const testReleases: ReleaseSummaryWithPermissions[] = [
+  const testReleases: ReleaseVersionSummaryWithPermissions[] = [
     testRelease1,
     testRelease2,
     testRelease3,
@@ -118,24 +120,26 @@ describe('PublicationPublishedReleases', () => {
     testRelease7,
   ];
 
-  const testReleasesPage1: PaginatedList<ReleaseSummaryWithPermissions> = {
-    paging: {
-      page: 1,
-      pageSize: 5,
-      totalPages: 2,
-      totalResults: 7,
-    },
-    results: testReleases.slice(0, 5),
-  };
-  const testReleasesPage2: PaginatedList<ReleaseSummaryWithPermissions> = {
-    paging: {
-      page: 2,
-      pageSize: 5,
-      totalPages: 2,
-      totalResults: 7,
-    },
-    results: testReleases.slice(5),
-  };
+  const testReleasesPage1: PaginatedList<ReleaseVersionSummaryWithPermissions> =
+    {
+      paging: {
+        page: 1,
+        pageSize: 5,
+        totalPages: 2,
+        totalResults: 7,
+      },
+      results: testReleases.slice(0, 5),
+    };
+  const testReleasesPage2: PaginatedList<ReleaseVersionSummaryWithPermissions> =
+    {
+      paging: {
+        page: 2,
+        pageSize: 5,
+        totalPages: 2,
+        totalResults: 7,
+      },
+      results: testReleases.slice(5),
+    };
 
   test('renders the published releases table once loaded', async () => {
     publicationService.listReleases.mockResolvedValue(testReleasesPage1);
@@ -330,7 +334,7 @@ describe('PublicationPublishedReleases', () => {
 
     const history = createMemoryHistory();
 
-    releaseService.createReleaseAmendment.mockResolvedValue({
+    releaseVersionService.createReleaseVersionAmendment.mockResolvedValue({
       id: 'release-amendment-id',
     });
 
@@ -370,9 +374,9 @@ describe('PublicationPublishedReleases', () => {
     );
 
     await waitFor(() => {
-      expect(releaseService.createReleaseAmendment).toHaveBeenCalledWith(
-        testRelease1.id,
-      );
+      expect(
+        releaseVersionService.createReleaseVersionAmendment,
+      ).toHaveBeenCalledWith(testRelease1.id);
     });
 
     expect(history.location.pathname).toBe(

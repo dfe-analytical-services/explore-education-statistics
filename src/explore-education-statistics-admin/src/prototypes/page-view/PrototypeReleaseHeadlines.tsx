@@ -26,7 +26,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
 
   const addBlock = useCallback(async () => {
     await actions.addContentSectionBlock({
-      releaseId: release.id,
+      releaseVersionId: release.id,
       sectionId: release.headlinesSection.id,
       sectionKey: 'headlinesSection',
       block: {
@@ -48,7 +48,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
           renderBlock={block => (
             <ReleaseBlock
               block={block}
-              releaseId={release.id}
+              releaseVersionId={release.id}
               transformFeaturedTableLinks={transformFeaturedTableLinks}
             />
           )}
@@ -57,7 +57,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
               allowComments
               block={block}
               publicationId={release.publication.id}
-              releaseId={release.id}
+              releaseVersionId={release.id}
             />
           )}
         />
@@ -84,7 +84,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
         <>
           <AddSecondaryStats release={release} updating />
           <DataBlockTabs
-            releaseId={release.id}
+            releaseVersionId={release.id}
             id="releaseHeadlines-dataBlock"
             dataBlock={release.keyStatisticsSecondarySection.content[0]}
             getInfographic={getChartFile}

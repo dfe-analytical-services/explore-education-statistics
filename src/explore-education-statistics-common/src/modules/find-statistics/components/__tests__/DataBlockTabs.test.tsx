@@ -149,7 +149,7 @@ describe('DataBlockTabs', () => {
 
     render(
       <DataBlockTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -182,7 +182,7 @@ describe('DataBlockTabs', () => {
 
     render(
       <DataBlockTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -213,7 +213,7 @@ describe('DataBlockTabs', () => {
 
     const { container } = render(
       <DataBlockTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         id="test-datablock"
         dataBlock={{
           ...testDataBlock,
@@ -243,7 +243,7 @@ describe('DataBlockTabs', () => {
 
     const { container } = render(
       <DataBlockTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -277,7 +277,7 @@ describe('DataBlockTabs', () => {
 
     const { container } = render(
       <DataBlockTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -313,7 +313,7 @@ describe('DataBlockTabs', () => {
 
     render(
       <DataBlockTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         id="test-block"
         dataBlock={{
           ...testDataBlock,
@@ -355,7 +355,7 @@ describe('DataBlockTabs', () => {
 
     const { container } = render(
       <DataBlockTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         id="test-block"
         dataBlock={testDataBlockMap}
       />,
@@ -393,7 +393,7 @@ describe('DataBlockTabs', () => {
 
     const { container } = render(
       <DataBlockTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         id="test-block"
         dataBlock={testDataBlockMap}
       />,
@@ -456,7 +456,7 @@ describe('DataBlockTabs', () => {
     const { rerender } = render(
       <DataBlockTabs
         id="test-block"
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataBlock={{
           ...testDataBlock,
           table: {
@@ -511,7 +511,7 @@ describe('DataBlockTabs', () => {
       rerender(
         <DataBlockTabs
           id="test-block"
-          releaseId="release-1"
+          releaseVersionId="release-1"
           dataBlock={{
             ...testDataBlock,
             id: 'block-2-id',

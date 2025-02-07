@@ -18,13 +18,13 @@ import { ReleaseType } from '@common/services/types/releaseType';
 
 interface Props {
   featuredTableId?: string;
-  releaseId: string;
+  releaseVersionId: string;
   releaseType: ReleaseType;
   publication: Publication | ContentPublication;
 }
 const ReleasePreviewTableTool = ({
   featuredTableId,
-  releaseId,
+  releaseVersionId,
   releaseType,
   publication,
 }: Props) => {
@@ -34,20 +34,20 @@ const ReleasePreviewTableTool = ({
     InitialTableToolState | undefined
   >(async () => {
     const [featuredTables, subjects] = await Promise.all([
-      tableBuilderService.listReleaseFeaturedTables(releaseId),
-      tableBuilderService.listReleaseSubjects(releaseId),
+      tableBuilderService.listReleaseFeaturedTables(releaseVersionId),
+      tableBuilderService.listReleaseSubjects(releaseVersionId),
     ]);
 
     if (dataBlockId) {
       const { table, query } = await dataBlockService.getDataBlock(dataBlockId);
 
       const [subjectMeta, tableData] = await Promise.all([
-        tableBuilderService.getSubjectMeta(query.subjectId, releaseId),
+        tableBuilderService.getSubjectMeta(query.subjectId, releaseVersionId),
         tableBuilderService.getTableData(
           {
             ...query,
           },
-          releaseId,
+          releaseVersionId,
         ),
       ]);
 
@@ -61,7 +61,7 @@ const ReleasePreviewTableTool = ({
         query: {
           ...query,
           publicationId: publication.id,
-          releaseId,
+          releaseVersionId,
         },
         subjectMeta,
         response: {
@@ -77,14 +77,14 @@ const ReleasePreviewTableTool = ({
       featuredTables,
       query: {
         publicationId: publication.id,
-        releaseId,
+        releaseVersionId,
         subjectId: '',
         indicators: [],
         filters: [],
         locationIds: [],
       },
     };
-  }, [releaseId, dataBlockId]);
+  }, [releaseVersionId, dataBlockId]);
 
   return (
     <LoadingSpinner loading={isLoading}>

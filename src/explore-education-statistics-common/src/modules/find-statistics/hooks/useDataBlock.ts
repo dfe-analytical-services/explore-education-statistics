@@ -11,16 +11,16 @@ import { useCallback, useMemo, useState } from 'react';
 
 interface Options {
   dataBlock: Pick<DataBlock, 'id' | 'charts' | 'query' | 'dataBlockParentId'>;
-  releaseId: string;
+  releaseVersionId: string;
   getInfographic?: GetInfographic;
 }
 
 export default function useDataBlock({
   dataBlock,
-  releaseId,
+  releaseVersionId,
   getInfographic,
 }: Options) {
-  const getChartFile = useGetReleaseFile(releaseId);
+  const getChartFile = useGetReleaseFile(releaseVersionId);
   const queryClient = useQueryClient();
 
   const chart = dataBlock.charts[0] as Chart | undefined;
@@ -36,7 +36,7 @@ export default function useDataBlock({
     isLoading: isTableDataLoading,
   } = useQuery({
     ...tableBuilderQueries.getDataBlockTable(
-      releaseId,
+      releaseVersionId,
       dataBlock.dataBlockParentId,
     ),
     staleTime: Infinity,
@@ -48,7 +48,7 @@ export default function useDataBlock({
     isInitialLoading: isGeoJsonInitialLoading,
   } = useQuery({
     ...tableBuilderQueries.getDataBlockGeoJson(
-      releaseId,
+      releaseVersionId,
       dataBlock.dataBlockParentId,
       selectedBoundaryLevel ?? -1,
     ),
@@ -61,7 +61,7 @@ export default function useDataBlock({
     async (boundaryLevel: number) => {
       await queryClient.prefetchQuery({
         ...tableBuilderQueries.getDataBlockGeoJson(
-          releaseId,
+          releaseVersionId,
           dataBlock.dataBlockParentId,
           boundaryLevel,
         ),
@@ -69,7 +69,7 @@ export default function useDataBlock({
       });
       setSelectedBoundaryLevel(boundaryLevel);
     },
-    [dataBlock, releaseId, queryClient],
+    [dataBlock, releaseVersionId, queryClient],
   );
 
   const fullTable = useMemo(() => {

@@ -13,7 +13,7 @@ interface Props extends InjectedWizardProps {
   featuredTables?: FeaturedTable[];
   isSubmitting: boolean;
   renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
-  release?: SelectedRelease;
+  releaseVersion?: SelectedRelease;
   subjects: Subject[];
 }
 
@@ -21,7 +21,7 @@ export default function DataSetStepContent({
   featuredTables = [],
   isSubmitting,
   renderFeaturedTableLink,
-  release,
+  releaseVersion,
   subjects,
   ...stepProps
 }: Props) {
@@ -56,7 +56,7 @@ export default function DataSetStepContent({
               )}
               isSubmitting={isSubmitting}
               renderFeaturedTableLink={renderFeaturedTableLink}
-              release={release}
+              releaseVersion={releaseVersion}
               subject={selectedSubject}
             />
           ) : (

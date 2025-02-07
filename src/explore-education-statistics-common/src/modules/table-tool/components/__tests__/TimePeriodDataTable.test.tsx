@@ -1705,7 +1705,7 @@ describe('TimePeriodDataTable', () => {
       filters: ['filter-1', 'filter-2', 'filter-3', 'filter-4'],
       indicators: ['indicator-2', 'indicator-1'],
       locationIds: ['location-2', 'location-1'],
-      releaseId: 'release-1-id',
+      releaseVersionId: 'release-1-id',
     };
 
     render(
@@ -1738,7 +1738,7 @@ describe('TimePeriodDataTable', () => {
       filters: ['filter-1', 'filter-4'], // filter-2 and filter-3 are missing
       indicators: ['indicator-2', 'indicator-1'],
       locationIds: ['location-2', 'location-1'],
-      releaseId: 'release-1-id',
+      releaseVersionId: 'release-1-id',
     };
 
     render(

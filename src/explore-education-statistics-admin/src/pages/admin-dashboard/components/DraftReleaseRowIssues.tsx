@@ -1,4 +1,4 @@
-import releaseService from '@admin/services/releaseService';
+import releaseVersionService from '@admin/services/releaseVersionService';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
@@ -7,12 +7,14 @@ import React from 'react';
 import TagGroup from '@common/components/TagGroup';
 
 interface Props {
-  releaseId: string;
+  releaseVersionId: string;
 }
 
-const DraftReleaseRowIssues = ({ releaseId }: Props) => {
+const DraftReleaseRowIssues = ({ releaseVersionId }: Props) => {
   const { value: checklist, isLoading: isLoadingChecklist } =
-    useAsyncHandledRetry(() => releaseService.getReleaseChecklist(releaseId));
+    useAsyncHandledRetry(() =>
+      releaseVersionService.getReleaseVersionChecklist(releaseVersionId),
+    );
 
   const totalIssues = checklist
     ? checklist.errors.length + checklist.warnings.length

@@ -4,14 +4,16 @@ import { PublicationManageTeamRouteParams } from '@admin/routes/publicationRoute
 import releasePermissionService, {
   UserReleaseRole,
 } from '@admin/services/releasePermissionService';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseVersionService, {
+  ReleaseVersion,
+} from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 interface Model {
-  release: Release;
+  release: ReleaseVersion;
   publicationContributors: UserReleaseRole[];
   releaseContributors: UserReleaseRole[];
 }
@@ -21,13 +23,13 @@ const PublicationManageReleaseContributorsPage = ({
 }: RouteComponentProps<PublicationManageTeamRouteParams>) => {
   const { publicationId } = usePublicationContext();
 
-  const { releaseId } = match.params;
+  const { releaseVersionId } = match.params;
 
   const { value, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [release, publicationContributors, releaseRoles] = await Promise.all([
-      releaseService.getRelease(releaseId),
+      releaseVersionService.getReleaseVersion(releaseVersionId),
       releasePermissionService.listPublicationContributors(publicationId),
-      releasePermissionService.listRoles(releaseId),
+      releasePermissionService.listRoles(releaseVersionId),
     ]);
     return {
       release,
@@ -36,7 +38,7 @@ const PublicationManageReleaseContributorsPage = ({
         role => role.role === 'Contributor',
       ),
     };
-  }, [publicationId, releaseId]);
+  }, [publicationId, releaseVersionId]);
 
   const {
     release,
@@ -50,7 +52,7 @@ const PublicationManageReleaseContributorsPage = ({
 
       <PublicationReleaseContributorsForm
         publicationId={publicationId}
-        releaseId={releaseId}
+        releaseVersionId={releaseVersionId}
         publicationContributors={publicationContributors}
         releaseContributors={releaseContributors}
       />

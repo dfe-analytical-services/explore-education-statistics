@@ -143,7 +143,7 @@ describe('ChartBuilderTabSection', () => {
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilderTabSection
           dataBlock={testDataBlock}
-          releaseId="release-1"
+          releaseVersionId="release-1"
           query={testQuery}
           table={testFullTableWithBoundaryLevels}
           onDataBlockSave={noop}
@@ -170,7 +170,7 @@ describe('ChartBuilderTabSection', () => {
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilderTabSection
           dataBlock={testDataBlock}
-          releaseId="release-1"
+          releaseVersionId="release-1"
           query={testQuery}
           table={testFullTableWithBoundaryLevels}
           onDataBlockSave={noop}

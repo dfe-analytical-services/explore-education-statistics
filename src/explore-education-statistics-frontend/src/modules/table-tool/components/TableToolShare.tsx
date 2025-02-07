@@ -38,10 +38,10 @@ const TableToolShare = ({ tableHeaders, query }: Props) => {
     setPermalinkError(undefined);
     setPermalinkLoading(true);
 
-    const { releaseId } = query;
+    const { releaseVersionId } = query;
     try {
       const { id } = await permalinkService.createPermalink({
-        releaseId,
+        releaseVersionId,
         query,
         configuration: {
           tableHeaders: mapUnmappedTableHeaders(tableHeaders),

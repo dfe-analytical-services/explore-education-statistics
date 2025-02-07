@@ -11,7 +11,7 @@ import {
 import client from '@admin/services/utils/service';
 import {
   ContentSection,
-  Release,
+  ReleaseVersion,
   ReleaseApprovalStatus,
 } from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
@@ -21,7 +21,7 @@ type ContentSectionViewModel = ContentSection<EditableBlock>;
 
 export interface EditableRelease
   extends Omit<
-    Release<EditableContentBlock, EditableDataBlock, EditableEmbedBlock>,
+    ReleaseVersion<EditableContentBlock, EditableDataBlock, EditableEmbedBlock>,
     'published'
   > {
   approvalStatus: ReleaseApprovalStatus;

@@ -1,7 +1,7 @@
 import DraftReleasesTable from '@admin/pages/admin-dashboard/components/DraftReleasesTable';
 import _releaseService, {
-  DashboardReleaseSummary,
-} from '@admin/services/releaseService';
+  DashboardReleaseVersionSummary,
+} from '@admin/services/releaseVersionService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -9,11 +9,13 @@ import noop from 'lodash/noop';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 
-jest.mock('@admin/services/releaseService');
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+jest.mock('@admin/services/releaseVersionService');
+const releaseVersionService = _releaseService as jest.Mocked<
+  typeof _releaseService
+>;
 
 describe('DraftReleasesTable', () => {
-  const testReleases: DashboardReleaseSummary[] = [
+  const testReleases: DashboardReleaseVersionSummary[] = [
     {
       id: 'release-1',
       latestRelease: true,
@@ -174,7 +176,7 @@ describe('DraftReleasesTable', () => {
   ];
 
   beforeEach(() => {
-    releaseService.getReleaseChecklist.mockResolvedValue({
+    releaseVersionService.getReleaseVersionChecklist.mockResolvedValue({
       errors: [
         {
           code: 'DataFileImportsMustBeCompleted',
@@ -530,7 +532,7 @@ describe('DraftReleasesTable', () => {
 
   test('handles cancelling an amendment correctly', async () => {
     const handleOnChange = jest.fn();
-    releaseService.getDeleteReleasePlan.mockResolvedValue({
+    releaseVersionService.getDeleteReleaseVersionPlan.mockResolvedValue({
       scheduledMethodologies: [
         {
           id: 'methodology-1',
@@ -574,9 +576,9 @@ describe('DraftReleasesTable', () => {
       ),
     ).toBeInTheDocument();
 
-    expect(releaseService.getDeleteReleasePlan).toHaveBeenCalledWith(
-      'release-2',
-    );
+    expect(
+      releaseVersionService.getDeleteReleaseVersionPlan,
+    ).toHaveBeenCalledWith('release-2');
 
     const modal = within(screen.getByRole('dialog'));
     expect(modal.getByText('Methodology 1')).toBeInTheDocument();
@@ -589,7 +591,9 @@ describe('DraftReleasesTable', () => {
     );
 
     await waitFor(() => {
-      expect(releaseService.deleteRelease).toHaveBeenCalledWith('release-2');
+      expect(releaseVersionService.deleteReleaseVersion).toHaveBeenCalledWith(
+        'release-2',
+      );
     });
 
     expect(handleOnChange).toHaveBeenCalled();

@@ -25,23 +25,23 @@ interface FormValues {
 export default function ReleaseDataFilePage({
   history,
   match: {
-    params: { publicationId, releaseId, fileId },
+    params: { publicationId, releaseVersionId, fileId },
   },
 }: RouteComponentProps<ReleaseDataFileRouteParams>) {
   const { value: dataFile, isLoading: dataFileLoading } = useAsyncRetry(
-    () => releaseDataFileService.getDataFile(releaseId, fileId),
-    [releaseId, fileId],
+    () => releaseDataFileService.getDataFile(releaseVersionId, fileId),
+    [releaseVersionId, fileId],
   );
 
   const queryClient = useQueryClient();
 
   const handleSubmit = async (values: FormValues) => {
-    await releaseDataFileService.updateFile(releaseId, fileId, {
+    await releaseDataFileService.updateFile(releaseVersionId, fileId, {
       title: values.title,
     });
 
     queryClient.removeQueries({
-      queryKey: releaseDataFileQueries.list(releaseId).queryKey,
+      queryKey: releaseDataFileQueries.list(releaseVersionId).queryKey,
     });
     await queryClient.invalidateQueries({
       queryKey: releaseDataFileQueries.list._def,
@@ -50,7 +50,7 @@ export default function ReleaseDataFilePage({
     history.push(
       generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
         publicationId,
-        releaseId,
+        releaseVersionId,
       }),
     );
   };
@@ -64,7 +64,7 @@ export default function ReleaseDataFilePage({
         back
         to={generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
           publicationId,
-          releaseId,
+          releaseVersionId,
         })}
       >
         Back

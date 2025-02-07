@@ -1,7 +1,7 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetFiltersMappingPage from '@admin/pages/release/data/ReleaseApiDataSetFiltersMappingPage';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import {
   releaseApiDataSetFiltersMappingRoute,
   ReleaseDataSetRouteParams,
@@ -13,7 +13,7 @@ import testFiltersMapping, {
   testFiltersMappingUnmappedColumns,
 } from '@admin/pages/release/data/__data__/testFiltersMapping';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
-import { Release } from '@admin/services/releaseService';
+import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -1223,19 +1223,23 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     });
   });
 
-  function renderPage(options?: { release?: Release; dataSetId?: string }) {
-    const { release = testRelease, dataSetId = 'data-set-id' } = options ?? {};
+  function renderPage(options?: {
+    releaseVersion?: ReleaseVersion;
+    dataSetId?: string;
+  }) {
+    const { releaseVersion = testRelease, dataSetId = 'data-set-id' } =
+      options ?? {};
 
     return render(
       <TestConfigContextProvider>
-        <ReleaseContextProvider release={release}>
+        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
           <MemoryRouter
             initialEntries={[
               generatePath<ReleaseDataSetRouteParams>(
                 releaseApiDataSetFiltersMappingRoute.path,
                 {
-                  publicationId: release.publicationId,
-                  releaseId: release.id,
+                  publicationId: releaseVersion.publicationId,
+                  releaseVersionId: releaseVersion.id,
                   dataSetId,
                 },
               ),
@@ -1246,7 +1250,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
               path={releaseApiDataSetFiltersMappingRoute.path}
             />
           </MemoryRouter>
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>,
     );
   }

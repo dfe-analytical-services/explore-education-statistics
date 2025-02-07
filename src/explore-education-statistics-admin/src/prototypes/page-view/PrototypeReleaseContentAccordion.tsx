@@ -24,7 +24,7 @@ const ReleaseContentAccordion = ({
 
   const addAccordionSection = useCallback(async () => {
     await addContentSection({
-      releaseId: release.id,
+      releaseVersionId: release.id,
       order: release.content.length,
     });
   }, [release.id, release.content.length, addContentSection]);
@@ -39,7 +39,7 @@ const ReleaseContentAccordion = ({
           return acc;
         }, {});
 
-      await updateContentSectionsOrder({ releaseId: release.id, order });
+      await updateContentSectionsOrder({ releaseVersionId: release.id, order });
     },
     [id, release.id, updateContentSectionsOrder],
   );

@@ -1,7 +1,7 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetLocationsMappingPage from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import {
   releaseApiDataSetLocationsMappingRoute,
   ReleaseDataSetRouteParams,
@@ -13,7 +13,7 @@ import testLocationsMapping, {
   testLocationsMappingGroups,
 } from '@admin/pages/release/data/__data__/testLocationsMapping';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
-import { Release } from '@admin/services/releaseService';
+import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -1292,19 +1292,23 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     });
   });
 
-  function renderPage(options?: { release?: Release; dataSetId?: string }) {
-    const { release = testRelease, dataSetId = 'data-set-id' } = options ?? {};
+  function renderPage(options?: {
+    releaseVersion?: ReleaseVersion;
+    dataSetId?: string;
+  }) {
+    const { releaseVersion = testRelease, dataSetId = 'data-set-id' } =
+      options ?? {};
 
     return render(
       <TestConfigContextProvider>
-        <ReleaseContextProvider release={release}>
+        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
           <MemoryRouter
             initialEntries={[
               generatePath<ReleaseDataSetRouteParams>(
                 releaseApiDataSetLocationsMappingRoute.path,
                 {
-                  publicationId: release.publicationId,
-                  releaseId: release.id,
+                  publicationId: releaseVersion.publicationId,
+                  releaseVersionId: releaseVersion.id,
                   dataSetId,
                 },
               ),
@@ -1315,7 +1319,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
               path={releaseApiDataSetLocationsMappingRoute.path}
             />
           </MemoryRouter>
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>,
     );
   }

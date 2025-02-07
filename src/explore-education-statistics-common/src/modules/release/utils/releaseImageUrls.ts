@@ -9,17 +9,23 @@ const releaseImageApiRegex = /\/api\/releases\/[A-Za-z0-9-]+\/images/g;
  * of the content's release ids when it's created.
  */
 export const insertReleaseIdPlaceholders = (str: string) =>
-  str.replaceAll(releaseImageApiRegex, `/api/releases/{releaseId}/images`);
+  str.replaceAll(
+    releaseImageApiRegex,
+    `/api/releases/{releaseVersionId}/images`,
+  );
 
 /**
  * Replace release id placeholders in a {@param str}
- * with an actual {@param releaseId}.
+ * with an actual {@param releaseVersionId}.
  *
  * This allows us to create amendments without having
  * to replace all of the release ids in the content.
  */
-export const replaceReleaseIdPlaceholders = (str: string, releaseId: string) =>
+export const replaceReleaseIdPlaceholders = (
+  str: string,
+  releaseVersionId: string,
+) =>
   str.replaceAll(
-    '/api/releases/{releaseId}/images',
-    `/api/releases/${releaseId}/images`,
+    '/api/releases/{releaseVersionId}/images',
+    `/api/releases/${releaseVersionId}/images`,
   );

@@ -97,7 +97,7 @@ describe('ReleaseDataFileReplacePage', () => {
           generatePath<ReleaseDataFileReplaceRouteParams>(
             releaseDataFileReplaceRoute.path,
             {
-              releaseId: 'release-1',
+              releaseVersionId: 'release-1',
               publicationId: 'publication-1',
               fileId: 'file-1',
             },
@@ -147,7 +147,7 @@ describe('ReleaseDataFileReplacePage', () => {
           generatePath<ReleaseDataFileReplaceRouteParams>(
             releaseDataFileReplaceRoute.path,
             {
-              releaseId: 'release-1',
+              releaseVersionId: 'release-1',
               publicationId: 'publication-1',
               fileId: 'file-1',
             },
@@ -198,7 +198,7 @@ describe('ReleaseDataFileReplacePage', () => {
           generatePath<ReleaseDataFileReplaceRouteParams>(
             releaseDataFileReplaceRoute.path,
             {
-              releaseId: 'release-1',
+              releaseVersionId: 'release-1',
               publicationId: 'publication-1',
               fileId: 'file-1',
             },
@@ -280,7 +280,7 @@ describe('ReleaseDataFileReplacePage', () => {
           generatePath<ReleaseDataFileReplaceRouteParams>(
             releaseDataFileReplaceRoute.path,
             {
-              releaseId: 'release-1',
+              releaseVersionId: 'release-1',
               publicationId: 'publication-1',
               fileId: 'file-1',
             },
@@ -352,7 +352,7 @@ describe('ReleaseDataFileReplacePage', () => {
           generatePath<ReleaseDataFileReplaceRouteParams>(
             releaseDataFileReplaceRoute.path,
             {
-              releaseId: 'release-1',
+              releaseVersionId: 'release-1',
               publicationId: 'publication-1',
               fileId: 'file-1',
             },
@@ -407,7 +407,7 @@ describe('ReleaseDataFileReplacePage', () => {
           generatePath<ReleaseDataFileReplaceRouteParams>(
             releaseDataFileReplaceRoute.path,
             {
-              releaseId: 'release-1',
+              releaseVersionId: 'release-1',
               publicationId: 'publication-1',
               fileId: 'file-1',
             },
@@ -457,7 +457,7 @@ describe('ReleaseDataFileReplacePage', () => {
           generatePath<ReleaseDataFileReplaceRouteParams>(
             releaseDataFileReplaceRoute.path,
             {
-              releaseId: 'release-1',
+              releaseVersionId: 'release-1',
               publicationId: 'publication-1',
               fileId: 'file-1',
             },
@@ -503,7 +503,7 @@ describe('ReleaseDataFileReplacePage', () => {
           generatePath<ReleaseDataFileReplaceRouteParams>(
             releaseDataFileReplaceRoute.path,
             {
-              releaseId: 'release-1',
+              releaseVersionId: 'release-1',
               publicationId: 'publication-1',
               fileId: 'file-1',
             },
@@ -576,7 +576,7 @@ describe('ReleaseDataFileReplacePage', () => {
           generatePath<ReleaseDataFileReplaceRouteParams>(
             releaseDataFileReplaceRoute.path,
             {
-              releaseId: 'release-1',
+              releaseVersionId: 'release-1',
               publicationId: 'publication-1',
               fileId: 'file-1',
             },
@@ -637,7 +637,7 @@ describe('ReleaseDataFileReplacePage', () => {
           generatePath<ReleaseDataFileReplaceRouteParams>(
             releaseDataFileReplaceRoute.path,
             {
-              releaseId: 'release-1',
+              releaseVersionId: 'release-1',
               publicationId: 'publication-1',
               fileId: 'file-1',
             },

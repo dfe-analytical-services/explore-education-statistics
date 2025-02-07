@@ -288,7 +288,7 @@ describe('TableToolWizard', () => {
           initialStep: 1,
           query: {
             subjectId: '',
-            releaseId: 'release-1',
+            releaseVersionId: 'release-1',
             locationIds: [],
             filters: [],
             indicators: [],

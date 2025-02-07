@@ -28,7 +28,7 @@ import ReleaseSummaryPage from '@admin/pages/release/ReleaseSummaryPage';
 
 export type ReleaseRouteParams = {
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
 };
 
 export type ReleaseDataBlockRouteParams = ReleaseRouteParams & {
@@ -70,172 +70,172 @@ export interface ReleaseRouteProps extends ProtectedRouteProps {
 }
 
 export const releaseSummaryRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/summary',
+  path: '/publication/:publicationId/release/:releaseVersionId/summary',
   title: 'Summary',
   component: ReleaseSummaryPage,
 };
 
 export const releaseSummaryEditRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/summary/edit',
+  path: '/publication/:publicationId/release/:releaseVersionId/summary/edit',
   title: 'Edit summary',
   component: ReleaseSummaryEditPage,
 };
 
 export const releaseDataRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data',
+  path: '/publication/:publicationId/release/:releaseVersionId/data',
   title: 'Data and files',
   component: ReleaseDataPage,
 };
 
 export const releaseAncillaryFilesRoute: ReleaseRouteProps = {
-  path: `/publication/:publicationId/release/:releaseId/data#${releaseDataPageTabIds.fileUploads}`,
+  path: `/publication/:publicationId/release/:releaseVersionId/data#${releaseDataPageTabIds.fileUploads}`,
   title: 'Data and files',
   component: ReleaseDataPage,
 };
 
 export const releaseAncillaryFileRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/ancillary/:fileId',
+  path: '/publication/:publicationId/release/:releaseVersionId/ancillary/:fileId',
   title: 'Ancillary file',
   component: ReleaseAncillaryFilePage,
 };
 
 export const releaseDataFileRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data/:fileId',
+  path: '/publication/:publicationId/release/:releaseVersionId/data/:fileId',
   title: 'Data file',
   component: ReleaseDataFilePage,
 };
 
 export const releaseDataFileReplaceRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data/:fileId/replace',
+  path: '/publication/:publicationId/release/:releaseVersionId/data/:fileId/replace',
   title: 'Replace data file',
   component: ReleaseDataFileReplacePage,
 };
 
 export const releaseDataFileReplacementCompleteRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data/:fileId/replacement-complete',
+  path: '/publication/:publicationId/release/:releaseVersionId/data/:fileId/replacement-complete',
   title: 'Replacement complete',
   component: ReleaseDataFileReplacementCompletePage,
 };
 
 export const releaseApiDataSetsRoute: ReleaseRouteProps = {
-  path: `/publication/:publicationId/release/:releaseId/data#${releaseDataPageTabIds.apiDataSets}`,
+  path: `/publication/:publicationId/release/:releaseVersionId/data#${releaseDataPageTabIds.apiDataSets}`,
   title: 'API data sets',
   component: ReleaseDataPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 
 export const releaseApiDataSetDetailsRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId',
+  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId',
   title: 'API data set details',
   component: ReleaseApiDataSetDetailsPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 
 export const releaseApiDataSetFiltersMappingRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/filters-mapping',
+  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/filters-mapping',
   title: 'API data set filters mapping',
   component: ReleaseApiDataSetFiltersMappingPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 
 export const releaseApiDataSetLocationsMappingRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/locations-mapping',
+  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/locations-mapping',
   title: 'API data set locations mapping',
   component: ReleaseApiDataSetLocationsMappingPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 
 export const releaseApiDataSetPreviewRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/preview',
+  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview',
   title: 'Preview API data set',
   component: ReleaseApiDataSetPreviewPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 
 export const releaseApiDataSetPreviewTokenRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/preview-tokens/:previewTokenId',
+  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview-tokens/:previewTokenId',
   title: 'API data set preview token',
   component: ReleaseApiDataSetPreviewTokenPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 
 export const releaseApiDataSetPreviewTokenLogRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/preview-tokens',
+  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview-tokens',
   title: 'View API data set token log',
   component: ReleaseApiDataSetPreviewTokenLogPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 
 export const releaseApiDataSetVersionHistoryRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/versions',
+  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/versions',
   title: 'API data set version history',
   component: ReleaseApiDataSetVersionHistoryPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 
 export const releaseApiDataSetChangelogRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/api-data-sets/:dataSetId/changelog/:dataSetVersionId',
+  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/changelog/:dataSetVersionId',
   title: 'View API data set token log',
   component: ReleaseApiDataSetChangelogPage,
   protectionAction: permissions => permissions.isBauUser,
 };
 
 export const releaseFootnotesRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/footnotes',
+  path: '/publication/:publicationId/release/:releaseVersionId/footnotes',
   title: 'Footnotes',
   component: ReleaseFootnotesPage,
 };
 
 export const releaseFootnotesCreateRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/create-footnote',
+  path: '/publication/:publicationId/release/:releaseVersionId/create-footnote',
   title: 'Create footnote',
   component: ReleaseFootnoteCreatePage,
 };
 
 export const releaseFootnotesEditRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/footnotes/:footnoteId',
+  path: '/publication/:publicationId/release/:releaseVersionId/footnotes/:footnoteId',
   title: 'Edit footnote',
   component: ReleaseFootnoteEditPage,
 };
 
 export const releaseDataBlocksRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data-blocks',
+  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks',
   title: 'Data blocks',
   component: ReleaseDataBlocksPage,
 };
 
 export const releaseTableToolRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data-blocks/table-tool',
+  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks/table-tool',
   title: 'Table tool',
   component: ReleaseTableToolPage,
 };
 
 export const releaseDataBlockCreateRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data-blocks/create',
+  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks/create',
   title: 'Create data block',
   component: ReleaseDataBlockCreatePage,
 };
 
 export const releaseDataBlockEditRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data-blocks/:dataBlockId',
+  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks/:dataBlockId',
   title: 'Edit data block',
   component: ReleaseDataBlockEditPage,
 };
 
 export const releaseContentRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/content',
+  path: '/publication/:publicationId/release/:releaseVersionId/content',
   title: 'Content',
   component: ReleaseContentPage,
 };
 
 export const releaseStatusRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/status',
+  path: '/publication/:publicationId/release/:releaseVersionId/status',
   title: 'Sign off',
   component: ReleasePublishStatusPage,
 };
 
 export const releasePreReleaseAccessRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/prerelease-access',
+  path: '/publication/:publicationId/release/:releaseVersionId/prerelease-access',
   title: 'Pre-release access',
   component: ReleasePreReleaseAccessPage,
 };

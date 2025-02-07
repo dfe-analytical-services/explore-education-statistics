@@ -1,7 +1,7 @@
-import { Release } from '@admin/services/releaseService';
+import { ReleaseVersion } from '@admin/services/releaseVersionService';
 
 // eslint-disable-next-line import/prefer-default-export
-export const testRelease: Release = {
+export const testRelease: ReleaseVersion = {
   id: 'release-1',
   releaseId: 'release-series-1',
   slug: 'release-1-slug',

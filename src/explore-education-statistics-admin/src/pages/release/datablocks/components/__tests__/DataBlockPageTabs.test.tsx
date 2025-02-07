@@ -88,7 +88,9 @@ describe('DataBlockPageTabs', () => {
   test('renders uninitialised table tool when no data block is selected', async () => {
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
-    render(<DataBlockPageTabs releaseId="release-1" onDataBlockSave={noop} />);
+    render(
+      <DataBlockPageTabs releaseVersionId="release-1" onDataBlockSave={noop} />,
+    );
 
     await waitFor(() => {
       const stepHeadings = screen.queryAllByRole('heading', { name: /Step/ });
@@ -112,7 +114,9 @@ describe('DataBlockPageTabs', () => {
   test('renders the data source form without other tabs when no data block is selected', async () => {
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
-    render(<DataBlockPageTabs releaseId="release-1" onDataBlockSave={noop} />);
+    render(
+      <DataBlockPageTabs releaseVersionId="release-1" onDataBlockSave={noop} />,
+    );
 
     await waitFor(() => {
       expect(screen.getByText('Data source')).toBeInTheDocument();
@@ -130,7 +134,7 @@ describe('DataBlockPageTabs', () => {
 
     render(
       <DataBlockPageTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataBlock={testDataBlock}
         onDataBlockSave={noop}
       />,
@@ -159,7 +163,7 @@ describe('DataBlockPageTabs', () => {
 
     render(
       <DataBlockPageTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataBlock={testDataBlock}
         onDataBlockSave={noop}
       />,
@@ -185,7 +189,7 @@ describe('DataBlockPageTabs', () => {
 
     render(
       <DataBlockPageTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataBlock={testDataBlock}
         onDataBlockSave={noop}
       />,
@@ -213,7 +217,7 @@ describe('DataBlockPageTabs', () => {
 
     render(
       <DataBlockPageTabs
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataBlock={{
           ...testDataBlock,
           table: {
@@ -254,7 +258,7 @@ describe('DataBlockPageTabs', () => {
 
       render(
         <DataBlockPageTabs
-          releaseId="release-1"
+          releaseVersionId="release-1"
           dataBlock={testDataBlock}
           onDataBlockSave={noop}
         />,
