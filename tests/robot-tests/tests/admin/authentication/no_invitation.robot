@@ -11,7 +11,7 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Login with a user without any invite or user record and assert that the user is redirected to the No Invitation page
-    user navigates to admin frontend
+    user navigates to admin homepage
     user waits until h1 is visible    Sign in
     user clicks element    id:signin-button
     user logs in via identity provider
