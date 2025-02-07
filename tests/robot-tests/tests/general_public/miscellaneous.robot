@@ -10,7 +10,7 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 
 *** Test Cases ***
 Verify public page loads
-    user navigates to public frontend
+    user navigates to public site homepage
     user waits until page contains    Explore education statistics
 
 Verify can accept cookie banner

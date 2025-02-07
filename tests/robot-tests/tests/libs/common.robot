@@ -1005,21 +1005,13 @@ user checks page does not contain other release
     user checks page does not contain element
     ...    xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
 
-# EES-5802 - remove in favour of just using "user navigates to".
+user navigates to admin homepage
+    go to    %{ADMIN_URL}
 
-user navigates to admin frontend
-    [Arguments]    ${URL}=%{ADMIN_URL}
-    go to    ${URL}
+user navigates to public site homepage
+    user navigates to    %{PUBLIC_URL}
 
-# EES-5802 - remove in favour of just using "user navigates to".
-
-user navigates to public frontend
-    [Arguments]    ${URL}=%{PUBLIC_URL}
-    user navigates to    ${URL}
-
-# EES-5802 - rename to "user navigates to www".
-
-user navigates to public frontend with www
+user navigates to www
     [Arguments]    ${URL}=%{PUBLIC_URL}
     ${www_url}=    get www url    ${URL}
     user navigates to    ${www_url}

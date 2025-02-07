@@ -59,23 +59,23 @@ user goes to release page via breadcrumb
 
 user navigates to public find statistics page
     environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}/find-statistics
+    user navigates to    %{PUBLIC_URL}/find-statistics
     user waits until h1 is visible    Find statistics and data
 
 user navigates to data tables page on public frontend
     environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}/data-tables
+    user navigates to    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
 
 user navigates to data catalogue page on public frontend
     environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}/data-catalogue
+    user navigates to    %{PUBLIC_URL}/data-catalogue
     user waits until h1 is visible    Data catalogue
     user waits until page contains    Find and download data sets with associated guidance files.
 
 user navigates to public methodologies page
     environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}/methodology
+    user navigates to    %{PUBLIC_URL}/methodology
     user waits until h1 is visible    Methodologies
     user waits until page contains    Browse to find out about the methodology behind specific
 

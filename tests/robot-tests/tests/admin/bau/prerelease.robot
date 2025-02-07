@@ -133,7 +133,7 @@ Navigate to prerelease page
     ${current_url}=    get location
     ${RELEASE_URL}=    remove substring from right of string    ${current_url}    /status
     set suite variable    ${RELEASE_URL}
-    user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
+    user navigates to    ${RELEASE_URL}/prerelease/content
 
 Validate prerelease has not started
     user waits until h1 is visible    Pre-release access is not yet available
@@ -148,7 +148,7 @@ Validate prerelease has not started
     ...    Pre-release access will be available from ${start_date} at 00:00 until it is published on ${end_date}.
 
 Go to prerelease access page
-    user navigates to admin frontend    ${RELEASE_URL}/prerelease-access
+    user navigates to    ${RELEASE_URL}/prerelease-access
     user waits until h2 is visible    Manage pre-release user access
 
 Check the invite emails field is required
@@ -240,7 +240,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
 
 Validate prerelease has not started for Analyst user
     user changes to analyst1
-    user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
+    user navigates to    ${RELEASE_URL}/prerelease/content
 
     user waits until h1 is visible    Pre-release access is not yet available
     user checks breadcrumb count should be    2
@@ -259,7 +259,7 @@ Start prerelease
     ${month}=    get london month date    offset_days=1
     ${month_word}=    get london month word    offset_days=1
     ${year}=    get london year    offset_days=1
-    user navigates to admin frontend    ${RELEASE_URL}/status
+    user navigates to    ${RELEASE_URL}/status
     user clicks button    Edit release status
     user enters text into element    id:releaseStatusForm-publishScheduled-day    ${day}
     user enters text into element    id:releaseStatusForm-publishScheduled-month    ${month}
@@ -276,7 +276,7 @@ Validate prerelease has started
     ${current_url}=    get location
     ${RELEASE_URL}=    remove substring from right of string    ${current_url}    /status
     set suite variable    ${RELEASE_URL}
-    user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
+    user navigates to    ${RELEASE_URL}/prerelease/content
 
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
@@ -394,7 +394,7 @@ Create and validate methodology
 
     approve methodology from methodology view
 
-    user navigates to admin frontend    ${RELEASE_URL}/prerelease/methodologies
+    user navigates to    ${RELEASE_URL}/prerelease/methodologies
     user waits until h1 is visible    Methodologies
     user waits until page contains    ${PUBLICATION_NAME} (Owned)
     user clicks link    ${PUBLICATION_NAME} (Owned)
@@ -403,7 +403,7 @@ Create and validate methodology
 
 Validate prerelease has started for Analyst user
     user changes to analyst1
-    user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
+    user navigates to    ${RELEASE_URL}/prerelease/content
 
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
@@ -515,7 +515,7 @@ Unschedule release
     # EES-2826 Cancel scheduled publishing because ReleaseStatus row in table storage isn't removed
     # by test theme teardown. Unscheduling prevents an error when the scheduled publishing begins.
     user changes to bau1
-    user navigates to admin frontend    ${RELEASE_URL}/status
+    user navigates to    ${RELEASE_URL}/status
     user puts release into draft    expected_next_release_date=January 2001
 
 
