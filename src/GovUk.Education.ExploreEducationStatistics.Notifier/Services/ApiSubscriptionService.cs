@@ -363,13 +363,12 @@ internal class ApiSubscriptionService(
             { NotifierEmailTemplateFields.DataSetVersion, version },
             { NotifierEmailTemplateFields.UnsubscribeUrl, unsubscribeUrl }
         };
-
         emailService.SendEmail(
             email: subscription.RowKey,
-            templateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionNotificationId,
+            templateId: govUkNotifyOptions.Value.EmailTemplates
+                .SelectDataSetPublishedTemplateId(version),
             values: personalisation);
     }
-
     private async Task<AsyncPageable<ApiSubscription>> GetExpiredApiSubscriptions(CancellationToken cancellationToken)
     {
         Expression<Func<ApiSubscription, bool>> filter = s =>

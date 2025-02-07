@@ -28,4 +28,9 @@ public static class ValidationMessages
         Code: nameof(AuthorizationTokenInvalid),
         Message: "The authorization token is invalid."
     );
+
+    public static readonly LocalizableMessage InvalidDataSetVersion = new(
+        Code: "InvalidDataSetVersion",
+        Message: "The data set version version number supplied is invalid."
+    );
 }
