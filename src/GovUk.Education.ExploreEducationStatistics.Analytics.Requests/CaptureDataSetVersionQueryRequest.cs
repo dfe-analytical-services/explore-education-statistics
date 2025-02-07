@@ -8,4 +8,4 @@ public record CaptureDataSetVersionQueryRequest(
     int totalRowsCount,
     DateTime startTime,
     DateTime endTime,
-    string queryJson);
+    string query);

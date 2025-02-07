@@ -24,7 +24,7 @@ public class AnalyticsService : IAnalyticsService
             totalRowsCount: totalRowsCount,
             startTime: startTime,
             endTime: endTime,
-            queryJson: JsonConvert.SerializeObject(query));
+            query: JsonConvert.SerializeObject(query));
 
         Console.Out.WriteLine(JsonConvert.SerializeObject(request));
         // TODO EES-5830 - implement the process of putting the message
