@@ -36,7 +36,7 @@ param routes AppGatewayRoute[]
 @description('Rules for how the App Gateway should rewrite URLs')
 param rewrites AppGatewayRewriteSet[]
 
-@description('Optional id of a WAF policy to use globally across all listeners in this APp Gateway')
+@description('Optional id of a WAF policy to use globally across all listeners in this App Gateway')
 param globalWafPolicyId string?
 
 @description('Availability zones in the region that the resource should be accessible from. Defaults to all zones')
