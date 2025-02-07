@@ -17,7 +17,7 @@ Invite user to the service with an unexpired invite via the API
     ...    Analyst
 
 Check that the invite appears on the Invite Users page
-    user navigates to admin frontend    %{ADMIN_URL}/administration/users/invites
+    user navigates to    %{ADMIN_URL}/administration/users/invites
     user waits until page contains    Invited users
     user checks page contains    %{EXPIRED_INVITE_USER_EMAIL}
 
@@ -35,7 +35,7 @@ Check that the invite does not appear on the Invite Users page
 
 Login with an expired invite and assert that the user is redirected to the expired invite page
     user opens the browser    %{ADMIN_URL}
-    user navigates to admin frontend
+    user navigates to admin homepage
     user waits until h1 is visible    Sign in
     user clicks element    id:signin-button
     user logs in via identity provider
@@ -48,5 +48,5 @@ Check that the user is on the Expired Invite page
     user waits until page contains    explore.statistics@education.gov.uk
 
 Check that the expired invite is now removed
-    user navigates to admin frontend
+    user navigates to admin homepage
     user waits until h1 is visible    No invitation    %{WAIT_MEDIUM}

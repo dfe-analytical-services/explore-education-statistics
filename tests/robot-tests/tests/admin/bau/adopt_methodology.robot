@@ -127,7 +127,7 @@ Get pre-release url
 
 Validate methodology appears in prerelease for analyst1
     user changes to analyst1
-    user navigates to admin frontend    ${PRERELEASE_URL}
+    user navigates to    ${PRERELEASE_URL}
 
     user clicks link    Methodologies
     user waits until h1 is visible    Methodologies
@@ -151,7 +151,7 @@ Drop adopted Methodology
 
 Validate adopted methodology no longer appears in prerelease
     user changes to analyst1
-    user navigates to admin frontend    ${PRERELEASE_URL}
+    user navigates to    ${PRERELEASE_URL}
 
     user clicks link    Methodologies
     user waits until h1 is visible    Methodologies

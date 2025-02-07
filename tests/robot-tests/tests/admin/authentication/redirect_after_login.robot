@@ -11,7 +11,7 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Check that a user is redirected to a protected page after being forced to sign in
-    user navigates to admin frontend    %{ADMIN_URL}/administration
+    user navigates to    %{ADMIN_URL}/administration
     user waits until h1 is visible    Sign in
     user clicks element    id:signin-button
     user logs in via identity provider
@@ -22,7 +22,7 @@ Check that a user is redirected to a protected page after being forced to sign i
 Check that a user is redirected to the dashboard if coming directly from the Sign In page
     user closes the browser
     user opens the browser
-    user navigates to admin frontend    %{ADMIN_URL}/sign-in
+    user navigates to    %{ADMIN_URL}/sign-in
     user waits until h1 is visible    Sign in
     user clicks element    id:signin-button
     user logs in via identity provider
@@ -33,7 +33,7 @@ Check that a user is redirected to the dashboard if coming directly from the Sig
 Check that a user is redirected to the dashboard if coming from the dashboard originally
     user closes the browser
     user opens the browser
-    user navigates to admin frontend    %{ADMIN_URL}/dashboard
+    user navigates to admin homepage
     user waits until h1 is visible    Sign in
     user clicks element    id:signin-button
     user logs in via identity provider
@@ -44,7 +44,7 @@ Check that a user is redirected to the dashboard if coming from the dashboard or
 Check that a user is shown a Forbidden page if redirected to a protected page that they cannot access after login
     user closes the browser
     user opens the browser
-    user navigates to admin frontend    %{ADMIN_URL}/administration
+    user navigates to    %{ADMIN_URL}/administration
     user waits until h1 is visible    Sign in
     user clicks element    id:signin-button
     user logs in via identity provider
@@ -55,7 +55,7 @@ Check that a user is shown a Forbidden page if redirected to a protected page th
 Check that a user is shown a Page Not Found page if redirected to a non-existent page after login
     user closes the browser
     user opens the browser
-    user navigates to admin frontend    %{ADMIN_URL}/sign-in?returnUrl=%2Fnon-existent-page
+    user navigates to    %{ADMIN_URL}/sign-in?returnUrl=%2Fnon-existent-page
     user waits until h1 is visible    Sign in
     user clicks element    id:signin-button
     user logs in via identity provider
