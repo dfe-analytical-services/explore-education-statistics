@@ -157,7 +157,7 @@ export default function FiltersForm({
     ([_, value]) => value.order,
   );
 
-  const allFilterKeys = orderedFilters.map(([filterKey]) => filterKey);
+  const allFilterKeys = Object.keys(subjectMeta.filters);
 
   const allFiltersOpen = openFilterGroups.length === allFilterKeys.length;
 
@@ -236,6 +236,20 @@ export default function FiltersForm({
                     }))}
                     order={[]}
                   />
+
+
+                  {subjectMeta.filterHierarchies?.map(fh => {
+                    return (
+                      <>
+                        {
+                          orderedFilters.find(
+                            value => value[1]?.id === fh.rootFilterId,
+                          )?.[1].legend
+                        }
+                      </>
+                    );
+                  })}
+
                   {orderedFilters.length > 0 && (
                     <FormFieldset
                       error={getError('filters')}
@@ -364,7 +378,6 @@ export default function FiltersForm({
                     ))}
                 </CollapsibleList>
               </SummaryListItem>
-
               {orderedFilters
                 .filter(([groupKey]) => !!values.filters[groupKey])
                 .map(([filterGroupKey, filterGroup]) => (
