@@ -104,7 +104,15 @@ export interface FeaturedTable {
   order: number;
 }
 
+interface FilterHierarchy {
+  rootFilterId: string;
+  childFilterIds: string[];
+  rootOptionIds: string[];
+  tiers: { level: number; hierarchy: { [key: string]: string[] } }[];
+}
+
 export interface SubjectMeta {
+  filterHierarchies: FilterHierarchy[];
   filters: Dictionary<{
     legend: string;
     hint?: string;
