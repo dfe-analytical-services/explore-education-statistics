@@ -21,6 +21,9 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Notifier.Validators.ValidationMessages;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("GovUk.Education.ExploreEducationStatistics.Notifier.Tests")]
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 
@@ -363,16 +366,25 @@ internal class ApiSubscriptionService(
             { NotifierEmailTemplateFields.DataSetVersion, version },
             { NotifierEmailTemplateFields.UnsubscribeUrl, unsubscribeUrl }
         };
-        var emailTemplates = govUkNotifyOptions.Value.EmailTemplates;
-        var templatePicker = new NewVersionEmailTemplateIdPicker(
-            emailTemplates.ApiSubscriptionMajorDataSetVersionId,
-            emailTemplates.ApiSubscriptionMinorDataSetVersionId);
+        
         emailService.SendEmail(
             email: subscription.RowKey,
-            templateId: templatePicker.GetTemplateId(version),
+            templateId: GetTemplateId(version),
             values: personalisation);
     }
 
+    public string GetTemplateId(string version)
+    {
+        if (!DataSetVersionNumber.TryParse(version, out var dataSetVersionNumber))
+        {
+            throw new ArgumentException("The data set version version number supplied is invalid.");
+        }
+        var emailTemplates = govUkNotifyOptions.Value.EmailTemplates;
+        var isNewMajorVersion = dataSetVersionNumber!.Major >= 2
+            && dataSetVersionNumber.Patch == 0
+            && dataSetVersionNumber.Minor == 0;
+        return isNewMajorVersion ? emailTemplates.ApiSubscriptionMajorDataSetVersionId : emailTemplates.ApiSubscriptionMinorDataSetVersionId;
+    }
     private async Task<AsyncPageable<ApiSubscription>> GetExpiredApiSubscriptions(CancellationToken cancellationToken)
     {
         Expression<Func<ApiSubscription, bool>> filter = s =>

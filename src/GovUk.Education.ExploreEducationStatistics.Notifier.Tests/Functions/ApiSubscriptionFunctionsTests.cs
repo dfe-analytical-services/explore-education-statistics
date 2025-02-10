@@ -8,15 +8,20 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Repositories.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Validators;
 using GovUk.Education.ExploreEducationStatistics.Notifier.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Options;
 using Moq;
 using Notify.Models.Responses;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Notifier.Options.GovUkNotifyOptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
@@ -746,7 +751,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         }
     }
 
-    public class NewVersionEmailTemplateIdTests
+    public class ApiSubscriptionServiceTests
     {
         [Theory]
         [InlineData("2.0.0", "major-template-id")]
@@ -764,10 +769,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         [InlineData("0.0.1", "minor-template-id")]
         public void GetTemplateId_ReturnsCorrectTemplateId(string version, string expectedTemplateId)
         {
-            var picker = new Options.NewVersionEmailTemplateIdPicker("major-template-id", "minor-template-id");
-
-            var templateId = picker.GetTemplateId(version);
-
+            var sut = SetUpMockDependendencies();
+            var templateId = sut.GetTemplateId(version);
             Assert.Equal(expectedTemplateId, templateId);
         }
 
@@ -778,10 +781,39 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         [InlineData("")]
         public void GetTemplateId_ThrowsExceptionNotFound(string version)
         {
-            var picker = new Options.NewVersionEmailTemplateIdPicker("major-template-id", "minor-template-id");
-
-            var exception = Assert.Throws<ArgumentException>(() => picker.GetTemplateId(version));
+            var sut = SetUpMockDependendencies();
+            var exception = Assert.Throws<ArgumentException>(() => sut.GetTemplateId(version));
             Assert.Equal("The data set version version number supplied is invalid.", exception.Message);
+        }
+
+        private static ApiSubscriptionService SetUpMockDependendencies()
+        {
+            var tokenServiceMock = new Mock<ITokenService>();
+            var emailServiceMock = new Mock<IEmailService>();
+            var apiSubscriptionRepositoryMock = new Mock<IApiSubscriptionRepository>();
+
+            var govOptions = new GovUkNotifyOptions
+            {
+                EmailTemplates = new EmailTemplateOptions
+                {
+                    ApiSubscriptionMajorDataSetVersionId = "major-template-id",
+                    ApiSubscriptionMinorDataSetVersionId = "minor-template-id"
+                }
+            };
+            var appOptions = new AppOptions() { PublicAppUrl = "test" };
+            
+            var appOptionsMock = new Mock<IOptions<AppOptions>>();
+            appOptionsMock.SetupGet(a => a.Value).Returns(appOptions);
+            
+            var govUkNotifyOptionsMock = new Mock<IOptions<GovUkNotifyOptions>>();
+            govUkNotifyOptionsMock.SetupGet(a => a.Value).Returns(govOptions);
+            
+            return new ApiSubscriptionService(
+                appOptionsMock.Object,
+                govUkNotifyOptionsMock.Object,
+                tokenServiceMock.Object,
+                emailServiceMock.Object,
+                apiSubscriptionRepositoryMock.Object);
         }
     }
 
