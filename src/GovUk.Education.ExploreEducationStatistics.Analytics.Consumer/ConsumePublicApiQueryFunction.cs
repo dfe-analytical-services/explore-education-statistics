@@ -1,31 +1,47 @@
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Model;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer;
 
-public class ConsumePublicApiQueryFunction(ILogger<ConsumePublicApiQueryFunction> logger)
+public class ConsumePublicApiQueryFunction(
+    IAnalyticsPathResolver pathResolver,
+    ILogger<ConsumePublicApiQueryFunction> logger)
 {
     [Function(nameof(ConsumePublicApiQueryFunction))]
     public Task Run(
-        [BlobTrigger("analytics/public-api/queries/{filename}")]
-        CaptureDataSetVersionQueryRequest request,
-        string filename)
+        [TimerTrigger("%App:ConsumePublicApiQueriesCronSchedule%")]
+        TimerInfo timer)
     {
-        var hash = GenerateHash(request);
+        logger.LogInformation($"{nameof(ConsumePublicApiQueryFunction)} triggered");
 
-        logger.LogInformation("""
-                              Processed Public API data set query
-                              Name: {Filename}
-                              Data: {RequestJson}"
-                              Hash: {Hash}
-                              """,
-            filename,
-            JsonSerializer.Serialize(request),
-            hash);
+        var folder = pathResolver.GetPublicApiQueriesFolderPath();
+
+        var queryFiles = Directory.GetFiles(folder).ToList();
+
+        queryFiles.ForEach(filename =>
+        {
+            logger.LogInformation("Found file {Filename} - deleting", filename);
+
+            File.Delete($"{folder}{Path.PathSeparator}{filename}");
+
+            logger.LogInformation("File {Filename} deleted", filename);
+        });
+
+        // var hash = GenerateHash(request);
+        //
+        // logger.LogInformation("""
+        //                       Processed Public API data set query
+        //                       Name: {Filename}
+        //                       Data: {RequestJson}"
+        //                       Hash: {Hash}
+        //                       """,
+        //     filename,
+        //     JsonSerializer.Serialize(request),
+        //     hash);
 
         return Task.CompletedTask;
     }
