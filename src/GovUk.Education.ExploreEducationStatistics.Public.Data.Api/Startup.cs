@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 using AngleSharp.Io;
 using Dapper;
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Options;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -212,6 +215,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             .Bind(configuration.GetRequiredSection(DataFilesOptions.Section));
         services.AddOptions<RequestTimeoutOptions>()
             .Bind(configuration.GetRequiredSection(RequestTimeoutOptions.Section));
+        services.AddOptions<AnalyticsOptions>()
+            .Bind(configuration.GetRequiredSection(AnalyticsOptions.Section));
 
         // Services
 
@@ -247,6 +252,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
 
         services.AddScoped<IAnalyticsService, AnalyticsService>();
+        services.AddScoped<IAnalyticsPathResolver, AnalyticsPathResolver>();
 
         // TODO EES-5660 - remove this migration after it has been run against each Public API-enabled environment.
         services.AddScoped<ICustomMigration, EES5660_MigrateDraftDataSetVersionFolderNames>();

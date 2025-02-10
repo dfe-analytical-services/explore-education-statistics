@@ -121,6 +121,7 @@ internal class DataSetQueryService(
             return await publicDataDbContext.DataSets
                 .AsNoTracking()
                 .Include(ds => ds.LatestLiveVersion)
+                .ThenInclude(dsv => dsv != null ? dsv.DataSet : null)
                 .Where(ds => ds.Id == dataSetId)
                 .Select(ds => ds.LatestLiveVersion!)
                 .SingleOrNotFoundAsync(cancellationToken);
@@ -144,13 +145,18 @@ internal class DataSetQueryService(
                 query: query,
                 cancellationToken: cancellationToken,
                 baseCriteriaPath: baseCriteriaPath)
-            .OnSuccessDo(results => analyticsService.ReportDataSetVersionQuery(
-                dataSetVersion: dataSetVersion,
-                query: query,
-                resultsCount: results.Results.Count,
-                totalRowsCount: results.Paging.TotalResults,
-                startTime: startTime,
-                endTime: DateTime.UtcNow));
+            .OnSuccessDo(results =>
+            {
+                // Deliberately do not await this operation as we do not want to
+                // delay the return of the query to the end user.
+                _ = analyticsService.ReportDataSetVersionQuery(
+                    dataSetVersion: dataSetVersion,
+                    query: query,
+                    resultsCount: results.Results.Count,
+                    totalRowsCount: results.Paging.TotalResults,
+                    startTime: startTime,
+                    endTime: DateTime.UtcNow);
+            });
     }
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(

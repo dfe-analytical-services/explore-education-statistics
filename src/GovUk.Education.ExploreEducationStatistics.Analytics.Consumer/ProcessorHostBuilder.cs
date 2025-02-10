@@ -1,4 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Options;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,12 +27,18 @@ public static class ProcessorHostBuilder
                 // TODO EES-5013 Why can't Command logging be suppressed via the logging config in application settings?
                 logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
             })
-            .ConfigureServices((_, services) =>
+            .ConfigureServices((builder, services) =>
             {
+                var configuration = builder.Configuration;
+                
+                services.AddOptions<AnalyticsOptions>()
+                    .Bind(configuration.GetRequiredSection(AnalyticsOptions.Section));
+                
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
-                    .AddScoped<IAnalyticsPathResolver, IAnalyticsPathResolver>();
+                    .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>()
+                    .AddTransient<IPublicApiAnalyticsService, PublicApiAnalyticsService>();
             });
     }
 }
