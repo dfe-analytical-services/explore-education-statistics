@@ -4,6 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
     {
         // Slug
         SlugNotUnique,
+        ReleaseSlugUsedByRedirect,
         PublicationSlugNotUnique,
         PublicationSlugUsedByRedirect,
         MethodologySlugNotUnique,
@@ -80,7 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Release update
         ReleasePublishedCannotBeFutureDate,
         ReleaseNotPublished,
-        UpdateRequestForPublishedReleaseInvalid,
+        UpdateRequestForPublishedReleaseVersionInvalid,
+        ReleaseUndergoingPublishing,
 
         // Release checklist errors
         DataFileImportsMustBeCompleted,

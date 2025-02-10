@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
+using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -41,14 +41,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId,
             ContactSaveRequest updatedContact);
 
-        Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>> ListLatestReleaseVersionsPaginated(
+        Task<Either<ActionResult, PaginatedListViewModel<ReleaseVersionSummaryViewModel>>> ListLatestReleaseVersionsPaginated(
             Guid publicationId,
             int page,
             int pageSize,
             bool? live = null,
             bool includePermissions = false);
 
-        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
+        Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListLatestReleaseVersions(
             Guid publicationId,
             bool? live = null,
             bool includePermissions = false);

@@ -11,7 +11,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
+    ReleaseVersionAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 // Assert that no User Publication roles will allow deleting the first version of a release
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
                     CreateHandler,
                     releaseVersion);
             }
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 // Assert that no User Publication roles will allow deleting an amendment release version when it is Approved
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
                     CreateHandler,
                     releaseVersion);
             }
@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 // Assert that users with the Publication Owner role on an amendment release version can delete if it is not yet approved
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Add(releaseVersion);
@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task DeleteSpecificReleaseAuthorizationHandler_NotAmendment()
             {
                 // Assert that no User Release roles will allow deleting the first version of a release
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
                     CreateHandler,
                     new ReleaseVersion
                     {
@@ -154,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task DeleteSpecificReleaseAuthorizationHandler_AmendmentButApproved()
             {
                 // Assert that no User Release roles will allow deleting an amendment release version when it is Approved
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
                     CreateHandler,
                     new ReleaseVersion
                     {
@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task DeleteSpecificReleaseAuthorizationHandler_UnapprovedAmendment()
             {
                 // Assert that no User Release roles will allow an amendment release version to be deleted if it is not yet approved
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
                     CreateHandler,
                     new ReleaseVersion
                     {

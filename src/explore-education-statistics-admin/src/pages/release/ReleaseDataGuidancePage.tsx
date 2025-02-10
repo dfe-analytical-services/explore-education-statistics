@@ -4,7 +4,9 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releaseDataGuidanceService, {
   ReleaseDataGuidance,
 } from '@admin/services/releaseDataGuidanceService';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseVersionService, {
+  Release,
+} from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import ReleaseDataGuidancePageContent from '@common/modules/release/components/ReleaseDataGuidancePageContent';
@@ -31,7 +33,7 @@ const ReleaseDataGuidancePage = ({
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [dataGuidance, release] = await Promise.all([
       releaseDataGuidanceService.getDataGuidance(releaseId),
-      releaseService.getRelease(releaseId),
+      releaseVersionService.getRelease(releaseId),
     ]);
 
     return {

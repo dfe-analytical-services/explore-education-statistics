@@ -1,7 +1,7 @@
 import PublicationDraftReleases from '@admin/pages/publication/components/PublicationDraftReleases';
 import PublicationScheduledReleases from '@admin/pages/publication/components/PublicationScheduledReleases';
 import publicationService from '@admin/services/publicationService';
-import { ReleaseSummaryWithPermissions } from '@admin/services/releaseService';
+import { ReleaseSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';

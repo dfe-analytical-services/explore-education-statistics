@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import { MethodologyVersion } from '@admin/services/methodologyService';
-import { DashboardReleaseSummary } from '@admin/services/releaseService';
+import { DashboardReleaseSummary } from '@admin/services/releaseVersionService';
 import {
   MethodologyRouteParams,
   methodologyContentRoute,

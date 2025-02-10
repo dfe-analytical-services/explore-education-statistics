@@ -4,7 +4,9 @@ import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseCon
 import _permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseService, {
+  Release,
+} from '@admin/services/releaseVersionService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -12,7 +14,7 @@ import { MemoryRouter } from 'react-router';
 import ReleaseStatusPage from '../ReleaseStatusPage';
 
 jest.mock('@admin/services/permissionService');
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 
 const permissionService = _permissionService as jest.Mocked<
   typeof _permissionService

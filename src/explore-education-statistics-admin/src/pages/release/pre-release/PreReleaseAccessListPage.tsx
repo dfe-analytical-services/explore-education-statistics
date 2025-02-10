@@ -2,7 +2,7 @@ import glossaryService from '@admin/services/glossaryService';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import releaseService from '@admin/services/releaseService';
+import releaseVersionService from '@admin/services/releaseVersionService';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ContentHtml from '@common/components/ContentHtml';
@@ -21,7 +21,7 @@ const PreReleaseAccessListPage = ({
   const { releaseId } = match.params;
 
   const { value: release, isLoading } = useAsyncHandledRetry(
-    () => releaseService.getRelease(releaseId),
+    () => releaseVersionService.getRelease(releaseId),
     [releaseId],
   );
 

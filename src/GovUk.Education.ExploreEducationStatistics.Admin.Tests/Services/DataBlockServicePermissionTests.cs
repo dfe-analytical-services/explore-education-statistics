@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetDeletePlan()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Create()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Update()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Delete()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IReleaseFileService? releaseFileService = null,
             IUserService? userService = null,
-            IBlobCacheService? cacheService = null,
+            IPrivateBlobCacheService? privateCacheService = null,
             ICacheKeyService? cacheKeyService = null)
         {
             var service = new DataBlockService(
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 userService ?? Mock.Of<IUserService>(Strict),
                 AdminMapper(),
-                cacheService ?? Mock.Of<IBlobCacheService>(Strict),
+                privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
                 cacheKeyService ?? Mock.Of<ICacheKeyService>(Strict)
             );
 

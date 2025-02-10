@@ -52,14 +52,14 @@ public class AuthorizationHandlerService
         _preReleaseService = preReleaseService;
     }
 
-    public Task<bool> HasRolesOnPublicationOrRelease(
+    public Task<bool> HasRolesOnPublicationOrReleaseVersion(
         Guid userId,
         Guid publicationId,
         Guid releaseVersionId,
         IEnumerable<PublicationRole> publicationRoles,
         IEnumerable<ReleaseRole> releaseRoles)
     {
-        return HasRolesOnPublicationOrRelease(
+        return HasRolesOnPublicationOrReleaseVersion(
             userId,
             publicationId,
             () => Task.FromResult((Guid?) releaseVersionId),
@@ -67,7 +67,7 @@ public class AuthorizationHandlerService
             releaseRoles);
     }
 
-    public async Task<bool> HasRolesOnPublicationOrRelease(
+    public async Task<bool> HasRolesOnPublicationOrReleaseVersion(
         Guid userId,
         Guid publicationId,
         Func<Task<Guid?>> releaseVersionIdSupplier,
@@ -96,7 +96,7 @@ public class AuthorizationHandlerService
         return usersReleaseRoles.Any(releaseRoles.Contains);
     }
 
-    public async Task<bool> HasRolesOnPublicationOrAnyRelease(
+    public async Task<bool> HasRolesOnPublicationOrAnyReleaseVersion(
         Guid userId,
         Guid publicationId,
         IEnumerable<PublicationRole> publicationRoles,
@@ -127,7 +127,7 @@ public class AuthorizationHandlerService
         return usersPublicationRoles.Any(publicationRoles.Contains);
     }
 
-    public async Task<bool> HasRolesOnRelease(
+    public async Task<bool> HasRolesOnReleaseVersion(
         Guid userId,
         Guid releaseVersionId,
         params ReleaseRole[] releaseRoles)
@@ -139,7 +139,7 @@ public class AuthorizationHandlerService
         return usersReleaseRoles.Any(releaseRoles.Contains);
     }
 
-    public async Task<bool> IsReleaseViewableByUser(ReleaseVersion releaseVersion, ClaimsPrincipal user)
+    public async Task<bool> IsReleaseVersionViewableByUser(ReleaseVersion releaseVersion, ClaimsPrincipal user)
     {
         // If the user has the "AccessAllReleases" Claim, they can see any release version.
         if (SecurityUtils.HasClaim(user, SecurityClaimTypes.AccessAllReleases))
@@ -157,7 +157,7 @@ public class AuthorizationHandlerService
         }
 
         // If the user has any non-Pre-release Viewer roles on the Release, they can see it at any time.
-        if (await HasRolesOnRelease(
+        if (await HasRolesOnReleaseVersion(
                     userId: user.GetUserId(),
                     releaseVersionId: releaseVersion.Id,
                     UnrestrictedReleaseViewerRoles))
@@ -167,7 +167,7 @@ public class AuthorizationHandlerService
 
         // If the user has the Pre-release Viewer role on this Release and the Release is within its open
         // Pre-release window, they can see the release version.
-        if (await HasRolesOnRelease(
+        if (await HasRolesOnReleaseVersion(
                     userId: user.GetUserId(),
                     releaseVersionId: releaseVersion.Id,
                     ReleaseRole.PrereleaseViewer))

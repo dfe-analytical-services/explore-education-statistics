@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         subjectIds: SetOf(Subject.Id)
                     ),
                 ReleaseVersion,
-                SecurityPolicies.CanUpdateSpecificRelease
+                SecurityPolicies.CanUpdateSpecificReleaseVersion
             );
         }
 
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         releaseVersionId: ReleaseVersion.Id,
                         footnoteId: Footnote.Id),
                 ReleaseVersion,
-                SecurityPolicies.CanUpdateSpecificRelease
+                SecurityPolicies.CanUpdateSpecificReleaseVersion
             );
         }
 
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         subjectIds: SetOf(Subject.Id)
                     ),
                 ReleaseVersion,
-                SecurityPolicies.CanUpdateSpecificRelease
+                SecurityPolicies.CanUpdateSpecificReleaseVersion
             );
         }
 
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     ),
                 ReleaseVersion,
-                SecurityPolicies.CanUpdateSpecificRelease
+                SecurityPolicies.CanUpdateSpecificReleaseVersion
             );
         }
 

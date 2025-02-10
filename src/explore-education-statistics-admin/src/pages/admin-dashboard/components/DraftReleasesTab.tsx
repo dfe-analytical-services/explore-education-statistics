@@ -1,5 +1,5 @@
 import DraftReleasesTable from '@admin/pages/admin-dashboard/components/DraftReleasesTable';
-import { DashboardReleaseSummary } from '@admin/services/releaseService';
+import { DashboardReleaseSummary } from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
 

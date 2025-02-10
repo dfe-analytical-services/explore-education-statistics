@@ -4,7 +4,7 @@ import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import { ReleaseSummaryWithPermissions } from '@admin/services/releaseService';
+import { ReleaseSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import InsetText from '@common/components/InsetText';

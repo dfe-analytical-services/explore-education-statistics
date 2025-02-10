@@ -10,7 +10,9 @@ import _dataBlockService, {
 import _publicationService, {
   Publication,
 } from '@admin/services/publicationService';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseService, {
+  Release,
+} from '@admin/services/releaseVersionService';
 import _tableBuilderService, {
   SubjectMeta,
   TableDataResponse,
@@ -25,7 +27,7 @@ import { generatePath } from 'react-router-dom';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/publicationService');
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 jest.mock('@common/services/tableBuilderService');
 
 const dataBlockService = _dataBlockService as jest.Mocked<

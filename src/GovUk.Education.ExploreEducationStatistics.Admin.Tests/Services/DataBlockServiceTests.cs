@@ -975,9 +975,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.CreateCacheKeyForDataBlock(releaseVersion.Id, dataBlockVersion.Id))
                     .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
 
-                var cacheService = new Mock<IBlobCacheService>(Strict);
+                var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-                cacheService
+                privateCacheService
                     .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
                     .Returns(Task.CompletedTask);
 
@@ -985,11 +985,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     context,
                     releaseFileService: releaseFileService.Object,
                     cacheKeyService: cacheKeyService.Object,
-                    cacheService: cacheService.Object);
+                    privateCacheService: privateCacheService.Object);
 
                 var result = await service.Delete(releaseVersion.Id, dataBlockVersion.Id);
 
-                VerifyAllMocks(releaseFileService, cacheKeyService, cacheService);
+                VerifyAllMocks(releaseFileService, cacheKeyService, privateCacheService);
 
                 result.AssertRight();
             }
@@ -1103,9 +1103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.CreateCacheKeyForDataBlock(releaseVersion.Id, draftDataBlockVersion.Id))
                     .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
 
-                var cacheService = new Mock<IBlobCacheService>(Strict);
+                var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-                cacheService
+                privateCacheService
                     .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
                     .Returns(Task.CompletedTask);
 
@@ -1113,11 +1113,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     context,
                     releaseFileService: releaseFileService.Object,
                     cacheKeyService: cacheKeyService.Object,
-                    cacheService: cacheService.Object);
+                    privateCacheService: privateCacheService.Object);
 
                 var result = await service.Delete(releaseVersion.Id, draftDataBlockVersion.Id);
 
-                VerifyAllMocks(releaseFileService, cacheKeyService, cacheService);
+                VerifyAllMocks(releaseFileService, cacheKeyService, privateCacheService);
 
                 result.AssertRight();
             }
@@ -1524,20 +1524,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.CreateCacheKeyForDataBlock(releaseVersion.Id, dataBlockVersion.Id))
                     .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
 
-                var cacheService = new Mock<IBlobCacheService>(Strict);
+                var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-                cacheService
+                privateCacheService
                     .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
                     .Returns(Task.CompletedTask);
 
                 var service = BuildDataBlockService(
                     context,
                     cacheKeyService: cacheKeyService.Object,
-                    cacheService: cacheService.Object);
+                    privateCacheService: privateCacheService.Object);
 
                 var result = await service.Update(dataBlockVersion.Id, updateRequest);
 
-                VerifyAllMocks(cacheKeyService, cacheService);
+                VerifyAllMocks(cacheKeyService, privateCacheService);
 
                 var updateResult = result.AssertRight();
 
@@ -1646,20 +1646,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.CreateCacheKeyForDataBlock(releaseVersion.Id, dataBlockVersion.Id))
                     .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
 
-                var cacheService = new Mock<IBlobCacheService>(Strict);
+                var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-                cacheService
+                privateCacheService
                     .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
                     .Returns(Task.CompletedTask);
 
                 var service = BuildDataBlockService(
                     context,
                     cacheKeyService: cacheKeyService.Object,
-                    cacheService: cacheService.Object);
+                    privateCacheService: privateCacheService.Object);
 
                 var result = await service.Update(dataBlockVersion.Id, updateRequest);
 
-                VerifyAllMocks(cacheKeyService, cacheService);
+                VerifyAllMocks(cacheKeyService, privateCacheService);
 
                 var viewModel = result.AssertRight();
 
@@ -1791,9 +1791,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.CreateCacheKeyForDataBlock(releaseVersion.Id, dataBlockVersion.Id))
                     .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
 
-                var cacheService = new Mock<IBlobCacheService>(Strict);
+                var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-                cacheService
+                privateCacheService
                     .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
                     .Returns(Task.CompletedTask);
 
@@ -1801,11 +1801,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     context,
                     releaseFileService: releaseFileService.Object,
                     cacheKeyService: cacheKeyService.Object,
-                    cacheService: cacheService.Object);
+                    privateCacheService: privateCacheService.Object);
 
                 var result = await service.Update(dataBlockVersion.Id, updateRequest);
 
-                VerifyAllMocks(releaseFileService, cacheKeyService, cacheService);
+                VerifyAllMocks(releaseFileService, cacheKeyService, privateCacheService);
 
                 var updateResult = result.AssertRight();
 
@@ -1898,7 +1898,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IReleaseFileService? releaseFileService = null,
             IUserService? userService = null,
-            IBlobCacheService? cacheService = null,
+            IPrivateBlobCacheService? privateCacheService = null,
             ICacheKeyService? cacheKeyService = null)
         {
             var service = new DataBlockService(
@@ -1907,7 +1907,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 userService ?? AlwaysTrueUserService().Object,
                 AdminMapper(),
-                cacheService ?? Mock.Of<IBlobCacheService>(Strict),
+                privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
                 cacheKeyService ?? Mock.Of<ICacheKeyService>(Strict)
             );
 

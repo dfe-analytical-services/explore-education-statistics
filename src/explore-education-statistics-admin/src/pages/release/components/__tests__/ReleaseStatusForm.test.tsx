@@ -1,6 +1,6 @@
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
-import { ReleaseChecklistErrorCode } from '@admin/services/releaseService';
+import { ReleaseChecklistErrorCode } from '@admin/services/releaseVersionService';
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import { screen, waitFor, within } from '@testing-library/react';
 import { format } from 'date-fns';

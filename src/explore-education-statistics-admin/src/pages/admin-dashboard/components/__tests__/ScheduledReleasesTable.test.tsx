@@ -1,13 +1,13 @@
 import ScheduledReleasesTable from '@admin/pages/admin-dashboard/components/ScheduledReleasesTable';
 import _releaseService, {
   DashboardReleaseSummary,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('ScheduledReleasesTable', () => {

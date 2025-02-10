@@ -3,7 +3,7 @@ import {
   publicationTeamAccessRoute,
 } from '@admin/routes/publicationRoutes';
 import { Publication } from '@admin/services/publicationService';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseSummary } from '@admin/services/releaseVersionService';
 import userService from '@admin/services/userService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';

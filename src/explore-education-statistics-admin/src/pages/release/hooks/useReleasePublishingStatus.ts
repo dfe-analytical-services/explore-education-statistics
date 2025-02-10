@@ -1,8 +1,8 @@
 import { StatusBlockProps } from '@admin/components/StatusBlock';
 import getStatusDetail from '@admin/pages/release/utils/getStatusDetail';
-import releaseService, {
+import releaseVersionService, {
   ReleaseStageStatus,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import isEqual from 'lodash/isEqual';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { forceCheck } from 'react-lazyload';
@@ -38,7 +38,7 @@ export default function useReleasePublishingStatus({
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const fetchNextStatus = useCallback(async () => {
-    const status = await releaseService.getReleaseStatus(releaseId);
+    const status = await releaseVersionService.getReleaseStatus(releaseId);
 
     const setNextStatus = (nextStatus: ReleaseStageStatus) => {
       setCurrentStatus(prevStatus => {

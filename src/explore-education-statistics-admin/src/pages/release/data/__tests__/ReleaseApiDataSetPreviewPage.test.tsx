@@ -9,7 +9,7 @@ import {
 import _apiDataSetService, {
   ApiDataSet,
 } from '@admin/services/apiDataSetService';
-import { Release } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseVersionService';
 import _previewTokenService, {
   PreviewToken,
 } from '@admin/services/previewTokenService';

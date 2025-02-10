@@ -6,7 +6,7 @@ import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseSummary } from '@admin/services/releaseVersionService';
 import FormattedDate from '@common/components/FormattedDate';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React from 'react';

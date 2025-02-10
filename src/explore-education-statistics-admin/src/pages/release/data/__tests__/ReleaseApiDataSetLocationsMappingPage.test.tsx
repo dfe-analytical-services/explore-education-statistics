@@ -13,7 +13,7 @@ import testLocationsMapping, {
   testLocationsMappingGroups,
 } from '@admin/pages/release/data/__data__/testLocationsMapping';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
-import { Release } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';

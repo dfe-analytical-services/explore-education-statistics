@@ -7,7 +7,7 @@ import {
 import publicationService, {
   PublicationPermissions,
 } from '@admin/services/publicationService';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseSummary } from '@admin/services/releaseVersionService';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';

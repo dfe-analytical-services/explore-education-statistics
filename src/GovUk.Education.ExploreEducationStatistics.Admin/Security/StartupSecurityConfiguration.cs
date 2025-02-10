@@ -91,14 +91,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanCreateReleaseForSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new CreateReleaseForSpecificPublicationRequirement()));
 
+                options.AddPolicy(SecurityPolicies.CanUpdateSpecificRelease.ToString(), policy =>
+                    policy.Requirements.Add(new UpdateSpecificReleaseRequirement()));
+
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
 
                 options.AddPolicy(ContentSecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewReleaseRequirement()));
 
-                options.AddPolicy(SecurityPolicies.CanUpdateSpecificRelease.ToString(), policy =>
-                    policy.Requirements.Add(new UpdateSpecificReleaseRequirement()));
+                options.AddPolicy(SecurityPolicies.CanUpdateSpecificReleaseVersion.ToString(), policy =>
+                    policy.Requirements.Add(new UpdateSpecificReleaseVersionRequirement()));
 
                 options.AddPolicy(SecurityPolicies.CanMarkSpecificReleaseAsDraft.ToString(), policy =>
                     policy.Requirements.Add(new MarkReleaseAsDraftRequirement()));
@@ -225,6 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              */
             services.AddTransient<IAuthorizationHandler, ViewSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdateSpecificReleaseVersionAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, DeleteSpecificReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, DeleteTestReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MarkReleaseAsDraftAuthorizationHandler>();

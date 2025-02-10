@@ -5,7 +5,7 @@ import {
   publicationManageReleaseContributorsPageRoute,
   PublicationTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseSummary } from '@admin/services/releaseVersionService';
 import releasePermissionService from '@admin/services/releasePermissionService';
 import userService from '@admin/services/userService';
 import LoadingSpinner from '@common/components/LoadingSpinner';

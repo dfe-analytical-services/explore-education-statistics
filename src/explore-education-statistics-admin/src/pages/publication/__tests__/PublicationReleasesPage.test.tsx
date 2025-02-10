@@ -5,13 +5,13 @@ import PublicationReleasesPage from '@admin/pages/publication/PublicationRelease
 import _publicationService, {
   PublicationWithPermissions,
 } from '@admin/services/publicationService';
-import _releaseService from '@admin/services/releaseService';
+import _releaseService from '@admin/services/releaseVersionService';
 import { screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
-jest.mock('@admin/services/releaseService');
+jest.mock('@admin/services/releaseVersionService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 jest.mock('@admin/services/publicationService');
