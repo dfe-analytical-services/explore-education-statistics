@@ -560,7 +560,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             fixture.NotificationClient
                 .Setup(mock => mock.SendEmail(
                     Email,
-                    GetGovUkNotifyOptions().EmailTemplates.ApiSubscriptionNotificationId,
+                    GetGovUkNotifyOptions().EmailTemplates.ApiSubscriptionMinorDataSetVersionId,
                     It.Is<Dictionary<string, dynamic>>(personalisation =>
                         AssertEmailTemplateValues(
                             personalisation,
@@ -743,6 +743,45 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             await functions.RemoveExpiredSubscriptions(
                 timerInfo: timerInfo ?? new TimerInfo(),
                 cancellationToken: CancellationToken.None);
+        }
+    }
+
+    public class NewVersionEmailTemplateIdTests
+    {
+        [Theory]
+        [InlineData("2.0.0", "major-template-id")]
+        [InlineData("2.0", "major-template-id")]
+        [InlineData("3.0.0", "major-template-id")]
+        [InlineData("3.0", "major-template-id")]
+        [InlineData("1.1.0", "minor-template-id")]
+        [InlineData("1.1", "minor-template-id")]
+        [InlineData("1.0.1", "minor-template-id")]
+        [InlineData("2.1.0", "minor-template-id")]
+        [InlineData("2.1", "minor-template-id")]
+        [InlineData("2.0.1", "minor-template-id")]
+        [InlineData("1.0.0", "minor-template-id")]
+        [InlineData("1.0", "minor-template-id")]
+        [InlineData("0.0.1", "minor-template-id")]
+        public void GetTemplateId_ReturnsCorrectTemplateId(string version, string expectedTemplateId)
+        {
+            var picker = new Options.NewVersionEmailTemplateIdPicker("major-template-id", "minor-template-id");
+
+            var templateId = picker.GetTemplateId(version);
+
+            Assert.Equal(expectedTemplateId, templateId);
+        }
+
+        [Theory]
+        [InlineData("2.*.0")]
+        [InlineData("Not a version")]
+        [InlineData("1.1.1.1")]
+        [InlineData("")]
+        public void GetTemplateId_ThrowsExceptionNotFound(string version)
+        {
+            var picker = new Options.NewVersionEmailTemplateIdPicker("major-template-id", "minor-template-id");
+
+            var exception = Assert.Throws<ArgumentException>(() => picker.GetTemplateId(version));
+            Assert.Equal("The data set version version number supplied is invalid.", exception.Message);
         }
     }
 

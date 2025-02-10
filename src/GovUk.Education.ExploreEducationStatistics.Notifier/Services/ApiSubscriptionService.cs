@@ -363,10 +363,13 @@ internal class ApiSubscriptionService(
             { NotifierEmailTemplateFields.DataSetVersion, version },
             { NotifierEmailTemplateFields.UnsubscribeUrl, unsubscribeUrl }
         };
-
+        var emailTemplates = govUkNotifyOptions.Value.EmailTemplates;
+        var templatePicker = new NewVersionEmailTemplateIdPicker(
+            emailTemplates.ApiSubscriptionMajorDataSetVersionId,
+            emailTemplates.ApiSubscriptionMinorDataSetVersionId);
         emailService.SendEmail(
             email: subscription.RowKey,
-            templateId: govUkNotifyOptions.Value.EmailTemplates.ApiSubscriptionNotificationId,
+            templateId: templatePicker.GetTemplateId(version),
             values: personalisation);
     }
 
