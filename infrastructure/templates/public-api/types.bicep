@@ -220,7 +220,10 @@ type AppGatewayRewriteCondition = {
 @export()
 type AppGatewayRewriteActionSet = {
   @description('Rewrite config for the URL')
-  urlConfiguration: AppGatewayRewriteUrlConfig
+  urlConfiguration: AppGatewayRewriteUrlConfig?
+
+  @description('Rewrite config for the URL')
+  responseHeaderConfigurations: AppGatewayRewriteHeaderConfig[]?
 }
 
 @export()
@@ -228,11 +231,20 @@ type AppGatewayRewriteUrlConfig = {
   @description('The path after it has been rewritten. Can contain variables from other parts of the request')
   modifiedPath: string?
 
-  @description('The query string after it has been rewritten. Can contain variables from other parts of the request')
+  @description('The query string after it has been rewritten. Can contain variables from other parts of the original request')
   modifiedQueryString: string?
 
   @description('Re-evaluate any associated URL path maps with the rewritten path. Defaults to false')
   reroute: bool?
+}
+
+@export()
+type AppGatewayRewriteHeaderConfig = {
+  @description('The HTTP header to inspect')
+  headerName: string
+
+  @description('The header value after it has been rewritten. Can contain variables from other parts of the original header')
+  headerValue: string
 }
 
 // This is not an exhaustive list. For a list of available operators, see:
