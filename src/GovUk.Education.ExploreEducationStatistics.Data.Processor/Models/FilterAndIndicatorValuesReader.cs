@@ -1,9 +1,9 @@
 # nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 
@@ -21,7 +21,7 @@ public class FilterAndIndicatorValuesReader
     private const string NotSpecifiedFilterItemLabel = "Not specified";
 
     private readonly Dictionary<Guid, int> _indicatorColumnIndexes;
-    private readonly Dictionary<Guid, int> _filterColumnIndexes;
+    private readonly SortedList<int, Guid> _filterColumnIndexes = [];
     private readonly Dictionary<Guid, int> _filterGroupColumnIndexes;
     private readonly Dictionary<string, FilterItem> _filterItemCache;
 
@@ -33,11 +33,12 @@ public class FilterAndIndicatorValuesReader
                 indicatorMeta => indicatorMeta.Indicator.Id,
                 indicatorMeta => csvHeaders.FindIndex(h => h.Equals(indicatorMeta.Column)));
 
-        _filterColumnIndexes = subjectMeta
+        subjectMeta
             .Filters
-            .ToDictionary(
-                filterMeta => filterMeta.Filter.Id,
-                filterMeta => csvHeaders.FindIndex(h => h.Equals(filterMeta.Column)));
+            .ForEach(filterMeta =>
+                _filterColumnIndexes.Add(
+                    csvHeaders.FindIndex(h => h.Equals(filterMeta.Column)),
+                    filterMeta.Filter.Id));
 
         _filterGroupColumnIndexes = subjectMeta
             .Filters
@@ -67,14 +68,17 @@ public class FilterAndIndicatorValuesReader
         IReadOnlyList<string> rowValues,
         Guid filterId)
     {
-        var columnIndex = _filterColumnIndexes[filterId];
+        var indexOfFilter = _filterColumnIndexes.IndexOfValue(filterId);
+        var columnIndex = _filterColumnIndexes.GetKeyAtIndex(indexOfFilter);
 
-        if (columnIndex == -1)
-        {
-            return NotSpecifiedFilterItemLabel;
-        }
+        return columnIndex == -1
+            ? NotSpecifiedFilterItemLabel
+            : rowValues[columnIndex].Trim().NullIfWhiteSpace() ?? NotSpecifiedFilterItemLabel;
+    }
 
-        return rowValues[columnIndex].Trim().NullIfWhiteSpace() ?? NotSpecifiedFilterItemLabel;
+    public int GetFilterItemTier(Guid filterId)
+    {
+        return _filterColumnIndexes.IndexOfValue(filterId) + 1;
     }
 
     public string GetFilterGroupLabel(

@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
@@ -11,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public FilterGroup FilterGroup { get; set; } = null!;
         public Guid FilterGroupId { get; set; }
         public List<FilterItemFootnote> Footnotes { get; set; } = new();
+        [NotMapped]
+        public int Tier { get; set; }
 
         public FilterItem()
         {
@@ -23,12 +26,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             FilterGroupId = filterGroupId;
         }
 
-        public FilterItem(string label, FilterGroup filterGroup)
+        public FilterItem(string label, FilterGroup filterGroup, int tier)
         {
             Id = Guid.NewGuid();
             Label = label;
             FilterGroup = filterGroup;
             FilterGroupId = filterGroup.Id;
+            Tier = tier;
         }
 
         public bool Equals(FilterItem? other)
@@ -41,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((FilterItem) obj);
+            return Equals((FilterItem)obj);
         }
 
         public override int GetHashCode()

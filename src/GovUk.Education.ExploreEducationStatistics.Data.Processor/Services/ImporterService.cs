@@ -106,8 +106,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
             var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
 
-            var filterItemsFromCsv = new HashSet<FilterItemMeta>();
-            var filterGroupsFromCsv = new HashSet<FilterGroupMeta>();
+            //var filterItemsFromCsv = new HashSet<FilterItemMeta>();
+            //var filterGroupsFromCsv = new HashSet<FilterGroupMeta>();
+            List<FilterItem> filterItems = [];
             var locations = new HashSet<Location>();
 
             var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
@@ -139,9 +140,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         var filterItemLabel = filterAndIndicatorReader.GetFilterItemLabel(rowValues, filterMeta.Filter.Id);
                         var filterGroupLabel = filterAndIndicatorReader.GetFilterGroupLabel(rowValues, filterMeta.Filter.Id);
 
-                        // What's the point of using these intermediary FilterGroupMeta/FilterItemMeta types here? They're just mapped to List<FilterGroup/Item> afterwards
-                        filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Id, filterGroupLabel));
-                        filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Id, filterGroupLabel, filterItemLabel));
+                        filterItems.Add(new(
+                            filterItemLabel,
+                            new(filterMeta.Filter.Id, filterGroupLabel),
+                            filterAndIndicatorReader.GetFilterItemTier(filterMeta.Filter.Id)
+                        ));
+
+                        //filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Id, filterGroupLabel));
+                        //filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Id, filterGroupLabel, filterItemLabel));
                     }
 
                     locations.Add(fixedInformationReader.GetLocation(rowValues));
@@ -150,67 +156,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return true;
             });
 
-            var filterGroups = filterGroupsFromCsv
-                .Select(filterGroupMeta => new FilterGroup(filterGroupMeta.FilterId, filterGroupMeta.FilterGroupLabel))
-                .ToList();
+            //var filterGroups = filterGroupsFromCsv
+            //    .Select(filterGroupMeta => new FilterGroup(filterGroupMeta.FilterId, filterGroupMeta.FilterGroupLabel))
+            //    .ToList();
 
-            var filterItems = filterItemsFromCsv
-                .Select(filterItemMeta =>
-                {
-                    var (filterId, filterGroupLabel, filterItemLabel) = filterItemMeta;
+            //var filterItems = filterItemsFromCsv
+            //    .Select(filterItemMeta =>
+            //    {
+            //        var (filterId, filterGroupLabel, filterItemLabel) = filterItemMeta;
 
-                    var filterGroup = filterGroups.Single(fg =>
-                        fg.FilterId.Equals(filterId) // FilterId refers to an item's PARENT
-                        && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
+            //        var filterGroup = filterGroups.Single(fg =>
+            //            fg.FilterId.Equals(filterId)
+            //            && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
 
-                    return new FilterItem(filterItemLabel, filterGroup); // includes filterGroups objects in returned filterItems
-                })
-                .ToList();
+            //        var filterTier = filterAndIndicatorReader.GetFilterItemTier(filterId);
 
-            var tierOneFilterGroupIds = filterGroups // this gives the top-level group of each of the 3 (total, higher, entry level)
-                .Select(group => group.FilterId)
-                .Distinct()
-                .ToList();
+            //        return new FilterItem(filterItemLabel, filterGroup, filterTier); // includes filterGroups objects in returned filterItems
+            //    })
+            //    .ToList();
 
-            var tierOneFilterItems = filterItems.Where(fi => fi.FilterGroup.Label == "Default");
-            var tierTwoFilterItems = filterItems.Where(fi => fi.FilterGroup.Label != "Default");
-            // works, but not very robust? (can reference Default's ID if needed) - only caters to 3 tier structure - need to add column to identify the tier if it grows to 4+?
+            var tierOneFilterGroupIds = filterItems // changing from group/item objects straight to filterItems has broken this bit (IDs aren't being found)
+                .Where(fi => fi.Tier == 1)
+                .Select(fi => fi.Id);
 
-            // NB. tierOneFilterItems doesn't reference the same objects as tierOneFilterGroupIds because they are separate types (FilterGroups/FilterItems)
-            // but seem to contain the same info
-            // Not sure of reason for defining some "items" as a "group" at a class level
-            // Why aren't they all just "items"?
-
-
-            // NB. this needs to work for both existing data sets with no default CSV column, and new ones with it
             var filterIdToAutoSelectFilterItem = tierOneFilterGroupIds
-                // this creates a dictionary consisting of
-                // key: a tier-one filter group's ID
-                // value: list of all filters which have a PARENT of one of the tierOneFilterGroupIds (total, higher, entry level)  
-
-                // what needs to happen(?):
-                // key: a tier 1 OR 2 filter ID
-                // value: a single filter "Total" which falls under that parent tier
                 .ToDictionary(
                     filterId => filterId,
                     filterId =>
                     {
                         var item = context.Filter.Where(f => f.Id == filterId);
-                        // GroupCsvColumn = null if parent filter
-                        // Subject has filters containing (names: e.g. qualification_level	subject_area	course_title)
-                        //      - itself
-                        //      - any parent filters (if present)
 
                         var autoSelectFilterItemLabel = context.Filter
                             .Where(f => f.Id == filterId)
                             .Select(f => f.AutoSelectFilterItemLabel)
                             .SingleOrDefault() ?? "Total"; // If meta file didn't specify a default, look for "Total"
-
-                        // TODO: This query needs to be able to climb up the hierarchy to determine the _parent_ "Total" (or alternative name)
-                        // i.e default selection for each filter's auto-selection option
-                        // i.e. a recursive query
-                        // ...
-                        // or was it the "Total" for each filter group?
 
                         var stuff = filterItems
                             .Where(item =>
