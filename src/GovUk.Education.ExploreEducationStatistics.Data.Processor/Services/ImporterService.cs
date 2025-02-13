@@ -180,6 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Select(fi => fi.Id);
 
             var filterIdToAutoSelectFilterItem = tierOneFilterGroupIds
+                // foreach filter, select the item which determines whether it should be autoselected (i.e. its parent's assigned "filter_default" or "Total")
                 .ToDictionary(
                     filterId => filterId,
                     filterId =>

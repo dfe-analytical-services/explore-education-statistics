@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
@@ -12,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string Label { get; set; } = string.Empty;
         public List<FilterItem> FilterItems { get; set; } = new();
         public List<FilterGroupFootnote> Footnotes { get; set; } = new();
+        [NotMapped]
+        public int Tier { get; set; }
 
         public static IEqualityComparer<FilterGroup> IdComparer { get; } = new IdEqualityComparer();
 
@@ -29,9 +32,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             FilterItems = new List<FilterItem>();
         }
 
+        public FilterGroup(Guid filterId, string label, int tier)
+        {
+            Id = Guid.NewGuid();
+            FilterId = filterId;
+            Label = label;
+            FilterItems = new List<FilterItem>();
+            Tier = tier;
+        }
+
         public FilterGroup Clone()
         {
-            return (FilterGroup) MemberwiseClone();
+            return (FilterGroup)MemberwiseClone();
         }
 
         private sealed class IdEqualityComparer : IEqualityComparer<FilterGroup>
