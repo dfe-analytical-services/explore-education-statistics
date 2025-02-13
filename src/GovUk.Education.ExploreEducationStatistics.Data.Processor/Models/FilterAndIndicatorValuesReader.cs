@@ -81,6 +81,11 @@ public class FilterAndIndicatorValuesReader
         return _filterColumnIndexes.IndexOfValue(filterId) + 1;
     }
 
+    public int GetFilterGroupTier(Guid filterId)
+    {
+        return _filterColumnIndexes.IndexOfValue(filterId); // not +1 because "Default" is the top tier which isn't a real level
+    }
+
     public string GetFilterGroupLabel(
         IReadOnlyList<string> rowValues,
         Guid filterId)

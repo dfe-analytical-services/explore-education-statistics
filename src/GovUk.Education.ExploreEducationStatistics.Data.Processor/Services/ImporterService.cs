@@ -106,8 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
             var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
 
-            //var filterItemsFromCsv = new HashSet<FilterItemMeta>();
-            //var filterGroupsFromCsv = new HashSet<FilterGroupMeta>();
+            var filterItemsFromCsv = new HashSet<FilterItemMeta>();
+            var filterGroupsFromCsv = new HashSet<FilterGroupMeta>();
             List<FilterItem> filterItems = [];
             var locations = new HashSet<Location>();
 
@@ -146,8 +146,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                             filterAndIndicatorReader.GetFilterItemTier(filterMeta.Filter.Id)
                         ));
 
-                        //filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Id, filterGroupLabel));
-                        //filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Id, filterGroupLabel, filterItemLabel));
+                        filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Id, filterGroupLabel));
+                        filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Id, filterGroupLabel, filterItemLabel));
                     }
 
                     locations.Add(fixedInformationReader.GetLocation(rowValues));
@@ -156,39 +156,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return true;
             });
 
-            //var filterGroups = filterGroupsFromCsv
-            //    .Select(filterGroupMeta => new FilterGroup(filterGroupMeta.FilterId, filterGroupMeta.FilterGroupLabel))
-            //    .ToList();
+            var filterGroups = filterGroupsFromCsv
+                .Select(filterGroupMeta => new FilterGroup(filterGroupMeta.FilterId, filterGroupMeta.FilterGroupLabel, filterAndIndicatorReader.GetFilterGroupTier(filterGroupMeta.FilterId)))
+                .ToList();
 
-            //var filterItems = filterItemsFromCsv
-            //    .Select(filterItemMeta =>
-            //    {
-            //        var (filterId, filterGroupLabel, filterItemLabel) = filterItemMeta;
+            var filterItems2 = filterItemsFromCsv
+                .Select(filterItemMeta =>
+                {
+                    var (filterId, filterGroupLabel, filterItemLabel) = filterItemMeta;
 
-            //        var filterGroup = filterGroups.Single(fg =>
-            //            fg.FilterId.Equals(filterId)
-            //            && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
+                    var filterGroup = filterGroups.Single(fg =>
+                        fg.FilterId.Equals(filterId)
+                        && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
 
-            //        var filterTier = filterAndIndicatorReader.GetFilterItemTier(filterId);
+                    var filterTier = filterAndIndicatorReader.GetFilterItemTier(filterId);
 
-            //        return new FilterItem(filterItemLabel, filterGroup, filterTier); // includes filterGroups objects in returned filterItems
-            //    })
-            //    .ToList();
+                    return new FilterItem(filterItemLabel, filterGroup, filterTier); // includes filterGroups objects in returned filterItems
+                })
+                .ToList();
 
             var tierOneFilterGroupIds = filterItems // changing from group/item objects straight to filterItems has broken this bit (IDs aren't being found)
                 .Where(fi => fi.Tier == 1)
                 .Select(fi => fi.Id);
 
-            var filterIdToAutoSelectFilterItem = tierOneFilterGroupIds
+            var filterIdToAutoSelectFilterItem = filterGroups
                 // foreach filter, select the item which determines whether it should be autoselected (i.e. its parent's assigned "filter_default" or "Total")
                 .ToDictionary(
-                    filterId => filterId,
-                    filterId =>
+                    filterGroup => filterGroup.Id,
+                    filterGroup =>
                     {
+                        var filterId = filterGroup.Id;
                         var item = context.Filter.Where(f => f.Id == filterId);
 
                         var autoSelectFilterItemLabel = context.Filter
-                            .Where(f => f.Id == filterId)
+                            .Where(f => f.Id == filterGroup.Id)
                             .Select(f => f.AutoSelectFilterItemLabel)
                             .SingleOrDefault() ?? "Total"; // If meta file didn't specify a default, look for "Total"
 
