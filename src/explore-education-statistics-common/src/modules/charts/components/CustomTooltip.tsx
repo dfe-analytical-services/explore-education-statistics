@@ -51,7 +51,7 @@ const CustomTooltip = ({
         {tooltipLabel}
       </p>
 
-      {!!payload.length && (
+      {payload && !!payload.length && (
         <ul className={styles.itemList} data-testid="chartTooltip-items">
           {getPayloadOrder()?.map((item, index) => {
             const dataKey =

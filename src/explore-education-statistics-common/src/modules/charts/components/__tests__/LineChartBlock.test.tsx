@@ -1,6 +1,8 @@
 import {
   testChartConfiguration,
   testChartTableData,
+  testEmptyChartConfiguration,
+  testEmptyChartTableData,
 } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import LineChartBlock, {
@@ -62,6 +64,27 @@ describe('LineChartBlock', () => {
       // expect there to be lines for all 3 data sets
       expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
     });
+  });
+
+  test('does not render the chart if there is no chart data', async () => {
+    const emptyFullTable = mapFullTable(testEmptyChartTableData);
+    const emptyChartProps: LineChartProps = {
+      ...testEmptyChartConfiguration,
+      legend: testEmptyChartConfiguration.legend as LegendConfiguration,
+      axes: testEmptyChartConfiguration.axes as LineChartProps['axes'],
+      meta: emptyFullTable.subjectMeta,
+      data: emptyFullTable.results,
+      dataLabelPosition: 'above',
+    };
+    const { container } = render(<LineChartBlock {...emptyChartProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No data to display.')).toBeInTheDocument();
+    });
+
+    expect(
+      container.querySelector('.recharts-wrapper'),
+    ).not.toBeInTheDocument();
   });
 
   test('major axis can be hidden', () => {
