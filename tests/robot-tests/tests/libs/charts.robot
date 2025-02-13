@@ -180,6 +180,11 @@ user checks map chart indicator tile contains
     user waits until element is visible    ${indicator_stat}
     user waits until element contains    ${indicator_stat}    ${statistic}
 
+user gets map boundary polygon dimensions
+    [Arguments]    ${index}=1
+    ${dimensions}=    Get Element Attribute    xpath://*[@class='leaflet-interactive'][${index}]    d
+    [Return]    ${dimensions}
+
 user checks infographic chart contains alt
     [Arguments]    ${locator}    ${text}
     user waits until parent contains element    ${locator}    css:img[alt="${text}"]
@@ -203,12 +208,6 @@ user configures basic chart
     user enters text into element    id:chartConfigurationForm-height    ${CHART_HEIGHT}
     user enters text into element    id:chartConfigurationForm-width    ${CHART_WIDTH}
 
-    IF    "${CHART_TYPE}" == "Geographic"
-        user clicks link    Boundary levels
-        user waits until h3 is visible    Boundary levels    %{WAIT_MEDIUM}
-        user chooses select option at index    name:boundaryLevel    1
-    END
-
     IF    "${CHART_ALT_TEXT}" != "${EMPTY}"
         user enters text into element    label:Alt text    ${CHART_ALT_TEXT}
     END
@@ -217,9 +216,12 @@ user configures basic chart
         user enters text into element    label:Subtitle    ${CHART_SUBTITLE}
     END
 
-    # Prevent intermittent failure when trying to switch to other chart tab
-    # after running this keyword
-    user clicks link    Chart configuration
+    IF    "${CHART_TYPE}" == "Geographic"
+        user clicks link    Boundary levels
+        user waits until h3 is visible    Boundary levels    %{WAIT_MEDIUM}
+        user chooses select option at index    id:chartBoundaryLevelsConfigurationForm-boundaryLevel    1
+        user clicks link    Chart configuration
+    END
 
 user selects all data sets for chart
     user clicks link    Data sets

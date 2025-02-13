@@ -14,7 +14,8 @@ import MapBlock, {
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useState } from 'react';
+import getMapInitialBoundaryLevel from './utils/getMapInitialBoundaryLevel';
 
 type HorizontalBarRendererProps = {
   type: 'horizontalbar';
@@ -51,9 +52,12 @@ export interface ChartRendererProps {
 
 function ChartRenderer({ source, id, chart }: ChartRendererProps) {
   const { data, meta, subtitle, title, type } = chart;
+  const [selectedBoundaryLevelId, setSelectedBoundaryLevelId] = useState(
+    type === 'map' ? getMapInitialBoundaryLevel(chart) : undefined,
+  );
 
   const chartComponent = useMemo(() => {
-    switch (chart.type) {
+    switch (type) {
       case 'line':
         return <LineChartBlock {...chart} />;
       case 'verticalbar':
@@ -61,7 +65,16 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
       case 'horizontalbar':
         return <HorizontalBarBlock {...chart} />;
       case 'map':
-        return <MapBlock {...chart} id={`${id}-map`} />;
+        return (
+          <MapBlock
+            {...chart}
+            onBoundaryLevelChange={number => {
+              setSelectedBoundaryLevelId(number);
+              return chart.onBoundaryLevelChange(number);
+            }}
+            id={`${id}-map`}
+          />
+        );
       case 'infographic':
         return <InfographicBlock {...chart} />;
       default:
@@ -69,25 +82,35 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
     }
   }, [id, chart]);
 
-  if (data?.length > 0 && meta) {
-    const footnotes = [...meta.footnotes];
+  const footnotes = useMemo(() => {
+    if (!data?.length || !meta) {
+      return [];
+    }
 
+    const metaFootnotes = [...meta.footnotes];
     const boundaryFootnoteId = 'map-footnote';
+
     if (
       type === 'map' &&
-      footnotes.findIndex(footnote => footnote.id === boundaryFootnoteId) === -1
+      metaFootnotes.findIndex(
+        footnote => footnote.id === boundaryFootnoteId,
+      ) === -1
     ) {
       const selectedBoundaryLevel = meta.boundaryLevels.find(
-        boundaryLevel => boundaryLevel.id === chart.boundaryLevel,
+        boundaryLevel => boundaryLevel.id === selectedBoundaryLevelId,
       );
       if (selectedBoundaryLevel) {
-        footnotes.push({
+        metaFootnotes.push({
           id: boundaryFootnoteId,
           label: `This map uses the boundary data ${selectedBoundaryLevel.label}`,
         });
       }
     }
 
+    return metaFootnotes;
+  }, [chart, data, meta, selectedBoundaryLevelId]);
+
+  if (data?.length && meta) {
     return (
       <figure className="govuk-!-margin-0" id={id} data-testid={id}>
         {title && (
