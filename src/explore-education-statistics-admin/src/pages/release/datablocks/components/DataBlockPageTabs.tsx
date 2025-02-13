@@ -27,7 +27,6 @@ import logger from '@common/services/logger';
 import tableBuilderService, {
   ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
-import minDelay from '@common/utils/minDelay';
 import { produce } from 'immer';
 import omit from 'lodash/omit';
 import React, { useCallback, useState } from 'react';
@@ -50,7 +49,6 @@ const DataBlockPageTabs = ({
   // Track number of saves as we can use this to
   // force re-rendering of the tab sections.
   const [saveNumber, setSaveNumber] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
 
   const {
     value: tableState,
@@ -188,8 +186,6 @@ const DataBlockPageTabs = ({
 
   const handleDataBlockSave = useCallback(
     async (nextDataBlock: SavedDataBlock) => {
-      setIsSaving(true);
-
       const dataBlockToSave: SavedDataBlock = {
         ...nextDataBlock,
         query: {
@@ -199,7 +195,7 @@ const DataBlockPageTabs = ({
         },
       };
 
-      const savedDataBlock = await minDelay(async () => {
+      const getSavedDataBlock = async () => {
         if (dataBlockToSave.id) {
           await handleFeaturedTableChange({
             originalName: dataBlock?.highlightName,
@@ -208,7 +204,8 @@ const DataBlockPageTabs = ({
             newDescription: dataBlockToSave.highlightDescription,
             dataBlockId: dataBlockToSave.id,
           });
-          return dataBlocksService.updateDataBlock(
+
+          await dataBlocksService.updateDataBlock(
             dataBlockToSave.id,
             dataBlockToSave as ReleaseDataBlock,
           );
@@ -228,13 +225,12 @@ const DataBlockPageTabs = ({
         });
 
         return newDataBlock;
-      }, 500);
+      };
+      const savedDataBlock = await getSavedDataBlock();
 
       if (onDataBlockSave) {
         onDataBlockSave(savedDataBlock);
       }
-
-      setIsSaving(false);
       setSaveNumber(saveNumber + 1);
     },
     [
@@ -362,12 +358,7 @@ const DataBlockPageTabs = ({
 
   return (
     <div style={{ position: 'relative' }} className="govuk-!-padding-top-2">
-      {(isLoading || isSaving) && (
-        <LoadingSpinner
-          text={`${isSaving ? 'Saving data block' : 'Loading data block'}`}
-          overlay
-        />
-      )}
+      {isLoading && <LoadingSpinner text="Loading data block" overlay />}
 
       {dataBlock && tableState && tableState?.initialStep < 5 && (
         <WarningMessage>
