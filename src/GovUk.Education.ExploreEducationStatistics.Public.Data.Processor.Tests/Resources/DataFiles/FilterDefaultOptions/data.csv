@@ -1,0 +1,29 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,qualification_type,qualification_level,subject_area,course_title,enrollment_count
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Total,All,All areas,Total,6544
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Total,All,All areas,Total,1212
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Vocational,Higher,Construction,Total,353
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Vocational,Higher,Construction,Total,46
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Vocational,Higher,Construction,Bricklaying,654
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Vocational,Higher,Construction,Bricklaying,2
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Vocational,Higher,Construction,Plastering,3
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Vocational,Higher,Construction,Plastering,4
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Vocational,Higher,Horticulture,Total,787
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Vocational,Higher,Horticulture,Total,6000
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Vocational,Higher,Horticulture,Forestry,5
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Vocational,Higher,Horticulture,Forestry,6
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Vocational,Higher,Horticulture,Hedge rows,7
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Vocational,Higher,Horticulture,Hedge rows,8
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Academic,Entry level,All areas,Total,65465
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Academic,Entry level,All areas,Total,65488
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Academic,Entry level,Science,Total,32
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Academic,Entry level,Science,Total,1234
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Academic,Entry level,Science,Biochemistry,9
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Academic,Entry level,Science,Biochemistry,10
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Academic,Entry level,Science,Physics,11
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Academic,Entry level,Science,Physics,12
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Academic,Entry level,Engineering,Total,234
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Academic,Entry level,Engineering,Total,23
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Academic,Entry level,Engineering,Civil engineering,13
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Academic,Entry level,Engineering,Civil engineering,14
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,Academic,Entry level,Engineering,Electrical engineering,15
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Academic,Entry level,Engineering,Electrical engineering,16

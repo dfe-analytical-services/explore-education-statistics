@@ -30,6 +30,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
     public static readonly TheoryData<ProcessorTestData> TestDataFiles = new()
     {
         ProcessorTestData.AbsenceSchool,
+        ProcessorTestData.FilterDefaultOptions
     };
 
     public static readonly TheoryData<ProcessorTestData, int> TestDataFilesWithMetaInsertBatchSize =
@@ -37,6 +38,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             { ProcessorTestData.AbsenceSchool, 1 },
             { ProcessorTestData.AbsenceSchool, 1000 },
+            { ProcessorTestData.FilterDefaultOptions, 1000 },
         };
 
     public class ImportMetadataDbTests(ProcessorFunctionsIntegrationTestFixture fixture)
@@ -170,7 +172,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 .SelectMany(level => level.OptionLinks)
                 .ToList();
 
-            Assert.Equal(15, actualLinks.Count);
+            Assert.Equal(testData.ExpectedLocations.Sum(l => l.Options.Count), actualLinks.Count);
             Assert.All(actualLinks, link =>
                 Assert.Equal(SqidEncoder.Encode(link.OptionId), link.PublicId));
         }
@@ -293,7 +295,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 .Where(link => link != actualMappedOption1Link && link != actualMappedOption2Link)
                 .ToList();
 
-            Assert.Equal(13, otherLinks.Count);
+            Assert.Equal(testData.ExpectedLocations.Sum(l => l.Options.Count), actualLinks.Count);
             Assert.All(otherLinks, link =>
                 Assert.Equal(SqidEncoder.Encode(link.OptionId), link.PublicId));
         }
@@ -1314,6 +1316,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         actualFilter.AssertDeepEqualTo(expectedFilter,
             ignoreProperties:
             [
+                m => m.DefaultOption,
                 m => m.DataSetVersionId,
                 m => m.Options,
                 m => m.OptionLinks,
