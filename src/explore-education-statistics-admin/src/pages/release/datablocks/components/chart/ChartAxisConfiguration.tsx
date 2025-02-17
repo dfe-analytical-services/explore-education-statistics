@@ -278,7 +278,9 @@ const ChartAxisConfiguration = ({
       min: Yup.number(),
       visible: Yup.boolean(),
       unit: Yup.string(),
-      decimalPlaces: Yup.string(),
+      decimalPlaces: Yup.number().positive(
+        'Displayed decimal places must be positive',
+      ),
       labelText: Yup.string(),
       labelWidth: Yup.number().positive('Label width must be positive'),
     });
@@ -601,12 +603,14 @@ const ChartAxisConfiguration = ({
                             hint="Leave blank to set default from metadata"
                             width={10}
                           />
-                          <FormFieldNumberInput<ChartAxisConfigurationFormValues>
-                            label="Displayed decimal places"
-                            name="decimalPlaces"
-                            hint="Leave blank to set default from metadata"
-                            width={10}
-                          />
+                          {type === 'minor' && (
+                            <FormFieldNumberInput<ChartAxisConfigurationFormValues>
+                              label="Displayed decimal places"
+                              name="decimalPlaces"
+                              hint="Leave blank to set default from metadata"
+                              width={10}
+                            />
+                          )}
                         </>
                       }
                     />
