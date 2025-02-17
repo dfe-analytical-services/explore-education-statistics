@@ -111,6 +111,10 @@ const HorizontalBarBlock = ({
   const chartHasNegativeValues =
     (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
 
+  if (!chartData.length) {
+    return <p className="govuk-!-margin-top-5">No data to display.</p>;
+  }
+
   return (
     <ChartContainer
       height={height || 300}
