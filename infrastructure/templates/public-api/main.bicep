@@ -475,6 +475,24 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
               }
             }
           }
+          {
+            name: 'replace-docs-backend-fqdn-with-public-docs-url'
+            conditions: [
+              {
+                variable: 'http_resp_Location'
+                pattern: 'https://${docsModule.outputs.appFqdn}/(.*)'
+                ignoreCase: true
+              }
+            ]
+            actionSet: {
+              responseHeaderConfigurations: [
+                {
+                  headerName: 'Location'
+                  headerValue: '${publicUrls.publicApi}/docs/{http_resp_Location_1}'
+                }
+              ]
+            }
+          }
         ]
       }
     ]
