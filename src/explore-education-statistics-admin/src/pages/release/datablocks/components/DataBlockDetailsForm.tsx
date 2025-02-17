@@ -28,12 +28,14 @@ const featuredTableDescriptionMaxLength = 200;
 const formId = 'dataBlockDetailsForm';
 
 interface Props {
+  hasChart?: boolean;
   initialValues?: DataBlockDetailsFormValues;
   onTitleChange?: (title: string) => void;
   onSubmit: (dataBlock: DataBlockDetailsFormValues) => void;
 }
 
 const DataBlockDetailsForm = ({
+  hasChart = false,
   initialValues = {
     heading: '',
     name: '',
@@ -50,7 +52,7 @@ const DataBlockDetailsForm = ({
     isHighlight,
     ...values
   }: FormValues) => {
-    onSubmit({
+    return onSubmit({
       ...values,
       highlightName: isHighlight ? highlightName : '',
       highlightDescription: isHighlight ? highlightDescription : '',
@@ -93,15 +95,20 @@ const DataBlockDetailsForm = ({
 
   return (
     <FormProvider
+      fallbackServerValidationError={
+        hasChart
+          ? 'The form submission is invalid and could not be processed. Please check the Chart configuration for errors.'
+          : undefined
+      }
       initialValues={{
         ...initialValues,
-        isHighlight: !!initialValues?.highlightName ?? false,
+        isHighlight: !!initialValues?.highlightName,
       }}
       validationSchema={validationSchema}
     >
       {({ formState, getValues }) => {
         return (
-          <Form id={formId} onSubmit={handleSubmit}>
+          <Form id={formId} submitId={formId} onSubmit={handleSubmit}>
             <h2>Data block details</h2>
 
             <FormGroup>
