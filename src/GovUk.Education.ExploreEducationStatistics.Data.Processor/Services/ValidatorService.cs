@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -15,6 +10,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IFileTypeService _fileTypeService;
         private readonly IDataImportService _dataImportService;
-        
+
         public ValidatorService(
             ILogger<ValidatorService> logger,
             IPrivateBlobStorageService privateBlobStorageService,
@@ -72,14 +72,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         /// Intervals at which to perform import status checks and updates.
         /// </summary>
         private const int Stage1RowCheck = 1000;
-        
+
         private static readonly List<string> MandatoryObservationColumns = new()
         {
             "time_identifier",
             "time_period",
             "geographic_level"
         };
-        
+
         public async Task<Either<List<DataImportError>, ProcessorStatistics>> Validate(Guid importId)
         {
             var import = await _dataImportService.GetImport(importId);
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
 
-            var dataFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, 
+            var dataFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles,
                 import.File.Path());
 
             var metaFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles,
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         var dataFileColumnHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
                         var dataFileTotalRows = await CsvUtils.GetTotalRows(dataFileStreamProvider);
 
-                        return await 
+                        return await
                             ValidateObservationHeaders(dataFileColumnHeaders)
                             .OnSuccess(() => ValidateAndCountObservations(
                                 import,
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var totalRows = 0;
             var errors = new List<DataImportError>();
-            
+
             // Check for unexpected column names
             Array.ForEach(ImporterMetaService.RequiredMetaColumns, col =>
             {
@@ -160,19 +160,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var reader = new MetaDataFileReader(csvHeaders);
 
+            var hasDefaultColumn = csvHeaders.Contains(MetaColumns.filter_default.ToString());
+            var filterGroups = new List<string>();
+            var filters = new List<string>();
+
             await CsvUtils.ForEachRow(fileStreamProvider, (cells, index, _) =>
             {
                 totalRows++;
-                
+
                 if (cells.Count != csvHeaders.Count)
                 {
                     var errorCode = MetaFileHasInvalidNumberOfColumns;
                     errors.Add(new DataImportError($"Error at data row {index + 1}: {errorCode.GetEnumLabel()}"));
                 }
-                
+
                 try
                 {
-                    reader.GetMetaRow(cells);
+                    var row = reader.GetMetaRow(cells);
+
+                    // TODO: Remove following two conditions for EES-5884
+                    if (row.ColumnType == ColumnType.Filter)
+                    {
+                        filters.Add(row.ColumnName);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(row?.FilterGroupingColumn))
+                    {
+                        filterGroups.Add(row.FilterGroupingColumn);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -180,20 +195,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
             });
 
+            // EES-5860 resolved a bug introduced as part of EES-4735, but doesn't include support for filter hierarchies.
+            // The following condition prevents publishers from uploading data sets which would cause the importer to fail.
+            // EES-5884 aims to implement hierarchy support, after which this condition should be removed.
+            if (hasDefaultColumn && filterGroups.Any(filters.Contains))
+            {
+                errors.Add(new DataImportError("The filter_default column cannot be used in conjunction with filter hierarchies"));
+            }
+
             if (errors.Count > 0)
             {
                 _logger.LogDebug("CSV metadata file {FileName} is invalid - {Errors}", file.Filename, errors.JoinToString());
                 return errors;
             }
-            
+
             _logger.LogDebug("CSV metadata file {FileName} is valid", file.Filename);
-            
+
             return (csvHeaders, totalRows);
         }
 
         private static async Task<Either<List<DataImportError>, Unit>> ValidateObservationHeaders(List<string> cols)
         {
-            var errors = new List<DataImportError>();   
+            var errors = new List<DataImportError>();
 
             foreach (var mandatoryCol in MandatoryObservationColumns)
             {
@@ -226,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
             var errors = new List<DataImportError>();
-            
+
             var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
 
             await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index, _) =>
@@ -236,18 +259,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     errors.Add(new DataImportError(FirstOneHundredErrors.GetEnumLabel()));
                     return false;
                 }
-                
+
                 if (rowValues.Count != csvHeaders.Count)
                 {
                     errors.Add(new DataImportError($"Error at row {index + 1}: cell count {rowValues.Count} " +
                                                    $"does not match column header count of {csvHeaders.Count}"));
                     return true;
                 }
-                
+
                 if (index % Stage1RowCheck == 0)
                 {
                     var currentStatus = await _dataImportService.GetImportStatus(import.Id);
-                    
+
                     if (currentStatus.IsFinishedOrAborting())
                     {
                         _logger.LogInformation(
@@ -263,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     fixedInformationReader.GetYear(rowValues);
 
                     var level = fixedInformationReader.GetGeographicLevel(rowValues);
-                    
+
                     if (rowCountByGeographicLevel.ContainsKey(level))
                     {
                         rowCountByGeographicLevel[level]++;
@@ -282,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     await _dataImportService.UpdateStatus(import.Id,
                         DataImportStatus.STAGE_1,
-                        (double) index / totalRows * 100);
+                        (double)index / totalRows * 100);
                 }
 
                 return true;
@@ -290,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             if (errors.Count > 0)
             {
-                _logger.LogDebug("{ErrorCount} errors fond whilst validating {FileName}", 
+                _logger.LogDebug("{ErrorCount} errors fond whilst validating {FileName}",
                     errors.Count, import.File.Filename);
                 return errors;
             }
