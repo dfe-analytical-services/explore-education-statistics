@@ -362,7 +362,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     containerAppEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     containerAppEnvironmentIpAddress: containerAppEnvironmentModule.outputs.containerAppEnvironmentIpAddress
     contentApiUrl: publicUrls.contentApi
-    publicApiUrl: publicUrls.publicApiAppGateway
+    publicApiUrl: publicUrls.publicApi
     publicSiteUrl: publicUrls.publicSite
     dockerImagesTag: dockerImagesTag
     appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
