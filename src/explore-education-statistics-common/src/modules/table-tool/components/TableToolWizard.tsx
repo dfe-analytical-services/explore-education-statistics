@@ -399,7 +399,7 @@ export default function TableToolWizard({
               },
             },
             name: 'qualification_level',
-            totalValue: '99bac031-9da6-443b-8c4e-16daa14fa631',
+            autoSelectFilterItemId: '99bac031-9da6-443b-8c4e-16daa14fa631',
             order: 0,
           },
           NameOfCourseBeingStudied: {
@@ -496,7 +496,7 @@ export default function TableToolWizard({
             },
             name: 'course_title',
             groupCsvColumn: 'subject_area',
-            totalValue: 'd0121b2f-38b8-4e85-8813-02084a9cb06a',
+            autoSelectFilterItemId: 'd0121b2f-38b8-4e85-8813-02084a9cb06a',
             order: 1,
           },
           SectorSubjectArea: {
@@ -555,7 +555,7 @@ export default function TableToolWizard({
             },
             name: 'subject_area',
             groupCsvColumn: 'qualification_level',
-            totalValue: 'd577db1b-0905-4485-ba93-cdccd91ac233',
+            autoSelectFilterItemId: 'd577db1b-0905-4485-ba93-cdccd91ac233',
             order: 2,
           },
         },
