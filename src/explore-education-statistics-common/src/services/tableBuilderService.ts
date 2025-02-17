@@ -104,7 +104,7 @@ export interface FeaturedTable {
   order: number;
 }
 
-interface FilterHierarchy {
+export interface FilterHierarchy {
   rootFilterId: string;
   childFilterIds: string[];
   rootOptionIds: string[];

@@ -30,6 +30,7 @@ import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
+import FilterHierarchy from './FilterHierarchies';
 
 export interface FiltersFormValues {
   indicators: string[];
@@ -217,7 +218,7 @@ export default function FiltersForm({
               {stepHeading}
 
               <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-half-from-desktop govuk-!-margin-bottom-6">
+                <div className="govuk-grid-column govuk-!-margin-bottom-6">
                   <FormFieldCheckboxSearchSubGroups
                     disabled={formState.isSubmitting}
                     groupLabel="Indicators"
@@ -236,19 +237,6 @@ export default function FiltersForm({
                     }))}
                     order={[]}
                   />
-
-
-                  {subjectMeta.filterHierarchies?.map(fh => {
-                    return (
-                      <>
-                        {
-                          orderedFilters.find(
-                            value => value[1]?.id === fh.rootFilterId,
-                          )?.[1].legend
-                        }
-                      </>
-                    );
-                  })}
 
                   {orderedFilters.length > 0 && (
                     <FormFieldset
@@ -290,6 +278,12 @@ export default function FiltersForm({
                       legend="Categories"
                       legendSize="m"
                     >
+                      {subjectMeta.filterHierarchies.map(filterHierarchy => (
+                        <FilterHierarchy
+                          filterHierachy={filterHierarchy}
+                          filters={subjectMeta.filters}
+                        />
+                      ))}
                       <div id="filterGroups">
                         {orderedFilters.map(([filterKey, filterGroup]) => {
                           const filterName = `filters.${filterKey}`;
