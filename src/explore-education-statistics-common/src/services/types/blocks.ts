@@ -1,31 +1,6 @@
-import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
-import {
-  AxisConfiguration,
-  AxisType,
-} from '@common/modules/charts/types/chart';
-import { DataSet } from '@common/modules/charts/types/dataSet';
+import { Chart } from '@common/modules/charts/types/chart';
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
-import { OmitStrict } from '@common/types';
-
-interface ChartAxisConfiguration
-  extends OmitStrict<AxisConfiguration, 'dataSets'> {
-  dataSets: DataSet[];
-}
-
-type ChartAxesConfiguration = {
-  [key in AxisType]?: ChartAxisConfiguration;
-};
-
-/**
- * This is the chart type that will be returned by the API.
- * It differs from {@see ChartRendererProps} as we need to
- * progressively migrate parts of its old data structure,
- * to our newer one that is being used by {@see ChartRendererProps}.
- */
-export type Chart = OmitStrict<ChartRendererProps, 'data' | 'meta' | 'axes'> & {
-  axes: ChartAxesConfiguration;
-};
 
 export interface Table {
   indicators: string[];

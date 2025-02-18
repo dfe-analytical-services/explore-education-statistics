@@ -322,6 +322,7 @@ public record ProcessorTestData
                 Column = "school_type",
                 Label = "School type",
                 Hint = "",
+                AutoSelectLabel = "Total",
                 DataSetVersionId = Guid.Empty,
                 Options =
                 [
@@ -339,7 +340,6 @@ public record ProcessorTestData
                     {
                         Id = 10,
                         Label = "Total",
-                        IsAggregate = true
                     },
                 ],
                 OptionLinks =

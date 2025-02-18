@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
@@ -127,17 +128,8 @@ internal class DataSetQueryService(
                 .SingleOrNotFoundAsync(cancellationToken);
         }
 
-        if (!VersionUtils.TryParse(dataSetVersion, out var version))
-        {
-            return new NotFoundResult();
-        }
-
-        return await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
-            .Where(dsv => dsv.DataSetId == dataSetId)
-            .Where(dsv => dsv.VersionMajor == version.Major)
-            .Where(dsv => dsv.VersionMinor == version.Minor)
-            .SingleOrNotFoundAsync(cancellationToken);
+        return await publicDataDbContext.DataSetVersions.AsNoTracking()
+            .FindByVersion(dataSetId, dataSetVersion, cancellationToken);
     }
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(

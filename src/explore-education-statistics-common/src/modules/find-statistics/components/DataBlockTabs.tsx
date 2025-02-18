@@ -6,15 +6,12 @@ import WarningMessage from '@common/components/WarningMessage';
 import withLazyLoad from '@common/hocs/withLazyLoad';
 import ChartRenderer from '@common/modules/charts/components/ChartRenderer';
 import { GetInfographic } from '@common/modules/charts/components/InfographicBlock';
-import { AxesConfiguration } from '@common/modules/charts/types/chart';
+import useDataBlock from '@common/modules/find-statistics/hooks/useDataBlock';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { DataBlock } from '@common/services/types/blocks';
-import { useQuery } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import React, { ReactNode } from 'react';
-import tableBuilderQueries from '../queries/tableBuilderQueries';
 
 const testId = (dataBlock: DataBlock) => `Data block - ${dataBlock.name}`;
 
@@ -42,31 +39,27 @@ const DataBlockTabs = ({
   onToggle,
 }: DataBlockTabsProps) => {
   const {
-    data: fullTable,
-    error,
-    isLoading,
-  } = useQuery(
-    tableBuilderQueries.getDataBlockTable(
-      releaseId,
-      dataBlock.dataBlockParentId,
-      dataBlock.charts[0]?.type === 'map'
-        ? dataBlock.charts[0].boundaryLevel
-        : undefined,
-    ),
-  );
+    chart,
+    isTableDataLoading,
+    isTableDataError,
+    fullTable,
+    isGeoJsonError,
+    isGeoJsonInitialLoading,
+  } = useDataBlock({
+    dataBlock,
+    releaseId,
+    getInfographic,
+  });
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
-
-  if (error && isAxiosError(error) && error.response?.status === 403) {
-    return null;
-  }
+  if (isTableDataError) return errorMessage;
 
   const additionTabContentElement =
     typeof additionalTabContent === 'function'
       ? additionalTabContent({ dataBlock })
       : additionalTabContent;
   return (
-    <LoadingSpinner loading={isLoading}>
+    <LoadingSpinner loading={isTableDataLoading || isGeoJsonInitialLoading}>
       <Tabs id={id} testId={testId(dataBlock)} onToggle={onToggle}>
         {firstTabs}
 
@@ -84,43 +77,16 @@ const DataBlockTabs = ({
             }
             title="Chart"
           >
-            {!!error && errorMessage}
-
+            {isGeoJsonError && errorMessage}
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
-                {dataBlock.charts.map((chart, index) => {
-                  const key = index;
-
-                  const axes = { ...chart.axes } as Required<AxesConfiguration>;
-
-                  if (chart.type === 'infographic') {
-                    return (
-                      <ChartRenderer
-                        {...chart}
-                        id={`${id}-chart`}
-                        key={key}
-                        axes={axes}
-                        data={fullTable?.results}
-                        meta={fullTable?.subjectMeta}
-                        source={dataBlock?.source}
-                        getInfographic={getInfographic}
-                      />
-                    );
-                  }
-
-                  return (
-                    <ChartRenderer
-                      {...chart}
-                      id={`${id}-chart`}
-                      key={key}
-                      axes={axes}
-                      data={fullTable?.results}
-                      meta={fullTable?.subjectMeta}
-                      source={dataBlock?.source}
-                    />
-                  );
-                })}
-
+                {chart && (
+                  <ChartRenderer
+                    id="dataBlockTabs-chart"
+                    source={dataBlock.source}
+                    chart={chart}
+                  />
+                )}
                 {additionTabContentElement}
               </ErrorBoundary>
             )}
@@ -143,8 +109,6 @@ const DataBlockTabs = ({
             }
             title="Table"
           >
-            {!!error && errorMessage}
-
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
                 <TimePeriodDataTable

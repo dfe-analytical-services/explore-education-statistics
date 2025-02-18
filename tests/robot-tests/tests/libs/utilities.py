@@ -1,4 +1,3 @@
-import base64
 import json
 import os
 import re
@@ -57,28 +56,21 @@ if not utilities_init.initialised:
     utilities_init.initialised = True
 
 
-def enable_basic_auth_headers():
-    # Setup basic auth headers for public frontend
+def get_url_with_basic_auth(url: str):
     public_auth_user = os.getenv("PUBLIC_AUTH_USER")
     public_auth_password = os.getenv("PUBLIC_AUTH_PASSWORD")
 
     if public_auth_user and public_auth_password:
-        token = base64.b64encode(f"{public_auth_user}:{public_auth_password}".encode())
-
-        try:
-            assert sl().driver is not None, "sl().driver is None"
-            sl().driver.execute_cdp_cmd("Network.enable", {})
-
-            sl().driver.execute_cdp_cmd(
-                "Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}}
-            )
-        except Exception as e:
-            BuiltIn().log_to_console("Exception: ", e)
-
-
-def disable_basic_auth_headers():
-    # Must be disabled to visit admin frontend
-    sl().driver.execute_cdp_cmd("Network.disable", {})
+        basic_auth_credentials = f"{public_auth_user}:{public_auth_password}"
+        if basic_auth_credentials in url:
+            return url
+        url_parts = url.split("://")
+        if len(url_parts) == 2:
+            return f"{url_parts[0]}://{basic_auth_credentials}@{url_parts[1]}"
+        else:
+            return f"{basic_auth_credentials}@{url_parts[0]}"
+    else:
+        return url
 
 
 def raise_assertion_error(err_msg):
@@ -115,7 +107,7 @@ def user_waits_until_parent_contains_element(
         child_locator = _normalise_child_locator(child_locator)
 
         def parent_contains_matching_element() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator_or_element, timeout_per_retry, error)
+            parent_el = _get_webelement_from_locator(parent_locator_or_element, timeout_per_retry, error)
             return element_finder().find(child_locator, required=False, parent=parent_el) is not None
 
         if is_noney(count):
@@ -132,7 +124,7 @@ def user_waits_until_parent_contains_element(
         count = int(count)
 
         def parent_contains_matching_elements() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator_or_element, timeout_per_retry, error)
+            parent_el = _get_webelement_from_locator(parent_locator_or_element, timeout_per_retry, error)
             return len(sl().find_elements(child_locator, parent=parent_el)) == count
 
         retry_or_fail_with_delay(
@@ -160,7 +152,7 @@ def user_waits_until_parent_contains_element_without_retries(
         child_locator = _normalise_child_locator(child_locator)
 
         def parent_contains_matching_element() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
+            parent_el = _get_webelement_from_locator(parent_locator, timeout, error)
             return element_finder().find(child_locator, required=False, parent=parent_el) is not None
 
         if is_noney(count):
@@ -174,7 +166,7 @@ def user_waits_until_parent_contains_element_without_retries(
         count = int(count)
 
         def parent_contains_matching_elements() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
+            parent_el = _get_webelement_from_locator(parent_locator, timeout, error)
             return len(sl().find_elements(child_locator, parent=parent_el)) == count
 
         waiting()._wait_until(
@@ -198,7 +190,7 @@ def user_waits_until_parent_does_not_contain_element(
         child_locator = _normalise_child_locator(child_locator)
 
         def parent_does_not_contain_matching_element() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
+            parent_el = _get_webelement_from_locator(parent_locator, timeout, error)
             return element_finder().find(child_locator, required=False, parent=parent_el) is None
 
         if is_noney(count):
@@ -212,7 +204,7 @@ def user_waits_until_parent_does_not_contain_element(
         count = int(count)
 
         def parent_does_not_contain_matching_elements() -> bool:
-            parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
+            parent_el = _get_webelement_from_locator(parent_locator, timeout, error)
             return len(sl().find_elements(child_locator, parent=parent_el)) != count
 
         waiting()._wait_until(
@@ -265,7 +257,7 @@ def get_child_element(parent_locator: object, child_locator: str, retries: int =
 def get_child_elements(parent_locator: object, child_locator: str):
     try:
         child_locator = _normalise_child_locator(child_locator)
-        parent_el = _get_parent_webelement_from_locator(parent_locator)
+        parent_el = _get_webelement_from_locator(parent_locator)
         return element_finder().find_elements(child_locator, parent=parent_el)
     except Exception as err:
         logger.warning(f"Error whilst executing utilities.py get_child_elements() - {err}")
@@ -275,6 +267,11 @@ def get_child_elements(parent_locator: object, child_locator: str):
 def user_sets_focus_to_element(selector):
     sl().wait_until_page_contains_element(selector)
     sl().set_focus_to_element(selector)
+
+
+def user_scrolls_element_to_center_of_view(locator_or_element: object):
+    element = _get_webelement_from_locator(locator_or_element)
+    sl().driver.execute_script('arguments[0].scrollIntoView({behavior: "instant", block: "center"})', element)
 
 
 def set_cookie_from_json(cookie_json):
@@ -354,7 +351,6 @@ def user_is_on_admin_dashboard_with_theme_selected(admin_url: str, theme: str) -
 
 
 def user_navigates_to_admin_dashboard_if_needed(admin_url: str):
-    disable_basic_auth_headers()
     if user_is_on_admin_dashboard(admin_url):
         return
 
@@ -377,7 +373,7 @@ def _normalise_child_locator(child_locator: str) -> str:
     raise_assertion_error(f"Child locator was not a str - {child_locator}")
 
 
-def _get_parent_webelement_from_locator(parent_locator: object, timeout: int = None, error: str = "") -> WebElement:
+def _get_webelement_from_locator(parent_locator: object, timeout: int = None, error: str = "") -> WebElement:
     if isinstance(parent_locator, str):
         sl().wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
         return sl().find_element(parent_locator)

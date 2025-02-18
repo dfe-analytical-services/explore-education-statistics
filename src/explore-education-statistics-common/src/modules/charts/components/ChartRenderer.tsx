@@ -14,77 +14,103 @@ import MapBlock, {
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useState } from 'react';
+import getMapInitialBoundaryLevel from './utils/getMapInitialBoundaryLevel';
 
-export type ChartRendererProps = {
+type HorizontalBarRendererProps = {
+  type: 'horizontalbar';
+} & HorizontalBarProps;
+
+type InfographicRendererProps = {
+  type: 'infographic';
+} & InfographicChartProps;
+
+type LineChartRendererProps = {
+  type: 'line';
+} & LineChartProps;
+
+type MapBlockRendererProps = {
+  type: 'map';
+} & Omit<MapBlockProps, 'id'>;
+
+type VerticalBarRendererProps = {
+  type: 'verticalbar';
+} & VerticalBarProps;
+
+export type RenderableChart =
+  | HorizontalBarRendererProps
+  | InfographicRendererProps
+  | LineChartRendererProps
+  | MapBlockRendererProps
+  | VerticalBarRendererProps;
+
+export interface ChartRendererProps {
   source?: string;
-} & (
-  | ({
-      type: 'line';
-    } & LineChartProps)
-  | ({
-      type: 'verticalbar';
-    } & VerticalBarProps)
-  | ({
-      type: 'horizontalbar';
-    } & HorizontalBarProps)
-  | ({
-      type: 'map';
-    } & Omit<MapBlockProps, 'id'> & {
-        boundaryLevel: number;
-      })
-  | ({
-      type: 'infographic';
-    } & InfographicChartProps)
-);
-
-export interface ChartRendererInternalProps {
-  id: string;
+  id?: string;
+  chart: RenderableChart;
 }
 
-function ChartRenderer({
-  source,
-  id,
-  ...props
-}: ChartRendererProps & ChartRendererInternalProps) {
-  const { data, meta, subtitle, title, type } = props;
+function ChartRenderer({ source, id, chart }: ChartRendererProps) {
+  const { data, meta, subtitle, title, type } = chart;
+  const [selectedBoundaryLevelId, setSelectedBoundaryLevelId] = useState(
+    type === 'map' ? getMapInitialBoundaryLevel(chart) : undefined,
+  );
 
-  const chart = useMemo(() => {
-    switch (props.type) {
+  const chartComponent = useMemo(() => {
+    switch (type) {
       case 'line':
-        return <LineChartBlock {...props} />;
+        return <LineChartBlock {...chart} />;
       case 'verticalbar':
-        return <VerticalBarBlock {...props} />;
+        return <VerticalBarBlock {...chart} />;
       case 'horizontalbar':
-        return <HorizontalBarBlock {...props} />;
+        return <HorizontalBarBlock {...chart} />;
       case 'map':
-        return <MapBlock {...props} id={`${id}-map`} />;
+        return (
+          <MapBlock
+            {...chart}
+            onBoundaryLevelChange={number => {
+              setSelectedBoundaryLevelId(number);
+              return chart.onBoundaryLevelChange(number);
+            }}
+            id={`${id}-map`}
+          />
+        );
       case 'infographic':
-        return <InfographicBlock {...props} />;
+        return <InfographicBlock {...chart} />;
       default:
         return <p>Unable to render invalid chart type</p>;
     }
-  }, [id, props]);
+  }, [id, chart]);
 
-  if (data?.length > 0 && meta) {
-    const footnotes = [...meta.footnotes];
+  const footnotes = useMemo(() => {
+    if (!data?.length || !meta) {
+      return [];
+    }
 
+    const metaFootnotes = [...meta.footnotes];
     const boundaryFootnoteId = 'map-footnote';
+
     if (
       type === 'map' &&
-      footnotes.findIndex(footnote => footnote.id === boundaryFootnoteId) === -1
+      metaFootnotes.findIndex(
+        footnote => footnote.id === boundaryFootnoteId,
+      ) === -1
     ) {
       const selectedBoundaryLevel = meta.boundaryLevels.find(
-        boundaryLevel => boundaryLevel.id === props.boundaryLevel,
+        boundaryLevel => boundaryLevel.id === selectedBoundaryLevelId,
       );
       if (selectedBoundaryLevel) {
-        footnotes.push({
+        metaFootnotes.push({
           id: boundaryFootnoteId,
           label: `This map uses the boundary data ${selectedBoundaryLevel.label}`,
         });
       }
     }
 
+    return metaFootnotes;
+  }, [chart, data, meta, selectedBoundaryLevelId]);
+
+  if (data?.length && meta) {
     return (
       <figure className="govuk-!-margin-0" id={id} data-testid={id}>
         {title && (
@@ -99,7 +125,7 @@ function ChartRenderer({
           </figcaption>
         )}
 
-        {chart}
+        {chartComponent}
 
         <FigureFootnotes
           footnotes={footnotes}

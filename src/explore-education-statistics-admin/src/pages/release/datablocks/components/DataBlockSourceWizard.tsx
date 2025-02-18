@@ -47,7 +47,7 @@ const DataBlockSourceWizardFinalStep = ({
 
   const handleSubmit = useCallback(
     (details: DataBlockDetailsFormValues) => {
-      onSave({
+      return onSave({
         details,
         table,
         tableHeaders,
@@ -87,6 +87,7 @@ const DataBlockSourceWizardFinalStep = ({
       </div>
 
       <DataBlockDetailsForm
+        hasChart={!!dataBlock?.charts?.length}
         initialValues={{
           heading: dataBlock?.heading ?? generateTableTitle(table.subjectMeta),
           highlightName: dataBlock?.highlightName ?? '',

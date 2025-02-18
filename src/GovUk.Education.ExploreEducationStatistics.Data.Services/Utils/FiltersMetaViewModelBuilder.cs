@@ -28,8 +28,7 @@ public static class FiltersMetaViewModelBuilder
             sequenceIdSelector: sequenceEntry => sequenceEntry.Id,
             resultSelector: (input, index) =>
             {
-                var totalFilterItemId = GetTotal(input)?.Id;
-                return new FilterMetaViewModel(input, totalFilterItemId, index)
+                return new FilterMetaViewModel(input, index)
                 {
                     Options = BuildFilterGroups(input.Value.FilterGroups, input.Sequence?.ChildSequence)
                 };
@@ -75,22 +74,6 @@ public static class FiltersMetaViewModelBuilder
             resultSelector: value => new FilterItemMetaViewModel(value),
             sequence
         );
-    }
-
-    private static FilterItem? GetTotal(Filter filter)
-    {
-        return GetTotalGroup(filter)?.FilterItems.FirstOrDefault(filterItem =>
-            IsLabelTotal(filterItem, item => item.Label));
-    }
-
-    private static FilterGroup? GetTotalGroup(Filter filter)
-    {
-        var filterGroups = filter.FilterGroups;
-
-        // Return the group if there is only one, otherwise the 'Total' group if it exists
-        return filterGroups.Count == 1
-            ? filterGroups.First()
-            : filterGroups.FirstOrDefault(filterGroup => IsLabelTotal(filterGroup, group => group.Label));
     }
 
     private static List<Filter> GroupFilterItemsByFilter(IEnumerable<FilterItem> filterItems)

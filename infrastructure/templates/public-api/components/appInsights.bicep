@@ -47,6 +47,9 @@ module exceptionCountAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    applicationInsights
+  ]
 }
 
 module exceptionServerCountAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.exceptionServerCount) {
@@ -65,6 +68,9 @@ module exceptionServerCountAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    applicationInsights
+  ]
 }
 
 module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
@@ -83,6 +89,9 @@ module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    applicationInsights
+  ]
 }
 
 output applicationInsightsKey string = applicationInsights.properties.InstrumentationKey

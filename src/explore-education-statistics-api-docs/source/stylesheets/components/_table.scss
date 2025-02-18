@@ -1,4 +1,6 @@
 .app-table-container {
+  margin-bottom: govuk-spacing(4);
+
   &:focus {
     box-shadow: 0 0 0 2px;
     outline: $govuk-focus-width solid $govuk-focus-colour;
@@ -8,5 +10,18 @@
   @include govuk-media-query($until: desktop) {
     display: block;
     overflow-x: auto;
+  }
+
+  table {
+    margin-bottom: 0;
+  }
+}
+
+.app-parameter-table {
+  hyphens: none;
+  word-break: normal;
+
+  &__description {
+    min-width: 200px;
   }
 }

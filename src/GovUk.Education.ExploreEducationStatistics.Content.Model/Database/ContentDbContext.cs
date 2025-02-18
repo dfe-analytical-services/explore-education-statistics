@@ -523,12 +523,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .WithMany(p => p.ReleaseVersions)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // TODO EES-5659 Remove this
-            modelBuilder.Entity<ReleaseVersion>()
-                .Property(rv => rv.TimePeriodCoverage)
-                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
-                .HasMaxLength(6);
-
             modelBuilder.Entity<ReleaseVersion>()
                 .Property<List<Link>>("RelatedInformation")
                 .IsRequired()

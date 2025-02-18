@@ -9,14 +9,13 @@ import {
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
 import render from '@common-test/render';
+import { Chart } from '@common/modules/charts/types/chart';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import _tableBuilderService, {
   TableDataQuery,
 } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 import { screen } from '@testing-library/react';
 import noop from 'lodash/noop';
-import React from 'react';
 
 jest.mock('@common/services/tableBuilderService');
 const tableBuilderService = _tableBuilderService as jest.Mocked<
@@ -186,7 +185,9 @@ describe('ChartBuilderTabSection', () => {
 
     await user.click(screen.getByRole('tab', { name: 'Boundary levels' }));
 
-    await user.selectOptions(screen.getByLabelText('Boundary level'), ['1']);
+    await user.selectOptions(screen.getByLabelText('Default boundary level'), [
+      '1',
+    ]);
 
     expect(tableBuilderService.getTableData).toHaveBeenCalledWith(
       { ...testQuery, boundaryLevel: 1 },

@@ -9,11 +9,13 @@ import dataBlocksService, {
   CreateReleaseDataBlock,
   ReleaseDataBlock,
 } from '@admin/services/dataBlockService';
+import featuredTableService from '@admin/services/featuredTableService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import getMapInitialBoundaryLevel from '@common/modules/charts/components/utils/getMapInitialBoundaryLevel';
 import isOrphanedDataSet from '@common/modules/charts/util/isOrphanedDataSet';
 import { InitialTableToolState } from '@common/modules/table-tool/components/TableToolWizard';
 import getInitialStepSubjectMeta from '@common/modules/table-tool/components/utils/getInitialStepSubjectMeta';
@@ -25,11 +27,9 @@ import logger from '@common/services/logger';
 import tableBuilderService, {
   ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
-import minDelay from '@common/utils/minDelay';
 import { produce } from 'immer';
 import omit from 'lodash/omit';
 import React, { useCallback, useState } from 'react';
-import featuredTableService from '@admin/services/featuredTableService';
 
 export type SavedDataBlock = CreateReleaseDataBlock & {
   id?: string;
@@ -49,7 +49,6 @@ const DataBlockPageTabs = ({
   // Track number of saves as we can use this to
   // force re-rendering of the tab sections.
   const [saveNumber, setSaveNumber] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
 
   const {
     value: tableState,
@@ -78,14 +77,12 @@ const DataBlockPageTabs = ({
       releaseId,
     };
 
-    const boundaryLevel =
-      dataBlock.charts[0]?.type === 'map'
-        ? dataBlock.charts[0].boundaryLevel
-        : undefined;
     const tableData = await tableBuilderService.getTableData(
       query,
       releaseId,
-      boundaryLevel,
+      dataBlock.charts[0]?.type === 'map'
+        ? getMapInitialBoundaryLevel(dataBlock.charts[0])
+        : undefined,
     );
 
     const { initialStep, subjectMeta } = await getInitialStepSubjectMeta(
@@ -189,8 +186,6 @@ const DataBlockPageTabs = ({
 
   const handleDataBlockSave = useCallback(
     async (nextDataBlock: SavedDataBlock) => {
-      setIsSaving(true);
-
       const dataBlockToSave: SavedDataBlock = {
         ...nextDataBlock,
         query: {
@@ -200,7 +195,7 @@ const DataBlockPageTabs = ({
         },
       };
 
-      const savedDataBlock = await minDelay(async () => {
+      const getSavedDataBlock = async () => {
         if (dataBlockToSave.id) {
           await handleFeaturedTableChange({
             originalName: dataBlock?.highlightName,
@@ -209,6 +204,7 @@ const DataBlockPageTabs = ({
             newDescription: dataBlockToSave.highlightDescription,
             dataBlockId: dataBlockToSave.id,
           });
+
           return dataBlocksService.updateDataBlock(
             dataBlockToSave.id,
             dataBlockToSave as ReleaseDataBlock,
@@ -229,13 +225,13 @@ const DataBlockPageTabs = ({
         });
 
         return newDataBlock;
-      }, 500);
+      };
+
+      const savedDataBlock = await getSavedDataBlock();
 
       if (onDataBlockSave) {
         onDataBlockSave(savedDataBlock);
       }
-
-      setIsSaving(false);
       setSaveNumber(saveNumber + 1);
     },
     [
@@ -363,12 +359,7 @@ const DataBlockPageTabs = ({
 
   return (
     <div style={{ position: 'relative' }} className="govuk-!-padding-top-2">
-      {(isLoading || isSaving) && (
-        <LoadingSpinner
-          text={`${isSaving ? 'Saving data block' : 'Loading data block'}`}
-          overlay
-        />
-      )}
+      {isLoading && <LoadingSpinner text="Loading data block" overlay />}
 
       {dataBlock && tableState && tableState?.initialStep < 5 && (
         <WarningMessage>

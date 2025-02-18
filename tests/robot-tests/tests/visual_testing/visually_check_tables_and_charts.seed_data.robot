@@ -2,7 +2,7 @@
 Resource            tables_and_charts.robot
 Library             tables_and_charts.py
 
-Force Tags          GeneralPublic    Local    Dev    Test    Preprod
+Force Tags          GeneralPublic    Local
 
 Suite Setup         do suite setup
 Suite Teardown      user closes the browser

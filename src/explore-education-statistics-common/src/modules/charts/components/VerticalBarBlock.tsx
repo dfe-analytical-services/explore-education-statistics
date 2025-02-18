@@ -163,6 +163,10 @@ const VerticalBarBlock = ({
     resizeTicks(containerWidth);
   }, 300);
 
+  if (!chartData.length) {
+    return <p className="govuk-!-margin-top-5">No data to display.</p>;
+  }
+
   return (
     <ChartContainer
       height={height || 300}

@@ -1133,19 +1133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ReleaseName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("TimePeriodCoverage")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
 
                     b.Property<string>("Type")
                         .IsRequired()

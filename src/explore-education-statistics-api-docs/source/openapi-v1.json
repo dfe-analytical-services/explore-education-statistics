@@ -112,7 +112,7 @@
           {
             "name": "dataSetVersion",
             "in": "query",
-            "description": "The version of the data set to use e.g. 2.0, 1.1, etc.",
+            "description": "The data set version e.g. 1.0, 1.1, 2.0, etc.\nWildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.",
             "schema": {
               "type": "string"
             }
@@ -187,7 +187,7 @@
           {
             "name": "dataSetVersion",
             "in": "query",
-            "description": "The version of the data set to use e.g. 2.0, 1.1, etc.",
+            "description": "The data set version e.g. 1.0, 1.1, 2.0, etc.\nWildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.",
             "schema": {
               "type": "string"
             }
@@ -606,7 +606,7 @@
           {
             "name": "dataSetVersion",
             "in": "query",
-            "description": "The version of the data set to use e.g. 2.0, 1.1, etc.",
+            "description": "The data set version e.g. 1.0, 1.1, 2.0, etc.\nWildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.",
             "schema": {
               "type": "string"
             }
@@ -695,7 +695,7 @@
           {
             "name": "dataSetVersion",
             "in": "query",
-            "description": "The version of the data set to use e.g. 2.0, 1.1, etc.",
+            "description": "The data set version e.g. 1.0, 1.1, 2.0, etc.\nWildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.",
             "schema": {
               "type": "string"
             }
@@ -842,7 +842,7 @@
           {
             "name": "dataSetVersion",
             "in": "path",
-            "description": "The data set version e.g. 1.0, 1.1, 2.0, etc.",
+            "description": "The data set version e.g. 1.0, 1.1, 2.0, etc.\nWildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.",
             "required": true,
             "schema": {
               "type": "string"
@@ -908,7 +908,7 @@
           {
             "name": "dataSetVersion",
             "in": "path",
-            "description": "The data set version e.g. 1.0, 1.1, 2.0, etc.",
+            "description": "The data set version e.g. 1.0, 1.1, 2.0, etc.\nWildcard versions are supported. For example, `2.*` returns the latest minor version in the v2 series.",
             "required": true,
             "schema": {
               "type": "string"
@@ -3061,9 +3061,9 @@
             "description": "The human-readable label describing the filter option.",
             "example": "State-funded primary"
           },
-          "isAggregate": {
+          "isAutoSelect": {
             "type": "boolean",
-            "description": "Whether the filter option is an aggregate (i.e. ‘all’ or a ‘total’) of the other filter options.",
+            "description": "Whether the filter option is auto selected in the table tool if no other options are selected.",
             "nullable": true,
             "example": false
           }

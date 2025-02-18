@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileDetailsTable';
+import DataFileSummaryList from '@admin/pages/release/data/components/DataFileSummaryList';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
 import ImporterStatus, {
   terminalImportStatuses,
@@ -19,71 +19,38 @@ import {
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
-import ReorderableList from '@common/components/ReorderableList';
-import reorder from '@common/utils/reorder';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { generatePath } from 'react-router';
 import styles from './DataFilesTable.module.scss';
 
 interface Props {
+  canUpdateRelease?: boolean;
+  caption: string;
   dataFiles: DataFile[];
   publicationId: string;
   releaseId: string;
-  canUpdateRelease?: boolean;
-  isReordering: boolean;
-  onCancelReordering: () => void;
-  onConfirmReordering: (nextSeries: DataFile[]) => void;
+  testId?: string;
   onDeleteFile: (dataFile: DataFile) => Promise<void>;
   onStatusChange: (
     dataFile: DataFile,
-    { totalRows, status }: DataFileImportStatus,
+    importStatus: DataFileImportStatus,
   ) => Promise<void>;
 }
 
 export default function DataFilesTable({
-  dataFiles: initialDataFiles,
+  canUpdateRelease,
+  caption,
+  dataFiles,
   publicationId,
   releaseId,
-  canUpdateRelease,
-  isReordering,
-  onCancelReordering,
-  onConfirmReordering,
+  testId,
   onDeleteFile,
   onStatusChange,
 }: Props) {
-  const [dataFiles, setDataFiles] = useState(initialDataFiles);
-
-  useEffect(() => {
-    setDataFiles(initialDataFiles);
-  }, [initialDataFiles]);
-
-  if (isReordering) {
-    return (
-      <ReorderableList
-        heading="Reorder data files"
-        id="dataFiles"
-        list={dataFiles.map(({ id, title }) => ({
-          id,
-          label: title,
-        }))}
-        onCancel={() => {
-          setDataFiles(initialDataFiles);
-          onCancelReordering();
-        }}
-        onConfirm={() => onConfirmReordering(dataFiles)}
-        onMoveItem={({ prevIndex, nextIndex }) => {
-          const reordered = reorder(dataFiles, prevIndex, nextIndex);
-          setDataFiles(reordered);
-        }}
-        onReverse={() => {
-          setDataFiles(dataFiles.toReversed());
-        }}
-      />
-    );
-  }
-
   return (
-    <table className={styles.table} data-testid="Data files table">
+    <table className={styles.table} data-testid={testId}>
+      <caption className="govuk-table__caption--m">{caption}</caption>
+
       <thead>
         <tr>
           <th scope="col">Title</th>
@@ -99,7 +66,7 @@ export default function DataFilesTable({
             <td data-testid="Title" className={styles.title}>
               {dataFile.title}
             </td>
-            <td data-testid="Data file size" className={styles.fileSize}>
+            <td data-testid="Size" className={styles.fileSize}>
               {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
             </td>
             <td data-testid="Status">
@@ -117,7 +84,7 @@ export default function DataFilesTable({
                   title="Data file details"
                   triggerButton={<ButtonText>View details</ButtonText>}
                 >
-                  <DataFileDetailsTable
+                  <DataFileSummaryList
                     dataFile={dataFile}
                     releaseId={releaseId}
                     onStatusChange={onStatusChange}

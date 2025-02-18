@@ -4,9 +4,10 @@ using '../main.bicep'
 param environmentName = 'Pre-Production'
 
 param publicUrls = {
-  contentApi: 'https://s101p02-as-ees-content.azurewebsites.net'
+  contentApi: 'https://content.pre-production.explore-education-statistics.service.gov.uk'
   publicSite: 'https://pre-production.explore-education-statistics.service.gov.uk'
-  publicApi: 'https://pre-production.statistics.api.education.gov.uk'
+  publicApi: 'https://pp-api.education.gov.uk/statistics-preprod'
+  publicApiAppGateway: 'https://pre-production.statistics.api.education.gov.uk'
 }
 
 // PostgreSQL Database Params
@@ -37,3 +38,4 @@ param postgreSqlServerConfig = {
 param recoveryVaultImmutable = true
 
 param enableThemeDeletion = false
+param enableSwagger = true

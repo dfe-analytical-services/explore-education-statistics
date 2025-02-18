@@ -119,6 +119,7 @@ param publicUrls {
   contentApi: string
   publicSite: string
   publicApi: string
+  publicApiAppGateway: string
 }
 
 @description('Specifies whether or not the Data Processor Function App already exists.')
@@ -185,7 +186,7 @@ var resourceNames = {
     acr: 'eesacr'
     acrResourceGroup: acrResourceGroupName
     // The Test Resource Group has broken from the naming convention of other environments for Core Storage
-    coreStorageAccount: subscription == 's101t01'
+    coreStorageAccount: subscription == 's101t01' || subscription == 's101p02'
       ? '${legacyResourcePrefix}storageeescore'
       : '${legacyResourcePrefix}saeescore'
     subnets: {
@@ -342,7 +343,7 @@ module containerAppEnvironmentModule 'application/shared/containerAppEnvironment
 }
 
 // Deploy main Public API Container App.
-module apiAppIdentityModule 'application/public-api/publicApiAppIdentity.bicep' = if (deployContainerApp) {
+module apiAppIdentityModule 'application/public-api/publicApiAppIdentity.bicep' = {
   name: 'publicApiAppIdentityApplicationModuleDeploy'
   params: {
     location: location
@@ -388,6 +389,20 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsS
 
 var docsRewriteSetName = '${publicApiResourcePrefix}-docs-rewrites'
 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: resourceNames.existingResources.keyVault
+}
+
+module publicApiWafPolicyModule 'application/public-api/publicApiWafPolicy.bicep' = {
+  name: 'publicApiWafPolicyModuleDeploy'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    fuapiSecretValue: keyVault.getSecret('ees-publicapi-app-gateway-fuapi-header')
+    tagValues: tagValues
+  }
+}
+
 // Create an Application Gateway to serve public traffic for the Public API Container App.
 module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContainerApp && deployDocsSite) {
   name: 'appGatewayModuleDeploy'
@@ -398,7 +413,8 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
       {
         name: publicApiResourcePrefix
         certificateName: '${publicApiResourcePrefix}-certificate'
-        fqdn: replace(publicUrls.publicApi, 'https://', '')
+        fqdn: replace(publicUrls.publicApiAppGateway, 'https://', '')
+        wafPolicyName: publicApiWafPolicyModule.outputs.name
       }
     ]
     backends: [
@@ -426,6 +442,17 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
             backendName: resourceNames.publicApi.docsApp
             rewriteSetName: docsRewriteSetName
           }
+          {
+            // Redirect non-rooted URL (has no trailing slash) to the
+            // rooted URL so that relative links in the docs site
+            // can resolve correctly.
+            name: 'docs-root-redirect'
+            paths: ['/docs']
+            type: 'redirect'
+            redirectUrl: '${publicUrls.publicApi}/docs/'
+            redirectType: 'Permanent'
+            includePath: false
+          }
         ]
       }
     ]
@@ -446,6 +473,24 @@ module appGatewayModule 'application/shared/appGateway.bicep' = if (deployContai
               urlConfiguration: {
                 modifiedPath: '/{var_uri_path_1}'
               }
+            }
+          }
+          {
+            name: 'replace-docs-backend-fqdn-with-public-docs-url'
+            conditions: [
+              {
+                variable: 'http_resp_Location'
+                pattern: 'https://${docsModule.outputs.appFqdn}/(.*)'
+                ignoreCase: true
+              }
+            ]
+            actionSet: {
+              responseHeaderConfigurations: [
+                {
+                  headerName: 'Location'
+                  headerValue: '${publicUrls.publicApi}/docs/{http_resp_Location_1}'
+                }
+              ]
             }
           }
         ]

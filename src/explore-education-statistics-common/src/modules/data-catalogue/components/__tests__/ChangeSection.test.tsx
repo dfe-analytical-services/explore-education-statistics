@@ -159,7 +159,7 @@ describe('ChangeSection', () => {
               currentState: {
                 id: 'filter-opt-4',
                 label: 'Filter option 4 updated',
-                isAggregate: true,
+                isAutoSelect: true,
               },
             },
             { currentState: { id: 'filter-opt-5', label: 'Filter option 5' } },
@@ -180,7 +180,7 @@ describe('ChangeSection', () => {
               currentState: {
                 id: 'filter-opt-8',
                 label: 'Filter option 8',
-                isAggregate: false,
+                isAutoSelect: false,
               },
             },
             { currentState: { id: 'filter-opt-9', label: 'Filter option 9' } },
@@ -240,7 +240,7 @@ describe('ChangeSection', () => {
       'label changed to: Filter option 4 updated',
     );
     expect(updatedFilter1Option2Changes[1]).toHaveTextContent(
-      'changed to an aggregate',
+      'changed to be the default option',
     );
 
     const addedFilter1Options = within(
@@ -279,7 +279,7 @@ describe('ChangeSection', () => {
 
     expect(updatedFilter2Option1Changes).toHaveLength(1);
     expect(updatedFilter2Options[0]).toHaveTextContent(
-      'no longer an aggregate',
+      'no longer the default option',
     );
 
     const addedFilter2Options = within(

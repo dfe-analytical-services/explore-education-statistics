@@ -18,10 +18,8 @@ module storeCoreStorageConnectionString '../../components/keyVaultSecret.bicep' 
   name: 'storeCoreStorageConnectionString'
   params: {
     keyVaultName: resourceNames.existingResources.keyVault
-    isEnabled: true
     secretName: coreStorageConnectionStringSecretKey
     secretValue: coreStorageConnectionString
-    contentType: 'text/plain'
   }
 }
 

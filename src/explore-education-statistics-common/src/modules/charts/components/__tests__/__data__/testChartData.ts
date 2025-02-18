@@ -1,5 +1,5 @@
+import { Chart } from '@common/modules/charts/types/chart';
 import { TableDataResponse } from '@common/services/tableBuilderService';
-import { Chart } from '@common/services/types/blocks';
 
 export const testChartConfiguration: Chart = {
   legend: {
@@ -98,7 +98,7 @@ export const testChartTableData: TableDataResponse = {
   subjectMeta: {
     filters: {
       SchoolType: {
-        totalValue: 'school-type-total',
+        autoSelectFilterItemId: 'school-type-total',
         hint: 'Filter by school type',
         legend: 'School type',
         options: {
@@ -118,7 +118,7 @@ export const testChartTableData: TableDataResponse = {
         name: 'school_type',
       },
       Characteristic: {
-        totalValue: 'characteristic-total',
+        autoSelectFilterItemId: 'characteristic-total',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         options: {
@@ -235,6 +235,116 @@ export const testChartTableData: TableDataResponse = {
         'unauthorised-absence-rate': '1.1',
       },
       timePeriod: '2015_AY',
+    },
+  ],
+};
+
+export const testEmptyChartConfiguration: Chart = {
+  legend: {
+    position: 'top',
+    items: [
+      {
+        dataSet: {
+          indicator: 'indicator-1-id',
+          filters: [],
+        },
+        label: 'Indicator 1',
+        colour: '#4763a5',
+      },
+    ],
+  },
+  axes: {
+    major: {
+      type: 'major',
+      groupBy: 'timePeriod',
+      sortAsc: true,
+      referenceLines: [],
+      dataSets: [
+        {
+          indicator: 'indicator-1-id',
+          filters: [],
+          location: {
+            level: 'localAuthority',
+            value: 'la-1',
+          },
+        },
+      ],
+      visible: true,
+      size: 50,
+      showGrid: true,
+      tickConfig: 'default',
+    },
+    minor: {
+      type: 'major',
+      groupBy: 'timePeriod',
+      referenceLines: [],
+      dataSets: [],
+      sortAsc: true,
+      visible: true,
+      size: 50,
+      showGrid: true,
+      min: 0,
+      tickConfig: 'default',
+    },
+  },
+  type: 'line',
+  title: 'Emptychart',
+  alt: 'Some alt text',
+  height: 300,
+  width: 600,
+};
+
+export const testEmptyChartTableData: TableDataResponse = {
+  subjectMeta: {
+    filters: {},
+    footnotes: [],
+    indicators: [
+      {
+        label: 'Indicator 1',
+        unit: '',
+        value: 'indicator-1-id',
+        name: 'indicator-1',
+      },
+    ],
+    locations: {
+      localAuthority: [
+        { id: 'la-1-id', label: 'LA 1', value: 'la-1' },
+        { id: 'la-2-id', label: 'LA 2', value: 'la-2' },
+      ],
+    },
+    boundaryLevels: [
+      {
+        id: 1,
+        label:
+          'Countries December 2017 Ultra Generalised Clipped Boundaries in UK',
+      },
+    ],
+    publicationName: 'Pupil absence in schools in England',
+    subjectName: 'Absence by characteristic',
+    timePeriodRange: [
+      { code: 'AY', label: '2020/21', year: 2020 },
+      { code: 'AY', label: '2021/22', year: 2021 },
+    ],
+    geoJsonAvailable: true,
+  },
+  results: [
+    {
+      filters: [],
+      geographicLevel: 'localAuthority',
+      locationId: 'la-1-id',
+      measures: {
+        'indicator-1-id': '1',
+      },
+      timePeriod: '2020_AY',
+    },
+    {
+      filters: [],
+      geographicLevel: 'localAuthority',
+      locationId: 'la-2-id',
+      measures: {
+        'indicator-1-id': '2',
+      },
+      timePeriod: '2021_AY',
     },
   ],
 };

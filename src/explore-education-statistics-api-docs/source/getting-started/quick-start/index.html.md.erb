@@ -53,7 +53,7 @@ To find a publication that you may be interested in, you'll need to make a `GET`
 [List publications](/reference-v1/endpoints/ListPublications/index.html) endpoint:
 
 ```
-GET <%= api_url "/api/v1/publications" %>
+GET <%= api_url "/v1/publications" %>
 ```
 
 This endpoint will respond with something like the following (parts have been omitted for brevity):
@@ -87,10 +87,10 @@ endpoint URL. For example:
 
 ```
 # Fetch page 2
-GET <%= api_url "/api/v1/publications?page=2" %>
+GET <%= api_url "/v1/publications?page=2" %>
 
 # Fetch page 3
-GET <%= api_url "/api/v1/publications?page=3" %>
+GET <%= api_url "/v1/publications?page=3" %>
 ```
 
 The possible values of `page` will be dictated by the total number of results (across all pages)
@@ -98,7 +98,7 @@ and the `pageSize` query parameter. For example, the following request would sho
 page instead of the default:
 
 ```
-GET <%= api_url "/api/v1/publications?page=1&pageSize=30" %>
+GET <%= api_url "/v1/publications?page=1&pageSize=30" %>
 ```
 
 Each page of results contains a `paging` property which describes the current page and the total
@@ -109,14 +109,14 @@ To make it easier to find a specific publication, you can append a `search` quer
 URL as well. The following example would search for publications matching the term 'pupil absence':
 
 ```
-GET <%= api_url "/api/v1/publications?search=pupil+absence" %>
+GET <%= api_url "/v1/publications?search=pupil+absence" %>
 ```
 
 Like a typical URL, you can combine query parameters together with `&`. For example, you'd use
 the following URL to get page 2 of publications matching the term 'pupil absence':
 
 ```
-GET <%= api_url "/api/v1/publications?search=pupil+absence&page=2" %>
+GET <%= api_url "/v1/publications?search=pupil+absence&page=2" %>
 ```
 
 Once you find a publication you are interested in, proceed to the next step.
@@ -129,7 +129,7 @@ the [List a publication's data sets](/reference-v1/endpoints/ListPublicationData
 endpoint:
 
 ```
-GET <%= api_url "/api/v1/publications/{publicationId}/data-sets" %>
+GET <%= api_url "/v1/publications/{publicationId}/data-sets" %>
 ```
 
 For this endpoint URL, you'd substitute the `{publicationId}` parameter with the `id` of the
@@ -150,7 +150,7 @@ For example, given the following publication (parts omitted for brevity):
 You'd make the following `GET` request:
 
 ```
-GET <%= api_url "/api/v1/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad/data-sets" %>
+GET <%= api_url "/v1/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad/data-sets" %>
 ```
 
 The endpoint responds with a paginated list of the publication's data sets which will look like the
@@ -232,7 +232,7 @@ Facets and indicators are collectively referenced as a data set's **metadata**. 
 your chosen data set, make the following `GET` request:
 
 ```
-GET <%= api_url "/api/v1/data-sets/{dataSetId}/meta" %>
+GET <%= api_url "/v1/data-sets/{dataSetId}/meta" %>
 ```
 
 To use this URL, substitute in the `{dataSetId}` parameter with the `id` of your chosen data set.
@@ -381,7 +381,7 @@ To use this endpoint, a `POST` request needs to be sent to the endpoint URL with
 request body. The most basic request would look like the following:
 
 ```
-POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
+POST <%= api_url "/v1/data-sets/{dataSetId}/query" %>
 {
   "indicators": []
 }
@@ -398,7 +398,7 @@ To refine your query to a subset of the data, you will also need to provide some
 by adding a `criteria` property to your query request:
 
 ```
-POST <%= api_url "/api/v1/data-sets/{dataSetId}/query" %>
+POST <%= api_url "/v1/data-sets/{dataSetId}/query" %>
 {
   "indicators": [],
   "criteria": {}
@@ -575,7 +575,7 @@ results. For example, the following request would fetch page 5, with each page c
 a maximum of 200 results:
 
 ```
-POST <%= api_url "/api/v1/data-sets/{dataSetId}/query?page=5&pageSize=200" %>
+POST <%= api_url "/v1/data-sets/{dataSetId}/query?page=5&pageSize=200" %>
 ```
 
 ## Conclusions

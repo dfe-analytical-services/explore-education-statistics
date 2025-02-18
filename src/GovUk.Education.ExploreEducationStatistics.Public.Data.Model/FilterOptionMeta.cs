@@ -9,8 +9,6 @@ public class FilterOptionMeta
 
     public required string Label { get; set; }
 
-    public bool? IsAggregate { get; set; }
-
     public List<FilterMeta> Metas { get; set; } = [];
 
     public List<FilterOptionMetaLink> MetaLinks { get; set; } = [];

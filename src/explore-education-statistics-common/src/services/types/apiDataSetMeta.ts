@@ -10,7 +10,7 @@ export interface Filter {
 export interface FilterOption {
   id: string;
   label: string;
-  isAggregate?: boolean;
+  isAutoSelect?: boolean;
 }
 
 export interface GeographicLevel {

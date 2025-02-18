@@ -15,7 +15,7 @@ describe('FiltersForm', () => {
     filters: {
       SchoolType: {
         id: 'school-type',
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by school type',
         legend: 'School type',
         options: {
@@ -40,7 +40,7 @@ describe('FiltersForm', () => {
       },
       Characteristic: {
         id: 'characteristic',
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         options: {
@@ -153,7 +153,7 @@ describe('FiltersForm', () => {
     filters: {
       Characteristic: {
         id: 'characteristic',
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         options: {
@@ -174,7 +174,7 @@ describe('FiltersForm', () => {
       },
       SchoolType: {
         id: 'school-type',
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by school type',
         legend: 'School type',
         options: {
@@ -195,7 +195,7 @@ describe('FiltersForm', () => {
       },
       FilterWithMultipleOptions: {
         id: 'filter-with-multiple-options',
-        totalValue: '',
+        autoSelectFilterItemId: '',
         hint: 'Filter by Filter With Multiple Options',
         legend: 'Filter With Multiple Options',
         options: {
@@ -580,7 +580,7 @@ describe('FiltersForm', () => {
             ...testSubjectMeta.filters,
             Characteristic: {
               ...testSubjectMeta.filters.Characteristic,
-              totalValue: 'total',
+              autoSelectFilterItemId: 'total',
             },
           },
         }}
@@ -656,7 +656,7 @@ describe('FiltersForm', () => {
             ...testSubjectMeta.filters,
             Characteristic: {
               ...testSubjectMeta.filters.Characteristic,
-              totalValue: 'total',
+              autoSelectFilterItemId: 'total',
             },
           },
         }}
@@ -704,7 +704,7 @@ describe('FiltersForm', () => {
             ...testSubjectMeta.filters,
             Characteristic: {
               ...testSubjectMeta.filters.Characteristic,
-              totalValue: 'total',
+              autoSelectFilterItemId: 'total',
             },
           },
         }}
@@ -872,7 +872,7 @@ describe('FiltersForm', () => {
           filters: {
             SchoolType: {
               id: 'school-type',
-              totalValue: '',
+              autoSelectFilterItemId: '',
               hint: 'Filter by school type',
               legend: 'School type',
               options: {
@@ -1030,7 +1030,7 @@ describe('FiltersForm', () => {
             ...testSubjectMeta.filters,
             Characteristic: {
               ...testSubjectMeta.filters.Characteristic,
-              totalValue: 'total',
+              autoSelectFilterItemId: 'total',
             },
           },
         }}
@@ -1043,7 +1043,7 @@ describe('FiltersForm', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /If no options are selected from a category then a 'Total' option may be selected automatically when creating a table./,
+        /If no options are selected from a category then a default option \(often 'Total'\) may be selected automatically when creating a table./,
       ),
     ).toBeInTheDocument();
     expect(
@@ -1070,7 +1070,7 @@ describe('FiltersForm', () => {
 
     expect(
       screen.queryByText(
-        /If no options are selected from a category then a 'Total' option may be selected automatically when creating a table./,
+        /If no options are selected from a category then a default option \(often 'Total'\) may be selected automatically when creating a table./,
       ),
     ).not.toBeInTheDocument();
     expect(

@@ -159,7 +159,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     memoryGis: resourceAndScalingConfig.memoryGis
     minReplicas: resourceAndScalingConfig.minReplicas
     maxReplicas: resourceAndScalingConfig.maxReplicas
-    scaleAtConcurrentHttpRequests: resourceAndScalingConfig.scaleAtConcurrentHttpRequests
+    scaleAtConcurrentHttpRequests: resourceAndScalingConfig.?scaleAtConcurrentHttpRequests
     workloadProfileName: resourceAndScalingConfig.workloadProfileName
     alerts: deployAlerts ? {
       restarts: true
@@ -172,6 +172,15 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues
+  }
+}
+
+module storePublicApiContainerAppPrivateUrl '../../components/keyVaultSecret.bicep' = {
+  name: 'storePublicApiContainerAppPrivateUrl'
+  params: {
+    keyVaultName: resourceNames.existingResources.keyVault
+    secretName: 'ees-publicapi-public-api-containerapp-private-url'
+    secretValue: 'https://${apiContainerAppModule.outputs.containerAppFqdn}'
   }
 }
 

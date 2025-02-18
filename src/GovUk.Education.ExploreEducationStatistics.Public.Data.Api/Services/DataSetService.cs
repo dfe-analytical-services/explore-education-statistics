@@ -370,7 +370,7 @@ internal class DataSetService(
         {
             Id = filterOptionMetaLink.PublicId,
             Label = filterOptionMetaLink.Option.Label,
-            IsAggregate = filterOptionMetaLink.Option.IsAggregate,
+            IsAutoSelect = filterOptionMetaLink.Meta.AutoSelectLabel == filterOptionMetaLink.Option.Label,
         };
     }
 

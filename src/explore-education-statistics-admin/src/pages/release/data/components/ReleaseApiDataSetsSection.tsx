@@ -9,23 +9,21 @@ import LiveApiDataSetsTable, {
 } from '@admin/pages/release/data/components/LiveApiDataSetsTable';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import apiDataSetService from '@admin/services/apiDataSetService';
-import {
-  releaseApiDataSetDetailsRoute,
-  ReleaseDataSetRouteParams,
-} from '@admin/routes/releaseRoutes';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { generatePath, useHistory } from 'react-router-dom';
 
 export default function ReleaseApiDataSetsSection() {
-  const history = useHistory();
   const { release } = useReleaseContext();
   const { user } = useAuthContext();
 
-  const { data: dataSets = [], isLoading: hasDataSetsLoading } = useQuery({
+  const {
+    data: dataSets = [],
+    isLoading: hasDataSetsLoading,
+    refetch,
+  } = useQuery({
     ...apiDataSetQueries.list(release.publicationId),
     refetchInterval: 20_000,
   });
@@ -85,16 +83,8 @@ export default function ReleaseApiDataSetsSection() {
                   const dataSet = await apiDataSetService.createDataSet({
                     releaseFileId,
                   });
-                  history.push(
-                    generatePath<ReleaseDataSetRouteParams>(
-                      releaseApiDataSetDetailsRoute.path,
-                      {
-                        publicationId: release.publicationId,
-                        releaseId: release.id,
-                        dataSetId: dataSet.id,
-                      },
-                    ),
-                  );
+                  refetch();
+                  return dataSet;
                 }}
               />
             ) : (

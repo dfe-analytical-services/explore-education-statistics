@@ -1,5 +1,6 @@
 import { responseTimeConfig, dynamicTotalGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
 import { staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
+import { removeMultiple } from '../functions.bicep'
 
 import {
   AppGatewayBackend
@@ -34,6 +35,9 @@ param routes AppGatewayRoute[]
 
 @description('Rules for how the App Gateway should rewrite URLs')
 param rewrites AppGatewayRewriteSet[]
+
+@description('Optional id of a WAF policy to use globally across all listeners in this App Gateway')
+param globalWafPolicyId string?
 
 @description('Availability zones in the region that the resource should be accessible from. Defaults to all zones')
 param availabilityZones ('1' | '2' | '3') [] = [
@@ -87,6 +91,8 @@ module keyVaultAccessPolicyModule 'keyVaultAccessPolicy.bicep' = {
   }
 }
 
+var invalidDomainLabelCharacters = ['.', '-']
+
 // Create public IP addresses for every site we will expose through this App Gateway.
 resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for site in sites: {
   name: '${site.name}-pip'
@@ -99,22 +105,12 @@ resource publicIPAddresses 'Microsoft.Network/publicIPAddresses@2024-01-01' = [f
     publicIPAllocationMethod: 'Static'
     idleTimeoutInMinutes: 4
     dnsSettings: {
-      domainNameLabel: replace(site.fqdn, '.', '')
-      fqdn: '${replace(site.fqdn, '.', '')}.${location}.cloudapp.azure.com'
+      domainNameLabel: removeMultiple(site.fqdn, invalidDomainLabelCharacters)
+      fqdn: '${removeMultiple(site.fqdn, invalidDomainLabelCharacters)}.${location}.cloudapp.azure.com'
     }
   }
   zones: availabilityZones
 }]
-
-// Add a Firewall Policy with OWASP and Bot rulesets, running in Prevention mode.
-module wafPolicyModule 'appGatewayWafPolicy.bicep' = {
-  name: 'wafPolicy'
-  params: {
-    name: '${appGatewayName}-afwp'
-    location: location
-    tagValues: tagValues
-  }
-}
 
 module pathRulesModule './appGatewayPathRules.bicep' = [for route in routes: {
   name: '${route.name}-route-paths'
@@ -217,6 +213,9 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
         }
         hostName: site.fqdn
         requireServerNameIndication: true
+        firewallPolicy: site.?wafPolicyName != null ? {
+          id: resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', site.?wafPolicyName ?? '')
+        } : null
       }
     }]
     requestRoutingRules: [for (route, index) in routes: {
@@ -276,9 +275,9 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
       minCapacity: 0
       maxCapacity: 10
     }
-    firewallPolicy: {
-      id: wafPolicyModule.outputs.id
-    }
+    firewallPolicy: globalWafPolicyId != null ? {
+      id: globalWafPolicyId!
+    } : null
   }
   dependsOn: [
     publicIPAddresses
@@ -304,6 +303,9 @@ module backendPoolsHealthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }
 
 module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseTime) {
@@ -318,6 +320,9 @@ module responseTimeAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null 
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }
 
 module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.failedRequests) {
@@ -340,6 +345,9 @@ module failedRequestsAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }
 
 module responseStatusAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.responseStatuses) {
@@ -362,4 +370,7 @@ module responseStatusAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != nul
     alertsGroupName: alerts!.alertsGroupName
     tagValues: tagValues
   }
+  dependsOn: [
+    appGateway
+  ]
 }
