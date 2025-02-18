@@ -2,6 +2,7 @@ using Asp.Versioning.ApiExplorer;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -9,7 +10,8 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 
 public class SwaggerConfig(
-    IApiVersionDescriptionProvider provider)
+    IApiVersionDescriptionProvider provider,
+    IOptions<AppOptions> appOptions)
     : IConfigureOptions<SwaggerGenOptions>
 {
     public void Configure(SwaggerGenOptions options)
@@ -74,7 +76,7 @@ public class SwaggerConfig(
         options.AddServer(new OpenApiServer
         {
             Description = "API server",
-            Url = "/"
+            Url = appOptions.Value.Url
         });
     }
 
