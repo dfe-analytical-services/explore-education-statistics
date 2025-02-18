@@ -15,16 +15,13 @@ const releaseVersionService = {
     spinner.start();
     console.time('createRelease');
 
-    const res = await adminApi.post(
-      `/api/publications/${publicationId}/releases`,
-      {
-        publicationId,
-        templateReleaseId: '',
-        timePeriodCoverage: { value: 'AY' },
-        type: 'AdHocStatistics',
-        year: Math.floor(Math.random() * (9999 - 1000 + 1) + 1000),
-      },
-    );
+    const res = await adminApi.post(`/api/releases`, {
+      publicationId,
+      templateReleaseId: '',
+      timePeriodCoverage: { value: 'AY' },
+      type: 'AdHocStatistics',
+      year: Math.floor(Math.random() * (9999 - 1000 + 1) + 1000),
+    });
     console.timeEnd('createRelease');
     const releaseId = res.data.id;
     spinner.succeed(
