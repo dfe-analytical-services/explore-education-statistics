@@ -205,7 +205,7 @@ const DataBlockPageTabs = ({
             dataBlockId: dataBlockToSave.id,
           });
 
-          await dataBlocksService.updateDataBlock(
+          return dataBlocksService.updateDataBlock(
             dataBlockToSave.id,
             dataBlockToSave as ReleaseDataBlock,
           );
@@ -226,6 +226,7 @@ const DataBlockPageTabs = ({
 
         return newDataBlock;
       };
+
       const savedDataBlock = await getSavedDataBlock();
 
       if (onDataBlockSave) {
