@@ -3060,12 +3060,6 @@
             "type": "string",
             "description": "The human-readable label describing the filter option.",
             "example": "State-funded primary"
-          },
-          "isAutoSelect": {
-            "type": "boolean",
-            "description": "Whether the filter option is auto selected in the table tool if no other options are selected.",
-            "nullable": true,
-            "example": false
           }
         },
         "additionalProperties": false,

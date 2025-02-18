@@ -25,41 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             this T actual,
             T expected,
             bool ignoreCollectionOrders = false,
-            Expression<Func<T, object>>[]? notEqualProperties = null)
+            Expression<Func<T, object?>>[]? ignoreProperties = null)
         {
             var compareLogic = new CompareLogic();
-            notEqualProperties?.ForEach(compareLogic.Config.IgnoreProperty);
+            ignoreProperties?.ForEach(compareLogic.Config.IgnoreProperty);
             compareLogic.Config.MaxDifferences = 100;
             compareLogic.Config.IgnoreCollectionOrder = ignoreCollectionOrders;
             var comparison = compareLogic.Compare(expected, actual);
             Assert.True(comparison.AreEqual, comparison.DifferencesString);
-            notEqualProperties?.ForEach(notEqualField =>
-            {
-                var fieldGetter = notEqualField.Compile();
-                var expectedValue = fieldGetter.Invoke(expected);
-                var actualValue = fieldGetter.Invoke(actual);
-
-                try
-                {
-                    Assert.NotEqual(expectedValue, actualValue);
-                }
-                catch (NotEqualException)
-                {
-                    throw new XunitException($"Expected values for expression {notEqualField} to not be equal, " +
-                                             $"but they were both of value \"{expectedValue}\".");
-                }
-            });
             return true;
-        }
-
-        /// <summary>
-        /// A convenience method for combining AssertDeepEqualTo with one or more inequality assertions for specific
-        /// fields.  This allows us to check for a general equality rule for the majority of an object's fields, whilst
-        /// also checking the opposite case for a smaller subset of fields.
-        /// </summary>
-        public static Expression<Func<T, object>>[] Except<T>(params Expression<Func<T, object>>[] properties)
-        {
-            return properties;
         }
 
         public static bool IsDeepEqualTo<T>(
