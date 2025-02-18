@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -42,7 +41,7 @@ public abstract class ReleaseServiceTests
                 Type = ReleaseType.ExperimentalStatistics,
             };
 
-            var releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
+            var releaseService = BuildService(Mock.Of<ContentDbContext>());
 
             var result = await releaseService.CreateRelease(releaseCreateRequest);
 
@@ -65,7 +64,7 @@ public abstract class ReleaseServiceTests
             Guid? newReleaseVersionId = null;
 
             var releaseVersionViewModel = new ReleaseVersionViewModel();
-            var releaseVersionServiceMock = new Mock<IReleaseVersionService>();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
             releaseVersionServiceMock
                 .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
                 .ReturnsAsync(releaseVersionViewModel)
@@ -73,7 +72,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(
+                var releaseService = BuildService(
                     contentDbContext: context, 
                     releaseVersionService: releaseVersionServiceMock.Object);
 
@@ -199,7 +198,7 @@ public abstract class ReleaseServiceTests
             Guid? newReleaseVersionId = null;
 
             var releaseVersionViewModel = new ReleaseVersionViewModel();
-            var releaseVersionServiceMock = new Mock<IReleaseVersionService>();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
             releaseVersionServiceMock
                 .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
                 .ReturnsAsync(releaseVersionViewModel)
@@ -207,7 +206,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildReleaseService(
+                var releaseService = BuildService(
                     contentDbContext: context, 
                     releaseVersionService: releaseVersionServiceMock.Object);
 
@@ -259,11 +258,13 @@ public abstract class ReleaseServiceTests
         }
     }
 
-    private static ReleaseService BuildReleaseService(
+    private static ReleaseService BuildService(
         ContentDbContext contentDbContext,
         IReleaseVersionService? releaseVersionService = null,
         IReleaseCacheService? releaseCacheService = null,
-        IPublicationCacheService? publicationCacheService = null)
+        IPublicationCacheService? publicationCacheService = null,
+        IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
+        IRedirectsCacheService? redirectsCacheService = null)
     {
         var userService = AlwaysTrueUserService();
 
@@ -277,6 +278,8 @@ public abstract class ReleaseServiceTests
             releaseVersionService: releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             releaseCacheService: releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
             publicationCacheService: publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
+            releasePublishingStatusRepository: releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(Strict),
+            redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             guidGenerator: new SequentialGuidGenerator()
         );
     }

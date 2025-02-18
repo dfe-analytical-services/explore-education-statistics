@@ -1,10 +1,8 @@
 #nullable enable
 using System;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -19,13 +17,11 @@ public class ReleaseCacheService(
     IReleaseService releaseService,
     IPublicBlobStorageService publicBlobStorageService) : IReleaseCacheService
 {
-    private readonly IReleaseService _releaseService = releaseService;
-
     [BlobCache(typeof(ReleaseCacheKey), ServiceName = "public")]
     public Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(string publicationSlug,
         string? releaseSlug = null)
     {
-        return _releaseService.GetRelease(publicationSlug, releaseSlug);
+        return releaseService.GetRelease(publicationSlug, releaseSlug);
     }
 
     [BlobCache(typeof(ReleaseCacheKey), forceUpdate: true, ServiceName = "public")]
@@ -34,7 +30,7 @@ public class ReleaseCacheService(
         string publicationSlug,
         string? releaseSlug = null)
     {
-        return _releaseService.GetRelease(releaseVersionId);
+        return releaseService.GetRelease(releaseVersionId);
     }
 
     [BlobCache(typeof(ReleaseStagedCacheKey), forceUpdate: true, ServiceName = "public")]
@@ -44,7 +40,7 @@ public class ReleaseCacheService(
         string publicationSlug,
         string? releaseSlug = null)
     {
-        return _releaseService.GetRelease(releaseVersionId, expectedPublishDate);
+        return releaseService.GetRelease(releaseVersionId, expectedPublishDate);
     }
 
     public async Task<Either<ActionResult, Unit>> RemoveRelease(
@@ -54,6 +50,13 @@ public class ReleaseCacheService(
         await publicBlobStorageService.DeleteBlob(
             containerName: BlobContainers.PublicContent,
             path: FileStoragePathUtils.PublicContentReleasePath(
+                publicationSlug: publicationSlug,
+                releaseSlug: releaseSlug)
+        );
+
+        await publicBlobStorageService.DeleteBlobs(
+            containerName: BlobContainers.PublicContent,
+            directoryPath: FileStoragePathUtils.PublicContentReleaseParentPath(
                 publicationSlug: publicationSlug,
                 releaseSlug: releaseSlug)
         );

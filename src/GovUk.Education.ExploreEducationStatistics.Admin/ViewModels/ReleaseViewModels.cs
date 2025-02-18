@@ -1,10 +1,7 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Newtonsoft.Json;
@@ -14,19 +11,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
     public record ReleaseViewModel
     {
-        public Guid Id { get; init; }
+        public required Guid Id { get; init; }
 
         public required Guid PublicationId { get; init; }
 
-        public required string Slug { get; init; } = string.Empty;
+        public required string Slug { get; init; }
 
+        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public required TimeIdentifier TimePeriodCoverage { get; init; }
 
         public required int Year { get; init; }
 
         public string? Label { get; init; }
 
-        public string Title { get; init; } = string.Empty;
+        public required string Title { get; init; }
     }
 
     public record ReleaseVersionViewModel

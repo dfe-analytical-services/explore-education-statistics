@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class UpdateSpecificReleaseRequirement : IAuthorizationRequirement
-{
-}
+public class UpdateSpecificReleaseRequirement : IAuthorizationRequirement;
 
 public class UpdateSpecificReleaseAuthorizationHandler(
     AuthorizationHandlerService authorizationHandlerService)
@@ -24,7 +22,7 @@ public class UpdateSpecificReleaseAuthorizationHandler(
             return;
         }
 
-        var allowedPublicationRole = PublicationRole.Owner;
+        const PublicationRole allowedPublicationRole = PublicationRole.Owner;
 
         if (await authorizationHandlerService
                 .HasRolesOnPublication(

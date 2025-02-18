@@ -23,12 +23,11 @@ using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Cont
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class UpdateSpecificReleaseVersionAuthorizationHandlerTests
     {
         public class ClaimTests
         {
-            // Test that Releases that are in any approval state other than Approved can be updated
+            // Test that Releases Versions that are in any approval state other than Approved can be updated
             // if the current user has the "UpdateAllReleases" Claim.
             [Fact]
             public async Task UpdateAllReleases_ClaimSucceedsIfNotApproved()
@@ -52,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     });
             }
 
-            // Test that Releases that are Approved cannot be updated by a user having any Claim.
+            // Test that Releases Versions that are Approved cannot be updated by a user having any Claim.
             [Fact]
             public async Task AllClaimsFailIfApproved()
             {
@@ -91,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 ApprovalStatus = status
                             };
 
-                            // Assert that a Publication Owner or Approver can update the Release in any approval
+                            // Assert that a Publication Owner or Approver can update the Release Version in any approval
                             // state other than Admin
                             await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                                 UpdateSpecificReleaseVersionRequirement>(
@@ -120,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ApprovalStatus = Approved
                 };
 
-                // Assert that no Publication Role can update the Release if it is Approved.
+                // Assert that no Publication Role can update the Release Version if it is Approved.
                 await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                     UpdateSpecificReleaseVersionRequirement>(
                     HandlerSupplier(releaseVersion),
@@ -152,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             };
 
                             // Assert that a Release Editor (Contributor, Lead, Approver) can update the Release
-                            // in any approval state other than Approved.
+                            // Version in any approval state other than Approved.
                             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
                                 UpdateSpecificReleaseVersionRequirement>(
                                 HandlerSupplier(releaseVersion),
@@ -181,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ApprovalStatus = Approved
                 };
 
-                // Assert that no Publication Role can update the Release if it is Approved.
+                // Assert that no Publication Role can update the Release Version if it is Approved.
                 await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
                     UpdateSpecificReleaseVersionRequirement>(
                     HandlerSupplier(releaseVersion),

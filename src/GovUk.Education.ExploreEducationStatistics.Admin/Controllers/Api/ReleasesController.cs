@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -16,10 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 public class ReleasesController(IReleaseService releaseService) : ControllerBase
 {
     [HttpPost("releases")]
-    public async Task<ActionResult<ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest release)
+    public async Task<ActionResult<ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request)
     {
         return await releaseService
-            .CreateRelease(release)
+            .CreateRelease(request)
             .HandleFailuresOrOk();
     }
 
@@ -31,7 +32,7 @@ public class ReleasesController(IReleaseService releaseService) : ControllerBase
         return await releaseService
             .UpdateRelease(
                 releaseId: releaseId, 
-                releaseUpdate: request,
+                request: request,
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }

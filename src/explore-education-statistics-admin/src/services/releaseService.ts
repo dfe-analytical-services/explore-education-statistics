@@ -13,15 +13,10 @@ export interface CreateReleaseVersionRequest {
   label?: string;
 }
 
-const releaseVersionService = {
-  createReleaseVersion(
-    createRequest: CreateReleaseVersionRequest,
-  ): Promise<ReleaseVersion> {
-    return client.post(
-      `/releases`,
-      createRequest,
-    );
+const releaseService = {
+  createReleaseVersion(createRequest: CreateReleaseVersionRequest): Promise<Release> {
+    return client.post(`/releases`, createRequest);
   },
 };
 
-export default releaseVersionService;
+export default releaseService;

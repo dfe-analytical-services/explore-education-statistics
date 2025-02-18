@@ -17,7 +17,6 @@ using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Cont
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 public class UpdateSpecificReleaseAuthorizationHandlerTests
 {
     private static readonly DataFixture DataFixture = new();
@@ -50,10 +49,8 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
                 handlerSupplier: HandlerSupplier(release),
                 entity: release,
                 publicationId: release.PublicationId,
-                publicationRolesExpectedToPass: new[]
-                {
-                    PublicationRole.Owner
-                });
+                publicationRolesExpectedToPass: [PublicationRole.Owner]
+            );
         }
     }
 

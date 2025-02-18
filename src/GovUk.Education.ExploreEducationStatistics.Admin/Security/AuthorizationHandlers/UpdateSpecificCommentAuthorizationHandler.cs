@@ -32,13 +32,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             Comment resource)
         {
             var releaseVersion = GetReleaseVersion(_contentDbContext, resource);
-            var updateSpecificReleaseContext = new AuthorizationHandlerContext(
-                new[] { new UpdateSpecificReleaseVersionRequirement() }, context.User, releaseVersion);
+            var updateSpecificReleaseVersionContext = new AuthorizationHandlerContext(
+                requirements: [new UpdateSpecificReleaseVersionRequirement()],
+                user:
+                context.User,
+                resource: releaseVersion);
 
             await new UpdateSpecificReleaseVersionAuthorizationHandler(_authorizationHandlerService)
-                .HandleAsync(updateSpecificReleaseContext);
+                .HandleAsync(updateSpecificReleaseVersionContext);
 
-            if (!updateSpecificReleaseContext.HasSucceeded)
+            if (!updateSpecificReleaseVersionContext.HasSucceeded)
             {
                 return;
             }

@@ -91,7 +91,8 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                 {
                     config.AddInMemoryCollection(
                     [
-                        new KeyValuePair<string, string?>("PublicStorage", _azuriteContainer.GetConnectionString())
+                        new KeyValuePair<string, string?>("PublicStorage", _azuriteContainer.GetConnectionString()),
+                        new KeyValuePair<string, string?>("PublisherStorage", _azuriteContainer.GetConnectionString())
                     ]);
                 })
                 .ConfigureServices(services =>
@@ -101,6 +102,9 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp) :
                             _azuriteContainer.GetConnectionString(),
                             sp.GetRequiredService<ILogger<IBlobStorageService>>()
                         )
+                    );
+                    services.ReplaceService<IPublisherTableStorageService>(sp =>
+                        new PublisherTableStorageService(_azuriteContainer.GetConnectionString())
                     );
                     services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
                 });

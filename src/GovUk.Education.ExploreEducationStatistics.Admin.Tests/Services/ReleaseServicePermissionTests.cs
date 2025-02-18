@@ -52,12 +52,45 @@ public class ReleaseServicePermissionTests
             );
     }
 
+    [Fact]
+    public async Task UpdateRelease()
+    {
+        Release release = _dataFixture.DefaultRelease()
+            .WithPublication(_dataFixture.DefaultPublication());
+
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFailWithMatcher<Release>(r => r.PublicationId == release.PublicationId,
+                CanUpdateSpecificRelease)
+            .AssertForbidden(
+                async userService =>
+                {
+                    await using var contextDbContext = InMemoryApplicationDbContext();
+                    contextDbContext.Releases.Add(release);
+                    await contextDbContext.SaveChangesAsync();
+
+                    var service = BuildService(
+                        context: contextDbContext,
+                        userService: userService.Object);
+
+                    return await service.UpdateRelease(
+                        releaseId: release.Id,
+                        new ReleaseUpdateRequest
+                        {
+                            Label = "initial",
+                        }
+                    );
+                }
+            );
+    }
+
     private static ReleaseService BuildService(
         IUserService userService,
         ContentDbContext? context = null,
         IReleaseVersionService? releaseVersionService = null,
         IReleaseCacheService? releaseCacheService = null,
-        IPublicationCacheService? publicationCacheService = null)
+        IPublicationCacheService? publicationCacheService = null,
+        IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
+        IRedirectsCacheService? redirectsCacheService = null)
     {
         return new ReleaseService(
             context: context ?? Mock.Of<ContentDbContext>(),
@@ -65,6 +98,8 @@ public class ReleaseServicePermissionTests
             releaseVersionService: releaseVersionService ?? Mock.Of<IReleaseVersionService>(),
             releaseCacheService: releaseCacheService ?? Mock.Of<IReleaseCacheService>(),
             publicationCacheService: publicationCacheService ?? Mock.Of<IPublicationCacheService>(),
+            releasePublishingStatusRepository: releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(),
+            redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(),
             guidGenerator: new SequentialGuidGenerator()
         );
     }

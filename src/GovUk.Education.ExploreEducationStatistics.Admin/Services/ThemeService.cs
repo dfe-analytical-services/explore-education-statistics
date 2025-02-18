@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToAsyncEnumerable()
                 .SelectAwait(async publicationId =>
                     await DeleteMethodologiesForPublication(publicationId)
-                        .OnSuccess(() => DeleteReleasesForPublication(publicationId))
+                        .OnSuccess(() => DeleteReleaseVersionsForPublication(publicationId))
                         .OnSuccess(() => DeletePublication(publicationId)))
                 .ToListAsync(cancellationToken);
 
@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessAllReturnVoid();
         }
 
-        private async Task<Either<ActionResult, Unit>> DeleteReleasesForPublication(Guid publicationId)
+        private async Task<Either<ActionResult, Unit>> DeleteReleaseVersionsForPublication(Guid publicationId)
         {
             var publications = await _contentDbContext
                 .Publications

@@ -11,10 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IReleaseService
 {
-    Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
+    Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request);
 
     Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
         Guid releaseId, 
-        ReleaseUpdateRequest releaseUpdate,
+        ReleaseUpdateRequest request,
         CancellationToken cancellationToken = default);
 }

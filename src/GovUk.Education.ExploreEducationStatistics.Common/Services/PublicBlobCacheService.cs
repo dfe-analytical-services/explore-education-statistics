@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 public class PublicBlobCacheService(
     IPublicBlobStorageService publicBlobStorageService,
-    ILogger<BlobCacheService> logger) 
+    ILogger<PublicBlobCacheService> logger) 
     : BlobCacheService(publicBlobStorageService, logger), IPublicBlobCacheService
 {
 }

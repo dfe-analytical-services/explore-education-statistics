@@ -8,9 +8,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApp
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class UpdateSpecificReleaseVersionRequirement : IAuthorizationRequirement
-    {
-    }
+    public class UpdateSpecificReleaseVersionRequirement : IAuthorizationRequirement;
 
     public class UpdateSpecificReleaseVersionAuthorizationHandler
         : AuthorizationHandler<UpdateSpecificReleaseVersionRequirement, ReleaseVersion>
