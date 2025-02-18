@@ -26,6 +26,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -644,7 +645,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         }
 
         [Fact]
-        public async Task SlugChanged_ReleaseRedirectNotCreatedForUnpublishedRelease()
+        public async Task SlugChanged_ReleaseRedirectNotCreatedForUnpublishedRelease_RedirectCacheUntouched()
         {
             var oldSlug = "2020-21-initial";
 
@@ -658,22 +659,47 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             await TestApp.AddTestData<ContentDbContext>(
                 context => context.Releases.Add(release));
 
+            var app = BuildApp();
+            var client = app.CreateClient();
+
+            var publicBlobCacheService = app.Services.GetRequiredService<IPublicBlobCacheService>();
+
+            var oldRedirectsCachedViewModel = new RedirectsViewModel(
+                PublicationRedirects: [],
+                MethodologyRedirects: [],
+                ReleaseRedirectsByPublicationSlug: []);
+            var redirectsCacheKey = new RedirectsCacheKey();
+
+            await publicBlobCacheService.SetItemAsync(redirectsCacheKey, oldRedirectsCachedViewModel);
+
+            // Testing that the redirects cache has actually been stored
+            Assert.NotNull(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
+
             var response = await UpdateRelease(
                 releaseId: release.Id,
-                label: "final");
+                label: "final",
+                client: client);
 
             response.AssertOk<ReleaseViewModel>();
 
             var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
-            var releaseRedirects = await contentDbContext.ReleaseRedirects
-                .ToListAsync();
+            var releaseRedirectsExist = await contentDbContext.ReleaseRedirects
+                .AnyAsync();
 
-            Assert.Empty(releaseRedirects);
+            Assert.False(releaseRedirectsExist);
+
+            // Check that the redirects cache is untouched
+            var newRedirectsCachedValue = await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel))
+                as RedirectsViewModel;
+
+            Assert.Empty(oldRedirectsCachedViewModel.PublicationRedirects);
+            Assert.Empty(oldRedirectsCachedViewModel.MethodologyRedirects);
+            Assert.Empty(oldRedirectsCachedViewModel.ReleaseRedirectsByPublicationSlug);
         }
 
         [Fact]
-        public async Task SlugChanged_ReleaseRedirectCreatedForLiveRelease()
+        public async Task SlugChanged_ReleaseRedirectCreatedForLiveRelease_RedirectsCacheUpdated()
         {
             var oldLabel = "initial";
             var oldSlug = $"2020-21-{oldLabel}";
@@ -733,7 +759,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         }
 
         [Fact]
-        public async Task SlugUnchanged_RedirectCacheUntouchedForLiveRelease()
+        public async Task SlugUnchanged_ReleaseRedirectNotCreatedForLiveRelease_RedirectCacheUntouched()
         {
             var oldLabel = "initial";
             var oldSlug = $"2020-21-{oldLabel}";
