@@ -29,6 +29,8 @@ collapsible_nav: true
 # Show links to contribute on GitHub
 show_contribution_banner: true
 github_repo: dfe-analytical-services/explore-education-statistics
+github_branch: master
+github_repo_path: src/explore-education-statistics-api-docs
 
 # Enable search
 enable_search: true
