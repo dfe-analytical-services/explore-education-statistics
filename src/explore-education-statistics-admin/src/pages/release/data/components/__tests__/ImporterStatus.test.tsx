@@ -1,5 +1,5 @@
 import flushPromises from '@common-test/flushPromises';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import ImporterStatus from '@admin/pages/release/data/components/ImporterStatus';
 import _releaseDataFileService, {
   DataFile,
@@ -84,12 +84,11 @@ describe('ImporterStatus', () => {
       releaseDataFileService.getDataFileImportStatus,
     ).toHaveBeenCalledTimes(1);
 
-    await waitFor(() => {
-      expect(screen.getByText('Validating')).toBeInTheDocument();
-      expect(
-        releaseDataFileService.getDataFileImportStatus,
-      ).toHaveBeenCalledTimes(1);
-    });
+    expect(await screen.findByText('Validating')).toBeInTheDocument();
+
+    expect(
+      releaseDataFileService.getDataFileImportStatus,
+    ).toHaveBeenCalledTimes(1);
   });
 
   test('renders with updated status from service at regular intervals', async () => {
@@ -116,14 +115,13 @@ describe('ImporterStatus', () => {
       releaseDataFileService.getDataFileImportStatus,
     ).toHaveBeenCalledTimes(1);
 
-    await waitFor(() => {
-      expect(screen.getByText('Validating')).toBeInTheDocument();
-      expect(screen.getByRole('progressbar')).toHaveAttribute(
-        'aria-valuenow',
-        '10',
-      );
-      expect(screen.getByText('10% complete')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('Validating')).toBeInTheDocument();
+    expect(await screen.findByText('10% complete')).toBeInTheDocument();
+
+    expect(screen.getByRole('progressbar')).toHaveAttribute(
+      'aria-valuenow',
+      '10',
+    );
 
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'STAGE_2',
@@ -138,14 +136,13 @@ describe('ImporterStatus', () => {
       releaseDataFileService.getDataFileImportStatus,
     ).toHaveBeenCalledTimes(2);
 
-    await waitFor(() => {
-      expect(screen.getByText('Importing')).toBeInTheDocument();
-      expect(screen.getByRole('progressbar')).toHaveAttribute(
-        'aria-valuenow',
-        '50',
-      );
-      expect(screen.getByText('50% complete')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('Importing')).toBeInTheDocument();
+    expect(await screen.findByText('50% complete')).toBeInTheDocument();
+
+    expect(screen.getByRole('progressbar')).toHaveAttribute(
+      'aria-valuenow',
+      '50',
+    );
 
     releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
       status: 'COMPLETE',
@@ -160,12 +157,10 @@ describe('ImporterStatus', () => {
       releaseDataFileService.getDataFileImportStatus,
     ).toHaveBeenCalledTimes(3);
 
-    await waitFor(() => {
-      expect(screen.getByText('Complete')).toBeInTheDocument();
-      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-      expect(screen.queryByText('100% complete')).not.toBeInTheDocument();
-    });
+    expect(await screen.findByText('Complete')).toBeInTheDocument();
 
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(screen.queryByText('100% complete')).not.toBeInTheDocument();
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
   });
 
@@ -193,21 +188,19 @@ describe('ImporterStatus', () => {
 
     await flushPromises();
 
-    await waitFor(() => {
-      expect(screen.getByText('Failed')).toBeInTheDocument();
+    expect(await screen.findByText('Failed')).toBeInTheDocument();
 
-      const details = within(screen.getByRole('group'));
+    const details = within(screen.getByRole('group'));
 
-      expect(
-        details.getByRole('button', { name: 'See errors' }),
-      ).toBeInTheDocument();
+    expect(
+      details.getByRole('button', { name: 'See errors' }),
+    ).toBeInTheDocument();
 
-      const errors = details.getAllByRole('listitem', { hidden: true });
+    const errors = details.getAllByRole('listitem', { hidden: true });
 
-      expect(errors).toHaveLength(2);
-      expect(errors[0]).toHaveTextContent('Some error 1');
-      expect(errors[1]).toHaveTextContent('Some error 2');
-    });
+    expect(errors).toHaveLength(2);
+    expect(errors[0]).toHaveTextContent('Some error 1');
+    expect(errors[1]).toHaveTextContent('Some error 2');
   });
 
   test('does not render error messages from service when `hideErrors` = true', async () => {
