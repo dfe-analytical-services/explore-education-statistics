@@ -1,8 +1,8 @@
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
 import {
-  Release,
-  ReleaseChecklistErrorCode,
-} from '@admin/services/releaseService';
+  ReleaseVersion,
+  ReleaseVersionChecklistErrorCode,
+} from '@admin/services/releaseVersionService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -55,7 +55,7 @@ const errorMappings = [
       PublishedReleaseCannotBeUnapproved:
         'Release has already been published and cannot be un-approved',
       ...mapValues(
-        keyBy(ReleaseChecklistErrorCode, value => value),
+        keyBy(ReleaseVersionChecklistErrorCode, value => value),
         _ => 'Resolve all errors in the publishing checklist',
       ),
     },
@@ -83,14 +83,14 @@ const fallbackErrorMapping = mapFallbackFieldError<ReleaseStatusFormValues>({
 });
 
 interface Props {
-  release: Release;
+  releaseVersion: ReleaseVersion;
   statusPermissions: ReleaseStatusPermissions;
   onCancel: () => void;
   onSubmit: (values: ReleaseStatusFormValues) => Promise<void> | void;
 }
 
 const ReleaseStatusForm = ({
-  release,
+  releaseVersion,
   statusPermissions,
   onCancel,
   onSubmit,
@@ -119,9 +119,13 @@ const ReleaseStatusForm = ({
             ? publishScheduled
             : undefined,
         notifySubscribers:
-          isApproved && release.amendment ? notifySubscribers : undefined,
+          isApproved && releaseVersion.amendment
+            ? notifySubscribers
+            : undefined,
         updatePublishedDate:
-          isApproved && release.amendment ? updatePublishedDate : undefined,
+          isApproved && releaseVersion.amendment
+            ? updatePublishedDate
+            : undefined,
       });
     } catch (err) {
       if (
@@ -192,7 +196,7 @@ const ReleaseStatusForm = ({
       updatePublishedDate: Yup.boolean(),
     });
 
-    if (release.amendment) {
+    if (releaseVersion.amendment) {
       return schema.shape({
         notifySubscribers: Yup.boolean().when('approvalStatus', {
           is: (value: string) => value === 'Approved',
@@ -206,26 +210,28 @@ const ReleaseStatusForm = ({
     }
 
     return schema;
-  }, [release.amendment]);
+  }, [releaseVersion.amendment]);
 
   return (
     <FormProvider
       errorMappings={errorMappings}
       fallbackErrorMapping={fallbackErrorMapping}
       initialValues={{
-        approvalStatus: release.approvalStatus,
-        notifySubscribers: release.amendment
-          ? release.notifySubscribers
+        approvalStatus: releaseVersion.approvalStatus,
+        notifySubscribers: releaseVersion.amendment
+          ? releaseVersion.notifySubscribers
           : undefined,
-        updatePublishedDate: release.amendment
-          ? release.updatePublishedDate
+        updatePublishedDate: releaseVersion.amendment
+          ? releaseVersion.updatePublishedDate
           : undefined,
-        internalReleaseNote: release.latestInternalReleaseNote,
-        publishMethod: release.publishScheduled ? 'Scheduled' : undefined,
-        publishScheduled: release.publishScheduled
-          ? parseISO(release.publishScheduled)
+        internalReleaseNote: releaseVersion.latestInternalReleaseNote,
+        publishMethod: releaseVersion.publishScheduled
+          ? 'Scheduled'
           : undefined,
-        nextReleaseDate: release.nextReleaseDate,
+        publishScheduled: releaseVersion.publishScheduled
+          ? parseISO(releaseVersion.publishScheduled)
+          : undefined,
+        nextReleaseDate: releaseVersion.nextReleaseDate,
       }}
       validationSchema={validationSchema}
     >
@@ -258,7 +264,7 @@ const ReleaseStatusForm = ({
                 ]}
                 onChange={element => {
                   if (
-                    release.amendment &&
+                    releaseVersion.amendment &&
                     element.target.value === 'Approved'
                   ) {
                     setValue('notifySubscribers' as const, true);
@@ -275,7 +281,7 @@ const ReleaseStatusForm = ({
                 rows={3}
               />
 
-              {approvalStatus === 'Approved' && release.amendment && (
+              {approvalStatus === 'Approved' && releaseVersion.amendment && (
                 <>
                   <FormFieldCheckbox
                     name="notifySubscribers"
@@ -308,7 +314,7 @@ const ReleaseStatusForm = ({
                       value: 'Scheduled',
                       conditional: (
                         <>
-                          {release.preReleaseUsersOrInvitesAdded && (
+                          {releaseVersion.preReleaseUsersOrInvitesAdded && (
                             <WarningMessage className="govuk-!-width-two-thirds">
                               Pre-release users will have access to a preview of
                               the release 24 hours before the scheduled publish
@@ -333,7 +339,7 @@ const ReleaseStatusForm = ({
                             Contact us if the release has not been published
                             within one hour.
                           </p>
-                          {release.preReleaseUsersOrInvitesAdded && (
+                          {releaseVersion.preReleaseUsersOrInvitesAdded && (
                             <WarningMessage className="govuk-!-width-two-thirds">
                               Pre-release users will not have access to a
                               preview of the release if it is published

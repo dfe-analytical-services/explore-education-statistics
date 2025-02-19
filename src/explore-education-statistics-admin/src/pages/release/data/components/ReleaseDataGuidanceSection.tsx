@@ -40,21 +40,24 @@ const initialReleaseDataGuidance = `
 `;
 
 interface Props {
-  releaseId: string;
+  releaseVersionId: string;
   canUpdateRelease: boolean;
 }
 
 const contentMaxLength = 250;
 const formId = 'dataGuidanceForm';
 
-const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
+const ReleaseDataGuidanceSection = ({
+  releaseVersionId,
+  canUpdateRelease,
+}: Props) => {
   const {
     value: dataGuidance,
     isLoading,
     setState: setDataGuidance,
   } = useAsyncHandledRetry(
-    () => releaseDataGuidanceService.getDataGuidance(releaseId),
-    [releaseId, canUpdateRelease],
+    () => releaseDataGuidanceService.getDataGuidance(releaseVersionId),
+    [releaseVersionId, canUpdateRelease],
   );
 
   const [isEditing, toggleEditing] = useToggle(canUpdateRelease);
@@ -62,7 +65,10 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
   const handleSubmit = async (values: DataGuidanceFormValues) => {
     await minDelay(async () => {
       const updatedGuidance =
-        await releaseDataGuidanceService.updateDataGuidance(releaseId, values);
+        await releaseDataGuidanceService.updateDataGuidance(
+          releaseVersionId,
+          values,
+        );
 
       setDataGuidance({ value: updatedGuidance });
 

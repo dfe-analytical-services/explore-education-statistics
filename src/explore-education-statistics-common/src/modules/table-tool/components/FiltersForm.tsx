@@ -207,7 +207,7 @@ export default function FiltersForm({
               {tableQueryError && formState.submitCount > 0 && (
                 <TableQueryError
                   errorCode={tableQueryError}
-                  releaseId={selectedPublication?.selectedRelease.id}
+                  releaseVersionId={selectedPublication?.selectedRelease.id}
                   showDownloadOption={showTableQueryErrorDownload}
                   subject={subject}
                   previousValues={previousValues}

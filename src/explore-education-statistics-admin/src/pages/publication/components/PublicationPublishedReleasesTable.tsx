@@ -4,7 +4,7 @@ import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import { ReleaseSummaryWithPermissions } from '@admin/services/releaseService';
+import { ReleaseVersionSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import InsetText from '@common/components/InsetText';
@@ -18,8 +18,8 @@ import { PublishedStatusGuidanceModal } from './PublicationGuidance';
 interface PublishedReleasesTableProps {
   focusReleaseId?: string;
   publicationId: string;
-  releases: ReleaseSummaryWithPermissions[];
-  onAmend: (releaseId: string) => void;
+  releases: ReleaseVersionSummaryWithPermissions[];
+  onAmend: (releaseVersionId: string) => void;
 }
 
 export default function PublicationPublishedReleasesTable({
@@ -80,7 +80,7 @@ export default function PublicationPublishedReleasesTable({
                       releaseSummaryRoute.path,
                       {
                         publicationId,
-                        releaseId: release.id,
+                        releaseVersionId: release.id,
                       },
                     )}
                   >

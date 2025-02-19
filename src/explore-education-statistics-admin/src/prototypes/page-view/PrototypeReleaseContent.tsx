@@ -65,7 +65,7 @@ const PrototypeReleaseContent = ({
 
   const addSummaryBlock = useCallback(async () => {
     await addContentSectionBlock({
-      releaseId: release.id,
+      releaseVersionId: release.id,
       sectionId: release.summarySection.id,
       sectionKey: 'summarySection',
       block: {
@@ -79,7 +79,7 @@ const PrototypeReleaseContent = ({
   const addRelatedDashboardsBlock = useCallback(async () => {
     if (release.relatedDashboardsSection) {
       await addContentSectionBlock({
-        releaseId: release.id,
+        releaseVersionId: release.id,
         sectionId: release.relatedDashboardsSection.id,
         sectionKey: 'relatedDashboardsSection',
         block: {
@@ -171,7 +171,7 @@ const PrototypeReleaseContent = ({
                   renderBlock={block => (
                     <ReleaseBlock
                       block={block}
-                      releaseId={release.id}
+                      releaseVersionId={release.id}
                       transformFeaturedTableLinks={transformFeaturedTableLinks}
                     />
                   )}
@@ -180,7 +180,7 @@ const PrototypeReleaseContent = ({
                       allowComments
                       block={block}
                       publicationId={release.publication.id}
-                      releaseId={release.id}
+                      releaseVersionId={release.id}
                     />
                   )}
                 />
@@ -257,7 +257,7 @@ const PrototypeReleaseContent = ({
                       releaseDataGuidanceRoute.path,
                       {
                         publicationId: release.publication.id,
-                        releaseId: release.id,
+                        releaseVersionId: release.id,
                       },
                     ),
                     state: {
@@ -277,7 +277,7 @@ const PrototypeReleaseContent = ({
                         preReleaseAccessListRoute.path,
                         {
                           publicationId: release.publication.id,
-                          releaseId: release.id,
+                          releaseVersionId: release.id,
                         },
                       ),
                       state: {
@@ -407,7 +407,7 @@ const PrototypeReleaseContent = ({
                   releaseDataGuidanceRoute.path,
                   {
                     publicationId: release.publication.id,
-                    releaseId: release.id,
+                    releaseVersionId: release.id,
                   },
                 ),
                 state: {
@@ -430,14 +430,14 @@ const PrototypeReleaseContent = ({
               <EditableSectionBlocks
                 blocks={release.relatedDashboardsSection.content}
                 renderBlock={block => (
-                  <ReleaseBlock block={block} releaseId={release.id} />
+                  <ReleaseBlock block={block} releaseVersionId={release.id} />
                 )}
                 renderEditableBlock={block => (
                   <PrototypeReleaseEditableBlock
                     allowComments
                     block={block}
                     publicationId={release.publication.id}
-                    releaseId={release.id}
+                    releaseVersionId={release.id}
                   />
                 )}
               />

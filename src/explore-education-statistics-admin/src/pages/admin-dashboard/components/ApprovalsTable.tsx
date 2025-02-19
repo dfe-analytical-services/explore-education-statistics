@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import { MethodologyVersion } from '@admin/services/methodologyService';
-import { DashboardReleaseSummary } from '@admin/services/releaseService';
+import { DashboardReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import {
   MethodologyRouteParams,
   methodologyContentRoute,
@@ -18,7 +18,7 @@ import merge from 'lodash/merge';
 
 interface Props {
   methodologyApprovals: MethodologyVersion[];
-  releaseApprovals: DashboardReleaseSummary[];
+  releaseApprovals: DashboardReleaseVersionSummary[];
 }
 
 export default function ApprovalsTable({
@@ -26,17 +26,17 @@ export default function ApprovalsTable({
   releaseApprovals,
 }: Props) {
   const releasesByPublication: Dictionary<{
-    releases: DashboardReleaseSummary[];
+    releases: DashboardReleaseVersionSummary[];
   }> = useMemo(() => {
     return releaseApprovals.reduce<
-      Dictionary<{ releases: DashboardReleaseSummary[] }>
-    >((acc, release) => {
-      if (acc[release.publication.title]) {
-        acc[release.publication.title].releases.push(release);
+      Dictionary<{ releases: DashboardReleaseVersionSummary[] }>
+    >((acc, releaseVersion) => {
+      if (acc[releaseVersion.publication.title]) {
+        acc[releaseVersion.publication.title].releases.push(releaseVersion);
       } else {
-        acc[release.publication.title] = {
-          ...acc[release.publication.title],
-          releases: [release],
+        acc[releaseVersion.publication.title] = {
+          ...acc[releaseVersion.publication.title],
+          releases: [releaseVersion],
         };
       }
       return acc;
@@ -104,7 +104,7 @@ export default function ApprovalsTable({
 interface PublicationRowProps {
   publication: string;
   methodologies: MethodologyVersion[];
-  releases: DashboardReleaseSummary[];
+  releases: DashboardReleaseVersionSummary[];
 }
 
 function PublicationRow({
@@ -119,22 +119,22 @@ function PublicationRow({
           {publication}
         </th>
       </tr>
-      {releases?.map(release => (
+      {releases?.map(releaseVersion => (
         <tr
-          key={release.id}
-          data-testid={`release-${publication} - ${release.title}`}
+          key={releaseVersion.id}
+          data-testid={`release-${publication} - ${releaseVersion.title}`}
         >
-          <td>{release.title}</td>
+          <td>{releaseVersion.title}</td>
           <td>Release</td>
           <td>
             <Link
               to={generatePath<ReleaseRouteParams>(releaseContentRoute.path, {
-                publicationId: release.publication.id,
-                releaseId: release.id,
+                publicationId: releaseVersion.publication.id,
+                releaseVersionId: releaseVersion.id,
               })}
             >
               Review this page
-              <VisuallyHidden> for {release.title}</VisuallyHidden>
+              <VisuallyHidden> for {releaseVersion.title}</VisuallyHidden>
             </Link>
           </td>
         </tr>

@@ -13,7 +13,7 @@ import createMethodology from '../modules/methodology/createMethodology';
 import addMethodologyTextContentBlock from '../modules/methodology/addMethodologyTextContentBlock';
 import addReleaseTextContentBlock from '../modules/release/addContentBlock';
 import logger from '../utils/logger';
-import releaseService from './releaseService';
+import releaseVersionService from './releaseVersionService';
 import subjectService from './subjectService';
 import commonService from './commonService';
 import publishAllReleases from '../modules/publication/publishAllReleases';
@@ -138,7 +138,7 @@ const promptService = {
       },
     });
 
-    const releases = await releaseService.getAllReleases(publication.id);
+    const releases = await releaseVersionService.getAllReleases(publication.id);
 
     await commonService.prepareDirectories();
 
@@ -150,7 +150,7 @@ const promptService = {
 
         const subjectIdPair = await subjectService.getSubjectIdArr(release.id);
 
-        await releaseService.addDataGuidance(subjectIdPair, release.id);
+        await releaseVersionService.addDataGuidance(subjectIdPair, release.id);
       }
     }
 

@@ -11,7 +11,7 @@ import { useWatch } from 'react-hook-form';
 import isEqual from 'lodash/isEqual';
 
 interface Props {
-  releaseId?: string;
+  releaseVersionId?: string;
   showDownloadOption?: boolean;
   subject: Subject;
   errorCode: TableQueryErrorCode;
@@ -25,7 +25,7 @@ interface ErrorMessageText {
 }
 
 const TableQueryError = ({
-  releaseId,
+  releaseVersionId,
   showDownloadOption = true,
   subject,
   errorCode,
@@ -81,17 +81,17 @@ const TableQueryError = ({
           <p>{downloadOptionMessage}</p>
           <Button
             className="govuk-!-margin-bottom-0"
-            disabled={!releaseId}
+            disabled={!releaseVersionId}
             onClick={async () => {
-              if (releaseId) {
-                await downloadService.downloadFiles(releaseId, [
+              if (releaseVersionId) {
+                await downloadService.downloadFiles(releaseVersionId, [
                   subject.file.id,
                 ]);
               }
             }}
           >
             {`Download ${subject.name} (${subject.file.extension}, ${subject.file.size})`}
-            {!releaseId && ` (available when the release is published)`}
+            {!releaseVersionId && ` (available when the release is published)`}
           </Button>
         </>
       ) : (

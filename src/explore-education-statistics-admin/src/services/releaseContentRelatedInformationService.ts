@@ -1,8 +1,10 @@
 import client from '@admin/services/utils/service';
-import { BasicLink, Release } from '@common/services/publicationService';
+import { BasicLink, ReleaseVersion } from '@common/services/publicationService';
 
 const releaseContentRelatedInformationService = {
-  getAll: (releaseId: string): Promise<Release['relatedInformation']> => {
+  getAll: (
+    releaseId: string,
+  ): Promise<ReleaseVersion['relatedInformation']> => {
     return client.get(`/release/${releaseId}/content/related-information`);
   },
   update: (

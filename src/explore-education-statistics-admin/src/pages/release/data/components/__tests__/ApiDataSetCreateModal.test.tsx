@@ -34,7 +34,7 @@ describe('ApiDataSetCreateModal', () => {
     const { user } = render(
       <ApiDataSetCreateModal
         publicationId="publication-id"
-        releaseId="release-id"
+        releaseVersionId="release-id"
         onSubmit={Promise.resolve}
       />,
     );
@@ -71,7 +71,7 @@ describe('ApiDataSetCreateModal', () => {
     const { user } = render(
       <ApiDataSetCreateModal
         publicationId="publication-id"
-        releaseId="release-id"
+        releaseVersionId="release-id"
         onSubmit={Promise.resolve}
       />,
     );
@@ -116,7 +116,7 @@ describe('ApiDataSetCreateModal', () => {
     const { user } = render(
       <ApiDataSetCreateModal
         publicationId="publication-id"
-        releaseId="release-id"
+        releaseVersionId="release-id"
         onSubmit={handleSubmit}
       />,
     );

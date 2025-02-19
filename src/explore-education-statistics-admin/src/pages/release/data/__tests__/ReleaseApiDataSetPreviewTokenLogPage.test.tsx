@@ -1,7 +1,7 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetPreviewTokenLogPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewTokenLogPage';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import {
   releaseApiDataSetPreviewTokenLogRoute,
   ReleaseDataSetRouteParams,
@@ -229,14 +229,14 @@ describe('ReleaseApiDataSetPreviewTokenLogPage', () => {
   function renderPage() {
     return render(
       <TestConfigContextProvider>
-        <ReleaseContextProvider release={testRelease}>
+        <ReleaseVersionContextProvider releaseVersion={testRelease}>
           <MemoryRouter
             initialEntries={[
               generatePath<ReleaseDataSetRouteParams>(
                 releaseApiDataSetPreviewTokenLogRoute.path,
                 {
                   publicationId: testRelease.publicationId,
-                  releaseId: testRelease.id,
+                  releaseVersionId: testRelease.id,
                   dataSetId: 'data-set-id',
                 },
               ),
@@ -247,7 +247,7 @@ describe('ReleaseApiDataSetPreviewTokenLogPage', () => {
               path={releaseApiDataSetPreviewTokenLogRoute.path}
             />
           </MemoryRouter>
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </TestConfigContextProvider>,
     );
   }

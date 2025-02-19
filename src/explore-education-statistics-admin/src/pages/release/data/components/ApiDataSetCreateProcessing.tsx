@@ -11,13 +11,13 @@ import { generatePath } from 'react-router-dom';
 interface Props {
   dataSetId: string;
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   onClose: () => void;
 }
 export default function ApiDataSetCreateProcessing({
   dataSetId,
   publicationId,
-  releaseId,
+  releaseVersionId,
   onClose,
 }: Props) {
   return (
@@ -29,7 +29,7 @@ export default function ApiDataSetCreateProcessing({
             releaseApiDataSetDetailsRoute.path,
             {
               publicationId,
-              releaseId,
+              releaseVersionId,
               dataSetId,
             },
           )}

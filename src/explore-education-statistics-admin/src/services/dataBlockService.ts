@@ -41,8 +41,8 @@ export interface DeleteDataBlockPlan {
 }
 
 const dataBlockService = {
-  listDataBlocks(releaseId: string): Promise<ReleaseDataBlockSummary[]> {
-    return client.get(`/releases/${releaseId}/data-blocks`);
+  listDataBlocks(releaseVersionId: string): Promise<ReleaseDataBlockSummary[]> {
+    return client.get(`/releases/${releaseVersionId}/data-blocks`);
   },
 
   getDataBlock(dataBlockId: string): Promise<ReleaseDataBlock> {
@@ -50,10 +50,10 @@ const dataBlockService = {
   },
 
   createDataBlock(
-    releaseId: string,
+    releaseVersionId: string,
     dataBlock: CreateReleaseDataBlock,
   ): Promise<ReleaseDataBlock> {
-    return client.post(`/releases/${releaseId}/data-blocks`, dataBlock);
+    return client.post(`/releases/${releaseVersionId}/data-blocks`, dataBlock);
   },
 
   updateDataBlock(
@@ -66,22 +66,22 @@ const dataBlockService = {
     );
   },
 
-  deleteDataBlock(releaseId: string, id: string): Promise<void> {
-    return client.delete(`/releases/${releaseId}/data-blocks/${id}`);
+  deleteDataBlock(releaseVersionId: string, id: string): Promise<void> {
+    return client.delete(`/releases/${releaseVersionId}/data-blocks/${id}`);
   },
 
   getDeleteBlockPlan(
-    releaseId: string,
+    releaseVersionId: string,
     id: string,
   ): Promise<DeleteDataBlockPlan> {
     return client.get(
-      `/releases/${releaseId}/data-blocks/${id}/delete-plan`,
+      `/releases/${releaseVersionId}/data-blocks/${id}/delete-plan`,
       {},
     );
   },
 
-  getUnattachedDataBlocks(releaseId: string): Promise<DataBlock[]> {
-    return client.get(`/release/${releaseId}/data-blocks/unattached`);
+  getUnattachedDataBlocks(releaseVersionId: string): Promise<DataBlock[]> {
+    return client.get(`/release/${releaseVersionId}/data-blocks/unattached`);
   },
 };
 

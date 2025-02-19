@@ -7,23 +7,26 @@ export type ImageAttributeTransformer = (
 ) => Dictionary<string>;
 
 export default function useReleaseImageAttributeTransformer(options: {
-  releaseId: string;
+  releaseVersionId: string;
   rootUrl?: string;
 }): ImageAttributeTransformer {
-  const { releaseId, rootUrl = '' } = options;
+  const { releaseVersionId, rootUrl = '' } = options;
 
   return useCallback(
     ({ src, srcset, ...attributes }: Dictionary<string>) => {
       return {
         ...attributes,
         src: src
-          ? `${rootUrl}${replaceReleaseIdPlaceholders(src, releaseId)}`
+          ? `${rootUrl}${replaceReleaseIdPlaceholders(src, releaseVersionId)}`
           : '',
         srcset: srcset
-          ? `${rootUrl}${replaceReleaseIdPlaceholders(srcset, releaseId)}`
+          ? `${rootUrl}${replaceReleaseIdPlaceholders(
+              srcset,
+              releaseVersionId,
+            )}`
           : '',
       };
     },
-    [releaseId, rootUrl],
+    [releaseVersionId, rootUrl],
   );
 }

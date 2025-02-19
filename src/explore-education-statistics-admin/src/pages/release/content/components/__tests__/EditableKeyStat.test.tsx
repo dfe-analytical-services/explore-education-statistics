@@ -47,7 +47,7 @@ describe('EditableKeyStat', () => {
     test('renders correctly', async () => {
       render(
         <EditableKeyStat
-          releaseId="release-1"
+          releaseVersionId="release-1"
           keyStat={testKeyStat}
           keyStats={[testKeyStat]}
         />,
@@ -161,7 +161,7 @@ describe('EditableKeyStat', () => {
 
       render(
         <EditableKeyStat
-          releaseId="release-1"
+          releaseVersionId="release-1"
           keyStat={testKeyStat}
           keyStats={[testKeyStat]}
         />,
@@ -203,7 +203,7 @@ describe('EditableKeyStat', () => {
 
       render(
         <EditableKeyStat
-          releaseId="release-1"
+          releaseVersionId="release-1"
           keyStat={testKeyStat}
           keyStats={[testKeyStat]}
           isEditing
@@ -257,7 +257,7 @@ describe('EditableKeyStat', () => {
 
       render(
         <EditableKeyStat
-          releaseId="release-1"
+          releaseVersionId="release-1"
           keyStat={testKeyStat}
           keyStats={[testKeyStat]}
           isEditing
@@ -291,7 +291,7 @@ describe('EditableKeyStat', () => {
     test('invalid `keyStat` renders null', async () => {
       const { container } = render(
         <EditableKeyStat
-          releaseId="release-1"
+          releaseVersionId="release-1"
           keyStat={
             {
               id: 'KeyStat-1',

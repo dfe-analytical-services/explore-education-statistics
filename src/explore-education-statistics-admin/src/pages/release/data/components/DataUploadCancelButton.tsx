@@ -7,13 +7,13 @@ import ErrorMessage from '@common/components/ErrorMessage';
 import React from 'react';
 
 interface Props {
-  releaseId: string;
+  releaseVersionId: string;
   fileId: string;
 }
 
-const DataUploadCancelButton = ({ releaseId, fileId }: Props) => {
+const DataUploadCancelButton = ({ releaseVersionId, fileId }: Props) => {
   const [{ error }, cancelImport] = useAsyncCallback(() =>
-    releaseDataFileService.cancelImport(releaseId, fileId),
+    releaseDataFileService.cancelImport(releaseVersionId, fileId),
   );
   const [showCancelButton, toggleShowCancelButton] = useToggle(true);
 

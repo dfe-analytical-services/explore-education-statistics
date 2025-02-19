@@ -81,7 +81,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
         onRemove={noop}
@@ -123,7 +123,7 @@ describe('EditableKeyStatDataBlock', () => {
     render(
       <EditableKeyStatDataBlock
         isEditing
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
         onRemove={noop}
@@ -159,7 +159,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={{ ...testKeyStat, trend: undefined }}
         keyStats={[testKeyStat]}
         onRemove={noop}
@@ -179,7 +179,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={{ ...testKeyStat, guidanceTitle: undefined }}
         keyStats={[testKeyStat]}
         onRemove={noop}
@@ -206,7 +206,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={{ ...testKeyStat, guidanceText: undefined }}
         keyStats={[testKeyStat]}
         onRemove={noop}
@@ -236,7 +236,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
         isEditing
@@ -266,7 +266,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
         isEditing
@@ -302,7 +302,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
         isEditing
@@ -344,7 +344,7 @@ describe('EditableKeyStatDataBlock', () => {
 
     render(
       <EditableKeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         keyStat={testKeyStat}
         keyStats={[testKeyStat]}
         onRemove={handleRemove}
