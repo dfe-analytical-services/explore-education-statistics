@@ -85,9 +85,9 @@ Create a second draft release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year    3010
 
-# In this new subject, the "School type" filter option "Total" is being updated to "State-funded primary and secondary",
-# and is no longer marked as an aggregate option. The location option "Yorkshire and the Humber" is being renamed to
-# "Yorkshire".
+# In this new subject:
+# - the "School type" filter option "Total" is being updated to "State-funded primary and secondary"
+# - the location option "Yorkshire and the Humber" is being renamed to "Yorkshire".
 
 Upload subject to second release
     user uploads subject and waits until complete    ${SUBJECT_2_NAME}    absence_school_minor_manual.csv
@@ -345,7 +345,6 @@ User verifies minor changes in the 'API data set changelog' section
     ${updated_school_types_total}=    user checks changed facet contains option    ${school_types_filter}    Total
     user checks element contains    ${updated_school_types_total}
     ...    label changed to: State-funded primary and secondary
-    user checks element contains    ${updated_school_types_total}    no longer an aggregate
 
     ${updated_regional_options}=    user checks changelog section contains updated location level
     ...    ${minor_changes_section}    Regional

@@ -23,13 +23,6 @@ export default function FilterOptionChangeLabel({
               id changed to: <code>{currentState.id}</code>
             </li>
           )}
-          {previousState.isAutoSelect !== currentState.isAutoSelect && (
-            <li>
-              {currentState.isAutoSelect
-                ? 'changed to be the default option'
-                : 'no longer the default option'}
-            </li>
-          )}
         </ul>
       </>
     );
