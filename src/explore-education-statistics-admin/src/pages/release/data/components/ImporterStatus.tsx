@@ -84,16 +84,18 @@ export type ImporterStatusChangeHandler = (
 ) => void;
 
 interface ImporterStatusProps {
-  releaseVersionId: string;
-  dataFile: DataFile;
-  onStatusChange?: ImporterStatusChangeHandler;
   className?: string;
+  dataFile: DataFile;
+  hideErrors?: boolean;
+  releaseVersionId: string;
+  onStatusChange?: ImporterStatusChangeHandler;
 }
 const ImporterStatus = ({
-  releaseVersionId,
-  dataFile,
-  onStatusChange,
   className,
+  dataFile,
+  hideErrors,
+  releaseVersionId,
+  onStatusChange,
 }: ImporterStatusProps) => {
   const [currentStatus, setCurrentStatus] = useState<StatusState>({
     status: dataFile.status,
@@ -159,7 +161,7 @@ const ImporterStatus = ({
         />
       )}
 
-      {currentStatus.status === 'FAILED' && (
+      {currentStatus.status === 'FAILED' && !hideErrors && (
         <>
           {currentStatus.errors && currentStatus.errors.length > 0 && (
             <Details

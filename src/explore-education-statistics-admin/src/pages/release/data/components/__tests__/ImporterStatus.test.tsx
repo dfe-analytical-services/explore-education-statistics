@@ -209,4 +209,35 @@ describe('ImporterStatus', () => {
       expect(errors[1]).toHaveTextContent('Some error 2');
     });
   });
+
+  test('does not render error messages from service when `hideErrors` = true', async () => {
+    releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
+      status: 'FAILED',
+      percentageComplete: 0,
+      stagePercentageComplete: 100,
+      totalRows: 100,
+      errors: ['Some error 1', 'Some error 2'],
+    });
+
+    render(
+      <ImporterStatus
+        releaseVersionId="release-1"
+        dataFile={{
+          ...testDataFile,
+          status: 'QUEUED',
+        }}
+        hideErrors
+      />,
+    );
+
+    expect(screen.getByText('Queued')).toBeInTheDocument();
+    expect(screen.queryByRole('group')).not.toBeInTheDocument();
+
+    await flushPromises();
+
+    expect(await screen.findByText('Failed')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'See errors' }),
+    ).not.toBeInTheDocument();
+  });
 });
