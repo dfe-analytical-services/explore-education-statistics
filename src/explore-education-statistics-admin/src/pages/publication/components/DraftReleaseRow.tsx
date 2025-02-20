@@ -68,11 +68,11 @@ const DraftReleaseRow = ({
             releaseVersionId: release.id,
           })}
         >
-          {release.permissions?.canUpdateRelease ? 'Edit Draft' : 'View'}
+          {release.permissions?.canUpdateReleaseVersion ? 'Edit Draft' : 'View'}
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
 
-        {release.permissions?.canDeleteRelease &&
+        {release.permissions?.canDeleteReleaseVersion &&
           release.approvalStatus === 'Draft' &&
           !release.amendment && (
             <DeleteDraftModal
@@ -89,7 +89,7 @@ const DraftReleaseRow = ({
             />
           )}
 
-        {release.permissions?.canDeleteRelease && release.amendment && (
+        {release.permissions?.canDeleteReleaseVersion && release.amendment && (
           <CancelAmendmentModal
             scheduledMethodologies={deleteReleasePlan?.scheduledMethodologies}
             triggerButton={

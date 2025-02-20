@@ -42,7 +42,7 @@ public class ReleaseVersionServicePermissionTests
                 .WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<ContentSecurityPolicies>()
-            .SetupResourceCheckToFail(releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+            .SetupResourceCheckToFail(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
             .AssertForbidden(
                 async userService =>
                 {
@@ -93,7 +93,7 @@ public class ReleaseVersionServicePermissionTests
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
-                CanDeleteSpecificRelease)
+                CanDeleteSpecificReleaseVersion)
             .AssertForbidden(
                 async userService =>
                 {
@@ -119,7 +119,7 @@ public class ReleaseVersionServicePermissionTests
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
-                CanDeleteSpecificRelease)
+                CanDeleteSpecificReleaseVersion)
             .AssertForbidden(
                 async userService =>
                 {
@@ -181,7 +181,7 @@ public class ReleaseVersionServicePermissionTests
                         .ReturnsAsync(true);
 
                     userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease))
+                        .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion))
                         .ReturnsAsync(true);
 
                     userService
@@ -189,11 +189,15 @@ public class ReleaseVersionServicePermissionTests
                         .ReturnsAsync(true);
 
                     userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanDeleteSpecificRelease))
+                        .Setup(s => s.MatchesPolicy(releaseVersion, CanDeleteSpecificReleaseVersion))
                         .ReturnsAsync(true);
 
                     userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanMakeAmendmentOfSpecificRelease))
+                        .Setup(s => s.MatchesPolicy(releaseVersion, CanMakeAmendmentOfSpecificReleaseVersion))
+                        .ReturnsAsync(true);
+
+                    userService
+                        .Setup(s => s.MatchesPolicy(releaseVersion.Release, CanUpdateSpecificRelease))
                         .ReturnsAsync(true);
 
                     await using var contextDbContext = InMemoryApplicationDbContext();
@@ -240,7 +244,7 @@ public class ReleaseVersionServicePermissionTests
                         .ReturnsAsync(true);
 
                     userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease))
+                        .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion))
                         .ReturnsAsync(true);
 
                     userService
@@ -248,11 +252,15 @@ public class ReleaseVersionServicePermissionTests
                         .ReturnsAsync(true);
 
                     userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanDeleteSpecificRelease))
+                        .Setup(s => s.MatchesPolicy(releaseVersion, CanDeleteSpecificReleaseVersion))
                         .ReturnsAsync(true);
 
                     userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanMakeAmendmentOfSpecificRelease))
+                        .Setup(s => s.MatchesPolicy(releaseVersion, CanMakeAmendmentOfSpecificReleaseVersion))
+                        .ReturnsAsync(true);
+
+                    userService
+                        .Setup(s => s.MatchesPolicy(releaseVersion.Release, CanUpdateSpecificRelease))
                         .ReturnsAsync(true);
 
                     userService

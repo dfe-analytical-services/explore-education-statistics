@@ -27,9 +27,10 @@ describe('PublicationScheduledReleases', () => {
     permissions: {
       canAddPrereleaseUsers: false,
       canUpdateRelease: true,
-      canDeleteRelease: false,
-      canMakeAmendmentOfRelease: true,
-      canViewRelease: false,
+      canUpdateReleaseVersion: true,
+      canDeleteReleaseVersion: false,
+      canMakeAmendmentOfReleaseVersion: true,
+      canViewReleaseVersion: false,
     },
     previousVersionId: 'release-previous-id',
     publishScheduled: '2022-01-01T00:00:00',
@@ -132,7 +133,7 @@ describe('PublicationScheduledReleases', () => {
             ...testRelease1,
             permissions: {
               ...testRelease1.permissions,
-              canUpdateRelease: false,
+              canUpdateReleaseVersion: false,
             },
           },
           testRelease2,

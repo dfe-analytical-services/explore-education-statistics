@@ -13,10 +13,11 @@ import { PartialDate } from '@common/utils/date/partialDate';
 
 export interface ReleaseVersionPermissions {
   canAddPrereleaseUsers: boolean;
-  canViewRelease: boolean;
   canUpdateRelease: boolean;
-  canDeleteRelease: boolean;
-  canMakeAmendmentOfRelease: boolean;
+  canViewReleaseVersion: boolean;
+  canUpdateReleaseVersion: boolean;
+  canDeleteReleaseVersion: boolean;
+  canMakeAmendmentOfReleaseVersion: boolean;
 }
 
 export interface ReleaseVersion {

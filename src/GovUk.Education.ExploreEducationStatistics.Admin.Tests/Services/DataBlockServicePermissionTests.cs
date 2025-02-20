@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Get()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetUnattachedDataBlocks()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
