@@ -60,7 +60,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly without any publication roles assigned', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummariesNoResults,
     );
 
@@ -96,7 +96,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with a mix of publication roles assigned', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummariesNoResults,
     );
     publicationService.listRoles.mockClear();
@@ -182,7 +182,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with only publication owners assigned', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummariesNoResults,
     );
     publicationService.listRoles.mockClear();
@@ -253,7 +253,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with only publication approvers assigned', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummariesNoResults,
     );
     publicationService.listRoles.mockClear();
@@ -332,7 +332,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with no releases', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummariesNoResults,
     );
 
@@ -356,7 +356,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with releases', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
 
@@ -425,7 +425,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with no contributor management permissions', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
 
@@ -497,7 +497,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with no permission to view release access section', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
     await renderPage({
@@ -512,7 +512,7 @@ describe('PublicationTeamAccessPage', () => {
       ).toBeInTheDocument();
     });
 
-    expect(publicationService.listReleases).toHaveBeenCalled();
+    expect(publicationService.listReleaseVersions).toHaveBeenCalled();
 
     expect(
       screen.queryByRole('heading', { name: 'Release access' }),
@@ -535,7 +535,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('selects the release from the id in the url', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
 
@@ -563,7 +563,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('selects the first release if no release is set in the url', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
 
@@ -592,7 +592,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('updates the page and url when select a different release', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       testPaginatedReleaseSummaries,
     );
 

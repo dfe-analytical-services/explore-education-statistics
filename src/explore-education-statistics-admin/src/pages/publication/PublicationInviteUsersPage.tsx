@@ -1,7 +1,9 @@
 import PublicationInviteNewUsersForm from '@admin/pages/publication/components/PublicationInviteNewUsersForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import { PublicationManageTeamRouteParams } from '@admin/routes/publicationRoutes';
-import publicationService from '@admin/services/publicationService';
+import publicationService, {
+  ReleaseVersionsType,
+} from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
@@ -15,7 +17,11 @@ const PublicationInviteUsersPage = ({
   const { releaseVersionId } = match.params;
 
   const { value: allReleases = { results: [] }, isLoading } =
-    useAsyncHandledRetry(() => publicationService.listReleases(publicationId));
+    useAsyncHandledRetry(() =>
+      publicationService.listReleaseVersions(publicationId, {
+        versionsType: ReleaseVersionsType.Latest,
+      }),
+    );
 
   const releases = allReleases.results;
 
