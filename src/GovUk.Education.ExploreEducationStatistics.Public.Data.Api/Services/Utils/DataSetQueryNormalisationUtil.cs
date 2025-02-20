@@ -1,41 +1,11 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Utils;
 
-public static class DataSetQuerySerializerUtil
+public static class DataSetQueryNormalisationUtil
 {
-    private class OrderedContractResolver : DefaultContractResolver
-    {
-        protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
-        {
-            return base.CreateProperties(type, memberSerialization)
-                .OrderBy(p => p.Order ?? int.MaxValue)  // Honour any explit ordering first
-                .ThenBy(p => p.PropertyName)
-                .ToList();
-        }
-    }
-    
-    private static readonly JsonSerializerSettings JsonSerializerSettings = new()
-    {
-        ContractResolver = new OrderedContractResolver(),
-        NullValueHandling = NullValueHandling.Ignore,
-    };
-
-    public static string SerializeQuery(DataSetQueryRequest query)
-    {
-        return SerializeObject(NormaliseQuery(query), Formatting.Indented);
-    }
-    
-    private static string SerializeObject(object obj, Formatting formatting)
-    {
-        return JsonConvert.SerializeObject(
-            value: obj,
-            formatting: formatting,
-            settings: JsonSerializerSettings);
-    }
-    
     internal static DataSetQueryRequest NormaliseQuery(DataSetQueryRequest original)
     {
         return original with
@@ -43,11 +13,6 @@ public static class DataSetQuerySerializerUtil
             Indicators = original
                 .Indicators
                 .Order()
-                .ToList(),
-            
-            Sorts = original
-                .Sorts?
-                .OrderBy(sort => sort.Field)
                 .ToList(),
             
             Criteria = original.Criteria != null ? NormaliseCriteria(original.Criteria) : null
@@ -94,7 +59,7 @@ public static class DataSetQuerySerializerUtil
             And = original
                 .And
                 .Select(NormaliseCriteria)
-                .OrderBy(criteria => SerializeObject(criteria, Formatting.None))
+                .OrderBy(criteria => JsonSerializationUtils.SerializeWithOrderedProperties(criteria, Formatting.None))
                 .ToList()
         };
     }
@@ -106,7 +71,7 @@ public static class DataSetQuerySerializerUtil
             Or = original
                 .Or
                 .Select(NormaliseCriteria)
-                .OrderBy(criteria => SerializeObject(criteria, Formatting.None))
+                .OrderBy(criteria => JsonSerializationUtils.SerializeWithOrderedProperties(criteria, Formatting.None))
                 .ToList()
         };
     }

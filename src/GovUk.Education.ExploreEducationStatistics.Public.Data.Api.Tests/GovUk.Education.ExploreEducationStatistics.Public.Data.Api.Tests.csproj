@@ -56,7 +56,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Utils\__snapshots__\" />
+    <Folder Include="Services\__snapshots__\" />
   </ItemGroup>
 
 </Project>

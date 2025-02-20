@@ -1,7 +1,6 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Options;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,8 +36,7 @@ public static class ProcessorHostBuilder
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
-                    .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>()
-                    .AddTransient<IPublicApiAnalyticsService, PublicApiAnalyticsService>();
+                    .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>();
             });
     }
 }

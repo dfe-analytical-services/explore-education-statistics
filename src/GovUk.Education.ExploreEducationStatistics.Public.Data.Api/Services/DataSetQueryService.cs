@@ -150,7 +150,10 @@ internal class DataSetQueryService(
                 // Deliberately do not await this operation as we do not want to
                 // delay the return of the query to the end user.
                 _ = analyticsService.ReportDataSetVersionQuery(
-                    dataSetVersion: dataSetVersion,
+                    dataSetId: dataSetVersion.DataSetId,
+                    dataSetVersionId: dataSetVersion.Id,
+                    semVersion: dataSetVersion.SemVersion().ToString(),
+                    dataSetTitle: dataSetVersion.DataSet.Title,
                     query: query,
                     resultsCount: results.Results.Count,
                     totalRowsCount: results.Paging.TotalResults,

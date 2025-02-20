@@ -6,7 +6,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.In
 public interface IAnalyticsService
 {
     Task ReportDataSetVersionQuery(
-        DataSetVersion dataSetVersion,
+        Guid dataSetId,
+        Guid dataSetVersionId,
+        string semVersion,
+        string dataSetTitle,
         DataSetQueryRequest query,
         int resultsCount,
         int totalRowsCount,

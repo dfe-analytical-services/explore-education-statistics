@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Resources.DataFiles.AbsenceSchool;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -3799,7 +3800,10 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
 
             analyticsService
                 .Setup(s => s.ReportDataSetVersionQuery(
-                    It.Is<DataSetVersion>(dsv => dsv.Id == dataSetVersion.Id),
+                    dataSetVersion.DataSet.Id,
+                    dataSetVersion.Id,
+                    dataSetVersion.SemVersion().ToString(),
+                    dataSetVersion.DataSet.Title,
                     ItIs.DeepEqualTo(request),
                     4,
                     4,

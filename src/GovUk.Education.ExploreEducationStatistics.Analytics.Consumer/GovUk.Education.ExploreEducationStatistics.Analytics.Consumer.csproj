@@ -34,8 +34,10 @@
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Analytics.Requests\GovUk.Education.ExploreEducationStatistics.Analytics.Requests.csproj"/>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Analytics.Services\GovUk.Education.ExploreEducationStatistics.Analytics.Services.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
   </ItemGroup>
 </Project>
