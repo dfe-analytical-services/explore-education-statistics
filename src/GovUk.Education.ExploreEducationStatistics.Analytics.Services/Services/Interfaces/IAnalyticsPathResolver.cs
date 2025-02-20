@@ -3,4 +3,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services.
 public interface IAnalyticsPathResolver
 {
     string PublicApiQueriesDirectoryPath();
+    
+    string PublicApiQueriesProcessingDirectoryPath();
+    
+    string PublicApiQueriesReportsDirectoryPath();
 }

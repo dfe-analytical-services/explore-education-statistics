@@ -14,4 +14,12 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver
     {
         return Path.Combine(_basePath, "PublicApiQueries");
     }
+
+    public string PublicApiQueriesProcessingDirectoryPath() {
+        return Path.Combine(_basePath, "PublicApiQueries", "Processing");
+    }
+
+    public string PublicApiQueriesReportsDirectoryPath() {
+        return Path.Combine(_basePath, "PublicApiQueries", "Reports");
+    }
 }
