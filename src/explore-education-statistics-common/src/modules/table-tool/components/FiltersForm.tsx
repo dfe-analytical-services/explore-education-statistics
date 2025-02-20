@@ -26,15 +26,17 @@ import {
   isServerValidationError,
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
+
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
-import FilterHierarchy from './FilterHierarchies';
+import FilterHierarchy from './FilterHierarchy';
 
 export interface FiltersFormValues {
   indicators: string[];
   filters: Dictionary<string[]>;
+  filterHierarchies: Dictionary<string[]>;
 }
 
 export type FilterFormSubmitHandler = (values: FiltersFormValues) => void;
@@ -81,6 +83,25 @@ export default function FiltersForm({
   const [previousValues, setPreviousValues] = useState<FiltersFormValues>();
   const [openFilterGroups, setOpenFilterGroups] = useState<string[]>([]);
 
+  const { hierarchiedFilterIds, nonHierarchiedFilters } = useMemo(() => {
+    const hierarchiedFilterIds =
+      subjectMeta.filterHierarchies?.flatMap(hierarchy => {
+        return [hierarchy.rootFilterId, ...hierarchy.childFilterIds];
+      }) ?? [];
+
+    const nonHierarchiedFilters = orderBy(
+      Object.entries(subjectMeta.filters) /* .filter(([_, filter]) => {
+        hierarchiedFilterIds.includes(filter.id);
+      }) */,
+      ([_, value]) => value.order,
+    );
+
+    return {
+      hierarchiedFilterIds,
+      nonHierarchiedFilters,
+    };
+  }, [subjectMeta]);
+
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
     const indicatorValues = Object.values(subjectMeta.indicators);
@@ -89,32 +110,47 @@ export default function FiltersForm({
         ? [indicatorValues[0].options[0].value]
         : initialValues?.indicators ?? [];
 
-    const filters = mapValues(subjectMeta.filters, filter => {
-      const filterGroups = Object.values(filter.options);
+    const filters = mapValues(
+      Object.fromEntries(nonHierarchiedFilters),
+      filter => {
+        const filterGroups = Object.values(filter.options);
 
-      // Automatically select when only one group in filter, with only one option in it.
-      if (filterGroups.length === 1 && filterGroups[0].options.length === 1) {
-        return [filterGroups[0].options[0].value];
-      }
+        // Automatically select when only one group in filter, with only one option in it.
+        if (filterGroups.length === 1 && filterGroups[0].options.length === 1) {
+          return [filterGroups[0].options[0].value];
+        }
 
-      if (initialValues?.filters) {
-        const filterValues = filterGroups
-          .flatMap(group => group.options)
-          .map(option => option.value);
+        if (initialValues?.filters) {
+          const filterValues = filterGroups
+            .flatMap(group => group.options)
+            .map(option => option.value);
 
-        return filterValues.filter(filterValue =>
-          initialValues.filters.includes(filterValue),
-        );
-      }
+          return filterValues.filter(filterValue =>
+            initialValues.filters.includes(filterValue),
+          );
+        }
 
-      return [];
-    });
+        return [];
+      },
+    );
+
+    const filterHierarchies = Object.fromEntries(
+      subjectMeta.filterHierarchies?.map(filterHierarchy => {
+        const { rootFilterId } = filterHierarchy;
+
+        // TODO
+        // check initial value matches with option ids in this hierarchy then add them to the array (below)
+
+        return [rootFilterId, []];
+      }) ?? [],
+    );
 
     return {
       filters,
       indicators,
+      filterHierarchies,
     };
-  }, [initialValues, subjectMeta]);
+  }, [initialValues, subjectMeta, nonHierarchiedFilters]);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps}>{stepTitle}</WizardStepHeading>
@@ -153,11 +189,6 @@ export default function FiltersForm({
     }
   };
 
-  const orderedFilters = orderBy(
-    Object.entries(subjectMeta.filters),
-    ([_, value]) => value.order,
-  );
-
   const allFilterKeys = Object.keys(subjectMeta.filters);
 
   const allFiltersOpen = openFilterGroups.length === allFilterKeys.length;
@@ -174,7 +205,19 @@ export default function FiltersForm({
         .of(Yup.string().defined())
         .min(1, 'Select at least one option from indicators'),
       filters: Yup.object(
-        mapValues(subjectMeta.filters, filter => {
+        mapValues(Object.fromEntries(nonHierarchiedFilters), filter => {
+          const label = filter.legend.toLowerCase();
+
+          return Yup.array()
+            .required(`Select at least one option from ${label}`)
+            .typeError(`Select at least one option from ${label}`)
+            .of(Yup.string().defined())
+            .min(1, `Select at least one option from ${label}`);
+        }),
+      ),
+      filterHierarchies: Yup.object(
+        // TODO
+        mapValues(Object.fromEntries(nonHierarchiedFilters), filter => {
           const label = filter.legend.toLowerCase();
 
           return Yup.array()
@@ -185,7 +228,7 @@ export default function FiltersForm({
         }),
       ),
     });
-  }, [subjectMeta.filters]);
+  }, [nonHierarchiedFilters]);
 
   const filtersIncludeTotal = Object.values(subjectMeta.filters).some(
     filter => filter.autoSelectFilterItemId,
@@ -238,7 +281,8 @@ export default function FiltersForm({
                     order={[]}
                   />
 
-                  {orderedFilters.length > 0 && (
+                  {nonHierarchiedFilters.length + hierarchiedFilterIds.length >
+                    0 && (
                     <FormFieldset
                       error={getError('filters')}
                       hint={
@@ -257,7 +301,7 @@ export default function FiltersForm({
                                 : ''
                             }`}
                           </span>
-                          {orderedFilters.length > 1 && (
+                          {nonHierarchiedFilters.length > 1 && (
                             <ButtonText
                               ariaExpanded={allFiltersOpen}
                               ariaControls="filterGroups"
@@ -280,43 +324,53 @@ export default function FiltersForm({
                     >
                       {subjectMeta.filterHierarchies.map(filterHierarchy => (
                         <FilterHierarchy
-                          filterHierachy={filterHierarchy}
+                          disabled={formState.isSubmitting}
+                          key={`filterHierarchies-${filterHierarchy.rootFilterId}`}
+                          filterHierarchy={filterHierarchy}
                           filters={subjectMeta.filters}
+                          filterId={filterHierarchy.rootFilterId}
+                          // name={`filterHierarchies.${filterHierarchy.rootFilterId}`}
+                          totalTiers={filterHierarchy.childFilterIds.length + 1}
                         />
                       ))}
                       <div id="filterGroups">
-                        {orderedFilters.map(([filterKey, filterGroup]) => {
-                          const filterName = `filters.${filterKey}`;
-                          const orderedFilterGroupOptions = orderBy(
-                            Object.values(filterGroup.options),
-                            'order',
-                          );
-                          return (
-                            <FormFieldCheckboxGroupsMenu
-                              disabled={formState.isSubmitting}
-                              groupLabel={filterGroup.legend}
-                              hint={filterGroup.hint}
-                              key={filterKey}
-                              legend={filterGroup.legend}
-                              name={filterName}
-                              open={openFilterGroups.includes(filterKey)}
-                              options={orderedFilterGroupOptions.map(group => ({
-                                legend: group.label,
-                                options: group.options,
-                              }))}
-                              order={[]}
-                              onToggle={isOpen => {
-                                setOpenFilterGroups(groups =>
-                                  isOpen
-                                    ? [...groups, filterKey]
-                                    : groups.filter(
-                                        group => group !== filterKey,
-                                      ),
-                                );
-                              }}
-                            />
-                          );
-                        })}
+                        {nonHierarchiedFilters.map(
+                          ([filterKey, filterGroup]) => {
+                            const filterName = `filters.${filterKey}`;
+                            const orderedFilterGroupOptions = orderBy(
+                              Object.values(filterGroup.options),
+                              'order',
+                            );
+
+                            return (
+                              <FormFieldCheckboxGroupsMenu
+                                disabled={formState.isSubmitting}
+                                groupLabel={filterGroup.legend}
+                                hint={filterGroup.hint}
+                                key={filterKey}
+                                legend={filterGroup.legend}
+                                name={filterName}
+                                open={openFilterGroups.includes(filterKey)}
+                                options={orderedFilterGroupOptions.map(
+                                  group => ({
+                                    legend: group.label,
+                                    options: group.options,
+                                  }),
+                                )}
+                                order={[]}
+                                onToggle={isOpen => {
+                                  setOpenFilterGroups(groups =>
+                                    isOpen
+                                      ? [...groups, filterKey]
+                                      : groups.filter(
+                                          group => group !== filterKey,
+                                        ),
+                                  );
+                                }}
+                              />
+                            );
+                          },
+                        )}
                       </div>
                     </FormFieldset>
                   )}
@@ -372,7 +426,7 @@ export default function FiltersForm({
                     ))}
                 </CollapsibleList>
               </SummaryListItem>
-              {orderedFilters
+              {nonHierarchiedFilters
                 .filter(([groupKey]) => !!values.filters[groupKey])
                 .map(([filterGroupKey, filterGroup]) => (
                   <SummaryListItem
