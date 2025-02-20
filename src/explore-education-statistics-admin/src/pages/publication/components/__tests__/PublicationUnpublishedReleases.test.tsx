@@ -110,7 +110,7 @@ describe('PublicationUnpublishedReleases', () => {
   });
 
   test('renders tables of unpublished releases once loaded', async () => {
-    publicationService.listReleases.mockResolvedValue(testReleasesPage1);
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
 
     render(
       <PublicationUnpublishedReleases publicationId={testPublicationId} />,
@@ -152,7 +152,7 @@ describe('PublicationUnpublishedReleases', () => {
   });
 
   test('shows error messages if unpublished releases could not be loaded', async () => {
-    publicationService.listReleases.mockRejectedValue(
+    publicationService.listReleaseVersions.mockRejectedValue(
       new Error('Something went wrong'),
     );
 
@@ -171,7 +171,7 @@ describe('PublicationUnpublishedReleases', () => {
   });
 
   test('shows empty messages if there are no unpublished releases', async () => {
-    publicationService.listReleases.mockResolvedValue({
+    publicationService.listReleaseVersions.mockResolvedValue({
       paging: {
         page: 1,
         pageSize: 20,
@@ -203,7 +203,7 @@ describe('PublicationUnpublishedReleases', () => {
   });
 
   test("shows empty messages if don't have permission to view draft or scheduled releases", async () => {
-    publicationService.listReleases.mockResolvedValue({
+    publicationService.listReleaseVersions.mockResolvedValue({
       paging: {
         page: 1,
         pageSize: 20,
@@ -251,8 +251,8 @@ describe('PublicationUnpublishedReleases', () => {
   });
 
   test('calls `onAmendmentDelete` handler when amendment is deleted', async () => {
-    publicationService.listReleases.mockResolvedValue(testReleasesPage1);
-    releaseVersionService.getDeleteReleaseVersionPlan.mockResolvedValue({
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
+    releaseService.getDeleteReleaseVersionPlan.mockResolvedValue({
       scheduledMethodologies: [],
     });
 
