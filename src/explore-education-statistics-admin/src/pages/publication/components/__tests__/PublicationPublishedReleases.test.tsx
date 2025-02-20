@@ -142,7 +142,7 @@ describe('PublicationPublishedReleases', () => {
     };
 
   test('renders the published releases table once loaded', async () => {
-    publicationService.listReleases.mockResolvedValue(testReleasesPage1);
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
 
     render(<PublicationPublishedReleases publicationId={testPublicationId} />);
 
@@ -242,7 +242,7 @@ describe('PublicationPublishedReleases', () => {
   });
 
   test('renders show more button with a maximum of the default `pageSize`', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       produce(testReleasesPage1, draft => {
         draft.paging.totalPages = 3;
         draft.paging.totalResults = 12;
@@ -263,7 +263,7 @@ describe('PublicationPublishedReleases', () => {
   });
 
   test('displays more releases when the show more button is clicked', async () => {
-    publicationService.listReleases
+    publicationService.listReleaseVersions
       .mockResolvedValueOnce(testReleasesPage1)
       .mockResolvedValueOnce(testReleasesPage2);
 
@@ -330,7 +330,7 @@ describe('PublicationPublishedReleases', () => {
   });
 
   test('creating an amendment works correctly', async () => {
-    publicationService.listReleases.mockResolvedValue(testReleasesPage1);
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
 
     const history = createMemoryHistory();
 
@@ -385,7 +385,7 @@ describe('PublicationPublishedReleases', () => {
   });
 
   test('does not show the amendment button if you do not have the correct permissions', async () => {
-    publicationService.listReleases.mockResolvedValue(
+    publicationService.listReleaseVersions.mockResolvedValue(
       produce(testReleasesPage1, draft => {
         draft.results[0].permissions.canMakeAmendmentOfRelease = false;
       }),

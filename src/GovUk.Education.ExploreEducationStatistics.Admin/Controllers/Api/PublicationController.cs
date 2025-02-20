@@ -92,15 +92,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("api/publication/{publicationId:guid}/releases")]
-        public async Task<ActionResult<PaginatedListViewModel<ReleaseVersionSummaryViewModel>>> ListLatestReleaseVersions(
+        public async Task<ActionResult<PaginatedListViewModel<ReleaseVersionSummaryViewModel>>> ListReleaseVersions(
             [Required] Guid publicationId,
+            [FromQuery] ReleaseVersionsType versionsType,
             [FromQuery, Range(1, double.PositiveInfinity)] int page = 1,
             [FromQuery, Range(0, double.PositiveInfinity)] int pageSize = 5,
-            [FromQuery] bool? live = null,
             [FromQuery] bool includePermissions = false)
         {
             return await publicationService
-                .ListLatestReleaseVersionsPaginated(publicationId, page, pageSize, live, includePermissions)
+                .ListReleaseVersionsPaginated(
+                    publicationId: publicationId,
+                    versionsType: versionsType,
+                    page: page,
+                    pageSize: pageSize,
+                    includePermissions: includePermissions)
                 .HandleFailuresOrOk();
         }
 

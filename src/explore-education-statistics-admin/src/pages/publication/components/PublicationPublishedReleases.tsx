@@ -3,7 +3,9 @@ import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import publicationService from '@admin/services/publicationService';
+import publicationService, {
+  ReleaseVersionsType,
+} from '@admin/services/publicationService';
 import releaseVersionService, {
   ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseVersionService';
@@ -41,10 +43,10 @@ export default function PublicationPublishedReleases({
   } = useInfiniteQuery(
     ['publicationPublishedReleases', publicationId],
     ({ pageParam = 1 }) => {
-      return publicationService.listReleases<ReleaseVersionSummaryWithPermissions>(
+      return publicationService.listReleaseVersions<ReleaseVersionSummaryWithPermissions>(
         publicationId,
         {
-          live: true,
+          versionsType: ReleaseVersionsType.LatestPublished,
           page: pageParam,
           pageSize,
           includePermissions: true,

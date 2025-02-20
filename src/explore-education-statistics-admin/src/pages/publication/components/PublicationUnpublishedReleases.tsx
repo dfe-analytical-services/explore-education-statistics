@@ -1,6 +1,8 @@
 import PublicationDraftReleases from '@admin/pages/publication/components/PublicationDraftReleases';
 import PublicationScheduledReleases from '@admin/pages/publication/components/PublicationScheduledReleases';
-import publicationService from '@admin/services/publicationService';
+import publicationService, {
+  ReleaseVersionsType,
+} from '@admin/services/publicationService';
 import { ReleaseVersionSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -22,10 +24,10 @@ export default function PublicationUnpublishedReleases({
     isSuccess,
     refetch,
   } = useQuery(['publicationUnpublishedReleases', publicationId], () =>
-    publicationService.listReleases<ReleaseVersionSummaryWithPermissions>(
+    publicationService.listReleaseVersions<ReleaseVersionSummaryWithPermissions>(
       publicationId,
       {
-        live: false,
+        versionsType: ReleaseVersionsType.OnlyDraft,
         pageSize: 100,
         includePermissions: true,
       },
@@ -38,7 +40,7 @@ export default function PublicationUnpublishedReleases({
         release =>
           (release.approvalStatus === 'Draft' ||
             release.approvalStatus === 'HigherLevelReview') &&
-          release.permissions?.canViewRelease, // We don't display draft releases they have no permission to view
+          release.permissions?.canViewReleaseVersion, // We don't display draft releases they have no permission to view
       ) ?? []
     );
   }, [releases?.results]);
@@ -48,7 +50,7 @@ export default function PublicationUnpublishedReleases({
       releases?.results.filter(
         release =>
           release.approvalStatus === 'Approved' &&
-          release.permissions?.canViewRelease, // We don't display scheduled releases they have no permission to view
+          release.permissions?.canViewReleaseVersion, // We don't display scheduled releases they have no permission to view
       ) ?? []
     );
   }, [releases?.results]);

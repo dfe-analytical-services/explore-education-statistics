@@ -376,14 +376,14 @@ public class PublicationService(
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseVersionSummaryViewModel>>>
-        ListLatestReleaseVersionsPaginated(
+        ListReleaseVersionsPaginated(
             Guid publicationId,
+            ReleaseVersionsType versionsType,
             int page = 1,
             int pageSize = 5,
-            bool? live = null,
             bool includePermissions = false)
     {
-        return await ListLatestReleaseVersions(publicationId, live, includePermissions)
+        return await ListReleaseVersions(publicationId, versionsType, includePermissions)
             .OnSuccess(
                 releases =>
                     // This is not ideal - we should paginate results in the database, however,
@@ -395,9 +395,9 @@ public class PublicationService(
             );
     }
 
-    public async Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListLatestReleaseVersions(
+    public async Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListReleaseVersions(
         Guid publicationId,
-        bool? live = null,
+        ReleaseVersionsType versionsType,
         bool includePermissions = false)
     {
         return await persistenceHelper
@@ -405,11 +405,7 @@ public class PublicationService(
             .OnSuccess(userService.CheckCanViewPublication)
             .OnSuccess(async () =>
             {
-                // Note the 'live' filter is applied after the latest release versions are retrieved.
-                // A published release with a current draft version is deliberately not returned when 'live' is true.
-                var releaseVersions = (await releaseVersionRepository.ListLatestReleaseVersions(publicationId))
-                    .Where(rv => live == null || rv.Live == live)
-                    .ToList();
+                var releaseVersions = await ListReleaseVersions(publicationId, versionsType);
 
                 return await releaseVersions
                     .ToAsyncEnumerable()
@@ -669,5 +665,18 @@ public class PublicationService(
         publicationCreateViewModel.IsSuperseded = await publicationRepository.IsSuperseded(publication.Id);
 
         return publicationCreateViewModel;
+    }
+
+    private async Task<List<ReleaseVersion>> ListReleaseVersions(Guid publicationId, ReleaseVersionsType versionsType)
+    {
+        return versionsType switch
+        {
+            ReleaseVersionsType.Latest => await releaseVersionRepository.ListLatestReleaseVersions(publicationId),
+            ReleaseVersionsType.LatestPublished => await releaseVersionRepository.ListLatestReleaseVersions(publicationId, publishedOnly: true),
+            ReleaseVersionsType.OnlyDraft => (await releaseVersionRepository.ListLatestReleaseVersions(publicationId))
+                .Where(rv => rv.Live == false)
+                .ToList(),
+            _ => throw new Exception(),
+        };
     }
 }
