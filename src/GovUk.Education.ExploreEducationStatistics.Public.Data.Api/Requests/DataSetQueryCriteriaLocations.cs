@@ -1,6 +1,5 @@
 using FluentValidation;
 using FluentValidation.Validators;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
@@ -17,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 /// used for multiple locations. This may match more results than you
 /// expect so it's recommended to use IDs where possible.
 /// </summary>
-public record DataSetQueryCriteriaLocations : ISortableCriteria
+public record DataSetQueryCriteriaLocations
 {
     /// <summary>
     /// Filter the results to be in this location.
@@ -80,11 +79,6 @@ public record DataSetQueryCriteriaLocations : ISortableCriteria
         };
     }
 
-    public string GetSortableString()
-    {
-        return $"{nameof(DataSetQueryCriteriaLocations)} {{ {nameof(Eq)}: {Eq}, {nameof(NotEq)}: {NotEq}, {nameof(In)}: [{In?.JoinToString(",")}], {nameof(NotIn)}: [{NotIn?.JoinToString(",")}] }}";
-    }
-    
     public class Validator : AbstractValidator<DataSetQueryCriteriaLocations>
     {
         public Validator()

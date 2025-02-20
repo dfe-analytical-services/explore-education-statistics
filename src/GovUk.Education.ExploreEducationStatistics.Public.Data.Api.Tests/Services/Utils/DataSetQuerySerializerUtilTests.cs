@@ -326,11 +326,40 @@ public abstract class DataSetQuerySerializerUtilTests
                 {
                     And =
                     [
-                        new DataSetQueryCriteriaNot { Not = new DataSetQueryCriteriaFacets() },
-                        new DataSetQueryCriteriaOr { Or = [] },
-                        new DataSetQueryCriteriaFacets(),
+                        new DataSetQueryCriteriaFacets
+                        {
+                            TimePeriods = new DataSetQueryCriteriaTimePeriods
+                            {
+                                Eq = new DataSetQueryTimePeriod
+                                {
+                                    Period = "Period1",
+                                    Code = "Code1"
+                                }
+                            }
+                        },
+                        new DataSetQueryCriteriaFacets
+                        {
+                            Filters = new DataSetQueryCriteriaFilters
+                            {
+                                NotEq = "Filter2"
+                            }
+                        },
                         new DataSetQueryCriteriaAnd { And = [] },
+                        new DataSetQueryCriteriaFacets
+                        {
+                            Filters = new DataSetQueryCriteriaFilters
+                            {
+                                Eq = "Filter2"
+                            }
+                        },
                         new DataSetQueryCriteriaOr { Or = [] },
+                        new DataSetQueryCriteriaFacets
+                        {
+                            Filters = new DataSetQueryCriteriaFilters
+                            {
+                                Eq = "Filter1"
+                            }
+                        },
                         new DataSetQueryCriteriaNot { Not = new DataSetQueryCriteriaFacets() }
                     ]
                 }
@@ -339,17 +368,53 @@ public abstract class DataSetQuerySerializerUtilTests
             var normalised = DataSetQuerySerializerUtil.NormaliseQuery(query);
 
             // Assert that sub-criteria are ordered by the alphabetical order of their
-            // criteria types (e.g. "And" before "Facets", "Facets" before "Not").
+            // JSON representations, with null elements removed.
             var expectedCriteria = new DataSetQueryCriteriaAnd
             {
                 And = new List<IDataSetQueryCriteria>
                 {
+                    // First child element is "And".
                     new DataSetQueryCriteriaAnd { And = new List<IDataSetQueryCriteria>() },
-                    new DataSetQueryCriteriaFacets(),
+                    // First child element is "Filters", followed by "Eq", followed by "Filter1".
+                    new DataSetQueryCriteriaFacets
+                    {
+                        Filters = new DataSetQueryCriteriaFilters
+                        {
+                            Eq = "Filter1"
+                        }
+                    },
+                    // First child element is "Filters", followed by "Eq", followed by "Filter2".
+                    new DataSetQueryCriteriaFacets
+                    {
+                        Filters = new DataSetQueryCriteriaFilters
+                        {
+                            Eq = "Filter2"
+                        }
+                    },
+                    // First child element is "Filters", followed by "NotEq", followed by "Filter2".
+                    new DataSetQueryCriteriaFacets
+                    {
+                        Filters = new DataSetQueryCriteriaFilters
+                        {
+                            NotEq = "Filter2"
+                        }
+                    },
+                    // First child element is "Not".
                     new DataSetQueryCriteriaNot { Not = new DataSetQueryCriteriaFacets() },
-                    new DataSetQueryCriteriaNot { Not = new DataSetQueryCriteriaFacets() },
+                    // First child element is "Or".
                     new DataSetQueryCriteriaOr { Or = new List<IDataSetQueryCriteria>() },
-                    new DataSetQueryCriteriaOr { Or = new List<IDataSetQueryCriteria>() }
+                    // First child element is "TimePeriods".
+                    new DataSetQueryCriteriaFacets
+                    {
+                        TimePeriods = new DataSetQueryCriteriaTimePeriods
+                        {
+                            Eq = new DataSetQueryTimePeriod
+                            {
+                                Period = "Period1",
+                                Code = "Code1"
+                            }
+                        }
+                    }
                 }
             };
 
@@ -489,214 +554,6 @@ public abstract class DataSetQuerySerializerUtilTests
         }
     }
 
-    public class GetSortableStringTests : DataSetQuerySerializerUtilTests
-    {
-        [Fact]
-        public void DataSetQueryCriteriaFilters()
-        {
-            var criteria = new DataSetQueryCriteriaFilters
-            {
-                Eq = "Option1", NotEq = "Option2", In = ["Option3", "Option4"], NotIn = ["Option5", "Option6"]
-            };
-
-            var expected =
-                "DataSetQueryCriteriaFilters { " +
-                "Eq: Option1, " +
-                "NotEq: Option2, " +
-                "In: [Option3,Option4], " +
-                "NotIn: [Option5,Option6] }";
-
-            Assert.Equal(expected, criteria.GetSortableString());
-        }
-
-        [Fact]
-        public void DataSetQueryCriteriaGeographicLevels()
-        {
-            var criteria = new DataSetQueryCriteriaGeographicLevels
-            {
-                Eq = "Option1", NotEq = "Option2", In = ["Option3", "Option4"], NotIn = ["Option5", "Option6"]
-            };
-
-            var expected =
-                "DataSetQueryCriteriaGeographicLevels { " +
-                "Eq: Option1, " +
-                "NotEq: Option2, " +
-                "In: [Option3,Option4], " +
-                "NotIn: [Option5,Option6] }";
-
-            Assert.Equal(expected, criteria.GetSortableString());
-        }
-
-        [Fact]
-        public void DataSetQueryCriteriaLocations()
-        {
-            var criteria = new DataSetQueryCriteriaLocations
-            {
-                Eq = new DataSetQueryLocationCode { Level = "Level1", Code = "Value1" },
-                NotEq = new DataSetQueryLocationId { Level = "Level2", Id = "Value2" },
-                In =
-                [
-                    new DataSetQueryLocationProviderUkprn { Level = "Level3", Ukprn = "Value3" },
-                    new DataSetQueryLocationSchoolUrn { Level = "Level4", Urn = "Value4" }
-                ],
-                NotIn =
-                [
-                    new DataSetQueryLocationLocalAuthorityCode { Level = "Level5", Code = "Value5" },
-                    new DataSetQueryLocationSchoolLaEstab { Level = "Level6", LaEstab = "Value6" },
-                    new DataSetQueryLocationLocalAuthorityOldCode { Level = "Level7", OldCode = "Value7" }
-                ]
-            };
-
-            var expected =
-                "DataSetQueryCriteriaLocations { " +
-                "Eq: DataSetQueryLocationCode { Code = Value1, Level = Level1 }, " +
-                "NotEq: DataSetQueryLocationId { Id = Value2, Level = Level2 }, " +
-                "In: [" +
-                "DataSetQueryLocationProviderUkprn { Ukprn = Value3, Level = Level3 }," +
-                "DataSetQueryLocationSchoolUrn { Urn = Value4, Level = Level4 }" +
-                "], " +
-                "NotIn: [" +
-                "DataSetQueryLocationLocalAuthorityCode { Code = Value5, Level = Level5 }," +
-                "DataSetQueryLocationSchoolLaEstab { LaEstab = Value6, Level = Level6 }," +
-                "DataSetQueryLocationLocalAuthorityOldCode { OldCode = Value7, Level = Level7 }" +
-                "] }";
-
-            Assert.Equal(expected, criteria.GetSortableString());
-        }
-
-        [Fact]
-        public void DataSetQueryCriteriaTimePeriods()
-        {
-            var criteria = new DataSetQueryCriteriaTimePeriods
-            {
-                Eq = new DataSetQueryTimePeriod { Period = "Period1", Code = "Code1" },
-                NotEq = new DataSetQueryTimePeriod { Period = "Period2", Code = "Code2" },
-                In = [new DataSetQueryTimePeriod { Period = "Period3", Code = "Code3" }],
-                NotIn = [new DataSetQueryTimePeriod { Period = "Period4", Code = "Code4" }],
-                Gt = new DataSetQueryTimePeriod { Period = "Period5", Code = "Code5" },
-                Gte = new DataSetQueryTimePeriod { Period = "Period6", Code = "Code6" },
-                Lt = new DataSetQueryTimePeriod { Period = "Period7", Code = "Code7" },
-                Lte = new DataSetQueryTimePeriod { Period = "Period8", Code = "Code8" },
-            };
-
-            var expected =
-                "DataSetQueryCriteriaTimePeriods { " +
-                "Eq: DataSetQueryTimePeriod { Period = Period1, Code = Code1 }, " +
-                "NotEq: DataSetQueryTimePeriod { Period = Period2, Code = Code2 }, " +
-                "In: [DataSetQueryTimePeriod { Period = Period3, Code = Code3 }], " +
-                "NotIn: [DataSetQueryTimePeriod { Period = Period4, Code = Code4 }], " +
-                "Gt: DataSetQueryTimePeriod { Period = Period5, Code = Code5 }, " +
-                "Gte: DataSetQueryTimePeriod { Period = Period6, Code = Code6 }, " +
-                "Lt: DataSetQueryTimePeriod { Period = Period7, Code = Code7 }, " +
-                "Lte: DataSetQueryTimePeriod { Period = Period8, Code = Code8 } }";
-
-            Assert.Equal(expected, criteria.GetSortableString());
-        }
-
-        [Fact]
-        public void DataSetQueryCriteriaFacets()
-        {
-            var filters = new DataSetQueryCriteriaFilters { Eq = "Option1" };
-            var geographicLevels = new DataSetQueryCriteriaGeographicLevels { Eq = "Option1" };
-            var locations = new DataSetQueryCriteriaLocations
-            {
-                Eq = new DataSetQueryLocationCode { Level = "Level1", Code = "Value1" }
-            };
-            var timePeriods = new DataSetQueryCriteriaTimePeriods
-            {
-                Eq = new DataSetQueryTimePeriod { Period = "Period1", Code = "Code1" }
-            };
-            
-            var criteria = new DataSetQueryCriteriaFacets
-            {
-                Filters = filters,
-                GeographicLevels = geographicLevels,
-                Locations = locations,
-                TimePeriods = timePeriods
-            };
-
-            var expected =
-                "DataSetQueryCriteriaFacets { " +
-                $"Filters: {filters.GetSortableString()}, " +
-                $"GeographicLevels: {geographicLevels.GetSortableString()}, " +
-                $"Locations: {locations.GetSortableString()}, " +
-                $"TimePeriods: {timePeriods.GetSortableString()} }}";
-
-
-            Assert.Equal(expected, criteria.GetSortableString());
-        }
-        
-        [Fact]
-        public void DataSetQueryCriteriaAnd()
-        {
-            var facets1 = new DataSetQueryCriteriaFacets
-            {
-                Filters = new DataSetQueryCriteriaFilters { Eq = "Option1" }
-            };
-            var facets2 = new DataSetQueryCriteriaFacets
-            {
-                Filters = new DataSetQueryCriteriaFilters { Eq = "Option2" }
-            };
-
-            var criteria = new DataSetQueryCriteriaAnd
-            {
-                And =
-                [
-                    facets1,
-                    facets2
-                ]
-            };
-
-            Assert.Equal(
-                $"DataSetQueryCriteriaAnd {{ And: [{facets1.GetSortableString()},{facets2.GetSortableString()}] }}",
-                criteria.GetSortableString());
-        }
-        
-        [Fact]
-        public void DataSetQueryCriteriaOr()
-        {
-            var facets1 = new DataSetQueryCriteriaFacets
-            {
-                Filters = new DataSetQueryCriteriaFilters { Eq = "Option1" }
-            };
-            var facets2 = new DataSetQueryCriteriaFacets
-            {
-                Filters = new DataSetQueryCriteriaFilters { Eq = "Option2" }
-            };
-
-            var criteria = new DataSetQueryCriteriaOr
-            {
-                Or =
-                [
-                    facets1,
-                    facets2
-                ]
-            };
-
-            Assert.Equal(
-                $"DataSetQueryCriteriaOr {{ Or: [{facets1.GetSortableString()},{facets2.GetSortableString()}] }}",
-                criteria.GetSortableString());
-        }
-        
-        [Fact]
-        public void DataSetQueryCriteriaNot()
-        {
-            var facets = new DataSetQueryCriteriaFacets
-            {
-                Filters = new DataSetQueryCriteriaFilters { Eq = "Option1" }
-            };
-
-            var criteria = new DataSetQueryCriteriaNot
-            {
-                Not = facets
-            };
-
-            Assert.Equal(
-                $"DataSetQueryCriteriaNot {{ Not: {facets.GetSortableString()} }}",
-                criteria.GetSortableString());
-        }
-    }
-
     public class SerializeTests : DataSetQuerySerializerUtilTests
     {
         [Fact]
@@ -726,9 +583,11 @@ public abstract class DataSetQuerySerializerUtilTests
 
             // Compare against the snapshot showing that:
             //
-            // * properties are displayed alphabetically
+            // * JSON properties are displayed alphabetically
             // * output is indented
             // * null fields are excluded
+            // * sub-criteria in "And" and "Or" elements are ordered alphabetically
+            //   based on their alphabetical representation as JSON.
             Snapshot.Match(serialized);
         }
     }

@@ -5,9 +5,7 @@
         "And": [
           {
             "Filters": {
-              "NotIn": [
-                "Filter4"
-              ]
+              "Eq": "Filter3"
             }
           },
           {
@@ -25,7 +23,9 @@
           },
           {
             "Filters": {
-              "Eq": "Filter3"
+              "NotIn": [
+                "Filter4"
+              ]
             }
           },
           {
@@ -66,20 +66,6 @@
             "Or": [
               {
                 "TimePeriods": {
-                  "NotIn": [
-                    {
-                      "Code": "Code",
-                      "Period": "Period3"
-                    },
-                    {
-                      "Code": "Code",
-                      "Period": "Period4"
-                    }
-                  ]
-                }
-              },
-              {
-                "TimePeriods": {
                   "In": [
                     {
                       "Code": "Code",
@@ -88,6 +74,20 @@
                     {
                       "Code": "Code",
                       "Period": "Period2"
+                    }
+                  ]
+                }
+              },
+              {
+                "TimePeriods": {
+                  "NotIn": [
+                    {
+                      "Code": "Code",
+                      "Period": "Period3"
+                    },
+                    {
+                      "Code": "Code",
+                      "Period": "Period4"
                     }
                   ]
                 }
@@ -100,9 +100,7 @@
         "And": [
           {
             "Filters": {
-              "NotIn": [
-                "Filter6"
-              ]
+              "Eq": "Filter9"
             }
           },
           {
@@ -120,7 +118,9 @@
           },
           {
             "Filters": {
-              "Eq": "Filter9"
+              "NotIn": [
+                "Filter6"
+              ]
             }
           }
         ]

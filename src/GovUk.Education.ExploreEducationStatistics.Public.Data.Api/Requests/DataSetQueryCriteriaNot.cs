@@ -22,11 +22,6 @@ public record DataSetQueryCriteriaNot : IDataSetQueryCriteria
     /// </example>
     public required IDataSetQueryCriteria Not { get; init; }
 
-    public string GetSortableString()
-    {
-        return $"{nameof(DataSetQueryCriteriaNot)} {{ {nameof(Not)}: {Not.GetSortableString()} }}";
-    }
-
     public class Validator : AbstractValidator<DataSetQueryCriteriaNot>
     {
         public Validator()

@@ -25,9 +25,14 @@ public static class DataSetQuerySerializerUtil
 
     public static string SerializeQuery(DataSetQueryRequest query)
     {
+        return SerializeObject(NormaliseQuery(query), Formatting.Indented);
+    }
+    
+    private static string SerializeObject(object obj, Formatting formatting)
+    {
         return JsonConvert.SerializeObject(
-            value: NormaliseQuery(query),
-            formatting: Formatting.Indented,
+            value: obj,
+            formatting: formatting,
             settings: JsonSerializerSettings);
     }
     
@@ -89,7 +94,7 @@ public static class DataSetQuerySerializerUtil
             And = original
                 .And
                 .Select(NormaliseCriteria)
-                .OrderBy(criteria => criteria.GetSortableString())
+                .OrderBy(criteria => SerializeObject(criteria, Formatting.None))
                 .ToList()
         };
     }
@@ -101,7 +106,7 @@ public static class DataSetQuerySerializerUtil
             Or = original
                 .Or
                 .Select(NormaliseCriteria)
-                .OrderBy(criteria => criteria.GetSortableString())
+                .OrderBy(criteria => SerializeObject(criteria, Formatting.None))
                 .ToList()
         };
     }
