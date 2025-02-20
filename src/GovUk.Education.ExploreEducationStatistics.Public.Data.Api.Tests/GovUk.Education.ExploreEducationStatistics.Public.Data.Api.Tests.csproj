@@ -55,4 +55,8 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Utils\__snapshots__\" />
+  </ItemGroup>
+
 </Project>

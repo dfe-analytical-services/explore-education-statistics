@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 /// <summary>
 /// The geographic levels criteria to filter results by in a data set query.
 /// </summary>
-public record DataSetQueryCriteriaGeographicLevels
+public record DataSetQueryCriteriaGeographicLevels : ISortableCriteria
 {
     /// <summary>
     /// Filter the results to be in this geographic level.
@@ -96,6 +96,11 @@ public record DataSetQueryCriteriaGeographicLevels
             },
             _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
         };
+    }
+    
+    public string GetSortableString()
+    {
+        return $"{nameof(DataSetQueryCriteriaGeographicLevels)} {{ {nameof(Eq)}: {Eq}, {nameof(NotEq)}: {NotEq}, {nameof(In)}: [{In?.JoinToString(",")}], {nameof(NotIn)}: [{NotIn?.JoinToString(",")}] }}";   
     }
 
     public class Validator : AbstractValidator<DataSetQueryCriteriaGeographicLevels>

@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Model;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Newtonsoft.Json;
 
@@ -23,7 +24,7 @@ public class AnalyticsService(
             "Capturing query for analytics for data set {DataSetTitle}",
             dataSetVersion.DataSet.Title);
 
-        var queryJson = JsonConvert.SerializeObject(query);
+        var queryJson = DataSetQuerySerializerUtil.SerializeQuery(query);
         
         var request = new CaptureDataSetVersionQueryRequest(
             DataSetId: dataSetVersion.DataSetId,
@@ -39,9 +40,9 @@ public class AnalyticsService(
         var directory = analyticsPathResolver.PublicApiQueriesDirectoryPath();
 
         Directory.CreateDirectory(directory);
-        
+
         await File.WriteAllTextAsync(
-            Path.Combine(directory, $"{Guid.NewGuid()}.json"), 
+            Path.Combine(directory, $"{Guid.NewGuid()}.json"),
             contents: JsonConvert.SerializeObject(request));
     }
 }

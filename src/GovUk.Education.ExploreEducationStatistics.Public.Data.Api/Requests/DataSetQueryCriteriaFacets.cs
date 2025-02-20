@@ -29,6 +29,11 @@ public record DataSetQueryCriteriaFacets : IDataSetQueryCriteria
     /// </summary>
     public DataSetQueryCriteriaTimePeriods? TimePeriods { get; init; }
 
+    public string GetSortableString()
+    {
+        return $"{nameof(DataSetQueryCriteriaFacets)} {{ {nameof(Filters)}: {Filters?.GetSortableString()}, {nameof(GeographicLevels)}: {GeographicLevels?.GetSortableString()}, {nameof(Locations)}: {Locations?.GetSortableString()}, {nameof(TimePeriods)}: {TimePeriods?.GetSortableString()} }}";
+    }
+
     public class Validator : AbstractValidator<DataSetQueryCriteriaFacets>
     {
         public Validator()

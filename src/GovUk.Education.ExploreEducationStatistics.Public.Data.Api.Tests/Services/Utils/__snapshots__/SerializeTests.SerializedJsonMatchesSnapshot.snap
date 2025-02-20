@@ -1,0 +1,148 @@
+﻿{
+  "Criteria": {
+    "And": [
+      {
+        "And": [
+          {
+            "Filters": {
+              "NotIn": [
+                "Filter4"
+              ]
+            }
+          },
+          {
+            "Filters": {
+              "In": [
+                "Filter1",
+                "Filter2"
+              ]
+            }
+          },
+          {
+            "Filters": {
+              "NotEq": "Filter5"
+            }
+          },
+          {
+            "Filters": {
+              "Eq": "Filter3"
+            }
+          },
+          {
+            "Not": {
+              "Or": [
+                {
+                  "Locations": {
+                    "NotIn": [
+                      {
+                        "Id": "Location1",
+                        "Level": "Level"
+                      },
+                      {
+                        "Level": "Level",
+                        "Ukprn": "Location4"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Locations": {
+                    "NotIn": [
+                      {
+                        "Id": "Location3",
+                        "Level": "Level"
+                      },
+                      {
+                        "Level": "Level",
+                        "Ukprn": "Location2"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Or": [
+              {
+                "TimePeriods": {
+                  "NotIn": [
+                    {
+                      "Code": "Code",
+                      "Period": "Period3"
+                    },
+                    {
+                      "Code": "Code",
+                      "Period": "Period4"
+                    }
+                  ]
+                }
+              },
+              {
+                "TimePeriods": {
+                  "In": [
+                    {
+                      "Code": "Code",
+                      "Period": "Period1"
+                    },
+                    {
+                      "Code": "Code",
+                      "Period": "Period2"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "And": [
+          {
+            "Filters": {
+              "NotIn": [
+                "Filter6"
+              ]
+            }
+          },
+          {
+            "Filters": {
+              "In": [
+                "Filter7",
+                "Filter8"
+              ]
+            }
+          },
+          {
+            "Filters": {
+              "NotEq": "Filter10"
+            }
+          },
+          {
+            "Filters": {
+              "Eq": "Filter9"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "Debug": true,
+  "Indicators": [
+    "Indicator1",
+    "Indicator2",
+    "Indicator3"
+  ],
+  "Page": 3,
+  "PageSize": 300,
+  "Sorts": [
+    {
+      "Direction": "ASC",
+      "Field": "Field1"
+    },
+    {
+      "Direction": "ASC",
+      "Field": "Field2"
+    }
+  ]
+}

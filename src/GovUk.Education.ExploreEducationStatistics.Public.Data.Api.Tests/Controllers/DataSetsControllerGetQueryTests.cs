@@ -2869,7 +2869,8 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     4,
                     4,
                     Capture.In(times),
-                    Capture.In(times)));
+                    Capture.In(times)))
+                .Returns(Task.CompletedTask);
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,

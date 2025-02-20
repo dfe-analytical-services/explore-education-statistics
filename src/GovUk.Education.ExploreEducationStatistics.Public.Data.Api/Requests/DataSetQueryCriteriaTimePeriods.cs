@@ -1,11 +1,12 @@
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 /// <summary>
 /// The time period criteria to filter results by in a data set query.
 /// </summary>
-public record DataSetQueryCriteriaTimePeriods
+public record DataSetQueryCriteriaTimePeriods : ISortableCriteria
 {
     /// <summary>
     /// Filter the results to be in this time period.
@@ -112,6 +113,11 @@ public record DataSetQueryCriteriaTimePeriods
         };
     }
 
+    public string GetSortableString()
+    {
+        return $"{nameof(DataSetQueryCriteriaTimePeriods)} {{ {nameof(Eq)}: {Eq}, {nameof(NotEq)}: {NotEq}, {nameof(In)}: [{In?.JoinToString(",")}], {nameof(NotIn)}: [{NotIn?.JoinToString(",")}], {nameof(Gt)}: {Gt}, {nameof(Gte)}: {Gte}, {nameof(Lt)}: {Lt}, {nameof(Lte)}: {Lte} }}";
+    }
+    
     public class Validator : AbstractValidator<DataSetQueryCriteriaTimePeriods>
     {
         public Validator()

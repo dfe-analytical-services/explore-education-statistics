@@ -1,4 +1,5 @@
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
@@ -31,6 +32,11 @@ public record DataSetQueryCriteriaOr : IDataSetQueryCriteria
     /// ]
     /// </example>
     public required IReadOnlyList<IDataSetQueryCriteria> Or { get; init; }
+    
+    public string GetSortableString()
+    {
+        return $"{nameof(DataSetQueryCriteriaOr)} {{ {nameof(Or)}: [{Or.Select(criteria => criteria.GetSortableString()).JoinToString(",")}] }}";
+    }
 
     public class Validator : AbstractValidator<DataSetQueryCriteriaOr>
     {

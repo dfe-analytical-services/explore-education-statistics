@@ -3804,7 +3804,8 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                     4,
                     4,
                     Capture.In(times),
-                    Capture.In(times)));
+                    Capture.In(times)))
+                .Returns(Task.CompletedTask);
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
