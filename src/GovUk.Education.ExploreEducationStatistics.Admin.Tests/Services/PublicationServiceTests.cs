@@ -2370,7 +2370,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListLatestReleaseVersions()
+        public async Task ListReleaseVersions_Latest()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -2381,6 +2381,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
                         .DefaultRelease(publishedVersions: 2, year: 2022)));
+
+            var latestReleaseVersion2020 = publication.Releases
+                .Single(r => r.Year == 2020)
+                .Versions
+                .Single(rv => rv.Version == 1);
+            var latestReleaseVersion2021 = publication.Releases
+                .Single(r => r.Year == 2021)
+                .Versions
+                .Single(rv => rv.Version == 0);
+            var latestReleaseVersion2022 = publication.Releases
+                .Single(r => r.Year == 2022)
+                .Versions
+                .Single(rv => rv.Version == 1);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2393,22 +2406,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListLatestReleaseVersions(
-                    publication.Id);
+                var result = await publicationService.ListReleaseVersions(
+                    publication.Id,
+                    ReleaseVersionsType.Latest);
 
-                var releases = result.AssertRight();
+                var releaseVersions = result.AssertRight();
 
-                Assert.Equal(new[]
-                {
-                    publication.Releases.Single(r => r.Year == 2022).Versions.Single(rv => rv.Version == 1).Id,
-                    publication.Releases.Single(r => r.Year == 2021).Versions.Single(rv => rv.Version == 0).Id,
-                    publication.Releases.Single(r => r.Year == 2020).Versions.Single(rv => rv.Version == 1).Id
-                }, releases.Select(r => r.Id).ToArray());
+                Assert.Equal(
+                    [
+                        latestReleaseVersion2022.Id,
+                        latestReleaseVersion2021.Id,
+                        latestReleaseVersion2020.Id
+                    ], 
+                    releaseVersions.Select(r => r.Id));
             }
         }
 
         [Fact]
-        public async Task ListLatestReleaseVersions_SingleRelease()
+        public async Task ListReleaseVersions_Latest_SingleRelease()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -2429,8 +2444,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListLatestReleaseVersions(
-                    publication.Id);
+                var result = await publicationService.ListReleaseVersions(
+                    publication.Id,
+                    ReleaseVersionsType.Latest);
 
                 var releases = result.AssertRight();
 
@@ -2455,7 +2471,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListLatestReleaseVersions_Live_True()
+        public async Task ListReleaseVersions_LatestPublished()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -2465,7 +2481,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     _dataFixture
                         .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultRelease(publishedVersions: 2, year: 2022)));
+                        .DefaultRelease(publishedVersions: 1, year: 2022)));
+
+            var latestPublishedReleaseVersion2020 = publication.Releases
+                .Single(r => r.Year == 2020)
+                .Versions
+                .Single(rv => rv.Version == 0);
+            var latestPublishedReleaseVersion2022 = publication.Releases
+                .Single(r => r.Year == 2022)
+                .Versions
+                .Single(rv => rv.Version == 0);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2478,20 +2503,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListLatestReleaseVersions(
-                    publication.Id, live: true);
+                var result = await publicationService.ListReleaseVersions(
+                    publication.Id,
+                    ReleaseVersionsType.LatestPublished);
 
-                var releases = result.AssertRight();
+                var releaseVersions = result.AssertRight();
 
-                Assert.Equal(new[]
-                {
-                    publication.Releases.Single(r => r.Year == 2022).Versions.Single(rv => rv.Version == 1).Id
-                }, releases.Select(r => r.Id).ToArray());
+                Assert.Equal(
+                    [
+                        latestPublishedReleaseVersion2022.Id,
+                        latestPublishedReleaseVersion2020.Id
+                    ], 
+                    releaseVersions.Select(r => r.Id));
             }
         }
 
         [Fact]
-        public async Task ListLatestReleaseVersions_Live_False()
+        public async Task ListReleaseVersions_OnlyDraft()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -2501,7 +2529,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     _dataFixture
                         .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultRelease(publishedVersions: 2, year: 2022)));
+                        .DefaultRelease(publishedVersions: 1, year: 2022)));
+
+            var latestDraftReleaseVersion2020 = publication.Releases
+                .Single(r => r.Year == 2020)
+                .Versions
+                .Single(rv => rv.Version == 1);
+            var latestDraftReleaseVersion2021 = publication.Releases
+                .Single(r => r.Year == 2021)
+                .Versions
+                .Single(rv => rv.Version == 0);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2514,21 +2551,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListLatestReleaseVersions(
-                    publication.Id, live: false);
+                var result = await publicationService.ListReleaseVersions(
+                    publication.Id,
+                    ReleaseVersionsType.OnlyDraft);
 
-                var releases = result.AssertRight();
+                var releaseVersions = result.AssertRight();
 
-                Assert.Equal(new[]
-                {
-                    publication.Releases.Single(r => r.Year == 2021).Versions.Single(rv => rv.Version == 0).Id,
-                    publication.Releases.Single(r => r.Year == 2020).Versions.Single(rv => rv.Version == 1).Id
-                }, releases.Select(r => r.Id).ToArray());
+                Assert.Equal(
+                    [
+                        latestDraftReleaseVersion2021.Id,
+                        latestDraftReleaseVersion2020.Id
+                    ], 
+                    releaseVersions.Select(r => r.Id));
             }
         }
 
         [Fact]
-        public async Task ListLatestReleaseVersions_IncludePermissions_True()
+        public async Task ListReleaseVersions_Latest_IncludePermissionsTrue()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -2547,23 +2586,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListLatestReleaseVersions(
-                    publication.Id, includePermissions: true);
+                var result = await publicationService.ListReleaseVersions(
+                    publicationId: publication.Id, 
+                    versionsType: ReleaseVersionsType.Latest,
+                    includePermissions: true);
 
-                var releases = result.AssertRight();
+                var releaseVersions = result.AssertRight();
 
-                var resultRelease = Assert.Single(releases);
+                var releaseVersion = Assert.Single(releaseVersions);
 
-                Assert.NotNull(resultRelease.Permissions);
-                Assert.True(resultRelease.Permissions!.CanDeleteRelease);
-                Assert.True(resultRelease.Permissions!.CanUpdateRelease);
-                Assert.True(resultRelease.Permissions!.CanAddPrereleaseUsers);
-                Assert.True(resultRelease.Permissions!.CanMakeAmendmentOfRelease);
+                Assert.NotNull(releaseVersion.Permissions);
+                Assert.True(releaseVersion.Permissions!.CanDeleteRelease);
+                Assert.True(releaseVersion.Permissions!.CanUpdateRelease);
+                Assert.True(releaseVersion.Permissions!.CanAddPrereleaseUsers);
+                Assert.True(releaseVersion.Permissions!.CanMakeAmendmentOfRelease);
             }
         }
 
         [Fact]
-        public async Task ListLatestReleaseVersions_IncludePermissions_False()
+        public async Task ListReleaseVersions_Latest_IncludePermissionsFalse()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -2582,19 +2623,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListLatestReleaseVersions(
-                    publication.Id, includePermissions: false);
+                var result = await publicationService.ListReleaseVersions(
+                    publicationId: publication.Id,
+                    versionsType: ReleaseVersionsType.Latest,
+                    includePermissions: false);
 
-                var releases = result.AssertRight();
+                var releaseVersions = result.AssertRight();
 
-                var resultRelease = Assert.Single(releases);
+                var releaseVersion = Assert.Single(releaseVersions);
 
-                Assert.Null(resultRelease.Permissions);
+                Assert.Null(releaseVersion.Permissions);
             }
         }
 
         [Fact]
-        public async Task ListLatestReleaseVersionsPaginated()
+        public async Task ListReleaseVersionsPaginated_Latest()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -2624,8 +2667,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 foreach (var (page, years) in expectedPagesAndYears)
                 {
-                    var result = await publicationService.ListLatestReleaseVersionsPaginated(
+                    var result = await publicationService.ListReleaseVersionsPaginated(
                         publication.Id,
+                        versionsType: ReleaseVersionsType.Latest,
                         page: page,
                         pageSize: pageSize
                     );
