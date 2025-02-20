@@ -278,8 +278,11 @@ User checks relevant headings exist on API data set details page
     user waits until h2 is visible    Data set preview
     user waits until h2 is visible    Variables in this data set
     user waits until h2 is visible    Using this data
-    user waits until h2 is visible    API data set quick start
+    user waits until h2 is visible    Using the API
     user waits until h2 is visible    API data set version history
+
+User verifies 'Get email alerts' link
+    user checks page contains link    Get email alerts
 
 User verifies 'Data set details' section
     user checks summary list contains    Theme    %{TEST_THEME_NAME}    id:dataSetDetails
@@ -322,8 +325,6 @@ User verifies 'Data set details' section
     ...    parent=id:dataSetDetails
 
     user checks summary list contains    Time period    2012/13    id:dataSetDetails
-    user checks summary list contains    Notifications    Get email updates about this API data set
-    ...    id:dataSetDetails
 
 User verifies 'API version history' section
     user checks table column heading contains    1    1    Version    id:apiVersionHistory

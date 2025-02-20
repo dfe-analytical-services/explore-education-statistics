@@ -172,13 +172,27 @@ describe('DataSetFilePage', () => {
   });
 
   describe('non-API data set', () => {
+    test('does not render the subscribe link', async () => {
+      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('link', {
+          name: 'Get email alerts',
+        }),
+      ).not.toBeInTheDocument();
+    });
+
     test('does not render API version info', async () => {
       render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       const infoSection = within(screen.getByTestId('data-set-file-info'));
-      expect(infoSection.queryByText('API version')).not.toBeInTheDocument();
+      expect(
+        infoSection.queryByText('API data set version'),
+      ).not.toBeInTheDocument();
     });
 
     test('renders the page navigation correctly', async () => {
@@ -226,13 +240,13 @@ describe('DataSetFilePage', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('does not render the API quick start section', async () => {
+    test('does not render the Using the API section', async () => {
       render(<DataSetFilePage dataSetFile={testDataSetFile} />);
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('heading', { name: 'API data set quick start' }),
+        screen.queryByRole('heading', { name: 'Using the API' }),
       ).not.toBeInTheDocument();
     });
   });
@@ -250,8 +264,27 @@ describe('DataSetFilePage', () => {
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       const infoSection = within(screen.getByTestId('data-set-file-info'));
-      expect(infoSection.getByText('API version')).toBeInTheDocument();
+      expect(infoSection.getByText('API data set version')).toBeInTheDocument();
       expect(infoSection.getByText('1.0')).toBeInTheDocument();
+    });
+
+    test('renders the subscribe link if has an `apiDataSetId`', async () => {
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          dataSetFile={testDataSetFile}
+        />,
+      );
+
+      expect(
+        screen.getByRole('link', {
+          name: 'Get email alerts',
+        }),
+      ).toHaveAttribute(
+        'href',
+        '/api-subscriptions/new-subscription/data-set-file-id',
+      );
     });
 
     test('renders the page navigation correctly', async () => {
@@ -276,7 +309,7 @@ describe('DataSetFilePage', () => {
       expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
       expect(navLinks[3]).toHaveAttribute('href', '#dataSetFootnotes');
       expect(navLinks[4]).toHaveAttribute('href', '#dataSetUsage');
-      expect(navLinks[5]).toHaveAttribute('href', '#apiQuickStart');
+      expect(navLinks[5]).toHaveAttribute('href', '#api');
       expect(navLinks[6]).toHaveAttribute('href', '#apiVersionHistory');
     });
 
@@ -301,7 +334,7 @@ describe('DataSetFilePage', () => {
       expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
       expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
       expect(navLinks[3]).toHaveAttribute('href', '#dataSetUsage');
-      expect(navLinks[4]).toHaveAttribute('href', '#apiQuickStart');
+      expect(navLinks[4]).toHaveAttribute('href', '#api');
       expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
     });
 
@@ -343,7 +376,7 @@ describe('DataSetFilePage', () => {
       expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
       expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
       expect(navLinks[3]).toHaveAttribute('href', '#dataSetUsage');
-      expect(navLinks[4]).toHaveAttribute('href', '#apiQuickStart');
+      expect(navLinks[4]).toHaveAttribute('href', '#api');
       expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
       expect(navLinks[6]).toHaveAttribute('href', '#apiChangelog');
     });
@@ -364,7 +397,7 @@ describe('DataSetFilePage', () => {
       ).toBeInTheDocument();
     });
 
-    test('renders the API quick start section', async () => {
+    test('renders the Using the API section', async () => {
       render(
         <DataSetFilePage
           apiDataSet={testApiDataSet}
@@ -376,7 +409,7 @@ describe('DataSetFilePage', () => {
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
       expect(
-        screen.getByRole('heading', { name: 'API data set quick start' }),
+        screen.getByRole('heading', { name: 'Using the API' }),
       ).toBeInTheDocument();
     });
 

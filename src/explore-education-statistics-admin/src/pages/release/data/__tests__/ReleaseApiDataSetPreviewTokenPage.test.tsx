@@ -116,17 +116,17 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
-        name: 'Get data set metadata',
+        name: 'Data set metadata',
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
-        name: 'Query data set (GET)',
+        name: 'Query data set using GET',
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
-        name: 'Query data set (POST)',
+        name: 'Query data set using POST',
       }),
     ).toBeInTheDocument();
   });
