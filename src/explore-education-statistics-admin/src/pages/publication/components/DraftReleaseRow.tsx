@@ -68,7 +68,7 @@ const DraftReleaseRow = ({
             releaseVersionId: release.id,
           })}
         >
-          {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
+          {release.permissions?.canUpdateRelease ? 'Edit Draft' : 'View'}
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
 
@@ -88,19 +88,6 @@ const DraftReleaseRow = ({
               }}
             />
           )}
-
-        {release.amendment && release.previousVersionId && (
-          <Link
-            className="govuk-!-margin-right-4 govuk-!-display-inline-block"
-            to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-              publicationId,
-              releaseVersionId: release.previousVersionId,
-            })}
-          >
-            View existing version
-            <VisuallyHidden> for {release.title}</VisuallyHidden>
-          </Link>
-        )}
 
         {release.permissions?.canDeleteRelease && release.amendment && (
           <CancelAmendmentModal
