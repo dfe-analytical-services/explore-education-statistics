@@ -27,7 +27,7 @@ public static class StartupSecurityConfiguration
                 policy.Requirements.Add(new ViewPublicationRequirement()));
 
             // does this use have permission to view a specific Release?
-            options.AddPolicy(ContentSecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
+            options.AddPolicy(ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(), policy =>
                 policy.Requirements.Add(new ViewReleaseRequirement()));
         });
     }

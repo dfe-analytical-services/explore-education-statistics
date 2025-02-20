@@ -49,7 +49,7 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
             releaseVersionId: release.id,
           })}
         >
-          {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
+          {release.permissions?.canUpdateReleaseVersion ? 'Edit' : 'View'}
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
 
@@ -66,7 +66,7 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
           </Link>
         )}
 
-        {release.permissions?.canDeleteRelease && release.amendment && (
+        {release.permissions?.canDeleteReleaseVersion && release.amendment && (
           <CancelAmendmentModal
             scheduledMethodologies={deleteReleasePlan?.scheduledMethodologies}
             triggerButton={

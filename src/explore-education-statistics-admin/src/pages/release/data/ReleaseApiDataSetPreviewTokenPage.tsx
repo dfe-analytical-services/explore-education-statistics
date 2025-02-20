@@ -2,7 +2,6 @@ import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import {
   releaseApiDataSetDetailsRoute,
-  releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenLogRoute,
   ReleaseDataSetPreviewTokenRouteParams,
   ReleaseDataSetRouteParams,

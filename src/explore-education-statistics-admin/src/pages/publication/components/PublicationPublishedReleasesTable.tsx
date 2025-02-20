@@ -50,7 +50,7 @@ export default function PublicationPublishedReleasesTable({
             Status <PublishedStatusGuidanceModal />
           </th>
           <th>Published date</th>
-          <th className={styles.actionsColumn}>Actions</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -74,8 +74,9 @@ export default function PublicationPublishedReleasesTable({
                 )}
               </td>
               <td>
-                {release.permissions.canViewRelease ? (
+                {release.permissions.canViewReleaseVersion ? (
                   <Link
+                    className="govuk-!-margin-right-4 govuk-!-display-inline-block"
                     to={generatePath<ReleaseRouteParams>(
                       releaseSummaryRoute.path,
                       {
@@ -92,11 +93,35 @@ export default function PublicationPublishedReleasesTable({
                     <VisuallyHidden> {release.title}</VisuallyHidden>
                   </>
                 )}
-                {release.permissions.canMakeAmendmentOfRelease && (
+                {release.permissions.canUpdateRelease ? (
+                  <Link
+                    className={`govuk-!-display-inline-block ${
+                      release.permissions.canMakeAmendmentOfReleaseVersion
+                        ? ' govuk-!-margin-right-4'
+                        : ''
+                    }`}
+                    to={generatePath<ReleaseRouteParams>(
+                      releaseSummaryRoute.path,
+                      {
+                        publicationId,
+                        releaseId: release.id,
+                      },
+                    )}
+                  >
+                    Edit Details
+                    <VisuallyHidden> {release.title}</VisuallyHidden>
+                  </Link>
+                ) : (
+                  <>
+                    No permission
+                    <VisuallyHidden> {release.title}</VisuallyHidden>
+                  </>
+                )}
+                {release.permissions.canMakeAmendmentOfReleaseVersion && (
                   <ModalConfirm
                     title="Confirm you want to amend this published release"
                     triggerButton={
-                      <ButtonText className="govuk-!-margin-left-4">
+                      <ButtonText>
                         Amend<VisuallyHidden> {release.title}</VisuallyHidden>
                       </ButtonText>
                     }
