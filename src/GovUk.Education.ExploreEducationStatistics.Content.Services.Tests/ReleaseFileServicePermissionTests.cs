@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         public async Task StreamFile()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseFile.ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseFile.ReleaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await PolicyCheckBuilder<ContentSecurityPolicies>()
                 .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
-                    ContentSecurityPolicies.CanViewSpecificRelease)
+                    ContentSecurityPolicies.CanViewSpecificReleaseVersion)
                 .AssertForbidden(
                     async userService =>
                     {

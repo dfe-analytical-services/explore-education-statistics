@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(releaseVersion, CanViewSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, CanViewSpecificReleaseVersion);
         }
     }
 }

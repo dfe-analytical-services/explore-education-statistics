@@ -50,7 +50,7 @@ const ScheduledReleaseRow = ({ publicationId, release }: Props) => {
             releaseVersionId: release.id,
           })}
         >
-          {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
+          {release.permissions?.canUpdateReleaseVersion ? 'Edit' : 'View'}
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
       </td>

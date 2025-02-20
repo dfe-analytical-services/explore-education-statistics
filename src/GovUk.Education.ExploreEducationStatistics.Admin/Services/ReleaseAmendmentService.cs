@@ -54,7 +54,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             .HydrateReleaseVersionForAmendment()
             .SingleOrDefault(releaseVersion => releaseVersion.Id == releaseVersionId)
             .OrNotFound()
-            .OnSuccess(_userService.CheckCanMakeAmendmentOfRelease)
+            .OnSuccess(_userService.CheckCanMakeAmendmentOfReleaseVersion)
             .OnSuccess(originalReleaseVersion =>
                 CreateBasicReleaseAmendment(originalReleaseVersion, createdDate)
                     .OnSuccessDo(CreateStatisticsReleaseAmendment)
