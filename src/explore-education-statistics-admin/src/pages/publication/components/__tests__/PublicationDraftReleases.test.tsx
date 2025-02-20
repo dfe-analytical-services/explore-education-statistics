@@ -29,9 +29,10 @@ describe('PublicationDraftReleases', () => {
     permissions: {
       canAddPrereleaseUsers: false,
       canUpdateRelease: true,
-      canDeleteRelease: false,
-      canMakeAmendmentOfRelease: true,
-      canViewRelease: false,
+      canUpdateReleaseVersion: true,
+      canDeleteReleaseVersion: false,
+      canMakeAmendmentOfReleaseVersion: true,
+      canViewReleaseVersion: false,
     },
     slug: 'release-1-slug',
     title: 'Release 1',
@@ -61,9 +62,10 @@ describe('PublicationDraftReleases', () => {
     permissions: {
       canAddPrereleaseUsers: false,
       canUpdateRelease: true,
-      canDeleteRelease: true,
-      canMakeAmendmentOfRelease: true,
-      canViewRelease: false,
+      canUpdateReleaseVersion: true,
+      canDeleteReleaseVersion: true,
+      canMakeAmendmentOfReleaseVersion: true,
+      canViewReleaseVersion: false,
     },
     previousVersionId: 'release-previous-id',
     published: '2022-01-03T00:00:00',
@@ -220,7 +222,7 @@ describe('PublicationDraftReleases', () => {
             ...testRelease1,
             permissions: {
               ...testRelease1.permissions,
-              canUpdateRelease: false,
+              canUpdateReleaseVersion: false,
             },
           },
           testRelease2,
@@ -252,7 +254,7 @@ describe('PublicationDraftReleases', () => {
             ...testRelease3,
             permissions: {
               ...testRelease2.permissions,
-              canDeleteRelease: false,
+              canDeleteReleaseVersion: false,
             },
           },
         ]}

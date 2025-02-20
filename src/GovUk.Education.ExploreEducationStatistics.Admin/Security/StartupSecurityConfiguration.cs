@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
 
-                options.AddPolicy(ContentSecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
+                options.AddPolicy(ContentSecurityPolicies.CanViewSpecificReleaseVersion.ToString(), policy =>
                     policy.Requirements.Add(new ViewReleaseRequirement()));
 
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificReleaseVersion.ToString(), policy =>
@@ -112,13 +112,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanApproveSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new MarkReleaseAsApprovedRequirement()));
 
-                options.AddPolicy(SecurityPolicies.CanMakeAmendmentOfSpecificRelease.ToString(), policy =>
+                options.AddPolicy(SecurityPolicies.CanMakeAmendmentOfSpecificReleaseVersion.ToString(), policy =>
                     policy.Requirements.Add(new MakeAmendmentOfSpecificReleaseRequirement()));
 
                 options.AddPolicy(SecurityPolicies.CanPublishSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new PublishSpecificReleaseRequirement()));
 
-                options.AddPolicy(SecurityPolicies.CanDeleteSpecificRelease.ToString(), policy =>
+                options.AddPolicy(SecurityPolicies.CanDeleteSpecificReleaseVersion.ToString(), policy =>
                     policy.Requirements.Add(new DeleteSpecificReleaseRequirement()));
 
                 options.AddPolicy(SecurityPolicies.CanDeleteTestRelease.ToString(), policy =>

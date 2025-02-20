@@ -33,9 +33,10 @@ describe('PublicationPublishedReleases', () => {
     permissions: {
       canAddPrereleaseUsers: false,
       canUpdateRelease: false,
-      canDeleteRelease: false,
-      canMakeAmendmentOfRelease: true,
-      canViewRelease: true,
+      canUpdateReleaseVersion: false,
+      canDeleteReleaseVersion: false,
+      canMakeAmendmentOfReleaseVersion: true,
+      canViewReleaseVersion: true,
     },
     published: '2022-01-01T00:00:00',
     slug: 'release-1-slug',
@@ -387,7 +388,7 @@ describe('PublicationPublishedReleases', () => {
   test('does not show the amendment button if you do not have the correct permissions', async () => {
     publicationService.listReleaseVersions.mockResolvedValue(
       produce(testReleasesPage1, draft => {
-        draft.results[0].permissions.canMakeAmendmentOfRelease = false;
+        draft.results[0].permissions.canMakeAmendmentOfReleaseVersion = false;
       }),
     );
 

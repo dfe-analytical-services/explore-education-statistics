@@ -68,10 +68,11 @@ describe('ApprovalsTable', () => {
       amendment: false,
       permissions: {
         canAddPrereleaseUsers: true,
-        canViewRelease: true,
         canUpdateRelease: true,
-        canDeleteRelease: false,
-        canMakeAmendmentOfRelease: false,
+        canViewReleaseVersion: true,
+        canUpdateReleaseVersion: true,
+        canDeleteReleaseVersion: false,
+        canMakeAmendmentOfReleaseVersion: false,
       },
     },
     {
@@ -110,10 +111,11 @@ describe('ApprovalsTable', () => {
       amendment: false,
       permissions: {
         canAddPrereleaseUsers: true,
-        canViewRelease: true,
         canUpdateRelease: true,
-        canDeleteRelease: false,
-        canMakeAmendmentOfRelease: false,
+        canViewReleaseVersion: true,
+        canUpdateReleaseVersion: true,
+        canDeleteReleaseVersion: false,
+        canMakeAmendmentOfReleaseVersion: false,
       },
     },
   ];

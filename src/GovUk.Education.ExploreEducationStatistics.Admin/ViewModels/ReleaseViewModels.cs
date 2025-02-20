@@ -92,13 +92,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public bool CanAddPrereleaseUsers { get; init; }
 
-        public bool CanViewRelease { get; set; }
-
         public bool CanUpdateRelease { get; init; }
 
-        public bool CanDeleteRelease { get; init; }
+        public bool CanViewReleaseVersion { get; set; }
 
-        public bool CanMakeAmendmentOfRelease { get; init; }
+        public bool CanUpdateReleaseVersion { get; init; }
+
+        public bool CanDeleteReleaseVersion { get; init; }
+
+        public bool CanMakeAmendmentOfReleaseVersion { get; init; }
     }
 
     public record ReleaseVersionSummaryViewModel

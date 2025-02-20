@@ -27,9 +27,10 @@ describe('PublicationUnpublishedReleases', () => {
   const testPermissions: ReleaseVersionPermissions = {
     canAddPrereleaseUsers: false,
     canUpdateRelease: true,
-    canDeleteRelease: true,
-    canMakeAmendmentOfRelease: true,
-    canViewRelease: true,
+    canUpdateReleaseVersion: true,
+    canDeleteReleaseVersion: true,
+    canMakeAmendmentOfReleaseVersion: true,
+    canViewReleaseVersion: true,
   };
 
   const testRelease1: ReleaseVersionSummaryWithPermissions = {
@@ -214,17 +215,17 @@ describe('PublicationUnpublishedReleases', () => {
         {
           ...testRelease1,
           approvalStatus: 'Approved',
-          permissions: { ...testPermissions, canViewRelease: false },
+          permissions: { ...testPermissions, canViewReleaseVersion: false },
         },
         {
           ...testRelease2,
           approvalStatus: 'Draft',
-          permissions: { ...testPermissions, canViewRelease: false },
+          permissions: { ...testPermissions, canViewReleaseVersion: false },
         },
         {
           ...testRelease3,
           approvalStatus: 'HigherLevelReview',
-          permissions: { ...testPermissions, canViewRelease: false },
+          permissions: { ...testPermissions, canViewReleaseVersion: false },
         },
       ],
     });
