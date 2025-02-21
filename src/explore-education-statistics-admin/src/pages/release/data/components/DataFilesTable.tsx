@@ -72,8 +72,9 @@ export default function DataFilesTable({
             <td data-testid="Status">
               <ImporterStatus
                 className={styles.fileStatus}
-                releaseVersionId={releaseVersionId}
                 dataFile={dataFile}
+                hideErrors
+                releaseVersionId={releaseVersionId}
                 onStatusChange={onStatusChange}
               />
             </td>
