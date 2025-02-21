@@ -14,10 +14,10 @@ public record ReleaseSearchViewModel
 
     public int TypeBoost { get; init; }
 
-    public string PublicationSlug { get; init; }
-    public string ReleaseSlug { get; init; }
+    public string PublicationSlug { get; init; } = string.Empty;
+    public string ReleaseSlug { get; init; } = string.Empty;
 
-    public string HtmlContent { get; init; }
+    public string HtmlContent { get; init; } = string.Empty;
 
     public ReleaseSearchViewModel(
         ReleaseCacheViewModel release,
