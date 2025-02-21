@@ -163,13 +163,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             
             AssertAll(
                 [
-                    () => Assert.Equal(releaseId, actual.ReleaseId), 
+                    () => Assert.Equal(releaseId, actual.ReleaseVersionId), 
                     () => Assert.Equal(publishedTimestamp, actual.Published), 
                     () => Assert.Equal("Publication Title", actual.PublicationTitle), 
                     () => Assert.Equal("This is the release summary", actual.Summary), 
                     () => Assert.Equal("the theme", actual.Theme), 
-                    () => Assert.Equal(releaseType.ToDisplayString(), actual.Type), 
-                    () => Assert.Equal(releaseType.ToTypeBoost(), actual.TypeBoost), 
+                    () => Assert.Equal("OfficialStatistics", actual.Type), 
+                    () => Assert.Equal(releaseType.ToSearchDocumentTypeBoost(), actual.TypeBoost), 
                     () => Assert.Equal("publication-slug", actual.PublicationSlug), 
                     () => Assert.Equal("release-slug", actual.ReleaseSlug), 
                 ],
