@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             
             AssertAll(
                 [
-                    () => Assert.Equal(releaseId, actual.ReleaseId), 
+                    () => Assert.Equal(releaseId, actual.ReleaseVersionId), 
                     () => Assert.Equal(publishedTimestamp, actual.Published), 
                     () => Assert.Equal("Publication Title", actual.PublicationTitle), 
                     () => Assert.Equal("This is the release summary", actual.Summary), 
