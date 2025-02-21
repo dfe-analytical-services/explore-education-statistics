@@ -51,6 +51,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("publications/{publicationSlug}/releases/latest/searchable")]
+        public async Task<ActionResult<ReleaseSearchViewModel>> GetLatestReleaseAsSearchableDocument(string publicationSlug) => 
+            await GetLatestReleaseSearchViewModel(publicationSlug).HandleFailuresOrOk();
+
         [HttpGet("publications/{publicationSlug}/releases/latest/summary")]
         public async Task<ActionResult<ReleaseSummaryViewModel>> GetLatestReleaseSummary(string publicationSlug)
         {
@@ -78,9 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         private Task<Either<ActionResult, ReleaseViewModel>> GetReleaseViewModel(
             string publicationSlug,
-            string? releaseSlug = null)
-        {
-            return _publicationCacheService.GetPublication(publicationSlug)
+            string? releaseSlug = null) =>
+            _publicationCacheService.GetPublication(publicationSlug)
                 .OnSuccessCombineWith(publication => _methodologyCacheService.GetSummariesByPublication(publication.Id))
                 .OnSuccessCombineWith(_ => _releaseCacheService.GetRelease(publicationSlug, releaseSlug))
                 .OnSuccess(tuple =>
@@ -91,7 +94,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                         new PublicationViewModel(publication, methodologySummaries)
                     );
                 });
-        }
+        
+        private Task<Either<ActionResult, ReleaseSearchViewModel>> GetLatestReleaseSearchViewModel(
+            string publicationSlug) =>
+            _publicationCacheService.GetPublication(publicationSlug)
+                .OnSuccessCombineWith(_ => _releaseCacheService.GetRelease(publicationSlug))
+                .OnSuccess(tuple =>
+                {
+                    var (publication, release) = tuple;
+                    return new ReleaseSearchViewModel(release, publication);
+                });
 
         private Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummaryViewModel(
             string publicationSlug,
