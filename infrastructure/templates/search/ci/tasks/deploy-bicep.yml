@@ -33,4 +33,5 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               resourceTags='$(resourceTags)' \
+              maintenanceIpRanges='$(maintenanceFirewallRules)' \
               deploySearchService=${{ parameters.deploySearchService }}
