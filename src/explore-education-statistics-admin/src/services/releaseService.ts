@@ -14,7 +14,9 @@ export interface CreateReleaseVersionRequest {
 }
 
 const releaseService = {
-  createReleaseVersion(createRequest: CreateReleaseVersionRequest): Promise<Release> {
+  createReleaseVersion(
+    createRequest: CreateReleaseVersionRequest,
+  ): Promise<ReleaseVersion> {
     return client.post(`/releases`, createRequest);
   },
 };

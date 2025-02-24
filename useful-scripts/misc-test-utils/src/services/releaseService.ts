@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import spinner from '../utils/spinner';
 import { ReleaseProgressResponse } from '../types/ReleaseProgressResponse';
 import sleep from '../utils/sleep';
-import { ReleaseVersion } from '../types/Release';
+import { Release } from '../types/Release';
 import adminApi from '../utils/adminApi';
 import logger from '../utils/logger';
 
