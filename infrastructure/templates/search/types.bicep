@@ -1,7 +1,11 @@
 @export()
 type ResourceNames = {
   existingResources: {
-  }
-  search: {
+    keyVault: string
+    vNet: string
+    alertsGroup: string
+    subnets: {
+      searchStoragePrivateEndpoints: string
+    }
   }
 }

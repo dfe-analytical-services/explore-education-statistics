@@ -1,4 +1,5 @@
-import { abbreviations } from 'abbreviations.bicep'
+import { abbreviations } from '../common/abbreviations.bicep'
+import { IpRange } from '../common/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -28,7 +29,37 @@ param deployAlerts bool = false
 @description('Does the Search Service need creating or updating?')
 param deploySearchService bool = false
 
+@description('Provides access to resources for specific IP address ranges used for service maintenance.')
+param maintenanceIpRanges IpRange[] = []
+
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
   DateProvisioned: dateProvisioned
 })
+
+var resourcePrefix = '${subscription}-ees'
+
+var resourceNames = {
+  existingResources: {
+    keyVault: '${subscription}-kv-ees-01'
+    vNet: '${subscription}-vnet-ees'
+    alertsGroup: '${subscription}-ag-ees-alertedusers'
+    subnets: {
+      searchStoragePrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-search-pep'
+    }
+  }
+}
+
+module searchServiceModule 'application/searchService.bicep' = if (deploySearchService) {
+  name: 'searchServiceModule'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    resourcePrefix: resourcePrefix
+    storageFirewallRules: maintenanceIpRanges
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+output searchServiceEndpoint string = deploySearchService ? searchServiceModule.outputs.searchServiceEndpoint : ''
