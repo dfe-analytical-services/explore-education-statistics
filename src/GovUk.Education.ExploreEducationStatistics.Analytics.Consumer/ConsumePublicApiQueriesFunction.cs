@@ -1,17 +1,17 @@
-using DuckDB.NET.Data;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Requests.Consumer;
 
 public class ConsumePublicApiQueriesFunction(
+    DuckDbConnection duckDbConnection,
     IAnalyticsPathResolver pathResolver,
     ILogger<ConsumePublicApiQueriesFunction> logger)
 {
     [Function(nameof(ConsumePublicApiQueriesFunction))]
-    public async Task Run(
+    public Task Run(
         [TimerTrigger("%App:ConsumePublicApiQueriesCronSchedule%")]
         TimerInfo timer)
     {
@@ -33,7 +33,7 @@ public class ConsumePublicApiQueriesFunction(
         if (filesToProcess.Count == 0)
         {
             logger.LogInformation("No data set queries to process");
-            return;
+            return Task.CompletedTask;
         }
         
         logger.LogInformation("Found {Count} data set queries to process", filesToProcess.Count);
@@ -45,16 +45,14 @@ public class ConsumePublicApiQueriesFunction(
             File.Move(originalPath, newPath);
         });
         
-        await using var duckDbConnection = new DuckDBConnection("DataSource=:memory:");
-        duckDbConnection.Open();
-        
-        await using var command = duckDbConnection.CreateCommand();
-        command.CommandText = "install json; load json;";
-        command.ExecuteNonQuery();
+        duckDbConnection.ExecuteNonQuery("install json; load json");
 
-        command.CommandText = $@"
-            CREATE TABLE queries_raw AS 
-            SELECT * FROM read_json('{processingDirectory}/*.json', 
+        duckDbConnection.ExecuteNonQuery($@"
+            CREATE TABLE queries AS 
+            SELECT
+                md5(Query) AS QueryHash,
+                *
+            FROM read_json('{processingDirectory}/*.json', 
                 format='auto',
                 columns = {{
                     DataSetId: UUID, 
@@ -66,17 +64,10 @@ public class ConsumePublicApiQueriesFunction(
                     StartTime: DATETIME,
                     EndTime: DATETIME,
                     Query: JSON
-                }});";
-        command.ExecuteNonQuery();
-        
-        command.CommandText = $@"
-            CREATE TABLE queries_raw_with_hash AS 
-            SELECT md5(Query) AS QueryHash, *
-            FROM queries_raw;";
-        command.ExecuteNonQuery();
+                }})");
 
-        command.CommandText = @"
-            CREATE TABLE queries AS 
+        duckDbConnection.ExecuteNonQuery(@"
+            CREATE TABLE query_report AS 
             SELECT 
                 QueryHash,
                 FIRST(DataSetId),
@@ -87,39 +78,41 @@ public class ConsumePublicApiQueriesFunction(
                 FIRST(TotalRowsCount),
                 FIRST(Query),
                 COUNT(QueryHash) AS QueryExecutions
-            FROM queries_raw_with_hash
-            GROUP BY QueryHash;";
-        command.ExecuteNonQuery();
+            FROM queries
+            GROUP BY QueryHash
+            ORDER BY QueryHash");
         
-        command.CommandText = @"
-            CREATE TABLE query_access AS 
+        duckDbConnection.ExecuteNonQuery(@"
+            CREATE TABLE query_access_report AS 
             SELECT 
                 QueryHash,
                 DataSetVersionId,
                 StartTime,
                 EndTime,
                 extract('milliseconds' FROM EndTime - StartTime) AS DurationMillis
-            FROM queries_raw_with_hash";
-        command.ExecuteNonQuery();
+            FROM queries
+            ORDER BY QueryHash");
 
-        var reportFilenameSuffix = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
+        var reportFilenamePrefix = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
         
         var queryReportFilename = Path.Combine(
             reportsDirectory, 
-            $"public-api-queries_{reportFilenameSuffix}.parquet");
+            $"{reportFilenamePrefix}_public-api-queries.parquet");
         
         var queryAccessReportFilename = Path.Combine(
             reportsDirectory, 
-            $"public-api-query-access_{reportFilenameSuffix}.parquet");
+            $"{reportFilenamePrefix}_public-api-query-access.parquet");
 
-        command.CommandText = $@"
-            COPY (SELECT * FROM queries)
-            TO '{queryReportFilename}' (FORMAT 'parquet', CODEC 'zstd');";
-        command.ExecuteNonQuery();
+        duckDbConnection.ExecuteNonQuery($@"
+            COPY (SELECT * FROM query_report)
+            TO '{queryReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
         
-        command.CommandText = $@"
-            COPY (SELECT * FROM query_access)
-            TO '{queryAccessReportFilename}' (FORMAT 'parquet', CODEC 'zstd');";
-        command.ExecuteNonQuery();
+        duckDbConnection.ExecuteNonQuery($@"
+            COPY (SELECT * FROM query_access_report)
+            TO '{queryAccessReportFilename}' (FORMAT 'parquet', CODEC 'zstd')");
+        
+        Directory.Delete(processingDirectory, recursive: true);
+        
+        return Task.CompletedTask;
     }
 }

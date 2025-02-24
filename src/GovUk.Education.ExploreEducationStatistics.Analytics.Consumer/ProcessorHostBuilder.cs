@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Options;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,11 +33,17 @@ public static class ProcessorHostBuilder
                 
                 services.AddOptions<AnalyticsOptions>()
                     .Bind(configuration.GetRequiredSection(AnalyticsOptions.Section));
-                
+
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
-                    .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>();
+                    .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>()
+                    .AddTransient<DuckDbConnection>(_ =>
+                    {
+                        var duckDbConnection = new DuckDbConnection();
+                        duckDbConnection.Open();
+                        return duckDbConnection;
+                    });
             });
     }
 }

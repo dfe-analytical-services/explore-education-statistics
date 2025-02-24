@@ -49,7 +49,7 @@ public class AnalyticsService(
 
         Directory.CreateDirectory(directory);
 
-        var filename = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}_{dataSetVersionId}.json";
+        var filename = $"{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}_{dataSetVersionId}.json";
         
         await File.WriteAllTextAsync(
             Path.Combine(directory, filename),
