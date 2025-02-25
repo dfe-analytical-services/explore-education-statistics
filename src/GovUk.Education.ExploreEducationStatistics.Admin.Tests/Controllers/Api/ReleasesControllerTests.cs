@@ -220,7 +220,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         }
 
         [Fact]
-        public async Task LabelOver50Characters()
+        public async Task LabelOver20Characters()
         {
             Publication publication = DataFixture.DefaultPublication();
 
@@ -231,13 +231,13 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
                 publicationId: publication.Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: new string('a', 51));
+                label: new string('a', 21));
 
             var validationProblem = response.AssertValidationProblem();
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal($"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '50'.", error.Message);
+            Assert.Equal($"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '20'.", error.Message);
             Assert.Equal(nameof(ReleaseCreateRequest.Label), error.Path);
         }
 
@@ -953,7 +953,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         }
 
         [Fact]
-        public async Task LabelOver50Characters()
+        public async Task LabelOver20Characters()
         {
             Release release = DataFixture.DefaultRelease(publishedVersions: 1)
                 .WithPublication(DataFixture.DefaultPublication());
@@ -963,13 +963,13 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
 
             var response = await UpdateRelease(
                 releaseId: release.Id,
-                label: new string('a', 51));
+                label: new string('a', 21));
 
             var validationProblem = response.AssertValidationProblem();
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal($"The field {nameof(ReleaseUpdateRequest.Label)} must be a string or array type with a maximum length of '50'.", error.Message);
+            Assert.Equal($"The field {nameof(ReleaseUpdateRequest.Label)} must be a string or array type with a maximum length of '20'.", error.Message);
             Assert.Equal(nameof(ReleaseUpdateRequest.Label), error.Path);
         }
 
