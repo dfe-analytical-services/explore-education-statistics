@@ -54,7 +54,7 @@ const ReleaseCreatePage = ({
   }, [publicationId]);
 
   const handleSubmit = async (values: ReleaseSummaryFormValues) => {
-    const createdRelease = await releaseService.createReleaseVersion({
+    const createdRelease = await releaseService.createRelease({
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
       },
