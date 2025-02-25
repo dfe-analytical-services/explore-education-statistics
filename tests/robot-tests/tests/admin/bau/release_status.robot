@@ -341,9 +341,9 @@ Validate checklist errors
 
 Navigate to data upload and confirm data replacement
     user clicks link    Data and files
-    user waits until page contains data uploads table
-
+    user waits until page contains element    testid:Data file replacements table
     user clicks link    Replace data
+    user waits until h2 is visible    Data file details
     user waits until page contains    Footnotes: OK
     user waits until page contains    Data blocks: OK
     user waits until button is enabled    Confirm data replacement

@@ -1,8 +1,8 @@
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { PaginatedList } from '@common/services/types/pagination';
 
 // eslint-disable-next-line import/prefer-default-export
-export const testReleaseSummaries: ReleaseSummary[] = [
+export const testReleaseSummaries: ReleaseVersionSummary[] = [
   {
     id: 'release-1',
     slug: 'release-1-slug',
@@ -54,17 +54,18 @@ export const testReleaseSummaries: ReleaseSummary[] = [
   },
 ];
 
-export const testPaginatedReleaseSummaries: PaginatedList<ReleaseSummary> = {
-  results: testReleaseSummaries,
-  paging: {
-    page: 1,
-    pageSize: 5,
-    totalPages: 1,
-    totalResults: 3,
-  },
-};
+export const testPaginatedReleaseSummaries: PaginatedList<ReleaseVersionSummary> =
+  {
+    results: testReleaseSummaries,
+    paging: {
+      page: 1,
+      pageSize: 5,
+      totalPages: 1,
+      totalResults: 3,
+    },
+  };
 
-export const testPaginatedReleaseSummariesNoResults: PaginatedList<ReleaseSummary> =
+export const testPaginatedReleaseSummariesNoResults: PaginatedList<ReleaseVersionSummary> =
   {
     results: [],
     paging: { page: 1, pageSize: 1, totalPages: 1, totalResults: 0 },

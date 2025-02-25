@@ -4,9 +4,9 @@ import {
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import publicationService from '@admin/services/publicationService';
-import releaseService, {
-  ReleaseSummaryWithPermissions,
-} from '@admin/services/releaseService';
+import releaseVersionService, {
+  ReleaseVersionSummaryWithPermissions,
+} from '@admin/services/releaseVersionService';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -41,7 +41,7 @@ export default function PublicationPublishedReleases({
   } = useInfiniteQuery(
     ['publicationPublishedReleases', publicationId],
     ({ pageParam = 1 }) => {
-      return publicationService.listReleases<ReleaseSummaryWithPermissions>(
+      return publicationService.listReleases<ReleaseVersionSummaryWithPermissions>(
         publicationId,
         {
           live: true,
@@ -106,11 +106,11 @@ export default function PublicationPublishedReleases({
               releases={allReleases}
               onAmend={async id => {
                 const { id: amendmentId } =
-                  await releaseService.createReleaseAmendment(id);
+                  await releaseVersionService.createReleaseVersionAmendment(id);
                 history.push(
                   generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
                     publicationId,
-                    releaseId: amendmentId,
+                    releaseVersionId: amendmentId,
                   }),
                 );
               }}

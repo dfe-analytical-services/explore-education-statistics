@@ -1,6 +1,6 @@
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
-import { ReleaseChecklistErrorCode } from '@admin/services/releaseService';
+import { ReleaseVersionChecklistErrorCode } from '@admin/services/releaseVersionService';
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import { screen, waitFor, within } from '@testing-library/react';
 import { format } from 'date-fns';
@@ -21,7 +21,7 @@ describe('ReleaseStatusForm', () => {
   test('renders with all status options enabled', () => {
     render(
       <ReleaseStatusForm
-        release={testRelease}
+        releaseVersion={testRelease}
         statusPermissions={testStatusPermissions}
         onCancel={noop}
         onSubmit={noop}
@@ -49,7 +49,7 @@ describe('ReleaseStatusForm', () => {
   test('renders with Approved status option disabled', () => {
     render(
       <ReleaseStatusForm
-        release={testRelease}
+        releaseVersion={testRelease}
         statusPermissions={{
           ...testStatusPermissions,
           canMarkApproved: false,
@@ -80,7 +80,7 @@ describe('ReleaseStatusForm', () => {
   test('renders with HigherLevelReview and Approved status options disabled', () => {
     render(
       <ReleaseStatusForm
-        release={testRelease}
+        releaseVersion={testRelease}
         statusPermissions={{
           ...testStatusPermissions,
           canMarkHigherLevelReview: false,
@@ -112,7 +112,7 @@ describe('ReleaseStatusForm', () => {
   test('renders with all options disabled', () => {
     render(
       <ReleaseStatusForm
-        release={testRelease}
+        releaseVersion={testRelease}
         statusPermissions={{
           canMarkDraft: false,
           canMarkHigherLevelReview: false,
@@ -144,7 +144,7 @@ describe('ReleaseStatusForm', () => {
   test('renders correctly with initial values', () => {
     render(
       <ReleaseStatusForm
-        release={{
+        releaseVersion={{
           ...testRelease,
           approvalStatus: 'HigherLevelReview',
           nextReleaseDate: {
@@ -193,7 +193,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={testRelease}
+          releaseVersion={testRelease}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
           onSubmit={handleSubmit}
@@ -223,7 +223,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={testRelease}
+          releaseVersion={testRelease}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
           onSubmit={handleSubmit}
@@ -270,7 +270,7 @@ describe('ReleaseStatusForm', () => {
     test('shows error message when internal note is empty', async () => {
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'HigherLevelReview',
           }}
@@ -297,7 +297,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'HigherLevelReview',
           }}
@@ -325,7 +325,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'HigherLevelReview',
           }}
@@ -371,7 +371,7 @@ describe('ReleaseStatusForm', () => {
     test('renders correctly with no published date', () => {
       render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
           }}
@@ -405,7 +405,7 @@ describe('ReleaseStatusForm', () => {
     test('renders correctly with published date', () => {
       render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
             publishScheduled: '2020-12-15',
@@ -446,7 +446,7 @@ describe('ReleaseStatusForm', () => {
     test('shows pre-release warnings when pre-release users have been added', () => {
       render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
             preReleaseUsersOrInvitesAdded: true,
@@ -473,7 +473,7 @@ describe('ReleaseStatusForm', () => {
     test('does not show pre-release warnings when pre-release users have not been added', () => {
       render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
             preReleaseUsersOrInvitesAdded: false,
@@ -500,7 +500,7 @@ describe('ReleaseStatusForm', () => {
     test('shows error message when internal note is empty', async () => {
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
           }}
@@ -525,7 +525,7 @@ describe('ReleaseStatusForm', () => {
     test('shows error message when no publishing method selected', async () => {
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
           }}
@@ -550,7 +550,7 @@ describe('ReleaseStatusForm', () => {
     test('shows error message when no publish date', async () => {
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
           }}
@@ -577,7 +577,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
           }}
@@ -603,7 +603,7 @@ describe('ReleaseStatusForm', () => {
       expect(handleSubmit).not.toHaveBeenCalled();
     });
 
-    test.each(ReleaseChecklistErrorCode)(
+    test.each(ReleaseVersionChecklistErrorCode)(
       'shows checklist error message `%s` after failed submit',
       async checklistError => {
         const handleSubmit = jest.fn().mockImplementation(() => {
@@ -614,7 +614,7 @@ describe('ReleaseStatusForm', () => {
 
         const { user } = render(
           <ReleaseStatusForm
-            release={testRelease}
+            releaseVersion={testRelease}
             statusPermissions={testStatusPermissions}
             onCancel={noop}
             onSubmit={handleSubmit}
@@ -647,7 +647,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={testRelease}
+          releaseVersion={testRelease}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
           onSubmit={handleSubmit}
@@ -675,7 +675,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             publishScheduled: format(new Date(), 'yyyy-MM-dd'),
             approvalStatus: 'Approved',
@@ -720,7 +720,7 @@ describe('ReleaseStatusForm', () => {
     test('shows confirmation modal when submitting with valid values and publish date', async () => {
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
           }}
@@ -764,7 +764,7 @@ describe('ReleaseStatusForm', () => {
     test('does not show confirmation modal when submitting invalid values with valid publish date', async () => {
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
           }}
@@ -806,7 +806,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
           }}
@@ -867,7 +867,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
           }}
@@ -937,7 +937,7 @@ describe('ReleaseStatusForm', () => {
 
       const { user } = render(
         <ReleaseStatusForm
-          release={{
+          releaseVersion={{
             ...testRelease,
             approvalStatus: 'Approved',
           }}
@@ -986,7 +986,7 @@ describe('ReleaseStatusForm', () => {
 
         render(
           <ReleaseStatusForm
-            release={{
+            releaseVersion={{
               ...testRelease,
               approvalStatus: 'Approved',
               amendment: true,
@@ -1013,7 +1013,7 @@ describe('ReleaseStatusForm', () => {
 
         const { user } = render(
           <ReleaseStatusForm
-            release={{
+            releaseVersion={{
               ...testRelease,
               approvalStatus: 'Approved',
               amendment: true,
@@ -1063,7 +1063,7 @@ describe('ReleaseStatusForm', () => {
 
         const { user } = render(
           <ReleaseStatusForm
-            release={{
+            releaseVersion={{
               ...testRelease,
               approvalStatus: 'Approved',
               amendment: true,
@@ -1106,7 +1106,7 @@ describe('ReleaseStatusForm', () => {
 
         const { user } = render(
           <ReleaseStatusForm
-            release={{
+            releaseVersion={{
               ...testRelease,
               approvalStatus: 'Approved',
               amendment: true,

@@ -175,7 +175,7 @@ describe('Filters', () => {
     ]);
 
     expect(handleChange).toHaveBeenCalledWith({
-      filterType: 'releaseId',
+      filterType: 'releaseVersionId',
       nextValue: 'release-1',
     });
   });
@@ -230,7 +230,7 @@ describe('Filters', () => {
       <Filters
         publicationId="publication-1"
         releases={testReleases}
-        releaseId="release-2"
+        releaseVersionId="release-2"
         themes={testThemes}
         themeId="theme-2"
         onChange={noop}

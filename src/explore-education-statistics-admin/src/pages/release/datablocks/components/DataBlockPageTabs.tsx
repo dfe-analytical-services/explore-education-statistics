@@ -36,13 +36,13 @@ export type SavedDataBlock = CreateReleaseDataBlock & {
 };
 
 interface Props {
-  releaseId: string;
+  releaseVersionId: string;
   dataBlock?: ReleaseDataBlock;
   onDataBlockSave?: (dataBlock: ReleaseDataBlock) => void;
 }
 
 const DataBlockPageTabs = ({
-  releaseId,
+  releaseVersionId,
   dataBlock,
   onDataBlockSave,
 }: Props) => {
@@ -56,14 +56,16 @@ const DataBlockPageTabs = ({
     error,
     isLoading,
   } = useAsyncRetry<InitialTableToolState>(async () => {
-    const subjects = await tableBuilderService.listReleaseSubjects(releaseId);
+    const subjects = await tableBuilderService.listReleaseSubjects(
+      releaseVersionId,
+    );
 
     if (!dataBlock) {
       return {
         initialStep: 1,
         subjects,
         query: {
-          releaseId,
+          releaseVersionId,
           subjectId: '',
           locationIds: [],
           filters: [],
@@ -74,12 +76,12 @@ const DataBlockPageTabs = ({
 
     const query: ReleaseTableDataQuery = {
       ...dataBlock.query,
-      releaseId,
+      releaseVersionId,
     };
 
     const tableData = await tableBuilderService.getTableData(
       query,
-      releaseId,
+      releaseVersionId,
       dataBlock.charts[0]?.type === 'map'
         ? getMapInitialBoundaryLevel(dataBlock.charts[0])
         : undefined,
@@ -150,13 +152,13 @@ const DataBlockPageTabs = ({
       switch (true) {
         case !!(originalName && !newName):
           await featuredTableService.deleteFeaturedTable(
-            releaseId,
+            releaseVersionId,
             dataBlockId,
           );
           break;
 
         case !!(!originalName && newName):
-          await featuredTableService.createFeaturedTable(releaseId, {
+          await featuredTableService.createFeaturedTable(releaseVersionId, {
             name: newName ?? '',
             description: newDescription ?? '',
             dataBlockId,
@@ -168,7 +170,7 @@ const DataBlockPageTabs = ({
           (originalName && originalDescription !== newDescription)
         ):
           await featuredTableService.updateFeaturedTable(
-            releaseId,
+            releaseVersionId,
             dataBlockId,
             {
               name: newName ?? '',
@@ -181,7 +183,7 @@ const DataBlockPageTabs = ({
           break;
       }
     },
-    [releaseId],
+    [releaseVersionId],
   );
 
   const handleDataBlockSave = useCallback(
@@ -190,7 +192,7 @@ const DataBlockPageTabs = ({
         ...nextDataBlock,
         query: {
           ...(omit(nextDataBlock.query, [
-            'releaseId',
+            'releaseVersionId',
           ]) as SavedDataBlock['query']),
         },
       };
@@ -210,9 +212,8 @@ const DataBlockPageTabs = ({
             dataBlockToSave as ReleaseDataBlock,
           );
         }
-
         const newDataBlock = await dataBlocksService.createDataBlock(
-          releaseId,
+          releaseVersionId,
           dataBlockToSave,
         );
 
@@ -237,7 +238,7 @@ const DataBlockPageTabs = ({
     [
       dataBlock,
       onDataBlockSave,
-      releaseId,
+      releaseVersionId,
       saveNumber,
       handleFeaturedTableChange,
     ],
@@ -407,7 +408,7 @@ const DataBlockPageTabs = ({
                   key={saveNumber}
                   dataBlock={dataBlock}
                   query={query}
-                  releaseId={releaseId}
+                  releaseVersionId={releaseVersionId}
                   table={response.table}
                   onDataBlockSave={handleDataBlockSave}
                   onTableUpdate={handleChartTableUpdate}

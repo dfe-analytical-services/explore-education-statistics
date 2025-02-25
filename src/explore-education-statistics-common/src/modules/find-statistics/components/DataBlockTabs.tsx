@@ -24,7 +24,7 @@ export interface DataBlockTabsProps {
   lastTabs?: ReactNode;
   getInfographic?: GetInfographic;
   id?: string;
-  releaseId: string;
+  releaseVersionId: string;
   onToggle?: (section: { id: string; title: string }) => void;
 }
 
@@ -35,7 +35,7 @@ const DataBlockTabs = ({
   lastTabs,
   getInfographic,
   id = `dataBlock-${dataBlock.id}`,
-  releaseId,
+  releaseVersionId,
   onToggle,
 }: DataBlockTabsProps) => {
   const {
@@ -47,7 +47,7 @@ const DataBlockTabs = ({
     isGeoJsonInitialLoading,
   } = useDataBlock({
     dataBlock,
-    releaseId,
+    releaseVersionId,
     getInfographic,
   });
 

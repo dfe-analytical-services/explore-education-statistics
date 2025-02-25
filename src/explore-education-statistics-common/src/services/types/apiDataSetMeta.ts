@@ -10,7 +10,6 @@ export interface Filter {
 export interface FilterOption {
   id: string;
   label: string;
-  isAutoSelect?: boolean;
 }
 
 export interface GeographicLevel {

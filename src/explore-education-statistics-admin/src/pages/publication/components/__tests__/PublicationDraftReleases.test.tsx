@@ -1,7 +1,7 @@
 import PublicationDraftReleases from '@admin/pages/publication/components/PublicationDraftReleases';
 import _releaseService, {
-  ReleaseSummaryWithPermissions,
-} from '@admin/services/releaseService';
+  ReleaseVersionSummaryWithPermissions,
+} from '@admin/services/releaseVersionService';
 import {
   render as baseRender,
   screen,
@@ -13,13 +13,15 @@ import noop from 'lodash/noop';
 import React, { ReactElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
-jest.mock('@admin/services/releaseService');
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+jest.mock('@admin/services/releaseVersionService');
+const releaseVersionService = _releaseService as jest.Mocked<
+  typeof _releaseService
+>;
 
 describe('PublicationDraftReleases', () => {
   const testPublicationId = 'publication-1';
 
-  const testRelease1: ReleaseSummaryWithPermissions = {
+  const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Draft',
     id: 'release-1',
@@ -43,7 +45,7 @@ describe('PublicationDraftReleases', () => {
     latestRelease: false,
   };
 
-  const testRelease2: ReleaseSummaryWithPermissions = {
+  const testRelease2: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
     approvalStatus: 'HigherLevelReview',
     id: 'release-2',
@@ -52,7 +54,7 @@ describe('PublicationDraftReleases', () => {
     title: 'Release 2',
   };
 
-  const testRelease3: ReleaseSummaryWithPermissions = {
+  const testRelease3: ReleaseVersionSummaryWithPermissions = {
     ...testRelease1,
     amendment: true,
     id: 'release-3',
@@ -72,7 +74,7 @@ describe('PublicationDraftReleases', () => {
   const testReleases = [testRelease1, testRelease2, testRelease3];
 
   beforeEach(() => {
-    releaseService.getReleaseChecklist.mockResolvedValue({
+    releaseVersionService.getReleaseVersionChecklist.mockResolvedValue({
       errors: [
         {
           code: 'DataFileImportsMustBeCompleted',
@@ -269,7 +271,7 @@ describe('PublicationDraftReleases', () => {
 
   test('handles cancelling an amendment correctly', async () => {
     const handleOnChange = jest.fn();
-    releaseService.getDeleteReleasePlan.mockResolvedValue({
+    releaseVersionService.getDeleteReleaseVersionPlan.mockResolvedValue({
       scheduledMethodologies: [
         {
           id: 'methodology-1',
@@ -300,9 +302,9 @@ describe('PublicationDraftReleases', () => {
     );
 
     await waitFor(() => {
-      expect(releaseService.getDeleteReleasePlan).toHaveBeenCalledWith(
-        testRelease3.id,
-      );
+      expect(
+        releaseVersionService.getDeleteReleaseVersionPlan,
+      ).toHaveBeenCalledWith(testRelease3.id);
     });
 
     const modal = within(screen.getByRole('dialog'));
@@ -320,7 +322,7 @@ describe('PublicationDraftReleases', () => {
     );
 
     await waitFor(() => {
-      expect(releaseService.deleteRelease).toHaveBeenCalledWith(
+      expect(releaseVersionService.deleteReleaseVersion).toHaveBeenCalledWith(
         testRelease3.id,
       );
     });

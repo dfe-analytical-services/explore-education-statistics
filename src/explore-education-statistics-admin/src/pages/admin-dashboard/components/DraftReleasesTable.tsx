@@ -4,7 +4,7 @@ import {
   DraftStatusGuidanceModal,
   IssuesGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
-import { DashboardReleaseSummary } from '@admin/services/releaseService';
+import { DashboardReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo } from 'react';
@@ -12,7 +12,7 @@ import React, { useMemo } from 'react';
 interface PublicationRowProps {
   isBauUser: boolean;
   publication: string;
-  releases: DashboardReleaseSummary[];
+  releases: DashboardReleaseVersionSummary[];
   onChangeRelease: () => void;
 }
 
@@ -43,7 +43,7 @@ const PublicationRow = ({
 
 interface DraftReleasesTableProps {
   isBauUser: boolean;
-  releases: DashboardReleaseSummary[];
+  releases: DashboardReleaseVersionSummary[];
   onChangeRelease: () => void;
 }
 
@@ -52,9 +52,9 @@ const DraftReleasesTable = ({
   releases,
   onChangeRelease,
 }: DraftReleasesTableProps) => {
-  const releasesByPublication: Dictionary<DashboardReleaseSummary[]> =
+  const releasesByPublication: Dictionary<DashboardReleaseVersionSummary[]> =
     useMemo(() => {
-      return releases.reduce<Dictionary<DashboardReleaseSummary[]>>(
+      return releases.reduce<Dictionary<DashboardReleaseVersionSummary[]>>(
         (acc, release) => {
           if (acc[release.publication.title]) {
             acc[release.publication.title].push(release);

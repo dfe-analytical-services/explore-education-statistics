@@ -13,7 +13,7 @@ interface Props extends InjectedWizardProps {
   featuredTables?: FeaturedTable[];
   isSubmitting: boolean;
   renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
-  release?: SelectedRelease;
+  releaseVersion?: SelectedRelease;
   subject: Subject;
 }
 
@@ -21,7 +21,7 @@ export default function DataSetDetails({
   featuredTables = [],
   isSubmitting,
   renderFeaturedTableLink,
-  release,
+  releaseVersion,
   subject,
   ...stepProps
 }: Props) {
@@ -36,13 +36,13 @@ export default function DataSetDetails({
       <WizardStepFormActions
         {...stepProps}
         additionalButton={
-          release && (
+          releaseVersion && (
             <>
               <span className="govuk-!-margin-left-3">or</span>
               <ButtonText
                 className="govuk-!-margin-bottom-0 govuk-!-margin-left-2"
                 onClick={async () => {
-                  await downloadService.downloadFiles(release?.id, [
+                  await downloadService.downloadFiles(releaseVersion?.id, [
                     subject.file.id,
                   ]);
                 }}

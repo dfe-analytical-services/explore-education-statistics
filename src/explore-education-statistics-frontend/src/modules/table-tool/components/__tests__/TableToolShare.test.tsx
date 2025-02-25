@@ -19,7 +19,7 @@ const permalinkService = _permalinkService as jest.Mocked<
 >;
 
 const tableQuery: ReleaseTableDataQuery = {
-  releaseId: 'release-1',
+  releaseVersionId: 'release-1',
   ...testQuery,
 };
 
@@ -53,7 +53,7 @@ describe('TableToolShare', () => {
       expect(permalinkService.createPermalink).toHaveBeenCalledWith<
         Parameters<typeof permalinkService.createPermalink>
       >({
-        releaseId: 'release-1',
+        releaseVersionId: 'release-1',
         query: tableQuery,
         configuration: {
           tableHeaders: mapUnmappedTableHeaders(testTableHeaders),

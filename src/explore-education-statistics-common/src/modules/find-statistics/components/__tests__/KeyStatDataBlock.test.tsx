@@ -79,7 +79,7 @@ describe('KeyStatDataBlock', () => {
 
     render(
       <KeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataBlockParentId="block-1"
         trend="Down from 620,330 in 2017"
         guidanceTitle="What is the number of applications received?"
@@ -117,7 +117,7 @@ describe('KeyStatDataBlock', () => {
 
     render(
       <KeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataBlockParentId="block-1"
         trend="Down from 620,330 in 2017"
         guidanceTitle={undefined}
@@ -157,7 +157,7 @@ describe('KeyStatDataBlock', () => {
 
     render(
       <KeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataBlockParentId="block-1"
         guidanceTitle="This shouldn't appear"
       />,
@@ -193,7 +193,7 @@ describe('KeyStatDataBlock', () => {
 
     render(
       <KeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataBlockParentId="block-1"
         trend="Down from 620,330 in 2017"
         guidanceTitle="What is the number of applications received?"
@@ -235,7 +235,7 @@ describe('KeyStatDataBlock', () => {
 
     render(
       <KeyStatDataBlock
-        releaseId="release-1"
+        releaseVersionId="release-1"
         dataBlockParentId="block-1"
         trend="Down from 620,330 in 2017"
         guidanceTitle="What is the number of applications received?"

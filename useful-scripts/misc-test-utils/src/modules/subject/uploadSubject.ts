@@ -6,7 +6,7 @@ import { projectRoot } from '../../config';
 import commonService from '../../services/commonService';
 import ZipDirectory from '../../utils/zipDirectory';
 import subjectService from '../../services/subjectService';
-import releaseService from '../../services/releaseService';
+import releaseVersionService from '../../services/releaseVersionService';
 import sleep from '../../utils/sleep';
 import spinner from '../../utils/spinner';
 import logger from '../../utils/logger';
@@ -39,7 +39,7 @@ const uploadSingleSubject = async (releaseId: string, fast: boolean) => {
 
   const subjectArray = await subjectService.getSubjectIdArr(releaseId);
 
-  await releaseService.addDataGuidance(
+  await releaseVersionService.addDataGuidance(
     subjectArray as { id: string; content: string }[],
     releaseId,
   );

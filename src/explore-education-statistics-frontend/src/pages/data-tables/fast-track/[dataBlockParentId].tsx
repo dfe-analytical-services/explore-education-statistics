@@ -19,7 +19,6 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> =
         publicationFilter: 'FastTrack',
       }),
     ]);
-
     if (!fastTrack) {
       throw new Error('Fast track not found');
     }

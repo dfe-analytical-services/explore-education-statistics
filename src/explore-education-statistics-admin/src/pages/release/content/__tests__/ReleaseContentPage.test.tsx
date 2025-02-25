@@ -841,7 +841,7 @@ describe('ReleaseContentPage', () => {
     initialEntries: string[] = [
       generatePath<ReleaseRouteParams>(releaseContentRoute.path, {
         publicationId: 'publication-1',
-        releaseId: 'release-1',
+        releaseVersionId: 'release-1',
       }),
     ],
   ) => {

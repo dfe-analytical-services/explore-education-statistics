@@ -67,7 +67,7 @@ const ReleaseContentAccordionSection = ({
 
   const addBlock = useCallback(async () => {
     await actions.addContentSectionBlock({
-      releaseId: release.id,
+      releaseVersionId: release.id,
       sectionId,
       sectionKey: 'content',
       block: {
@@ -81,7 +81,7 @@ const ReleaseContentAccordionSection = ({
   const addEmbedBlock = useCallback(
     async (embedBlock: EditableEmbedFormValues) => {
       await actions.addEmbedSectionBlock({
-        releaseId: release.id,
+        releaseVersionId: release.id,
         sectionId,
         sectionKey: 'content',
         request: {
@@ -97,7 +97,7 @@ const ReleaseContentAccordionSection = ({
   const attachDataBlock = useCallback(
     async (contentBlockId: string) => {
       await actions.attachContentSectionBlock({
-        releaseId: release.id,
+        releaseVersionId: release.id,
         sectionId,
         sectionKey: 'content',
         block: {
@@ -116,7 +116,7 @@ const ReleaseContentAccordionSection = ({
     }, {});
 
     await actions.updateSectionBlockOrder({
-      releaseId: release.id,
+      releaseVersionId: release.id,
       sectionId,
       sectionKey: 'content',
       order,
@@ -128,7 +128,7 @@ const ReleaseContentAccordionSection = ({
       await actions.updateContentSectionHeading({
         sectionId,
         title,
-        releaseId: release.id,
+        releaseVersionId: release.id,
       });
     },
     [actions, sectionId, release.id],
@@ -137,7 +137,7 @@ const ReleaseContentAccordionSection = ({
   const handleRemoveSection = useCallback(async () => {
     await actions.removeContentSection({
       sectionId,
-      releaseId: release.id,
+      releaseVersionId: release.id,
     });
   }, [actions, sectionId, release.id]);
 
@@ -191,7 +191,7 @@ const ReleaseContentAccordionSection = ({
             renderBlock={block => (
               <ReleaseBlock
                 block={block}
-                releaseId={release.id}
+                releaseVersionId={release.id}
                 transformFeaturedTableLinks={transformFeaturedTableLinks}
                 visible={open}
               />
@@ -205,7 +205,7 @@ const ReleaseContentAccordionSection = ({
                 sectionKey="content"
                 editable={!isReordering}
                 publicationId={release.publication.id}
-                releaseId={release.id}
+                releaseVersionId={release.id}
                 visible={open}
               />
             )}
@@ -216,7 +216,7 @@ const ReleaseContentAccordionSection = ({
               {showDataBlockForm && (
                 <DataBlockSelectForm
                   id={`dataBlockSelectForm-${sectionId}`}
-                  releaseId={release.id}
+                  releaseVersionId={release.id}
                   onSelect={async selectedDataBlockId => {
                     await attachDataBlock(selectedDataBlockId);
                     toggleDataBlockForm.off();

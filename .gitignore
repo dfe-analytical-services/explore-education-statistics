@@ -98,4 +98,4 @@ src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.IdpBootstrapUse
 **/*/tempkey.rsa
 
 ## IDE Files (e.g. local Visual Studio configuration)
-*.csproj.user
+*.user

@@ -30,7 +30,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
 
   const { publicApiUrl, publicApiDocsUrl } = useConfig();
 
-  const { dataSetId, previewTokenId, releaseId, publicationId } =
+  const { dataSetId, previewTokenId, releaseVersionId, publicationId } =
     useParams<ReleaseDataSetPreviewTokenRouteParams>();
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
@@ -45,7 +45,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     releaseApiDataSetDetailsRoute.path,
     {
       publicationId,
-      releaseId,
+      releaseVersionId,
       dataSetId,
     },
   );
@@ -54,7 +54,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     releaseApiDataSetPreviewTokenLogRoute.path,
     {
       publicationId,
-      releaseId,
+      releaseVersionId,
       dataSetId,
     },
   );

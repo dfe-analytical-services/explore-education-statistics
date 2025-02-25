@@ -2,9 +2,9 @@ import baseRender from '@common-test/render';
 import PublicationUnpublishedReleases from '@admin/pages/publication/components/PublicationUnpublishedReleases';
 import _publicationService from '@admin/services/publicationService';
 import _releaseService, {
-  ReleasePermissions,
-  ReleaseSummaryWithPermissions,
-} from '@admin/services/releaseService';
+  ReleaseVersionPermissions,
+  ReleaseVersionSummaryWithPermissions,
+} from '@admin/services/releaseVersionService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -16,13 +16,15 @@ const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
 
-jest.mock('@admin/services/releaseService');
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
+jest.mock('@admin/services/releaseVersionService');
+const releaseVersionService = _releaseService as jest.Mocked<
+  typeof _releaseService
+>;
 
 describe('PublicationUnpublishedReleases', () => {
   const testPublicationId = 'publication-1';
 
-  const testPermissions: ReleasePermissions = {
+  const testPermissions: ReleaseVersionPermissions = {
     canAddPrereleaseUsers: false,
     canUpdateRelease: true,
     canDeleteRelease: true,
@@ -30,7 +32,7 @@ describe('PublicationUnpublishedReleases', () => {
     canViewRelease: true,
   };
 
-  const testRelease1: ReleaseSummaryWithPermissions = {
+  const testRelease1: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
     id: 'release-1',
@@ -49,7 +51,7 @@ describe('PublicationUnpublishedReleases', () => {
     latestRelease: false,
   };
 
-  const testRelease2: ReleaseSummaryWithPermissions = {
+  const testRelease2: ReleaseVersionSummaryWithPermissions = {
     amendment: false,
     approvalStatus: 'Draft',
     id: 'release-2',
@@ -67,7 +69,7 @@ describe('PublicationUnpublishedReleases', () => {
     latestRelease: false,
   };
 
-  const testRelease3: ReleaseSummaryWithPermissions = {
+  const testRelease3: ReleaseVersionSummaryWithPermissions = {
     amendment: true,
     approvalStatus: 'HigherLevelReview',
     id: 'release-3',
@@ -85,21 +87,22 @@ describe('PublicationUnpublishedReleases', () => {
     latestRelease: false,
   };
 
-  const testReleasesPage1: PaginatedList<ReleaseSummaryWithPermissions> = {
-    paging: {
-      page: 1,
-      pageSize: 20,
-      totalPages: 1,
-      totalResults: 3,
-    },
-    results: [testRelease1, testRelease2, testRelease3],
-  };
+  const testReleasesPage1: PaginatedList<ReleaseVersionSummaryWithPermissions> =
+    {
+      paging: {
+        page: 1,
+        pageSize: 20,
+        totalPages: 1,
+        totalResults: 3,
+      },
+      results: [testRelease1, testRelease2, testRelease3],
+    };
 
   beforeEach(() => {
-    releaseService.getReleaseStatus.mockResolvedValue({
+    releaseVersionService.getReleaseVersionStatus.mockResolvedValue({
       overallStage: 'Complete',
     });
-    releaseService.getReleaseChecklist.mockResolvedValue({
+    releaseVersionService.getReleaseVersionChecklist.mockResolvedValue({
       errors: [],
       valid: true,
       warnings: [],
@@ -249,7 +252,7 @@ describe('PublicationUnpublishedReleases', () => {
 
   test('calls `onAmendmentDelete` handler when amendment is deleted', async () => {
     publicationService.listReleases.mockResolvedValue(testReleasesPage1);
-    releaseService.getDeleteReleasePlan.mockResolvedValue({
+    releaseVersionService.getDeleteReleaseVersionPlan.mockResolvedValue({
       scheduledMethodologies: [],
     });
 
