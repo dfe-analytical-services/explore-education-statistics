@@ -1,5 +1,5 @@
 module GovukTechDocs
-  module PathHelpers
+  module PatchedPathHelpers
     # Monkey patch this function as it doesn't correctly generate
     # paths when using relative links. This means that the TOC
     # won't open correctly on the current page as the paths are wrong.
@@ -10,5 +10,9 @@ module GovukTechDocs
         super
       end
     end
+  end
+
+  module PathHelpers
+    prepend PatchedPathHelpers
   end
 end
