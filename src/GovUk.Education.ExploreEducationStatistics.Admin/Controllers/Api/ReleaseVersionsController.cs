@@ -48,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _dataImportService = dataImportService;
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpDelete("release/{releaseVersionId:guid}")]
         public async Task<ActionResult> DeleteReleaseVersion(
             Guid releaseVersionId,
@@ -58,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpPost("release/{releaseVersionId:guid}/amendment")]
         public async Task<ActionResult<IdViewModel>> CreateReleaseAmendment(Guid releaseVersionId)
         {
@@ -66,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}")]
         public async Task<ActionResult<DataFileInfo>> GetDataFileInfo(Guid releaseVersionId, Guid fileId)
         {
@@ -74,6 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("release/{releaseVersionId:guid}/data")]
         public async Task<ActionResult<List<DataFileInfo>>> GetDataFileInfo(Guid releaseVersionId)
         {
@@ -82,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpPut("release/{releaseVersionId:guid}/data/order")]
         public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(Guid releaseVersionId,
             List<Guid> fileIds)
@@ -91,6 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpPost("release/{releaseVersionId:guid}/data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
@@ -111,6 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpPost("release/{releaseVersionId:guid}/zip-data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
@@ -129,6 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpPost("release/{releaseVersionId:guid}/upload-bulk-zip-data")]
         [DisableRequestSizeLimit]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
@@ -142,6 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpPost("release/{releaseVersionId:guid}/import-bulk-zip-data")]
         public async Task<ActionResult<List<DataFileInfo>>> ImportBulkZipDataSetsFromTempStorage(
             Guid releaseVersionId,
@@ -153,6 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("releases/{releaseVersionId:guid}")]
         public async Task<ActionResult<ReleaseVersionViewModel>> GetReleaseVersion(Guid releaseVersionId)
         {
@@ -161,6 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("releases/{releaseVersionId:guid}/status")]
         public async Task<ActionResult<List<ReleaseStatusViewModel>>> ListReleaseStatuses(Guid releaseVersionId)
         {
@@ -169,6 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("releases/{releaseVersionId:guid}/publication-status")]
         public async Task<ActionResult<ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(
             Guid releaseVersionId)
@@ -187,6 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpPost("releases/{releaseVersionId:guid}/status")]
         public async Task<ActionResult<ReleaseVersionViewModel>> CreateReleaseStatus(ReleaseStatusCreateRequest request,
             Guid releaseVersionId)
@@ -197,6 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("publications/{publicationId:guid}/releases/template")]
         public async Task<ActionResult<IdTitleViewModel>> GetTemplateRelease(
             [Required] Guid publicationId)
@@ -206,6 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("releases/draft")]
         public async Task<ActionResult<List<ReleaseVersionSummaryViewModel>>> ListDraftReleases()
         {
@@ -214,6 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("releases/approvals")]
         public async Task<ActionResult<List<ReleaseVersionSummaryViewModel>>> ListUsersReleasesForApproval()
         {
@@ -222,6 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("releases/scheduled")]
         public async Task<ActionResult<List<ReleaseVersionSummaryViewModel>>> ListScheduledReleases()
         {
@@ -230,6 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}/import/status")]
         public Task<ActionResult<DataImportStatusViewModel>> GetDataUploadStatus(Guid releaseVersionId, Guid fileId)
         {
@@ -239,6 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("release/{releaseVersionId:guid}/delete-plan")]
         public async Task<ActionResult<DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
             Guid releaseVersionId,
@@ -249,6 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}/delete-plan")]
         public async Task<ActionResult<DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
             Guid releaseVersionId,
@@ -263,6 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpDelete("release/{releaseVersionId:guid}/data/{fileId:guid}")]
         public async Task<ActionResult> DeleteDataFiles(Guid releaseVersionId, Guid fileId)
         {
@@ -272,6 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpPost("release/{releaseVersionId:guid}/data/{fileId:guid}/import/cancel")]
         public async Task<ActionResult> CancelFileImport(Guid releaseVersionId, Guid fileId)
         {
@@ -281,6 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(_ => new AcceptedResult());
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("releases/{releaseVersionId:guid}/stage-status")]
         public async Task<ActionResult<ReleasePublishingStatusViewModel>> GetReleaseStatusesAsync(Guid releaseVersionId)
         {
@@ -289,6 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpGet("releases/{releaseVersionId:guid}/checklist")]
         public async Task<ActionResult<ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId)
         {
@@ -297,6 +321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        // We intend to change this route, to make these endpoints more consistent, as per EES-5895
         [HttpPatch("releases/{releaseVersionId:guid}/published")]
         public async Task<ActionResult> UpdateReleasePublished(Guid releaseVersionId,
             ReleasePublishedUpdateRequest request)
