@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 $"{AppendPathSeparator(staging ? PublicContentStagingPath() : null)}publications/{publicationSlug.TrimToLower()}";
         }
 
-        private static string PublicContentReleaseParentPath(string publicationSlug, string releaseSlug)
+        public static string PublicContentReleaseParentPath(string publicationSlug, string releaseSlug)
         {
             return
                 $"{PublicContentPublicationParentPath(publicationSlug)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}";

@@ -345,7 +345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             var methodologyService = new Mock<IMethodologyService>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
-            var releaseService = new Mock<IReleaseService>(Strict);
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             await using (var contentContext = InMemoryApplicationDbContext(contextId))
             {
@@ -353,9 +353,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentContext,
                     methodologyService: methodologyService.Object,
                     publishingService: publishingService.Object,
-                    releaseService: releaseService.Object);
+                    releaseVersionService: releaseVersionService.Object);
 
-                releaseService
+                releaseVersionService
                     .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
                     .ReturnsAsync(Unit.Instance);
 
@@ -371,7 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(releaseDataFileService,
                     methodologyService,
                     publishingService,
-                    releaseService);
+                    releaseVersionService);
 
                 result.AssertRight();
 
@@ -447,7 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
-            var releaseService = new Mock<IReleaseService>(Strict);
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             var publicDataDbContext = new Mock<PublicDataDbContext>();
             publicDataDbContext.SetupGet(c => c.DataSetVersions).ReturnsDbSet(dataSetVersions);
@@ -458,7 +458,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext: contentContext,
                     publicDataDbContext: publicDataDbContext.Object,
                     publishingService: publishingService.Object,
-                    releaseService: releaseService.Object);
+                    releaseVersionService: releaseVersionService.Object);
 
                 var releaseVersionDeleteSequence = new MockSequence();
 
@@ -471,7 +471,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     };
 
                 releaseVersionIdsInExpectedDeleteOrder.ForEach(releaseVersionId =>
-                    releaseService
+                    releaseVersionService
                         .InSequence(releaseVersionDeleteSequence)
                         .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
                         .ReturnsAsync(Unit.Instance));
@@ -483,7 +483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(releaseDataFileService,
                     publishingService,
-                    releaseService);
+                    releaseVersionService);
 
                 result.AssertRight();
             }
@@ -556,14 +556,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
-            var releaseService = new Mock<IReleaseService>(Strict);
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             await using (var contentContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupThemeService(
                     contentDbContext: contentContext,
                     publishingService: publishingService.Object,
-                    releaseService: releaseService.Object);
+                    releaseVersionService: releaseVersionService.Object);
 
                 var releaseVersionDeleteSequence = new MockSequence();
 
@@ -580,7 +580,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     };
 
                 releaseVersionIdsInExpectedDeleteOrder.ForEach(releaseVersionId =>
-                    releaseService
+                    releaseVersionService
                         .InSequence(releaseVersionDeleteSequence)
                         .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
                         .ReturnsAsync(Unit.Instance));
@@ -592,7 +592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(releaseDataFileService,
                     publishingService,
-                    releaseService);
+                    releaseVersionService);
 
                 result.AssertRight();
             }
@@ -658,19 +658,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var publishingService = new Mock<IPublishingService>(Strict);
-            var releaseService = new Mock<IReleaseService>(Strict);
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             await using (var contentContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupThemeService(
                     contentContext,
                     publishingService: publishingService.Object,
-                    releaseService: releaseService.Object);
+                    releaseVersionService: releaseVersionService.Object);
 
                 var releaseVersionDeleteSequence = new MockSequence();
 
                 releaseVersionIdsInExpectedDeleteOrder.ForEach(releaseVersionId =>
-                    releaseService
+                    releaseVersionService
                         .InSequence(releaseVersionDeleteSequence)
                         .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
                         .ReturnsAsync(Unit.Instance));
@@ -682,7 +682,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(
                     publishingService,
-                    releaseService);
+                    releaseVersionService);
 
                 result.AssertRight();
 
@@ -816,7 +816,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             var methodologyService = new Mock<IMethodologyService>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
-            var releaseService = new Mock<IReleaseService>(Strict);
+            var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
             await using (var contentContext = InMemoryApplicationDbContext(contextId))
             {
@@ -824,7 +824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentContext,
                     methodologyService: methodologyService.Object,
                     publishingService: publishingService.Object,
-                    releaseService: releaseService.Object);
+                    releaseVersionService: releaseVersionService.Object);
 
                 methodologyService
                     .Setup(s => s.DeleteMethodology(methodology.Id, true))
@@ -833,7 +833,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
                     .ReturnsAsync(Unit.Instance);
 
-                releaseService
+                releaseVersionService
                     .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
                     .ReturnsAsync(Unit.Instance);
 
@@ -842,7 +842,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(releaseDataFileService,
                     methodologyService,
                     publishingService,
-                    releaseService);
+                    releaseVersionService);
 
                 result.AssertRight();
 
@@ -960,7 +960,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IMethodologyService? methodologyService = null,
             IPublishingService? publishingService = null,
-            IReleaseService? releaseService = null,
+            IReleaseVersionService? releaseVersionService = null,
             bool enableThemeDeletion = true)
         {
             contentDbContext ??= new Mock<ContentDbContext>().Object;
@@ -983,7 +983,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
-                releaseService ?? Mock.Of<IReleaseService>(Strict)
+                releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict)
             );
         }
     }

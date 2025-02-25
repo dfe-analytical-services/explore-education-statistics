@@ -79,22 +79,14 @@ export interface ReleaseVersionSummaryWithPermissions
   permissions: ReleaseVersionPermissions;
 }
 
-interface BaseReleaseVersionRequest {
+export interface UpdateReleaseVersionRequest {
+  preReleaseAccessList?: string;
   year: number;
   timePeriodCoverage: {
     value: string;
   };
   type: ReleaseType;
   label?: string;
-}
-
-export interface CreateReleaseVersionRequest extends BaseReleaseVersionRequest {
-  publicationId: string;
-  templateReleaseId?: string;
-}
-
-export interface UpdateReleaseVersionRequest extends BaseReleaseVersionRequest {
-  preReleaseAccessList?: string;
 }
 
 export interface CreateReleaseVersionStatusRequest {
@@ -210,15 +202,6 @@ export interface DeleteReleasePlan {
 }
 
 const releaseVersionService = {
-  createReleaseVersion(
-    createRequest: CreateReleaseVersionRequest,
-  ): Promise<ReleaseVersion> {
-    return client.post(
-      `/publications/${createRequest.publicationId}/releases`,
-      createRequest,
-    );
-  },
-
   getReleaseVersion(id: string): Promise<ReleaseVersion> {
     return client.get(`/releases/${id}`);
   },
@@ -231,7 +214,7 @@ const releaseVersionService = {
     id: string,
     updateRequest: UpdateReleaseVersionRequest,
   ): Promise<ReleaseVersion> {
-    return client.put(`/releases/${id}`, updateRequest);
+    return client.put(`/releaseVersions/${id}`, updateRequest);
   },
 
   createReleaseVersionStatus(

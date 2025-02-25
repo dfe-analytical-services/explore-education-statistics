@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
+#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -12,19 +13,6 @@ public static class ReleaseCreateRequestValidator
     public static Either<ActionResult, Unit> Validate(ReleaseCreateRequest releaseCreateRequest)
     {
         if (releaseCreateRequest.Type == ReleaseType.ExperimentalStatistics)
-        {
-            return ValidationActionResult(ReleaseTypeInvalid);
-        }
-
-        return Unit.Instance;
-    }
-}
-
-public static class ReleaseUpdateRequestValidator
-{
-    public static Either<ActionResult, Unit> Validate(ReleaseUpdateRequest releaseUpdateRequest)
-    {
-        if (releaseUpdateRequest.Type == ReleaseType.ExperimentalStatistics)
         {
             return ValidationActionResult(ReleaseTypeInvalid);
         }

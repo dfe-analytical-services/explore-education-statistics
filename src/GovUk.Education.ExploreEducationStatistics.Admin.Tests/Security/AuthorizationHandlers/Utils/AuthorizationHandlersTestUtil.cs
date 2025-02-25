@@ -1,18 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlerContextFactory;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils
@@ -188,6 +192,89 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             ClaimsPrincipal user, TEntity entity) where TRequirement : IAuthorizationRequirement
         {
             return CreateAuthContext<TRequirement, TEntity>(user, entity);
+        }
+
+        public static async Task AssertHandlerSucceedsWithPublicationRoles<TEntity, TRequirement>(
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+            TEntity entity,
+            Guid publicationId,
+            params PublicationRole[] publicationRolesExpectedToPass)
+            where TRequirement : IAuthorizationRequirement
+        {
+            var user = DataFixture.AuthenticatedUser().Generate();
+
+            await ForEachPublicationRoleAsync(async role =>
+            {
+                // Test the handler succeeds with the Owner role on the Publication for the User
+                await AssertHandlerHandlesPublicationRoleScenarioSuccessfully<TRequirement>(handlerSupplier,
+                    new PublicationRoleTestScenario
+                    {
+                        User = user,
+                        Entity = entity,
+                        // Setup a UserPublicationRole for this Publication and User
+                        UserPublicationRoles = ListOf(
+                            new UserPublicationRole
+                            {
+                                PublicationId = publicationId,
+                                UserId = user.GetUserId(),
+                                Role = role
+                            }),
+                        ExpectedToPass = publicationRolesExpectedToPass.Contains(role),
+                        UnexpectedFailMessage =
+                            $"Expected having role {role} on the Publication to have made the handler succeed",
+                    });
+
+                await ForEachPublicationRoleAsync(async role =>
+                {
+                    // Test the handler fails without the role on the correct Publication or the correct User
+                    await AssertHandlerHandlesPublicationRoleScenarioSuccessfully<TRequirement>(handlerSupplier,
+                        new PublicationRoleTestScenario
+                        {
+                            User = user,
+                            Entity = entity,
+                            // Setup a UserPublicationRole for this Publication but a different User
+                            UserPublicationRoles = ListOf(
+                                new UserPublicationRole
+                                {
+                                    PublicationId = publicationId,
+                                    UserId = Guid.NewGuid(),
+                                    Role = role
+                                },
+                                // Setup a UserPublicationRoles for this User but a different Publication
+                                new UserPublicationRole
+                                {
+                                    PublicationId = Guid.NewGuid(),
+                                    UserId = user.GetUserId(),
+                                    Role = role
+                                }),
+                            ExpectedToPass = false,
+                            UnexpectedPassMessage =
+                                $"Expected not having {role} role on the Publication would have made the handler fail"
+                        });
+                });
+            });
+        }
+
+        private static async Task AssertHandlerHandlesPublicationRoleScenarioSuccessfully<TRequirement>(
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+            PublicationRoleTestScenario scenario) where TRequirement : IAuthorizationRequirement
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                if (scenario.UserPublicationRoles != null)
+                {
+                    await context.AddRangeAsync(scenario.UserPublicationRoles);
+                    await context.SaveChangesAsync();
+                }
+            }
+
+            using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var handler = handlerSupplier(context);
+                await AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario);
+            }
         }
 
         public class HandlerTestScenario
