@@ -30,7 +30,7 @@ class KeywordListener:
             )
 
     def end_keyword(self, name, attributes):
-        if attributes["status"] == "FAIL":
+        if attributes["status"] == "FAIL" and attributes["kwname"] != "Record Test Failure":
             args_and_value_string = self.get_args_and_values_string(attributes)
             self.logger.warning(
                 f'\tFAILED KEYWORD: {attributes["kwname"]}\t\t{args_and_value_string}\t\tfile://{attributes["source"]} line {attributes["lineno"]}'

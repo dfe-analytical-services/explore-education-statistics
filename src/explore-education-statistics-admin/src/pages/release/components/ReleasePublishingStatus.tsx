@@ -1,22 +1,22 @@
 import useReleasePublishingStatus from '@admin/pages/release/hooks/useReleasePublishingStatus';
 import ReleasePublishingStatusTag from '@admin/pages/release/components/ReleasePublishingStatusTag';
 import ReleasePublishingStages from '@admin/pages/release/components/ReleasePublishingStages';
-import { ReleaseStageStatus } from '@admin/services/releaseService';
+import { ReleaseVersionStageStatus } from '@admin/services/releaseVersionService';
 import React from 'react';
 
 interface ReleasePublishingStatusProps {
-  releaseId: string;
+  releaseVersionId: string;
   refreshPeriod?: number;
-  onChange?: (status: ReleaseStageStatus) => void;
+  onChange?: (status: ReleaseVersionStageStatus) => void;
 }
 
 export default function ReleasePublishingStatus({
-  releaseId,
+  releaseVersionId,
   refreshPeriod,
   onChange,
 }: ReleasePublishingStatusProps) {
   const { currentStatus, currentStatusDetail } = useReleasePublishingStatus({
-    releaseId,
+    releaseVersionId,
     refreshPeriod,
     onChange,
   });

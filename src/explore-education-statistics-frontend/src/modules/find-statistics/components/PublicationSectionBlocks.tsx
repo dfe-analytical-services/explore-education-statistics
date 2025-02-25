@@ -6,7 +6,7 @@ import DataBlockTabs from '@frontend/modules/find-statistics/components/DataBloc
 import EmbedBlock from '@common/modules/find-statistics/components/EmbedBlock';
 import ExploreDataButton from '@frontend/modules/find-statistics/components/ExploreDataButton';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
-import { Release } from '@common/services/publicationService';
+import { ReleaseVersion } from '@common/services/publicationService';
 import { Block } from '@common/services/types/blocks';
 import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
@@ -14,20 +14,20 @@ import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 
 export interface PublicationSectionBlocksProps {
-  release: Release;
+  releaseVersion: ReleaseVersion;
   blocks: Block[];
   visible?: boolean;
 }
 
 const PublicationSectionBlocks = ({
-  release,
+  releaseVersion,
   blocks,
   visible,
 }: PublicationSectionBlocksProps) => {
-  const getReleaseFile = useGetReleaseFile(release.id);
+  const getReleaseFile = useGetReleaseFile(releaseVersion.id);
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
-    releaseId: release.id,
+    releaseVersionId: releaseVersion.id,
     rootUrl: process.env.CONTENT_API_BASE_URL.replace('/api', ''),
   });
 
@@ -47,7 +47,7 @@ const PublicationSectionBlocks = ({
             <Gate condition={!!visible} key={block.id}>
               <DataBlockTabs
                 dataBlock={block}
-                releaseId={release.id}
+                releaseVersionId={releaseVersion.id}
                 getInfographic={getReleaseFile}
                 onToggle={section => {
                   logEvent({

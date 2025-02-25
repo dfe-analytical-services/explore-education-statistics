@@ -1,5 +1,5 @@
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
-import { Release } from '@common/services/publicationService';
+import { ReleaseVersion } from '@common/services/publicationService';
 import { FileInfo } from '@common/services/types/file';
 import { within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
@@ -54,7 +54,7 @@ describe('ReleaseDataAndFiles', () => {
       slug: 'publication-1',
     },
     slug: 'release-1',
-  } as Release;
+  } as ReleaseVersion;
 
   const mockAllFilesButton = <a href="#">Mock download all data (zip)</a>;
   const mockCreateTablesButton = <a href="#">Mock create tables button</a>;

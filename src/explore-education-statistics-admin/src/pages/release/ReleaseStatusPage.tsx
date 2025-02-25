@@ -2,15 +2,15 @@ import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import ReleasePublishingStatus from '@admin/pages/release/components/ReleasePublishingStatus';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
 import permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
-import releaseService, {
-  ReleaseStageStatus,
+import releaseVersionService, {
+  ReleaseVersionStageStatus,
   ReleaseStatus,
-} from '@admin/services/releaseService';
+} from '@admin/services/releaseVersionService';
 import Button from '@common/components/Button';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -43,37 +43,37 @@ export default function ReleaseStatusPage() {
   const lastLocation = useLastLocation();
 
   const {
-    releaseId,
-    release: contextRelease,
+    releaseVersionId,
+    releaseVersion: contextRelease,
     onReleaseChange,
-  } = useReleaseContext();
+  } = useReleaseVersionContext();
 
-  const { value: release, setState: setRelease } = useAsyncHandledRetry(
+  const { value: releaseVersion, setState: setRelease } = useAsyncHandledRetry(
     async () =>
       lastLocation && lastLocation !== location
-        ? releaseService.getRelease(releaseId)
+        ? releaseVersionService.getReleaseVersion(releaseVersionId)
         : contextRelease,
-    [releaseId],
+    [releaseVersionId],
   );
 
   const { value: releaseStatuses } = useAsyncRetry<ReleaseStatus[]>(
-    () => releaseService.getReleaseStatuses(releaseId),
-    [releaseId, release],
+    () => releaseVersionService.getReleaseVersionStatuses(releaseVersionId),
+    [releaseVersionId, releaseVersion],
   );
 
   const { value: statusPermissions } = useAsyncRetry<ReleaseStatusPermissions>(
-    () => permissionService.getReleaseStatusPermissions(releaseId),
+    () => permissionService.getReleaseStatusPermissions(releaseVersionId),
   );
 
   const { publicAppUrl } = useConfig();
 
-  const handlePublishingStatusChange = (status: ReleaseStageStatus) => {
+  const handlePublishingStatusChange = (status: ReleaseVersionStageStatus) => {
     if (status.overallStage === 'Complete') {
       onReleaseChange();
     }
   };
 
-  if (!release) {
+  if (!releaseVersion) {
     return <LoadingSpinner />;
   }
 
@@ -84,7 +84,7 @@ export default function ReleaseStatusPage() {
   if (isEditing && statusPermissions) {
     return (
       <ReleaseStatusEditPage
-        release={release}
+        releaseVersion={releaseVersion}
         statusPermissions={statusPermissions}
         onCancel={toggleEditing.off}
         onUpdate={nextRelease => {
@@ -106,35 +106,39 @@ export default function ReleaseStatusPage() {
       <UrlContainer
         className="govuk-!-margin-bottom-4"
         id="public-release-url"
-        url={`${publicAppUrl}/find-statistics/${release.publicationSlug}/${release.slug}`}
+        url={`${publicAppUrl}/find-statistics/${releaseVersion.publicationSlug}/${releaseVersion.slug}`}
       />
 
       <SummaryList>
         <SummaryListItem term="Current status">
           <StatusBlock
-            text={statusMap[release.approvalStatus]}
-            id={`CurrentReleaseStatus-${statusMap[release.approvalStatus]}`}
+            text={statusMap[releaseVersion.approvalStatus]}
+            id={`CurrentReleaseStatus-${
+              statusMap[releaseVersion.approvalStatus]
+            }`}
           />
         </SummaryListItem>
-        {release.approvalStatus === 'Approved' && (
+        {releaseVersion.approvalStatus === 'Approved' && (
           <SummaryListItem term="Release process status">
             <ReleasePublishingStatus
-              releaseId={releaseId}
+              releaseVersionId={releaseVersionId}
               refreshPeriod={1000}
               onChange={handlePublishingStatusChange}
             />
           </SummaryListItem>
         )}
         <SummaryListItem term="Scheduled release">
-          {release.publishScheduled ? (
-            <FormattedDate>{parseISO(release.publishScheduled)}</FormattedDate>
+          {releaseVersion.publishScheduled ? (
+            <FormattedDate>
+              {parseISO(releaseVersion.publishScheduled)}
+            </FormattedDate>
           ) : (
             'Not scheduled'
           )}
         </SummaryListItem>
         <SummaryListItem term="Next release expected">
-          {isValidPartialDate(release.nextReleaseDate) ? (
-            <time>{formatPartialDate(release.nextReleaseDate)}</time>
+          {isValidPartialDate(releaseVersion.nextReleaseDate) ? (
+            <time>{formatPartialDate(releaseVersion.nextReleaseDate)}</time>
           ) : (
             'Not set'
           )}

@@ -1,23 +1,23 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
-import releaseService from '@admin/services/releaseService';
+import releaseVersionService from '@admin/services/releaseVersionService';
 
 const releaseQueries = createQueryKeys('release', {
-  listDraftReleases: {
+  listDraftReleaseVersions: {
     queryKey: null,
-    queryFn: () => releaseService.listDraftReleases(),
+    queryFn: () => releaseVersionService.listDraftReleaseVersions(),
   },
-  listScheduledReleases: {
+  listScheduledReleaseVersions: {
     queryKey: null,
-    queryFn: () => releaseService.listScheduledReleases(),
+    queryFn: () => releaseVersionService.listScheduledReleaseVersions(),
   },
-  listReleasesForApproval: {
+  listReleaseVersionsForApproval: {
     queryKey: null,
-    queryFn: () => releaseService.listReleasesForApproval(),
+    queryFn: () => releaseVersionService.listReleaseVersionsForApproval(),
   },
-  get(releaseId: string) {
+  get(id: string) {
     return {
-      queryKey: [releaseId],
-      queryFn: () => releaseService.getRelease(releaseId),
+      queryKey: [id],
+      queryFn: () => releaseVersionService.getReleaseVersion(id),
     };
   },
 });

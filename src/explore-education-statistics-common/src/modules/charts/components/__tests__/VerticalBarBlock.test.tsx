@@ -1,6 +1,8 @@
 import {
   testChartConfiguration,
   testChartTableData,
+  testEmptyChartConfiguration,
+  testEmptyChartTableData,
 } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import VerticalBarBlock, {
@@ -64,6 +66,27 @@ describe('VerticalBarBlock', () => {
         15,
       );
     });
+  });
+
+  test('does not render the chart if there is no chart data', async () => {
+    const emptyFullTable = mapFullTable(testEmptyChartTableData);
+    const emptyChartProps: VerticalBarProps = {
+      ...testEmptyChartConfiguration,
+      legend: testEmptyChartConfiguration.legend as LegendConfiguration,
+      axes: testEmptyChartConfiguration.axes as VerticalBarProps['axes'],
+      meta: emptyFullTable.subjectMeta,
+      data: emptyFullTable.results,
+      dataLabelPosition: 'outside',
+    };
+    const { container } = render(<VerticalBarBlock {...emptyChartProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No data to display.')).toBeInTheDocument();
+    });
+
+    expect(
+      container.querySelector('.recharts-wrapper'),
+    ).not.toBeInTheDocument();
   });
 
   test('major axis can be hidden', () => {

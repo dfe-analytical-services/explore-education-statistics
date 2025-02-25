@@ -70,7 +70,7 @@ function formatNumber(
 
   let formattedNumber: string;
 
-  if (typeof decimalPlaces === 'undefined') {
+  if (typeof decimalPlaces === 'undefined' || Math.sign(decimalPlaces) === -1) {
     const minDecimalPlaces = clamp(
       countDecimalPlaces(value) ?? 0,
       0,

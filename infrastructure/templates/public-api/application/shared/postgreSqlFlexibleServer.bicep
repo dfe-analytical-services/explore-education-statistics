@@ -82,13 +82,11 @@ module storeDataProcessorPsqlConnectionString '../../components/keyVaultSecret.b
   name: 'storeDataProcessorPsqlConnectionString'
   params: {
     keyVaultName: resourceNames.existingResources.keyVault
-    isEnabled: true
     secretName: dataProcessorPsqlConnectionStringSecretKey
     secretValue: createManagedIdentityConnectionString(
       connectionStringTemplate,
       resourceNames.publicApi.dataProcessorIdentity
     )
-    contentType: 'text/plain'
   }
 }
 
@@ -98,13 +96,11 @@ module storePublisherPsqlConnectionString '../../components/keyVaultSecret.bicep
   name: 'storePublisherPsqlConnectionString'
   params: {
     keyVaultName: resourceNames.existingResources.keyVault
-    isEnabled: true
     secretName: publisherPsqlConnectionStringSecretKey
     secretValue: createManagedIdentityConnectionString(
       connectionStringTemplate,
       resourceNames.existingResources.publisherFunction
     )
-    contentType: 'text/plain'
   }
 }
 
@@ -114,13 +110,11 @@ module storeAdminPsqlConnectionString '../../components/keyVaultSecret.bicep' = 
   name: 'storeAdminPsqlConnectionString'
   params: {
     keyVaultName: resourceNames.existingResources.keyVault
-    isEnabled: true
     secretName: adminPsqlConnectionStringSecretKey
     secretValue: createManagedIdentityConnectionString(
       connectionStringTemplate,
       resourceNames.existingResources.adminApp
     ) 
-    contentType: 'text/plain'
   }
 }
 

@@ -23,20 +23,20 @@ interface Props {
   publicationContributors: UserReleaseRole[];
   publicationId: string;
   releaseContributors: UserReleaseRole[];
-  releaseId: string;
+  releaseVersionId: string;
 }
 
 const PublicationReleaseContributorsForm = ({
   publicationContributors,
   publicationId,
   releaseContributors,
-  releaseId,
+  releaseVersionId,
 }: Props) => {
   const history = useHistory();
 
   const handleSubmit = async (values: FormValues) => {
     await releasePermissionService.updateReleaseContributors(
-      releaseId,
+      releaseVersionId,
       values.userIds,
     );
     history.push(
@@ -44,7 +44,7 @@ const PublicationReleaseContributorsForm = ({
         publicationTeamAccessRoute.path,
         {
           publicationId,
-          releaseId,
+          releaseVersionId,
         },
       ),
     );
@@ -63,7 +63,7 @@ const PublicationReleaseContributorsForm = ({
                 publicationTeamAccessRoute.path,
                 {
                   publicationId,
-                  releaseId,
+                  releaseVersionId,
                 },
               ),
             );
@@ -112,7 +112,7 @@ const PublicationReleaseContributorsForm = ({
                       publicationTeamAccessRoute.path,
                       {
                         publicationId,
-                        releaseId,
+                        releaseVersionId,
                       },
                     ),
                   );

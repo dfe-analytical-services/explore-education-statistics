@@ -14,7 +14,7 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 >;
 
 describe('getInitialStepSubjectMeta', () => {
-  test('returns `initialStep` of 1 when query does not have a `releaseId`', async () => {
+  test('returns `initialStep` of 1 when query does not have a `releaseVersionId`', async () => {
     const query: ReleaseTableDataQuery = {
       subjectId: '',
       filters: [],
@@ -31,7 +31,7 @@ describe('getInitialStepSubjectMeta', () => {
 
   test('returns `initialStep` of 2 when query does not have a `subjectId`', async () => {
     const query: ReleaseTableDataQuery = {
-      releaseId: 'release-1',
+      releaseVersionId: 'release-1',
       subjectId: '',
       filters: [],
       indicators: [],
@@ -71,7 +71,7 @@ describe('getInitialStepSubjectMeta', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(subjectMeta);
 
     const query: ReleaseTableDataQuery = {
-      releaseId: 'release-1',
+      releaseVersionId: 'release-1',
       subjectId: 'subject-1',
       locationIds: [],
       indicators: [],
@@ -106,7 +106,7 @@ describe('getInitialStepSubjectMeta', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(subjectMeta);
 
     const query: ReleaseTableDataQuery = {
-      releaseId: 'release-1',
+      releaseVersionId: 'release-1',
       subjectId: 'subject-1',
       locationIds: ['england'],
       indicators: [],
@@ -152,7 +152,7 @@ describe('getInitialStepSubjectMeta', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(subjectMeta);
 
     const query: ReleaseTableDataQuery = {
-      releaseId: 'release-1',
+      releaseVersionId: 'release-1',
       subjectId: 'subject-1',
       locationIds: ['england', 'sheffield', 'barnsley'],
       indicators: [],
@@ -246,7 +246,7 @@ describe('getInitialStepSubjectMeta', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(subjectMeta);
 
     const query: ReleaseTableDataQuery = {
-      releaseId: 'release-1',
+      releaseVersionId: 'release-1',
       subjectId: 'subject-1',
       locationIds: ['england'],
       timePeriod: {

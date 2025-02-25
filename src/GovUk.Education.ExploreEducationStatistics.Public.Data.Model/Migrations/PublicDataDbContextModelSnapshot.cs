@@ -227,10 +227,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AutoSelectLabel")
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)");
-
                     b.Property<string>("Column")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -241,6 +237,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
+
+                    b.Property<int?>("DefaultOptionId")
+                        .HasMaxLength(120)
+                        .HasColumnType("integer");
 
                     b.Property<string>("Hint")
                         .IsRequired()
@@ -260,6 +260,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DefaultOptionId");
 
                     b.HasIndex("DataSetVersionId", "Column")
                         .IsUnique();
@@ -984,7 +986,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMeta", "DefaultOption")
+                        .WithMany()
+                        .HasForeignKey("DefaultOptionId");
+
                     b.Navigation("DataSetVersion");
+
+                    b.Navigation("DefaultOption");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMetaChange", b =>

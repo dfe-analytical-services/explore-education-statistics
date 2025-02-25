@@ -484,7 +484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddHttpClient<IPublicDataApiClient, PublicDataApiClient>((provider, httpClient) =>
                 {
                     var options = provider.GetRequiredService<IOptions<PublicDataApiOptions>>();
-                    httpClient.BaseAddress = new Uri(options.Value.Url);
+                    httpClient.BaseAddress = new Uri(options.Value.PrivateUrl);
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, SecurityConstants.AdminUserAgent);
                 });
 

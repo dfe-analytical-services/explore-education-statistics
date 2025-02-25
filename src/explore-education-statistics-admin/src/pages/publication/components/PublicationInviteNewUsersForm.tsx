@@ -3,7 +3,7 @@ import {
   publicationTeamAccessRoute,
 } from '@admin/routes/publicationRoutes';
 import { Publication } from '@admin/services/publicationService';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import userService from '@admin/services/userService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -39,14 +39,14 @@ export const errorMappings = [
 
 interface Props {
   publication: Publication;
-  releases: ReleaseSummary[];
-  releaseId: string;
+  releases: ReleaseVersionSummary[];
+  releaseVersionId: string;
 }
 
 const PublicationInviteNewUsersForm = ({
   publication,
   releases,
-  releaseId,
+  releaseVersionId,
 }: Props) => {
   const history = useHistory();
 
@@ -61,7 +61,7 @@ const PublicationInviteNewUsersForm = ({
         publicationTeamAccessRoute.path,
         {
           publicationId: publication.id,
-          releaseId,
+          releaseVersionId,
         },
       ),
     );
@@ -126,7 +126,7 @@ const PublicationInviteNewUsersForm = ({
                         publicationTeamAccessRoute.path,
                         {
                           publicationId: publication.id,
-                          releaseId,
+                          releaseVersionId,
                         },
                       ),
                     );

@@ -24,7 +24,7 @@ import DataFilesTable from './DataFilesTable';
 
 interface Props {
   publicationId: string;
-  releaseId: string;
+  releaseVersionId: string;
   canUpdateRelease: boolean;
   onDataFilesChange?: (dataFiles: DataFile[]) => void;
 }
@@ -36,7 +36,7 @@ interface DeleteDataFile {
 
 export default function ReleaseDataUploadsSection({
   publicationId,
-  releaseId,
+  releaseVersionId,
   canUpdateRelease,
   onDataFilesChange,
 }: Props) {
@@ -49,7 +49,7 @@ export default function ReleaseDataUploadsSection({
     data: initialDataFiles,
     isLoading,
     refetch: refetchDataFiles,
-  } = useQuery(releaseDataFileQueries.list(releaseId));
+  } = useQuery(releaseDataFileQueries.list(releaseVersionId));
 
   // Store the data files on state so we can reliably update them
   // when the permissions/status change.
@@ -87,14 +87,14 @@ export default function ReleaseDataUploadsSection({
   const confirmBulkUploadPlan = useCallback(
     async (archiveDataSetFiles: ArchiveDataSetFile[]) => {
       await releaseDataFileService.importBulkZipDataFile(
-        releaseId,
+        releaseVersionId,
         archiveDataSetFiles,
       );
 
       setBulkUploadPlan(undefined);
       await refetchDataFiles();
     },
-    [releaseId, setBulkUploadPlan, refetchDataFiles],
+    [releaseVersionId, setBulkUploadPlan, refetchDataFiles],
   );
 
   const handleStatusChange = useCallback(
@@ -108,7 +108,7 @@ export default function ReleaseDataUploadsSection({
       }
 
       const permissions = await permissionService.getDataFilePermissions(
-        releaseId,
+        releaseVersionId,
         dataFile.id,
       );
 
@@ -125,20 +125,20 @@ export default function ReleaseDataUploadsSection({
         ),
       );
     },
-    [releaseId],
+    [releaseVersionId],
   );
 
   const handleDeleteFile = useCallback(
     async (dataFile: DataFile) => {
       setDeleteDataFile({
         plan: await releaseDataFileService.getDeleteDataFilePlan(
-          releaseId,
+          releaseVersionId,
           dataFile,
         ),
         file: dataFile,
       });
     },
-    [releaseId],
+    [releaseVersionId],
   );
 
   const handleDeleteConfirm = useCallback(async () => {
@@ -152,7 +152,7 @@ export default function ReleaseDataUploadsSection({
     setFileDeleting(deleteDataFile, true);
 
     try {
-      await releaseDataFileService.deleteDataFiles(releaseId, file.id);
+      await releaseDataFileService.deleteDataFiles(releaseVersionId, file.id);
 
       setAllDataFiles(files =>
         files.filter(dataFile => dataFile.id !== file.id),
@@ -161,7 +161,7 @@ export default function ReleaseDataUploadsSection({
       logger.error(err);
       setFileDeleting(deleteDataFile, false);
     }
-  }, [deleteDataFile, releaseId, setFileDeleting]);
+  }, [deleteDataFile, releaseVersionId, setFileDeleting]);
 
   const handleDeleteExit = useCallback(() => {
     setDeleteDataFile(undefined);
@@ -175,7 +175,7 @@ export default function ReleaseDataUploadsSection({
             return;
           }
 
-          await releaseDataFileService.uploadDataFiles(releaseId, {
+          await releaseDataFileService.uploadDataFiles(releaseVersionId, {
             title: values.title,
             dataFile: values.dataFile as File,
             metadataFile: values.metadataFile as File,
@@ -188,7 +188,7 @@ export default function ReleaseDataUploadsSection({
           if (!values.title) {
             return;
           }
-          await releaseDataFileService.uploadZipDataFile(releaseId, {
+          await releaseDataFileService.uploadZipDataFile(releaseVersionId, {
             title: values.title,
             zipFile: values.zipFile as File,
           });
@@ -199,7 +199,7 @@ export default function ReleaseDataUploadsSection({
         case 'bulkZip': {
           const uploadPlan =
             await releaseDataFileService.getUploadBulkZipDataFilePlan(
-              releaseId,
+              releaseVersionId,
               values.bulkZipFile!,
             );
 
@@ -210,20 +210,20 @@ export default function ReleaseDataUploadsSection({
           break;
       }
     },
-    [releaseId, refetchDataFiles],
+    [releaseVersionId, refetchDataFiles],
   );
 
   const handleConfirmReordering = useCallback(
     async (nextDataFiles: DataFile[]) => {
       setAllDataFiles(
         await releaseDataFileService.updateDataFilesOrder(
-          releaseId,
+          releaseVersionId,
           nextDataFiles.map(file => file.id),
         ),
       );
       toggleReordering.off();
     },
-    [releaseId, toggleReordering],
+    [releaseVersionId, toggleReordering],
   );
 
   return (
@@ -305,7 +305,7 @@ export default function ReleaseDataUploadsSection({
                     caption="Data file replacements"
                     dataFiles={replacedDataFiles}
                     publicationId={publicationId}
-                    releaseId={releaseId}
+                    releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
                     onDeleteFile={handleDeleteFile}
                     onStatusChange={handleStatusChange}
@@ -318,7 +318,7 @@ export default function ReleaseDataUploadsSection({
                     caption="Data files"
                     dataFiles={dataFiles}
                     publicationId={publicationId}
-                    releaseId={releaseId}
+                    releaseVersionId={releaseVersionId}
                     testId="Data files table"
                     onDeleteFile={handleDeleteFile}
                     onStatusChange={handleStatusChange}

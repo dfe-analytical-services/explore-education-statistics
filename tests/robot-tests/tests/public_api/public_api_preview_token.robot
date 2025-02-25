@@ -62,6 +62,9 @@ Create API data set
     user chooses select option    name:releaseFileId    ${SUBJECT_NAME_1}
     user clicks button    Confirm new API data set
 
+    user waits until page contains    Creating API data set
+    user clicks link    View API data set details
+
     user waits until page finishes loading
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
@@ -150,9 +153,10 @@ User revokes preview token
     user clicks button    Confirm
     user waits until page finishes loading
     user waits until modal is not visible    Revoke preview token    %{WAIT_LONG}
-    user waits until page contains    Generate API data set preview token
+    user waits until page contains    API data set preview token log
 
 User again clicks on 'Generate preview token'
+    user clicks link    Generate preview token
     user clicks button    Generate preview token
 
 User creates another preview token through 'Generate preview token' modal window

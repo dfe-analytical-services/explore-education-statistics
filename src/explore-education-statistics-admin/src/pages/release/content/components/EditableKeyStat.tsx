@@ -12,7 +12,7 @@ interface EditableKeyStatProps {
   isEditing?: boolean;
   keyStat: KeyStatistic;
   keyStats: KeyStatistic[];
-  releaseId: string;
+  releaseVersionId: string;
   testId?: string;
 }
 
@@ -20,7 +20,7 @@ const EditableKeyStat = ({
   isEditing = false,
   keyStat,
   keyStats,
-  releaseId,
+  releaseVersionId,
   testId = 'keyStat',
 }: EditableKeyStatProps) => {
   const {
@@ -36,16 +36,16 @@ const EditableKeyStat = ({
         <EditableKeyStatDataBlock
           keyStat={keyStat}
           keyStats={keyStats}
-          releaseId={releaseId}
+          releaseVersionId={releaseVersionId}
           testId={testId}
           isEditing={isEditing}
           onRemove={async () => {
             await deleteKeyStatistic({
-              releaseId,
+              releaseVersionId,
               keyStatisticId: keyStat.id,
             });
             await updateUnattachedDataBlocks({
-              releaseId,
+              releaseVersionId,
             });
           }}
           onSubmit={async values => {
@@ -54,7 +54,7 @@ const EditableKeyStat = ({
             };
 
             await updateKeyStatisticDataBlock({
-              releaseId,
+              releaseVersionId,
               keyStatisticId: keyStat.id,
               request,
             });
@@ -70,7 +70,7 @@ const EditableKeyStat = ({
           isEditing={isEditing}
           onRemove={async () => {
             await deleteKeyStatistic({
-              releaseId,
+              releaseVersionId,
               keyStatisticId: keyStat.id,
             });
           }}
@@ -79,7 +79,7 @@ const EditableKeyStat = ({
               ...values,
             };
             await updateKeyStatisticText({
-              releaseId,
+              releaseVersionId,
               keyStatisticId: keyStat.id,
               request,
             });

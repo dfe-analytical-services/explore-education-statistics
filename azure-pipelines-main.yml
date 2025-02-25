@@ -471,7 +471,8 @@ jobs:
         inputs:
           workingDirectory: $(WorkingDirectory)
           targetType: inline
-          script: | 
+          script: |
+            set -e
             bundle exec middleman build
             # Remove afterwards as we don't want it in the artifact
             rm -rf build

@@ -1319,10 +1319,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // The release version should remain unchanged from the original release version.
                 // Additionally, no new ReleaseStatus entries were added.
                 saved.AssertDeepEqualTo(releaseVersion,
-                    notEqualProperties: AssertExtensions.Except<ReleaseVersion>(
+                    ignoreProperties:
+                    [
                         rv => rv.Release,
                         rv => rv.Publication
-                    ));
+                    ]);
 
                 // Furthermore, we have proven that the Publisher was not informed of the change, as it
                 // did not complete.
@@ -1429,10 +1430,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // The release version should remain unchanged from the original release version.
                 // Additionally, no new ReleaseStatus entries were added.
                 saved.AssertDeepEqualTo(releaseVersion,
-                    notEqualProperties: AssertExtensions.Except<ReleaseVersion>(
+                    ignoreProperties:
+                    [
                         rv => rv.Release,
                         rv => rv.Publication
-                    ));
+                    ]);
 
                 // We have also shown that unfortunately the invite emails would have been sent out despite the
                 // approval failing, but we have more importantly stopped a release version from only having been partially

@@ -24,7 +24,7 @@ describe('PublicationInviteNewUsersForm', () => {
       <PublicationInviteNewUsersForm
         publication={publication}
         releases={testReleaseSummaries}
-        releaseId={currentReleaseId}
+        releaseVersionId={currentReleaseId}
       />,
     );
 
@@ -85,7 +85,7 @@ describe('PublicationInviteNewUsersForm', () => {
       <PublicationInviteNewUsersForm
         publication={publication}
         releases={testReleaseSummaries}
-        releaseId={currentReleaseId}
+        releaseVersionId={currentReleaseId}
       />,
     );
 
@@ -114,7 +114,7 @@ describe('PublicationInviteNewUsersForm', () => {
       <PublicationInviteNewUsersForm
         publication={publication}
         releases={testReleaseSummaries}
-        releaseId={currentReleaseId}
+        releaseVersionId={currentReleaseId}
       />,
     );
 

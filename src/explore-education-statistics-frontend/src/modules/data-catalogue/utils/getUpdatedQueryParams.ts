@@ -9,31 +9,32 @@ export default async function getUpdatedQueryParams({
   filterType,
   nextValue,
   query,
-  releaseId,
+  releaseVersionId,
   sortBy,
   onFetchReleases,
 }: {
   filterType: DataSetFileFilter;
   nextValue: string;
   query: ParsedUrlQuery;
-  releaseId?: string;
+  releaseVersionId?: string;
   sortBy?: DataSetFileSortOption;
   onFetchReleases?: () => Promise<ReleaseSummary[]>;
 }): Promise<DataCataloguePageQuery> {
-  if (filterType === 'releaseId') {
-    const filterByReleaseId = nextValue !== 'latest' && nextValue !== 'all';
+  if (filterType === 'releaseVersionId') {
+    const filterByReleaseVersionId =
+      nextValue !== 'latest' && nextValue !== 'all';
 
     return {
       ...omit(query, [
         'page',
-        ...(filterByReleaseId
+        ...(filterByReleaseVersionId
           ? ['latest', 'latestOnly', 'sortBy']
-          : ['releaseId']),
+          : ['releaseVersionId']),
       ]),
-      ...(!filterByReleaseId && {
+      ...(!filterByReleaseVersionId && {
         latestOnly: nextValue === 'latest' ? 'true' : 'false',
       }),
-      ...(filterByReleaseId && { [filterType]: nextValue }),
+      ...(filterByReleaseVersionId && { [filterType]: nextValue }),
     };
   }
 
@@ -42,7 +43,7 @@ export default async function getUpdatedQueryParams({
       ...omit(query, [
         filterType,
         'page',
-        'releaseId',
+        'releaseVersionId',
         ...(filterType === 'themeId' ? ['publicationId'] : []),
       ]),
       sortBy,
@@ -55,8 +56,10 @@ export default async function getUpdatedQueryParams({
     return {
       ...omit(query, 'page', 'latestOnly'),
       [filterType]: nextValue,
-      releaseId: releaseData?.find(release =>
-        releaseId ? release.id === releaseId : release.latestRelease,
+      releaseVersionId: releaseData?.find(release =>
+        releaseVersionId
+          ? release.id === releaseVersionId
+          : release.latestRelease,
       )?.id,
       ...(sortBy !== 'newest' && { sortBy }),
     };
@@ -65,7 +68,9 @@ export default async function getUpdatedQueryParams({
   return {
     ...omit(query, [
       'page',
-      ...(filterType === 'themeId' ? ['publicationId', 'releaseId'] : []),
+      ...(filterType === 'themeId'
+        ? ['publicationId', 'releaseVersionId']
+        : []),
     ]),
     [filterType]: nextValue,
     sortBy: filterType === 'searchTerm' ? 'relevance' : sortBy,

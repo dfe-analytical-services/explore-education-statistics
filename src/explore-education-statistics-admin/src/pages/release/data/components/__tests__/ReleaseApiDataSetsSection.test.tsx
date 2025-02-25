@@ -1,6 +1,6 @@
 import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
+import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import ReleaseApiDataSetsSection from '@admin/pages/release/data/components/ReleaseApiDataSetsSection';
 import _apiDataSetCandidateService, {
   ApiDataSetCandidate,
@@ -9,7 +9,7 @@ import _apiDataSetService, {
   ApiDataSetSummary,
 } from '@admin/services/apiDataSetService';
 import { GlobalPermissions } from '@admin/services/authService';
-import { Release } from '@admin/services/releaseService';
+import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render, { CustomRenderResult } from '@common-test/render';
 import { createMemoryHistory, History } from 'history';
 import { screen, waitFor, within } from '@testing-library/react';
@@ -184,7 +184,7 @@ describe('ReleaseApiDataSetsSection', () => {
     apiDataSetService.listDataSets.mockResolvedValue([]);
 
     renderPage({
-      release: {
+      releaseVersion: {
         ...testRelease,
         approvalStatus: 'Approved',
       },
@@ -245,7 +245,7 @@ describe('ReleaseApiDataSetsSection', () => {
     ).toBeInTheDocument();
   });
 
-  test('submitting the create version form calls the correct service and redirects to next page', async () => {
+  test('submitting the create version form calls the correct service and updates the modal', async () => {
     apiDataSetCandidateService.listCandidates.mockResolvedValue(testCandidates);
     apiDataSetService.listDataSets.mockResolvedValue([]);
     apiDataSetService.createDataSet.mockResolvedValue({
@@ -290,29 +290,29 @@ describe('ReleaseApiDataSetsSection', () => {
       });
     });
 
-    expect(history.location.pathname).toBe(
-      '/publication/publication-1/release/release-1/api-data-sets/data-set-id',
-    );
+    expect(
+      await screen.findByText('Creating API data set'),
+    ).toBeInTheDocument();
   });
 
   function renderPage(options?: {
-    release?: Release;
+    releaseVersion?: ReleaseVersion;
     user?: User;
     history?: History;
   }): CustomRenderResult {
     const {
-      release = testRelease,
+      releaseVersion = testRelease,
       user = testBauUser,
       history = createMemoryHistory(),
     } = options ?? {};
 
     return render(
       <AuthContextTestProvider user={user}>
-        <ReleaseContextProvider release={release}>
+        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
           <Router history={history}>
             <ReleaseApiDataSetsSection />
           </Router>
-        </ReleaseContextProvider>
+        </ReleaseVersionContextProvider>
       </AuthContextTestProvider>,
     );
   }

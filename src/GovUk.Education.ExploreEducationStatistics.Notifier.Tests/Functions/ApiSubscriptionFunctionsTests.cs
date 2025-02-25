@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Options;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Requests;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Validators;
@@ -542,8 +543,21 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
     public class NotifySubscribersTests(NotifierFunctionsIntegrationTestFixture fixture)
         : ApiSubscriptionFunctionsTests(fixture)
     {
-        [Fact]
-        public async Task Success()
+        [Theory]
+        [InlineData("2.0.0", "api-subscription-major-data-set-version-published-id")]
+        [InlineData("2.0", "api-subscription-major-data-set-version-published-id")]
+        [InlineData("3.0.0", "api-subscription-major-data-set-version-published-id")]
+        [InlineData("3.0", "api-subscription-major-data-set-version-published-id")]
+        [InlineData("1.1.0", "api-subscription-data-set-version-published-id")]
+        [InlineData("1.1", "api-subscription-data-set-version-published-id")]
+        [InlineData("1.0.1", "api-subscription-data-set-version-published-id")]
+        [InlineData("2.1.0", "api-subscription-data-set-version-published-id")]
+        [InlineData("2.1", "api-subscription-data-set-version-published-id")]
+        [InlineData("2.0.1", "api-subscription-data-set-version-published-id")]
+        [InlineData("1.0.0", "api-subscription-data-set-version-published-id")]
+        [InlineData("1.0", "api-subscription-data-set-version-published-id")]
+        [InlineData("0.0.1", "api-subscription-data-set-version-published-id")]
+        public async Task Success(string version, string templateId)
         {
             var subscription = new ApiSubscription
             {
@@ -553,20 +567,18 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 Status = ApiSubscriptionStatus.Subscribed,
                 Expiry = null
             };
-
             await CreateApiSubscription(subscription);
-
             string? unsubscribeUrl = null;
             fixture.NotificationClient
                 .Setup(mock => mock.SendEmail(
                     Email,
-                    GetGovUkNotifyOptions().EmailTemplates.ApiSubscriptionNotificationId,
+                    templateId,
                     It.Is<Dictionary<string, dynamic>>(personalisation =>
                         AssertEmailTemplateValues(
                             personalisation,
                             DataSetTitle,
                             $"{GetAppOptions().PublicAppUrl}/data-catalogue/data-set/{_dataSetFileId}",
-                            Version,
+                            version,
                             $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/")
                     ),
                     null,
@@ -585,7 +597,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             await NotifyApiSubscribers(
                 dataSetId: _dataSetId,
                 dataSetFileId: _dataSetFileId,
-                version: Version);
+                version: version);
 
             MockUtils.VerifyAllMocks(fixture.NotificationClient);
 
@@ -743,6 +755,56 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             await functions.RemoveExpiredSubscriptions(
                 timerInfo: timerInfo ?? new TimerInfo(),
                 cancellationToken: CancellationToken.None);
+        }
+    }
+
+    public class EmailTemplateOptions
+    {
+        [Theory]
+        [InlineData("2.0.0", "breaking-change-template-id")]
+        [InlineData("2.0", "breaking-change-template-id")]
+        [InlineData("3.0.0", "breaking-change-template-id")]
+        [InlineData("3.0", "breaking-change-template-id")]
+        [InlineData("1.1.0", "non-breaking-change-template-id")]
+        [InlineData("1.1", "non-breaking-change-template-id")]
+        [InlineData("1.0.1", "non-breaking-change-template-id")]
+        [InlineData("2.1.0", "non-breaking-change-template-id")]
+        [InlineData("2.1", "non-breaking-change-template-id")]
+        [InlineData("2.0.1", "non-breaking-change-template-id")]
+        [InlineData("1.0.0", "non-breaking-change-template-id")]
+        [InlineData("1.0", "non-breaking-change-template-id")]
+        [InlineData("0.0.1", "non-breaking-change-template-id")]
+        public void SelectDataSetPublishedTemplateID_ReturnsCorrectTemplateId(string version, string expectedTemplateId)
+        {
+            GovUkNotifyOptions govUkNotifyOptions = new()
+            {
+                EmailTemplates = new GovUkNotifyOptions.EmailTemplateOptions
+                {
+                    ApiSubscriptionMajorDataSetVersionPublishedId = "breaking-change-template-id",
+                    ApiSubscriptionDataSetVersionPublishedId = "non-breaking-change-template-id"
+                }
+            }; 
+            var templateId = govUkNotifyOptions.EmailTemplates.SelectDataSetPublishedTemplateId(version);
+            Assert.Equal(expectedTemplateId, templateId);
+        }
+
+        [Theory]
+        [InlineData("2.*.0")]
+        [InlineData("Not a version")]
+        [InlineData("1.1.1.1")]
+        [InlineData("")]
+        public void SelectDataSetPublishedTemplateID_ThrowsArgumentException(string version)
+        {
+            GovUkNotifyOptions govUkNotifyOptions = new()
+            {
+                EmailTemplates = new GovUkNotifyOptions.EmailTemplateOptions
+                {
+                    ApiSubscriptionMajorDataSetVersionPublishedId = "breaking-change-template-id",
+                    ApiSubscriptionDataSetVersionPublishedId = "non-breaking-change-template-id"
+                }
+            };
+            var exception = Assert.Throws<ArgumentException>(() => govUkNotifyOptions.EmailTemplates.SelectDataSetPublishedTemplateId(version));
+            Assert.Equal(ValidationMessages.InvalidDataSetVersion.Message, exception.Message);
         }
     }
 

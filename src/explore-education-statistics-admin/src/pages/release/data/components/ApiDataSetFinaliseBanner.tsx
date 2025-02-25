@@ -15,7 +15,7 @@ interface Props {
   dataSetVersionId: string;
   draftVersionStatus?: DataSetDraftVersionStatus;
   finalisingStatus?: DataSetFinalisingStatus;
-  releaseId: string;
+  releaseVersionId: string;
   publicationId: string;
   onFinalise: () => void;
 }
@@ -25,7 +25,7 @@ export default function ApiDataSetFinaliseBanner({
   dataSetVersionId,
   draftVersionStatus,
   finalisingStatus,
-  releaseId,
+  releaseVersionId,
   publicationId,
   onFinalise,
 }: Props) {
@@ -90,7 +90,7 @@ export default function ApiDataSetFinaliseBanner({
               releaseApiDataSetChangelogRoute.path,
               {
                 publicationId,
-                releaseId,
+                releaseVersionId,
                 dataSetId,
                 dataSetVersionId,
               },

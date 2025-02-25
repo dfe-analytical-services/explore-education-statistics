@@ -27,7 +27,7 @@ import { generatePath, RouteComponentProps } from 'react-router';
 const ReleaseDataFileReplacePage = ({
   history,
   match: {
-    params: { publicationId, releaseId, fileId },
+    params: { publicationId, releaseVersionId, fileId },
   },
 }: RouteComponentProps<ReleaseDataFileReplaceRouteParams>) => {
   const {
@@ -36,8 +36,8 @@ const ReleaseDataFileReplacePage = ({
     setState: setDataFile,
     retry: fetchDataFile,
   } = useAsyncHandledRetry(
-    () => releaseDataFileService.getDataFile(releaseId, fileId),
-    [releaseId, fileId],
+    () => releaseDataFileService.getDataFile(releaseVersionId, fileId),
+    [releaseVersionId, fileId],
   );
 
   const {
@@ -49,7 +49,10 @@ const ReleaseDataFileReplacePage = ({
     if (!dataFile?.replacedBy) {
       return undefined;
     }
-    return releaseDataFileService.getDataFile(releaseId, dataFile.replacedBy);
+    return releaseDataFileService.getDataFile(
+      releaseVersionId,
+      dataFile.replacedBy,
+    );
   }, [dataFile]);
 
   const handleStatusChange = async (
@@ -62,7 +65,7 @@ const ReleaseDataFileReplacePage = ({
         rows: totalRows,
         status,
         permissions: await permissionService.getDataFilePermissions(
-          releaseId,
+          releaseVersionId,
           file.id,
         ),
       },
@@ -74,7 +77,7 @@ const ReleaseDataFileReplacePage = ({
     { totalRows, status }: DataFileImportStatus,
   ) => {
     const permissions = await permissionService.getDataFilePermissions(
-      releaseId,
+      releaseVersionId,
       file.id,
     );
     setReplacementDataFile({
@@ -94,13 +97,13 @@ const ReleaseDataFileReplacePage = ({
     let file: DataFile;
 
     if (values.uploadType === 'csv') {
-      file = await releaseDataFileService.uploadDataFiles(releaseId, {
+      file = await releaseDataFileService.uploadDataFiles(releaseVersionId, {
         replacingFileId: currentFile.id,
         dataFile: values.dataFile as File,
         metadataFile: values.metadataFile as File,
       });
     } else {
-      file = await releaseDataFileService.uploadZipDataFile(releaseId, {
+      file = await releaseDataFileService.uploadZipDataFile(releaseVersionId, {
         replacingFileId: currentFile.id,
         zipFile: values.zipFile as File,
       });
@@ -116,7 +119,7 @@ const ReleaseDataFileReplacePage = ({
       value: {
         ...file,
         permissions: await permissionService.getDataFilePermissions(
-          releaseId,
+          releaseVersionId,
           file.id,
         ),
       },
@@ -132,7 +135,7 @@ const ReleaseDataFileReplacePage = ({
       onConfirm={async () => {
         if (replacementDataFile?.id) {
           await releaseDataFileService.deleteDataFiles(
-            releaseId,
+            releaseVersionId,
             replacementDataFile.id,
           );
         }
@@ -191,7 +194,7 @@ const ReleaseDataFileReplacePage = ({
         back
         to={generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
           publicationId,
-          releaseId,
+          releaseVersionId,
         })}
       >
         Back
@@ -212,7 +215,7 @@ const ReleaseDataFileReplacePage = ({
               <DataFileDetailsTable
                 dataFile={dataFile}
                 replacementDataFile={replacementDataFile}
-                releaseId={releaseId}
+                releaseVersionId={releaseVersionId}
                 onStatusChange={handleStatusChange}
                 onReplacementStatusChange={handleReplacementStatusChange}
               />
@@ -237,7 +240,7 @@ const ReleaseDataFileReplacePage = ({
                   <DataFileReplacementPlan
                     cancelButton={replacementCancelButton}
                     publicationId={publicationId}
-                    releaseId={releaseId}
+                    releaseVersionId={releaseVersionId}
                     fileId={dataFile.id}
                     replacementFileId={replacementDataFile.id}
                     onReplacement={() => {
@@ -246,7 +249,7 @@ const ReleaseDataFileReplacePage = ({
                           releaseDataFileReplacementCompleteRoute.path,
                           {
                             publicationId,
-                            releaseId,
+                            releaseVersionId,
                             fileId: replacementDataFile.id,
                           },
                         ),

@@ -2,7 +2,7 @@ export const dataSetFileFilters = [
   'dataSetType',
   'latest',
   'publicationId',
-  'releaseId',
+  'releaseVersionId',
   'geographicLevel',
   'searchTerm',
   'themeId',

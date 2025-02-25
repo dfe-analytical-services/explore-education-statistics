@@ -155,6 +155,7 @@ Add release note to amendment
 Check amendment has no prerelease users
     user clicks link    Pre-release access
     user waits until h2 is visible    Manage pre-release user access
+    user waits until page contains button    Invite new users
     user checks page contains    No pre-release users have been invited.
 
 Check that there is no Pre-release warning text on the sign off page during amendment

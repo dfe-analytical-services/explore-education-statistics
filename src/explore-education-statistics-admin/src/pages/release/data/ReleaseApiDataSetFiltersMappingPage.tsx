@@ -72,7 +72,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
     [],
   );
 
-  const { dataSetId, releaseId, publicationId } =
+  const { dataSetId, releaseVersionId, publicationId } =
     useParams<ReleaseDataSetRouteParams>();
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
@@ -303,7 +303,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
           releaseApiDataSetDetailsRoute.path,
           {
             publicationId,
-            releaseId,
+            releaseVersionId,
             dataSetId,
           },
         )}
@@ -537,7 +537,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   releaseApiDataSetDetailsRoute.path,
                   {
                     publicationId,
-                    releaseId,
+                    releaseVersionId,
                     dataSetId: dataSet.id,
                   },
                 )}

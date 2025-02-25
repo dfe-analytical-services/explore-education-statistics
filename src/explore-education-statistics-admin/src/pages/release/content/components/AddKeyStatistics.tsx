@@ -26,8 +26,11 @@ export default function AddKeyStatistics({ release }: Props) {
 
   const addKeyStatDataBlock = useCallback(
     async (dataBlockId: string) => {
-      await addKeyStatisticDataBlock({ releaseId: release.id, dataBlockId });
-      await updateUnattachedDataBlocks({ releaseId: release.id });
+      await addKeyStatisticDataBlock({
+        releaseVersionId: release.id,
+        dataBlockId,
+      });
+      await updateUnattachedDataBlocks({ releaseVersionId: release.id });
       setFormType(undefined);
     },
     [release.id, addKeyStatisticDataBlock, updateUnattachedDataBlocks],
@@ -36,7 +39,7 @@ export default function AddKeyStatistics({ release }: Props) {
   const addKeyStatText = useCallback(
     async (newKeyStatText: KeyStatisticTextCreateRequest) => {
       await addKeyStatisticText({
-        releaseId: release.id,
+        releaseVersionId: release.id,
         keyStatisticText: newKeyStatText,
       });
       setFormType(undefined);
@@ -56,7 +59,7 @@ export default function AddKeyStatistics({ release }: Props) {
             statistic.
           </WarningMessage>
           <KeyStatDataBlockSelectForm
-            releaseId={release.id}
+            releaseVersionId={release.id}
             onSelect={addKeyStatDataBlock}
             onCancel={() => setFormType(undefined)}
           />

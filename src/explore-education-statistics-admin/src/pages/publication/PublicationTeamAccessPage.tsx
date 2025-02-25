@@ -7,7 +7,7 @@ import {
 import publicationService, {
   PublicationPermissions,
 } from '@admin/services/publicationService';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -21,7 +21,7 @@ import ButtonLink from '@admin/components/ButtonLink';
 import PublicationReleaseAccess from '@admin/pages/publication/components/PublicationReleaseAccess';
 
 interface Model {
-  releases: ReleaseSummary[];
+  releases: ReleaseVersionSummary[];
   publicationRoles: UserPublicationRole[];
   publicationOwners: UserPublicationRole[];
   publicationApprovers: UserPublicationRole[];
@@ -32,9 +32,11 @@ const PublicationTeamAccessPage = ({
   match,
 }: RouteComponentProps<PublicationTeamRouteParams>) => {
   const history = useHistory();
-  const { releaseId } = match.params;
+  const { releaseVersionId } = match.params;
   const { publicationId, permissions } = usePublicationContext();
-  const [currentReleaseId, setCurrentReleaseId] = useState(releaseId ?? '');
+  const [currentReleaseId, setCurrentReleaseId] = useState(
+    releaseVersionId ?? '',
+  );
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const { results: releases } = await publicationService.listReleases(
@@ -42,7 +44,7 @@ const PublicationTeamAccessPage = ({
     );
     const publicationRoles = await publicationService.listRoles(publicationId);
 
-    if (!releaseId && releases.length) {
+    if (!releaseVersionId && releases.length) {
       setCurrentReleaseId(releases[0].id);
 
       history.replace(
@@ -50,7 +52,7 @@ const PublicationTeamAccessPage = ({
           publicationTeamAccessRoute.path,
           {
             publicationId,
-            releaseId: releases[0].id,
+            releaseVersionId: releases[0].id,
           },
         ),
       );
@@ -152,7 +154,7 @@ const PublicationTeamAccessPage = ({
               publicationInviteUsersPageRoute.path,
               {
                 publicationId,
-                releaseId: currentReleaseId,
+                releaseVersionId: currentReleaseId,
               },
             )}
           >
@@ -188,7 +190,7 @@ const PublicationTeamAccessPage = ({
                         publicationTeamAccessRoute.path,
                         {
                           publicationId,
-                          releaseId: e.target.value,
+                          releaseVersionId: e.target.value,
                         },
                       ),
                     );

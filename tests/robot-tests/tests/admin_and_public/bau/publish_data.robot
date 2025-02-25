@@ -550,6 +550,8 @@ Check other release is correct
     user checks page contains    View releases (1)
     user waits until page contains other release    ${RELEASE_2_NAME}
     user checks page does not contain other release    ${RELEASE_1_NAME}
+    user clicks link    View latest data: ${RELEASE_2_NAME}
+    user waits until page contains title caption    ${RELEASE_2_NAME}    %{WAIT_SMALL}
 
 Go to Table Tool page
     user navigates to data tables page on public frontend

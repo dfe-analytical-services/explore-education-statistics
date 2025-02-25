@@ -21,19 +21,19 @@ import { generatePath, RouteComponentProps } from 'react-router';
 const ReleaseFootnotesPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseId } = match.params;
+  const { publicationId, releaseVersionId } = match.params;
   const [isReordering, toggleIsReordering] = useToggle(false);
 
   const { value: canUpdateRelease = false, isLoading: isPermissionLoading } =
     useAsyncHandledRetry(
-      () => permissionService.canUpdateRelease(releaseId),
-      [releaseId],
+      () => permissionService.canUpdateRelease(releaseVersionId),
+      [releaseVersionId],
     );
 
   const { value: footnoteMeta, isLoading: isFootnoteMetaLoading } =
     useAsyncHandledRetry(
-      () => footnoteService.getFootnoteMeta(releaseId),
-      [releaseId],
+      () => footnoteService.getFootnoteMeta(releaseVersionId),
+      [releaseVersionId],
     );
 
   const {
@@ -41,8 +41,8 @@ const ReleaseFootnotesPage = ({
     setState: setFootnotes,
     isLoading: isFootnotesLoading,
   } = useAsyncHandledRetry(
-    () => footnoteService.getFootnotes(releaseId),
-    [releaseId],
+    () => footnoteService.getFootnotes(releaseVersionId),
+    [releaseVersionId],
   );
 
   const handleReorder = (reorderedFootnotes: Footnote[]) => {
@@ -53,7 +53,7 @@ const ReleaseFootnotesPage = ({
 
   const handleSaveOrder = async () => {
     await footnoteService.updateFootnotesOrder(
-      releaseId,
+      releaseVersionId,
       footnotes?.map(footnote => footnote.id) ?? [],
     );
   };
@@ -71,7 +71,7 @@ const ReleaseFootnotesPage = ({
           <Link
             to={generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
               publicationId,
-              releaseId,
+              releaseVersionId,
             })}
           >
             Data and files
@@ -96,7 +96,7 @@ const ReleaseFootnotesPage = ({
                   releaseFootnotesCreateRoute.path,
                   {
                     publicationId,
-                    releaseId,
+                    releaseVersionId,
                   },
                 )}
               >
@@ -118,7 +118,7 @@ const ReleaseFootnotesPage = ({
 
         <FootnotesList
           publicationId={publicationId}
-          releaseId={releaseId}
+          releaseVersionId={releaseVersionId}
           footnotes={footnotes}
           footnoteMeta={footnoteMeta}
           canUpdateRelease={canUpdateRelease}
@@ -128,7 +128,7 @@ const ReleaseFootnotesPage = ({
             toggleIsReordering();
           }}
           onDelete={async footnote => {
-            await footnoteService.deleteFootnote(releaseId, footnote.id);
+            await footnoteService.deleteFootnote(releaseVersionId, footnote.id);
             setFootnotes({
               value: footnotes?.filter(f => f.id !== footnote.id),
             });

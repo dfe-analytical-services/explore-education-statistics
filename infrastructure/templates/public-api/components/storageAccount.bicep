@@ -165,9 +165,7 @@ module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
   name: '${storageAccountName}ConnectionStringSecretDeploy'
   params: {
     keyVaultName: keyVaultName
-    isEnabled: true
     secretValue: storageAccountConnectionString
-    contentType: 'text/plain'
     secretName: connectionStringSecretName
   }
 }
@@ -178,9 +176,7 @@ module storeAccessKeyToKeyVault './keyVaultSecret.bicep' = {
   name: '${storageAccountName}AccessKeySecretDeploy'
   params: {
     keyVaultName: keyVaultName
-    isEnabled: true
     secretValue: key
-    contentType: 'text/plain'
     secretName: accessKeySecretName
   }
 }

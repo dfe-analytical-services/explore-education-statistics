@@ -514,7 +514,7 @@ describe('DataCataloguePage', () => {
         pathname: '/data-catalogue',
         query: {
           publicationId: 'publication-2',
-          releaseId: 'release-3',
+          releaseVersionId: 'release-3',
           themeId: 'theme-2',
         },
       });
@@ -702,7 +702,7 @@ describe('DataCataloguePage', () => {
         pathname: '/data-catalogue',
         query: {
           publicationId: 'publication-2',
-          releaseId: 'release-1',
+          releaseVersionId: 'release-1',
           themeId: 'theme-2',
         },
       });
@@ -1050,7 +1050,7 @@ describe('DataCataloguePage', () => {
 
     test('filters by theme id, publication id and release id', async () => {
       mockRouter.setCurrentUrl(
-        '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseId=release-1',
+        '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseVersionId=release-1',
       );
 
       dataSetService.listDataSetFiles.mockResolvedValueOnce({
@@ -1252,7 +1252,7 @@ describe('DataCataloguePage', () => {
     });
 
     test('does not filter by release id only', async () => {
-      mockRouter.setCurrentUrl('/data-catalogue?releaseId=release-1');
+      mockRouter.setCurrentUrl('/data-catalogue?releaseVersionId=release-1');
 
       dataSetService.listDataSetFiles.mockResolvedValueOnce({
         results: testDataSetFileSummaries,
@@ -1332,7 +1332,7 @@ describe('DataCataloguePage', () => {
 
     test('removing theme filter when also filtering by publication and release', async () => {
       mockRouter.setCurrentUrl(
-        '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseId=release-1',
+        '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseVersionId=release-1',
       );
 
       dataSetService.listDataSetFiles.mockResolvedValueOnce({
@@ -1421,7 +1421,7 @@ describe('DataCataloguePage', () => {
 
     test('removing publication filter when also filtering by release', async () => {
       mockRouter.setCurrentUrl(
-        '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseId=release-1',
+        '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseVersionId=release-1',
       );
 
       dataSetService.listDataSetFiles.mockResolvedValueOnce({
@@ -1487,7 +1487,7 @@ describe('DataCataloguePage', () => {
 
     test('removing release filter', async () => {
       mockRouter.setCurrentUrl(
-        '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseId=release-1',
+        '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseVersionId=release-1',
       );
 
       dataSetService.listDataSetFiles.mockResolvedValueOnce({
@@ -1579,7 +1579,7 @@ describe('DataCataloguePage', () => {
 
     test('removing all filters', async () => {
       mockRouter.setCurrentUrl(
-        '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseId=release-1',
+        '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseVersionId=release-1',
       );
 
       dataSetService.listDataSetFiles.mockResolvedValueOnce({

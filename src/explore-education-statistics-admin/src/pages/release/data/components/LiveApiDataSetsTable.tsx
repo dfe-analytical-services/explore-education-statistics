@@ -76,7 +76,7 @@ export default function LiveApiDataSetsTable({
                     releaseApiDataSetDetailsRoute.path,
                     {
                       publicationId,
-                      releaseId: releaseVersionId,
+                      releaseVersionId,
                       dataSetId: dataSet.id,
                     },
                   )}
@@ -94,7 +94,7 @@ export default function LiveApiDataSetsTable({
                         </>
                       }
                       publicationId={publicationId}
-                      releaseId={releaseVersionId}
+                      releaseVersionId={releaseVersionId}
                       submitText="Confirm new data set version"
                       title="Create a new API data set version"
                       onSubmit={async ({ releaseFileId }) => {
@@ -107,7 +107,7 @@ export default function LiveApiDataSetsTable({
                             releaseApiDataSetDetailsRoute.path,
                             {
                               publicationId,
-                              releaseId: releaseVersionId,
+                              releaseVersionId,
                               dataSetId: dataSet.id,
                             },
                           ),
