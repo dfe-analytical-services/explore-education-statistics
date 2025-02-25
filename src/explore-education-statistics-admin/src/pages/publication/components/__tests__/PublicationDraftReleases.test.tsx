@@ -15,7 +15,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('@admin/services/releaseVersionService');
 const releaseVersionService = _releaseVersionService as jest.Mocked<
-    typeof _releaseVersionService
+  typeof _releaseVersionService
 >;
 
 describe('PublicationDraftReleases', () => {
