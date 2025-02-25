@@ -38,12 +38,7 @@ public static class ProcessorHostBuilder
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
                     .AddTransient<IAnalyticsPathResolver, AnalyticsPathResolver>()
-                    .AddTransient<DuckDbConnection>(_ =>
-                    {
-                        var duckDbConnection = new DuckDbConnection();
-                        duckDbConnection.Open();
-                        return duckDbConnection;
-                    });
+                    .AddTransient<DuckDbConnection>(_ => new DuckDbConnection());
             });
     }
 }

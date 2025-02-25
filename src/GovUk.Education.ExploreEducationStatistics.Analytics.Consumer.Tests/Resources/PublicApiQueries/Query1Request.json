@@ -1,0 +1,66 @@
+{
+  "DataSetId": "01d29401-7274-a871-a8db-d4bc4e98c324",
+  "DataSetTitle": "Data Set 1",
+  "DataSetVersion": "1.2.0",
+  "DataSetVersionId": "01d29401-7974-1276-a06b-b28a6a5385c6",
+  "EndTime": "2025-02-24T03:07:44.850Z",
+  "Query": {
+    "Criteria": {
+      "Filters": {
+        "Eq": "qOnjG"
+      },
+      "Locations": {
+        "In": [
+          {
+            "Id": "7zXob",
+            "Level": "LA"
+          },
+          {
+            "Id": "it6Xr",
+            "Level": "LA"
+          },
+          {
+            "Id": "IzBzg",
+            "Level": "LA"
+          },
+          {
+            "Id": "pTSoj",
+            "Level": "LA"
+          },
+          {
+            "Id": "dP0Zw",
+            "Level": "NAT"
+          },
+          {
+            "Id": "6jrfe",
+            "Level": "REG"
+          },
+          {
+            "Id": "LxWjE",
+            "Level": "REG"
+          },
+          {
+            "Id": "0kT5D",
+            "Level": "SCH"
+          }
+        ]
+      },
+      "TimePeriods": {
+        "NotEq": {
+          "Code": "AY",
+          "Period": "2021/2022"
+        }
+      }
+    },
+    "Debug": false,
+    "Indicators": [
+      "7YFXo",
+      "dPe0Z"
+    ],
+    "Page": 1,
+    "PageSize": 1000
+  },
+  "ResultsCount": 44,
+  "StartTime": "2025-02-24T03:07:44.710Z",
+  "TotalRowsCount": 800
+}

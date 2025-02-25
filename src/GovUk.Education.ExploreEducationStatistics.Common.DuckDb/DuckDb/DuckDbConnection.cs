@@ -36,10 +36,10 @@ public class DuckDbConnection(string connectionString = DuckDBConnectionStringBu
         return command;
     }
     
-    public void ExecuteNonQuery(string commandText)
+    public int ExecuteNonQuery(string commandText)
     {
         var command = CreateCommand();
         command.CommandText = commandText;
-        command.ExecuteNonQuery();
+        return command.ExecuteNonQuery();
     }
 }
