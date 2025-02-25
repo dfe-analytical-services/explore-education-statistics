@@ -1,0 +1,20 @@
+variables:
+  BuildConfiguration: Release
+  ResourceGroupName: s101p01-rg-ees-common
+  AcrServiceConnection: s101p-common-datahub-spn-ees-dfe-gov-uk-service-connection # @MarkFix needs creating
+
+trigger: none
+    
+pool: ees-ubuntu2204-large
+
+steps:
+  - task: AzureResourceManagerTemplateDeployment@3
+    inputs:
+      deploymentName: 'DeployCommonResourceGroupTemplate'
+      deploymentMode: 'Incremental'
+      deploymentScope: 'Resource Group'
+      azureSubscription: ${AcrServiceConnection}
+      resourceGroupName: ${ResourceGroupName}
+      action: 'Create Or Update Resource Group'
+      templateLocation: 'Linked artifact'
+      csmFile: '${Build.SourcesDirectory}/infrastructure/templates/common-rg/common-rg.bicep'
