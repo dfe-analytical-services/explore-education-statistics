@@ -8,6 +8,13 @@ parameters:
       - Yes
       - No
     default: No
+  - name: deploySearchDocsFunction
+    displayName: Does the Search Docs Function need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No
   - name: deploySearchService
     displayName: Does the Search Service need creating or updating?
     type: string
@@ -51,6 +58,8 @@ variables:
     value: ubuntu-latest
   - name: deployAlerts
     value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
+  - name: deploySearchDocsFunction
+    value: ${{ iif(eq(parameters.deploySearchDocsFunction, 'Yes'), true, false) }}
   - name: deploySearchService
     value: ${{ iif(eq(parameters.deploySearchService, 'Yes'), true, false) }}
 

@@ -26,6 +26,9 @@ param dateProvisioned string = utcNow('u')
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
+@description('Does the Search Docs Function need creating or updating?')
+param deploySearchDocsFunction bool = false
+
 @description('Does the Search Service need creating or updating?')
 param deploySearchService bool = false
 
@@ -52,12 +55,24 @@ var resourceNames = {
     vNet: '${legacyResourcePrefix}-vnet-ees'
     alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
     subnets: {
+      searchDocsFunctionPrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-searchdocs-pep'
       searchDocsStoragePrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-searchdocs-pep'
     }
   }
   search: {
+    searchDocsFunction: '${resourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
     searchDocsStorageAccount: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocs'
     searchService: '${resourcePrefix}-${abbreviations.searchSearchServices}'
+  }
+}
+
+module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = if (deploySearchDocsFunction) {
+  name: 'searchDocsFunctionModule'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    tagValues: tagValues
+    deployAlerts: deployAlerts
   }
 }
 

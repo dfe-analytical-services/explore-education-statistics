@@ -36,6 +36,7 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
                 deploySearchService: false
+                deploySearchDocsFunction: false
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -44,3 +45,4 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
                 deploySearchService: $(deploySearchService)
+                deploySearchDocsFunction: $(deploySearchDocsFunction)
