@@ -1,0 +1,21 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "DurableManagementStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
+    "ReleaseVersionPublishedQueueName": "release-version-published-queue",
+    "SearchableDocumentCreatedQueueName": "search-document-created-queue"
+  },
+  "Host": {
+    "LocalHttpPort": 7074,
+    "CORS": "*"
+  },
+  "App": {
+    "SearchStorageConnectionString": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1;QueueEndpoint=http://data-storage:10001/devstoreaccount1;",
+    "SearchableDocumentsContainerName": "searchable-documents"
+  },
+  "ContentApi": {
+    "Url": "http://localhost:5010"
+  }
+}
