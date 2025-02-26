@@ -11,6 +11,8 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: deploySearchDocsFunction
+    type: string
   - name: deploySearchService
     type: string
 
@@ -34,4 +36,5 @@ steps:
               subscription='$(subscription)' \
               resourceTags='$(resourceTags)' \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
+              deploySearchDocsFunction=${{ parameters.deploySearchDocsFunction }} \
               deploySearchService=${{ parameters.deploySearchService }}
