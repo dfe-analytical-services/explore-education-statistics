@@ -350,3 +350,21 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?fun
     tagValues: tagValues
   }
 }
+
+// Container stuff
+@description('Specifies the login server from the registry.')
+@secure()
+param acrLoginServer string
+
+@description('Specifies the container image to deploy from the registry.')
+param containerAppImageName string
+
+@description('Specifies the container port.')
+param containerAppTargetPort int = 8080
+
+@description('The CORS policy to use for the Container App.')
+param corsPolicy {
+  allowedHeaders: string[]?
+  allowedMethods: string[]?
+  allowedOrigins: string[]?
+}
