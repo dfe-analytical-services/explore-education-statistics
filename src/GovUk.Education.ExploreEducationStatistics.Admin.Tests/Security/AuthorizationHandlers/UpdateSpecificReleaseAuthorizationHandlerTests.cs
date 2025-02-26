@@ -24,14 +24,14 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
     public class ClaimTests
     {
         [Fact]
-        public async Task UpdateAllPublications_ClaimSucceeds()
+        public async Task UpdateAllReleases_ClaimSucceeds()
         {
             Release release = DataFixture.DefaultRelease();
 
             await AssertHandlerSucceedsWithCorrectClaims<Release, UpdateSpecificReleaseRequirement>(
                 HandlerSupplier(release),
                 release,
-                SecurityClaimTypes.UpdateAllPublications
+                SecurityClaimTypes.UpdateAllReleases
             );
         }
     }

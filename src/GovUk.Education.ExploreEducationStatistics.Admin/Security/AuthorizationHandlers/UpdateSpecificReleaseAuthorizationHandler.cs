@@ -16,7 +16,7 @@ public class UpdateSpecificReleaseAuthorizationHandler(
         UpdateSpecificReleaseRequirement requirement,
         Release release)
     {
-        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.UpdateAllPublications))
+        if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.UpdateAllReleases))
         {
             context.Succeed(requirement);
             return;
