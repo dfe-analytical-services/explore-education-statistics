@@ -214,7 +214,7 @@ const releaseVersionService = {
     id: string,
     updateRequest: UpdateReleaseVersionRequest,
   ): Promise<ReleaseVersion> {
-    return client.put(`/releaseVersions/${id}`, updateRequest);
+    return client.patch(`/releaseVersions/${id}`, updateRequest);
   },
 
   createReleaseVersionStatus(
