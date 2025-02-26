@@ -31,7 +31,7 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
             await AssertHandlerSucceedsWithCorrectClaims<Release, UpdateSpecificReleaseRequirement>(
                 HandlerSupplier(release),
                 release,
-                SecurityClaimTypes.UpdateAllPublications
+                SecurityClaimTypes.UpdateAllReleases
             );
         }
     }
