@@ -1,0 +1,40 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+
+jobs:
+  - deployment: DeploySearchDocsFunction
+    displayName: Deploy Search Docs Function
+    condition: and(succeeded(), eq(variables.deploySearchDocsFunction, true))
+    dependsOn: ${{ parameters.dependsOn }}
+    environment: ${{ parameters.environment }}
+    pool:
+      vmImage: $(vmImageName)
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: MainBuild
+            displayName: Download Search Docs Function artifact
+            artifact: searchDocsFunction
+
+          - task: AzureCLI@2
+            displayName: 'Deploy using az cli'
+            retryCountOnTaskFailure: 1
+            inputs:
+              azureSubscription: ${{ parameters.serviceConnection }}
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                set -e
+                echo "Deploying Search Docs Function app using OneDeploy"
+                az functionapp deployment source config-zip \
+                  --resource-group $(resourceGroupName) \
+                  --name $(searchDocsFunctionAppName) \
+                  --src '$(Pipeline.Workspace)/MainBuild/searchDocsFunction/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.zip'

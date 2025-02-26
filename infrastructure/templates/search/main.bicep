@@ -26,6 +26,9 @@ param dateProvisioned string = utcNow('u')
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
+@description('Does the Search Docs Function need creating or updating?')
+param deploySearchDocsFunction bool = false
+
 @description('Does the Search Service need creating or updating?')
 param deploySearchService bool = false
 
@@ -44,6 +47,15 @@ var tagValues = union(resourceTags ?? {}, {
 // The resource prefix for resources created in the ARM template.
 var legacyResourcePrefix = subscription
 
+var maintenanceFirewallRules = [
+  for maintenanceIpRange in maintenanceIpRanges: {
+    name: maintenanceIpRange.name
+    cidr: maintenanceIpRange.cidr
+    tag: 'Default'
+    priority: 100
+  }
+]
+
 var resourcePrefix = '${subscription}-ees'
 
 var resourceNames = {
@@ -52,12 +64,38 @@ var resourceNames = {
     vNet: '${legacyResourcePrefix}-vnet-ees'
     alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
     subnets: {
+      searchDocsFunction: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-searchdocs'
+      searchDocsFunctionPrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-searchdocs-pep'
       searchDocsStoragePrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-searchdocs-pep'
     }
   }
   search: {
+    searchDocsFunction: '${resourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
+    searchDocsFunctionStorageAccount: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
     searchDocsStorageAccount: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocs'
     searchService: '${resourcePrefix}-${abbreviations.searchSearchServices}'
+  }
+}
+
+module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = if (deploySearchDocsFunction) {
+  name: 'searchDocsFunctionModule'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    functionAppFirewallRules: union(
+      [
+        {
+          cidr: 'AzureCloud'
+          tag: 'ServiceTag'
+          priority: 101
+          name: 'AzureCloud'
+        }
+      ],
+      maintenanceFirewallRules
+    )
+    storageFirewallRules: maintenanceIpRanges
+    tagValues: tagValues
+    deployAlerts: deployAlerts
   }
 }
 
