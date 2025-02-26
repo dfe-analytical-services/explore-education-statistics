@@ -22,6 +22,7 @@ resources:
   pipelines:
     - pipeline: MainBuild
       source: Explore Education Statistics
+      branch: EES-5899
       trigger:
         branches:
           - dev

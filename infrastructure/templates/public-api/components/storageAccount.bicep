@@ -184,3 +184,4 @@ module storeAccessKeyToKeyVault './keyVaultSecret.bicep' = {
 output storageAccountName string = storageAccount.name
 output connectionStringSecretName string = connectionStringSecretName
 output accessKeySecretName string = accessKeySecretName
+output primaryEndpoints object = storageAccount.properties.primaryEndpoints

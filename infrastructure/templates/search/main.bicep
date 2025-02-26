@@ -34,6 +34,15 @@ var tagValues = union(resourceTags ?? {}, {
   DateProvisioned: dateProvisioned
 })
 
+var maintenanceFirewallRules = [
+  for maintenanceIpRange in maintenanceIpRanges: {
+    name: maintenanceIpRange.name
+    cidr: maintenanceIpRange.cidr
+    tag: 'Default'
+    priority: 100
+  }
+]
+
 var resourcePrefix = '${subscription}-ees'
 
 var resourceNames = {
@@ -42,8 +51,33 @@ var resourceNames = {
     vNet: '${subscription}-vnet-ees'
     alertsGroup: '${subscription}-ag-ees-alertedusers'
     subnets: {
+      searchDocsFunction: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-searchdocs'
+      searchDocsFunctionPrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-searchdocs-pep'
       searchStoragePrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-search-pep'
     }
+  }
+}
+
+module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
+  name: 'searchDocsFunctionModule'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    resourcePrefix: resourcePrefix
+    functionAppFirewallRules: union(
+      [
+        {
+          cidr: 'AzureCloud'
+          tag: 'ServiceTag'
+          priority: 101
+          name: 'AzureCloud'
+        }
+      ],
+      maintenanceFirewallRules
+    )
+    storageFirewallRules: maintenanceIpRanges
+    tagValues: tagValues
+    deployAlerts: deployAlerts
   }
 }
 
@@ -59,4 +93,5 @@ module searchServiceModule 'application/searchService.bicep' = {
   }
 }
 
+output searchDocsFunctionAppUrl string = searchDocsFunctionModule.outputs.functionAppUrl
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
