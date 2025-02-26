@@ -65,6 +65,7 @@ parameters:
       - dev
       - test
       - preprod
+      - prod
     default: none
 
 resources:
@@ -87,6 +88,8 @@ variables:
     value: $[or(eq(variables['forceDeployToEnvironment'], 'test'), eq(variables['Build.SourceBranch'], 'refs/heads/test'))]
   - name: isPreProd
     value: $[or(eq(variables['forceDeployToEnvironment'], 'preprod'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))]
+  - name: isProdDirect
+    value: $[eq(variables['forceDeployToEnvironment'], 'prod')]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
@@ -141,6 +144,14 @@ stages:
       stageName: DeployProd
       condition:  and(succeeded(), eq(variables.isMaster, true))
       dependsOn: DeployPreProd
+      environment: Prod
+      serviceConnection: $(serviceConnectionProd)
+      bicepParamFile: prod
+
+  - template: stages/deploy.yml
+    parameters:
+      stageName: DeployProdDirect
+      condition:  eq(variables.isProdDirect, true)
       environment: Prod
       serviceConnection: $(serviceConnectionProd)
       bicepParamFile: prod
