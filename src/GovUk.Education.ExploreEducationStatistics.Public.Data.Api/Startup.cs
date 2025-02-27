@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Migrations;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Interfaces;
@@ -245,9 +244,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetIndicatorRepository, ParquetIndicatorRepository>();
         services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
-
-        // TODO EES-5660 - remove this migration after it has been run against each Public API-enabled environment.
-        services.AddScoped<ICustomMigration, EES5660_MigrateDraftDataSetVersionFolderNames>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
