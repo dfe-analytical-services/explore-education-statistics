@@ -51,7 +51,7 @@ public class EES5660_MigrateDraftDataSetVersionFolderNamesTests(TestApplicationF
 
         var versionedFolder = pathResolver.DirectoryPath(dataSetVersion, dataSetVersion.SemVersion());
         Directory.CreateDirectory(versionedFolder);
-        File.Create(Path.Combine(versionedFolder, "test.txt"));
+        File.Create(Path.Combine(versionedFolder, "test.txt")).Dispose();
         
         GetMigration().Apply();
 
