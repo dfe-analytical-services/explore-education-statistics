@@ -20,12 +20,15 @@ export const insertReleaseIdPlaceholders = (str: string) =>
  *
  * This allows us to create amendments without having
  * to replace all of the release ids in the content.
+ *
+ * TODO EES-5901 - migrate all content placeholders to be "releaseVersionId"
+ * and then remove the legacy "releaseId" checks below.
  */
 export const replaceReleaseIdPlaceholders = (
   str: string,
   releaseVersionId: string,
 ) =>
   str.replaceAll(
-    '/api/releases/{releaseVersionId}/images',
+    /\/api\/releases\/\{(releaseId|releaseVersionId)}\/images/g,
     `/api/releases/${releaseVersionId}/images`,
   );
