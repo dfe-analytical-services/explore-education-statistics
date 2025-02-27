@@ -1,15 +1,16 @@
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { useDesktopMedia } from '@common/hooks/useMedia';
 import ChartContainer from '@common/modules/charts/components/ChartContainer';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import useLegend from '@common/modules/charts/components/hooks/useLegend';
 import createReferenceLine from '@common/modules/charts/components/utils/createReferenceLine';
 import {
-  AxisConfiguration,
   ChartDefinition,
-  StackedBarProps,
+  HorizontalBarChart,
+  VerticalBarChart,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import { otherAxisPositionTypes } from '@common/modules/charts/types/referenceLinePosition';
 import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
@@ -18,14 +19,16 @@ import {
   getMajorAxisDomainTicks,
   getMinorAxisDomainTicks,
 } from '@common/modules/charts/util/domainTicks';
-import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
+import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
+import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
+import getUnit from '@common/modules/charts/util/getUnit';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
-import getUnit from '@common/modules/charts/util/getUnit';
-import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
-import { otherAxisPositionTypes } from '@common/modules/charts/types/referenceLinePosition';
+import groupBy from 'lodash/groupBy';
 import React, {
   memo,
   RefObject,
@@ -45,17 +48,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import groupBy from 'lodash/groupBy';
-import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 
 const chartBottomMargin = 20;
 
-export interface VerticalBarProps extends StackedBarProps {
-  legend: LegendConfiguration;
-  axes: {
-    major: AxisConfiguration;
-    minor: AxisConfiguration;
-  };
+export interface VerticalBarBlockProps extends VerticalBarChart {
+  data: TableDataResult[];
+  meta: FullTableMeta;
 }
 
 const VerticalBarBlock = ({
@@ -70,7 +68,7 @@ const VerticalBarBlock = ({
   showDataLabels,
   stacked,
   width,
-}: VerticalBarProps) => {
+}: VerticalBarBlockProps) => {
   const { isMedia: isDesktopMedia } = useDesktopMedia();
   const [xAxisTickWidth, setXAxisTickWidth] = useState<number>();
   const containerRef = useRef<RefObject<HTMLDivElement>>(null);

@@ -1,49 +1,48 @@
 import ChartContainer from '@common/modules/charts/components/ChartContainer';
-import createReferenceLine from '@common/modules/charts/components/utils/createReferenceLine';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import useLegend from '@common/modules/charts/components/hooks/useLegend';
+import LineChartLabel from '@common/modules/charts/components/LineChartLabel';
+import createReferenceLine from '@common/modules/charts/components/utils/createReferenceLine';
 import {
-  AxisConfiguration,
   ChartDefinition,
-  ChartProps,
   ChartSymbol,
-  LineChartDataLabelPosition,
+  LineChart as LineChartType,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
-import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
 import {
   getMajorAxisDomainTicks,
   getMinorAxisDomainTicks,
 } from '@common/modules/charts/util/domainTicks';
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
+import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
+import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
+import getUnit from '@common/modules/charts/util/getUnit';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
-import LineChartLabel from '@common/modules/charts/components/LineChartLabel';
-import getUnit from '@common/modules/charts/util/getUnit';
 import React, { memo } from 'react';
 import {
   CartesianGrid,
+  LabelProps,
   Legend,
   LegendType,
   Line,
   LineChart,
   ReferenceLine,
   ResponsiveContainer,
+  Symbols,
+  SymbolsProps,
   Tooltip,
   XAxis,
   YAxis,
-  Symbols,
-  SymbolsProps,
-  LabelProps,
 } from 'recharts';
-import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 
 const lineStyles: Dictionary<string> = {
   solid: '',
@@ -51,27 +50,23 @@ const lineStyles: Dictionary<string> = {
   dotted: '2 2',
 };
 
-export interface LineChartProps extends ChartProps {
-  dataLabelPosition?: LineChartDataLabelPosition;
-  legend: LegendConfiguration;
-  axes: {
-    major: AxisConfiguration;
-    minor: AxisConfiguration;
-  };
+export interface LineChartBlockProps extends LineChartType {
+  data: TableDataResult[];
+  meta: FullTableMeta;
 }
 
 const LineChartBlock = ({
   alt,
-  data,
-  meta,
-  height,
   axes,
-  legend,
-  width,
-  includeNonNumericData,
-  showDataLabels,
+  data,
   dataLabelPosition,
-}: LineChartProps) => {
+  height,
+  includeNonNumericData,
+  meta,
+  legend,
+  showDataLabels,
+  width,
+}: LineChartBlockProps) => {
   const [legendProps, renderLegend] = useLegend();
 
   const dataSetCategories: DataSetCategory[] = createDataSetCategories({

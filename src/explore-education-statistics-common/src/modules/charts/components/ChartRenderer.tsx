@@ -1,63 +1,43 @@
 import FigureFootnotes from '@common/components/FigureFootnotes';
 import HorizontalBarBlock, {
-  HorizontalBarProps,
+  HorizontalBarBlockProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
 import InfographicBlock, {
-  InfographicChartProps,
+  InfographicBlockProps,
 } from '@common/modules/charts/components/InfographicBlock';
 import LineChartBlock, {
-  LineChartProps,
+  LineChartBlockProps,
 } from '@common/modules/charts/components/LineChartBlock';
 import MapBlock, {
   MapBlockProps,
 } from '@common/modules/charts/components/MapBlock';
 import VerticalBarBlock, {
-  VerticalBarProps,
+  VerticalBarBlockProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
 import React, { memo, useMemo, useState } from 'react';
 import getMapInitialBoundaryLevel from './utils/getMapInitialBoundaryLevel';
 
-type HorizontalBarRendererProps = {
-  type: 'horizontalbar';
-} & HorizontalBarProps;
-
-type InfographicRendererProps = {
-  type: 'infographic';
-} & InfographicChartProps;
-
-type LineChartRendererProps = {
-  type: 'line';
-} & LineChartProps;
-
-type MapBlockRendererProps = {
-  type: 'map';
-} & Omit<MapBlockProps, 'id'>;
-
-type VerticalBarRendererProps = {
-  type: 'verticalbar';
-} & VerticalBarProps;
-
 export type RenderableChart =
-  | HorizontalBarRendererProps
-  | InfographicRendererProps
-  | LineChartRendererProps
-  | MapBlockRendererProps
-  | VerticalBarRendererProps;
+  | HorizontalBarBlockProps
+  | InfographicBlockProps
+  | LineChartBlockProps
+  | MapBlockProps
+  | VerticalBarBlockProps;
 
 export interface ChartRendererProps {
-  source?: string;
-  id?: string;
   chart: RenderableChart;
+  id?: string;
+  source?: string;
 }
 
-function ChartRenderer({ source, id, chart }: ChartRendererProps) {
-  const { data, meta, subtitle, title, type } = chart;
+function ChartRenderer({ chart, id, source }: ChartRendererProps) {
+  const { subtitle, title, type } = chart;
   const [selectedBoundaryLevelId, setSelectedBoundaryLevelId] = useState(
     type === 'map' ? getMapInitialBoundaryLevel(chart) : undefined,
   );
 
   const chartComponent = useMemo(() => {
-    switch (type) {
+    switch (chart.type) {
       case 'line':
         return <LineChartBlock {...chart} />;
       case 'verticalbar':
@@ -80,14 +60,14 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
       default:
         return <p>Unable to render invalid chart type</p>;
     }
-  }, [id, chart]);
+  }, [chart, id]);
 
   const footnotes = useMemo(() => {
-    if (!data?.length || !meta) {
+    if (!('data' in chart) || !chart.data?.length || !('meta' in chart)) {
       return [];
     }
 
-    const metaFootnotes = [...meta.footnotes];
+    const metaFootnotes = [...chart.meta.footnotes];
     const boundaryFootnoteId = 'map-footnote';
 
     if (
@@ -96,7 +76,7 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
         footnote => footnote.id === boundaryFootnoteId,
       ) === -1
     ) {
-      const selectedBoundaryLevel = meta.boundaryLevels.find(
+      const selectedBoundaryLevel = chart.meta.boundaryLevels.find(
         boundaryLevel => boundaryLevel.id === selectedBoundaryLevelId,
       );
       if (selectedBoundaryLevel) {
@@ -108,9 +88,9 @@ function ChartRenderer({ source, id, chart }: ChartRendererProps) {
     }
 
     return metaFootnotes;
-  }, [chart, data, meta, selectedBoundaryLevelId]);
+  }, [chart, selectedBoundaryLevelId, type]);
 
-  if (data?.length && meta) {
+  if ('data' in chart && chart.data?.length && 'meta' in chart && chart.meta) {
     return (
       <figure className="govuk-!-margin-0" id={id} data-testid={id}>
         {title && (

@@ -7,14 +7,18 @@ import ChartRenderer, {
 import isChartRenderable, {
   getChartPreviewText,
 } from '@common/modules/charts/util/isChartRenderable';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import React, { useRef } from 'react';
 
 interface Props {
   chart?: RenderableChart;
+  data: TableDataResult[];
   loading: boolean;
+  meta: FullTableMeta;
 }
 
-const ChartBuilderPreview = ({ chart, loading }: Props) => {
+const ChartBuilderPreview = ({ chart, data, loading, meta }: Props) => {
   const renderCount = useRef(0);
 
   return (
@@ -28,8 +32,10 @@ const ChartBuilderPreview = ({ chart, loading }: Props) => {
             <div className="govuk-width-container govuk-!-padding-4 dfe-border">
               <ChartRenderer
                 chart={chart}
-                key={renderCount.current}
+                data={data}
                 id="chartBuilderPreview"
+                key={renderCount.current}
+                meta={meta}
               />
             </div>
           </LoadingSpinner>

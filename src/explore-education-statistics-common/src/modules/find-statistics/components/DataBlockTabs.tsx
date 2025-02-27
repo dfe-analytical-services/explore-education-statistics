@@ -80,11 +80,13 @@ const DataBlockTabs = ({
             {isGeoJsonError && errorMessage}
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
-                {chart && (
+                {chart && data && meta && (
                   <ChartRenderer
                     id="dataBlockTabs-chart"
                     source={dataBlock.source}
                     chart={chart}
+                    data={data}
+                    meta={meta}
                   />
                 )}
                 {additionTabContentElement}

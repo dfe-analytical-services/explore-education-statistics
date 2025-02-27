@@ -19,12 +19,12 @@ import useToggle from '@common/hooks/useToggle';
 import { RenderableChart } from '@common/modules/charts/components/ChartRenderer';
 import {
   horizontalBarBlockDefinition,
-  HorizontalBarProps,
+  HorizontalBarBlockProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
-import { InfographicChartProps } from '@common/modules/charts/components/InfographicBlock';
+import { InfographicBlockProps } from '@common/modules/charts/components/InfographicBlock';
 import {
   lineChartBlockDefinition,
-  LineChartProps,
+  LineChartBlockProps,
 } from '@common/modules/charts/components/LineChartBlock';
 import {
   mapBlockDefinition,
@@ -32,13 +32,13 @@ import {
 } from '@common/modules/charts/components/MapBlock';
 import {
   verticalBarBlockDefinition,
-  VerticalBarProps,
+  VerticalBarBlockProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
 import {
   AxisType,
   Chart,
   ChartDefinition,
-  ChartProps,
+  LineChart,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
@@ -67,7 +67,7 @@ type ChartBuilderChartProps = RenderableChart & {
 const filterChartProps = (props: ChartBuilderChartProps): Chart => {
   const excludedProps: (
     | keyof ChartBuilderChartProps
-    | keyof InfographicChartProps
+    | keyof InfographicBlockProps
     | keyof MapBlockProps
   )[] = [
     'data',
@@ -90,7 +90,7 @@ const filterChartProps = (props: ChartBuilderChartProps): Chart => {
 
   // Filter out deprecated data set configurations
   filteredProps = produce(filteredProps, draft => {
-    if (draft.axes.major) {
+    if ('axes' in draft && draft.axes.major) {
       draft.axes.major.dataSets = draft.axes.major.dataSets.map(
         dataSet => omit(dataSet, ['config']) as DataSet,
       );
@@ -164,19 +164,10 @@ export default function ChartBuilder({
       return undefined;
     }
 
-    const baseProps: ChartProps = {
-      ...options,
-      data,
-      map,
-      legend,
-      axes,
-      meta,
-    };
-
     switch (definition.type) {
       case 'infographic':
         return {
-          ...baseProps,
+          ...options,
           type: 'infographic',
           fileId: options.file ? options.file.name : options.fileId ?? '',
           getInfographic: options.file
@@ -185,17 +176,16 @@ export default function ChartBuilder({
         };
       case 'line':
         return {
-          ...(baseProps as LineChartProps),
           type: 'line',
-        };
+        } satisfies LineChart;
       case 'horizontalbar':
         return {
-          ...(baseProps as HorizontalBarProps),
+          ...(baseProps as HorizontalBarBlockProps),
           type: 'horizontalbar',
         };
       case 'verticalbar':
         return {
-          ...(baseProps as VerticalBarProps),
+          ...(baseProps as VerticalBarBlockProps),
           type: 'verticalbar',
         };
       case 'map':
@@ -333,7 +323,12 @@ export default function ChartBuilder({
       />
 
       {definition && (
-        <ChartBuilderPreview chart={chart} loading={isDataLoading} />
+        <ChartBuilderPreview
+          chart={chart}
+          data={data}
+          meta={meta}
+          loading={isDataLoading}
+        />
       )}
 
       {definition && (

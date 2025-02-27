@@ -110,28 +110,6 @@ export interface MapConfig {
   dataSetConfigs: MapDataSetConfig[];
 }
 
-export interface ChartProps {
-  data: TableDataResult[];
-  meta: FullTableMeta;
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
-  height: number;
-  width?: number;
-  axes: AxesConfiguration;
-  legend?: LegendConfiguration;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
-}
-
-export interface StackedBarProps extends ChartProps {
-  barThickness?: number;
-  dataLabelPosition?: BarChartDataLabelPosition;
-  stacked?: boolean;
-}
-
 export interface ChartCapabilities {
   canIncludeNonNumericData: boolean;
   canPositionLegendInline: boolean;
@@ -210,102 +188,76 @@ export const chartDefinitions: ChartDefinition[] = [
   infographicBlockDefinition,
 ];
 
-interface HorizontalBarChart {
-  type: 'horizontalbar';
-  title?: string;
-  titleType?: TitleType;
+interface BaseChart {
+  type: ChartType;
+  title: string;
+  subtitle?: string;
   alt: string;
   height: number;
   width?: number;
+}
+
+export interface HorizontalBarChart extends BaseChart {
+  type: 'horizontalbar';
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
   barThickness?: number;
   dataLabelPosition?: BarChartDataLabelPosition;
   stacked?: boolean;
-  legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;
     minor: AxisConfiguration;
   };
+  legend: LegendConfiguration;
 }
 
-interface Infographic {
+export interface InfographicChart extends BaseChart {
   type: 'infographic';
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
-  height: number;
-  width?: number;
-  axes: AxesConfiguration;
-  legend?: LegendConfiguration;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
   fileId: string;
 }
 
-export interface LineChart {
+export interface LineChart extends BaseChart {
   type: 'line';
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
-  height: number;
-  width?: number;
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
   dataLabelPosition?: LineChartDataLabelPosition;
-  legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;
     minor: AxisConfiguration;
   };
+  legend: LegendConfiguration;
 }
 
-export interface MapChart {
+export interface MapChart extends BaseChart {
   type: 'map';
+  boundaryLevel: number;
+  /**
+   * @deprecated TODO EES-4271: Use `map.dataSetConfigs` instead
+   */
+  dataGroups?: number;
+  /**
+   * @deprecated TODO EES-4271: Use `map.dataSetConfigs` instead
+   */
+  dataClassification?: DataGroupingType;
   axes: {
     major: AxisConfiguration;
   };
-  dataGroups?: number;
-  dataClassification?: DataGroupingType;
   legend: LegendConfiguration;
-  map?: MapConfig;
-  position?: { lat: number; lng: number };
-  boundaryLevel: number;
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
-  height: number;
-  width?: number;
-  includeNonNumericData?: boolean;
-  showDataLabels?: boolean;
-  subtitle?: string;
+  map: MapConfig;
 }
 
-interface VerticalBarChart {
+export interface VerticalBarChart extends BaseChart {
   type: 'verticalbar';
-  title?: string;
-  titleType?: TitleType;
-  alt: string;
-  height: number;
-  width?: number;
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
-  map?: MapConfig;
-  subtitle?: string;
   barThickness?: number;
   dataLabelPosition?: BarChartDataLabelPosition;
   stacked?: boolean;
-  legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;
     minor: AxisConfiguration;
   };
+  legend: LegendConfiguration;
 }
 
 /**
@@ -315,7 +267,7 @@ interface VerticalBarChart {
  * to our newer one that is being used by {@see ChartRendererProps}.
  */
 export type Chart =
-  | Infographic
+  | InfographicChart
   | LineChart
   | MapChart
   | HorizontalBarChart

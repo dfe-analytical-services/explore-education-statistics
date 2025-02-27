@@ -6,7 +6,7 @@ import {
 } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import HorizontalBarBlock from '@common/modules/charts/components/HorizontalBarBlock';
-import { VerticalBarProps } from '@common/modules/charts/components/VerticalBarBlock';
+import { VerticalBarBlockProps } from '@common/modules/charts/components/VerticalBarBlock';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -16,10 +16,10 @@ jest.mock('recharts/lib/util/LogUtils');
 
 describe('HorizontalBarBlock', () => {
   const fullTable = mapFullTable(testChartTableData);
-  const props: VerticalBarProps = {
+  const props: VerticalBarBlockProps = {
     ...testChartConfiguration,
     legend: testChartConfiguration.legend as LegendConfiguration,
-    axes: testChartConfiguration.axes as VerticalBarProps['axes'],
+    axes: testChartConfiguration.axes as VerticalBarBlockProps['axes'],
     meta: fullTable.subjectMeta,
     data: fullTable.results,
     dataLabelPosition: 'inside',
@@ -69,10 +69,10 @@ describe('HorizontalBarBlock', () => {
 
   test('does not render the chart if there is no chart data', async () => {
     const emptyFullTable = mapFullTable(testEmptyChartTableData);
-    const emptyChartProps: VerticalBarProps = {
+    const emptyChartProps: VerticalBarBlockProps = {
       ...testEmptyChartConfiguration,
       legend: testEmptyChartConfiguration.legend as LegendConfiguration,
-      axes: testEmptyChartConfiguration.axes as VerticalBarProps['axes'],
+      axes: testEmptyChartConfiguration.axes as VerticalBarBlockProps['axes'],
       meta: emptyFullTable.subjectMeta,
       data: emptyFullTable.results,
       dataLabelPosition: 'inside',

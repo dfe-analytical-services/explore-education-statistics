@@ -3,8 +3,13 @@ import { GetInfographic } from '@common/modules/charts/components/InfographicBlo
 import getMapInitialBoundaryLevel from '@common/modules/charts/components/utils/getMapInitialBoundaryLevel';
 import { Chart } from '@common/modules/charts/types/chart';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
+import {
+  FullTable,
+  FullTableMeta,
+} from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import { DataBlock } from '@common/services/types/blocks';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
@@ -15,11 +20,20 @@ interface Options {
   getInfographic?: GetInfographic;
 }
 
+interface UseDataBlockReturn {
+  chart?: RenderableChart;
+  isTableDataLoading: boolean;
+  isTableDataError: boolean;
+  fullTable?: FullTable;
+  isGeoJsonError: boolean;
+  isGeoJsonInitialLoading: boolean;
+}
+
 export default function useDataBlock({
   dataBlock,
   releaseVersionId,
   getInfographic,
-}: Options) {
+}: Options): UseDataBlockReturn {
   const getChartFile = useGetReleaseFile(releaseVersionId);
   const queryClient = useQueryClient();
 

@@ -3,15 +3,14 @@ import ResponsiveImage from '@common/components/ResponsiveImage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import {
   ChartDefinition,
-  ChartProps,
+  InfographicChart,
 } from '@common/modules/charts/types/chart';
 import toDataUrl from '@common/utils/file/toDataUrl';
 import React, { memo } from 'react';
 
 export type GetInfographic = (fileId: string) => Promise<Blob>;
 
-export interface InfographicChartProps extends ChartProps {
-  fileId: string;
+export interface InfographicBlockProps extends InfographicChart {
   getInfographic?: GetInfographic;
 }
 
@@ -19,9 +18,9 @@ const InfographicBlock = ({
   alt,
   fileId,
   getInfographic,
-  width,
   height,
-}: InfographicChartProps) => {
+  width,
+}: InfographicBlockProps) => {
   const {
     value: file,
     error,

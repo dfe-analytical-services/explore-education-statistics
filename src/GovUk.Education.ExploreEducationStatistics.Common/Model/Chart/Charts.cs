@@ -26,25 +26,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     public interface IChart
     {
         ChartType Type { get; }
-        string? Title { get; set; }
+        string Title { get; set; }
+        string? Subtitle { get; set; }
         string Alt { get; set; }
         int Height { get; set; }
         int? Width { get; set; }
-        bool IncludeNonNumericData { get; set; }
-
         Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
         public ChartLegend? Legend { get; set; }
-
     }
 
     public abstract class Chart : IChart
     {
         public string? Title { get; set; }
         public string? Subtitle { get; set; }
-        public string Alt { get; set; }
+        public string Alt { get; set; } = string.Empty;
         public int Height { get; set; }
         public int? Width { get; set; }
-        public bool IncludeNonNumericData { get; set; } = false;
 
         public abstract ChartType Type { get; }
 
@@ -57,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public override ChartType Type => Line;
         public bool ShowDataLabels { get; set; }
+        public bool IncludeNonNumericData { get; set; }
         public LineChartDataLabelPosition? DataLabelPosition { get; set; }
     }
 
@@ -67,6 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public int? BarThickness { get; set; }
         public bool Stacked;
         public bool ShowDataLabels { get; set; }
+        public bool IncludeNonNumericData { get; set; }
         public BarChartDataLabelPosition? DataLabelPosition { get; set; }
     }
 
@@ -77,6 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public int? BarThickness { get; set; }
         public bool Stacked;
         public bool ShowDataLabels { get; set; }
+        public bool IncludeNonNumericData { get; set; }
         public BarChartDataLabelPosition? DataLabelPosition { get; set; }
     }
 
@@ -100,12 +100,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
     public class MapChartConfig
     {
-        public List<ChartDataSetConfig> DataSetConfigs { get; set; } = new();
+        public List<ChartDataSetConfig> DataSetConfigs { get; set; } = [];
     }
 
     public class InfographicChart : Chart
     {
         public override ChartType Type => Infographic;
-        public string FileId { get; set; }
+
+        public string FileId { get; set; } = string.Empty;
     }
 }

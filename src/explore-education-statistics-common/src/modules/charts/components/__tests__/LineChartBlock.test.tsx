@@ -6,7 +6,7 @@ import {
 } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import LineChartBlock, {
-  LineChartProps,
+  LineChartBlockProps,
 } from '@common/modules/charts/components/LineChartBlock';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -17,9 +17,9 @@ jest.mock('recharts/lib/util/LogUtils');
 
 describe('LineChartBlock', () => {
   const fullTable = mapFullTable(testChartTableData);
-  const props: LineChartProps = {
+  const props: LineChartBlockProps = {
     ...testChartConfiguration,
-    axes: testChartConfiguration.axes as LineChartProps['axes'],
+    axes: testChartConfiguration.axes as LineChartBlockProps['axes'],
     legend: testChartConfiguration.legend as LegendConfiguration,
     meta: fullTable.subjectMeta,
     data: fullTable.results,
@@ -68,10 +68,10 @@ describe('LineChartBlock', () => {
 
   test('does not render the chart if there is no chart data', async () => {
     const emptyFullTable = mapFullTable(testEmptyChartTableData);
-    const emptyChartProps: LineChartProps = {
+    const emptyChartProps: LineChartBlockProps = {
       ...testEmptyChartConfiguration,
       legend: testEmptyChartConfiguration.legend as LegendConfiguration,
-      axes: testEmptyChartConfiguration.axes as LineChartProps['axes'],
+      axes: testEmptyChartConfiguration.axes as LineChartBlockProps['axes'],
       meta: emptyFullTable.subjectMeta,
       data: emptyFullTable.results,
       dataLabelPosition: 'above',
@@ -377,7 +377,7 @@ describe('LineChartBlock', () => {
   });
 
   test('can limit range of major ticks to default', () => {
-    const propsWithTicks: LineChartProps = {
+    const propsWithTicks: LineChartBlockProps = {
       ...props,
       axes: {
         minor: props.axes.minor,
@@ -419,7 +419,7 @@ describe('LineChartBlock', () => {
   });
 
   test('can limit range of major ticks to custom', () => {
-    const propsWithTicks: LineChartProps = {
+    const propsWithTicks: LineChartBlockProps = {
       ...props,
       axes: {
         minor: props.axes.minor,

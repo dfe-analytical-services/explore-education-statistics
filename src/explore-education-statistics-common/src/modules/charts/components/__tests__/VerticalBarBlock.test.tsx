@@ -6,7 +6,7 @@ import {
 } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
 import VerticalBarBlock, {
-  VerticalBarProps,
+  VerticalBarBlockProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -17,9 +17,9 @@ jest.mock('recharts/lib/util/LogUtils');
 
 describe('VerticalBarBlock', () => {
   const fullTable = mapFullTable(testChartTableData);
-  const props: VerticalBarProps = {
+  const props: VerticalBarBlockProps = {
     ...testChartConfiguration,
-    axes: testChartConfiguration.axes as VerticalBarProps['axes'],
+    axes: testChartConfiguration.axes as VerticalBarBlockProps['axes'],
     legend: testChartConfiguration.legend as LegendConfiguration,
     meta: fullTable.subjectMeta,
     data: fullTable.results,
@@ -70,10 +70,10 @@ describe('VerticalBarBlock', () => {
 
   test('does not render the chart if there is no chart data', async () => {
     const emptyFullTable = mapFullTable(testEmptyChartTableData);
-    const emptyChartProps: VerticalBarProps = {
+    const emptyChartProps: VerticalBarBlockProps = {
       ...testEmptyChartConfiguration,
       legend: testEmptyChartConfiguration.legend as LegendConfiguration,
-      axes: testEmptyChartConfiguration.axes as VerticalBarProps['axes'],
+      axes: testEmptyChartConfiguration.axes as VerticalBarBlockProps['axes'],
       meta: emptyFullTable.subjectMeta,
       data: emptyFullTable.results,
       dataLabelPosition: 'outside',
@@ -286,7 +286,7 @@ describe('VerticalBarBlock', () => {
   });
 
   test('can limit range of minor ticks to start and end', () => {
-    const propsWithTicks: VerticalBarProps = {
+    const propsWithTicks: VerticalBarBlockProps = {
       ...props,
       axes: {
         major: props.axes.major,
