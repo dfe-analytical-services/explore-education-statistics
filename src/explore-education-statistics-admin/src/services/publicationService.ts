@@ -1,5 +1,5 @@
 import { MethodologyVersion } from '@admin/services/methodologyService';
-import { ReleaseSummary } from '@admin/services/releaseVersionService';
+import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import {
@@ -180,8 +180,9 @@ const publicationService = {
   },
 
   listReleaseVersions<
-    TReleaseVersionSummary extends 
-      ReleaseVersionSummary = ReleaseVersionSummary>(
+    TReleaseVersionSummary extends
+      ReleaseVersionSummary = ReleaseVersionSummary,
+  >(
     publicationId: string,
     params: ListReleaseVersionsParams,
   ): Promise<PaginatedList<TReleaseVersionSummary>> {

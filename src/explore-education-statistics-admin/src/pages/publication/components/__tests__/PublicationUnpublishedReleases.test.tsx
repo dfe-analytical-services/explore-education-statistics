@@ -253,7 +253,7 @@ describe('PublicationUnpublishedReleases', () => {
 
   test('calls `onAmendmentDelete` handler when amendment is deleted', async () => {
     publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
-    releaseService.getDeleteReleaseVersionPlan.mockResolvedValue({
+    releaseVersionService.getDeleteReleaseVersionPlan.mockResolvedValue({
       scheduledMethodologies: [],
     });
 
