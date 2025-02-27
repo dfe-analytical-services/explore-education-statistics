@@ -89,12 +89,16 @@ const DataBlockSelector = ({
             );
           }}
         />
-        <p className="govuk-!-font-weight-bold govuk-!-margin-right-4 govuk-!-margin-left-4 govuk-!-margin-bottom-0">
-          or
-        </p>
-        <ButtonLink className="govuk-!-margin-0" to={releaseDataBlockPath}>
-          Create another data block
-        </ButtonLink>
+        {canUpdate && (
+          <>
+            <p className="govuk-!-font-weight-bold govuk-!-margin-right-4 govuk-!-margin-left-4 govuk-!-margin-bottom-0">
+              or
+            </p>
+            <ButtonLink className="govuk-!-margin-0" to={releaseDataBlockPath}>
+              Create another data block
+            </ButtonLink>
+          </>
+        )}
       </div>
     </>
   );
