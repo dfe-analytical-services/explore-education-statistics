@@ -104,7 +104,7 @@ export default function PublicationPublishedReleasesTable({
                       releaseSummaryRoute.path,
                       {
                         publicationId,
-                        releaseId: release.id,
+                        releaseVersionId: release.id,
                       },
                     )}
                   >
