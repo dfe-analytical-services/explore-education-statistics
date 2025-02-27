@@ -109,7 +109,7 @@ describe('insertReleaseIdPlaceholders', () => {
       insertReleaseIdPlaceholders(
         '/api/releases/some-release-id/images/some-image-id',
       ),
-    ).toBe('/api/releases/{releaseVersionId}/images/some-image-id');
+    ).toBe('/api/releases/{releaseId}/images/some-image-id');
   });
 
   test('adds release id placeholder for multiple uris', () => {
@@ -120,9 +120,9 @@ describe('insertReleaseIdPlaceholders', () => {
           '/api/releases/some-release-id-3/images/some-image-id-300 300w',
       ),
     ).toBe(
-      '/api/releases/{releaseVersionId}/images/some-image-id-100 100w, ' +
-        '/api/releases/{releaseVersionId}/images/some-image-id-200 200w, ' +
-        '/api/releases/{releaseVersionId}/images/some-image-id-300 300w',
+      '/api/releases/{releaseId}/images/some-image-id-100 100w, ' +
+        '/api/releases/{releaseId}/images/some-image-id-200 200w, ' +
+        '/api/releases/{releaseId}/images/some-image-id-300 300w',
     );
   });
 
