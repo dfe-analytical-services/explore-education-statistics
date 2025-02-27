@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Migrations;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Interfaces;
