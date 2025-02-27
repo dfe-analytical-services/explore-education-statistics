@@ -32,13 +32,15 @@ function FilterHierarchyFormFieldOptions({
   }
 
   return (
-    <FilterHierarchyOptions
-      {...props}
-      {...field}
-      id={name}
-      value={value}
-      optionsTree={optionsTree}
-    />
+    <>
+      <FilterHierarchyOptions
+        {...props}
+        {...field}
+        id={name}
+        value={value}
+        optionsTree={optionsTree}
+      />
+    </>
   );
 }
 

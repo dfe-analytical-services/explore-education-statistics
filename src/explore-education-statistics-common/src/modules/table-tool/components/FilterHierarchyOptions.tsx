@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { useFormContext } from 'react-hook-form';
 import getFilterHierarchyColumns from '../utils/getFilterHierarchyColumns';
 import React, { memo } from 'react';
+import FormField from '@common/components/form/FormField';
 
 export type FilterHierarchyOptionsTree = {
   value: string;
@@ -46,26 +47,25 @@ function FilterHierarchyOptions({
     >
       {level === 0 && JSON.stringify({ name: props.name, value })}
       {optionsTree.map(option => {
-        const key = `${id}-${option.value}`;
+        const key = `${id}.${option.value}`;
         return (
           <div key={key} className="govuk-grid-row govuk-!-margin-bottom-2">
             <div className={getFilterHierarchyColumns(1, totalColumns - level)}>
-              <FormCheckbox
-                {...props}
+              <FormField
+                name={props.name}
+                as={FormCheckbox}
                 {...option}
-                disabled={disabled}
-                id={id}
-                checked={!!option.value && value.includes(option.value)}
+                id={key}
               />
             </div>
-            {/* <FilterHierarchyOptions
+            <FilterHierarchyOptions
               {...props}
               id={key}
               optionsTree={option.options}
               level={level + 1}
               totalColumns={totalColumns}
               value={value}
-            /> */}
+            />
           </div>
         );
       })}
