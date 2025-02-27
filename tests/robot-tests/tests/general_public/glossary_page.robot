@@ -10,7 +10,7 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 
 *** Test Cases ***
 Navigate to glossary page
-    user navigates to public frontend
+    user navigates to public site homepage
     user waits until h1 is visible    Explore our statistics and data
 
     user clicks link    Glossary

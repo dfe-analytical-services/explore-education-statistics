@@ -109,7 +109,7 @@ Verify that the publication is not visible on the public methodologies page with
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Verify that the methodology is not publicly accessible by URL without a published release
-    user navigates to public frontend    ${ACCESSIBLE_METHODOLOGY_URL}
+    user navigates to    ${ACCESSIBLE_METHODOLOGY_URL}
     user waits until h1 is visible    Page not found    %{WAIT_MEDIUM}
 
 Alter the approval to publish the methodology with the release
@@ -123,7 +123,7 @@ Verify that the publication is still not visible on the public methodologies pag
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Verify that the methodology is still not publicly accessible by URL without publishing the release
-    user navigates to public frontend    ${ACCESSIBLE_METHODOLOGY_URL}
+    user navigates to    ${ACCESSIBLE_METHODOLOGY_URL}
     user waits until page contains    Page not found
 
 Navigate to release content page and add headline text block
@@ -172,20 +172,20 @@ Verify that the methodology is publicly accessible
 
 Verify that methodology hash links open accordion sections correctly
     [Documentation]    EES-3877
-    user navigates to public frontend    ${METHODOLOGY_URL}#content-section-3-test-title-3
+    user navigates to    ${METHODOLOGY_URL}#content-section-3-test-title-3
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until page contains title caption    Methodology    %{WAIT_SMALL}
     user checks page contains    3.test-title 3
     user checks page contains    Content 3
 
-    user navigates to public frontend    ${METHODOLOGY_URL}#content-section-4-test-title-4
+    user navigates to    ${METHODOLOGY_URL}#content-section-4-test-title-4
     user waits until page finishes loading
 
     user checks page contains    4.-test-.title 4
     user checks page contains    Content 4
 
 Verify that the methodology displays a link to the publication
-    user navigates to public frontend    ${METHODOLOGY_URL}
+    user navigates to    ${METHODOLOGY_URL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until page contains title caption    Methodology    %{WAIT_SMALL}
 
@@ -340,7 +340,7 @@ Verify that the user cannot edit the status of the amended methodology
 
 Go to methodology amendment's public page
     ${METHODOLOGY_URL}=    get element attribute    css:#public-methodology-url    value
-    user navigates to public frontend    ${METHODOLOGY_URL}
+    user navigates to    ${METHODOLOGY_URL}
     user waits until page contains title    ${PUBLICATION_NAME} - Amended methodology
     user waits until page contains title caption    Methodology
 

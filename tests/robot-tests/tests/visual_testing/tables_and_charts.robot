@@ -21,7 +21,7 @@ Check release
     Log to console    \n\n\t=====================================================================\n
     Log to console    \tProcessing release at %{PUBLIC_URL}${release.url}
 
-    user navigates to public frontend    %{PUBLIC_URL}${release.url}
+    user navigates to    %{PUBLIC_URL}${release.url}
 
     IF    ${release.has_key_stat_blocks}
         Log to console    \n\tCapturing Key Stats:
@@ -63,7 +63,7 @@ Check release
 
 Check Fast Track Table
     [Arguments]    ${content_block}
-    user navigates to public frontend    %{PUBLIC_URL}${content_block.content_url}
+    user navigates to    %{PUBLIC_URL}${content_block.content_url}
     user waits until page contains element    id:tableToolWizard
     ${filepath}=    user takes screenshot of element    id:tableToolWizard
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${FAST_TRACKS_FOLDER}/${content_block.content_block_id}-table.png

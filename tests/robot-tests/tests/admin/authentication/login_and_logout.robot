@@ -11,7 +11,7 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Log in as BAU and check the dashboard is looking OK and the sign out buttons are available
-    user navigates to admin frontend    %{ADMIN_URL}/dashboard
+    user navigates to admin homepage
     user waits until h1 is visible    Sign in
     user clicks element    id:signin-button
     user logs in via identity provider
@@ -26,7 +26,7 @@ Log out using the button in the page header
     user waits until page contains title    Signed out
 
 Check that logging out via the header link has successfully removed the ability to access the dashboard
-    user navigates to admin frontend    %{ADMIN_URL}/dashboard
+    user navigates to admin homepage
     user waits until page contains title    Sign in
 
 Log in again and log out using the button in the dashboard
@@ -41,7 +41,7 @@ Log in again and log out using the button in the dashboard
     user waits until page contains title    Signed out
 
 Check that logging out with the dashboard link has successfully removed the ability to access the dashboard
-    user navigates to admin frontend    %{ADMIN_URL}/dashboard
+    user navigates to admin homepage
     user waits until page contains title    Sign in
 
 Switch users in the same browser

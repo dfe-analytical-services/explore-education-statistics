@@ -97,7 +97,7 @@ user closes the browser and delete test user
 
 user opens browser and logs in via Identity Provider
     user opens the browser
-    user navigates to admin frontend
+    user navigates to admin homepage
     user waits until h1 is visible    Sign in
     user clicks element    id:signin-button
     user logs in via identity provider
