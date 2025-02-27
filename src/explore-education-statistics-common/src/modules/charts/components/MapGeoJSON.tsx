@@ -122,6 +122,12 @@ export default function MapGeoJSON({
 
       featureLayer.bindTooltip(
         () => {
+          // Not ideal, we would want to use `max-width` instead.
+          // Unfortunately it doesn't seem to work with the tooltip
+          // for some reason (maybe due to the pane styling).
+          const mapWidth = map?.getContainer().clientWidth;
+          const tooltipStyle = mapWidth ? `width: ${mapWidth / 2 - 20}px` : '';
+
           if (feature.properties.dataSets[selectedDataSetKey]) {
             const dataSetValue = formatPretty(
               feature.properties.dataSets[selectedDataSetKey].value,
@@ -129,15 +135,6 @@ export default function MapGeoJSON({
               selectedDataSetConfig.dataSet.indicator.decimalPlaces,
             );
             const content = `${selectedDataSetConfig.config.label}: ${dataSetValue}`;
-
-            const mapWidth = map?.getContainer().clientWidth;
-
-            // Not ideal, we would want to use `max-width` instead.
-            // Unfortunately it doesn't seem to work with the tooltip
-            // for some reason (maybe due to the pane styling).
-            const tooltipStyle = mapWidth
-              ? `width: ${mapWidth / 2 - 20}px`
-              : '';
 
             return (
               `<div class="${styles.tooltip}" style="${tooltipStyle}">` +
@@ -147,7 +144,12 @@ export default function MapGeoJSON({
             );
           }
 
-          return '';
+          return (
+            `<div class="${styles.tooltip}" style="${tooltipStyle}">` +
+            `<p><strong data-testid="chartTooltip-label">${feature.properties.Name}</strong></p>` +
+            `<p class="${styles.tooltipContent}" data-testid="chartTooltip-contents">No data available.</p>` +
+            `</div>`
+          );
         },
         { sticky: true },
       );
