@@ -15,9 +15,27 @@ describe('DataSetFileApiQuickStart', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'API data set quick start',
+        name: 'Using the API',
       }),
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: 'API documentation',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'https://dev.statistics.api.education.gov.uk/docs',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'Building API integrations',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'https://dev.statistics.api.education.gov.uk/docs/getting-started/building-api-integrations/',
+    );
 
     expect(
       screen.getByRole('heading', { name: 'API data set details' }),
