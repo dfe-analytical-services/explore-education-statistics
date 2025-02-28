@@ -31,7 +31,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
 import useToggle from '@common/hooks/useToggle';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import orderMapLegendItems from './utils/orderMapLegendItems';
 import generateDataSetKey from '../util/generateDataSetKey';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
@@ -169,7 +168,7 @@ export default function MapBlock({
   );
 
   const dataSetOptions = useMemo<SelectOption[]>(() => {
-    const dataSetKeys = orderMapLegendItems(legend).map(({ dataSet }) =>
+    const dataSetKeys = legend.items.map(({ dataSet }) =>
       generateDataSetKey(dataSet),
     );
     return dataSetKeys
