@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
             
             if (await _authorizationHandlerService
-                    .HasRolesOnPublicationOrRelease(
+                    .HasRolesOnPublicationOrReleaseVersion(
                         context.User.GetUserId(),
                         releaseVersion.PublicationId,
                         releaseVersion.Id,

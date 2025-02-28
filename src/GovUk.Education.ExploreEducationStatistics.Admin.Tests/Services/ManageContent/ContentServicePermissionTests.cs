@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task AddContentBlock()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task AddContentSection()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task AttachDataBlock()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task RemoveContentBlock()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task RemoveContentSection()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task ReorderContentBlocks()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task ReorderContentSections()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task UpdateContentSectionHeading()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task UpdateTextBasedContentBlock()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {

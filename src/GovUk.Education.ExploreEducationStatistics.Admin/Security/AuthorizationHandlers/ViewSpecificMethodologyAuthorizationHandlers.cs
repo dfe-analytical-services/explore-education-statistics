@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             // view it.  Additionally, if the user is an Editor (Contributor, Lead) or an Approver of any
             // (Live or non-Live) release version of the owning publication of this methodology, they can view it.
             if (await _authorizationHandlerService
-                    .HasRolesOnPublicationOrAnyRelease(
+                    .HasRolesOnPublicationOrAnyReleaseVersion(
                         context.User.GetUserId(),
                         owningPublication.Id,
                         ListOf(PublicationRole.Owner, PublicationRole.Approver),

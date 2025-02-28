@@ -67,6 +67,7 @@ const DataBlockPageReadOnlyTabs = ({ releaseVersionId, dataBlock }: Props) => {
             title="Chart"
             key="chart"
             id="dataBlockTabs-chart"
+            lazy
             testId={`${testId(dataBlock)}-chart-tab`}
           >
             {fullTable && (

@@ -15,9 +15,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return GetImages(htmlContent, idCapturingRegex);
         }
 
+        // TODO EES-5901 - migrate all content placeholders to be "releaseVersionId" and then remove the legacy
+        // "releaseId" checks below.
         public static List<Guid> GetReleaseImages(string htmlContent)
         {
-            var idCapturingRegex = new Regex(@"^/api/releases/{releaseId}/images/(.+)$");
+            var idCapturingRegex = new Regex(@"^/api/releases/{(releaseId|releaseVersionId)}/images/(.+)$");
             return GetImages(htmlContent, idCapturingRegex);
         }
 
@@ -33,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(node => node.Attributes["src"].Value)
                 .Select(srcVal => idCapturingRegex.Match(srcVal))
                 .Where(match => match.Success)
-                .Select(match => match.Groups[1].Value)
+                .Select(match => match.Groups[^1].Value)
                 .ToList();
 
             // Convert to Guids, removing any that are malformed

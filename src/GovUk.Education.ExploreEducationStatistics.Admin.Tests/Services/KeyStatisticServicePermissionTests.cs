@@ -26,7 +26,7 @@ public class KeyStatisticServicePermissionTests
     public async Task CreateKeyStatisticDataBlock()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {
@@ -42,7 +42,7 @@ public class KeyStatisticServicePermissionTests
     public async Task CreateKeyStatisticText()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {
@@ -58,7 +58,7 @@ public class KeyStatisticServicePermissionTests
     public async Task UpdateKeyStatisticDataBlock()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {
@@ -74,7 +74,7 @@ public class KeyStatisticServicePermissionTests
     public async Task UpdateKeyStatisticText()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {
@@ -90,7 +90,7 @@ public class KeyStatisticServicePermissionTests
     public async Task Delete()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {
@@ -106,7 +106,7 @@ public class KeyStatisticServicePermissionTests
     public async Task Reorder()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
             .AssertForbidden(
                 userService =>
                 {

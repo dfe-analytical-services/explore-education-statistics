@@ -20,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         col_type,
         label,
         filter_grouping_column,
+        parent_filter,
         filter_hint,
         filter_default,
         indicator_grouping,
@@ -33,7 +34,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IDatabaseHelper _databaseHelper;
 
         public static readonly string[] RequiredMetaColumns = Enum.GetValues<MetaColumns>()
-            .Where(col => col != MetaColumns.filter_default) // if we make other columns optional, screener would also need updating
+            .Where(col =>
+                col != MetaColumns.parent_filter
+                && col != MetaColumns.filter_default) // if we make other columns optional, screener would also need updating
             .Select(col => col.ToString())
             .ToArray();
 

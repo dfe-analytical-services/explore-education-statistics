@@ -28,8 +28,10 @@ describe('DataSetFileUsage', () => {
     ).toHaveAttribute('href', 'test-table-tool-link');
 
     expect(
-      screen.queryByRole('link', { name: 'API documentation' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('heading', { name: 'Download this data using code' }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByTestId('copy-download-url')).toBeInTheDocument();
   });
 
   test('renders correctly with API data set', () => {
@@ -55,13 +57,10 @@ describe('DataSetFileUsage', () => {
     ).toHaveAttribute('href', 'test-table-tool-link');
 
     expect(
-      screen.getByRole('link', {
-        name: 'API documentation',
-      }),
-    ).toHaveAttribute(
-      'href',
-      'https://dev.statistics.api.education.gov.uk/docs',
-    );
+      screen.queryByRole('heading', { name: 'Download this data using code' }),
+    ).not.toBeInTheDocument();
+
+    expect(screen.queryByTestId('copy-download-url')).not.toBeInTheDocument();
   });
 
   test('clicking the download button calls the `onDownload` handler', async () => {
@@ -83,18 +82,5 @@ describe('DataSetFileUsage', () => {
     );
 
     expect(handleDownload).toHaveBeenCalledTimes(1);
-  });
-
-  test('renders download with code API link', () => {
-    render(
-      <DataSetFileUsage
-        dataSetFileId="data-set-file-id"
-        hasApiDataSet
-        tableToolLink="test-table-tool-link"
-        onDownload={noop}
-      />,
-    );
-
-    expect(screen.getByTestId('copy-download-url')).toBeInTheDocument();
   });
 });

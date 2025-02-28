@@ -16,7 +16,6 @@ public class AutoSelectFilterItemMigrationController(StatisticsDbContext statist
 {
     public class MigrationResult
     {
-        public bool IsDryRun;
         public int Processed;
     }
 
@@ -28,11 +27,11 @@ public class AutoSelectFilterItemMigrationController(StatisticsDbContext statist
         var queryable = statisticsDbContext.Filter
             .Where(f =>
                 f.AutoSelectFilterItemId == null
-                && f.FilterGroups.Count(
-                    group => group.FilterItems.Count(
-                        item => item.Label == "Total" // this will be case agnostic (i.e. also find "total")
-                    ) == 1
-                ) == 1) // only one Total filter item across all filter items
+                // one group with label "Total" that contains one item with label "Total"
+                && f.FilterGroups.Count(group => group.Label == "Total"
+                                               && group.FilterItems.Count(item => item.Label == "Total")
+                                               == 1)
+                == 1)
             .Select(f => f.Id);
 
         if (num != null)
@@ -48,7 +47,8 @@ public class AutoSelectFilterItemMigrationController(StatisticsDbContext statist
         {
             var autoSelectFilterItemId = statisticsDbContext.FilterItem
                 .Where(fi => fi.FilterGroup.FilterId == filterId
-                             && fi.Label == "Total")
+                             && fi.Label == "Total"
+                             && fi.FilterGroup.Label == "Total")
                 .Select(fi => fi.Id)
                 .SingleOrDefault();
 

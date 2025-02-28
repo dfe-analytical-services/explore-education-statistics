@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Upload()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {

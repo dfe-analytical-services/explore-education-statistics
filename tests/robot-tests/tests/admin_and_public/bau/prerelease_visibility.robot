@@ -39,7 +39,7 @@ Check release isn't publically visible
     check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
-    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+    user navigates to    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found
     user checks page does not contain    ${RELEASE_NAME}
 
@@ -66,7 +66,7 @@ Check methodology isn't publically visible
     check that variable is not empty    PUBLIC_METHODOLOGY_LINK    ${PUBLIC_METHODOLOGY_LINK}
     Set Suite Variable    ${PUBLIC_METHODOLOGY_LINK}
 
-    user navigates to public frontend    ${PUBLIC_METHODOLOGY_LINK}
+    user navigates to    ${PUBLIC_METHODOLOGY_LINK}
     user waits until page contains    Page not found
 
 Return to admin again
@@ -138,12 +138,12 @@ Check scheduled release isn't visible on public Table Tool
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Go to public release URL and check release isn't visible
-    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+    user navigates to    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found
     user waits until page does not contain    ${PUBLICATION_NAME}
 
 Check methodology isn't accessible via URL
-    user navigates to public frontend    ${PUBLIC_METHODOLOGY_LINK}
+    user navigates to    ${PUBLIC_METHODOLOGY_LINK}
     user waits until page contains    Page not found
 
 Go to admin release summary
@@ -155,7 +155,7 @@ Approve release for immediate publication
     user approves original release for immediate publication
 
 Check release has been published
-    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+    user navigates to    ${PUBLIC_RELEASE_LINK}
     user waits until page contains title caption    Calendar year 2000
     user waits until h1 is visible    ${PUBLICATION_NAME}
 

@@ -15,6 +15,10 @@
     color: govuk-colour('black');
     outline: govuk-colour('black') solid $govuk-focus-width;
   }
+
+  :global(.leaflet-tooltip-pane) {
+    overflow-wrap: break-word;
+  }
 }
 
 .mapSpinner {

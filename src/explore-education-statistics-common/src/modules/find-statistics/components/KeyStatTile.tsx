@@ -24,7 +24,7 @@ const KeyStatTile = ({
       </TitleElement>
 
       <p className="govuk-heading-xl" data-testid={`${testId}-statistic`}>
-        {formatPretty(value)}
+        {value}
       </p>
 
       {children}

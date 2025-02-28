@@ -54,7 +54,7 @@ public class MarkMethodologyAsApprovedAuthorizationHandler :
         // If the user is a Publication Approver that owns this Methodology, they can approve it.
         // Additionally, if they're an Approver for any Releases on the owning Publication, they can approve it.
         if (await _authorizationHandlerService
-                .HasRolesOnPublicationOrAnyRelease(
+                .HasRolesOnPublicationOrAnyReleaseVersion(
                     context.User.GetUserId(),
                     owningPublication.Id,
                     ListOf(PublicationRole.Approver),

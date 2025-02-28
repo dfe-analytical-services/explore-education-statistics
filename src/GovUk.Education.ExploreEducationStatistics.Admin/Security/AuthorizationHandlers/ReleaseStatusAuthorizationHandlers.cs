@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             if (await _authorizationHandlerService
-                    .HasRolesOnPublicationOrRelease(
+                    .HasRolesOnPublicationOrReleaseVersion(
                         userId: context.User.GetUserId(),
                         publicationId: releaseVersion.PublicationId,
                         releaseVersionId: releaseVersion.Id,
@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 : ReleaseEditorAndApproverRoles;
 
             if (await _authorizationHandlerService
-                    .HasRolesOnPublicationOrRelease(
+                    .HasRolesOnPublicationOrReleaseVersion(
                         userId: context.User.GetUserId(),
                         publicationId: releaseVersion.PublicationId,
                         releaseVersionId: releaseVersion.Id,
@@ -137,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 : ReleaseEditorAndApproverRoles;
 
             if (await _authorizationHandlerService
-                    .HasRolesOnPublicationOrRelease(
+                    .HasRolesOnPublicationOrReleaseVersion(
                         userId: context.User.GetUserId(),
                         publicationId: releaseVersion.PublicationId,
                         releaseVersionId: releaseVersion.Id,

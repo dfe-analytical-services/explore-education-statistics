@@ -18,7 +18,7 @@ Check permalink with id
     Log to console    \n\n\t=====================================================================\n
     Log to console    \tProcessing permalink at ${permalink_url}
 
-    user navigates to public frontend    ${permalink_url}
+    user navigates to    ${permalink_url}
 
     Log to console    \n\tCapturing Permalink:
 

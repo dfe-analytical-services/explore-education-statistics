@@ -1,5 +1,5 @@
 import PublicationScheduledReleases from '@admin/pages/publication/components/PublicationScheduledReleases';
-import _releaseService, {
+import _releaseVersionService, {
   ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseVersionService';
 import {
@@ -12,8 +12,8 @@ import React, { ReactElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('@admin/services/releaseVersionService');
-const releaseVersionService = _releaseService as jest.Mocked<
-  typeof _releaseService
+const releaseVersionService = _releaseVersionService as jest.Mocked<
+  typeof _releaseVersionService
 >;
 
 describe('PublicationScheduledReleases', () => {

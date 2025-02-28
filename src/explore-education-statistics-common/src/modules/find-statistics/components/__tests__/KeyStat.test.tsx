@@ -7,7 +7,7 @@ describe('KeyStat', () => {
     render(
       <KeyStat
         title="Number of applications received"
-        statistic="608180"
+        statistic="608,180"
         trend="Down from 620,330 in 2017"
         guidanceTitle="What is the number of applications received?"
         guidanceText="Total number of applications received for places at primary and secondary schools."
@@ -43,7 +43,7 @@ describe('KeyStat', () => {
     render(
       <KeyStat
         title="Number of applications received"
-        statistic="608180"
+        statistic="608,180"
         trend="Down from 620,330 in 2017"
         guidanceTitle={undefined}
         guidanceText="Total number of applications received for places at primary and secondary schools."
@@ -79,7 +79,7 @@ describe('KeyStat', () => {
     render(
       <KeyStat
         title="Number of applications received"
-        statistic="608180"
+        statistic="608,180"
         guidanceTitle="This shouldn't appear"
       />,
     );

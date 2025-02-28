@@ -12,7 +12,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
+    ReleaseVersionAuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 // Assert that users with the Publication Owner role can assign pre release contacts to a release
                 // that's unapproved
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                     AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 // Assert that users with the Publication Owner role can assign pre release contacts to a release
                 // that's approved
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<
                     AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that users with an editor User Release role can assign pre release contacts to a release
                 // that's unapproved
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
                     AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     CreateHandler,
                     new ReleaseVersion
@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that users with an editor User Release role can assign pre release contacts to a release
                 // that's approved
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<
                     AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     CreateHandler,
                     new ReleaseVersion

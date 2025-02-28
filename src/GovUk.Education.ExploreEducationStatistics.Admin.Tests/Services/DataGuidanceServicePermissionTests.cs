@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await contentDbContext.SaveChangesAsync();
 
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, SecurityPolicies.CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, SecurityPolicies.CanUpdateSpecificReleaseVersion)
                 .AssertForbidden(
                     userService =>
                     {
