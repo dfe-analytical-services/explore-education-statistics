@@ -2,6 +2,7 @@
 import {
   FirewallRule
   AzureFileShareMount
+  EntraIdAuthentication
 } from '../types.bicep'
 
 // param sites_dwtestfa_name string = 'dwtestfa'
@@ -123,6 +124,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   }
   kind: 'functionapp,linux,container'
   properties: {
+    functionAppConfig: {} // Needed?
     enabled: true
     // hostNameSslStates: [
     //   {
@@ -146,12 +148,13 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     // vnetContentShareEnabled: false
     siteConfig: {
       numberOfWorkers: 1
-      linuxFxVersion: 'DOCKER|mcr.microsoft.com/azure-functions/base:TAG?' // Which TAG? Changed from DOCKER|mcr.microsoft.com/azure-functions/dotnet:4-appservice-quickstart
-      acrUseManagedIdentityCreds: false
-      alwaysOn: false
-      http20Enabled: false
+      linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:[BUILD-TAG]' // Changed from DOCKER|mcr.microsoft.com/azure-functions/dotnet:4-appservice-quickstart
+      acrUseManagedIdentityCreds: true // Changed from false
+      // alwaysOn: false
+      // http20Enabled: false
       functionAppScaleLimit: 0 // Set this?
       minimumElasticInstanceCount: 1
+      keyVaultReferenceIdentity: keyVaultReferenceIdentity // Added
     }
     // scmSiteAlsoStopped: false
     clientAffinityEnabled: false // Durable is true + default is true?
@@ -226,11 +229,11 @@ resource sites_dwtestfa_name_web 'Microsoft.Web/sites/config@2024-04-01' = {
     //   'index.php'
     // ]
     // netFrameworkVersion: 'v4.0'
-    linuxFxVersion: 'DOCKER|mcr.microsoft.com/azure-functions/base:TAG?' // Which TAG? Changed from DOCKER|mcr.microsoft.com/azure-functions/dotnet:4-appservice-quickstart
+    linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:[BUILD-TAG]' // Changed from DOCKER|mcr.microsoft.com/azure-functions/dotnet:4-appservice-quickstart
     // requestTracingEnabled: false
     // remoteDebuggingEnabled: false
     // httpLoggingEnabled: false
-    // acrUseManagedIdentityCreds: false
+    acrUseManagedIdentityCreds: true // Changed from false
     logsDirectorySizeLimit: 35
     // detailedErrorLoggingEnabled: false
     publishingUsername: 'REDACTED'
@@ -251,7 +254,14 @@ resource sites_dwtestfa_name_web 'Microsoft.Web/sites/config@2024-04-01' = {
     //   rampUpRules: []
     // }
     // autoHealEnabled: false
-    // vnetRouteAllEnabled: false
+    vnetRouteAllEnabled: true // Changed from false
+    appSettings: [
+      // Added
+      {
+        name: 'WEBSITE_PULL_IMAGE_OVER_VNET'
+        value: 'true'
+      }
+    ]
     vnetPrivatePortsCount: 0
     publicNetworkAccess: 'Disabled'
     cors: {
@@ -293,25 +303,6 @@ resource sites_dwtestfa_name_web 'Microsoft.Web/sites/config@2024-04-01' = {
   }
 }
 
-resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
-  name: 'azurestorageaccounts'
-  parent: functionApp
-  properties: reduce(
-    azureFileShares,
-    {},
-    (cur, next) =>
-      union(cur, {
-        '${next.storageName}': {
-          type: 'AzureFiles'
-          shareName: next.fileShareName
-          mountPath: next.mountPath
-          accountName: next.storageAccountName
-          accessKey: next.storageAccountKey
-        }
-      })
-  )
-}
-
 // Needed?
 resource sites_dwtestfa_name_sites_dwtestfa_name_azurewebsites_net 'Microsoft.Web/sites/hostNameBindings@2024-04-01' = {
   parent: functionApp // Changed from sites_dwtestfa_name_resource
@@ -339,6 +330,25 @@ resource sites_dwtestfa_name_sites_dwtestfa_name_azurewebsites_net 'Microsoft.We
 //   }
 // }
 
+resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
+  name: 'azurestorageaccounts'
+  parent: functionApp
+  properties: reduce(
+    azureFileShares,
+    {},
+    (cur, next) =>
+      union(cur, {
+        '${next.storageName}': {
+          type: 'AzureFiles'
+          shareName: next.fileShareName
+          mountPath: next.mountPath
+          accountName: next.storageAccountName
+          accessKey: next.storageAccountKey
+        }
+      })
+  )
+}
+
 module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
   name: '${functionAppName}PrivateEndpointDeploy'
   params: {
@@ -351,20 +361,24 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?fun
   }
 }
 
+module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthentication != null) {
+  name: '${functionAppName}AzureAuthentication'
+  params: {
+    clientId: entraIdAuthentication!.appRegistrationClientId
+    siteName: functionAppName
+    allowedClientIds: entraIdAuthentication!.allowedClientIds
+    allowedPrincipalIds: entraIdAuthentication!.allowedPrincipalIds
+    requireAuthentication: entraIdAuthentication!.requireAuthentication
+  }
+}
+
 // Container stuff
 @description('Specifies the login server from the registry.')
 @secure()
 param acrLoginServer string
 
 @description('Specifies the container image to deploy from the registry.')
-param containerAppImageName string
+param functionAppImageName string
 
-@description('Specifies the container port.')
-param containerAppTargetPort int = 8080
-
-@description('The CORS policy to use for the Container App.')
-param corsPolicy {
-  allowedHeaders: string[]?
-  allowedMethods: string[]?
-  allowedOrigins: string[]?
-}
+@description('An existing App Registration registered with Entra ID that will be used to control access to this Container App')
+param entraIdAuthentication EntraIdAuthentication?
