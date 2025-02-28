@@ -1,0 +1,109 @@
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
+
+public class ReleaseSearchViewModelExtensionsTests
+{
+    [Fact]
+    public void BuildMetadataShouldReturnExpectedMetadataKeysAndValues()
+    {
+        var releaseSearchViewModel = new ReleaseSearchViewModelDto
+        {
+            ReleaseVersionId = new Guid("12345678-1234-1234-1234-123456789abc"),
+            Published = new DateTimeOffset(2025, 02, 21, 09, 24, 01, TimeSpan.FromHours(1)),
+            PublicationTitle = "Publication Title",
+            Summary = "This is a summary.",
+            Theme = "Theme",
+            Type = "Official Statistics",
+            TypeBoost = 10,
+            PublicationSlug = "publication-slug",
+            ReleaseSlug = "release-slug",
+            HtmlContent = "<p>This is some Html Content</p>",
+        };
+        
+        // ACT
+        var actual = releaseSearchViewModel.BuildMetadata();
+        
+        // ASSERT
+        AssertAll(
+        [
+            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.ReleaseVersionId, "12345678-1234-1234-1234-123456789abc"),
+            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.PublicationSlug, "publication-slug"),
+            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.ReleaseSlug, "release-slug"),
+            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.Published, "2025-02-21T08:24:01Z"),
+            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.Summary, "This is a summary."),
+            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.Title, "Publication Title"),
+            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.Theme, "Theme"),
+            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.Type, "Official Statistics"),
+            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.TypeBoost, "10"),
+            () => Assert.Equal(9, actual.Keys.Count) // Ensure there aren't any extra items in the metadata
+        ]);
+        
+        Action AssertMetadata(string key, string value) => () => Assert.Equal(value, actual[key]);
+    }
+
+    /// <summary>
+    /// Azure metadata does not accept unicode characters. Therefore we need to encode them. 
+    /// </summary>
+    [Fact]
+    public void GivenSummaryWithUnicodeCharacters_WhenBuildingMetadata_ThenSummaryContainsOnlyAsciiCharacters()
+    {
+        var releaseSearchViewModel = new ReleaseSearchViewModelBuilder()
+            .WithSummary("Right single quotation mark = ’")
+            .Build();
+        
+        var actual = releaseSearchViewModel.BuildMetadata();
+        
+        Assert.Equal("Right single quotation mark = \\u2019", actual[ReleaseSearchViewModelAzureBlobMetadataKeys.Summary]);
+    }
+    
+    /// <summary>
+    /// Azure metadata does not accept preceding or trailing spaces. Therefore we need to trim them. 
+    /// </summary>
+    [Fact]
+    public void GivenSummaryWithExtraSpaces_WhenBuildingMetadata_ThenSummaryIsTrimmed()
+    {
+        var releaseSearchViewModel = new ReleaseSearchViewModelBuilder()
+            .WithSummary("  extra spaces either side ")
+            .Build();
+        
+        var actual = releaseSearchViewModel.BuildMetadata();
+        
+        Assert.Equal("extra spaces either side", actual[ReleaseSearchViewModelAzureBlobMetadataKeys.Summary]);
+    }
+    
+    /// <summary>
+    /// Azure metadata does not accept unicode characters. Therefore we need to encode them. 
+    /// </summary>
+    [Fact]
+    public void GivenTitleWithUnicodeCharacters_WhenBuildingMetadata_ThenTitleContainsOnlyAsciiCharacters()
+    {
+        var releaseSearchViewModel = new ReleaseSearchViewModelBuilder()
+            .WithTitle("Right single quotation mark = ’")
+            .Build();
+        
+        var actual = releaseSearchViewModel.BuildMetadata();
+        
+        Assert.Equal("Right single quotation mark = \\u2019", actual[ReleaseSearchViewModelAzureBlobMetadataKeys.Title]);
+    }
+    
+    /// <summary>
+    /// Azure metadata does not accept preceding or trailing spaces. Therefore we need to trim them. 
+    /// </summary>
+    [Fact]
+    public void GivenTitleWithExtraSpaces_WhenBuildingMetadata_ThenTitleIsTrimmed()
+    {
+        var releaseSearchViewModel = new ReleaseSearchViewModelBuilder()
+            .WithTitle("  extra spaces either side ")
+            .Build();
+        
+        var actual = releaseSearchViewModel.BuildMetadata();
+        
+        Assert.Equal("extra spaces either side", actual[ReleaseSearchViewModelAzureBlobMetadataKeys.Title]);
+    }
+    
+    private void AssertAll(params IEnumerable<Action>[] assertions) => Assert.All(assertions.SelectMany(a => a), assertion => assertion());
+}
