@@ -52,6 +52,10 @@ param location string
 param tagValues object
 
 // Added
+@description('The Docker image tag for the data screener. This value represents a pipeline build number')
+param screenerDockerImageTag string = '1.0.0'
+
+// Added
 @description('Specifies the App Service plan name')
 param appServicePlanName string
 
@@ -148,7 +152,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     // vnetContentShareEnabled: false
     siteConfig: {
       numberOfWorkers: 1
-      linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:[BUILD-TAG]' // Changed from DOCKER|mcr.microsoft.com/azure-functions/dotnet:4-appservice-quickstart
+      linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${screenerDockerImageTag}' // Changed from DOCKER|mcr.microsoft.com/azure-functions/dotnet:4-appservice-quickstart
       acrUseManagedIdentityCreds: true // Changed from false
       // alwaysOn: false
       // http20Enabled: false
@@ -229,7 +233,7 @@ resource sites_dwtestfa_name_web 'Microsoft.Web/sites/config@2024-04-01' = {
     //   'index.php'
     // ]
     // netFrameworkVersion: 'v4.0'
-    linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:[BUILD-TAG]' // Changed from DOCKER|mcr.microsoft.com/azure-functions/dotnet:4-appservice-quickstart
+    linuxFxVersion: 'DOCKER|${acrLoginServer}/${functionAppImageName}:${screenerDockerImageTag}' // Changed from DOCKER|mcr.microsoft.com/azure-functions/dotnet:4-appservice-quickstart
     // requestTracingEnabled: false
     // remoteDebuggingEnabled: false
     // httpLoggingEnabled: false

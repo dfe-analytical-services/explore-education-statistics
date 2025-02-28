@@ -163,6 +163,9 @@ var tagValues = union(resourceTags ?? {}, {
   DateProvisioned: dateProvisioned
 })
 
+@description('The Docker image tag for the data screener. This value represents a pipeline build number')
+param screenerDockerImageTag string = '1.0.0'
+
 //
 // Define our resource prefix.
 //
