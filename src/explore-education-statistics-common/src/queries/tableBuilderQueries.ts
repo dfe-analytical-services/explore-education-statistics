@@ -44,11 +44,14 @@ const tableBuilderQueries = createQueryKeys('tableBuilder', {
 
         return {
           title: indicator.label,
-          value: formatPretty(
-            indicatorValue,
-            indicator.unit,
-            indicator.decimalPlaces,
-          ),
+          value:
+            indicator.unit === 'string'
+              ? indicatorValue
+              : formatPretty(
+                  indicatorValue,
+                  indicator.unit,
+                  indicator.decimalPlaces,
+                ),
         };
       },
     };
