@@ -20,7 +20,7 @@ ${RELEASE_2_NAME}=          Academic year 2000/01
 
 *** Test Cases ***
 Navigate to manage users page as bau1
-    user navigates to admin frontend    %{ADMIN_URL}/administration/users
+    user navigates to    %{ADMIN_URL}/administration/users
     user checks table column heading contains    1    1    Name
     user checks table column heading contains    1    2    Email
     user checks table column heading contains    1    3    Role

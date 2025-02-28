@@ -11,7 +11,7 @@ import metaService, {
 import publicationService, {
   Publication,
 } from '@admin/services/publicationService';
-import releaseVersionService from '@admin/services/releaseVersionService';
+import releaseService from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -54,7 +54,7 @@ const ReleaseCreatePage = ({
   }, [publicationId]);
 
   const handleSubmit = async (values: ReleaseSummaryFormValues) => {
-    const createdRelease = await releaseVersionService.createReleaseVersion({
+    const createdRelease = await releaseService.createRelease({
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
       },

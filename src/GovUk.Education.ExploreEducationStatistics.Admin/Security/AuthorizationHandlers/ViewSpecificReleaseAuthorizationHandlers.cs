@@ -20,7 +20,7 @@ public class ViewSpecificReleaseAuthorizationHandler : AuthorizationHandler<View
         ViewReleaseRequirement requirement,
         ReleaseVersion releaseVersion)
     {
-        if (await _authorizationHandlerService.IsReleaseViewableByUser(releaseVersion, context.User))
+        if (await _authorizationHandlerService.IsReleaseVersionViewableByUser(releaseVersion, context.User))
         {
             context.Succeed(requirement);
         }

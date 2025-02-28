@@ -1,7 +1,7 @@
 import baseRender from '@common-test/render';
 import PublicationUnpublishedReleases from '@admin/pages/publication/components/PublicationUnpublishedReleases';
 import _publicationService from '@admin/services/publicationService';
-import _releaseService, {
+import _releaseVersionService, {
   ReleaseVersionPermissions,
   ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseVersionService';
@@ -17,8 +17,8 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 jest.mock('@admin/services/releaseVersionService');
-const releaseVersionService = _releaseService as jest.Mocked<
-  typeof _releaseService
+const releaseVersionService = _releaseVersionService as jest.Mocked<
+  typeof _releaseVersionService
 >;
 
 describe('PublicationUnpublishedReleases', () => {

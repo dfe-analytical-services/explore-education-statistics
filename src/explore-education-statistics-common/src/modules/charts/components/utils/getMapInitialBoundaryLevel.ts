@@ -1,10 +1,8 @@
 import isEqual from 'lodash/isEqual';
 import { MapChart } from '../../types/chart';
-import orderMapLegendItems from './orderMapLegendItems';
 
 export default function getMapInitialBoundaryLevel(chart: MapChart): number {
-  const orderedLegends = orderMapLegendItems(chart.legend);
-  const firstLegend = orderedLegends[0];
+  const firstLegend = chart.legend.items[0];
   if (!firstLegend) {
     return chart.boundaryLevel;
   }

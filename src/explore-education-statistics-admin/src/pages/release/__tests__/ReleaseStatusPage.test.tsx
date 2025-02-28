@@ -4,7 +4,7 @@ import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/Rel
 import _permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
-import _releaseService, {
+import _releaseVersionService, {
   ReleaseVersion,
 } from '@admin/services/releaseVersionService';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -19,8 +19,8 @@ jest.mock('@admin/services/releaseVersionService');
 const permissionService = _permissionService as jest.Mocked<
   typeof _permissionService
 >;
-const releaseVersionService = _releaseService as jest.Mocked<
-  typeof _releaseService
+const releaseVersionService = _releaseVersionService as jest.Mocked<
+  typeof _releaseVersionService
 >;
 
 describe('ReleaseStatusPage', () => {

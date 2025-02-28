@@ -48,54 +48,48 @@ export default function DataSetFileUsage({
         />
         <ChevronCard
           cardSize="l"
+          className={hasApiDataSet ? 'govuk-!-padding-bottom-0' : undefined}
           description="View tables that we have built for you, or create your own tables from open data using our table tool"
           link={<Link to={tableToolLink}>View or create your own tables</Link>}
         />
-        {hasApiDataSet && (
-          <ChevronCard
-            cardSize="l"
-            description="This data set is also available via an API, follow the link to get all the information to get started"
-            link={
-              <Link to={process.env.PUBLIC_API_DOCS_URL ?? ''}>
-                API documentation
-              </Link>
-            }
-          />
-        )}
       </ChevronGrid>
+      {!hasApiDataSet && (
+        <>
+          <h3>Download this data using code</h3>
 
-      <h3>Download this data using code</h3>
+          <p>
+            Access this data using common programming languages using the URL
+            below.
+          </p>
 
-      <p>
-        Access this data using common programming languages using the URL below.
-      </p>
+          <CopyTextButton
+            className="govuk-!-margin-top-5 govuk-!-margin-bottom-5"
+            id="copy-download-url"
+            text={downloadUrl}
+            label="URL"
+            labelHidden={false}
+          />
 
-      <CopyTextButton
-        className="govuk-!-margin-top-5 govuk-!-margin-bottom-5"
-        id="copy-download-url"
-        text={downloadUrl}
-        label="URL"
-        labelHidden={false}
-      />
+          <h4>Example code</h4>
 
-      <h4>Example code</h4>
+          <Tabs id="dataSetUsage-code">
+            <TabsSection title="Python">
+              <h5 className="govuk-heading-s">Python</h5>
 
-      <Tabs id="dataSetUsage-code">
-        <TabsSection title="Python">
-          <h5 className="govuk-heading-s">Python</h5>
-
-          <CodeBlock language="python">
-            {`import pandas as pd
+              <CodeBlock language="python">
+                {`import pandas as pd
 
 pd.read_csv("${downloadUrl}")`}
-          </CodeBlock>
-        </TabsSection>
-        <TabsSection title="R">
-          <h5 className="govuk-heading-s">R</h5>
+              </CodeBlock>
+            </TabsSection>
+            <TabsSection title="R">
+              <h5 className="govuk-heading-s">R</h5>
 
-          <CodeBlock language="r">{`read.csv("${downloadUrl}")`}</CodeBlock>
-        </TabsSection>
-      </Tabs>
+              <CodeBlock language="r">{`read.csv("${downloadUrl}")`}</CodeBlock>
+            </TabsSection>
+          </Tabs>
+        </>
+      )}
     </DataSetFilePageSection>
   );
 }

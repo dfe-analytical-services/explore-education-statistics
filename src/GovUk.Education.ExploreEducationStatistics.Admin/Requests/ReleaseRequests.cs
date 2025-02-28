@@ -25,7 +25,7 @@ public record ReleaseCreateRequest
     [Range(1000, 9999)]
     public int Year { get; init; }
 
-    [MaxLength(50)]
+    [MaxLength(20)]
     public string? Label { get; init; }
 
     public Guid? TemplateReleaseId { get; init; }
@@ -33,20 +33,6 @@ public record ReleaseCreateRequest
 
 public record ReleaseUpdateRequest
 {
-    [Required]
-    public ReleaseType? Type { get; init; }
-
-    [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-    [Required]
-    public TimeIdentifier TimePeriodCoverage { get; init; }
-
-    public string PreReleaseAccessList { get; init; } = string.Empty;
-
-    public string Slug => CreateReleaseSlug(year: Year, timePeriodCoverage: TimePeriodCoverage, label: Label);
-
-    [Range(1000, 9999)]
-    public int Year { get; init; }
-
-    [MaxLength(50)]
+    [MaxLength(20)]
     public string? Label { get; init; }
 }

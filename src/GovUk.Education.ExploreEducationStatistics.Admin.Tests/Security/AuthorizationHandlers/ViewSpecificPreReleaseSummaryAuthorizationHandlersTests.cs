@@ -11,7 +11,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
+    ReleaseVersionAuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
@@ -37,7 +37,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
     public async Task ViewSpecificPreReleaseSummary_SucceedsWithReleaseRoles()
     {
         // Assert that a User who has any unrestricted viewer role on a Release can view the PreRelease Summary
-        await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewSpecificPreReleaseSummaryRequirement>(
+        await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewSpecificPreReleaseSummaryRequirement>(
             CreateHandler,
             new ReleaseVersion
             {
@@ -53,7 +53,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         {
             Id = Guid.NewGuid()
         };
-        await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<ViewSpecificPreReleaseSummaryRequirement>(
+        await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewSpecificPreReleaseSummaryRequirement>(
             CreateHandler,
             new ReleaseVersion
             {

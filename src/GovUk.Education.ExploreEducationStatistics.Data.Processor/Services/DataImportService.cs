@@ -189,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Label = f.Label,
                     Hint = f.Hint,
                     ColumnName = f.Name,
-                    GroupCsvColumn = f.GroupCsvColumn,
+                    ParentFilter = f.ParentFilter,
                 })
                 .ToListAsync();
 
@@ -240,9 +240,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             List<FilterMeta> filters)
         {
             var rootFilters = filters
-                .Where(parentFilter => parentFilter.GroupCsvColumn == null
+                .Where(parentFilter => parentFilter.ParentFilter == null
                                        && filters.Any(childFilter =>
-                                           parentFilter.ColumnName == childFilter.GroupCsvColumn));
+                                           parentFilter.ColumnName == childFilter.ParentFilter));
 
             var hierarchies = new List<DataSetFileFilterHierarchy>();
 
@@ -272,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var parentFilter = rootFilter;
             var parentFilterItemIds = rootFilterItemIds;
             var childFilter = filters
-                .Single(f => f.GroupCsvColumn == parentFilter.ColumnName);
+                .Single(f => f.ParentFilter == parentFilter.ColumnName);
 
             // Loop over each parent/child or tier, starting with the root filter, until no child is found
             while (true)
@@ -317,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 // check whether we're finished
                 var newChildFilter = filters
-                    .SingleOrDefault(newChildFilter => newChildFilter.GroupCsvColumn == childFilter.ColumnName);
+                    .SingleOrDefault(newChildFilter => newChildFilter.ParentFilter == childFilter.ColumnName);
                 if (newChildFilter == null)
                 {
                     break;

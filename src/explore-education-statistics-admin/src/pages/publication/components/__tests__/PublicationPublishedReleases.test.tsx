@@ -1,5 +1,5 @@
 import PublicationPublishedReleases from '@admin/pages/publication/components/PublicationPublishedReleases';
-import _releaseService, {
+import _releaseVersionService, {
   ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseVersionService';
 import _publicationService from '@admin/services/publicationService';
@@ -13,8 +13,8 @@ import React, { ReactElement } from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 
 jest.mock('@admin/services/releaseVersionService');
-const releaseVersionService = _releaseService as jest.Mocked<
-  typeof _releaseService
+const releaseVersionService = _releaseVersionService as jest.Mocked<
+  typeof _releaseVersionService
 >;
 
 jest.mock('@admin/services/publicationService');

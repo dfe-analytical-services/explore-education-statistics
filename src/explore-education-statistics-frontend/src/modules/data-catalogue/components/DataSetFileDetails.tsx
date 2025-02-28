@@ -15,13 +15,13 @@ import orderBy from 'lodash/orderBy';
 import React from 'react';
 
 interface Props {
+  apiDataSetId?: string;
   dataSetFile: DataSetFile;
-  hasApiDataSet?: boolean;
 }
 
 export default function DataSetFileDetails({
+  apiDataSetId,
   dataSetFile,
-  hasApiDataSet = false,
 }: Props) {
   const {
     release,
@@ -43,6 +43,13 @@ export default function DataSetFileDetails({
         <SummaryListItem term="Publication">
           {release.publication.title}
         </SummaryListItem>
+        {apiDataSetId && (
+          <SummaryListItem term="API data set ID">
+            {apiDataSetId}
+            <br />
+            <Link to="#api">How do I use this ID?</Link>
+          </SummaryListItem>
+        )}
         <SummaryListItem term="Release">
           <Link
             to={`/find-statistics/${release.publication.slug}/${release.slug}`}
@@ -109,17 +116,6 @@ export default function DataSetFileDetails({
         {timePeriodRange && (timePeriodRange.from || timePeriodRange.to) && (
           <SummaryListItem term="Time period">
             {getTimePeriodString(timePeriodRange)}
-          </SummaryListItem>
-        )}
-        {hasApiDataSet && (
-          <SummaryListItem term="Notifications">
-            <Link
-              className="govuk-!-display-none-print"
-              unvisited
-              to={`/api-subscriptions/new-subscription/${dataSetFile.id}`}
-            >
-              Get email updates about this API data set
-            </Link>
           </SummaryListItem>
         )}
       </SummaryList>

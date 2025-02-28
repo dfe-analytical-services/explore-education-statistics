@@ -12,10 +12,6 @@ public interface IDataSetVersionPathResolver
 
     string DirectoryPath(DataSetVersion dataSetVersion);
 
-    // TODO EES-5660 - remove after draft DataSetVersion folders are migrated for each
-    // Public API-enabled environment.
-    string DirectoryPath(DataSetVersion dataSetVersion, SemVersion versionNumber);
-
     string CsvDataPath(DataSetVersion dataSetVersion)
         => Path.Combine(DirectoryPath(dataSetVersion), DataSetFilenames.CsvDataFile);
 
