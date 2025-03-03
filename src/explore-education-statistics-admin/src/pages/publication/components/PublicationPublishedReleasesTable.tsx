@@ -108,7 +108,7 @@ export default function PublicationPublishedReleasesTable({
                       },
                     )}
                   >
-                    Edit Details
+                    Edit details
                     <VisuallyHidden> {release.title}</VisuallyHidden>
                   </Link>
                 ) : (
