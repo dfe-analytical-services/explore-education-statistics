@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var request = new PermalinkCreateRequest
             {
-                ReleaseId = null,
+                ReleaseVersionId = null,
                 Configuration = new TableBuilderConfiguration
                 {
                     TableHeaders = new TableHeaders()
@@ -582,7 +582,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var request = new PermalinkCreateRequest
             {
-                ReleaseId = releaseVersion.Id,
+                ReleaseVersionId = releaseVersion.Id,
                 Configuration = new TableBuilderConfiguration
                 {
                     TableHeaders = new TableHeaders()
