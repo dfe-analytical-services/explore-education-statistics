@@ -2,10 +2,10 @@ import {
   FirewallRule
   AzureFileShareMount
   EntraIdAuthentication
-} from '../types.bicep'
+} from '../../public-api/types.bicep'
 
-import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
-import { dynamicAverageGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
+import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../public-api/components/alerts/staticAlertConfig.bicep'
+import { dynamicAverageGreaterThan } from '../../public-api/components/alerts/dynamicAlertConfig.bicep'
 
 @description('An existing Managed Identity\'s Resource Id with which to associate this Function App')
 param userAssignedManagedIdentityParams {
@@ -87,7 +87,7 @@ var firewallRules = [
   }
 ]
 
-module appServicePlanModule 'appServicePlan.bicep' = {
+module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
   name: appServicePlanName
   params: {
     planName: appServicePlanName
@@ -166,7 +166,7 @@ resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
   )
 }
 
-module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
+module privateEndpointModule '../../public-api/components/privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {
   name: '${functionAppName}PrivateEndpointDeploy'
   params: {
     serviceId: functionApp.id
@@ -178,7 +178,7 @@ module privateEndpointModule 'privateEndpoint.bicep' = if (privateEndpoints.?fun
   }
 }
 
-module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthentication != null) {
+module azureAuthentication '../../public-api/components/siteAzureAuthentication.bicep' = if (entraIdAuthentication != null) {
   name: '${functionAppName}AzureAuthentication'
   params: {
     clientId: entraIdAuthentication!.appRegistrationClientId
@@ -189,7 +189,7 @@ module azureAuthentication 'siteAzureAuthentication.bicep' = if (entraIdAuthenti
   }
 }
 
-module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
+module healthAlert '../../public-api/components/alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.functionAppHealth) {
   name: '${functionAppName}HealthAlertModule'
   params: {
     resourceName: functionAppName
@@ -211,7 +211,7 @@ module healthAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && aler
 
 var unexpectedHttpStatusCodeMetrics = ['Http401', 'Http5xx']
 
-module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
+module unexpectedHttpStatusCodeAlerts '../../public-api/components/alerts/staticMetricAlert.bicep' = [
   for httpStatusCode in unexpectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
@@ -235,7 +235,7 @@ module unexpectedHttpStatusCodeAlerts 'alerts/staticMetricAlert.bicep' = [
 
 var expectedHttpStatusCodeMetrics = ['Http403', 'Http4xx']
 
-module expectedHttpStatusCodeAlerts 'alerts/dynamicMetricAlert.bicep' = [
+module expectedHttpStatusCodeAlerts '../../public-api/components/alerts/dynamicMetricAlert.bicep' = [
   for httpStatusCode in expectedHttpStatusCodeMetrics: if (alerts != null && alerts!.httpErrors) {
     name: '${functionAppName}${httpStatusCode}Module'
     params: {
