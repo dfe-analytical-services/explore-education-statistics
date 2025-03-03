@@ -20,11 +20,12 @@ param publicApiContainerAppConfig = {
 }
 
 param publicApiContainerAppWorkloadProfiles = [{
-  name: 'D8'
-  workloadProfileType: 'D8'
-  minimumCount: 0
-  maximumCount: 10
+    name: 'D8'
+    workloadProfileType: 'D8'
+    minimumCount: 0
+    maximumCount: 10
 }]
 
 param enableThemeDeletion = true
 param enableSwagger = true
+param screenerDockerImageTag = '1.0.0'
