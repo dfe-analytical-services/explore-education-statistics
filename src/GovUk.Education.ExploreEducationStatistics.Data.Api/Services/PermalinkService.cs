@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
             CancellationToken cancellationToken = default)
         {
-            return await (request.ReleaseId ?? await FindLatestPublishedReleaseVersionId(request.Query.SubjectId))
+            return await (request.ReleaseVersionId ?? await FindLatestPublishedReleaseVersionId(request.Query.SubjectId))
                 .OnSuccess(releaseVersionId =>
                 {
                     return _tableBuilderService.Query(releaseVersionId,
