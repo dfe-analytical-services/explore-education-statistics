@@ -12,7 +12,3 @@ public class AzureBlobStorageException : Exception
     }
 }
 
-public class AzureBlobStorageNotFoundException : AzureBlobStorageException
-{
-    public AzureBlobStorageNotFoundException(string containerName, string blobName) : base(containerName, blobName, "Not found") { }
-}

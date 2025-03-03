@@ -2,7 +2,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public interface IAzureBlobStorageClient
 {
-    Task UploadAsync(string containerName, string blobName, Blob blob, CancellationToken cancellationToken = default);
-    Task<Blob> DownloadAsync(string containerName, string blobName, CancellationToken cancellationToken = default);
-    Task DeleteAsync(string containerName, string blobName, CancellationToken cancellationToken = default);
+    /// <summary>
+    /// Upload a Blob to Azure storage account
+    /// </summary>
+    /// <param name="containerName">The name of the storage account container</param>
+    /// <param name="blobName">The name (including any path) of the blob</param>
+    /// <param name="blob">The contents and metadata to be uploaded</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns></returns>
+    Task UploadBlob(string containerName, string blobName, Blob blob, CancellationToken cancellationToken = default);
 }

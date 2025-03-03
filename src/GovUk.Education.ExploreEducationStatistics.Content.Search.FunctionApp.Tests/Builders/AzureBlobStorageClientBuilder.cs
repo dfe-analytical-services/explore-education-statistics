@@ -13,7 +13,7 @@ internal class AzureBlobStorageClientBuilder
     {
         Assert = new(_mock);
         
-        _mock.Setup(mock => mock.UploadAsync(
+        _mock.Setup(mock => mock.UploadBlob(
             It.IsAny<string>(), 
             It.IsAny<string>(), 
             It.IsAny<Blob>(), 
@@ -31,7 +31,7 @@ internal class AzureBlobStorageClientBuilder
             string? blobName = null, 
             Func<Blob, bool>? whereBlob = null)
         {
-            mock.Verify(m => m.UploadAsync(
+            mock.Verify(m => m.UploadBlob(
                 It.Is<string>(actualContainerName => containerName == null || actualContainerName == containerName),
                 It.Is<string>(actualBlobName => blobName == null || actualBlobName == blobName),
                 It.Is<Blob>(blob => whereBlob == null || whereBlob(blob)), 

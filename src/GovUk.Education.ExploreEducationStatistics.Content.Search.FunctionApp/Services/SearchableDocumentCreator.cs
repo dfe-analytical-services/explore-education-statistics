@@ -24,7 +24,7 @@ public class SearchableDocumentCreator(
         var searchViewModel = await contentApiClient.GetPublicationLatestReleaseSearchViewModelAsync(request.PublicationSlug, cancellationToken);
 
         var blobName = searchViewModel.ReleaseId.ToString();
-        await azureBlobStorageClient.UploadAsync(
+        await azureBlobStorageClient.UploadBlob(
             appOptions.Value.SearchableDocumentsContainerName, 
             blobName, 
             new Blob(searchViewModel.HtmlContent, searchViewModel.BuildMetadata()), 

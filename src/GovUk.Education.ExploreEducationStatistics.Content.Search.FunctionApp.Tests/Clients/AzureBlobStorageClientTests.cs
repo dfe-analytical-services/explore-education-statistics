@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class AzureBlobStorageClientTests
 {
-    private IAzureBlobStorageClient GetSut(string connectionString)
+    private AzureBlobStorageClient GetSut(string connectionString)
     {
         var blobServiceClient = new BlobServiceClient(connectionString);
         return new AzureBlobStorageClient(blobServiceClient);
@@ -17,14 +17,21 @@ public class AzureBlobStorageClientTests
     public class IntegrationTests
     {
         /// <summary>
-        /// Integration Tests
+        /// Integration Tests.
+        /// In order to run these:
+        /// - set StorageAccountName to the name of the Storage Account in Azure
+        /// - set StorageAccountAccessKey to one of its Access keys (found under Security + networking)
+        /// - unskip the test 
         /// </summary>
         public class HiveITAzureAccount : AzureBlobStorageClientTests
         {
-            private string _integrationTestStorageAccountConnectionString = "** add Azure connection string here **";
-            private string _integrationTestContainerName = "integration-tests";
+            private const string StorageAccountName = "-- azure storage account name here --";
+            private const string StorageAccountAccessKey = "-- azure storage account access key here --";
+            
+            private const string IntegrationTestStorageAccountConnectionString = $"AccountName={StorageAccountName};AccountKey={StorageAccountAccessKey};";
+            private const string IntegrationTestContainerName = "integration-tests";
 
-            private IAzureBlobStorageClient GetSut() => base.GetSut(_integrationTestStorageAccountConnectionString);
+            private AzureBlobStorageClient GetSut() => base.GetSut(IntegrationTestStorageAccountConnectionString);
 
             [Fact(Skip = "This integration test creates a blob in an Azure Storage Account and retrieves it again.")]
             public async Task CanUploadBlob()
@@ -40,12 +47,12 @@ public class AzureBlobStorageClientTests
                 });
                 
                 // ACT
-                await sut.UploadAsync(_integrationTestContainerName, uniqueBlobName, blob);
+                await sut.UploadBlob(IntegrationTestContainerName, uniqueBlobName, blob);
                 
                 // ASSERT
-                var actual = await sut.DownloadAsync(_integrationTestContainerName, uniqueBlobName);
+                var actual = await AzureBlobStorageIntegrationHelper.DownloadAsync(sut.BlobServiceClient, IntegrationTestContainerName, uniqueBlobName);
                 Assert.Equal(blob, actual);
-                await sut.DeleteAsync(_integrationTestContainerName, uniqueBlobName);
+                await AzureBlobStorageIntegrationHelper.DeleteAsync(sut.BlobServiceClient, IntegrationTestContainerName, uniqueBlobName);
             }
             
             [Fact(Skip = "This integration test gets a non-existent blob from Azure Storage Account.")]
@@ -56,13 +63,13 @@ public class AzureBlobStorageClientTests
                 var sut = GetSut();
                 
                 // ACT
-                var actual = await Record.ExceptionAsync(() => sut.DownloadAsync(_integrationTestContainerName, uniqueBlobName));
+                var actual = await Record.ExceptionAsync(() => AzureBlobStorageIntegrationHelper.DownloadAsync(sut.BlobServiceClient, IntegrationTestContainerName, uniqueBlobName));
                 
                 // ASSERT
                 Assert.NotNull(actual);
                 var azureBlobStorageNotFoundException = Assert.IsType<AzureBlobStorageNotFoundException>(actual);
                 Assert.Equal(uniqueBlobName, azureBlobStorageNotFoundException.BlobName);
-                Assert.Equal(_integrationTestContainerName, azureBlobStorageNotFoundException.ContainerName);
+                Assert.Equal(IntegrationTestContainerName, azureBlobStorageNotFoundException.ContainerName);
             }
             
             [Fact(Skip = "This integration test deletes a non-existent blob from Azure Storage Account.")]
@@ -73,8 +80,13 @@ public class AzureBlobStorageClientTests
                 var sut = GetSut();
                 
                 // ACT
-                await sut.DeleteAsync(_integrationTestContainerName, uniqueBlobName);
+                await AzureBlobStorageIntegrationHelper.DeleteAsync(sut.BlobServiceClient, IntegrationTestContainerName, uniqueBlobName);
             }
         }    
     }
+}
+
+public class AzureBlobStorageNotFoundException : AzureBlobStorageException
+{
+    public AzureBlobStorageNotFoundException(string containerName, string blobName) : base(containerName, blobName, "Not found") { }
 }
