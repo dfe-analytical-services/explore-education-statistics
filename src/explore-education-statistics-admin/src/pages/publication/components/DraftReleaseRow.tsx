@@ -68,7 +68,7 @@ const DraftReleaseRow = ({
             releaseVersionId: release.id,
           })}
         >
-          {release.permissions?.canUpdateReleaseVersion ? 'Edit Draft' : 'View'}
+          {release.permissions?.canUpdateReleaseVersion ? 'Edit draft' : 'View'}
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
 
