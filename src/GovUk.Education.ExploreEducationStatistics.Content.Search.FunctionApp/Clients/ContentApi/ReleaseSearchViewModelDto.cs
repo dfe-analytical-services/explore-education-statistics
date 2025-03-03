@@ -1,6 +1,6 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 
-public class ReleaseSearchViewModelDto
+public record ReleaseSearchViewModelDto
 {
     public Guid ReleaseId { get; init; }
     public Guid ReleaseVersionId { get; init; }

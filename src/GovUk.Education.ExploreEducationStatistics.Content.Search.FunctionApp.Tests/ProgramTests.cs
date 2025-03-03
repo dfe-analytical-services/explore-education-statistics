@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,7 +35,7 @@ public class ProgramTests
             }
         }));
     
-    private IHost GetSut(Func<IHostBuilder, IHostBuilder> modifyHostBuilder) => Program.BuildHost(modifyHostBuilder(new HostBuilder()));
+    private IHost GetSut(Func<IHostBuilder, IHostBuilder> modifyHostBuilder) => modifyHostBuilder(new HostBuilder()).BuildHost();
 
     public class BasicTests : ProgramTests
     {

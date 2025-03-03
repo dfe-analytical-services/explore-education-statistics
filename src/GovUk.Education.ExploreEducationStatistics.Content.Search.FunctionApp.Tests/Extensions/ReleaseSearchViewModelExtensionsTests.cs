@@ -30,15 +30,15 @@ public class ReleaseSearchViewModelExtensionsTests
         // ASSERT
         AssertAll(
         [
-            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.ReleaseVersionId, "12345678-1234-1234-1234-123456789abc"),
-            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.PublicationSlug, "publication-slug"),
-            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.ReleaseSlug, "release-slug"),
-            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.Published, "2025-02-21T08:24:01Z"),
-            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.Summary, "This is a summary."),
-            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.Title, "Publication Title"),
-            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.Theme, "Theme"),
-            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.Type, "Official Statistics"),
-            AssertMetadata(ReleaseSearchViewModelAzureBlobMetadataKeys.TypeBoost, "10"),
+            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseVersionId, "12345678-1234-1234-1234-123456789abc"),
+            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.PublicationSlug, "publication-slug"),
+            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug, "release-slug"),
+            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.Published, "2025-02-21T08:24:01Z"),
+            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.Summary, "This is a summary."),
+            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.Title, "Publication Title"),
+            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.Theme, "Theme"),
+            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.Type, "Official Statistics"),
+            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.TypeBoost, "10"),
             () => Assert.Equal(9, actual.Keys.Count) // Ensure there aren't any extra items in the metadata
         ]);
         
@@ -57,7 +57,7 @@ public class ReleaseSearchViewModelExtensionsTests
         
         var actual = releaseSearchViewModel.BuildMetadata();
         
-        Assert.Equal("Right single quotation mark = \\u2019", actual[ReleaseSearchViewModelAzureBlobMetadataKeys.Summary]);
+        Assert.Equal("Right single quotation mark = \\u2019", actual[SearchableDocumentAzureBlobMetadataKeys.Summary]);
     }
     
     /// <summary>
@@ -72,7 +72,7 @@ public class ReleaseSearchViewModelExtensionsTests
         
         var actual = releaseSearchViewModel.BuildMetadata();
         
-        Assert.Equal("extra spaces either side", actual[ReleaseSearchViewModelAzureBlobMetadataKeys.Summary]);
+        Assert.Equal("extra spaces either side", actual[SearchableDocumentAzureBlobMetadataKeys.Summary]);
     }
     
     /// <summary>
@@ -87,7 +87,7 @@ public class ReleaseSearchViewModelExtensionsTests
         
         var actual = releaseSearchViewModel.BuildMetadata();
         
-        Assert.Equal("Right single quotation mark = \\u2019", actual[ReleaseSearchViewModelAzureBlobMetadataKeys.Title]);
+        Assert.Equal("Right single quotation mark = \\u2019", actual[SearchableDocumentAzureBlobMetadataKeys.Title]);
     }
     
     /// <summary>
@@ -102,7 +102,7 @@ public class ReleaseSearchViewModelExtensionsTests
         
         var actual = releaseSearchViewModel.BuildMetadata();
         
-        Assert.Equal("extra spaces either side", actual[ReleaseSearchViewModelAzureBlobMetadataKeys.Title]);
+        Assert.Equal("extra spaces either side", actual[SearchableDocumentAzureBlobMetadataKeys.Title]);
     }
     
     private void AssertAll(params IEnumerable<Action>[] assertions) => Assert.All(assertions.SelectMany(a => a), assertion => assertion());

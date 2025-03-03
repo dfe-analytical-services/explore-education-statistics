@@ -25,12 +25,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
             throw new UnableToGetPublicationLatestReleaseSearchViewModelException(publicationSlug, e.StatusCode, e.Message);
         }
 
-        var result = await response.Content.ReadFromJsonAsync<ReleaseSearchViewModelDto>(cancellationToken: cancellationToken);
-        if (result == null)
-        {
-            throw new UnableToGetPublicationLatestReleaseSearchViewModelException(publicationSlug, "Response content could not be deserialised");
-        }
-
-        return result;
+        return await response.Content.ReadFromJsonAsync<ReleaseSearchViewModelDto>(cancellationToken: cancellationToken) 
+                     ?? throw new UnableToGetPublicationLatestReleaseSearchViewModelException(publicationSlug, "Response content could not be deserialised");
     }
 }

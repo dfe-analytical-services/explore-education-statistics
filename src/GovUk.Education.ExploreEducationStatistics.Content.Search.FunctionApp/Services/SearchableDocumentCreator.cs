@@ -1,5 +1,4 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
@@ -18,7 +17,9 @@ public class SearchableDocumentCreator(
     IAzureBlobStorageClient azureBlobStorageClient, 
     IOptions<AppOptions> appOptions) : ISearchableDocumentCreator
 {
-    public async Task<CreatePublicationLatestReleaseSearchableDocumentResponse> CreatePublicationLatestReleaseSearchableDocument(CreatePublicationLatestReleaseSearchableDocumentRequest request, CancellationToken cancellationToken = default)
+    public async Task<CreatePublicationLatestReleaseSearchableDocumentResponse> CreatePublicationLatestReleaseSearchableDocument(
+        CreatePublicationLatestReleaseSearchableDocumentRequest request, 
+        CancellationToken cancellationToken = default)
     {
         var searchViewModel = await contentApiClient.GetPublicationLatestReleaseSearchViewModelAsync(request.PublicationSlug, cancellationToken);
 
