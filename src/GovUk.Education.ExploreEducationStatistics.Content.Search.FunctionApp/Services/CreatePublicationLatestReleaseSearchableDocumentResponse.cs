@@ -1,8 +1,8 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 
-public record CreatePublicationLatestReleaseSearchableDocumentResponse
+public abstract record CreatePublicationLatestReleaseSearchableDocumentResponse
 {
-    public required string PublicationSlug { get; init; }
-    public required Guid ReleaseVersionId { get; init; }
-    public required string BlobName { get; init; }
+    public record Success(Guid ReleaseVersionId, string BlobName) : CreatePublicationLatestReleaseSearchableDocumentResponse();
+    public record NotFound() : CreatePublicationLatestReleaseSearchableDocumentResponse();
+    public record Error(string ErrorMessage) : CreatePublicationLatestReleaseSearchableDocumentResponse();
 }

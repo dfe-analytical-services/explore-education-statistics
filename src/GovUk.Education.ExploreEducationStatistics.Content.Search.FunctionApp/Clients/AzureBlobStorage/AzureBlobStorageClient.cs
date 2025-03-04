@@ -7,15 +7,24 @@ public class AzureBlobStorageClient(BlobServiceClient blobServiceClient) : IAzur
 {
     internal BlobServiceClient BlobServiceClient { get; } = blobServiceClient;
 
-    public async Task UploadBlob(string containerName, string blobName, Blob blob, CancellationToken cancellationToken = default)
+    public async Task<UploadBlobResponse> UploadBlob(UploadBlobRequest request, CancellationToken cancellationToken = default)
     {
-        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
-        var blobClient = blobContainerClient.GetBlobClient(blobName);
+        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(request.ContainerName);
+        var blobClient = blobContainerClient.GetBlobClient(request.BlobName);
 
-        await using var stream = blob.Contents.ToStream();
-        await blobClient.UploadAsync(
-            stream,
-            metadata: blob.Metadata,
-            cancellationToken: cancellationToken);
+        await using var stream = request.Blob.Contents.ToStream();
+        try
+        {
+            await blobClient.UploadAsync(
+                stream,
+                metadata: request.Blob.Metadata,
+                cancellationToken: cancellationToken);
+            
+            return new UploadBlobResponse.Success();
+        }
+        catch (Exception e)
+        {
+            return new UploadBlobResponse.Error(e.Message);
+        }
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 
-public record ReleaseSearchViewModelDto
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+
+internal record ReleaseSearchViewModelDto
 {
     public Guid ReleaseId { get; init; }
     public Guid ReleaseVersionId { get; init; }
@@ -16,4 +18,20 @@ public record ReleaseSearchViewModelDto
     public string ReleaseSlug { get; init; } = string.Empty;
 
     public string HtmlContent { get; init; } = string.Empty;
+
+    public ReleaseSearchableDocument ToModel() =>
+        new()
+        {
+            ReleaseId = ReleaseId,
+            ReleaseVersionId = ReleaseVersionId,
+            Published = Published,
+            PublicationTitle = PublicationTitle,
+            Summary = Summary,
+            Theme = Theme,
+            Type = Type,
+            TypeBoost = TypeBoost,
+            PublicationSlug = PublicationSlug,
+            ReleaseSlug = ReleaseSlug,
+            HtmlContent = HtmlContent,
+        };
 }

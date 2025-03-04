@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments.Dtos;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -18,16 +19,29 @@ public class CreateSearchableReleaseDocumentInAzureStorageFunction(
     {
         logger.LogInformation("{FunctionName} triggered: {Request}", context.FunctionDefinition.Name, message);
 
-        var request = new CreatePublicationLatestReleaseSearchableDocumentRequest{ PublicationSlug = message.ReleaseSlug };
+        var publicationSlug = message.ReleaseSlug;
+        var request = new CreatePublicationLatestReleaseSearchableDocumentRequest(publicationSlug);
         var response = await searchableDocumentCreator.CreatePublicationLatestReleaseSearchableDocument(request, cancellationToken);
-        var searchDocumentCreatedMessage = new SearchDocumentCreatedMessage
-        {
-            PublicationSlug = response.PublicationSlug,
-            BlobName = response.BlobName,
-            ReleaseVersionId = response.ReleaseVersionId
-        };
 
-        logger.LogInformation("{FunctionName} completed. {Response}", context.FunctionDefinition.Name, searchDocumentCreatedMessage);
-        return searchDocumentCreatedMessage;
+        logger.LogInformation("{FunctionName} completed. {@Response}", context.FunctionDefinition.Name, response);
+
+        return response switch
+        {
+            CreatePublicationLatestReleaseSearchableDocumentResponse.Success msg => 
+                new SearchDocumentCreatedMessage
+                    {
+                        PublicationSlug = publicationSlug,
+                        BlobName = msg.BlobName,
+                        ReleaseVersionId = msg.ReleaseVersionId
+                    },
+            
+            CreatePublicationLatestReleaseSearchableDocumentResponse.NotFound => 
+                throw new UnableToCreateSearchableDocumentException(publicationSlug, "Publication Release not found."),
+            
+            CreatePublicationLatestReleaseSearchableDocumentResponse.Error msg => 
+                throw new UnableToCreateSearchableDocumentException(publicationSlug, msg.ErrorMessage),
+            
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 }

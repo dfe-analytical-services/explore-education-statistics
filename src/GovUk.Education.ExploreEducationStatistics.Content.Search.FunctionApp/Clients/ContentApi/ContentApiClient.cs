@@ -1,5 +1,5 @@
-﻿using System.Net.Http.Json;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
+﻿using System.Net;
+using System.Net.Http.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 
@@ -8,24 +8,28 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
     internal HttpClient HttpClient { get; } = httpClient;
     
     private const string GetPublicationLatestReleaseSearchViewModelFormat = "api/publications/{0}/releases/latest/searchable";
-    public async Task<ReleaseSearchViewModelDto> GetPublicationLatestReleaseSearchViewModelAsync(string publicationSlug, CancellationToken cancellationToken)
+    public async Task<GetResponse> GetPublicationLatestReleaseSearchViewModelAsync(GetRequest request, CancellationToken cancellationToken)
     {
-        var url = string.Format(GetPublicationLatestReleaseSearchViewModelFormat, publicationSlug);
+        var url = string.Format(GetPublicationLatestReleaseSearchViewModelFormat, request.PublicationSlug);
         HttpResponseMessage response;
         try
         {
             response = await HttpClient.GetAsync(url, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
-                throw new UnableToGetPublicationLatestReleaseSearchViewModelException(publicationSlug, response.StatusCode, response.ReasonPhrase);
+                return response.StatusCode == HttpStatusCode.NotFound
+                    ? new GetResponse.NotFound()
+                    : new GetResponse.Error($"Error {response.StatusCode}: {response.ReasonPhrase}");
             }
         }
         catch (HttpRequestException e)
         {
-            throw new UnableToGetPublicationLatestReleaseSearchViewModelException(publicationSlug, e.StatusCode, e.Message);
+            return new GetResponse.Error($"Error {e.StatusCode}: {e.Message}");
         }
 
-        return await response.Content.ReadFromJsonAsync<ReleaseSearchViewModelDto>(cancellationToken: cancellationToken) 
-                     ?? throw new UnableToGetPublicationLatestReleaseSearchViewModelException(publicationSlug, "Response content could not be deserialised");
+        var dto = await response.Content.ReadFromJsonAsync<ReleaseSearchViewModelDto>(cancellationToken: cancellationToken);
+        return dto is null
+            ? new GetResponse.Error($"Could not deserialise response from API")
+            : new GetResponse.Successful(dto.ToModel());
     }
 }

@@ -1,6 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using Microsoft.Extensions.Options;
 using Blob = GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage.Blob;
@@ -12,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 /// The contents of a Release along with its metadata are retrieved from the ContentAPI and uploaded
 /// to Azure Blob storage 
 /// </summary>
-public class SearchableDocumentCreator(
+internal class SearchableDocumentCreator(
     IContentApiClient contentApiClient, 
     IAzureBlobStorageClient azureBlobStorageClient, 
     IOptions<AppOptions> appOptions) : ISearchableDocumentCreator
@@ -21,21 +22,36 @@ public class SearchableDocumentCreator(
         CreatePublicationLatestReleaseSearchableDocumentRequest request, 
         CancellationToken cancellationToken = default)
     {
-        var searchViewModel = await contentApiClient.GetPublicationLatestReleaseSearchViewModelAsync(request.PublicationSlug, cancellationToken);
-
-        var blobName = searchViewModel.ReleaseId.ToString();
-        await azureBlobStorageClient.UploadBlob(
-            appOptions.Value.SearchableDocumentsContainerName, 
-            blobName, 
-            new Blob(searchViewModel.HtmlContent, searchViewModel.BuildMetadata()), 
-            cancellationToken);
-
-        return new CreatePublicationLatestReleaseSearchableDocumentResponse
+        var publicationSlug = request.PublicationSlug;
+        var getResponse = await contentApiClient.GetPublicationLatestReleaseSearchViewModelAsync(new GetRequest(publicationSlug), cancellationToken);
+        return getResponse switch
         {
-            PublicationSlug = request.PublicationSlug,
-            ReleaseVersionId = searchViewModel.ReleaseVersionId,
-            BlobName = blobName
+            GetResponse.Successful msg => await Upload(msg.ReleaseSearchableDocument, cancellationToken),
+            GetResponse.NotFound => new CreatePublicationLatestReleaseSearchableDocumentResponse.NotFound(),
+            GetResponse.Error msg => new CreatePublicationLatestReleaseSearchableDocumentResponse.Error(msg.ErrorMessage),
+            _ => throw new ArgumentOutOfRangeException(nameof(getResponse), getResponse, null)
         };
     }
+
+    private async Task<CreatePublicationLatestReleaseSearchableDocumentResponse> Upload(
+        ReleaseSearchableDocument searchableDocument, 
+        CancellationToken cancellationToken)
+    {
+        var blobName = searchableDocument.ReleaseId.ToString();
+        var uploadBlobRequest = new UploadBlobRequest(
+            appOptions.Value.SearchableDocumentsContainerName,
+            blobName,
+            new Blob(searchableDocument.HtmlContent, searchableDocument.BuildMetadata()));
+            
+        var uploadBlobResponse = await azureBlobStorageClient.UploadBlob(uploadBlobRequest, cancellationToken);
+
+        return uploadBlobResponse switch
+        {
+            UploadBlobResponse.Success =>  new CreatePublicationLatestReleaseSearchableDocumentResponse.Success(searchableDocument.ReleaseVersionId, blobName),
+            UploadBlobResponse.Error uploadMsg => new CreatePublicationLatestReleaseSearchableDocumentResponse.Error(uploadMsg.ErrorMessage),
+            _ => throw new ArgumentOutOfRangeException(nameof(uploadBlobResponse), uploadBlobResponse, null)
+        };
+    }
+
 }
 

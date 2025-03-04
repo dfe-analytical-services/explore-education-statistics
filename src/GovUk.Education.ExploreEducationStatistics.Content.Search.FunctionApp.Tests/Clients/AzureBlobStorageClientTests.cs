@@ -47,7 +47,7 @@ public class AzureBlobStorageClientTests
                 });
                 
                 // ACT
-                await sut.UploadBlob(IntegrationTestContainerName, uniqueBlobName, blob);
+                await sut.UploadBlob(new UploadBlobRequest(IntegrationTestContainerName, uniqueBlobName, blob));
                 
                 // ASSERT
                 var actual = await AzureBlobStorageIntegrationHelper.DownloadAsync(sut.BlobServiceClient, IntegrationTestContainerName, uniqueBlobName);

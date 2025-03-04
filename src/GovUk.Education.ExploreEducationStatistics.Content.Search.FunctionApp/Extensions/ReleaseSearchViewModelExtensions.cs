@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
@@ -20,7 +21,7 @@ public static class SearchableDocumentAzureBlobMetadataKeys
 }
 public static class ReleaseSearchViewModelExtensions
 {
-    public static IDictionary<string, string> BuildMetadata(this ReleaseSearchViewModelDto searchViewModel)
+    public static IDictionary<string, string> BuildMetadata(this ReleaseSearchableDocument searchViewModel)
     {
         var metadata = new Dictionary<string, string>()
         {

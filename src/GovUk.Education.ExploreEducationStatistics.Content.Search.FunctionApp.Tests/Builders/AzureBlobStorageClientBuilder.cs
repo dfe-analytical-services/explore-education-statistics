@@ -12,29 +12,29 @@ internal class AzureBlobStorageClientBuilder
     public AzureBlobStorageClientBuilder()
     {
         Assert = new(_mock);
-        
+
         _mock.Setup(mock => mock.UploadBlob(
-            It.IsAny<string>(), 
-            It.IsAny<string>(), 
-            It.IsAny<Blob>(), 
-            It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+                It.IsAny<UploadBlobRequest>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => new UploadBlobResponse.Success());
     }
-    
+
     public IAzureBlobStorageClient Build() => _mock.Object;
 
     public Asserter Assert { get; }
+
     public class Asserter(Mock<IAzureBlobStorageClient> mock)
     {
         public void BlobWasUploaded(
             string? containerName = null,
-            string? blobName = null, 
+            string? blobName = null,
             Func<Blob, bool>? whereBlob = null)
         {
             mock.Verify(m => m.UploadBlob(
-                It.Is<string>(actualContainerName => containerName == null || actualContainerName == containerName),
-                It.Is<string>(actualBlobName => blobName == null || actualBlobName == blobName),
-                It.Is<Blob>(blob => whereBlob == null || whereBlob(blob)), 
+                It.Is<UploadBlobRequest>(request =>
+                    (containerName == null || request.ContainerName == containerName) &&
+                    (blobName == null || request.BlobName == blobName) &&
+                    (whereBlob == null || whereBlob(request.Blob))),
                 It.IsAny<CancellationToken>()), Times.Once);
         }
     }

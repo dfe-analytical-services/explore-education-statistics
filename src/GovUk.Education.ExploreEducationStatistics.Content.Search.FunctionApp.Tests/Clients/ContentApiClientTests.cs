@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients;
@@ -53,11 +54,13 @@ public class ContentApiClientTests
                 var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
                 
                 // ACT
-                var actual = await sut.GetPublicationLatestReleaseSearchViewModelAsync(publicationSlug);
+                var getResponse = await sut.GetPublicationLatestReleaseSearchViewModelAsync(new GetRequest(publicationSlug));
                 
                 // ASSERT
-                Assert.NotNull(actual);
-                var expected = new ReleaseSearchViewModelDto
+                Assert.NotNull(getResponse);
+                var successful = Assert.IsType<GetResponse.Successful>(getResponse);
+                var actual = successful.ReleaseSearchableDocument;
+                var expected = new ReleaseSearchableDocument
                 {
                     ReleaseVersionId = new Guid("46c5d916-ee40-49bd-cfdc-08dc1c5c621e"),
                     Published = DateTimeOffset.Parse("2018-07-18T23:00:00Z"), 
@@ -87,12 +90,11 @@ public class ContentApiClientTests
                     var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
                     
                     // ACT
-                    var exception = await Record.ExceptionAsync(() => sut.GetPublicationLatestReleaseSearchViewModelAsync(publicationSlug));
+                    var response = sut.GetPublicationLatestReleaseSearchViewModelAsync(new GetRequest(publicationSlug));
                     
                     // ASSERT
-                    Assert.NotNull(exception);
-                    var unableToGetPublicationLatestReleaseSearchViewModelException = Assert.IsType<UnableToGetPublicationLatestReleaseSearchViewModelException>(exception);
-                    Assert.Contains(publicationSlug, unableToGetPublicationLatestReleaseSearchViewModelException.Message);
+                    Assert.NotNull(response);
+                    Assert.IsType<GetResponse.NotFound>(response);
                 }
             }
         
