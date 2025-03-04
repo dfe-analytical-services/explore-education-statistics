@@ -16,7 +16,7 @@ internal class ContentApiClientBuilder
         Assert = new Asserter(_mock);
         
         _mock
-            .Setup(m => m.GetPublicationLatestReleaseSearchViewModelAsync(It.IsAny<GetRequest>(), It.IsAny<CancellationToken>()))
+            .Setup(m => m.GetPublicationLatestReleaseSearchableDocumentAsync(It.IsAny<GetRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => new GetResponse.Successful(_releaseSearchableDocument ?? _releaseSearchableDocumentBuilder.Build()));
     }
 
@@ -42,7 +42,7 @@ internal class ContentApiClientBuilder
     {
         public void ContentWasLoadedFor(string publicationSlug)
         {
-            mock.Verify(m => m.GetPublicationLatestReleaseSearchViewModelAsync(It.Is<GetRequest>(request => request.PublicationSlug == publicationSlug), It.IsAny<CancellationToken>()), Times.Once);
+            mock.Verify(m => m.GetPublicationLatestReleaseSearchableDocumentAsync(It.Is<GetRequest>(request => request.PublicationSlug == publicationSlug), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

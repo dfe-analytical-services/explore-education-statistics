@@ -8,7 +8,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
     internal HttpClient HttpClient { get; } = httpClient;
     
     private const string GetPublicationLatestReleaseSearchViewModelFormat = "api/publications/{0}/releases/latest/searchable";
-    public async Task<GetResponse> GetPublicationLatestReleaseSearchViewModelAsync(GetRequest request, CancellationToken cancellationToken)
+    public async Task<GetResponse> GetPublicationLatestReleaseSearchableDocumentAsync(GetRequest request, CancellationToken cancellationToken)
     {
         var url = string.Format(GetPublicationLatestReleaseSearchViewModelFormat, request.PublicationSlug);
         HttpResponseMessage response;

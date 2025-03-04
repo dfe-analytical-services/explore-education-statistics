@@ -54,7 +54,7 @@ public class ContentApiClientTests
                 var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
                 
                 // ACT
-                var getResponse = await sut.GetPublicationLatestReleaseSearchViewModelAsync(new GetRequest(publicationSlug));
+                var getResponse = await sut.GetPublicationLatestReleaseSearchableDocumentAsync(new GetRequest(publicationSlug));
                 
                 // ASSERT
                 Assert.NotNull(getResponse);
@@ -90,7 +90,7 @@ public class ContentApiClientTests
                     var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
                     
                     // ACT
-                    var response = sut.GetPublicationLatestReleaseSearchViewModelAsync(new GetRequest(publicationSlug));
+                    var response = sut.GetPublicationLatestReleaseSearchableDocumentAsync(new GetRequest(publicationSlug));
                     
                     // ASSERT
                     Assert.NotNull(response);

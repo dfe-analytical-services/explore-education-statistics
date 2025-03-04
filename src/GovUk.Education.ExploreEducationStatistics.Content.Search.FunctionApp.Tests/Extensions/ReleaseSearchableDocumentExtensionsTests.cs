@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Test
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
 
-public class ReleaseSearchViewModelExtensionsTests
+public class ReleaseSearchableDocumentExtensionsTests
 {
     [Fact]
     public void BuildMetadataShouldReturnExpectedMetadataKeysAndValues()

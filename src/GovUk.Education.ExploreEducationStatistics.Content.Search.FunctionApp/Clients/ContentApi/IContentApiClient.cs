@@ -2,5 +2,5 @@
 
 internal interface IContentApiClient
 {
-    Task<GetResponse> GetPublicationLatestReleaseSearchViewModelAsync(GetRequest request, CancellationToken cancellationToken = default);
+    Task<GetResponse> GetPublicationLatestReleaseSearchableDocumentAsync(GetRequest request, CancellationToken cancellationToken = default);
 }

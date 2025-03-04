@@ -19,7 +19,7 @@ public static class SearchableDocumentAzureBlobMetadataKeys
     public const string Type = "type";
     public const string TypeBoost = "typeBoost";
 }
-public static class ReleaseSearchViewModelExtensions
+public static class ReleaseSearchableDocumentExtensions
 {
     public static IDictionary<string, string> BuildMetadata(this ReleaseSearchableDocument searchViewModel)
     {

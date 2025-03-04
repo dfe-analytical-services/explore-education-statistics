@@ -23,7 +23,7 @@ internal class SearchableDocumentCreator(
         CancellationToken cancellationToken = default)
     {
         var publicationSlug = request.PublicationSlug;
-        var getResponse = await contentApiClient.GetPublicationLatestReleaseSearchViewModelAsync(new GetRequest(publicationSlug), cancellationToken);
+        var getResponse = await contentApiClient.GetPublicationLatestReleaseSearchableDocumentAsync(new GetRequest(publicationSlug), cancellationToken);
         return getResponse switch
         {
             GetResponse.Successful msg => await Upload(msg.ReleaseSearchableDocument, cancellationToken),
