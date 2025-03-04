@@ -340,6 +340,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(Release1V1.Id, viewModel.Id);
                 Assert.Equal(Release1V1.Release.Title, viewModel.Title);
                 Assert.Equal(Release1V1.Published, viewModel.Published);
+                Assert.Equal(Release1.Id, viewModel.ReleaseId);
 
                 Assert.Equal(2, viewModel.KeyStatistics.Count);
 

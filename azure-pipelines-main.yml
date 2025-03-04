@@ -251,6 +251,22 @@ jobs:
           artifactName: processor
           targetPath: $(Build.ArtifactStagingDirectory)/processor
 
+      - task: DotNetCoreCLI@2
+        displayName: Package Search Function App
+        inputs:
+          command: publish
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.csproj'
+          arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/searchFunctionApp
+          zipAfterPublish: True
+
+      - task: PublishPipelineArtifact@1
+        displayName: Publish Search Function App artifact
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
+        inputs:
+          artifactName: searchFunctionApp
+          targetPath: $(Build.ArtifactStagingDirectory)/searchFunctionApp
+
   - job: Admin
     pool: ees-ubuntu2204-xlarge
     workspace:

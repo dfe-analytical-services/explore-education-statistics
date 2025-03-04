@@ -1,0 +1,3 @@
+﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
+
+public record CreatePublicationLatestReleaseSearchableDocumentRequest(string PublicationSlug);
