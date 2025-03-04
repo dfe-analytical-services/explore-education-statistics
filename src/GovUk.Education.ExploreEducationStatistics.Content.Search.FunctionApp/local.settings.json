@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "ReleaseVersionPublishedQueueName": "release-version-published-queue",
+    "SearchableDocumentCreatedQueueName": "search-document-created-queue"
+  },
+  "Host": {
+    "LocalHttpPort": 7075,
+    "CORS": "*"
+  }
+}
