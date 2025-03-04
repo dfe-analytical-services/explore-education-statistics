@@ -14,12 +14,19 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useEffect, useRef } from 'react';
 import { generatePath } from 'react-router';
 import { PublishedStatusGuidanceModal } from './PublicationGuidance';
+import ReleaseLabelEditModal, {
+  ReleaseLabelFormValues,
+} from './ReleaseLabelEditModal';
 
 interface PublishedReleasesTableProps {
   focusReleaseId?: string;
   publicationId: string;
   releases: ReleaseVersionSummaryWithPermissions[];
   onAmend: (releaseVersionId: string) => void;
+  onEdit: (
+    releaseId: string,
+    releaseDetailsFormValues: ReleaseLabelFormValues,
+  ) => Promise<void>;
 }
 
 export default function PublicationPublishedReleasesTable({
@@ -27,6 +34,7 @@ export default function PublicationPublishedReleasesTable({
   publicationId,
   releases,
   onAmend,
+  onEdit,
 }: PublishedReleasesTableProps) {
   const rowRef = useRef<HTMLTableRowElement>(null);
 
@@ -93,29 +101,24 @@ export default function PublicationPublishedReleasesTable({
                     <VisuallyHidden> {release.title}</VisuallyHidden>
                   </>
                 )}
-                {release.permissions.canUpdateRelease ? (
-                  <Link
-                    className={`govuk-!-display-inline-block ${
-                      release.permissions.canMakeAmendmentOfReleaseVersion
-                        ? ' govuk-!-margin-right-4'
-                        : ''
-                    }`}
-                    to={generatePath<ReleaseRouteParams>(
-                      releaseSummaryRoute.path,
-                      {
-                        publicationId,
-                        releaseVersionId: release.id,
-                      },
-                    )}
-                  >
-                    Edit details
-                    <VisuallyHidden> {release.title}</VisuallyHidden>
-                  </Link>
-                ) : (
-                  <>
-                    No permission
-                    <VisuallyHidden> {release.title}</VisuallyHidden>
-                  </>
+                {release.permissions.canUpdateRelease && (
+                  <ReleaseLabelEditModal
+                    triggerButton={
+                      <ButtonText
+                        className={`govuk-!-display-inline-block ${
+                          release.permissions.canMakeAmendmentOfReleaseVersion
+                            ? ' govuk-!-margin-right-4'
+                            : ''
+                        }`}
+                      >
+                        Edit details
+                      </ButtonText>
+                    }
+                    initialValues={{ label: release.label }}
+                    onSubmit={formValues =>
+                      onEdit(release.releaseId, formValues)
+                    }
+                  />
                 )}
                 {release.permissions.canMakeAmendmentOfReleaseVersion && (
                   <ModalConfirm

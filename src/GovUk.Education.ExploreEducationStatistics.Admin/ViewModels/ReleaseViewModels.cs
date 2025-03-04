@@ -107,9 +107,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public Guid Id { get; init; }
 
+        public Guid ReleaseId { get; init; }
+
         public string Title { get; init; } = string.Empty;
 
         public string Slug { get; init; } = string.Empty;
+
+        public string? Label { get; init; }
 
         public int Year { get; init; }
 

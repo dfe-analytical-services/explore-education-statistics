@@ -1,9 +1,6 @@
 import PublicationDraftReleases from '@admin/pages/publication/components/PublicationDraftReleases';
 import PublicationScheduledReleases from '@admin/pages/publication/components/PublicationScheduledReleases';
-import publicationService, {
-  ReleaseVersionsType,
-} from '@admin/services/publicationService';
-import { ReleaseVersionSummaryWithPermissions } from '@admin/services/releaseVersionService';
+import publicationQueries from '@admin/queries/publicationQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';
@@ -23,14 +20,9 @@ export default function PublicationUnpublishedReleases({
     isLoading,
     isSuccess,
     refetch,
-  } = useQuery(['publicationUnpublishedReleases', publicationId], () =>
-    publicationService.listReleaseVersions<ReleaseVersionSummaryWithPermissions>(
+  } = useQuery(
+    publicationQueries.listUnpublishedReleaseVersionsWithPermissions(
       publicationId,
-      {
-        versionsType: ReleaseVersionsType.OnlyDraft,
-        pageSize: 100,
-        includePermissions: true,
-      },
     ),
   );
 

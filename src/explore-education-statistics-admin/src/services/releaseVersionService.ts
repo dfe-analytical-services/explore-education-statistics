@@ -52,8 +52,10 @@ export interface ReleaseVersion {
 
 export interface ReleaseVersionSummary {
   id: string;
+  releaseId: string;
   title: string;
   slug: string;
+  label?: string;
   year: number;
   yearTitle: string;
   timePeriodCoverage: ValueLabelPair;
