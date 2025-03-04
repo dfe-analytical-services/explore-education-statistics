@@ -211,7 +211,7 @@ var resourceNames = {
   }
   publicApi: {
     apiApp: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
-    apiAppIdentity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.appContainerApps}-api'
+    apiAppIdentity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.appContainerApps}-api' // @MarkFix I think this needs to be s101p-common managed identity?
     appInsights: '${publicApiResourcePrefix}-${abbreviations.insightsComponents}'
     dataProcessor: '${publicApiResourcePrefix}-${abbreviations.webSitesFunctions}-processor'
     dataProcessorIdentity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.webSitesFunctions}-processor'

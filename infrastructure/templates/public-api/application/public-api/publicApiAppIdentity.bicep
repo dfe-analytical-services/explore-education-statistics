@@ -9,7 +9,7 @@ param location string
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = { // @MarkFix fetch existing here?
   name: resourceNames.publicApi.apiAppIdentity
   location: location
   tags: tagValues

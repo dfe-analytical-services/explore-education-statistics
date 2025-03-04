@@ -40,7 +40,6 @@ steps:
       addSpnToEnvironment: true
       inlineScript: |
         set -e
-
         az deployment group ${{ parameters.action }} \
           --name $(infraDeployName) \
           --resource-group $(resourceGroupName) \
@@ -54,7 +53,7 @@ steps:
               postgreSqlEntraIdAdminPrincipals='$(postgreSqlEntraIdAdminPrincipals)' \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
               acrResourceGroupName='$(acrResourceGroupName)' \
-              dockerImagesTag='$(resources.pipeline.MainBuild.runName)' \
+              dockerImagesTag='$(resources.pipeline.MainBuild.runName)' \ # @MarkFix maybe this is fine if the PAPI MainBuild pipeline publishes the image?
               deploySharedPrivateDnsZones=${{ parameters.deploySharedPrivateDnsZones }} \
               deployPsqlFlexibleServer=${{ parameters.deployPsqlFlexibleServer }} \
               deployContainerApp=${{ parameters.deployContainerApp }} \

@@ -70,7 +70,7 @@ param dockerPullManagedIdentityClientId string
 
 @description('An existing Service Principal\'s Secret value with which this Container App can pull Docker images (using it as the ACR password)')
 @secure()
-param dockerPullManagedIdentitySecretValue string
+param dockerPullManagedIdentitySecretValue string // @MarkFix remove
 
 @description('The id of the owning Container App Environment')
 param environmentId string
@@ -128,7 +128,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${userAssignedManagedIdentityId}': {}
+      '${userAssignedManagedIdentityId}': {} // @MarkFix Could be removed? Or should be s101p01-rg-ees-common managed identity resourceId
     }
   }
   properties: {
@@ -137,7 +137,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       secrets: [
         {
           name: 'container-registry-password'
-          value: dockerPullManagedIdentitySecretValue
+          value: dockerPullManagedIdentitySecretValue // @MarkFix remove?
         }
       ]
       maxInactiveRevisions: 1
@@ -156,9 +156,10 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       }
       registries: [
         {
+          //identity: {ResourceIdOfUserAssignedManagedIdentity in s101p01-rg-ees-common} // @MarkFix
           server: acrLoginServer
           username: dockerPullManagedIdentityClientId
-          passwordSecretRef: 'container-registry-password'
+          passwordSecretRef: 'container-registry-password' // @MarkFix remove
         }
       ]
     }

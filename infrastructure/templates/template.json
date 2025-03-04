@@ -2094,7 +2094,8 @@
         "clientAffinityEnabled": false,
         "reserved": true,
         "siteConfig": {
-          "acrUseManagedIdentityCreds": false,
+          "acrUseManagedIdentityCreds": true, // @MarkFix
+          "acrUserManagedIdentityID":  "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('ees-common-mi')]", // @MarkFix variable - resourceId is probably entirely wrong
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
@@ -2131,7 +2132,7 @@
         "CONTENT_API_BASE_URL": "[concat('https://', parameters('contentApiUrl'),'/api')]",
         "DATA_API_BASE_URL": "[concat('https://', parameters('dataApiUrl'),'/api')]",
         "DOCKER_REGISTRY_SERVER_URL": "[parameters('dockerRegistryServerUrl')]",
-        "DOCKER_REGISTRY_SERVER_USERNAME": "[parameters('dockerRegistryServerUsername')]",
+        "DOCKER_REGISTRY_SERVER_USERNAME": "[parameters('dockerRegistryServerUsername')]", // @MarkFix need to remove these?
         "DOCKER_REGISTRY_SERVER_PASSWORD": "[parameters('dockerRegistryServerPassword')]",
         "NOTIFICATION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
         "GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",

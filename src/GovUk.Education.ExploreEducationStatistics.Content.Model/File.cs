@@ -17,6 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Filename { get; set; } = string.Empty;
 
+        public string NewColumn { get; set; } = string.Empty;
+
         public FileType Type { get; set; }
 
         public Guid? DataSetFileId { get; set; }

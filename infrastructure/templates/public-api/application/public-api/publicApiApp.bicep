@@ -69,11 +69,11 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
   params: {
     location: location
     containerAppName: resourceNames.publicApi.apiApp
-    acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
+    acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN') // @MarkFix secret needs to point to new s101p01-rg-ees-common acr
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
-    dockerPullManagedIdentityClientId: keyVault.getSecret('DOCKER-REGISTRY-SERVER-USERNAME')
-    dockerPullManagedIdentitySecretValue: keyVault.getSecret('DOCKER-REGISTRY-SERVER-PASSWORD')
-    userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
+    dockerPullManagedIdentityClientId: keyVault.getSecret('DOCKER-REGISTRY-SERVER-USERNAME') // @MarkFix needs to relate to new s101p01-rg-ees-common acr
+    dockerPullManagedIdentitySecretValue: keyVault.getSecret('DOCKER-REGISTRY-SERVER-PASSWORD') // @MarkFix remove
+    userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id // @MarkFix should be s101p01-common managed identity?
     environmentId: containerAppEnvironmentId
     environmentIpAddress: containerAppEnvironmentIpAddress
     deployPrivateDns: true
