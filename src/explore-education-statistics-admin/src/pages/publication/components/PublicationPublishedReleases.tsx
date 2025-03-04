@@ -1,32 +1,37 @@
 import PublicationPublishedReleasesTable from '@admin/pages/publication/components/PublicationPublishedReleasesTable';
+import publicationQueries from '@admin/queries/publicationQueries';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import publicationService, {
-  ReleaseVersionsType,
-} from '@admin/services/publicationService';
 import releaseVersionService, {
   ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseVersionService';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
+import { PaginatedList } from '@common/services/types/pagination';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import last from 'lodash/last';
 import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
+import { ReleaseLabelFormValues } from './ReleaseLabelEditModal';
 
 interface Props {
   publicationId: string;
   pageSize?: number;
   refetchRef?: MutableRefObject<() => void>;
+  onEdit: (
+    releaseId: string,
+    releaseDetailsFormValues: ReleaseLabelFormValues,
+  ) => Promise<void>;
 }
 
 export default function PublicationPublishedReleases({
   publicationId,
   pageSize = 5,
   refetchRef,
+  onEdit,
 }: Props) {
   const history = useHistory();
 
@@ -40,26 +45,20 @@ export default function PublicationPublishedReleases({
     isLoading,
     isSuccess,
     refetch,
-  } = useInfiniteQuery(
-    ['publicationPublishedReleases', publicationId],
-    ({ pageParam = 1 }) => {
-      return publicationService.listReleaseVersions<ReleaseVersionSummaryWithPermissions>(
-        publicationId,
-        {
-          versionsType: ReleaseVersionsType.LatestPublished,
-          page: pageParam,
-          pageSize,
-          includePermissions: true,
-        },
-      );
-    },
-    {
-      getNextPageParam: lastPage =>
+  } = useInfiniteQuery({
+    ...publicationQueries.listPublishedReleaseVersionsWithPermissions(
+      publicationId,
+      pageSize,
+    ),
+    ...{
+      getNextPageParam: (
+        lastPage: PaginatedList<ReleaseVersionSummaryWithPermissions>,
+      ) =>
         lastPage.paging.totalPages > lastPage.paging.page
           ? lastPage.paging.page + 1
           : undefined,
     },
-  );
+  });
 
   useEffect(() => {
     if (refetchRef) {
@@ -116,6 +115,7 @@ export default function PublicationPublishedReleases({
                   }),
                 );
               }}
+              onEdit={onEdit}
             />
 
             {hasNextPage && showMoreNumber > 0 && (
