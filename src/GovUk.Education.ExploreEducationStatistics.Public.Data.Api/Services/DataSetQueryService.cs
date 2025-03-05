@@ -118,7 +118,8 @@ internal class DataSetQueryService(
 
         if (dataSetVersion is null)
         {
-            return await publicDataDbContext.DataSets
+            return await publicDataDbContext
+                .DataSets
                 .AsNoTracking()
                 .Include(ds => ds.LatestLiveVersion)
                 .ThenInclude(dsv => dsv != null ? dsv.DataSet : null)
@@ -127,7 +128,10 @@ internal class DataSetQueryService(
                 .SingleOrNotFoundAsync(cancellationToken);
         }
 
-        return await publicDataDbContext.DataSetVersions.AsNoTracking()
+        return await publicDataDbContext
+            .DataSetVersions
+            .AsNoTracking()
+            .Include(dsv => dsv.DataSet)
             .FindByVersion(dataSetId, dataSetVersion, cancellationToken);
     }
     

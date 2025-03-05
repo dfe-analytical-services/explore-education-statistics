@@ -63,6 +63,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     private readonly AppInsightsOptions _appInsightsOptions = configuration
         .GetSection(AppInsightsOptions.Section)
         .Get<AppInsightsOptions>()!;
+    
+    private readonly AnalyticsOptions _analyticsOptions = configuration
+        .GetRequiredSection(AnalyticsOptions.Section)
+        .Get<AnalyticsOptions>()!;
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -251,8 +255,15 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
 
-        services.AddScoped<IAnalyticsService, AnalyticsService>();
-        services.AddScoped<IAnalyticsPathResolver, AnalyticsPathResolver>();
+        if (_analyticsOptions.Enabled)
+        {
+            services.AddScoped<IAnalyticsService, AnalyticsService>();
+            services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
+        }
+        else
+        {
+            services.AddScoped<IAnalyticsService, NoOpAnalyticsService>();
+        }
 
         // TODO EES-5660 - remove this migration after it has been run against each Public API-enabled environment.
         services.AddScoped<ICustomMigration, EES5660_MigrateDraftDataSetVersionFolderNames>();
@@ -364,5 +375,15 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         var migrations = serviceScope.ServiceProvider.GetServices<ICustomMigration>();
 
         migrations.ForEach(migration => migration.Apply());
+    }
+
+    private class NoOpAnalyticsService : IAnalyticsService
+    {
+        public Task ReportDataSetVersionQuery(Guid dataSetId, Guid dataSetVersionId, string semVersion,
+            string dataSetTitle,
+            DataSetQueryRequest query, int resultsCount, int totalRowsCount, DateTime startTime, DateTime endTime)
+        {
+            return Task.CompletedTask;       
+        }
     }
 }

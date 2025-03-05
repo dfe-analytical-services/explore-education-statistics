@@ -13,7 +13,8 @@ public static class JsonSerializationUtils
         ContractResolver = new OrderedContractResolver(),
         NullValueHandling = NullValueHandling.Ignore,
         DateFormatHandling = DateFormatHandling.IsoDateFormat,
-        DateFormatString = "yyyy-MM-ddThh:mm:ss.fffZ"
+        DateFormatString = "yyyy-MM-ddThh:mm:ss.fffZ",
+        
     };
     
     public static string SerializeWithOrderedProperties(object obj, Formatting formatting)
@@ -24,12 +25,13 @@ public static class JsonSerializationUtils
             settings: JsonSerializerSettings);
     }
     
-    private class OrderedContractResolver : DefaultContractResolver
+    private class OrderedContractResolver : CamelCasePropertyNamesContractResolver
     {
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
         {
+            // Honour any explicit ordering first, and then alphabetically.
             return base.CreateProperties(type, memberSerialization)
-                .OrderBy(p => p.Order ?? int.MaxValue)  // Honour any explit ordering first
+                .OrderBy(p => p.Order ?? int.MaxValue)
                 .ThenBy(p => p.PropertyName)
                 .ToList();
         }
