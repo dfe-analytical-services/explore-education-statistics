@@ -42,6 +42,8 @@ param enableSwagger bool
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
+var analyticsFileShareMountPath = '/data/analytics'
+
 var dataFilesFileShareMountPath = '/data/public-api-data'
 
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
@@ -87,11 +89,20 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     vnetName: resourceNames.existingResources.vNet
     volumeMounts: [
       {
+        volumeName: 'analytics-file-share-mount'
+        mountPath: analyticsFileShareMountPath
+      }
+      {
         volumeName: 'public-api-file-share-mount'
         mountPath: dataFilesFileShareMountPath
       }
     ]
     volumes: [
+      {
+        name: 'analytics-file-share-mount'
+        storageType: 'AzureFile'
+        storageName: resourceNames.sharedResources.analyticsFileShare
+      }
       {
         name: 'public-api-file-share-mount'
         storageType: 'AzureFile'
@@ -111,6 +122,14 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
         // identity.
         name: 'AZURE_CLIENT_ID'
         value: apiContainerAppManagedIdentity.properties.clientId
+      }
+      {
+        name: 'Analytics__Enabled'
+        value: 'true'
+      }
+      {
+        name: 'Analytics__BasePath'
+        value: analyticsFileShareMountPath
       }
       {
         name: 'App__Url'

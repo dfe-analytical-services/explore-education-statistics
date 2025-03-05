@@ -27,11 +27,11 @@ resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets
   parent: vNet
 }
 
-module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
-  name: 'publicApiStorageAccountDeploy'
+module analyticsStorageAccountModule '../../components/storageAccount.bicep' = {
+  name: 'analyticsStorageAccountDeploy'
   params: {
     location: location
-    storageAccountName: resourceNames.publicApi.publicApiStorageAccount
+    storageAccountName: resourceNames.sharedResources.analyticsStorageAccount
     publicNetworkAccessEnabled: false
     firewallRules: storageFirewallRules
     sku: config.sku
@@ -49,12 +49,12 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
   }
 }
 
-module dataFilesFileShareModule '../../components/fileShare.bicep' = {
-  name: 'publicApiFileShareDeploy'
+module analyticsFileShareModule '../../components/fileShare.bicep' = {
+  name: 'analyticsFileShareDeploy'
   params: {
-    fileShareName: resourceNames.publicApi.publicApiFileShare
+    fileShareName: resourceNames.sharedResources.analyticsFileShare
     fileShareQuotaGbs: config.fileShare.quotaGbs
-    storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
+    storageAccountName: analyticsStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: config.fileShare.accessTier
     alerts: deployAlerts ? {
       availability: true
@@ -66,8 +66,6 @@ module dataFilesFileShareModule '../../components/fileShare.bicep' = {
   }
 }
 
-output storageAccountName string = publicApiStorageAccountModule.outputs.storageAccountName
-output connectionStringSecretName string = publicApiStorageAccountModule.outputs.connectionStringSecretName
-output accessKeySecretName string = publicApiStorageAccountModule.outputs.accessKeySecretName
-output publicApiDataFileShareName string = resourceNames.publicApi.publicApiFileShare
-output publicApiStorageAccountName string = resourceNames.publicApi.publicApiStorageAccount
+output storageAccountName string = analyticsStorageAccountModule.outputs.storageAccountName
+output connectionStringSecretName string = analyticsStorageAccountModule.outputs.connectionStringSecretName
+output accessKeySecretName string = analyticsStorageAccountModule.outputs.accessKeySecretName
