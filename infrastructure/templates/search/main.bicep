@@ -26,6 +26,9 @@ param dateProvisioned string = utcNow('u')
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
+@description('Specifies whether or not the Search Docs Function App already exists.')
+param searchDocsFunctionAppExists bool = true
+
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
@@ -64,6 +67,7 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = {
     location: location
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
+    functionAppExists: searchDocsFunctionAppExists
     functionAppFirewallRules: union(
       [
         {
