@@ -8,24 +8,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class JsonSerializationUtils
 {
-    private static readonly JsonSerializerSettings JsonSerializerSettings = new()
+    public static string Serialize(
+        object obj,
+        Formatting formatting = Formatting.None,
+        bool camelCase = false,
+        bool orderedProperties = false)
     {
-        ContractResolver = new OrderedContractResolver(),
-        NullValueHandling = NullValueHandling.Ignore,
-        DateFormatHandling = DateFormatHandling.IsoDateFormat,
-        DateFormatString = "yyyy-MM-ddThh:mm:ss.fffZ",
+        var contractResolver = GetContractResolver(camelCase, orderedProperties);
+
+        var settings = new JsonSerializerSettings
+        {
+            ContractResolver = contractResolver,
+            NullValueHandling = NullValueHandling.Ignore,
+            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            DateFormatString = "yyyy-MM-ddThh:mm:ss.fffZ",
+        };
         
-    };
-    
-    public static string SerializeWithOrderedProperties(object obj, Formatting formatting)
-    {
         return JsonConvert.SerializeObject(
             value: obj,
             formatting: formatting,
-            settings: JsonSerializerSettings);
+            settings: settings);
+    }
+
+    private static IContractResolver GetContractResolver(bool camelCase, bool orderedProperties)
+    {
+        if (camelCase && orderedProperties)
+        {
+            return new OrderedFieldsCamelCaseContractResolver();
+        }
+
+        if (camelCase)
+        {
+            return new CamelCasePropertyNamesContractResolver();
+        }
+
+        if (orderedProperties)
+        {
+            return new OrderedFieldsContractResolver();
+        }
+
+        return new DefaultContractResolver();
+    }
+
+    private class OrderedFieldsCamelCaseContractResolver : CamelCasePropertyNamesContractResolver
+    {
+        protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+        {
+            // Honour any explicit ordering first, and then alphabetically.
+            return base.CreateProperties(type, memberSerialization)
+                .OrderBy(p => p.Order ?? int.MaxValue)
+                .ThenBy(p => p.PropertyName)
+                .ToList();
+        }
     }
     
-    private class OrderedContractResolver : CamelCasePropertyNamesContractResolver
+    private class OrderedFieldsContractResolver : DefaultContractResolver
     {
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
         {

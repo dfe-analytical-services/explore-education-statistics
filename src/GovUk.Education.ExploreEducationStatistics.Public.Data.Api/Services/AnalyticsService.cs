@@ -41,9 +41,11 @@ public class AnalyticsService(
             EndTime: endTime,
             Query: DataSetQueryNormalisationUtil.NormaliseQuery(query));
 
-        var serialisedRequest = JsonSerializationUtils.SerializeWithOrderedProperties(
+        var serialisedRequest = JsonSerializationUtils.Serialize(
             obj: request,
-            formatting: Formatting.Indented);
+            formatting: Formatting.Indented,
+            orderedProperties: true,
+            camelCase: true);
 
         var directory = analyticsPathResolver.PublicApiQueriesDirectoryPath();
 

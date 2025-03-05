@@ -1,0 +1,10 @@
+﻿{
+  "Field2": "Value2",
+  "Field1": "Value1",
+  "Field3": "Value3",
+  "Child": {
+    "Field2": "ChildValue2",
+    "Field1": "ChildValue1",
+    "Field3": "ChildValue3"
+  }
+}

@@ -59,7 +59,12 @@ public static class DataSetQueryNormalisationUtil
             And = original
                 .And
                 .Select(NormaliseCriteria)
-                .OrderBy(criteria => JsonSerializationUtils.SerializeWithOrderedProperties(criteria, Formatting.None))
+                .OrderBy(criteria => JsonSerializationUtils.Serialize(
+                    obj: criteria,
+                    formatting: Formatting.None,
+                    camelCase: true,
+                    orderedProperties: true
+                    ))
                 .ToList()
         };
     }
@@ -71,7 +76,11 @@ public static class DataSetQueryNormalisationUtil
             Or = original
                 .Or
                 .Select(NormaliseCriteria)
-                .OrderBy(criteria => JsonSerializationUtils.SerializeWithOrderedProperties(criteria, Formatting.None))
+                .OrderBy(criteria => JsonSerializationUtils.Serialize(
+                    obj: criteria,
+                    formatting: Formatting.None,
+                    camelCase: true,
+                    orderedProperties: true))
                 .ToList()
         };
     }

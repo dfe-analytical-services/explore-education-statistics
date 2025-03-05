@@ -1,66 +1,66 @@
 ﻿{
-  "DataSetId": "72e16c8c-2dc0-4063-bdf6-ee52bd127ebe",
-  "DataSetTitle": "Data Set Title 2",
-  "DataSetVersion": "3.0.0",
-  "DataSetVersionId": "bb68fd95-1231-498c-8858-b061d739ae17",
-  "EndTime": "2025-02-20T01:00:10.999Z",
-  "Query": {
-    "Criteria": {
-      "And": [
+  "dataSetId": "72e16c8c-2dc0-4063-bdf6-ee52bd127ebe",
+  "dataSetTitle": "Data Set Title 2",
+  "dataSetVersion": "3.0.0",
+  "dataSetVersionId": "bb68fd95-1231-498c-8858-b061d739ae17",
+  "endTime": "2025-02-20T01:00:10.999Z",
+  "query": {
+    "criteria": {
+      "and": [
         {
-          "And": [
+          "and": [
             {
-              "Filters": {
-                "Eq": "Filter3"
+              "filters": {
+                "eq": "Filter3"
               }
             },
             {
-              "Filters": {
-                "In": [
+              "filters": {
+                "in": [
                   "Filter1",
                   "Filter2"
                 ]
               }
             },
             {
-              "Filters": {
-                "NotEq": "Filter5"
+              "filters": {
+                "notEq": "Filter5"
               }
             },
             {
-              "Filters": {
-                "NotIn": [
+              "filters": {
+                "notIn": [
                   "Filter4"
                 ]
               }
             },
             {
-              "Not": {
-                "Or": [
+              "not": {
+                "or": [
                   {
-                    "Locations": {
-                      "NotIn": [
+                    "locations": {
+                      "notIn": [
                         {
-                          "Id": "Location1",
-                          "Level": "Level"
+                          "id": "Location1",
+                          "level": "Level"
                         },
                         {
-                          "Level": "Level",
-                          "Ukprn": "Location4"
+                          "level": "Level",
+                          "ukprn": "Location4"
                         }
                       ]
                     }
                   },
                   {
-                    "Locations": {
-                      "NotIn": [
+                    "locations": {
+                      "notIn": [
                         {
-                          "Id": "Location3",
-                          "Level": "Level"
+                          "id": "Location3",
+                          "level": "Level"
                         },
                         {
-                          "Level": "Level",
-                          "Ukprn": "Location2"
+                          "level": "Level",
+                          "ukprn": "Location2"
                         }
                       ]
                     }
@@ -69,31 +69,31 @@
               }
             },
             {
-              "Or": [
+              "or": [
                 {
-                  "TimePeriods": {
-                    "In": [
+                  "timePeriods": {
+                    "in": [
                       {
-                        "Code": "Code",
-                        "Period": "Period1"
+                        "code": "Code",
+                        "period": "Period1"
                       },
                       {
-                        "Code": "Code",
-                        "Period": "Period2"
+                        "code": "Code",
+                        "period": "Period2"
                       }
                     ]
                   }
                 },
                 {
-                  "TimePeriods": {
-                    "NotIn": [
+                  "timePeriods": {
+                    "notIn": [
                       {
-                        "Code": "Code",
-                        "Period": "Period3"
+                        "code": "Code",
+                        "period": "Period3"
                       },
                       {
-                        "Code": "Code",
-                        "Period": "Period4"
+                        "code": "Code",
+                        "period": "Period4"
                       }
                     ]
                   }
@@ -103,28 +103,28 @@
           ]
         },
         {
-          "And": [
+          "and": [
             {
-              "Filters": {
-                "Eq": "Filter9"
+              "filters": {
+                "eq": "Filter9"
               }
             },
             {
-              "Filters": {
-                "In": [
+              "filters": {
+                "in": [
                   "Filter7",
                   "Filter8"
                 ]
               }
             },
             {
-              "Filters": {
-                "NotEq": "Filter10"
+              "filters": {
+                "notEq": "Filter10"
               }
             },
             {
-              "Filters": {
-                "NotIn": [
+              "filters": {
+                "notIn": [
                   "Filter6"
                 ]
               }
@@ -133,26 +133,26 @@
         }
       ]
     },
-    "Debug": true,
-    "Indicators": [
+    "debug": true,
+    "indicators": [
       "Indicator1",
       "Indicator2",
       "Indicator3"
     ],
-    "Page": 3,
-    "PageSize": 300,
-    "Sorts": [
+    "page": 3,
+    "pageSize": 300,
+    "sorts": [
       {
-        "Direction": "ASC",
-        "Field": "Field2"
+        "direction": "ASC",
+        "field": "Field2"
       },
       {
-        "Direction": "ASC",
-        "Field": "Field1"
+        "direction": "ASC",
+        "field": "Field1"
       }
     ]
   },
-  "ResultsCount": 120,
-  "StartTime": "2025-02-20T01:00:00.000Z",
-  "TotalRowsCount": 10000
+  "resultsCount": 120,
+  "startTime": "2025-02-20T01:00:00.000Z",
+  "totalRowsCount": 10000
 }
