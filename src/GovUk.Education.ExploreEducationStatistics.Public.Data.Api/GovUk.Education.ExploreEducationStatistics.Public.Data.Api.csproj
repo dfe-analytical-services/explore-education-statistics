@@ -46,6 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Analytics.Services\GovUk.Education.ExploreEducationStatistics.Analytics.Services.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj"/>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Requests\GovUk.Education.ExploreEducationStatistics.Content.Requests.csproj"/>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj"/>
@@ -53,11 +54,11 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Services\GovUk.Education.ExploreEducationStatistics.Public.Data.Services.csproj"/>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.csproj"/>
   </ItemGroup>
-  
+
   <Target Name="BuildOpenApiFiles" AfterTargets="Build">
     <!-- Add new API versions to this group -->
     <ItemGroup>
-      <Version Include="1" />
+      <Version Include="1"/>
     </ItemGroup>
 
     <Exec Command="dotnet tool restore"/>
@@ -69,7 +70,7 @@
 
   <Target Name="CopyOpenApiFilesOnPublish" AfterTargets="Publish">
     <ItemGroup>
-      <OpenApiFiles Include="$(OutputPath)wwwroot\openapi-*.json" />
+      <OpenApiFiles Include="$(OutputPath)wwwroot\openapi-*.json"/>
     </ItemGroup>
 
     <Copy SourceFiles="@(OpenApiFiles)" DestinationFolder="$(PublishDir)wwwroot\"/>

@@ -1,0 +1,158 @@
+﻿{
+  "dataSetId": "72e16c8c-2dc0-4063-bdf6-ee52bd127ebe",
+  "dataSetTitle": "Data Set Title 2",
+  "dataSetVersion": "3.0.0",
+  "dataSetVersionId": "bb68fd95-1231-498c-8858-b061d739ae17",
+  "endTime": "2025-02-20T01:00:10.999Z",
+  "query": {
+    "criteria": {
+      "and": [
+        {
+          "and": [
+            {
+              "filters": {
+                "eq": "Filter3"
+              }
+            },
+            {
+              "filters": {
+                "in": [
+                  "Filter1",
+                  "Filter2"
+                ]
+              }
+            },
+            {
+              "filters": {
+                "notEq": "Filter5"
+              }
+            },
+            {
+              "filters": {
+                "notIn": [
+                  "Filter4"
+                ]
+              }
+            },
+            {
+              "not": {
+                "or": [
+                  {
+                    "locations": {
+                      "notIn": [
+                        {
+                          "id": "Location1",
+                          "level": "Level"
+                        },
+                        {
+                          "level": "Level",
+                          "ukprn": "Location4"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "locations": {
+                      "notIn": [
+                        {
+                          "id": "Location3",
+                          "level": "Level"
+                        },
+                        {
+                          "level": "Level",
+                          "ukprn": "Location2"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "or": [
+                {
+                  "timePeriods": {
+                    "in": [
+                      {
+                        "code": "Code",
+                        "period": "Period1"
+                      },
+                      {
+                        "code": "Code",
+                        "period": "Period2"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "timePeriods": {
+                    "notIn": [
+                      {
+                        "code": "Code",
+                        "period": "Period3"
+                      },
+                      {
+                        "code": "Code",
+                        "period": "Period4"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "and": [
+            {
+              "filters": {
+                "eq": "Filter9"
+              }
+            },
+            {
+              "filters": {
+                "in": [
+                  "Filter7",
+                  "Filter8"
+                ]
+              }
+            },
+            {
+              "filters": {
+                "notEq": "Filter10"
+              }
+            },
+            {
+              "filters": {
+                "notIn": [
+                  "Filter6"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "debug": true,
+    "indicators": [
+      "Indicator1",
+      "Indicator2",
+      "Indicator3"
+    ],
+    "page": 3,
+    "pageSize": 300,
+    "sorts": [
+      {
+        "direction": "ASC",
+        "field": "Field2"
+      },
+      {
+        "direction": "ASC",
+        "field": "Field1"
+      }
+    ]
+  },
+  "resultsCount": 120,
+  "startTime": "2025-02-20T01:00:00.000Z",
+  "totalRowsCount": 10000
+}

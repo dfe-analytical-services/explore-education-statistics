@@ -15,6 +15,7 @@ obj
 /data/public-api-db/*
 !/data/public-api-db/00-init.sh
 /data/public-api-data
+/data/analytics
 dfe-meta.db
 
 ## CSharp
@@ -98,4 +99,4 @@ src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.IdpBootstrapUse
 **/*/tempkey.rsa
 
 ## IDE Files (e.g. local Visual Studio configuration)
-*.user
+*.csproj.user

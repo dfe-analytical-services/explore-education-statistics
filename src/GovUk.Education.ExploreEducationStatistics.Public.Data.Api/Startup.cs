@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 using AngleSharp.Io;
 using Dapper;
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Options;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -59,6 +62,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     private readonly AppInsightsOptions _appInsightsOptions = configuration
         .GetSection(AppInsightsOptions.Section)
         .Get<AppInsightsOptions>()!;
+    
+    private readonly AnalyticsOptions _analyticsOptions = configuration
+        .GetRequiredSection(AnalyticsOptions.Section)
+        .Get<AnalyticsOptions>()!;
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -211,6 +218,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             .Bind(configuration.GetRequiredSection(DataFilesOptions.Section));
         services.AddOptions<RequestTimeoutOptions>()
             .Bind(configuration.GetRequiredSection(RequestTimeoutOptions.Section));
+        services.AddOptions<AnalyticsOptions>()
+            .Bind(configuration.GetRequiredSection(AnalyticsOptions.Section));
 
         // Services
 
@@ -244,6 +253,16 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetIndicatorRepository, ParquetIndicatorRepository>();
         services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
+
+        if (_analyticsOptions.Enabled)
+        {
+            services.AddScoped<IAnalyticsService, AnalyticsService>();
+            services.AddSingleton<IAnalyticsPathResolver, AnalyticsPathResolver>();
+        }
+        else
+        {
+            services.AddScoped<IAnalyticsService, NoOpAnalyticsService>();
+        }
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -319,7 +338,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 foreach (var description in (app as WebApplication)!.DescribeApiVersions())
                 {
                     options.SwaggerEndpoint(
-                        url: $"{_appOptions.Url}/swagger/v{description.GroupName}/openapi.json",
+                        url: $"/swagger/v{description.GroupName}/openapi.json",
                         name: $"v{description.GroupName}");
                 }
             });
@@ -352,5 +371,15 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         var migrations = serviceScope.ServiceProvider.GetServices<ICustomMigration>();
 
         migrations.ForEach(migration => migration.Apply());
+    }
+
+    private class NoOpAnalyticsService : IAnalyticsService
+    {
+        public Task ReportDataSetVersionQuery(Guid dataSetId, Guid dataSetVersionId, string semVersion,
+            string dataSetTitle,
+            DataSetQueryRequest query, int resultsCount, int totalRowsCount, DateTime startTime, DateTime endTime)
+        {
+            return Task.CompletedTask;       
+        }
     }
 }
