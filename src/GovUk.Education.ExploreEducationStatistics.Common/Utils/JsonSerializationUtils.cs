@@ -21,7 +21,7 @@ public static class JsonSerializationUtils
             ContractResolver = contractResolver,
             NullValueHandling = NullValueHandling.Ignore,
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            DateFormatString = "yyyy-MM-ddThh:mm:ss.fffZ",
+            DateFormatString = "yyyy-MM-ddTHH:mm:ss.fffZ",
         };
         
         return JsonConvert.SerializeObject(
