@@ -41,10 +41,11 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection ReplaceService<TService>(
         this IServiceCollection services,
-        TService replacement)
+        TService replacement,
+        bool optional = false)
         where TService : class
     {
-        return services.ReplaceService(_ => replacement);
+        return services.ReplaceService(_ => replacement, optional);
     }
 
     /// <summary>
@@ -53,12 +54,23 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection ReplaceService<TService>(
         this IServiceCollection services,
-        Func<IServiceProvider, TService> replacement)
+        Func<IServiceProvider, TService> replacement,
+        bool optional = false)
         where TService : class
     {
         // Remove the default service descriptor that was provided by Startup.cs.
         var descriptor = services
-            .Single(d => d.ServiceType == typeof(TService));
+            .SingleOrDefault(d => d.ServiceType == typeof(TService));
+
+        if (descriptor == null)
+        {
+            if (optional)
+            {
+                return services;
+            }
+            
+            throw new ArgumentNullException($"{nameof(TService)} service was not found to replace.");
+        }
 
         services.Remove(descriptor);
 

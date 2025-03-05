@@ -1,7 +1,9 @@
 #nullable enable
 using System;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -13,6 +15,13 @@ public static class WebApplicationFactoryExtensions
         Action<IServiceCollection> configureServices) where TEntrypoint : class
     {
         return app.WithWebHostBuilder(builder => builder.ConfigureServices(configureServices));
+    }
+    
+    public static WebApplicationFactory<TEntrypoint> ConfigureAppConfiguration<TEntrypoint>(
+        this WebApplicationFactory<TEntrypoint> app,
+        Action<WebHostBuilderContext, IConfigurationBuilder> configureAppConfiguration) where TEntrypoint : class
+    {
+        return app.WithWebHostBuilder(builder => builder.ConfigureAppConfiguration(configureAppConfiguration));
     }
 
     public static WebApplicationFactory<TEntrypoint> ResetDbContext<TDbContext, TEntrypoint>(
