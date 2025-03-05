@@ -598,7 +598,7 @@ Validate line chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admission Numbers (Nailsea Youngwood): 4,198
 
 Configure basic vertical bar chart
-    user navigates to admin frontend    ${DATABLOCK_URL}
+    user navigates to    ${DATABLOCK_URL}
 
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_MEDIUM}
     user waits until page finishes loading
@@ -693,7 +693,7 @@ Save and validate vertical bar chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admissions: 4,198
 
 Configure basic horizontal bar chart
-    user navigates to admin frontend    ${DATABLOCK_URL}
+    user navigates to    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page finishes loading
 
@@ -775,7 +775,7 @@ Save and validate horizontal bar chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admissions: 4,198
 
 Configure basic geographic chart
-    user navigates to admin frontend    ${DATABLOCK_URL}
+    user navigates to    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page finishes loading
 
@@ -932,7 +932,7 @@ Save and validate geographic chart embeds correctly
     user checks map chart indicator tile contains    ${datablock}    Admissions in 2014    9,854
 
 Configure basic infographic chart
-    user navigates to admin frontend    ${DATABLOCK_URL}
+    user navigates to    ${DATABLOCK_URL}
 
     user waits until h2 is visible    ${DATABLOCK_NAME}
     user waits until page finishes loading
@@ -972,7 +972,7 @@ Delete embedded data block
     user clicks button    Confirm
 
 Delete chart from data block
-    user navigates to admin frontend    ${DATABLOCK_URL}
+    user navigates to    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}
     user waits until page finishes loading
     user clicks link    Chart

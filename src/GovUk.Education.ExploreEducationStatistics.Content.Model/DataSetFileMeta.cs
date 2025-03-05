@@ -45,7 +45,7 @@ public class FilterMeta
     public required string ColumnName { get; set; }
 
     [JsonIgnore]
-    public string? GroupCsvColumn { get; set; }
+    public string? ParentFilter { get; set; }
 }
 
 public class IndicatorMeta

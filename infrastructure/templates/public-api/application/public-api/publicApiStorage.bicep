@@ -1,4 +1,4 @@
-import { ResourceNames, IpRange, PublicApiStorageAccountConfig } from '../../types.bicep'
+import { ResourceNames, IpRange, StorageAccountConfig } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -7,7 +7,7 @@ param resourceNames ResourceNames
 param location string
 
 @description('Public API storage account and file share configuration.')
-param config PublicApiStorageAccountConfig
+param config StorageAccountConfig
 
 @description('Firewall rules.')
 param storageFirewallRules IpRange[]
@@ -50,7 +50,7 @@ module publicApiStorageAccountModule '../../components/storageAccount.bicep' = {
 }
 
 module dataFilesFileShareModule '../../components/fileShare.bicep' = {
-  name: 'fileShareDeploy'
+  name: 'publicApiFileShareDeploy'
   params: {
     fileShareName: resourceNames.publicApi.publicApiFileShare
     fileShareQuotaGbs: config.fileShare.quotaGbs

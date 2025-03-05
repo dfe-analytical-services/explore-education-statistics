@@ -5,6 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record ReleaseSearchViewModel
 {
+    public Guid ReleaseId { get; init; }
     public Guid ReleaseVersionId { get; init; }
     public DateTimeOffset Published { get; init; } = DateTimeOffset.MinValue;
     public string PublicationTitle { get; init; } = string.Empty;
@@ -20,22 +21,21 @@ public record ReleaseSearchViewModel
     public string HtmlContent { get; init; } = string.Empty;
 
     public ReleaseSearchViewModel(
-        ReleaseCacheViewModel release,
+        ReleaseCacheViewModel releaseVersion,
         PublicationCacheViewModel publication)
     {
-        ReleaseVersionId = release.Id;
-        Published = release.Published ?? throw new ArgumentException("Release must have a published date");
+        ReleaseId = releaseVersion.ReleaseId;
+        ReleaseVersionId = releaseVersion.Id;
+        Published = releaseVersion.Published ?? throw new ArgumentException("Release must have a published date");
         PublicationTitle = publication.Title;
-        Summary = ExtractHtmlBlocks(release.SummarySection.Content).StripHtml();
+        Summary = ExtractHtmlBlocks(releaseVersion.SummarySection.Content).StripHtml();
         Theme = publication.Theme.Title;
-        Type = release.Type.ToString();
-        TypeBoost = release.Type.ToSearchDocumentTypeBoost();
+        Type = releaseVersion.Type.ToString();
+        TypeBoost = releaseVersion.Type.ToSearchDocumentTypeBoost();
         PublicationSlug = publication.Slug;
-        ReleaseSlug = release.Slug;
-        HtmlContent = RenderSearchableHtmlContent(publication, release);
+        ReleaseSlug = releaseVersion.Slug;
+        HtmlContent = RenderSearchableHtmlContent(publication, releaseVersion);
     }
-
-    public ReleaseSearchViewModel() { }
 
     private static string RenderSearchableHtmlContent(
         PublicationCacheViewModel publication,

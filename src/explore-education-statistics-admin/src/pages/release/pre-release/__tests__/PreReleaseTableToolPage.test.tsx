@@ -10,7 +10,7 @@ import _dataBlockService, {
 import _publicationService, {
   Publication,
 } from '@admin/services/publicationService';
-import _releaseService, {
+import _releaseVersionService, {
   ReleaseVersion,
 } from '@admin/services/releaseVersionService';
 import _tableBuilderService, {
@@ -36,8 +36,8 @@ const dataBlockService = _dataBlockService as jest.Mocked<
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
-const releaseVersionService = _releaseService as jest.Mocked<
-  typeof _releaseService
+const releaseVersionService = _releaseVersionService as jest.Mocked<
+  typeof _releaseVersionService
 >;
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService

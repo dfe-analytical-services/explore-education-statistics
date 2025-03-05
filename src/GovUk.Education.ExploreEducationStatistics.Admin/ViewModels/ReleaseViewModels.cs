@@ -11,6 +11,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
     public record ReleaseViewModel
     {
+        public required Guid Id { get; init; }
+
+        public required Guid PublicationId { get; init; }
+
+        public required string Slug { get; init; }
+
+        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
+        public required TimeIdentifier TimePeriodCoverage { get; init; }
+
+        public required int Year { get; init; }
+
+        public string? Label { get; init; }
+
+        public required string Title { get; init; }
+    }
+
+    public record ReleaseVersionViewModel
+    {
         public Guid Id { get; set; }
 
         public Guid ReleaseId { get; set; }
@@ -83,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public bool CanMakeAmendmentOfRelease { get; init; }
     }
 
-    public record ReleaseSummaryViewModel
+    public record ReleaseVersionSummaryViewModel
     {
         public Guid Id { get; init; }
 

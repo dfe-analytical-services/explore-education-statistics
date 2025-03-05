@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using ExternalMethodologyViewModel =
     GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
+using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("api/publication/{publicationId:guid}/releases")]
-        public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
+        public async Task<ActionResult<PaginatedListViewModel<ReleaseVersionSummaryViewModel>>> ListLatestReleaseVersions(
             [Required] Guid publicationId,
             [FromQuery, Range(1, double.PositiveInfinity)] int page = 1,
             [FromQuery, Range(0, double.PositiveInfinity)] int pageSize = 5,

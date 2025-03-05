@@ -2,7 +2,6 @@
 
 .info {
   background-color: govuk-colour('light-grey');
-
   margin-bottom: govuk-spacing(4);
   padding: govuk-spacing(3);
 
@@ -26,5 +25,12 @@
 
   @include govuk-media-query($until: tablet) {
     margin-top: govuk-spacing(2);
+  }
+}
+
+.subscribeContainer {
+  @include govuk-media-query($from: tablet) {
+    align-items: start;
+    display: flex;
   }
 }

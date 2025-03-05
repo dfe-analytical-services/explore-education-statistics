@@ -63,28 +63,4 @@ describe('DataSetFileDetails', () => {
       modal.getByRole('button', { name: 'Close modal' }),
     ).toBeInTheDocument();
   });
-
-  test('renders the subscribe link if `hasApiDataSet` is true', async () => {
-    render(<DataSetFileDetails dataSetFile={testDataSetFile} hasApiDataSet />);
-
-    expect(
-      within(screen.getByTestId('Notifications')).getByRole('link', {
-        name: 'Get email updates about this API data set',
-      }),
-    ).toHaveAttribute(
-      'href',
-      '/api-subscriptions/new-subscription/data-set-file-id',
-    );
-  });
-
-  test('does not render the subscribe link if `hasApiDataSet` is false', async () => {
-    render(
-      <DataSetFileDetails
-        dataSetFile={testDataSetFile}
-        hasApiDataSet={false}
-      />,
-    );
-
-    expect(screen.queryByTestId('Notifications')).not.toBeInTheDocument();
-  });
 });

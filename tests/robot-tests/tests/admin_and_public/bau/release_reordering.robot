@@ -135,7 +135,7 @@ Validate first release has latest release status in publication release order
     user checks table cell contains    3    4    Delete
 
 Navigate to first published release on public frontend
-    user navigates to public frontend    ${PUBLIC_RELEASE_1_URL}
+    user navigates to    ${PUBLIC_RELEASE_1_URL}
 
 Validate first published release on public frontend is the latest data
     user checks page contains    This is the latest data
@@ -234,7 +234,7 @@ Validate reordered publication releases
     user checks table cell contains    3    3    Latest release
 
 Navigate to first published release on public frontend after reordering
-    user navigates to public frontend    ${PUBLIC_RELEASE_1_URL}
+    user navigates to    ${PUBLIC_RELEASE_1_URL}
 
 Validate first published release is the latest data after reordering
     user checks page contains    This is the latest data
@@ -326,7 +326,7 @@ Validate second release has latest release status in publication release order
     user checks table cell does not contain    4    3    Latest release
 
 Navigate to second published release on public frontend
-    user navigates to public frontend    ${PUBLIC_RELEASE_2_URL}
+    user navigates to    ${PUBLIC_RELEASE_2_URL}
 
 Validate second published release is the latest data
     user checks page contains    This is the latest data
@@ -406,7 +406,7 @@ Validate first legacy release is deleted from publication release order
     user checks table cell does not contain    3    3    Latest release
 
 Navigate to second published release on public frontend after deleting legacy release
-    user navigates to public frontend    ${PUBLIC_RELEASE_2_URL}
+    user navigates to    ${PUBLIC_RELEASE_2_URL}
 
 Validate other releases section of second published release does not include first legacy release
     user checks number of other releases is correct    2
@@ -454,13 +454,13 @@ Validate first release has latest release status in publication release order af
     user checks table cell contains    3    4    Delete
 
 Navigate to first published release on public frontend after changing the latest release
-    user navigates to public frontend    ${PUBLIC_RELEASE_1_URL}
+    user navigates to    ${PUBLIC_RELEASE_1_URL}
 
 Validate first published release is the latest data after changing the latest release
     user checks page contains    This is the latest data
 
 Navigate to second published release on public frontend after changing the latest release
-    user navigates to public frontend    ${PUBLIC_RELEASE_2_URL}
+    user navigates to    ${PUBLIC_RELEASE_2_URL}
 
 Validate second published release is not the latest data after changing the latest release
     user checks page contains    This is not the latest data

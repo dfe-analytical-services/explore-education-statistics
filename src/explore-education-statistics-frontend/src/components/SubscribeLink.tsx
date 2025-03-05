@@ -1,21 +1,25 @@
+import SubscribeIcon from '@common/components/SubscribeIcon';
+import Link from '@frontend/components/Link';
+import styles from '@frontend/components/SubscribeLink.module.scss';
 import React from 'react';
-import Link from './Link';
 
-export interface SubscribeLinkProps {
-  slug: string;
+interface Props {
+  text?: string;
+  url: string;
 }
 
-const SubscribeLink = ({ slug }: SubscribeLinkProps) => {
+export default function SubscribeLink({
+  text = 'Get email alerts',
+  url,
+}: Props) {
   return (
     <Link
-      className="govuk-!-display-none-print"
+      className={`${styles.link} govuk-!-display-none-print`}
       unvisited
-      to={`/subscriptions/new-subscription/${slug}`}
-      data-testid={`subsciption-${slug}`}
+      to={url}
     >
-      Sign up for email alerts
+      <SubscribeIcon className={styles.icon} />
+      {text}
     </Link>
   );
-};
-
-export default SubscribeLink;
+}

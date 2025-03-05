@@ -955,16 +955,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Label")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasMaxLength(81)
-                        .HasColumnType("nvarchar(81)");
+                        .HasMaxLength(51)
+                        .HasColumnType("nvarchar(51)");
 
                     b.Property<string>("TimePeriodCoverage")
                         .IsRequired()

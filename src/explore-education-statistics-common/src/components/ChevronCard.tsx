@@ -5,8 +5,10 @@ import React, { cloneElement, ReactElement, ReactNode } from 'react';
 interface Props {
   as?: keyof JSX.IntrinsicElements;
   cardSize?: 'l' | 'm' | 's';
+  className?: string;
   description: string;
   descriptionAfter?: ReactNode;
+  headingSize?: 'l' | 'm' | 's';
   link?: ReactNode;
   noBorder?: boolean;
   noChevron?: boolean;
@@ -15,8 +17,10 @@ interface Props {
 export default function ChevronCard({
   as: Component = 'li',
   cardSize = 'm',
+  className,
   description,
   descriptionAfter,
+  headingSize = 's',
   link,
   noBorder = false,
   noChevron = false,
@@ -30,11 +34,17 @@ export default function ChevronCard({
       })}
     >
       <div
-        className={classNames(styles.card, {
+        className={classNames(styles.card, className, {
           [styles.noBorder]: noBorder,
         })}
       >
-        <h3 className="govuk-heading-s govuk-!-margin-bottom-2">
+        <h3
+          className={classNames('govuk-!-margin-bottom-2', {
+            'govuk-heading-s': headingSize === 's',
+            'govuk-heading-m': headingSize === 'm',
+            'govuk-heading-l': headingSize === 'l',
+          })}
+        >
           {link &&
             cloneElement(link as ReactElement, {
               className: classNames(styles.link, {

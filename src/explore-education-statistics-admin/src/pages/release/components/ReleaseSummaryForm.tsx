@@ -87,7 +87,7 @@ export default function ReleaseSummaryForm({
         .oneOf(permittedReleaseTypes),
       templateReleaseId: Yup.string(),
       releaseLabel: Yup.string().max(
-        50,
+        20,
         /* eslint-disable no-template-curly-in-string */
         'Release label must be no longer than ${max} characters',
       ),

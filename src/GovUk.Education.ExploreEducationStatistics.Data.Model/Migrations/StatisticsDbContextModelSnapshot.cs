@@ -111,6 +111,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ParentFilter")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 

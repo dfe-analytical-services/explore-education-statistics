@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseVersionAuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task ViewReleaseStatusHistoryAuthorizationHandler_ReleaseRoles()
             {
-                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseStatusHistoryRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseStatusHistoryRequirement>(
                     CreateHandler,
                     new ReleaseVersion(),
                     ReleaseRole.Viewer,
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task ViewReleaseStatusHistoryAuthorizationHandler_PublicationRoles()
             {
-                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseStatusHistoryRequirement>(
+                await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseStatusHistoryRequirement>(
                     CreateHandler,
                     new ReleaseVersion
                     {

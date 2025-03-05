@@ -228,7 +228,7 @@ User checks relevant headings exist on API data set details page
     user waits until h2 is visible    Data set preview
     user waits until h2 is visible    Variables in this data set
     user waits until h2 is visible    Using this data
-    user waits until h2 is visible    API data set quick start
+    user waits until h2 is visible    Using the API
     user waits until h2 is visible    API data set version history
     user waits until h2 is visible    API data set changelog
 
