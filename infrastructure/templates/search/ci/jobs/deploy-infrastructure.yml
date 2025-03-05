@@ -37,6 +37,14 @@ jobs:
                 parameterFile: $(paramFile)
                 deploySearchDocsFunction: false
                 deploySearchService: false
+                searchDocsFunctionAppExists: false
+
+            - template: ../../../public-api/ci/tasks/check-function-app-exists.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                functionAppName: $(searchDocsFunctionAppName)
+                variableName: searchDocsFunctionAppExists
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -46,3 +54,4 @@ jobs:
                 parameterFile: $(paramFile)
                 deploySearchDocsFunction: $(deploySearchDocsFunction)
                 deploySearchService: $(deploySearchService)
+                searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)

@@ -32,6 +32,9 @@ param deploySearchDocsFunction bool = false
 @description('Does the Search Service need creating or updating?')
 param deploySearchService bool = false
 
+@description('Specifies whether or not the Search Docs Function App already exists.')
+param searchDocsFunctionAppExists bool = true
+
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
@@ -82,6 +85,7 @@ module searchDocsFunctionModule 'application/searchDocsFunction.bicep' = if (dep
   params: {
     location: location
     resourceNames: resourceNames
+    functionAppExists: searchDocsFunctionAppExists
     functionAppFirewallRules: union(
       [
         {

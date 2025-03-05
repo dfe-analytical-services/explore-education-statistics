@@ -15,6 +15,9 @@ parameters:
     type: string
   - name: deploySearchService
     type: string
+  - name: searchDocsFunctionAppExists
+    type: string
+    default: true
 
 steps:
   - task: AzureCLI@2
@@ -37,4 +40,5 @@ steps:
               resourceTags='$(resourceTags)' \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
               deploySearchDocsFunction=${{ parameters.deploySearchDocsFunction }} \
-              deploySearchService=${{ parameters.deploySearchService }}
+              deploySearchService=${{ parameters.deploySearchService }} \
+              searchDocsFunctionAppExists=${{ parameters.searchDocsFunctionAppExists }}

@@ -19,6 +19,9 @@ param location string
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string = ''
 
+@description('Specifies whether or not the Search Docs Function App already exists.')
+param functionAppExists bool
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -43,10 +46,12 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
     location: location
     applicationInsightsKey: applicationInsightsKey
     appServicePlanName: resourceNames.search.searchDocsFunction
+    functionAppExists: functionAppExists
     keyVaultName: resourceNames.existingResources.keyVault
     sku: {
-      name: 'FC1'
-      tier: 'FlexConsumption'
+      name: 'EP1'
+      tier: 'ElasticPremium'
+      family: 'EP'
     }
     operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'
@@ -65,7 +70,10 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
       cpuPercentage: true
       memoryPercentage: true
       storageAccountAvailability: true
-      storageLatency: true
+      storageLatency: false
+      fileServiceAvailability: true
+      fileServiceLatency: false
+      fileServiceCapacity: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
     tagValues: tagValues

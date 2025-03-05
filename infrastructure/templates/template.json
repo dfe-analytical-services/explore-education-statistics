@@ -3694,9 +3694,9 @@
               ],
               "delegations": [
                 {
-                  "name": "environment",
+                  "name": "webapp",
                   "properties": {
-                    "serviceName": "Microsoft.App/environments"
+                    "serviceName": "Microsoft.Web/serverFarms"
                   }
                 }
               ]

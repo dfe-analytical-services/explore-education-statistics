@@ -34,9 +34,6 @@ param storageAccountPublicNetworkAccessEnabled bool = false
 @description('Specifies firewall rules for the storage account in use by the Function App.')
 param storageFirewallRules IpRange[] = []
 
-@description('Name of the deployment container in the storage account.')
-param storageDeploymentContainerName string = 'app-package'
-
 @description('The Application Insights key that is associated with this resource.')
 param applicationInsightsKey string
 
@@ -74,6 +71,9 @@ param sku object
 @description('Specifies the Key Vault name that this Function App will be permitted to get and list secrets from.')
 param keyVaultName string
 
+@description('Specifies whether or not the Function App already exists.')
+param functionAppExists bool
+
 @description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan.')
 param alwaysOn bool = false
 
@@ -83,6 +83,9 @@ param alerts {
   memoryPercentage: bool
   storageAccountAvailability: bool
   storageLatency: bool
+  fileServiceAvailability: bool
+  fileServiceLatency: bool
+  fileServiceCapacity: bool
   alertsGroupName: string
 }?
 
@@ -118,13 +121,20 @@ var storageAlerts = alerts != null
     }
   : null
 
-var functionAppLocation = 'North Europe'
+var fileServiceAlerts = alerts != null
+? {
+    availability: alerts!.fileServiceAvailability
+    latency: alerts!.fileServiceLatency
+    capacity: alerts!.fileServiceCapacity
+    alertsGroupName: alerts!.alertsGroupName
+  }
+: null
 
 module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
   name: '${appServicePlanName}ModuleDeploy'
   params: {
     planName: appServicePlanName
-    location: functionAppLocation
+    location: location
     kind: 'functionapp'
     sku: sku
     operatingSystem: operatingSystem
@@ -149,6 +159,7 @@ module storageAccountModule '../../public-api/components/storageAccount.bicep' =
     keyVaultName: keyVaultName
     privateEndpointSubnetIds: {
       blob: privateEndpoints.storageAccounts
+      file: privateEndpoints.storageAccounts
       queue: privateEndpoints.storageAccounts
     }
     publicNetworkAccessEnabled: storageAccountPublicNetworkAccessEnabled
@@ -157,37 +168,84 @@ module storageAccountModule '../../public-api/components/storageAccount.bicep' =
   }
 }
 
-module deploymentBlobServiceModule '../../common/components/blobService.bicep' = {
+module blobServiceModule '../../common/components/blobService.bicep' = {
   name: '${storageAccountName}BlobServiceModuleDeploy'
   params: {
     storageAccountName: storageAccountName
-    containerNames: [storageDeploymentContainerName]
+    containerNames: []
+  }
+}
+
+module fileShareModule '../../public-api/components/fileShare.bicep' = {
+  name: '${storageAccountName}FileShareModuleDeploy'
+  params: {
+    storageAccountName: storageAccountModule.outputs.storageAccountName
+    fileShareName: '${functionAppName}-share'
+    alerts: fileServiceAlerts
+    tagValues: tagValues
   }
 }
 
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
-  location: functionAppLocation
-  kind: 'functionapp'
+  location: location
+  kind: (operatingSystem == 'Linux' ? 'functionapp,linux' : 'functionapp')
   identity: identity
   properties: {
+    containerSize: instanceMemoryMB
+    reserved: operatingSystem == 'Linux'
     serverFarmId: appServicePlanModule.outputs.planId
+    vnetContentShareEnabled: true
     virtualNetworkSubnetId: subnetId
     siteConfig: {
       alwaysOn: alwaysOn
       appSettings: [
         {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: applicationInsightsKey
+        }
+        {
           name: 'AzureWebJobsStorage__accountName'
           value: storageAccountModule.outputs.storageAccountName
         }
         {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: applicationInsightsKey
+          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${storageAccountModule.outputs.connectionStringSecretName})'
+        }
+        {
+          name: 'WEBSITE_CONTENTSHARE'
+          value: fileShareModule.outputs.fileShareName
+        }
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~4'
+        }
+        {
+          name: 'FUNCTIONS_WORKER_RUNTIME'
+          value: functionAppRuntime
+        }
+        {
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1'
+        }
+        // Prevent the function app from building when performing deployment of an already-built site
+        {
+          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+          value: 'false'
+        }
+        // It's only possible to UPDATE a Function App using a Key Vault reference for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING setting,
+        // not creating a new Function App, unless we use the below setting to skip validation for the first time we create
+        // this Function App.  See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
+        {
+          name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
+          value: !functionAppExists ? '1' : null
         }
       ]
       ftpsState: 'FtpsOnly'
+      functionAppScaleLimit: maximumInstanceCount
       minTlsVersion: '1.3'
-      netFrameworkVersion: '8.0'
+      netFrameworkVersion: functionAppRuntimeVersion
+      linuxFxVersion: operatingSystem == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
       publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
       ipSecurityRestrictions: publicNetworkAccessEnabled && length(firewallRules) > 0 ? firewallRules : null
       ipSecurityRestrictionsDefaultAction: 'Deny'
@@ -202,34 +260,24 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       ]
       scmIpSecurityRestrictionsUseMain: false
     }
-    functionAppConfig: {
-      deployment: {
-        storage: {
-          authentication: {
-            type: 'SystemAssignedIdentity'
-          }
-          type: 'blobContainer'
-          value: '${storageAccountModule.outputs.primaryEndpoints.blob}${storageDeploymentContainerName}'
-        }
-      }
-      scaleAndConcurrency: {
-        instanceMemoryMB: instanceMemoryMB
-        maximumInstanceCount: maximumInstanceCount
-      }
-      runtime: { 
-        name: functionAppRuntime
-        version: functionAppRuntimeVersion
-      }
-    }
     httpsOnly: true
   }
   tags: tagValues
 }
 
+module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAssignment.bicep' = {
+  name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
+  params: {
+    principalIds: userAssignedManagedIdentityParams != null ? [userAssignedManagedIdentityParams!.principalId] : [functionApp.identity.principalId]
+    keyVaultName: keyVaultName
+    role: 'Secrets User'
+  }
+}
+
 module storageAccountRoleAssignmentModule 'storageAccountRoleAssignment.bicep' = {
   name: '${storageAccountName}RoleAssignmentModuleDeploy'
   params: {
-    principalIds: [functionApp.identity.principalId]
+    principalIds: userAssignedManagedIdentityParams != null ? [userAssignedManagedIdentityParams!.principalId] : [functionApp.identity.principalId]
     storageAccountName: storageAccountModule.outputs.storageAccountName
     role: 'Storage Blob Data Owner'
   }
