@@ -1,11 +1,9 @@
-using System.Diagnostics;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Utils;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Newtonsoft.Json;
+using IAnalyticsPathResolver = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.IAnalyticsPathResolver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -13,8 +11,6 @@ public class AnalyticsService(
     IAnalyticsPathResolver analyticsPathResolver,
     ILogger<AnalyticsService> logger) : IAnalyticsService
 {
-    private static readonly Stopwatch Stopwatch = new();
-    
     public async Task ReportDataSetVersionQuery(
         Guid dataSetId,
         Guid dataSetVersionId,

@@ -1,5 +1,5 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Snapshooter.Xunit;

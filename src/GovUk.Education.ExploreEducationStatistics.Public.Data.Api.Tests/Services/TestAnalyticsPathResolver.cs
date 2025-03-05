@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Analytics.Service.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 
@@ -13,13 +13,5 @@ public class TestAnalyticsPathResolver : IAnalyticsPathResolver
     public string PublicApiQueriesDirectoryPath()
     {
         return Path.Combine(_basePath, "PublicApiQueries");
-    }
-
-    public string PublicApiQueriesProcessingDirectoryPath() {
-        return Path.Combine(_basePath, "PublicApiQueries", "Processing");
-    }
-
-    public string PublicApiQueriesReportsDirectoryPath() {
-        return Path.Combine(_basePath, "PublicApiQueries", "Reports");
     }
 }

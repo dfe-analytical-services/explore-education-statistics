@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Analytics.Service.Options;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 
 public class AnalyticsOptions
 {
