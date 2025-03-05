@@ -7,7 +7,11 @@ public class AzureBlobStorageClient(BlobServiceClient blobServiceClient) : IAzur
 {
     internal BlobServiceClient BlobServiceClient { get; } = blobServiceClient;
 
-    public async Task UploadBlob(string containerName, string blobName, Blob blob, CancellationToken cancellationToken = default)
+    public async Task UploadBlob(
+        string containerName,
+        string blobName,
+        Blob blob,
+        CancellationToken cancellationToken = default)
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
         var blobClient = blobContainerClient.GetBlobClient(blobName);

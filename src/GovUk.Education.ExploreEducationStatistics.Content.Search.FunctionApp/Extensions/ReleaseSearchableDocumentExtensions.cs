@@ -1,5 +1,6 @@
-﻿using System.Text;
+using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
@@ -18,21 +19,22 @@ public static class SearchableDocumentAzureBlobMetadataKeys
     public const string ReleaseType = "RELEASE-TYPE";
     public const string TypeBoost = "TYPE-BOOST";
 }
-public static class ReleaseSearchViewModelExtensions
+
+public static class ReleaseSearchableDocumentExtensions
 {
-    public static IDictionary<string, string> BuildMetadata(this ReleaseSearchViewModelDto searchViewModel)
+    public static IDictionary<string, string> BuildMetadata(this ReleaseSearchableDocument releaseSearchableDocument)
     {
         var metadata = new Dictionary<string, string>()
         {
-            { SearchableDocumentAzureBlobMetadataKeys.ReleaseVersionId, searchViewModel.ReleaseVersionId.ToString() },
-            { SearchableDocumentAzureBlobMetadataKeys.PublicationSlug, searchViewModel.PublicationSlug },
-            { SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug, searchViewModel.ReleaseSlug },
-            { SearchableDocumentAzureBlobMetadataKeys.Published, searchViewModel.Published.ToUniversalTime().ToString("yyyy-MM-ddThh:mm:ssZ") ?? string.Empty },
-            { SearchableDocumentAzureBlobMetadataKeys.Summary, ToMetadataSafeString(searchViewModel.Summary) },
-            { SearchableDocumentAzureBlobMetadataKeys.Title, ToMetadataSafeString(searchViewModel.PublicationTitle) },
-            { SearchableDocumentAzureBlobMetadataKeys.Theme, searchViewModel.Theme },
-            { SearchableDocumentAzureBlobMetadataKeys.ReleaseType, searchViewModel.Type },
-            { SearchableDocumentAzureBlobMetadataKeys.TypeBoost, searchViewModel.TypeBoost.ToString() },
+            { SearchableDocumentAzureBlobMetadataKeys.ReleaseVersionId, releaseSearchableDocument.ReleaseVersionId.ToString() },
+            { SearchableDocumentAzureBlobMetadataKeys.PublicationSlug, releaseSearchableDocument.PublicationSlug },
+            { SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug, releaseSearchableDocument.ReleaseSlug },
+            { SearchableDocumentAzureBlobMetadataKeys.Published, releaseSearchableDocument.Published.ToUniversalTime().ToString("yyyy-MM-ddThh:mm:ssZ") ?? string.Empty },
+            { SearchableDocumentAzureBlobMetadataKeys.Summary, ToMetadataSafeString(releaseSearchableDocument.Summary) },
+            { SearchableDocumentAzureBlobMetadataKeys.Title, ToMetadataSafeString(releaseSearchableDocument.PublicationTitle) },
+            { SearchableDocumentAzureBlobMetadataKeys.Theme, releaseSearchableDocument.Theme },
+            { SearchableDocumentAzureBlobMetadataKeys.ReleaseType, releaseSearchableDocument.ReleaseType },
+            { SearchableDocumentAzureBlobMetadataKeys.TypeBoost, releaseSearchableDocument.TypeBoost.ToString() },
         };
         return metadata;
     }
@@ -66,6 +68,7 @@ public static class ReleaseSearchViewModelExtensions
                 sb.Append("\\u" + ((int)c).ToString("x4"));
             }
         }  
+
         return sb.ToString();  
     }
 }

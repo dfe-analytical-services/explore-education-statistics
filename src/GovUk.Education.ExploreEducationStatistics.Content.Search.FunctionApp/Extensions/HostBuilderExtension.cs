@@ -17,46 +17,52 @@ public static class HostBuilderExtension
 {
     public static IHost BuildHost(this IHostBuilder hostBuilder) => hostBuilder
         .ConfigureFunctionsWebApplication()
-        .ConfigureAppConfiguration((context, configurationBuilder) =>
-            configurationBuilder
-                .AddJsonFile(path: $"appsettings.json", optional: true, reloadOnChange: false)
-                .AddJsonFile(path: $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
-                    optional: true,
-                    reloadOnChange: false)
-                .AddEnvironmentVariables())
-        .ConfigureServices((context, services) =>
-            services
-                .AddApplicationInsightsTelemetryWorkerService()
-                .ConfigureFunctionsApplicationInsights()
-
-                .Configure<AppOptions>(context.Configuration.GetSection(AppOptions.Section))
-                .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))
-
-                .AddTransient<IContentApiClient, ContentApiClient>()
-                .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
-                .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
-                .AddAzureClientsInline(clientBuilder =>
-                {
-                    clientBuilder.AddClient<BlobServiceClient, BlobClientOptions>((_, _, serviceProvider) =>
-                    {
-                        var appOptions = serviceProvider.GetRequiredService<IOptions<AppOptions>>().Value;
-                        return new BlobServiceClient(appOptions.SearchStorageConnectionString);
-                    });
-                    clientBuilder.UseCredential(new DefaultAzureCredential());
-                })
-                .AddHttpClient<IContentApiClient, ContentApiClient>((provider, httpClient) =>
-                {
-                    var options = provider.GetRequiredService<IOptions<ContentApiOptions>>().Value;
-                    httpClient.BaseAddress = new Uri(options.Url);
-                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Content Search Function App");
-                })
-
+        .ConfigureAppConfiguration(
+            (context, configurationBuilder) =>
+                configurationBuilder
+                    .AddJsonFile($"appsettings.json", true, false)
+                    .AddJsonFile(
+                        $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
+                        true,
+                        false)
+                    .AddEnvironmentVariables())
+        .ConfigureServices(
+            (context, services) =>
+                services
+                    .AddApplicationInsightsTelemetryWorkerService()
+                    .ConfigureFunctionsApplicationInsights()
+                    .Configure<AppOptions>(context.Configuration.GetSection(AppOptions.Section))
+                    .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))
+                    .AddTransient<IContentApiClient, ContentApiClient>()
+                    .AddTransient<IAzureBlobStorageClient, AzureBlobStorageClient>()
+                    .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
+                    .AddAzureClientsInline(
+                        clientBuilder =>
+                        {
+                            clientBuilder.AddClient<BlobServiceClient, BlobClientOptions>(
+                                (_, _, serviceProvider) =>
+                                {
+                                    var appOptions = serviceProvider.GetRequiredService<IOptions<AppOptions>>().Value;
+                                    return new BlobServiceClient(appOptions.SearchStorageConnectionString);
+                                });
+                            clientBuilder.UseCredential(new DefaultAzureCredential());
+                        })
+                    .AddHttpClient<IContentApiClient, ContentApiClient>(
+                        (provider, httpClient) =>
+                        {
+                            var options = provider.GetRequiredService<IOptions<ContentApiOptions>>().Value;
+                            httpClient.BaseAddress = new Uri(options.Url);
+                            httpClient.DefaultRequestHeaders.Add(
+                                HeaderNames.UserAgent,
+                                "EES Content Search Function App");
+                        })
         )
         .Build()
-        .Execute(host =>
-        {
-            // Validate the configuration on startup to fail fast.
-            host.Services.GetRequiredService<IOptions<AppOptions>>().Value.Validate();
-            host.Services.GetRequiredService<IOptions<ContentApiOptions>>().Value.Validate();
-        });
+        .Execute(
+            host =>
+            {
+                // Validate the configuration on startup to fail fast.
+                host.Services.GetRequiredService<IOptions<AppOptions>>().Value.Validate();
+                host.Services.GetRequiredService<IOptions<ContentApiOptions>>().Value.Validate();
+            });
 }

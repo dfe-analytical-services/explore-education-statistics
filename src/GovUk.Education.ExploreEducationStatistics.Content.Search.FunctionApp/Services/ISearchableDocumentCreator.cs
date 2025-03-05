@@ -2,5 +2,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public interface ISearchableDocumentCreator
 {
-    Task<CreatePublicationLatestReleaseSearchableDocumentResponse> CreatePublicationLatestReleaseSearchableDocument(CreatePublicationLatestReleaseSearchableDocumentRequest request, CancellationToken cancellationToken = default);
+    Task<CreatePublicationLatestReleaseSearchableDocumentResponse> CreatePublicationLatestReleaseSearchableDocument(
+        CreatePublicationLatestReleaseSearchableDocumentRequest request,
+        CancellationToken cancellationToken = default);
 }

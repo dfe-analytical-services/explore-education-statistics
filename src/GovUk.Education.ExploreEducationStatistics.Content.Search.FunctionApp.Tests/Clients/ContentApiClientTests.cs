@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients;
@@ -53,18 +53,18 @@ public class ContentApiClientTests
                 var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
                 
                 // ACT
-                var actual = await sut.GetPublicationLatestReleaseSearchViewModelAsync(publicationSlug);
+                var actual = await sut.GetPublicationLatestReleaseSearchableDocumentAsync(publicationSlug);
                 
                 // ASSERT
                 Assert.NotNull(actual);
-                var expected = new ReleaseSearchViewModelDto
+                var expected = new ReleaseSearchableDocument
                 {
                     ReleaseVersionId = new Guid("46c5d916-ee40-49bd-cfdc-08dc1c5c621e"),
                     Published = DateTimeOffset.Parse("2018-07-18T23:00:00Z"), 
                     PublicationTitle = "Seed publication - Permanent and fixed-period exclusions in England",
                     Summary = "Read national statistical summaries, view charts and tables and download data files.",
                     Theme = "Seed theme - Pupils and schools",
-                    Type = "OfficialStatistics",
+                    ReleaseType = "OfficialStatistics",
                     TypeBoost = 5,
                     PublicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england",
                     ReleaseSlug = "2016-17",
@@ -87,7 +87,7 @@ public class ContentApiClientTests
                     var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
                     
                     // ACT
-                    var exception = await Record.ExceptionAsync(() => sut.GetPublicationLatestReleaseSearchViewModelAsync(publicationSlug));
+                    var exception = await Record.ExceptionAsync(() => sut.GetPublicationLatestReleaseSearchableDocumentAsync(publicationSlug));
                     
                     // ASSERT
                     Assert.NotNull(exception);

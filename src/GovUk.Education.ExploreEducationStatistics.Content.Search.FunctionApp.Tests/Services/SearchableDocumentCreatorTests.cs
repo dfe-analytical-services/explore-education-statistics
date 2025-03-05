@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
@@ -78,15 +78,15 @@ public class SearchableDocumentCreatorTests
         public async Task Should_upload_searchable_document_blob()
         {
             // ARRANGE
-            var releaseSearchViewModel = new ReleaseSearchViewModelBuilder().Build();
-            _contentApiClientBuilder.WhereReleaseSearchViewModelIs(releaseSearchViewModel);
+            var releaseSearchableDocument = new ReleaseSearchableDocumentBuilder().Build();
+            _contentApiClientBuilder.WhereReleaseSearchViewModelIs(releaseSearchableDocument);
             var sut = GetSut();
             
             // ACT
             await sut.CreatePublicationLatestReleaseSearchableDocument(new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" });
             
             // ASSERT
-            var expected = new Blob(releaseSearchViewModel.HtmlContent, releaseSearchViewModel.BuildMetadata());
+            var expected = new Blob(releaseSearchableDocument.HtmlContent, releaseSearchableDocument.BuildMetadata());
             _azureBlobStorageClientBuilder.Assert.BlobWasUploaded(whereBlob: blob => blob == expected);
         }
         
@@ -94,17 +94,16 @@ public class SearchableDocumentCreatorTests
         public async Task Should_return_information_in_response()
         {
             // ARRANGE
-            var releaseSearchViewModel = new ReleaseSearchViewModelBuilder().Build();
-            _contentApiClientBuilder.WhereReleaseSearchViewModelIs(releaseSearchViewModel);
+            var releaseSearchableDocument = new ReleaseSearchableDocumentBuilder().Build();
+            _contentApiClientBuilder.WhereReleaseSearchViewModelIs(releaseSearchableDocument);
             var sut = GetSut();
             
             // ACT
             var response = await sut.CreatePublicationLatestReleaseSearchableDocument(new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" });
 
             // ASSERT
-            Assert.Equal(releaseSearchViewModel.ReleaseVersionId, response.ReleaseVersionId);
-            Assert.Equal(releaseSearchViewModel.ReleaseId.ToString(), response.BlobName);
-            Assert.Equal("publication-slug", response.PublicationSlug);
+            Assert.Equal(releaseSearchableDocument.ReleaseVersionId, response.ReleaseVersionId);
+            Assert.Equal(releaseSearchableDocument.ReleaseId.ToString(), response.BlobName);
         }
     }
     

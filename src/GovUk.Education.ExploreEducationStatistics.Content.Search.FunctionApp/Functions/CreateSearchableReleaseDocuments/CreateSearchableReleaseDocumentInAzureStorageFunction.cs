@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CreateSearchableReleaseDocuments.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -12,7 +12,8 @@ public class CreateSearchableReleaseDocumentInAzureStorageFunction(
     [Function("CreateSearchableReleaseDocument")]
     [QueueOutput("%SearchableDocumentCreatedQueueName%")]
     public async Task<SearchDocumentCreatedMessage> CreateSearchableReleaseDocumentInAzureStorage(
-        [QueueTrigger("%ReleaseVersionPublishedQueueName%")] ReleasePublishedMessage message,
+        [QueueTrigger("%ReleaseVersionPublishedQueueName%")]
+        ReleasePublishedMessage message,
         FunctionContext context,
         CancellationToken cancellationToken)
     {

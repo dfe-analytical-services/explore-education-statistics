@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
@@ -12,30 +12,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 /// The contents of a Release along with its metadata are retrieved from the ContentAPI and uploaded
 /// to Azure Blob storage 
 /// </summary>
-public class SearchableDocumentCreator(
-    IContentApiClient contentApiClient, 
-    IAzureBlobStorageClient azureBlobStorageClient, 
+internal class SearchableDocumentCreator(
+    IContentApiClient contentApiClient,
+    IAzureBlobStorageClient azureBlobStorageClient,
     IOptions<AppOptions> appOptions) : ISearchableDocumentCreator
 {
-    public async Task<CreatePublicationLatestReleaseSearchableDocumentResponse> CreatePublicationLatestReleaseSearchableDocument(
-        CreatePublicationLatestReleaseSearchableDocumentRequest request, 
-        CancellationToken cancellationToken = default)
+    public async Task<CreatePublicationLatestReleaseSearchableDocumentResponse>
+        CreatePublicationLatestReleaseSearchableDocument(
+            CreatePublicationLatestReleaseSearchableDocumentRequest request,
+            CancellationToken cancellationToken = default)
     {
-        var searchViewModel = await contentApiClient.GetPublicationLatestReleaseSearchViewModelAsync(request.PublicationSlug, cancellationToken);
+        var releaseSearchableDocument =
+            await contentApiClient.GetPublicationLatestReleaseSearchableDocumentAsync(
+                request.PublicationSlug,
+                cancellationToken);
 
-        var blobName = searchViewModel.ReleaseId.ToString();
+        var blobName = releaseSearchableDocument.ReleaseId.ToString();
         await azureBlobStorageClient.UploadBlob(
-            appOptions.Value.SearchableDocumentsContainerName, 
-            blobName, 
-            new Blob(searchViewModel.HtmlContent, searchViewModel.BuildMetadata()), 
+            appOptions.Value.SearchableDocumentsContainerName,
+            blobName,
+            new Blob(releaseSearchableDocument.HtmlContent, releaseSearchableDocument.BuildMetadata()),
             cancellationToken);
 
         return new CreatePublicationLatestReleaseSearchableDocumentResponse
         {
             PublicationSlug = request.PublicationSlug,
-            ReleaseVersionId = searchViewModel.ReleaseVersionId,
+            ReleaseVersionId = releaseSearchableDocument.ReleaseVersionId,
             BlobName = blobName
         };
     }
 }
-

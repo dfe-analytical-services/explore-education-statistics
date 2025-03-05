@@ -5,7 +5,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddAzureClientsInline(this IServiceCollection serviceCollection, Action<AzureClientFactoryBuilder> builder)
+    public static IServiceCollection AddAzureClientsInline(
+        this IServiceCollection serviceCollection,
+        Action<AzureClientFactoryBuilder> builder)
     {
         serviceCollection.AddAzureClients(builder);
         return serviceCollection;
