@@ -1,5 +1,6 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
@@ -7,16 +8,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 internal class ContentApiClientBuilder
 {
     private readonly Mock<IContentApiClient> _mock = new Mock<IContentApiClient>(MockBehavior.Strict);
-    private readonly ReleaseSearchViewModelBuilder _releaseSearchViewModelBuilder = new();
-    private ReleaseSearchViewModelDto? _releaseSearchViewModel;
+    private readonly ReleaseSearchableDocumentBuilder _releaseSearchableDocumentBuilder = new();
+    private ReleaseSearchableDocument? _releaseSearchableDocument;
 
     public ContentApiClientBuilder()
     {
         Assert = new Asserter(_mock);
         
         _mock
-            .Setup(m => m.GetPublicationLatestReleaseSearchViewModelAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_releaseSearchViewModel ?? _releaseSearchViewModelBuilder.Build());
+            .Setup(m => m.GetPublicationLatestReleaseSearchableDocumentAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_releaseSearchableDocument ?? _releaseSearchableDocumentBuilder.Build());
     }
 
     public IContentApiClient Build()
@@ -24,15 +25,15 @@ internal class ContentApiClientBuilder
         return _mock.Object;
     }
 
-    public ContentApiClientBuilder WhereReleaseSearchViewModelIs(ReleaseSearchViewModelDto releaseSearchViewModel)
+    public ContentApiClientBuilder WhereReleaseSearchViewModelIs(ReleaseSearchableDocument releaseSearchableDocument)
     {
-        _releaseSearchViewModel = releaseSearchViewModel;
+        _releaseSearchableDocument = releaseSearchableDocument;
         return this;
     }
     
-    public ContentApiClientBuilder WhereReleaseSearchViewModelIs(Func<ReleaseSearchViewModelBuilder, ReleaseSearchViewModelBuilder> modifyReleaseSearchViewModel)
+    public ContentApiClientBuilder WhereReleaseSearchViewModelIs(Func<ReleaseSearchableDocumentBuilder, ReleaseSearchableDocumentBuilder> modifyReleaseSearchViewModel)
     {
-        modifyReleaseSearchViewModel(_releaseSearchViewModelBuilder);
+        modifyReleaseSearchViewModel(_releaseSearchableDocumentBuilder);
         return this;
     }
 
@@ -41,7 +42,7 @@ internal class ContentApiClientBuilder
     {
         public void ContentWasLoadedFor(string publicationSlug)
         {
-            mock.Verify(m => m.GetPublicationLatestReleaseSearchViewModelAsync(publicationSlug, It.IsAny<CancellationToken>()), Times.Once);
+            mock.Verify(m => m.GetPublicationLatestReleaseSearchableDocumentAsync(publicationSlug, It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

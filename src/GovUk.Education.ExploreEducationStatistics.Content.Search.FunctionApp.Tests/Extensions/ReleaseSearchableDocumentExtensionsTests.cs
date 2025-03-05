@@ -1,23 +1,24 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
 
-public class ReleaseSearchViewModelExtensionsTests
+public class ReleaseSearchableDocumentExtensionsTests
 {
     [Fact]
     public void BuildMetadataShouldReturnExpectedMetadataKeysAndValues()
     {
-        var releaseSearchViewModel = new ReleaseSearchViewModelDto
+        var releaseSearchableDocument = new ReleaseSearchableDocument
         {
             ReleaseVersionId = new Guid("12345678-1234-1234-1234-123456789abc"),
             Published = new DateTimeOffset(2025, 02, 21, 09, 24, 01, TimeSpan.FromHours(1)),
             PublicationTitle = "Publication Title",
             Summary = "This is a summary.",
             Theme = "Theme",
-            Type = "Official Statistics",
+            ReleaseType = "Official Statistics",
             TypeBoost = 10,
             PublicationSlug = "publication-slug",
             ReleaseSlug = "release-slug",
@@ -25,7 +26,7 @@ public class ReleaseSearchViewModelExtensionsTests
         };
         
         // ACT
-        var actual = releaseSearchViewModel.BuildMetadata();
+        var actual = releaseSearchableDocument.BuildMetadata();
         
         // ASSERT
         AssertAll(
@@ -51,7 +52,7 @@ public class ReleaseSearchViewModelExtensionsTests
     [Fact]
     public void GivenSummaryWithUnicodeCharacters_WhenBuildingMetadata_ThenSummaryContainsOnlyAsciiCharacters()
     {
-        var releaseSearchViewModel = new ReleaseSearchViewModelBuilder()
+        var releaseSearchViewModel = new ReleaseSearchableDocumentBuilder()
             .WithSummary("Right single quotation mark = ’")
             .Build();
         
@@ -66,7 +67,7 @@ public class ReleaseSearchViewModelExtensionsTests
     [Fact]
     public void GivenSummaryWithExtraSpaces_WhenBuildingMetadata_ThenSummaryIsTrimmed()
     {
-        var releaseSearchViewModel = new ReleaseSearchViewModelBuilder()
+        var releaseSearchViewModel = new ReleaseSearchableDocumentBuilder()
             .WithSummary("  extra spaces either side ")
             .Build();
         
@@ -81,7 +82,7 @@ public class ReleaseSearchViewModelExtensionsTests
     [Fact]
     public void GivenTitleWithUnicodeCharacters_WhenBuildingMetadata_ThenTitleContainsOnlyAsciiCharacters()
     {
-        var releaseSearchViewModel = new ReleaseSearchViewModelBuilder()
+        var releaseSearchViewModel = new ReleaseSearchableDocumentBuilder()
             .WithTitle("Right single quotation mark = ’")
             .Build();
         
@@ -96,7 +97,7 @@ public class ReleaseSearchViewModelExtensionsTests
     [Fact]
     public void GivenTitleWithExtraSpaces_WhenBuildingMetadata_ThenTitleIsTrimmed()
     {
-        var releaseSearchViewModel = new ReleaseSearchViewModelBuilder()
+        var releaseSearchViewModel = new ReleaseSearchableDocumentBuilder()
             .WithTitle("  extra spaces either side ")
             .Build();
         
