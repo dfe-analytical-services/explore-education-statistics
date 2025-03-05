@@ -42,6 +42,8 @@ type ResourceNames = {
     }
   }
   sharedResources: {
+    analyticsStorageAccount: string
+    analyticsFileShare: string
     appGateway: string
     appGatewayIdentity: string
     containerAppEnvironment: string
@@ -416,7 +418,7 @@ type PostgreSqlFlexibleServerConfig = {
 }
 
 @export()
-type PublicApiStorageAccountConfig = {
+type StorageAccountConfig = {
   sku: 'Standard_LRS' | 'Premium_LRS' | 'Premium_ZRS'
   kind: 'StorageV2' | 'FileStorage'
   fileShare: {

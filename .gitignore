@@ -15,6 +15,7 @@ obj
 /data/public-api-db/*
 !/data/public-api-db/00-init.sh
 /data/public-api-data
+/data/analytics
 dfe-meta.db
 
 ## CSharp

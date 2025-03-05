@@ -6,7 +6,7 @@ import {
   StaticWebAppSku
   ContainerAppWorkloadProfile
   PostgreSqlFlexibleServerConfig
-  PublicApiStorageAccountConfig
+  StorageAccountConfig
 } from 'types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
@@ -15,8 +15,18 @@ param subscription string = ''
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
 
+@description('Analytics Storage configuration.')
+param analyticsStorageConfig StorageAccountConfig = {
+  kind: 'FileStorage'
+  sku: 'Premium_ZRS'
+  fileShare: {
+    quotaGbs: 100
+    accessTier: 'Premium'
+  }
+}
+
 @description('Public API Storage configuration.')
-param publicApiStorageConfig PublicApiStorageAccountConfig = {
+param publicApiStorageConfig StorageAccountConfig = {
   kind: 'FileStorage'
   sku: 'Premium_ZRS'
   fileShare: {
@@ -201,6 +211,8 @@ var resourceNames = {
     }
   }
   sharedResources: {
+    analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt'
+    analyticsStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
     appGateway: '${commonResourcePrefix}-${abbreviations.networkApplicationGateways}-01'
     appGatewayIdentity: '${commonResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.networkApplicationGateways}-01'
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
@@ -250,6 +262,18 @@ module privateDnsZonesModule 'application/shared/privateDnsZones.bicep' = if (de
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
+    tagValues: tagValues
+  }
+}
+
+module analyticsStorageModule 'application/shared/analyticsStorage.bicep' = {
+  name: 'analyticsStorageAccountApplicationModuleDeploy'
+  params: {
+    location: location
+    resourceNames: resourceNames
+    config: analyticsStorageConfig
+    storageFirewallRules: maintenanceIpRanges
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }
@@ -339,6 +363,7 @@ module containerAppEnvironmentModule 'application/shared/containerAppEnvironment
   }
   dependsOn: [
     publicApiStorageModule
+    analyticsStorageModule
   ]
 }
 
