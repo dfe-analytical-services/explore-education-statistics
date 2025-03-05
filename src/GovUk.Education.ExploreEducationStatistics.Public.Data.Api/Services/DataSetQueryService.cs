@@ -463,29 +463,28 @@ internal class DataSetQueryService(
         await Task.WhenAll(filterOptionsById, locationOptionsById, timePeriodsById);
 
         return rows.Select(row => new DataSetQueryResultViewModel
-            {
-                GeographicLevel =
-                    EnumUtil.GetFromEnumLabel<GeographicLevel>((string)row[DataTable.Cols.GeographicLevel]!),
-                TimePeriod = timePeriodsById.Result[(int)row[DataTable.Cols.TimePeriodId]!],
-                Filters = columnMappings.Filters
-                    .Where(kv => row[kv.Value] is int and not 0)
-                    .ToDictionary(
-                        kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
-                        kv => filterOptionsById.Result[(int)row[kv.Value]!]
-                    ),
-                Locations = columnMappings.LocationLevels
-                    .Where(kv => row[kv.Value] is int and not 0)
-                    .ToDictionary(
-                        kv => kv.Key,
-                        kv => locationOptionsById.Result[(int)row[kv.Value]!]
-                    ),
-                Values = columnMappings.Indicators
-                    .ToDictionary(
-                        kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
-                        kv => row[kv.Value] as string ?? string.Empty
-                    )
-            })
-            .ToList();
+        {
+            GeographicLevel = EnumUtil.GetFromEnumLabel<GeographicLevel>((string)row[DataTable.Cols.GeographicLevel]!),
+            TimePeriod = timePeriodsById.Result[(int)row[DataTable.Cols.TimePeriodId]!],
+            Filters = columnMappings.Filters
+                .Where(kv => row[kv.Value] is int and not 0)
+                .ToDictionary(
+                    kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
+                    kv => filterOptionsById.Result[(int)row[kv.Value]!]
+                ),
+            Locations = columnMappings.LocationLevels
+                .Where(kv => row[kv.Value] is int and not 0)
+                .ToDictionary(
+                    kv => kv.Key,
+                    kv => locationOptionsById.Result[(int)row[kv.Value]!]
+                ),
+            Values = columnMappings.Indicators
+                .ToDictionary(
+                    kv => debug ? $"{kv.Key} :: {kv.Value}" : kv.Key,
+                    kv => row[kv.Value] as string ?? string.Empty
+                )
+        })
+        .ToList();
     }
 
     private static WarningViewModel MapGetQueryWarning(WarningViewModel warning)
